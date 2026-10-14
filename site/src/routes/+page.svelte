@@ -131,7 +131,20 @@
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 		<section class="charts" id="charts" tabindex="0" aria-label="Linked charts. Hover or use the left and right arrow keys to read values at a point in time; Escape returns to range totals.">
 			<div class="chart">
-				<div class="ch-head"><h2 class="crumbs" id="gen-title">Generation</h2><span class="unit" id="gen-unit">MW, stacked by fuel</span><div class="legends"><span class="lg">Total <b id="v-gen"></b></span></div></div>
+				<div class="ch-head">
+					<h2 class="crumbs" id="gen-title">Generation</h2><span class="unit" id="gen-unit">MW, stacked by fuel</span>
+					<div class="legends">
+						<span class="lg" id="lg-tot">Total <b id="v-gen"></b></span>
+						<select class="grp" id="sel-view" aria-label="Group the generation sources">
+							<option value="detailed">Detailed</option>
+							<option value="simple">Simplified</option>
+							<option value="cgr">Coal/Gas/Renewables</option>
+							<option value="flex">Flexibility</option>
+							<option value="rf">Renewables/Fossils</option>
+							<option value="vre">VRE/Residual</option>
+						</select>
+					</div>
+				</div>
 				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
 				<canvas id="cv-gen" role="img" aria-label="Stacked area chart of generation by fuel"></canvas>
 			</div>
@@ -187,7 +200,7 @@
 				<tfoot><tr><td id="tot-lbl">Total generation</td><td class="n" id="tot-q"></td><td class="n" id="tot-s">100%</td></tr></tfoot>
 			</table>
 			<dl class="sys" id="sys"></dl>
-			<p class="hint">Select a name, or click a band in the chart, to break it down by plant, and by grid connection for plants on more than one bus. Select a colour square to hide that layer. Hover the charts, or focus them and use the arrow keys, to read a single interval.</p>
+			<p class="hint">Use the menu above the chart to group sources (by fuel, flexibility, renewables and fossils, and more). Select a name, or click a band in the chart, to break it down by fuel and plant, and by grid connection for plants on more than one bus. Select a colour square to hide that layer. Hover the charts, or focus them and use the arrow keys, to read a single interval.</p>
 		</aside>
 	</div>
 
@@ -203,7 +216,8 @@
 					<tr><td>Wholesale price</td><td>EMI real-time dispatch: nodal prices</td><td>Island reference nodes Haywards (HAY2201) and Benmore (BEN2201). These are dispatch prices, not final prices</td></tr>
 					<tr><td>Demand</td><td>EMI real-time dispatch: load by connection point</td><td>Metered grid demand. Rooftop solar is added back for the dashed line. Tiwai is the Tiwai Point smelter (TWI2201)</td></tr>
 					<tr><td>HVDC transfer</td><td>Estimated</td><td>Mean of the South Island surplus and the North Island shortfall, since the dispatch feed doesn't include HVDC flow. Positive is northward</td></tr>
-					<tr><td>Emissions intensity</td><td>Calculated</td><td>Fuel mix × emission factors. Provisional factors: coal/gas Rankine 0.95, gas 0.50, geothermal 0.07 t CO₂e/MWh</td></tr>
+					<tr><td>Emissions intensity</td><td>Calculated</td><td>Fuel mix × emission factors. Provisional factors: coal/gas Rankine 0.95, gas 0.50, diesel 0.80, geothermal 0.07 t CO₂e/MWh</td></tr>
+					<tr><td>Source groups</td><td>Grouped from the fuel mix</td><td>Groupings follow Open Electricity's. Thermal and fossils are coal/gas Rankine, gas and diesel. Renewables are geothermal, hydro, wind and solar (grid and rooftop). Flexibility: slow flexible is geothermal and the Huntly Rankines; fast flexible is gas, diesel and hydro; variable is wind and solar. VRE/Residual splits wind and solar from everything else. Batteries and HVDC are always shown separately, because they can charge or export. Grouping is by fuel, so gas cogeneration plant counts as fast flexible</td></tr>
 				</tbody>
 			</table>
 		</div>

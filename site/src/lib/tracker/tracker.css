@@ -4,6 +4,7 @@
   --line: #d6dfde; --grid: #e5ebeb; --accent: #0d6275; --accent-soft: #d6e8eb; --warn-bg: #f6ecd9; --warn-ink: #6b4a0d;
   --f-coal: #4b4744; --f-gas: #d9731f; --f-geo: #a63a78; --f-hydro: #2f6db8; --f-wind: #2f9a78;
   --f-solar: #c48e10; --f-batt: #7356c4; --f-hvdc: #71838f; --co2: #6d5a4c;
+  --f-diesel: #b23a2a; --g-fossil: #96501a; --g-ren: #208a68; --g-slow: #a8435e; --g-fast: #2b7fa8; --g-vre: #a39a1a; --g-resid: #2f5aa8;
   --p-ni: #132020; --p-si: #0d6275; --live-bg: #dcefe4; --live-ink: #1d6440;
   --font-ui: "Schibsted Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
@@ -14,6 +15,7 @@
     --line: #253131; --grid: #1c2727; --accent: #5cb5c8; --accent-soft: #163239; --warn-bg: #2e2412; --warn-ink: #e9c98a;
     --f-coal: #77716d; --f-gas: #cc7a2e; --f-geo: #c4508f; --f-hydro: #4f8bd6; --f-wind: #2fa883;
     --f-solar: #bb8c18; --f-batt: #8a72d8; --f-hvdc: #7f909b; --co2: #a8927f;
+    --f-diesel: #bf3a52; --g-fossil: #a8693a; --g-ren: #2ea88a; --g-slow: #c75c78; --g-fast: #3c97c2; --g-vre: #9a9020; --g-resid: #5784d0;
     --p-ni: #e1e9e9; --p-si: #5cb5c8; --live-bg: #16301f; --live-ink: #8fd3a8;
     color-scheme: dark;
   }
@@ -23,6 +25,7 @@
   --line: #253131; --grid: #1c2727; --accent: #5cb5c8; --accent-soft: #163239; --warn-bg: #2e2412; --warn-ink: #e9c98a;
   --f-coal: #77716d; --f-gas: #cc7a2e; --f-geo: #c4508f; --f-hydro: #4f8bd6; --f-wind: #2fa883;
   --f-solar: #bb8c18; --f-batt: #8a72d8; --f-hvdc: #7f909b; --co2: #a8927f;
+  --f-diesel: #bf3a52; --g-fossil: #a8693a; --g-ren: #2ea88a; --g-slow: #c75c78; --g-fast: #3c97c2; --g-vre: #9a9020; --g-resid: #5784d0;
   --p-ni: #e1e9e9; --p-si: #5cb5c8; --live-bg: #16301f; --live-ink: #8fd3a8;
   color-scheme: dark;
 }
@@ -67,8 +70,18 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 .lg i { width: 14px; height: 0; border-top: 2px solid var(--c); display: inline-block; }
 .lg i.dash { border-top-style: dashed; }
 .lg i.area { height: 9px; border: 0; background: var(--c); opacity: 0.75; border-radius: 2px; width: 10px; }
+#lg-tot:has(> b:empty) { visibility: hidden; } /* "Total" label only while a value shows */
 .lg b { font-weight: 500; color: var(--ink); font-family: var(--font-data); font-variant-numeric: tabular-nums; }
-.legends { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-left: auto; }
+.legends { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 14px; margin-left: auto; }
+/* Grouping menu beside the generation chart's total */
+select.grp {
+  font: inherit; font-size: 0.8rem; color: var(--ink); background-color: var(--surface); cursor: pointer;
+  border: 1px solid var(--line); border-radius: 6px; padding: 3px 26px 3px 9px; appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: right 13px center, right 9px center; background-size: 4px 4px; background-repeat: no-repeat;
+}
+select.grp:hover { border-color: var(--muted); }
+select.grp:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 canvas { display: block; width: 100%; }
 #cv-gen { height: 300px; } #cv-price, #cv-demand { height: 132px; } #cv-hvdc, #cv-co2 { height: 100px; } #cv-ren { height: 122px; }
 

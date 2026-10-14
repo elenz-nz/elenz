@@ -19,7 +19,7 @@ export const tzName = t => nzOffset(t) === 13 * 36e5 ? 'NZDT' : 'NZST';
 export function buildModel(D) {
   const N = D.N, t = new Float64Array(N);
   for (let i = 0; i < N; i++) t[i] = D.t0 + i * D.step;
-  const keys = ['coal', 'gas', 'geo', 'hydro', 'wind', 'solar', 'roof', 'batt', 'hvdc'];
+  const keys = ['geo', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt', 'hvdc'];
   const isl = s => { const o = {}; for (const k of [...keys, 'metered', 'underlying', 'tiwai', 'price']) o[k] = Float64Array.from(s[k] || new Array(N).fill(0)); return o; };
   const NI = isl(D.NI), SI = isl(D.SI);
   const plants = D.plants.map(p => ({ ...p, s: Float64Array.from(p.s), units: p.units && p.units.map(u => ({ ...u, s: Float64Array.from(u.s) })) }));
@@ -30,10 +30,12 @@ export function mountTracker(D) {
   let M = buildModel(D);
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  // Stack order, bottom to top: geothermal (baseload) first, then thermal, hydro and the variable sources.
   const FUELS = [
+    { k: 'geo', name: 'Geothermal', tok: '--f-geo', ef: 0.07, ren: 1 },
     { k: 'coal', name: 'Coal/gas, Rankine', tok: '--f-coal', ef: 0.95 },
     { k: 'gas', name: 'Gas', tok: '--f-gas', ef: 0.50 },
-    { k: 'geo', name: 'Geothermal', tok: '--f-geo', ef: 0.07, ren: 1 },
+    { k: 'diesel', name: 'Diesel', tok: '--f-diesel', ef: 0.80 },
     { k: 'hydro', name: 'Hydro', tok: '--f-hydro', ren: 1 },
     { k: 'wind', name: 'Wind', tok: '--f-wind', ren: 1 },
     { k: 'solar', name: 'Solar, grid', tok: '--f-solar', ren: 1 },
@@ -42,6 +44,27 @@ export function mountTracker(D) {
     { k: 'hvdc', name: 'HVDC', tok: '--f-hvdc', hatch: 1, signed: 1 },
   ];
   const FUEL = Object.fromEntries(FUELS.map(f => [f.k, f]));
+  // Source groupings for the generation chart, after Open Electricity's. Each group lists its fuels in stack order.
+  // Battery and HVDC are signed (charging, export), so they stay separate layers in every view.
+  const REN = { id: 'ren', name: 'Renewables', tok: '--g-ren', f: ['geo', 'hydro', 'wind', 'solar', 'roof'] };
+  const FOSSIL = f => ({ id: 'fossil', name: f, tok: '--g-fossil', f: ['coal', 'gas', 'diesel'] });
+  const VRE = name => ({ id: 'vre', name, tok: '--g-vre', f: ['wind', 'solar', 'roof'] });
+  const one = k => ({ id: k, name: FUEL[k].name, tok: FUEL[k].tok, f: [k] });
+  const VIEWS = {
+    detailed: { groups: null },
+    simple: { groups: [one('geo'), FOSSIL('Thermal'), one('hydro'), one('wind'), { id: 'solar', name: 'Solar', tok: '--f-solar', f: ['solar', 'roof'] }] },
+    cgr: { groups: [REN, one('coal'), one('gas'), one('diesel')] },
+    flex: { groups: [
+      { id: 'slow', name: 'Slow flexible', tok: '--g-slow', f: ['geo', 'coal'] },
+      { id: 'fast', name: 'Fast flexible', tok: '--g-fast', f: ['gas', 'diesel', 'hydro'] },
+      VRE('Variable'),
+    ] },
+    rf: { groups: [REN, FOSSIL('Fossils')] },
+    vre: { groups: [{ id: 'resid', name: 'Residual', tok: '--g-resid', f: ['geo', 'coal', 'gas', 'diesel', 'hydro'] }, VRE('Variable renewables')] },
+  };
+  const SIGNED = FUELS.filter(f => f.signed).map(f => f.k);
+  const groupById = id => (VIEWS[state.view].groups || []).find(g => g.id === id);
+  const TOP_LEVEL = { group: null, fuel: null, plant: null };
 
   // National series = sum of islands
   const add = (a, b) => a.map((v, i) => v + b[i]);
@@ -60,14 +83,15 @@ export function mountTracker(D) {
   const plantsFor = (fuel, r = state.region) => M.plants.filter(p => p.fuel === fuel && (r === 'NZ' || p.isl === r));
   const plantByName = name => M.plants.find(p => p.name === name);
 
-  const state = { region: 'NZ', range: 288, agg: 1, hover: null, hidden: new Set(), drill: { fuel: null, plant: null } };
+  const state = { region: 'NZ', range: 288, agg: 1, view: 'detailed', hover: null, hidden: new Set(), drill: { ...TOP_LEVEL } };
   try {
     const s = JSON.parse(localStorage.getItem('elenz-view') || 'null');
     if (s && ['NZ', 'NI', 'SI'].includes(s.region)) state.region = s.region;
     if (s && [288, 864, 2016].includes(s.range)) state.range = s.range;
     if (s && [1, 6].includes(s.agg)) state.agg = s.agg;
+    if (s && Object.hasOwn(VIEWS, s.view)) state.view = s.view;
   } catch (e) {}
-  const save = () => { try { localStorage.setItem('elenz-view', JSON.stringify({ region: state.region, range: state.range, agg: state.agg })); } catch (e) {} };
+  const save = () => { try { localStorage.setItem('elenz-view', JSON.stringify({ region: state.region, range: state.range, agg: state.agg, view: state.view })); } catch (e) {} };
 
   // ---------- time helpers ----------
   const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -113,30 +137,44 @@ export function mountTracker(D) {
     return v;
   }
 
-  // ---------- drill-down layers: fuel → plant → dispatched unit ----------
+  // ---------- drill-down layers: group → fuel → plant → dispatched unit ----------
   const TOP = 7;
+  function fuelLayer(k, group) {
+    const f = FUEL[k], r = state.region;
+    return { id: k, name: k === 'hvdc' ? (r === 'NI' ? 'HVDC import' : 'HVDC export') : f.name, tok: f.tok, hatch: f.hatch ? k : null, tag: f.tag,
+             signed: !!f.signed, s: V.fuels[k], drill: plantsFor(k).length ? { group, fuel: k, plant: null } : null };
+  }
   function relayer() {
-    const r = state.region, d = state.drill, L = [];
-    if (!d.fuel) {
-      for (const k of present[r]) {
-        const f = FUEL[k];
-        L.push({ id: k, name: k === 'hvdc' ? (r === 'NI' ? 'HVDC import' : 'HVDC export') : f.name, tok: f.tok, hatch: f.hatch ? k : null, tag: f.tag,
-                 signed: !!f.signed, s: V.fuels[k], drill: plantsFor(k).length ? { fuel: k, plant: null } : null });
-      }
-    } else if (!d.plant) {
-      const ps = plantsFor(d.fuel), f = FUEL[d.fuel];
-      // the largest plants get their own shade of the fuel colour; smaller ones share a muted fill but stay separate layers
-      ps.forEach((p, i) => L.push({ id: p.name, name: p.name, tok: f.tok, shade: i < TOP ? i : null, muted: i >= TOP, signed: !!f.signed, s: V.avg(p.s), plant: p, drill: { fuel: d.fuel, plant: p.name } }));
-    } else {
+    const r = state.region, d = state.drill, L = [], groups = VIEWS[state.view].groups;
+    if (d.plant) {
       const p = plantByName(d.plant), f = FUEL[p.fuel];
       if (p.units) p.units.forEach((u, i) => L.push({ id: u.name, name: busLabel(u.name), tok: f.tok, shade: i, signed: !!f.signed, s: V.avg(u.s), cap: u.cap }));
       else L.push({ id: p.name, name: p.name, tok: f.tok, signed: !!f.signed, s: V.avg(p.s), cap: p.cap });
+    } else if (d.fuel) {
+      const ps = plantsFor(d.fuel), f = FUEL[d.fuel];
+      // the largest plants get their own shade of the fuel colour; smaller ones share a muted fill but stay separate layers
+      ps.forEach((p, i) => L.push({ id: p.name, name: p.name, tok: f.tok, shade: i < TOP ? i : null, muted: i >= TOP, signed: !!f.signed, s: V.avg(p.s), plant: p, drill: { group: d.group, fuel: d.fuel, plant: p.name } }));
+    } else if (d.group) {
+      for (const k of groupById(d.group).f) if (present[r].includes(k)) L.push(fuelLayer(k, d.group));
+    } else if (!groups) {
+      for (const k of present[r]) L.push(fuelLayer(k, null));
+    } else {
+      for (const g of groups) {
+        const ks = g.f.filter(k => present[r].includes(k));
+        if (!ks.length) continue;
+        const s = new Float64Array(V.n);
+        for (const k of ks) { const a = V.fuels[k]; for (let j = 0; j < V.n; j++) s[j] += a[j]; }
+        // a group of several fuels opens onto its fuels; a single-fuel group goes straight to its plants
+        const drill = g.f.length > 1 ? { group: g.id, fuel: null, plant: null } : plantsFor(ks[0]).length ? { group: null, fuel: ks[0], plant: null } : null;
+        L.push({ id: 'g:' + g.id, name: g.name, tok: g.tok, tag: g.f.length > 1 && ks.includes('roof') ? 'incl. est.' : FUEL[ks[0]].tag, hatch: g.f.length === 1 && FUEL[ks[0]].hatch ? ks[0] : null, signed: false, s, drill });
+      }
+      for (const k of SIGNED) if (present[r].includes(k)) L.push(fuelLayer(k, null));
     }
     V.layers = L;
   }
   // "ROX2201 ROX0" -> "220 kV · ROX2201": the POC code carries the bus voltage
   const busLabel = k => { const poc = k.split(' ')[0]; const kv = parseInt(poc.slice(3, 6), 10); return `${kv} kV · ${poc}`; };
-  const level = () => state.drill.plant ? 2 : state.drill.fuel ? 1 : 0;
+  const level = () => state.drill.plant ? 'unit' : state.drill.fuel ? 'plant' : state.drill.group ? 'fuel' : 'top';
   function drillTo(d) {
     state.drill = d; state.hidden.clear(); relayer(); buildSummary(); render();
   }
@@ -145,7 +183,7 @@ export function mountTracker(D) {
   let C = {}, PAT = {};
   function readColours() {
     const cs = getComputedStyle(document.documentElement);
-    for (const t of ['--ink', '--ink-2', '--muted', '--line', '--grid', '--surface', '--accent', '--accent-soft', '--co2', '--p-ni', '--p-si', '--f-coal', '--f-gas', '--f-geo', '--f-hydro', '--f-wind', '--f-solar', '--f-batt', '--f-hvdc'])
+    for (const t of ['--ink', '--ink-2', '--muted', '--line', '--grid', '--surface', '--accent', '--accent-soft', '--co2', '--p-ni', '--p-si', '--f-coal', '--f-gas', '--f-diesel', '--f-geo', '--f-hydro', '--f-wind', '--f-solar', '--f-batt', '--f-hvdc', '--g-fossil', '--g-ren', '--g-slow', '--g-fast', '--g-vre', '--g-resid'])
       C[t] = cs.getPropertyValue(t).trim();
     PAT = {};
     for (const f of FUELS) if (f.hatch) {
@@ -249,7 +287,7 @@ export function mountTracker(D) {
   // ---------- charts ----------
   let GEN = null; // last stack geometry, for click-to-drill
   function capacityOf() {
-    if (level() !== 2) return null;
+    if (level() !== 'unit') return null;
     const c = V.layers.reduce((a, l) => a + (l.cap || 0), 0);
     return c || plantByName(state.drill.plant).cap || null;
   }
@@ -378,29 +416,38 @@ export function mountTracker(D) {
   // ---------- summary ----------
   const REGION = { NZ: 'New Zealand', NI: 'North Island', SI: 'South Island' };
   function crumbs() {
-    const d = state.drill, parts = [{ label: 'Generation', to: d.fuel ? { fuel: null, plant: null } : null }];
-    if (d.fuel) parts.push({ label: FUEL[d.fuel].name, to: d.plant ? { fuel: d.fuel, plant: null } : null });
+    const d = state.drill, parts = [{ label: 'Generation', to: d.group || d.fuel ? { ...TOP_LEVEL } : null }];
+    if (d.group) parts.push({ label: groupById(d.group).name, to: d.fuel ? { group: d.group, fuel: null, plant: null } : null });
+    if (d.fuel) parts.push({ label: FUEL[d.fuel].name, to: d.plant ? { group: d.group, fuel: d.fuel, plant: null } : null });
     if (d.plant) parts.push({ label: d.plant, to: null });
     return parts;
   }
   function renderCrumbs() {
-    const parts = crumbs(), h = $('gen-title');
+    const parts = crumbs(), h = $('gen-title'), d = state.drill;
     h.innerHTML = parts.map((p, i) => (i ? '<span class="sep" aria-hidden="true">›</span>' : '') + (p.to ? `<button type="button" data-i="${i}">${esc(p.label)}</button>` : `<span aria-current="${i === parts.length - 1 ? 'page' : 'false'}">${esc(p.label)}</span>`)).join('');
     h.querySelectorAll('button').forEach(b => b.addEventListener('click', () => drillTo(parts[+b.dataset.i].to)));
     const lv = level();
-    $('gen-unit').textContent = lv === 0 ? 'MW, stacked by fuel' : lv === 1 ? 'MW, stacked by plant' : (V.layers.length > 1 ? 'MW, by grid connection' : 'MW');
-    const up = lv ? parts[parts.length - 2] : null;
-    $('sum-level').hidden = !lv;
-    if (lv) {
-      $('sum-level-txt').textContent = lv === 1 ? `${FUEL[state.drill.fuel].name} plants · ${REGION[state.region]}` : (V.layers.length > 1 ? `${state.drill.plant} · by grid connection` : state.drill.plant);
-      $('sum-back').textContent = `‹ ${up.label === 'Generation' ? 'All fuels' : up.label}`;
+    $('gen-unit').textContent = {
+      top: VIEWS[state.view].groups ? 'MW, stacked by group' : 'MW, stacked by fuel',
+      fuel: 'MW, stacked by fuel', plant: 'MW, stacked by plant',
+      unit: V.layers.length > 1 ? 'MW, by grid connection' : 'MW',
+    }[lv];
+    const up = lv !== 'top' ? parts[parts.length - 2] : null;
+    $('sum-level').hidden = !up;
+    if (up) {
+      $('sum-level-txt').textContent = {
+        fuel: () => `${groupById(d.group).name} · ${REGION[state.region]}`,
+        plant: () => `${FUEL[d.fuel].name} plants · ${REGION[state.region]}`,
+        unit: () => V.layers.length > 1 ? `${d.plant} · by grid connection` : d.plant,
+      }[lv]();
+      $('sum-back').textContent = `‹ ${up.label === 'Generation' ? 'All sources' : up.label}`;
       $('sum-back').onclick = () => drillTo(up.to);
     }
   }
   function buildSummary() {
     renderCrumbs();
     const body = $('mix-body'); body.innerHTML = '';
-    $('col-name').textContent = ['Source', 'Plant', V.layers.length > 1 ? 'Connection' : 'Plant'][level()];
+    $('col-name').textContent = { top: 'Source', fuel: 'Fuel', plant: 'Plant', unit: V.layers.length > 1 ? 'Connection' : 'Plant' }[level()];
     for (const l of V.layers) {
       const tr = document.createElement('tr'); tr.style.setProperty('--c', colourOf(l));
       if (state.hidden.has(l.id)) tr.className = 'off';
@@ -425,11 +472,12 @@ export function mountTracker(D) {
   const signedTxt = (l, v, range) => range ? (l.id === 'hvdc' ? (v >= 0 ? 'net in' : 'net out') : 'net')
     : l.id === 'hvdc' ? (Math.abs(v) < 1 ? '—' : v > 0 ? 'import' : 'export') : (Math.abs(v) < 1 ? 'idle' : v > 0 ? 'output' : 'charging');
   function totalLabel() {
-    const lv = level();
-    return lv === 0 ? 'Total generation' : lv === 1 ? `Total ${FUEL[state.drill.fuel].name.toLowerCase()}` : `Total ${state.drill.plant}`;
+    const lv = level(), d = state.drill;
+    return lv === 'top' ? 'Total generation' : lv === 'fuel' ? `Total ${groupById(d.group).name.toLowerCase()}`
+      : lv === 'plant' ? `Total ${FUEL[d.fuel].name.toLowerCase()}` : `Total ${d.plant}`;
   }
   function plantRows(range, j) {
-    if (level() !== 2) return [];
+    if (level() !== 'unit') return [];
     const p = plantByName(state.drill.plant), cap = capacityOf();
     const rows = [['Grid connection', esc(p.poc.join(', ')), ''], cap && ['Nameplate capacity', fmt(cap), 'MW']];
     if (range) {
@@ -454,7 +502,7 @@ export function mountTracker(D) {
       $('col-q').textContent = 'GWh';
       const E = new Map(); let tot = 0;
       for (const l of layers) { let s = 0; for (let i = 0; i < V.n; i++) s += l.s[i] * V.hrs[i]; E.set(l, s / 1000); }
-      if (level() === 0) { for (let i = 0; i < V.n; i++) tot += V.gen[i] * V.hrs[i]; tot /= 1000; }
+      if (level() === 'top') { for (let i = 0; i < V.n; i++) tot += V.gen[i] * V.hrs[i]; tot /= 1000; }
       else for (const l of layers) tot += l.signed ? E.get(l) : Math.max(0, E.get(l));
       for (const l of layers) {
         const e = E.get(l);
@@ -462,7 +510,7 @@ export function mountTracker(D) {
         l.row.querySelector('[data-s]').textContent = l.signed ? signedTxt(l, e, true) : tot > 0 ? (e / tot * 100).toFixed(1) + '%' : '—';
         l.row.querySelector('[data-b]').style.transform = `scaleX(${l.signed || tot <= 0 ? 0 : Math.max(0, e / tot)})`;
       }
-      $('tot-q').textContent = gwh(tot); $('tot-s').textContent = layers.some(l => l.signed) && level() ? 'net' : '100%';
+      $('tot-q').textContent = gwh(tot); $('tot-s').textContent = layers.some(l => l.signed) && level() !== 'top' ? 'net' : '100%';
       let pn = 0, ps = 0, pk = 0, pku = 0, tw = 0, hv = 0, em = 0, gw = 0, re = 0, hs = 0;
       for (let i = 0; i < V.n; i++) {
         const w = V.hrs[i]; hs += w; pn += V.pNI[i] * w; ps += V.pSI[i] * w; tw += V.tiwai[i] * w; hv += V.hvdc[i] * w;
@@ -488,14 +536,14 @@ export function mountTracker(D) {
     $('sum-sub').textContent = `${dayLbl(p)} · TP ${tp(p)} · ${state.agg === 1 ? '5-minute' : 'half-hour average'}`;
     $('col-q').textContent = 'MW';
     let tot = 0;
-    if (level() === 0) tot = V.gen[j]; else for (const l of layers) tot += l.signed ? l.s[j] : Math.max(0, l.s[j]);
+    if (level() === 'top') tot = V.gen[j]; else for (const l of layers) tot += l.signed ? l.s[j] : Math.max(0, l.s[j]);
     for (const l of layers) {
       const v = l.s[j];
       l.row.querySelector('[data-q]').textContent = fmt(v);
       l.row.querySelector('[data-s]').textContent = l.signed ? signedTxt(l, v, false) : tot > 0.5 ? (v / tot * 100).toFixed(1) + '%' : '—';
       l.row.querySelector('[data-b]').style.transform = `scaleX(${l.signed || tot <= 0.5 ? 0 : Math.max(0, v / tot)})`;
     }
-    $('tot-q').textContent = fmt(tot); $('tot-s').textContent = layers.some(l => l.signed) && level() ? '' : '100%';
+    $('tot-q').textContent = fmt(tot); $('tot-s').textContent = layers.some(l => l.signed) && level() !== 'top' ? '' : '100%';
     setSys([
       ...plantRows(false, j),
       ['Price, North Island', money(V.pNI[j]), '/MWh'],
@@ -522,16 +570,22 @@ export function mountTracker(D) {
   function syncControls() {
     for (const [seg, val] of [['seg-region', state.region], ['seg-range', String(state.range)], ['seg-int', String(state.agg)]])
       for (const b of $(seg).querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v === val));
+    $('sel-view').value = state.view;
   }
   function rebuild() {
     const d = state.drill;
     if (d.plant) { const p = plantByName(d.plant); if (state.region !== 'NZ' && p.isl !== state.region) d.plant = null; }
     if (d.fuel && !plantsFor(d.fuel).length) { d.fuel = null; d.plant = null; }
+    if (d.group && !groupById(d.group)?.f.some(k => present[state.region].includes(k))) d.group = null;
     V = buildView(); relayer(); state.hover = null; syncControls(); buildSummary(); render(); save();
   }
 
   $('seg-region').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; state.region = b.dataset.v; state.hidden.clear(); rebuild(); });
   $('seg-range').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; state.range = +b.dataset.v; rebuild(); });
+  $('sel-view').addEventListener('change', e => {
+    if (!Object.hasOwn(VIEWS, e.target.value)) return;
+    state.view = e.target.value; state.drill = { ...TOP_LEVEL }; state.hidden.clear(); rebuild();
+  });
   $('seg-int').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; state.agg = +b.dataset.v; rebuild(); });
 
   const charts = $('charts');
@@ -543,7 +597,7 @@ export function mountTracker(D) {
   for (const cv of charts.querySelectorAll('canvas')) {
     cv.addEventListener('pointermove', e => {
       const j = indexAt(cv, e.clientX); if (j !== state.hover) { state.hover = j; render(); }
-      if (cv.id === 'cv-gen' && e.pointerType === 'mouse') { const l = layerAt(e.clientX, e.clientY); cv.style.cursor = l && l.drill ? 'pointer' : ''; cv.title = l ? l.name + (l.drill ? ' — click to see ' + (level() ? 'grid connections' : 'plants') : '') : ''; }
+      if (cv.id === 'cv-gen' && e.pointerType === 'mouse') { const l = layerAt(e.clientX, e.clientY); cv.style.cursor = l && l.drill ? 'pointer' : ''; cv.title = l ? l.name + (l.drill ? ' — click to see ' + (l.drill.plant ? 'grid connections' : l.drill.fuel ? 'plants' : 'fuels') : '') : ''; }
     });
     cv.addEventListener('pointerdown', e => { state.hover = indexAt(cv, e.clientX); render(); });
   }
