@@ -66,11 +66,15 @@ tiwai = "TWI2201"
 # Owners for plant the register doesn't list yet (see [units] above). Plant name -> owner.
 [plant_owners]
 "Ruakākā Solar Farm" = "Meridian"
+"Kaiwaikawe Wind Farm" = "Mercury"
+"Kōwhai Park Solar Farm" = "Contact"
+"Mangahao" = "Contact"                    # King Country Energy, part of Manawa
 
 # Hydro schemes for the "By hydro scheme" view, each listed upstream to downstream. Hydro stations not listed
 # here are shown as "Other hydro".
 [hydro_schemes]
-Waitaki = ["Takapō A", "Takapō B", "Ōhau A", "Ōhau B", "Ōhau C", "Benmore", "Aviemore", "Waitaki"]
+Tekapo = ["Takapō A", "Takapō B"]
+Waitaki = ["Ōhau A", "Ōhau B", "Ōhau C", "Benmore", "Aviemore", "Waitaki"]
 Waikato = ["Aratiatia", "Ōhakuri", "Ātiamuri", "Whakamaru", "Maraetai", "Waipāpa", "Arapuni", "Karāpiro"]
 "Manapōuri" = ["Manapōuri"]
 Clutha = ["Clyde", "Roxburgh"]

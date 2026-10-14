@@ -4,7 +4,7 @@
   --line: #d6dfde; --grid: #e5ebeb; --accent: #0d6275; --accent-soft: #d6e8eb; --warn-bg: #f6ecd9; --warn-ink: #6b4a0d;
   --f-coal: #4b4744; --f-gas: #d9731f; --f-geo: #a63a78; --f-hydro: #2f6db8; --f-wind: #2f9a78;
   --f-solar: #c48e10; --f-batt: #7356c4; --f-hvdc: #71838f; --co2: #6d5a4c;
-  --o1: #2a78d6; --o2: #eb6834; --o3: #1baf7a; --o4: #6250d6; --o5: #e87ba4; --o6: #55605f;
+  --o1: #f58025; --o2: #39a0b8; --o3: #e02030; --o4: #e2c400; --o5: #a8690c; --o6: #55605f;
   --f-diesel: #b23a2a; --g-fossil: #96501a; --g-ren: #208a68; --g-fast: #2b7fa8; --g-vre: #a39a1a; --g-resid: #2f5aa8;
   --p-ni: #132020; --p-si: #0d6275; --live-bg: #dcefe4; --live-ink: #1d6440;
   --font-ui: "Schibsted Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -16,7 +16,7 @@
     --line: #253131; --grid: #1c2727; --accent: #5cb5c8; --accent-soft: #163239; --warn-bg: #2e2412; --warn-ink: #e9c98a;
     --f-coal: #5f5a57; --f-gas: #cc7a2e; --f-geo: #c4508f; --f-hydro: #4f8bd6; --f-wind: #2fa883;
     --f-solar: #bb8c18; --f-batt: #8a72d8; --f-hvdc: #7f909b; --co2: #a8927f;
-    --o1: #3987e5; --o2: #d95926; --o3: #199e70; --o4: #9085e9; --o5: #d55181; --o6: #a9b4b3;
+    --o1: #f08a3c; --o2: #4fb3cb; --o3: #e5484d; --o4: #e0c51c; --o5: #c78a1a; --o6: #a9b4b3;
     --f-diesel: #bf3a52; --g-fossil: #a8693a; --g-ren: #2ea88a; --g-fast: #3c97c2; --g-vre: #9a9020; --g-resid: #5784d0;
     --p-ni: #e1e9e9; --p-si: #5cb5c8; --live-bg: #16301f; --live-ink: #8fd3a8;
     color-scheme: dark;
@@ -27,7 +27,7 @@
   --line: #253131; --grid: #1c2727; --accent: #5cb5c8; --accent-soft: #163239; --warn-bg: #2e2412; --warn-ink: #e9c98a;
   --f-coal: #5f5a57; --f-gas: #cc7a2e; --f-geo: #c4508f; --f-hydro: #4f8bd6; --f-wind: #2fa883;
   --f-solar: #bb8c18; --f-batt: #8a72d8; --f-hvdc: #7f909b; --co2: #a8927f;
-  --o1: #3987e5; --o2: #d95926; --o3: #199e70; --o4: #9085e9; --o5: #d55181; --o6: #a9b4b3;
+  --o1: #f08a3c; --o2: #4fb3cb; --o3: #e5484d; --o4: #e0c51c; --o5: #c78a1a; --o6: #a9b4b3;
   --f-diesel: #bf3a52; --g-fossil: #a8693a; --g-ren: #2ea88a; --g-fast: #3c97c2; --g-vre: #9a9020; --g-resid: #5784d0;
   --p-ni: #e1e9e9; --p-si: #5cb5c8; --live-bg: #16301f; --live-ink: #8fd3a8;
   color-scheme: dark;
@@ -103,6 +103,8 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 .nav[hidden] { display: none; }
 
 /* Tooltip that follows the mouse */
+.chart-note { margin: 2px 0 4px; color: var(--muted); font-size: 0.76rem; }
+.chart-note[hidden] { display: none; }
 .tip { position: fixed; left: 0; top: 0; z-index: 30; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; box-shadow: 0 6px 18px rgb(0 0 0 / 0.14); font-size: 0.8rem; display: grid; gap: 3px; min-width: 170px; max-width: 320px; }
 .tip[hidden] { display: none; }
 .tip-t { font-weight: 600; color: var(--ink); margin-bottom: 1px; }

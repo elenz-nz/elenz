@@ -92,7 +92,7 @@
 "scheme":"Waikaremoana"
 },
 "Kaiwaikawe Wind Farm":{
-"owner":"Other generators"
+"owner":"Mercury"
 },
 "Kaiwera Downs (Stage 2)":{
 "owner":"Mercury"
@@ -123,7 +123,7 @@
 "owner":"Other generators"
 },
 "Kōwhai Park Solar Farm":{
-"owner":"Other generators"
+"owner":"Contact"
 },
 "Kūmara":{
 "owner":"Contact"
@@ -139,7 +139,7 @@
 "scheme":"Manapōuri"
 },
 "Mangahao":{
-"owner":"Other generators"
+"owner":"Contact"
 },
 "Maraetai":{
 "owner":"Mercury",
@@ -244,11 +244,11 @@
 },
 "Takapō A":{
 "owner":"Genesis",
-"scheme":"Waitaki"
+"scheme":"Tekapo"
 },
 "Takapō B":{
 "owner":"Genesis",
-"scheme":"Waitaki"
+"scheme":"Tekapo"
 },
 "Taranaki Combined Cycle":{
 "owner":"Contact"

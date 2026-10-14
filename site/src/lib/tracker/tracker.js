@@ -78,8 +78,11 @@ export function mountTracker(D, hooks = {}) {
 
   // ---------- plant sets: views stacked by site, hydro scheme or owner ----------
   // A set is a list of plants shown as one layer; drilling into it lists its plants.
-  const SCHEMES = ['Waitaki', 'Waikato', 'Manapōuri', 'Clutha', 'Tongariro', 'Waikaremoana', 'Rangitaiki', 'Waipori', 'Other hydro'];
-  const OWNERS = ['Meridian', 'Contact', 'Mercury', 'Genesis', 'Nova', 'Other generators'];
+  const SCHEMES = ['Tekapo', 'Waitaki', 'Waikato', 'Manapōuri', 'Clutha', 'Tongariro', 'Waikaremoana', 'Rangitaiki', 'Waipori', 'Other hydro'];
+  // stacking order chosen so neighbouring brand colours stay distinguishable (colour-blind checked)
+  const OWNERS = ['Genesis', 'Meridian', 'Contact', 'Mercury', 'Nova', 'Other generators'];
+  const hydroOnly = () => VIEWS[state.view].by === 'scheme';
+  const topIsAll = () => level() === 'top' && !hydroOnly();  // shares of all generation (not just the layers shown)
   const ownerOf = p => PLANT_META[p.name]?.owner || 'Other generators';
   const schemeOf = p => PLANT_META[p.name]?.scheme || 'Other hydro';
   const SITE_SHARE = 0.95, SITE_MAX = 12;  // by site: the plants making up 95% of each fuel (at most 12) get their own layer
@@ -286,7 +289,7 @@ export function mountTracker(D, hooks = {}) {
         for (const f of FUELS) {
           if (f.signed || !present[r].includes(f.k)) continue;
           const mine = sets.filter(x => x.fuel === f.k);
-          if (by === 'scheme' && f.k === 'hydro') { mine.forEach((x, i) => L.push(setLayer(x, i))); continue; }
+          if (by === 'scheme') { if (f.k === 'hydro') mine.forEach((x, i) => L.push(setLayer(x, i))); continue; }
           if (by === 'site') {
             const small = new Set(mine.flatMap(x => x.plants));
             const ps = plantsFor(f.k).filter(p => !small.has(p)).sort((a, b) => energy(b) - energy(a));
@@ -299,7 +302,7 @@ export function mountTracker(D, hooks = {}) {
           L.push(fuelLayer(f.k, null));
         }
       }
-      for (const k of SIGNED) if (present[r].includes(k)) L.push(fuelLayer(k, null));
+      if (!hydroOnly()) for (const k of SIGNED) if (present[r].includes(k)) L.push(fuelLayer(k, null));
     } else if (!groups) {
       for (const k of present[r]) L.push(fuelLayer(k, null));
     } else {
@@ -341,7 +344,7 @@ export function mountTracker(D, hooks = {}) {
   }
   const alpha = (hex, a) => { const h = hex.replace('#', ''); const n = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16); return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`; };
   // lightness steps of the fuel hue for plants and units, alternating so neighbours differ
-  const SHADE = [0, 15, -13, 26, -22, 8, -6];
+  const SHADE = [0, 15, -13, 26, -22, 8, -6, 20, -17, 4];
   function shade(hex, i) {
     let r = parseInt(hex.slice(1, 3), 16) / 255, g = parseInt(hex.slice(3, 5), 16) / 255, b = parseInt(hex.slice(5, 7), 16) / 255;
     const mx = Math.max(r, g, b), mn = Math.min(r, g, b); let h = 0, s = 0, l = (mx + mn) / 2;
@@ -575,6 +578,9 @@ export function mountTracker(D, hooks = {}) {
       fuel: setById(d.group) ? 'MW, stacked by plant' : 'MW, stacked by fuel', plant: 'MW, stacked by plant',
       unit: V.layers.length > 1 ? 'MW, by grid connection' : 'MW',
     }[lv];
+    const note = $('gen-note'), by = VIEWS[state.view].by;
+    note.hidden = by !== 'owner';
+    note.textContent = by === 'owner' ? "Owners as of October 2026, from each plant's operator in the EA register (Manawa Energy's stations counted as Contact's). Today's owners are applied to the whole history, so earlier sales and transfers aren't shown." : '';
     const up = lv !== 'top' ? parts[parts.length - 2] : null;
     $('sum-level').hidden = !up;
     if (up) {
@@ -662,7 +668,7 @@ export function mountTracker(D, hooks = {}) {
     : l.id === 'hvdc' ? (Math.abs(v) < 1 ? '—' : v > 0 ? 'import' : 'export') : (Math.abs(v) < 1 ? 'idle' : v > 0 ? 'output' : 'charging');
   function totalLabel() {
     const lv = level(), d = state.drill;
-    return lv === 'top' ? 'Total generation' : lv === 'fuel' ? `Total ${groupById(d.group).name.toLowerCase()}`
+    return lv === 'top' ? (hydroOnly() ? 'Total hydro' : 'Total generation') : lv === 'fuel' ? `Total ${groupById(d.group).name.toLowerCase()}`
       : lv === 'plant' ? `Total ${FUEL[d.fuel].name.toLowerCase()}` : `Total ${d.plant}`;
   }
   function plantRows(range, j) {
@@ -696,7 +702,7 @@ export function mountTracker(D, hooks = {}) {
       }
       const E = new Map(); let tot = 0;
       for (const l of layers) { let s = 0; for (let i = 0; i < V.n; i++) s += l.s[i] * V.hrs[i]; E.set(l, s / 1000); }
-      if (level() === 'top') { for (let i = 0; i < V.n; i++) tot += V.gen[i] * V.hrs[i]; tot /= 1000; }
+      if (topIsAll()) { for (let i = 0; i < V.n; i++) tot += V.gen[i] * V.hrs[i]; tot /= 1000; }
       else for (const l of layers) tot += l.signed ? E.get(l) : Math.max(0, E.get(l));
       // energy in GWh, or TWh once totals run past 10,000 GWh
       const tw = Math.abs(tot) >= 1e4, en = v => gwh(tw ? v / 1000 : v).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -708,7 +714,7 @@ export function mountTracker(D, hooks = {}) {
         l.row.querySelector('[data-s]').textContent = l.signed ? signedTxt(l, e, true) : tot > 0 ? (e / tot * 100).toFixed(1) + '%' : '—';
         l.row.querySelector('[data-b]').style.transform = `scaleX(${l.signed || tot <= 0 ? 0 : Math.max(0, e / tot)})`;
       }
-      $('tot-q').textContent = en(tot); $('tot-s').textContent = layers.some(l => l.signed) && level() !== 'top' ? 'net' : '100%';
+      $('tot-q').textContent = en(tot); $('tot-s').textContent = layers.some(l => l.signed) && !topIsAll() ? 'net' : '100%';
       let pn = 0, ps = 0, pk = 0, pku = 0, ti = 0, hv = 0, em = 0, gw = 0, re = 0, hs = 0;
       for (let i = 0; i < V.n; i++) {
         const w = V.hrs[i]; hs += w; pn += V.pNI[i] * w; ps += V.pSI[i] * w; ti += V.tiwai[i] * w; hv += V.hvdc[i] * w;
@@ -735,14 +741,14 @@ export function mountTracker(D, hooks = {}) {
     $('sum-sub').textContent = sub;
     $('col-q').textContent = long ? 'MW avg' : 'MW';
     let tot = 0;
-    if (level() === 'top') tot = V.gen[j]; else for (const l of layers) tot += l.signed ? l.s[j] : Math.max(0, l.s[j]);
+    if (topIsAll()) tot = V.gen[j]; else for (const l of layers) tot += l.signed ? l.s[j] : Math.max(0, l.s[j]);
     for (const l of [...layers, ...V.sections.filter(x => x.row)]) {
       const v = l.members ? l.members.reduce((a, m) => a + m.s[j], 0) : l.s[j];
       l.row.querySelector('[data-q]').textContent = fmt(v);
       l.row.querySelector('[data-s]').textContent = l.signed ? signedTxt(l, v, false) : tot > 0.5 ? (v / tot * 100).toFixed(1) + '%' : '—';
       l.row.querySelector('[data-b]').style.transform = `scaleX(${l.signed || tot <= 0.5 ? 0 : Math.max(0, v / tot)})`;
     }
-    $('tot-q').textContent = fmt(tot); $('tot-s').textContent = layers.some(l => l.signed) && level() !== 'top' ? '' : '100%';
+    $('tot-q').textContent = fmt(tot); $('tot-s').textContent = layers.some(l => l.signed) && !topIsAll() ? '' : '100%';
     setSys([
       ...plantRows(false, j),
       ['Price, North Island', money(V.pNI[j]), '/MWh'],
@@ -784,6 +790,7 @@ export function mountTracker(D, hooks = {}) {
     const R = RANGES[state.range], inp = $('in-date'), end = state.end ?? endOfToday();
     $('lb-date').textContent = R.fixed ? 'All data' : `${R.label} ending`;
     inp.disabled = !!R.fixed;
+    inp.style.visibility = R.fixed ? 'hidden' : '';  // All has no end date
     inp.value = R.fixed ? '' : ymd(end - 1);
     inp.min = ymd(firstDay()); inp.max = ymd(models.live.END);
     $('btn-latest').hidden = state.end == null;
@@ -895,7 +902,7 @@ export function mountTracker(D, hooks = {}) {
       case 'cv-gen': {
         const l = layerAt(e.clientX, e.clientY), lv = level();
         let tot = 0;
-        if (lv === 'top') tot = V.gen[j]; else for (const x of V.layers) tot += x.signed ? x.s[j] : Math.max(0, x.s[j]);
+        if (topIsAll()) tot = V.gen[j]; else for (const x of V.layers) tot += x.signed ? x.s[j] : Math.max(0, x.s[j]);
         if (!l) return head + row(C['--ink'], totalLabel(), fmt(tot), mw);
         const v = l.s[j];
         const extra = l.signed ? `${mw} · ${signedTxt(l, v, false)}` : `${mw}${tot > 0.5 ? ` · ${(v / tot * 100).toFixed(1)}%` : ''}`;
