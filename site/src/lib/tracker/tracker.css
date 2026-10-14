@@ -1,7 +1,7 @@
 /* Layout: masthead, one control bar, then a linked-chart column with a sticky summary table beside it (stacks below on phones). */
 :root {
   --bg: #f2f5f5; --surface: #fbfcfc; --ink: #132020; --ink-2: #3f4f4e; --muted: #667574;
-  --line: #d6dfde; --grid: #e5ebeb; --accent: #0d6275; --accent-soft: #d6e8eb; --warn-bg: #f6ecd9; --warn-ink: #6b4a0d;
+  --line: #d6dfde; --grid: #e5ebeb; --land: #e1e8e8; --accent: #0d6275; --accent-soft: #d6e8eb; --warn-bg: #f6ecd9; --warn-ink: #6b4a0d;
   --f-coal: #4b4744; --f-gas: #d9731f; --f-geo: #a63a78; --f-hydro: #2f6db8; --f-wind: #2f9a78;
   --f-solar: #c48e10; --f-batt: #7356c4; --f-hvdc: #71838f; --co2: #6d5a4c;
   --o1: #f58025; --o2: #39a0b8; --o3: #e02030; --o4: #e2c400; --o5: #a8690c; --o6: #55605f;
@@ -12,8 +12,8 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0c1212; --surface: #121a1a; --ink: #e1e9e9; --ink-2: #b3c1c0; --muted: #849493;
-    --line: #253131; --grid: #1c2727; --accent: #5cb5c8; --accent-soft: #163239; --warn-bg: #2e2412; --warn-ink: #e9c98a;
+    --bg: #131c1c; --surface: #1a2424; --ink: #e1e9e9; --ink-2: #b3c1c0; --muted: #849493;
+    --line: #2f3e3e; --grid: #243030; --land: #2e3d3d; --accent: #5cb5c8; --accent-soft: #163239; --warn-bg: #2e2412; --warn-ink: #e9c98a;
     --f-coal: #5f5a57; --f-gas: #cc7a2e; --f-geo: #c4508f; --f-hydro: #4f8bd6; --f-wind: #2fa883;
     --f-solar: #bb8c18; --f-batt: #8a72d8; --f-hvdc: #7f909b; --co2: #a8927f;
     --o1: #f08a3c; --o2: #4fb3cb; --o3: #e5484d; --o4: #e0c51c; --o5: #c78a1a; --o6: #a9b4b3;
@@ -23,8 +23,8 @@
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0c1212; --surface: #121a1a; --ink: #e1e9e9; --ink-2: #b3c1c0; --muted: #849493;
-  --line: #253131; --grid: #1c2727; --accent: #5cb5c8; --accent-soft: #163239; --warn-bg: #2e2412; --warn-ink: #e9c98a;
+  --bg: #131c1c; --surface: #1a2424; --ink: #e1e9e9; --ink-2: #b3c1c0; --muted: #849493;
+  --line: #2f3e3e; --grid: #243030; --land: #2e3d3d; --accent: #5cb5c8; --accent-soft: #163239; --warn-bg: #2e2412; --warn-ink: #e9c98a;
   --f-coal: #5f5a57; --f-gas: #cc7a2e; --f-geo: #c4508f; --f-hydro: #4f8bd6; --f-wind: #2fa883;
   --f-solar: #bb8c18; --f-batt: #8a72d8; --f-hvdc: #7f909b; --co2: #a8927f;
   --o1: #f08a3c; --o2: #4fb3cb; --o3: #e5484d; --o4: #e0c51c; --o5: #c78a1a; --o6: #a9b4b3;

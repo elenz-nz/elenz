@@ -173,7 +173,7 @@
 									{#each ringOf(R) as f}
 										<circle class="seg" r={RING_R} transform="rotate(-90)"
 											style="stroke:{f.hatch ? 'url(#hatch-roof)' : `var(${f.tok})`};stroke-dasharray:{f.len} {RING_C - f.len};stroke-dashoffset:{-f.start}">
-											<title>{name}: {f.name} {fmt(f.mw)} MW ({f.pct.toFixed(1)}%)</title>
+											<title>{`${name}: ${f.name} ${fmt(f.mw)} MW (${f.pct.toFixed(1)}%)`}</title>
 										</circle>
 									{/each}
 									<text class="ring-v" y="2" text-anchor="middle">{fmt(R.gen)}</text>
@@ -265,7 +265,7 @@
 
 	.map { position: relative; width: 100%; max-width: 680px; margin-inline: auto; }
 	.map svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-	.land { fill: var(--grid); stroke: var(--line); stroke-width: 1; stroke-linejoin: round; }
+	.land { fill: var(--land, var(--grid)); stroke: var(--line); stroke-width: 1; stroke-linejoin: round; }
 	.hv-line { fill: none; stroke: color-mix(in srgb, var(--f-hvdc) 45%, transparent); stroke-linecap: round; }
 	.hv-flow { fill: none; stroke: var(--f-hvdc); stroke-linecap: round; stroke-dasharray: 2 14; animation: flow 1.6s linear infinite; }
 	.hv-flow.south { animation-direction: reverse; }
