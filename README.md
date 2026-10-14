@@ -49,7 +49,8 @@ variable. `.emi_key` is git-ignored; never commit the key.
 
 ## How the live data updates
 
-`.github/workflows/update-data.yml` runs `ingest/update.py` on GitHub every 5 minutes. It fetches new intervals from
+`.github/workflows/update-data.yml` runs `ingest/update.py` on GitHub every 5 minutes, started by a Cloudflare cron
+trigger in the site's Worker (GitHub's own schedule is too unreliable to depend on). It fetches new intervals from
 the EMI API, keeps a compact 7-day store (`state.csv.gz`) and rebuilds `tracker.json`, saving both to Cloudflare
 Workers KV. The site's Worker (`worker/index.js`) serves `/data/tracker.json` from KV, so code changes and data
 updates never overwrite each other. It needs three repository secrets: `EMI_KEY`, `CF_ACCOUNT_ID`, `CF_API_TOKEN`.

@@ -15,11 +15,13 @@ This repository is public: never commit keys, tokens or personal details.
   columns `U|POC UNIT`, `C|...` charging, `L|NI`, `L|SI`, `T`, `P|NI`, `P|SI`, `src`), `build_tracker.py`
   (state → tracker.json), `emi_live.py` (API client), `store.py` (Workers KV via the Cloudflare REST API, or
   `data/store` locally), `sync.py` (EMI blob container + Open-Meteo), `common.py` (paths, overrides).
-- `.github/workflows/update-data.yml`: runs `update.py` every 5 minutes on GitHub (free because the repo is public).
-  Secrets: `EMI_KEY`, `CF_ACCOUNT_ID`, `CF_API_TOKEN` (Workers KV Storage: Edit). KV namespace id lives in
-  `wrangler.jsonc`. GitHub disables schedules in public repos after 60 days without commits.
+- `.github/workflows/update-data.yml`: runs `update.py` on GitHub (free because the repo is public). Triggered every
+  5 minutes by the Worker's Cloudflare cron through the workflow_dispatch API, because GitHub's own schedule never
+  fired for this new repo (it stays as a 30-minute backup). Secrets: `EMI_KEY`, `CF_ACCOUNT_ID`, `CF_API_TOKEN`
+  (Workers KV Storage: Edit). KV namespace id lives in `wrangler.jsonc`. A run with no new data saves nothing.
 - `worker/index.js`: serves static assets, and `/data/tracker.json` from KV (binding `DATA`), falling back to the
-  bundled snapshot. KV free plan: 1,000 writes/day (the job uses ~600), 100,000 reads/day.
+  bundled snapshot; its `scheduled` handler dispatches the GitHub job (Worker secret `GITHUB_TOKEN`: fine-grained,
+  elenz only, Actions read/write; it expires, so renew it yearly). KV free plan: 1,000 writes/day (the job uses ~600), 100,000 reads/day.
 - `facilities/overrides.toml`: curated corrections; `facilities/connection_points.csv`: POC → island;
   `facilities/plant_register.csv`: the EA register (refresh with `sync.py plants`, review the diff).
 - `data/`: raw downloads, git-ignored.

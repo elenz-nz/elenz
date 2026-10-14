@@ -79,6 +79,7 @@ def main(log=print):
     raw = store.get('state.csv.gz')
     s = st.loads(raw) if raw else None
     log('state:', 'none yet' if s is None else f'{len(s)} intervals to {s.index.max()}')
+    before = None if s is None else (len(s), s.index[s.src != 'empty'].max())
 
     latest = st.compact(emi_live.to_frame(emi_live.fetch()), 'api')
     t_latest = latest.index.max()
@@ -94,6 +95,10 @@ def main(log=print):
         s = st.merge(s, part)
     log(f'latest {t_latest}, fetched {len(todo)} intervals, {max(0, len(missing) - BUDGET)} older gaps left for later runs')
 
+    if before == (len(s), s.index[s.src != 'empty'].max()):
+        # nothing new (e.g. two triggers fired close together): skip the writes to stay inside KV's free daily limit
+        log(f'no new intervals since the last run (latest {t_latest}); nothing saved')
+        return
     js = build(s, irradiance(store, log), log)
     body = json.dumps(js, separators=(',', ':'), allow_nan=False).encode()
     store.put('state.csv.gz', st.dumps(s))

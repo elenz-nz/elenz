@@ -1,6 +1,8 @@
-# Every 5 minutes: fetch new intervals from the EMI real-time dispatch API, rebuild the tracker data,
-# and save it to Cloudflare Workers KV, where the site reads it. GitHub runs schedules on a best-effort basis,
-# so runs can be a few minutes late; each run fills any intervals a late or skipped run missed.
+# Fetch new intervals from the EMI real-time dispatch API, rebuild the tracker data, and save it to Cloudflare
+# Workers KV, where the site reads it. The site's Worker triggers this every 5 minutes through the API
+# (workflow_dispatch), because GitHub's own schedule is unreliable for new repositories; the schedule below is a
+# backup every 30 minutes. Each run fills any intervals a late or skipped run missed, and saves nothing if no new
+# data has arrived.
 #
 # Secrets (repo Settings → Secrets and variables → Actions): EMI_KEY, CF_ACCOUNT_ID, CF_API_TOKEN.
 # The KV namespace id is read from wrangler.jsonc.
@@ -8,7 +10,7 @@ name: Update data
 
 on:
   schedule:
-    - cron: '2-59/5 * * * *'   # every 5 minutes, off the top of the hour when GitHub is busiest
+    - cron: '17,47 * * * *'   # backup only; the Worker's cron is the main trigger
   workflow_dispatch:
 
 permissions:
