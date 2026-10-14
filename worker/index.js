@@ -1,18 +1,24 @@
 // The Elenz Worker.
-//  fetch:     serves the site's static files, except /data/tracker.json, which comes from Workers KV (written by
-//             the GitHub Actions job). Until KV has data, the bundled snapshot is served.
-//  scheduled: every 5 minutes (Cloudflare cron, see wrangler.jsonc), asks GitHub to run the data job. GitHub's own
+//  fetch:     serves the site's static files, except /data/tracker.json and /data/history/*, which come from
+//             Workers KV (written by the GitHub Actions jobs). Until KV has data, the bundled snapshot is served for
+//             tracker.json; history returns 404 until the first history run.
+//  scheduled: asks GitHub to run the data jobs. Every 5 minutes: the live update (update-data.yml). Every 6 hours:
+//             the history update (history.yml), which adds newly published daily dispatch files. GitHub's own
 //             schedule is unreliable for new repositories; on-demand runs start within seconds.
 //             Needs the Worker secret GITHUB_TOKEN: a fine-grained token for stubzy19/elenz with Actions: read and write.
-const DISPATCH = 'https://api.github.com/repos/stubzy19/elenz/actions/workflows/update-data.yml/dispatches';
+const WORKFLOWS = 'https://api.github.com/repos/stubzy19/elenz/actions/workflows';
+const HISTORY_CRON = '40 */6 * * *'; // must match wrangler.jsonc
+// history files the site may request: the index, all days, and one half-hourly file per month
+const HISTORY_FILE = /^\/data\/history\/(index\.json|day\.json|hh\/\d{4}-\d{2}\.json)$/;
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === '/data/status.json' && env.DATA) {
       // last outcome of the scheduled trigger, for checking the pipeline without the Cloudflare dashboard
-      const status = await env.DATA.get('cron-status');
-      return new Response(status || '{"result":"no scheduled run recorded yet"}', {
+      const [live, history] = await Promise.all([env.DATA.get('cron-status', 'json'), env.DATA.get('cron-status-history', 'json')]);
+      const status = { ...(live || { result: 'no scheduled run recorded yet' }), history: history || { result: 'no history run triggered yet' } };
+      return new Response(JSON.stringify(status), {
         headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
       });
     }
@@ -28,15 +34,31 @@ export default {
         });
       }
     }
+    const hist = url.pathname.match(HISTORY_FILE);
+    if (hist && env.DATA) {
+      const body = await env.DATA.get('hist/' + hist[1], { type: 'stream', cacheTtl: 600 });
+      if (!body) return new Response('{"error":"not available yet"}', { status: 404, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
+      return new Response(body, {
+        headers: {
+          'content-type': 'application/json; charset=utf-8',
+          // history changes a few times a day at most
+          'cache-control': 'public, max-age=900',
+          'access-control-allow-origin': '*',
+        },
+      });
+    }
     return env.ASSETS.fetch(request);
   },
 
   async scheduled(event, env) {
+    const history = event.cron === HISTORY_CRON;
+    const workflow = history ? 'history.yml' : 'update-data.yml';
+    const statusKey = history ? 'cron-status-history' : 'cron-status';
     let result;
     if (!env.GITHUB_TOKEN) {
       result = 'GITHUB_TOKEN secret not set';
     } else {
-      const r = await fetch(DISPATCH, {
+      const r = await fetch(`${WORKFLOWS}/${workflow}/dispatches`, {
         method: 'POST',
         headers: {
           authorization: `Bearer ${env.GITHUB_TOKEN}`,
@@ -52,9 +74,9 @@ export default {
     // record the outcome when it changes, or hourly, to stay well inside KV's free daily write limit
     if (env.DATA) {
       const now = new Date().toISOString();
-      const prev = await env.DATA.get('cron-status', 'json');
-      if (!prev || prev.result !== result || Date.parse(now) - Date.parse(prev.at) > 3600e3) {
-        await env.DATA.put('cron-status', JSON.stringify({ at: now, cron: event.cron, result }));
+      const prev = await env.DATA.get(statusKey, 'json');
+      if (history || !prev || prev.result !== result || Date.parse(now) - Date.parse(prev.at) > 3600e3) {
+        await env.DATA.put(statusKey, JSON.stringify({ at: now, cron: event.cron, result }));
       }
     }
   },

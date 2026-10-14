@@ -24,10 +24,13 @@ ROOF_PR = 0.78
 
 
 def register():
-    """(POC, unit) -> fuel, plant name, nameplate MW: EA register plus facilities/overrides.toml."""
+    """(POC, unit) -> fuel, plant name, nameplate MW: EA register plus facilities/overrides.toml.
+
+    The register keeps dated rows, so retired units (Taranaki Combined Cycle) and old connections (Pātea on HWA1101)
+    stay mapped for history; where a unit has several rows, the latest one wins."""
     O = overrides()
     plant = pd.read_csv(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'facilities', 'plant_register.csv'))
-    plant = plant[plant.EffectiveEndDate.astype(str).str.startswith('9999')]
+    plant = plant.sort_values('EffectiveEndDate').drop_duplicates(['PointOfConnectionCode', 'UnitCode'], keep='last')
     fuel = {(r.PointOfConnectionCode, r.UnitCode): O['fuels'][r.Fuel] for r in plant.itertuples() if r.Fuel in O['fuels']}
     names = {(r.PointOfConnectionCode, r.UnitCode): r.PlantName for r in plant.itertuples()}
     cap = {(r.PointOfConnectionCode, r.UnitCode): float(r.NameplateMegawatts) for r in plant.itertuples() if r.NameplateMegawatts == r.NameplateMegawatts}
@@ -62,15 +65,29 @@ def rooftop(irr, full):
 
 
 def build(state, irr, log=print):
-    O = overrides()
-    charge = O['battery_charging']
-    isl_tab = connection_islands()
-    fuel, names, cap = register()
-
     real = state[state.src != 'empty']
     last = real.index.max()
     full = pd.date_range(last - pd.Timedelta(minutes=5 * (WINDOW - 1)), last, freq='5min')
     s = real[real.index >= full[0]].reindex(full)  # missing intervals become NaN rows, interpolated below
+    js = assemble(s, full, rooftop(irr, full), log)
+    src = s.src.dropna()
+    api_t = src[src == 'api'].index
+    t0 = js['t0']
+    js['meta'] = {'intervals': int(s.src.notna().sum()), 'expected': len(full), 'end': t0 + (len(full) - 1) * 300000,
+                  'api_from': int(api_t.min().timestamp() * 1000) if len(api_t) else None,
+                  'built': int(pd.Timestamp.now(tz='UTC').timestamp() * 1000)}
+    log(f'built {len(full)} intervals ({int(s.src.notna().sum())} with data) to {last}, {len(js["plants"])} plants')
+    return js
+
+
+def assemble(s, full, roof, log=print):
+    """Rows of the compact state on a regular time grid (NaN rows where no data) -> the tracker data layout:
+    island series by fuel, demand, Tiwai, prices, rooftop solar, estimated HVDC, and plant series.
+    Shared by the live tracker (5-minute) and the history files (half-hourly)."""
+    O = overrides()
+    charge = O['battery_charging']
+    isl_tab = connection_islands()
+    fuel, names, cap = register()
     present = s.src.notna()
     gen_cols = [c for c in s.columns if c.startswith('U|')]
     chg_cols = [c for c in s.columns if c.startswith('C|')]
@@ -97,6 +114,8 @@ def build(state, irr, log=print):
                 lost.add(col[2:])
             continue
         island_gen[isl][f] = island_gen[isl][f] + series.fillna(0).where(present)
+        if (series.fillna(0).abs() <= 0.5).all():
+            continue  # idle all window (e.g. a unit's old connection point): not part of the plant here
         key = (names.get((poc, bunit), f'{poc} {bunit}'), f, isl)
         ukey = f'{poc} {bunit}'
         plant_units.setdefault(key, {})
@@ -118,7 +137,6 @@ def build(state, irr, log=print):
     genNI = sum(out['NI'][k] for k in KEYS)
     genSI = sum(out['SI'][k] for k in KEYS)
     hv = ((genSI - out['SI']['metered']) + (out['NI']['metered'] - genNI)) / 2
-    roof = rooftop(irr, full)
     for isl in ['NI', 'SI']:
         out[isl]['roof'] = roof[isl]
         out[isl]['underlying'] = out[isl]['metered'] + roof[isl]
@@ -126,7 +144,7 @@ def build(state, irr, log=print):
     out['SI']['hvdc'] = -hv
 
     t0 = int(full[0].timestamp() * 1000)
-    js = {'t0': t0, 'step': 300000, 'N': len(full), 'hvdcN': enc(hv)}
+    js = {'t0': t0, 'step': int(full.freq.nanos // 1_000_000), 'N': len(full), 'hvdcN': enc(hv)}
     for isl in ['NI', 'SI']:
         js[isl] = {k: enc(v, 2 if k == 'price' else 0) for k, v in out[isl].items()}
 
@@ -144,13 +162,6 @@ def build(state, irr, log=print):
         plants.append(entry)
     plants.sort(key=lambda p: (p['fuel'], -sum(p['s'])))
     js['plants'] = plants
-
-    src = s.src.dropna()
-    api_t = src[src == 'api'].index
-    js['meta'] = {'intervals': int(present.sum()), 'expected': len(full), 'end': t0 + (len(full) - 1) * 300000,
-                  'api_from': int(api_t.min().timestamp() * 1000) if len(api_t) else None,
-                  'built': int(pd.Timestamp.now(tz='UTC').timestamp() * 1000)}
-    log(f'built {len(full)} intervals ({int(present.sum())} with data) to {last}, {len(plants)} plants')
     return js
 
 

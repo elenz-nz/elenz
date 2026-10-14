@@ -1,33 +1,37 @@
 // Elenz tracker: linked generation, price, demand, HVDC, emissions and renewables charts on one time axis.
 // Data: tracker.json built by ingest/build_tracker.py. Drawn on <canvas>; the page supplies the markup (ids below).
 
-// ---------- New Zealand time (handles the NZST/NZDT change; offset cached per hour) ----------
-const NZ_PARTS = new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' });
-const offCache = new Map();
-export function nzOffset(t) {
-  const h = Math.floor(t / 36e5);
-  let o = offCache.get(h);
-  if (o === undefined) {
-    const p = Object.fromEntries(NZ_PARTS.formatToParts(new Date(h * 36e5)).map(x => [x.type, x.value]));
-    o = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute) - h * 36e5;
-    offCache.set(h, o);
-  }
-  return o;
-}
-export const tzName = t => nzOffset(t) === 13 * 36e5 ? 'NZDT' : 'NZST';
+import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore } from './series.js';
+export { nzOffset, tzName };
 
-export function buildModel(D) {
-  const N = D.N, t = new Float64Array(N);
-  for (let i = 0; i < N; i++) t[i] = D.t0 + i * D.step;
-  const keys = ['geo', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt', 'hvdc'];
-  const isl = s => { const o = {}; for (const k of [...keys, 'metered', 'underlying', 'tiwai', 'price']) o[k] = Float64Array.from(s[k] || new Array(N).fill(0)); return o; };
-  const NI = isl(D.NI), SI = isl(D.SI);
-  const plants = D.plants.map(p => ({ ...p, s: Float64Array.from(p.s), units: p.units && p.units.map(u => ({ ...u, s: Float64Array.from(u.s) })) }));
-  return { STEP: D.step, N, END: t[N - 1], t, NI, SI, NIs: NI, SIs: SI, hvdcN: Float64Array.from(D.hvdcN), keys, plants };
+// A model: one segment (series.js) plus what the charts read. NIs/SIs are the island series (same objects).
+function toModel(S, END) {
+  return { ...S, N: S.n, END: END ?? S.t[S.n - 1], NIs: S.NI, SIs: S.SI };
 }
+export const buildModel = D => toModel(fromLayout(D));
 
-export function mountTracker(D) {
-  let M = buildModel(D);
+// Ranges: the live week at 5 minutes, then history. Each lists its intervals; the first is the default.
+const RANGES = {
+  '1d': { model: 'live', n: 288, ints: ['5m', '30m'], span: 'Last 24 hours' },
+  '3d': { model: 'live', n: 864, ints: ['5m', '30m'], span: 'Last 3 days' },
+  '7d': { model: 'live', n: 2016, ints: ['5m', '30m'], span: 'Last 7 days' },
+  '30d': { model: 'hh', days: 30, ints: ['30m', '1d'], span: 'Last 30 days' },
+  '1y': { model: 'day', days: 365, ints: ['1d', '1w', '1mo'], def: '1w', span: 'Last 12 months' },
+  'all': { model: 'day', ints: ['1d', '1w', '1mo'], def: '1mo', span: null },
+};
+const INTS = {
+  '5m': { label: '5 min', key: null, live: true },
+  '30m': { label: '30 min', key: KEY.hh },
+  '1d': { label: 'Day', key: KEY.day },
+  '1w': { label: 'Week', key: KEY.week },
+  '1mo': { label: 'Month', key: KEY.month },
+};
+const OLD_RANGE = { 288: '1d', 864: '3d', 2016: '7d' };
+
+export function mountTracker(D, hooks = {}) {
+  const models = { live: buildModel(D), hh: null, day: null };
+  const history = historyStore();
+  let M = models.live;
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   // Stack order, bottom to top: geothermal (baseload) first, then thermal, hydro and the variable sources.
@@ -83,20 +87,26 @@ export function mountTracker(D) {
   const plantsFor = (fuel, r = state.region) => M.plants.filter(p => p.fuel === fuel && (r === 'NZ' || p.isl === r));
   const plantByName = name => M.plants.find(p => p.name === name);
 
-  const state = { region: 'NZ', range: 288, agg: 1, view: 'detailed', hover: null, hidden: new Set(), drill: { ...TOP_LEVEL } };
+  const state = { region: 'NZ', range: '1d', int: '5m', view: 'detailed', hover: null, hidden: new Set(), drill: { ...TOP_LEVEL } };
+  let saved = null;
   try {
     const s = JSON.parse(localStorage.getItem('elenz-view') || 'null');
     if (s && ['NZ', 'NI', 'SI'].includes(s.region)) state.region = s.region;
-    if (s && [288, 864, 2016].includes(s.range)) state.range = s.range;
-    if (s && [1, 6].includes(s.agg)) state.agg = s.agg;
+    const r = OLD_RANGE[s?.range] || s?.range;
+    if (Object.hasOwn(RANGES, r)) saved = r;  // a long range needs history loaded first (see below)
+    if (s && Object.hasOwn(INTS, s.int)) state.int = s.int;
+    else if (s?.agg === 6) state.int = '30m';
     if (s && Object.hasOwn(VIEWS, s.view)) state.view = s.view;
   } catch (e) {}
-  const save = () => { try { localStorage.setItem('elenz-view', JSON.stringify({ region: state.region, range: state.range, agg: state.agg, view: state.view })); } catch (e) {} };
+  if (saved && RANGES[saved].model === 'live') { state.range = saved; saved = null; }
+  if (!RANGES[state.range].ints.includes(state.int)) state.int = RANGES[state.range].def || RANGES[state.range].ints[0];
+  const save = () => { try { localStorage.setItem('elenz-view', JSON.stringify({ region: state.region, range: state.range, int: state.int, view: state.view })); } catch (e) {} };
 
   // ---------- time helpers ----------
   const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const lp = t => { const d = new Date(t + nzOffset(t)); return { dow: d.getUTCDay(), dom: d.getUTCDate(), mon: d.getUTCMonth(), h: d.getUTCHours(), m: d.getUTCMinutes() }; };
+  const MONTH = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const lp = t => { const d = new Date(t + nzOffset(t)); return { y: d.getUTCFullYear(), dow: d.getUTCDay(), dom: d.getUTCDate(), mon: d.getUTCMonth(), h: d.getUTCHours(), m: d.getUTCMinutes() }; };
   const clock = p => (p.h === 12 && p.m === 0) ? 'noon' : (p.h === 0 && p.m === 0) ? 'midnight' : `${p.h % 12 || 12}:${String(p.m).padStart(2, '0')} ${p.h < 12 ? 'am' : 'pm'}`;
   const hourLbl = p => p.h === 12 ? 'noon' : `${p.h % 12 || 12} ${p.h < 12 ? 'am' : 'pm'}`;
   const dayLbl = p => `${DOW[p.dow]} ${p.dom} ${MON[p.mon]}`;
@@ -104,26 +114,73 @@ export function mountTracker(D) {
   const fmt = v => Math.round(v).toLocaleString('en-NZ');
   const money = v => '$' + (v >= 100 ? Math.round(v).toLocaleString('en-NZ') : v.toFixed(v < 10 ? 2 : 0));
   const gwh = v => v.toFixed(Math.abs(v) < 10 ? 2 : 1);
+  const isLong = () => !INTS[state.int].live && state.int !== '30m';  // points are days, weeks or months
+  // a point's name: short for the hover chip, long for the summary heading
+  function chip(j) {
+    const p = lp(V.t[j]);
+    return { '1d': `${DOW[p.dow]} ${p.dom} ${MON[p.mon]}`, '1w': `w/c ${p.dom} ${MON[p.mon]}`, '1mo': `${MON[p.mon]} ${p.y}` }[state.int] || `${DOW[p.dow]} ${clock(p)}`;
+  }
+  function heading(j) {
+    const p = lp(V.t[j]), last = j === V.n - 1 && V.partial;
+    const h = {
+      '1d': [`${DOW[p.dow]} ${p.dom} ${MON[p.mon]} ${p.y}`, last ? 'daily average so far' : 'daily average'],
+      '1w': [`Week of ${p.dom} ${MON[p.mon]} ${p.y}`, last ? 'average for the week so far' : 'weekly average'],
+      '1mo': [`${MONTH[p.mon]} ${p.y}`, last ? 'average for the month so far' : 'monthly average'],
+    }[state.int];
+    return h || [clock(p), `${dayLbl(p)} · TP ${tp(p)} · ${state.int === '5m' ? '5-minute' : 'half-hour average'}`];
+  }
+
+  // ---------- time axis: ticks, labels and the vertical lines at day, week, month or year boundaries ----------
+  function marks(v) {
+    const out = [], r = state.range;
+    for (let j = 0; j < v.n; j++) {
+      const p = lp(v.t[j]), q = j ? lp(v.t[j - 1]) : null;
+      if (RANGES[r].model === 'live') {
+        const every = { '1d': 3, '3d': 6, '7d': 24 }[r];
+        if (p.m !== 0 || p.h % every) continue;
+        const midnight = p.h === 0;
+        out.push({ j, line: midnight, strong: midnight,
+                   label: midnight ? `${DOW[p.dow]} ${p.dom}` : r === '1d' || (r === '3d' && p.h === 12) ? hourLbl(p) : null });
+      } else if (r === '30d') {
+        if (!q || p.dom === q.dom) continue;
+        const monday = p.dow === 1;
+        out.push({ j, line: monday, strong: monday, label: monday ? `${p.dom} ${MON[p.mon]}` : null });
+      } else if (r === '1y') {
+        if (!q || p.mon === q.mon) continue;
+        out.push({ j, line: true, strong: p.mon === 0, label: p.mon === 0 ? `${MON[p.mon]} ${p.y}` : MON[p.mon] });
+      } else {
+        if (!q || p.y === q.y) continue;
+        out.push({ j, line: true, strong: true, label: String(p.y) });
+      }
+    }
+    return out;
+  }
 
   // ---------- view ----------
   let V;
   function buildView() {
-    const start = M.N - state.range, groups = [];
-    if (state.agg === 1) for (let i = start; i < M.N; i++) groups.push([i, i + 1]);
-    else {
-      let gs = start, key = Math.floor((M.t[start] + nzOffset(M.t[start])) / 18e5);
-      for (let i = start + 1; i <= M.N; i++) {
-        const k = i < M.N ? Math.floor((M.t[i] + nzOffset(M.t[i])) / 18e5) : -1;
-        if (k !== key) { groups.push([gs, i]); gs = i; key = k; }
-      }
-    }
+    const R = RANGES[state.range], key = INTS[state.int].key, groups = [];
+    let start = 0;
+    if (R.n) start = Math.max(0, M.N - R.n);
+    else if (R.days) start = firstAtOrAfter(M.t, M.END - R.days * 864e5 + (R.model === 'day' ? 36e5 : 0));
+    if (!key) for (let i = start; i < M.N; i++) groups.push([i, i + 1]);
+    else for (let a = start, i = start + 1; i <= M.N; i++) if (i === M.N || key(M.t[i]) !== key(M.t[a])) { groups.push([a, i]); a = i; }
     const n = groups.length;
-    const avg = arr => { const o = new Float64Array(n); groups.forEach(([a, b], j) => { let s = 0; for (let i = a; i < b; i++) s += arr[i]; o[j] = s / (b - a); }); return o; };
+    // averages weighted by each point's hours (days are 23-25 hours at the daylight-saving changes)
+    const hrs = groups.map(([a, b]) => { let h = 0; for (let i = a; i < b; i++) h += M.h[i]; return h; });
+    const avg = arr => { const o = new Float64Array(n); groups.forEach(([a, b], j) => { let s = 0; for (let i = a; i < b; i++) s += arr[i] * M.h[i]; o[j] = s / hrs[j]; }); return o; };
+    const max = arr => { const o = new Float64Array(n); groups.forEach(([a, b], j) => { let m = -Infinity; for (let i = a; i < b; i++) m = Math.max(m, arr[i]); o[j] = m; }); return o; };
     const S = SRC[state.region];
-    const v = { n, avg, t: groups.map(([a]) => M.t[a]), hrs: groups.map(([a, b]) => (b - a) / 12), fuels: {} };
+    const v = { n, avg, t: groups.map(([a]) => M.t[a]), hrs, fuels: {} };
     FUELS.forEach(f => v.fuels[f.k] = avg(S[f.k]));
     v.metered = avg(S.metered); v.underlying = avg(S.underlying); v.tiwai = avg(S.tiwai);
+    // peak demand: the highest 5-minute or half-hour value, which daily history keeps alongside its averages
+    const pk = M.peak && M.peak[state.region];
+    v.pkMet = max(pk ? pk.metered : S.metered); v.pkUnd = max(pk ? pk.underlying : S.underlying);
+    // the last day, week or month is incomplete when it runs up to the newest data
+    v.partial = isLong() && n > 0 && key(M.END + 3e5) === key(v.t[n - 1]);
     v.pNI = avg(M.NIs.price); v.pSI = avg(M.SIs.price); v.hvdc = avg(M.hvdcN);
+    v.marks = marks(v);
     v.gen = new Float64Array(n); v.co2 = new Float64Array(n); v.ren = new Float64Array(n);
     for (let j = 0; j < n; j++) {
       let tot = 0, em = 0, re = 0;
@@ -242,25 +299,21 @@ export function mountTracker(D) {
       ctx.fillStyle = C['--muted']; ctx.fillText(tickFmt(t), x0 - 7, y);
     }
     ctx.strokeStyle = C['--line'];
-    for (let j = 0; j < n; j++) { const p = lp(V.t[j]); if (p.h === 0 && p.m === 0) { const x = Math.round(X(j)) + 0.5; ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke(); } }
+    for (const mk of V.marks) if (mk.line) { const x = Math.round(X(mk.j)) + 0.5; ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke(); }
     if (opt.axis) drawAxis(ctx, X, bottom, x0, x1);
     return { X, Y, Yinv, x0, x1, top, bottom };
   }
   function drawAxis(ctx, X, bottom, x0, x1) {
     ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.font = FONT;
-    const every = state.range === 288 ? 3 : state.range === 864 ? 6 : 24;
     let lastX = -1e9;
-    for (let j = 0; j < V.n; j++) {
-      const p = lp(V.t[j]); if (p.m !== 0 || p.h % every !== 0) continue;
-      const x = X(j);
+    for (const mk of V.marks) {
+      const x = X(mk.j);
       ctx.strokeStyle = C['--line']; ctx.beginPath(); ctx.moveTo(Math.round(x) + 0.5, bottom); ctx.lineTo(Math.round(x) + 0.5, bottom + 4); ctx.stroke();
-      const midnight = p.h === 0;
-      if (!midnight && state.range === 864 && p.h !== 12) continue;
-      const lbl = midnight ? `${DOW[p.dow]} ${p.dom}` : hourLbl(p);
-      const tw = ctx.measureText(lbl).width;
+      if (!mk.label) continue;
+      const tw = ctx.measureText(mk.label).width;
       if (x - tw / 2 < lastX + 10 || x - tw / 2 < x0 - 30 || x + tw / 2 > x1 + 10) continue;
-      ctx.fillStyle = midnight ? C['--ink-2'] : C['--muted'];
-      ctx.fillText(lbl, x, bottom + 7); lastX = x + tw / 2;
+      ctx.fillStyle = mk.strong ? C['--ink-2'] : C['--muted'];
+      ctx.fillText(mk.label, x, bottom + 7); lastX = x + tw / 2;
     }
   }
   function line(ctx, X, Y, arr, color, width = 1.75, dash) {
@@ -333,7 +386,7 @@ export function mountTracker(D) {
     GEN = { F, tops };
     cursor(ctx, F);
     if (state.hover != null) {
-      const p = lp(V.t[state.hover]), lbl = `${DOW[p.dow]} ${clock(p)}`;
+      const lbl = chip(state.hover);
       ctx.font = '600 11px "IBM Plex Mono", ui-monospace, monospace'; const tw = ctx.measureText(lbl).width;
       let x = F.X(state.hover) - tw / 2 - 6; x = Math.max(F.x0, Math.min(F.x1 - tw - 12, x));
       ctx.fillStyle = C['--ink']; roundRect(ctx, x, F.top, tw + 12, 18, 4); ctx.fill();
@@ -356,7 +409,7 @@ export function mountTracker(D) {
     line(ctx, X, Y, V.pSI, alpha(C['--p-si'], aSI));
     line(ctx, X, Y, V.pNI, alpha(C['--p-ni'], aNI));
     const prim = r === 'SI' ? V.pSI : V.pNI; let jm = 0; for (let j = 1; j < V.n; j++) if (prim[j] > prim[jm]) jm = j;
-    const p = lp(V.t[jm]), lbl = `High ${money(prim[jm])} · ${DOW[p.dow]} ${clock(p)}`;
+    const lbl = `High ${money(prim[jm])} · ${chip(jm)}`;
     ctx.font = FONT; const tw = ctx.measureText(lbl).width, x = X(jm), y = Y(prim[jm]);
     ctx.fillStyle = C['--ink-2']; ctx.textBaseline = 'middle';
     if (x + 10 + tw < F.x1) { ctx.textAlign = 'left'; ctx.fillText(lbl, x + 9, Math.max(F.top + 6, y)); }
@@ -495,26 +548,27 @@ export function mountTracker(D) {
     const showT = r !== 'NI';
     $('tot-lbl').textContent = totalLabel();
     if (j == null) {
-      const span = { 288: 'Last 24 hours', 864: 'Last 3 days', 2016: 'Last 7 days' }[state.range];
-      const pe = lp(M.END);
-      $('sum-when').textContent = span;
-      $('sum-sub').textContent = `to ${clock(pe)} ${dayLbl(pe)} · energy and averages`;
-      $('col-q').textContent = 'GWh';
+      const pe = lp(M.END), p0 = lp(V.t[0]);
+      $('sum-when').textContent = RANGES[state.range].span || `Since ${p0.dom} ${MON[p0.mon]} ${p0.y}`;
+      $('sum-sub').textContent = `to ${clock(pe)} ${dayLbl(pe)}${RANGES[state.range].model === 'live' ? '' : ' ' + pe.y} · energy and averages`;
       const E = new Map(); let tot = 0;
       for (const l of layers) { let s = 0; for (let i = 0; i < V.n; i++) s += l.s[i] * V.hrs[i]; E.set(l, s / 1000); }
       if (level() === 'top') { for (let i = 0; i < V.n; i++) tot += V.gen[i] * V.hrs[i]; tot /= 1000; }
       else for (const l of layers) tot += l.signed ? E.get(l) : Math.max(0, E.get(l));
+      // energy in GWh, or TWh once totals run past 10,000 GWh
+      const tw = Math.abs(tot) >= 1e4, en = v => gwh(tw ? v / 1000 : v).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      $('col-q').textContent = tw ? 'TWh' : 'GWh';
       for (const l of layers) {
         const e = E.get(l);
-        l.row.querySelector('[data-q]').textContent = gwh(e);
+        l.row.querySelector('[data-q]').textContent = en(e);
         l.row.querySelector('[data-s]').textContent = l.signed ? signedTxt(l, e, true) : tot > 0 ? (e / tot * 100).toFixed(1) + '%' : '—';
         l.row.querySelector('[data-b]').style.transform = `scaleX(${l.signed || tot <= 0 ? 0 : Math.max(0, e / tot)})`;
       }
-      $('tot-q').textContent = gwh(tot); $('tot-s').textContent = layers.some(l => l.signed) && level() !== 'top' ? 'net' : '100%';
-      let pn = 0, ps = 0, pk = 0, pku = 0, tw = 0, hv = 0, em = 0, gw = 0, re = 0, hs = 0;
+      $('tot-q').textContent = en(tot); $('tot-s').textContent = layers.some(l => l.signed) && level() !== 'top' ? 'net' : '100%';
+      let pn = 0, ps = 0, pk = 0, pku = 0, ti = 0, hv = 0, em = 0, gw = 0, re = 0, hs = 0;
       for (let i = 0; i < V.n; i++) {
-        const w = V.hrs[i]; hs += w; pn += V.pNI[i] * w; ps += V.pSI[i] * w; tw += V.tiwai[i] * w; hv += V.hvdc[i] * w;
-        pk = Math.max(pk, V.metered[i]); pku = Math.max(pku, V.underlying[i]);
+        const w = V.hrs[i]; hs += w; pn += V.pNI[i] * w; ps += V.pSI[i] * w; ti += V.tiwai[i] * w; hv += V.hvdc[i] * w;
+        pk = Math.max(pk, V.pkMet[i]); pku = Math.max(pku, V.pkUnd[i]);
         em += V.co2[i] * V.gen[i] * w; re += V.ren[i] * V.gen[i] * w; gw += V.gen[i] * w;
       }
       setSys([
@@ -523,18 +577,19 @@ export function mountTracker(D) {
         ['Price, South Island', money(ps / hs), 'avg'],
         ['Peak demand, metered', fmt(pk), 'MW'],
         ['Peak, with rooftop solar', fmt(pku), 'MW'],
-        showT && ['Tiwai smelter', fmt(tw / hs), 'MW avg'],
-        ['HVDC, net transfer', (Math.abs(hv) / 1000).toFixed(1), hv >= 0 ? 'GWh north' : 'GWh south'],
+        showT && ['Tiwai smelter', fmt(ti / hs), 'MW avg'],
+        Math.abs(hv) >= 1e7 ? ['HVDC, net transfer', (Math.abs(hv) / 1e6).toFixed(2), hv >= 0 ? 'TWh north' : 'TWh south']
+          : ['HVDC, net transfer', (Math.abs(hv) / 1000).toFixed(1), hv >= 0 ? 'GWh north' : 'GWh south'],
         ['Emissions intensity', fmt(em / gw), 'g/kWh'],
         ['Renewable share', (re / gw).toFixed(1) + '%', ''],
       ]);
       for (const id of ['v-gen', 'v-pni', 'v-psi', 'v-met', 'v-und', 'v-xt', 'v-hv', 'v-co2', 'v-ren']) $(id).textContent = '';
       return;
     }
-    const p = lp(V.t[j]);
-    $('sum-when').textContent = clock(p);
-    $('sum-sub').textContent = `${dayLbl(p)} · TP ${tp(p)} · ${state.agg === 1 ? '5-minute' : 'half-hour average'}`;
-    $('col-q').textContent = 'MW';
+    const [when, sub] = heading(j), long = isLong();
+    $('sum-when').textContent = when;
+    $('sum-sub').textContent = sub;
+    $('col-q').textContent = long ? 'MW avg' : 'MW';
     let tot = 0;
     if (level() === 'top') tot = V.gen[j]; else for (const l of layers) tot += l.signed ? l.s[j] : Math.max(0, l.s[j]);
     for (const l of layers) {
@@ -548,9 +603,10 @@ export function mountTracker(D) {
       ...plantRows(false, j),
       ['Price, North Island', money(V.pNI[j]), '/MWh'],
       ['Price, South Island', money(V.pSI[j]), '/MWh'],
-      ['Demand, metered', fmt(V.metered[j]), 'MW'],
-      ['With rooftop solar', fmt(V.underlying[j]), 'MW'],
-      showT && ['Tiwai smelter', fmt(V.tiwai[j]), 'MW'],
+      ['Demand, metered', fmt(V.metered[j]), long ? 'MW avg' : 'MW'],
+      ['With rooftop solar', fmt(V.underlying[j]), long ? 'MW avg' : 'MW'],
+      long && ['Peak demand, metered', fmt(V.pkMet[j]), 'MW'],
+      showT && ['Tiwai smelter', fmt(V.tiwai[j]), long ? 'MW avg' : 'MW'],
       ['HVDC', hvTxt(V.hvdc[j]), hvDir(V.hvdc[j])],
       ['Emissions intensity', fmt(V.co2[j]), 'g/kWh'],
       ['Renewable share', V.ren[j].toFixed(1) + '%', ''],
@@ -568,25 +624,64 @@ export function mountTracker(D) {
   function drawAll() { drawGen(); drawPrice(); drawDemand(); drawHvdc(); drawCo2(); drawRen(); }
   function render() { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { drawAll(); updateSummary(); }); }
   function syncControls() {
-    for (const [seg, val] of [['seg-region', state.region], ['seg-range', String(state.range)], ['seg-int', String(state.agg)]])
-      for (const b of $(seg).querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v === val));
+    const seg = $('seg-int');
+    if (seg.dataset.for !== state.range) {  // each range offers its own intervals
+      seg.innerHTML = RANGES[state.range].ints.map(k => `<button type="button" data-v="${k}">${INTS[k].label}</button>`).join('');
+      seg.dataset.for = state.range;
+    }
+    for (const [id, val] of [['seg-region', state.region], ['seg-range', state.range], ['seg-int', state.int]])
+      for (const b of $(id).querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v === val));
     $('sel-view').value = state.view;
+  }
+
+  // ---------- models: the live week, and history merged with it (loaded when a long range is first chosen) ----------
+  const merge = kind => toModel(history.merged(kind, models.live), models.live.END);
+  function useModel() {
+    const m = models[RANGES[state.range].model];
+    if (m !== M) { M = m; derive(); }
+  }
+  function report(extra = {}) {
+    const kind = RANGES[state.range].model, ix = history.index;
+    hooks.status?.({ range: state.range, kind, loading: false, error: '', liveEnd: models.live.END,
+                     histFirst: kind !== 'live' && V ? V.t[0] : null, histEnd: kind !== 'live' ? M.histEnd : null,
+                     histBuilt: ix && ix.built, ...extra });
+  }
+  let pending = 0;
+  async function setRange(r) {
+    const kind = RANGES[r].model, ticket = ++pending;
+    if (kind !== 'live' && !models[kind]) {
+      report({ range: r, kind, loading: true });
+      for (const b of $('seg-range').querySelectorAll('button')) b.setAttribute('aria-busy', String(b.dataset.v === r));
+      try {
+        await history.load(kind, models.live.END);
+        models[kind] = merge(kind);
+      } catch (e) {
+        if (ticket === pending) report({ range: r, kind, error: e.message || String(e) });
+        return;
+      } finally {
+        for (const b of $('seg-range').querySelectorAll('button')) b.removeAttribute('aria-busy');
+      }
+      if (ticket !== pending) return;  // another range was chosen while this one loaded
+    }
+    state.range = r;
+    if (!RANGES[r].ints.includes(state.int)) state.int = RANGES[r].def || RANGES[r].ints[0];
+    useModel(); rebuild();
   }
   function rebuild() {
     const d = state.drill;
     if (d.plant) { const p = plantByName(d.plant); if (state.region !== 'NZ' && p.isl !== state.region) d.plant = null; }
     if (d.fuel && !plantsFor(d.fuel).length) { d.fuel = null; d.plant = null; }
     if (d.group && !groupById(d.group)?.f.some(k => present[state.region].includes(k))) d.group = null;
-    V = buildView(); relayer(); state.hover = null; syncControls(); buildSummary(); render(); save();
+    V = buildView(); relayer(); state.hover = null; syncControls(); buildSummary(); render(); save(); report();
   }
 
   $('seg-region').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; state.region = b.dataset.v; state.hidden.clear(); rebuild(); });
-  $('seg-range').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; state.range = +b.dataset.v; rebuild(); });
+  $('seg-range').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || !Object.hasOwn(RANGES, b.dataset.v)) return; setRange(b.dataset.v); });
   $('sel-view').addEventListener('change', e => {
     if (!Object.hasOwn(VIEWS, e.target.value)) return;
     state.view = e.target.value; state.drill = { ...TOP_LEVEL }; state.hidden.clear(); rebuild();
   });
-  $('seg-int').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; state.agg = +b.dataset.v; rebuild(); });
+  $('seg-int').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || !RANGES[state.range].ints.includes(b.dataset.v)) return; state.int = b.dataset.v; rebuild(); });
 
   const charts = $('charts');
   const indexAt = (cv, clientX) => {
@@ -604,7 +699,7 @@ export function mountTracker(D) {
   $('cv-gen').addEventListener('click', e => { if (e.pointerType === 'touch') return; const l = layerAt(e.clientX, e.clientY); if (l && l.drill) drillTo(l.drill); });
   charts.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') { state.hover = null; render(); } });
   charts.addEventListener('keydown', e => {
-    const step = state.agg === 1 ? (e.shiftKey ? 12 : 1) : (e.shiftKey ? 2 : 1);
+    const step = e.shiftKey ? { '5m': 12, '30m': 2, '1d': 7, '1w': 4, '1mo': 12 }[state.int] : 1;
     if (e.target !== charts) return;
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
       e.preventDefault();
@@ -629,10 +724,20 @@ export function mountTracker(D) {
 
   readColours();
   rebuild();
+  if (saved) setRange(saved);  // reopen on the viewer's last long range once its history has loaded
 
   return {
     // new data: keep the viewer's region, range, interval and drill-down; drop the hover point
-    update(D2) { M = buildModel(D2); derive(); updateAsof(); rebuild(); },
+    update(D2) {
+      models.live = buildModel(D2);
+      for (const kind of ['hh', 'day']) if (models[kind]) models[kind] = merge(kind);
+      M = null; useModel(); updateAsof(); rebuild();
+      // history gains days a few times a day: refresh what's loaded, at most hourly (history.load checks the age)
+      for (const kind of ['hh', 'day']) if (models[kind]) history.load(kind, models.live.END).then(() => {
+        models[kind] = merge(kind);
+        if (RANGES[state.range].model === kind) { M = null; useModel(); rebuild(); }
+      }).catch(() => {});
+    },
     destroy() { mo.disconnect(); ro.disconnect(); if (mq) mq.removeEventListener('change', retheme); cancelAnimationFrame(raf); },
   };
 }

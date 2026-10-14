@@ -150,9 +150,14 @@ a { color: var(--accent); }
   .brand p { display: none; }
   #cv-gen { height: 240px; }
   .seg button { padding: 4px 8px; }
+  #seg-range { flex-wrap: wrap; }
   .ctl > span { display: none; }
 }
 .pill.live { background: var(--live-bg); color: var(--live-ink); }
 .pill.live::before { background: currentColor; }
 .pill.stale { background: var(--warn-bg); color: var(--warn-ink); }
+.pill.hist { background: var(--accent-soft); color: var(--accent); }
+.seg button[aria-busy="true"] { cursor: progress; background-image: linear-gradient(90deg, transparent, var(--accent-soft), transparent); background-size: 200% 100%; animation: busy 1.1s linear infinite; }
+@keyframes busy { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+@media (prefers-reduced-motion: reduce) { .seg button[aria-busy="true"] { animation: none; } }
 .loading { padding: 40px 16px; text-align: center; color: var(--muted); }

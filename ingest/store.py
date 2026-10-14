@@ -66,6 +66,7 @@ class LocalStore:
 
     def put(self, key, body, ctype=None):
         path = os.path.join(self.folder, key)
+        os.makedirs(os.path.dirname(path), exist_ok=True)  # keys like hist/hh/2026-09.json
         with open(path + '.tmp', 'wb') as f:
             f.write(body)
         os.replace(path + '.tmp', path)

@@ -7,8 +7,11 @@
 	const DATA_URL = '/data/tracker.json';
 	const LIVE_MINUTES = 15; // data newer than this counts as live
 
+	type View = { range: string; kind: string; loading: boolean; error: string; liveEnd: number; histFirst: number | null; histEnd: number | null };
+
 	let meta = $state<Meta | null>(null);
 	let error = $state('');
+	let view = $state<View | null>(null);
 	let now = $state(Date.now());
 
 	const PARTS = new Intl.DateTimeFormat('en-NZ', {
@@ -19,12 +22,23 @@
 		return `${p.hour}:${p.minute} ${String(p.dayPeriod).toLowerCase()} ${p.weekday} ${p.day} ${p.month}`;
 	}
 	const dayOnly = (t: number) => new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', day: 'numeric', month: 'short' }).format(new Date(t));
+	const dayYear = (t: number) => {
+		const p = Object.fromEntries(new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', day: 'numeric', month: 'numeric', year: 'numeric' }).formatToParts(new Date(t)).map((x) => [x.type, x.value]));
+		return `${p.day} ${'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ')[+p.month - 1]} ${p.year}`;
+	};
 
 	const age = $derived(meta ? (now - meta.end) / 60000 : 0);
 	const live = $derived(meta !== null && age < LIVE_MINUTES);
 	const missing = $derived(meta ? Math.round(100 * (1 - meta.intervals / meta.expected)) : 0);
 	const notice = $derived.by(() => {
 		if (!meta) return '';
+		if (view && view.kind !== 'live') {
+			if (view.loading) return 'Loading history…';
+			if (view.error) return view.error;
+			if (view.histEnd == null) return '';
+			const step = view.kind === 'day' ? 'Daily averages of half-hourly' : 'Half-hourly';
+			return `${step} dispatch data from ${dayYear(view.histFirst!)} to ${dayYear(view.histEnd)} from the Electricity Authority's daily EMI files (published 1–4 days late), then the live real-time dispatch feed to ${when(view.liveEnd)}. Rooftop solar is estimated from the EA's monthly record of installed solar capacity and irradiance, and HVDC transfer from the balance between the islands.${view.kind === 'day' ? ' Peak demand is the highest half-hour.' : ''}`;
+		}
 		const mixed = meta.api_from !== null && meta.api_from > meta.end - 7 * 864e5 + 3e5;
 		const source = mixed
 			? `: the Electricity Authority's daily EMI files up to ${dayOnly(meta.api_from! - 864e5)}, then the live real-time dispatch feed.`
@@ -45,7 +59,7 @@
 			meta = D.meta;
 			error = '';
 			if (tracker) tracker.update(D);
-			else tracker = mountTracker(D);
+			else tracker = mountTracker(D, { status: (v: View) => (view = v) });
 		}
 		load().catch((e) => (error = `The data couldn't be loaded. ${e.message} Try reloading the page.`));
 		// new data lands every 5–15 minutes; check every 2 minutes while the page is on screen, and on return
@@ -82,7 +96,9 @@
 			</div>
 		</div>
 		{#if meta}
-			{#if live}
+			{#if view && view.kind !== 'live' && !view.loading && !view.error}
+				<span class="pill hist" title="History from the EA's daily dispatch files, then the live feed">History · since 2020</span>
+			{:else if live}
 				<span class="pill live" title="Updated from the EMI real-time dispatch feed every 5 minutes">Live</span>
 			{:else}
 				<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {when(meta.end)}</span>
@@ -102,16 +118,19 @@
 		<div class="ctl">
 			<span id="lb-range">Range</span>
 			<div class="seg" role="group" aria-labelledby="lb-range" id="seg-range">
-				<button type="button" id="g-1" data-v="288">24 h</button>
-				<button type="button" id="g-3" data-v="864">3 days</button>
-				<button type="button" id="g-7" data-v="2016">7 days</button>
+				<button type="button" data-v="1d">24 h</button>
+				<button type="button" data-v="3d">3 days</button>
+				<button type="button" data-v="7d">7 days</button>
+				<button type="button" data-v="30d">30 days</button>
+				<button type="button" data-v="1y">1 year</button>
+				<button type="button" data-v="all">All</button>
 			</div>
 		</div>
 		<div class="ctl">
 			<span id="lb-int">Interval</span>
 			<div class="seg" role="group" aria-labelledby="lb-int" id="seg-int">
-				<button type="button" id="i-5" data-v="1">5 min</button>
-				<button type="button" id="i-30" data-v="6">30 min</button>
+				<button type="button" data-v="5m">5 min</button>
+				<button type="button" data-v="30m">30 min</button>
 			</div>
 		</div>
 		<span class="asof" id="asof"></span>
@@ -206,7 +225,7 @@
 
 	<section class="sources" aria-labelledby="src-h">
 		<h2 id="src-h">Where the data comes from</h2>
-		<p>Live series come from the Electricity Authority's EMI real-time dispatch feed, about a minute after each 5-minute dispatch case runs. The EA's daily dispatch files carry the same data and fill any gaps. Both are published under CC BY 4.0.</p>
+		<p>Live series come from the Electricity Authority's EMI real-time dispatch feed, about a minute after each 5-minute dispatch case runs. The EA's daily dispatch files carry the same data, fill any gaps, and provide the history back to September 2020. Both are published under CC BY 4.0.</p>
 		<div class="tbl-wrap">
 			<table class="src">
 				<thead><tr><th scope="col">Chart</th><th scope="col">Source</th><th scope="col">How it's built</th></tr></thead>
@@ -217,6 +236,7 @@
 					<tr><td>Demand</td><td>EMI real-time dispatch: load by connection point</td><td>Metered grid demand. Rooftop solar is added back for the dashed line. Tiwai is the Tiwai Point smelter (TWI2201)</td></tr>
 					<tr><td>HVDC transfer</td><td>Estimated</td><td>Mean of the South Island surplus and the North Island shortfall, since the dispatch feed doesn't include HVDC flow. Positive is northward</td></tr>
 					<tr><td>Emissions intensity</td><td>Calculated</td><td>Fuel mix × emission factors. Provisional factors: coal/gas Rankine 0.95, gas 0.50, diesel 0.80, geothermal 0.07 t CO₂e/MWh</td></tr>
+					<tr><td>History</td><td>EMI daily dispatch files (<code>NodalPricesAndVolumes</code>), from 10 Sep 2020</td><td>The same dispatch cases as the live feed, published 1–4 days late. Each trading period is the average of its 5-minute intervals; the 30-day view shows half-hours, longer ranges daily averages, with each day's highest half-hour kept for peak demand. The live week fills in the latest days. Rooftop solar uses the EA's monthly installed distributed solar capacity (report GUEHMT, about 140 MW in 2020), up to the 1,000 MW assumed for the live week, with Open-Meteo hourly irradiance</td></tr>
 					<tr><td>Source groups</td><td>Grouped from the fuel mix</td><td>Groupings follow Open Electricity's. Thermal and fossils are coal/gas Rankine, gas and diesel. Renewables are geothermal, hydro, wind and solar (grid and rooftop). Flexibility: slow flexible is geothermal and the Huntly Rankines; fast flexible is gas, diesel and hydro; variable is wind and solar. VRE/Residual splits wind and solar from everything else. Batteries and HVDC are always shown separately, because they can charge or export. Grouping is by fuel, so gas cogeneration plant counts as fast flexible</td></tr>
 				</tbody>
 			</table>

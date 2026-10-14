@@ -8,13 +8,14 @@
   "preview_urls": false,
   // keep variables and secrets set in the Cloudflare dashboard (GITHUB_TOKEN) when a code push redeploys
   "keep_vars": true,
-  // every 5 minutes, just after each interval's dispatch case is published: triggers the GitHub data job
-  "triggers": { "crons": ["*/5 * * * *"] },
+  // every 5 minutes, just after each interval's dispatch case is published: triggers the GitHub live data job.
+  // every 6 hours at :40: triggers the history job (newly published daily dispatch files). See worker/index.js.
+  "triggers": { "crons": ["*/5 * * * *", "40 */6 * * *"] },
   "assets": {
     "directory": "./site/build",
     "binding": "ASSETS",
     "run_worker_first": ["/data/*"]
   },
-  // Workers KV namespace "elenz-data": the GitHub job (ingest/update.py) writes tracker.json here
+  // Workers KV namespace "elenz-data": the GitHub jobs write tracker.json (ingest/update.py) and hist/* (ingest/history.py) here
   "kv_namespaces": [{ "binding": "DATA", "id": "dd69ad9aae3343c8b3ca5722ddf45548" }]
 }
