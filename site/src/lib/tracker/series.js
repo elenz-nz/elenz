@@ -150,17 +150,29 @@ export function historyStore(base = '/data/history') {
   const monthOf = t => { const d = new Date(local(t)); return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`; };
   return {
     get index() { return H.index; },
-    /** Fetch what a model needs: 'hh' the half-hourly months covering the last 31 days, 'day' the daily file. */
-    async load(kind, liveEnd) {
-      const ix = await index();
-      if (kind === 'day') { if (!H.day) H.day = fromLayout(await getJSON(`${base}/day.json`)); return; }
-      const want = [];
-      for (let t = Math.min(liveEnd, ix.end) - 31 * 864e5; ; t += 20 * 864e5) {
-        const m = monthOf(Math.min(t, ix.end));
+    /** Months of half-hourly history covering [from, to], among those published. */
+    monthsFor(from, to) {
+      const ix = H.index, want = [];
+      if (!ix) return want;
+      to = Math.min(to, ix.end);
+      for (let t = Math.max(from, ix.first); ; t += 20 * 864e5) {
+        const m = monthOf(Math.min(t, to));
         if (!want.includes(m)) want.push(m);
-        if (t >= ix.end) break;
+        if (t >= to) break;
       }
-      await Promise.all(want.filter(m => ix.months.includes(m) && !H.hh.has(m)).map(async m => H.hh.set(m, fromLayout(await getJSON(`${base}/hh/${m}.json`)))));
+      return want.filter(m => ix.months.includes(m));
+    },
+    /** True if what a view of [from, to] needs is already loaded. */
+    has(kind, from, to) {
+      if (!H.index || Date.now() - H.at > 3600e3) return false;
+      return kind === 'day' ? !!H.day : this.monthsFor(from, to).every(m => H.hh.has(m));
+    },
+    /** Fetch what a view of [from, to] needs: 'hh' the half-hourly months covering it, 'day' the daily file. */
+    async load(kind, from, to) {
+      await index();
+      if (kind === 'day') { if (!H.day) H.day = fromLayout(await getJSON(`${base}/day.json`)); return; }
+      const want = this.monthsFor(from, to).filter(m => !H.hh.has(m));
+      await Promise.all(want.map(async m => H.hh.set(m, fromLayout(await getJSON(`${base}/hh/${m}.json`)))));
     },
     /** History of one kind followed by the live week (5-minute segment) averaged to the same step. */
     merged(kind, live) {

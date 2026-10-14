@@ -11,14 +11,17 @@ function toModel(S, END) {
 export const buildModel = D => toModel(fromLayout(D));
 
 // Ranges: the live week at 5 minutes, then history. Each lists its intervals; the first is the default.
+// A range can end at the latest data or on a chosen date (state.end); the arrows step by the range's length.
+// Past windows outside the live week come from half-hourly history, so they offer the `past` intervals.
 const RANGES = {
-  '1d': { model: 'live', n: 288, ints: ['5m', '30m'], span: 'Last 24 hours' },
-  '3d': { model: 'live', n: 864, ints: ['5m', '30m'], span: 'Last 3 days' },
-  '7d': { model: 'live', n: 2016, ints: ['5m', '30m'], span: 'Last 7 days' },
-  '30d': { model: 'hh', days: 30, ints: ['30m', '1d'], span: 'Last 30 days' },
-  '1y': { model: 'day', days: 365, ints: ['1d', '1w', '1mo'], def: '1w', span: 'Last 12 months' },
-  'all': { model: 'day', ints: ['1d', '1w', '1mo'], def: '1mo', span: null },
+  '1d': { model: 'live', n: 288, days: 1, label: '24 hours', ints: ['5m', '30m'], past: ['30m'], span: 'Last 24 hours' },
+  '3d': { model: 'live', n: 864, days: 3, label: '3 days', ints: ['5m', '30m'], past: ['30m'], span: 'Last 3 days' },
+  '7d': { model: 'live', n: 2016, days: 7, label: '7 days', ints: ['5m', '30m'], past: ['30m', '1d'], span: 'Last 7 days' },
+  '30d': { model: 'hh', days: 30, label: '30 days', ints: ['30m', '1d'], span: 'Last 30 days' },
+  '1y': { model: 'day', days: 365, label: '1 year', ints: ['1d', '1w', '1mo'], def: '1w', span: 'Last 12 months' },
+  'all': { model: 'day', label: 'All', fixed: true, ints: ['1d', '1w', '1mo'], def: '1mo', span: null },
 };
+const DAY = 864e5;
 const INTS = {
   '5m': { label: '5 min', key: null, live: true },
   '30m': { label: '30 min', key: KEY.hh },
@@ -87,7 +90,7 @@ export function mountTracker(D, hooks = {}) {
   const plantsFor = (fuel, r = state.region) => M.plants.filter(p => p.fuel === fuel && (r === 'NZ' || p.isl === r));
   const plantByName = name => M.plants.find(p => p.name === name);
 
-  const state = { region: 'NZ', range: '1d', int: '5m', view: 'detailed', hover: null, hidden: new Set(), drill: { ...TOP_LEVEL } };
+  const state = { region: 'NZ', range: '1d', end: null, kind: 'live', int: '5m', view: 'detailed', hover: null, hoverBy: null, hidden: new Set(), drill: { ...TOP_LEVEL } };
   let saved = null;
   try {
     const s = JSON.parse(localStorage.getItem('elenz-view') || 'null');
@@ -159,12 +162,16 @@ export function mountTracker(D, hooks = {}) {
   // ---------- view ----------
   let V;
   function buildView() {
-    const R = RANGES[state.range], key = INTS[state.int].key, groups = [];
-    let start = 0;
-    if (R.n) start = Math.max(0, M.N - R.n);
-    else if (R.days) start = firstAtOrAfter(M.t, M.END - R.days * 864e5 + (R.model === 'day' ? 36e5 : 0));
-    if (!key) for (let i = start; i < M.N; i++) groups.push([i, i + 1]);
-    else for (let a = start, i = start + 1; i <= M.N; i++) if (i === M.N || key(M.t[i]) !== key(M.t[a])) { groups.push([a, i]); a = i; }
+    const R = RANGES[state.range], key = INTS[state.int].key, groups = [], daily = state.kind === 'day';
+    let start = 0, stop = M.N;
+    if (state.end != null) {
+      // [end − range, end); daily points sit at local midnight, which moves an hour at the clock changes
+      stop = firstAtOrAfter(M.t, state.end);
+      start = firstAtOrAfter(M.t, state.end - R.days * DAY - (daily ? 2 * 36e5 : 0));
+    } else if (state.kind === 'live') start = Math.max(0, M.N - R.n);
+    else if (R.days) start = firstAtOrAfter(M.t, M.END - R.days * DAY + (daily ? 36e5 : 0));
+    if (!key) for (let i = start; i < stop; i++) groups.push([i, i + 1]);
+    else for (let a = start, i = start + 1; i <= stop; i++) if (i === stop || key(M.t[i]) !== key(M.t[a])) { groups.push([a, i]); a = i; }
     const n = groups.length;
     // averages weighted by each point's hours (days are 23-25 hours at the daylight-saving changes)
     const hrs = groups.map(([a, b]) => { let h = 0; for (let i = a; i < b; i++) h += M.h[i]; return h; });
@@ -178,7 +185,7 @@ export function mountTracker(D, hooks = {}) {
     const pk = M.peak && M.peak[state.region];
     v.pkMet = max(pk ? pk.metered : S.metered); v.pkUnd = max(pk ? pk.underlying : S.underlying);
     // the last day, week or month is incomplete when it runs up to the newest data
-    v.partial = isLong() && n > 0 && key(M.END + 3e5) === key(v.t[n - 1]);
+    v.partial = state.end == null && isLong() && n > 0 && key(M.END + 3e5) === key(v.t[n - 1]);
     v.pNI = avg(M.NIs.price); v.pSI = avg(M.SIs.price); v.hvdc = avg(M.hvdcN);
     v.marks = marks(v);
     v.gen = new Float64Array(n); v.co2 = new Float64Array(n); v.ren = new Float64Array(n);
@@ -358,7 +365,7 @@ export function mountTracker(D, hooks = {}) {
     if (cap) mx = Math.max(mx, cap * 1.04);
     const dom = nice(0, Math.max(mx, 1), 5);
     if (mn < 0) dom.lo = mn * 1.2;
-    const F = frame(c, dom, v => fmt(v));
+    const F = frame(c, dom, v => fmt(v), { axis: true });
     const { X, Y } = F;
     for (const L of tops) {
       let fill = L.l.hatch ? ctx.createPattern(PAT[L.l.hatch], 'repeat') : colourOf(L.l);
@@ -385,7 +392,7 @@ export function mountTracker(D, hooks = {}) {
     }
     GEN = { F, tops };
     cursor(ctx, F);
-    if (state.hover != null) {
+    if (state.hover != null && state.hoverBy !== 'mouse') {  // the mouse tooltip shows the time itself
       const lbl = chip(state.hover);
       ctx.font = '600 11px "IBM Plex Mono", ui-monospace, monospace'; const tw = ctx.measureText(lbl).width;
       let x = F.X(state.hover) - tw / 2 - 6; x = Math.max(F.x0, Math.min(F.x1 - tw - 12, x));
@@ -411,9 +418,11 @@ export function mountTracker(D, hooks = {}) {
     const prim = r === 'SI' ? V.pSI : V.pNI; let jm = 0; for (let j = 1; j < V.n; j++) if (prim[j] > prim[jm]) jm = j;
     const lbl = `High ${money(prim[jm])} · ${chip(jm)}`;
     ctx.font = FONT; const tw = ctx.measureText(lbl).width, x = X(jm), y = Y(prim[jm]);
-    ctx.fillStyle = C['--ink-2']; ctx.textBaseline = 'middle';
-    if (x + 10 + tw < F.x1) { ctx.textAlign = 'left'; ctx.fillText(lbl, x + 9, Math.max(F.top + 6, y)); }
-    else { ctx.textAlign = 'right'; ctx.fillText(lbl, x - 9, Math.max(F.top + 6, y)); }
+    ctx.fillStyle = C['--ink-2']; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+    // beside the high point, kept inside the plot (clear of the axis labels on narrow screens)
+    let lx = x + 10 + tw < F.x1 ? x + 9 : x - 9 - tw;
+    lx = Math.max(F.x0 + 4, Math.min(F.x1 - tw, lx));
+    ctx.fillText(lbl, lx, Math.max(F.top + 6, y));
     if (state.hover == null) dot(ctx, x, y, r === 'SI' ? C['--p-si'] : C['--p-ni']);
     cursor(ctx, F);
     if (state.hover != null) { const j = state.hover; dot(ctx, X(j), Y(V.pSI[j]), alpha(C['--p-si'], aSI)); dot(ctx, X(j), Y(V.pNI[j]), alpha(C['--p-ni'], aNI)); }
@@ -548,9 +557,16 @@ export function mountTracker(D, hooks = {}) {
     const showT = r !== 'NI';
     $('tot-lbl').textContent = totalLabel();
     if (j == null) {
-      const pe = lp(M.END), p0 = lp(V.t[0]);
-      $('sum-when').textContent = RANGES[state.range].span || `Since ${p0.dom} ${MON[p0.mon]} ${p0.y}`;
-      $('sum-sub').textContent = `to ${clock(pe)} ${dayLbl(pe)}${RANGES[state.range].model === 'live' ? '' : ' ' + pe.y} · energy and averages`;
+      const R = RANGES[state.range], p0 = lp(V.t[0] ?? M.END);
+      if (state.end == null) {
+        const pe = lp(M.END);
+        $('sum-when').textContent = R.span || `Since ${p0.dom} ${MON[p0.mon]} ${p0.y}`;
+        $('sum-sub').textContent = `to ${clock(pe)} ${dayLbl(pe)}${R.model === 'live' ? '' : ' ' + pe.y} · energy and averages`;
+      } else {
+        const pe = lp(state.end - 1), d = p => `${p.dom} ${MON[p.mon]}`;
+        $('sum-when').textContent = R.days === 1 ? `${DOW[pe.dow]} ${d(pe)} ${pe.y}` : `${R.label} to ${d(pe)} ${pe.y}`;
+        $('sum-sub').textContent = `${R.days === 1 ? 'whole day' : `${d(p0)}${p0.y !== pe.y ? ' ' + p0.y : ''} – ${d(pe)}`} · energy and averages`;
+      }
       const E = new Map(); let tot = 0;
       for (const l of layers) { let s = 0; for (let i = 0; i < V.n; i++) s += l.s[i] * V.hrs[i]; E.set(l, s / 1000); }
       if (level() === 'top') { for (let i = 0; i < V.n; i++) tot += V.gen[i] * V.hrs[i]; tot /= 1000; }
@@ -623,12 +639,33 @@ export function mountTracker(D, hooks = {}) {
   let raf = 0;
   function drawAll() { drawGen(); drawPrice(); drawDemand(); drawHvdc(); drawCo2(); drawRen(); }
   function render() { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { drawAll(); updateSummary(); }); }
+  const intsFor = (r, kind) => RANGES[r].model === 'live' && kind !== 'live' ? RANGES[r].past : RANGES[r].ints;
+  // local midnight at or before t; whole days later or earlier (a day is 23-25 hours at the clock changes)
+  const midnightOf = t => { const k = KEY.day(t) * DAY; return k - nzOffset(k - nzOffset(k)); };
+  const addDays = (m, k) => midnightOf(m + k * DAY + 3 * 36e5);
+  const endOfToday = () => addDays(midnightOf(models.live.END), 1);
+  const ymd = t => { const p = lp(t); return `${p.y}-${String(p.mon + 1).padStart(2, '0')}-${String(p.dom).padStart(2, '0')}`; };
+  const firstDay = () => history.index?.first ?? Date.UTC(2020, 8, 9, 12);
   function syncControls() {
-    const seg = $('seg-int');
-    if (seg.dataset.for !== state.range) {  // each range offers its own intervals
-      seg.innerHTML = RANGES[state.range].ints.map(k => `<button type="button" data-v="${k}">${INTS[k].label}</button>`).join('');
-      seg.dataset.for = state.range;
+    const seg = $('seg-int'), ints = intsFor(state.range, state.kind);
+    if (seg.dataset.for !== ints.join()) {  // each range offers its own intervals
+      seg.innerHTML = ints.map(k => `<button type="button" data-v="${k}">${INTS[k].label}</button>`).join('');
+      seg.dataset.for = ints.join();
     }
+    // the date control: the chosen range ends on this date (today = the latest data)
+    const R = RANGES[state.range], inp = $('in-date'), end = state.end ?? endOfToday();
+    $('lb-date').textContent = R.fixed ? 'All data' : `${R.label} ending`;
+    inp.disabled = !!R.fixed;
+    inp.value = R.fixed ? '' : ymd(end - 1);
+    inp.min = ymd(firstDay()); inp.max = ymd(models.live.END);
+    $('btn-latest').hidden = state.end == null;
+    // the arrows on the chart step by the range
+    const prev = $('nav-prev'), next = $('nav-next');
+    prev.hidden = next.hidden = !!R.fixed;
+    prev.disabled = !R.fixed && end - R.days * DAY <= firstDay();
+    next.disabled = state.end == null;
+    prev.setAttribute('aria-label', `Previous ${R.label}`); next.setAttribute('aria-label', `Next ${R.label}`);
+    prev.title = `Previous ${R.label}`; next.title = state.end == null ? 'Showing the latest data' : `Next ${R.label}`;
     for (const [id, val] of [['seg-region', state.region], ['seg-range', state.range], ['seg-int', state.int]])
       for (const b of $(id).querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v === val));
     $('sel-view').value = state.view;
@@ -637,36 +674,55 @@ export function mountTracker(D, hooks = {}) {
   // ---------- models: the live week, and history merged with it (loaded when a long range is first chosen) ----------
   const merge = kind => toModel(history.merged(kind, models.live), models.live.END);
   function useModel() {
-    const m = models[RANGES[state.range].model];
+    const m = models[state.kind];
     if (m !== M) { M = m; derive(); }
   }
   function report(extra = {}) {
-    const kind = RANGES[state.range].model, ix = history.index;
-    hooks.status?.({ range: state.range, kind, loading: false, error: '', liveEnd: models.live.END,
-                     histFirst: kind !== 'live' && V ? V.t[0] : null, histEnd: kind !== 'live' ? M.histEnd : null,
+    const ix = history.index, kind = state.kind;
+    hooks.status?.({ range: state.range, kind, past: state.end != null, loading: false, error: '', liveEnd: models.live.END,
+                     histFirst: kind !== 'live' && V ? V.t[0] : null, histEnd: kind !== 'live' ? Math.min(M.histEnd, (state.end ?? Infinity) - 1) : null,
                      histBuilt: ix && ix.built, ...extra });
   }
+  // which data a window needs: the live 5-minute week if it covers it, otherwise half-hourly or daily history
+  function kindFor(r, end) {
+    const R = RANGES[r];
+    if (R.model !== 'live') return R.model;
+    if (end == null) return 'live';
+    return end - R.days * DAY >= models.live.t[0] - 6e4 ? 'live' : 'hh';
+  }
   let pending = 0;
-  async function setRange(r) {
-    const kind = RANGES[r].model, ticket = ++pending;
-    if (kind !== 'live' && !models[kind]) {
-      report({ range: r, kind, loading: true });
-      for (const b of $('seg-range').querySelectorAll('button')) b.setAttribute('aria-busy', String(b.dataset.v === r));
-      try {
-        await history.load(kind, models.live.END);
-        models[kind] = merge(kind);
-      } catch (e) {
-        if (ticket === pending) report({ range: r, kind, error: e.message || String(e) });
-        return;
-      } finally {
-        for (const b of $('seg-range').querySelectorAll('button')) b.removeAttribute('aria-busy');
+  async function setView(r, end = state.end) {
+    const R = RANGES[r];
+    if (R.fixed || (end != null && end >= endOfToday())) end = null;
+    const kind = kindFor(r, end), ticket = ++pending;
+    if (kind !== 'live') {
+      const to = end ?? models.live.END, from = end == null ? to - 31 * DAY : end - R.days * DAY - DAY;
+      if (!history.has(kind, from, to) || !models[kind]) {
+        report({ range: r, kind, loading: true });
+        $('charts').setAttribute('aria-busy', 'true');
+        try {
+          await history.load(kind, from, to);
+          models[kind] = merge(kind);
+        } catch (e) {
+          if (ticket === pending) report({ error: e.message || String(e) });  // the view stays as it was
+          return;
+        } finally {
+          $('charts').removeAttribute('aria-busy');
+        }
+        if (ticket !== pending) return;  // another view was chosen while this one loaded
       }
-      if (ticket !== pending) return;  // another range was chosen while this one loaded
     }
-    state.range = r;
-    if (!RANGES[r].ints.includes(state.int)) state.int = RANGES[r].def || RANGES[r].ints[0];
+    state.range = r; state.end = end; state.kind = kind;
+    const ints = intsFor(r, kind);
+    if (!ints.includes(state.int)) state.int = R.def && ints.includes(R.def) ? R.def : ints[0];
     useModel(); rebuild();
   }
+  const step = dir => {
+    const R = RANGES[state.range];
+    if (R.fixed) return;
+    if (dir < 0) setView(state.range, addDays(state.end ?? endOfToday(), -R.days));
+    else if (state.end != null) setView(state.range, addDays(state.end, R.days));
+  };
   function rebuild() {
     const d = state.drill;
     if (d.plant) { const p = plantByName(d.plant); if (state.region !== 'NZ' && p.isl !== state.region) d.plant = null; }
@@ -676,39 +732,96 @@ export function mountTracker(D, hooks = {}) {
   }
 
   $('seg-region').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; state.region = b.dataset.v; state.hidden.clear(); rebuild(); });
-  $('seg-range').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || !Object.hasOwn(RANGES, b.dataset.v)) return; setRange(b.dataset.v); });
+  $('seg-range').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || !Object.hasOwn(RANGES, b.dataset.v)) return; setView(b.dataset.v); });
+  $('in-date').addEventListener('change', e => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(e.target.value);
+    if (!m) return;
+    const day = midnightOf(Date.UTC(+m[1], +m[2] - 1, +m[3], 12) - 12 * 36e5);  // that date's local midnight
+    setView(state.range, addDays(day, 1));
+  });
+  $('btn-latest').addEventListener('click', () => setView(state.range, null));
+  $('nav-prev').addEventListener('click', () => step(-1));
+  $('nav-next').addEventListener('click', () => step(1));
   $('sel-view').addEventListener('change', e => {
     if (!Object.hasOwn(VIEWS, e.target.value)) return;
     state.view = e.target.value; state.drill = { ...TOP_LEVEL }; state.hidden.clear(); rebuild();
   });
-  $('seg-int').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || !RANGES[state.range].ints.includes(b.dataset.v)) return; state.int = b.dataset.v; rebuild(); });
+  $('seg-int').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || !intsFor(state.range, state.kind).includes(b.dataset.v)) return; state.int = b.dataset.v; rebuild(); });
 
-  const charts = $('charts');
+  // ---------- pointer and keyboard: one time cursor across both chart panels, a tooltip that follows the mouse ----------
+  const boxes = [$('charts'), $('charts-more')];
+  const tip = $('tip');
   const indexAt = (cv, clientX) => {
     const r = cv.getBoundingClientRect(), x0 = PADL, x1 = r.width - PADR;
     const f = (clientX - r.left - x0) / (x1 - x0);
     return Math.max(0, Math.min(V.n - 1, Math.round(f * (V.n - 1))));
   };
-  for (const cv of charts.querySelectorAll('canvas')) {
-    cv.addEventListener('pointermove', e => {
-      const j = indexAt(cv, e.clientX); if (j !== state.hover) { state.hover = j; render(); }
-      if (cv.id === 'cv-gen' && e.pointerType === 'mouse') { const l = layerAt(e.clientX, e.clientY); cv.style.cursor = l && l.drill ? 'pointer' : ''; cv.title = l ? l.name + (l.drill ? ' — click to see ' + (l.drill.plant ? 'grid connections' : l.drill.fuel ? 'plants' : 'fuels') : '') : ''; }
-    });
-    cv.addEventListener('pointerdown', e => { state.hover = indexAt(cv, e.clientX); render(); });
+  const row = (colour, name, value, extra = '', hatch = false) =>
+    `<div class="tip-r"><i class="${hatch ? 'hatch' : ''}" style="--c:${colour}"></i><span>${esc(name)}</span><b>${value}</b>${extra ? `<small>${extra}</small>` : ''}</div>`;
+  function tipHtml(cv, j, e) {
+    const mw = isLong() ? 'MW avg' : 'MW', head = `<div class="tip-t">${esc(chip(j))}</div>`;
+    switch (cv.id) {
+      case 'cv-gen': {
+        const l = layerAt(e.clientX, e.clientY), lv = level();
+        let tot = 0;
+        if (lv === 'top') tot = V.gen[j]; else for (const x of V.layers) tot += x.signed ? x.s[j] : Math.max(0, x.s[j]);
+        if (!l) return head + row(C['--ink'], totalLabel(), fmt(tot), mw);
+        const v = l.s[j];
+        const extra = l.signed ? `${mw} · ${signedTxt(l, v, false)}` : `${mw}${tot > 0.5 ? ` · ${(v / tot * 100).toFixed(1)}%` : ''}`;
+        return head + row(colourOf(l), l.name, fmt(v), extra, !!l.hatch);
+      }
+      case 'cv-price':
+        return head + row(C['--p-ni'], 'North Island · Haywards', money(V.pNI[j]), '/MWh') + row(C['--p-si'], 'South Island · Benmore', money(V.pSI[j]), '/MWh');
+      case 'cv-demand':
+        return head + row(C['--ink'], 'Metered', fmt(V.metered[j]), mw) + row(C['--ink-2'], 'With rooftop solar', fmt(V.underlying[j]), mw)
+          + (state.region !== 'NI' ? row(C['--accent'], 'Without Tiwai', fmt(V.metered[j] - V.tiwai[j]), mw) : '')
+          + (isLong() ? row(C['--muted'], 'Peak, metered', fmt(V.pkMet[j]), 'MW') : '');
+      case 'cv-hvdc':
+        return head + row(C['--f-hvdc'], 'Benmore ⇄ Haywards', hvTxt(V.hvdc[j]), hvDir(V.hvdc[j]));
+      case 'cv-co2':
+        return head + row(C['--co2'], 'Emissions intensity', fmt(V.co2[j]), 'g CO₂e/kWh');
+      default:
+        return head + row(C['--accent'], 'Renewable share', V.ren[j].toFixed(1) + '%');
+    }
   }
-  $('cv-gen').addEventListener('click', e => { if (e.pointerType === 'touch') return; const l = layerAt(e.clientX, e.clientY); if (l && l.drill) drillTo(l.drill); });
-  charts.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') { state.hover = null; render(); } });
-  charts.addEventListener('keydown', e => {
-    const step = e.shiftKey ? { '5m': 12, '30m': 2, '1d': 7, '1w': 4, '1mo': 12 }[state.int] : 1;
-    if (e.target !== charts) return;
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-      e.preventDefault();
-      const cur = state.hover == null ? V.n - 1 : state.hover;
-      state.hover = Math.max(0, Math.min(V.n - 1, cur + (e.key === 'ArrowLeft' ? -step : step))); render();
-    } else if (e.key === 'Home') { e.preventDefault(); state.hover = 0; render(); }
-    else if (e.key === 'End') { e.preventDefault(); state.hover = V.n - 1; render(); }
-    else if (e.key === 'Escape') { state.hover = null; render(); }
-  });
+  function showTip(cv, j, e) {
+    tip.innerHTML = tipHtml(cv, j, e);
+    tip.hidden = false;
+    const w = tip.offsetWidth, h = tip.offsetHeight, pad = 8;
+    let x = e.clientX + 16, y = e.clientY + 16;
+    if (x + w > window.innerWidth - pad) x = e.clientX - w - 16;
+    if (y + h > window.innerHeight - pad) y = e.clientY - h - 12;
+    tip.style.transform = `translate(${Math.max(pad, x)}px, ${Math.max(pad, y)}px)`;
+  }
+  const hideTip = () => { tip.hidden = true; };
+  for (const box of boxes) for (const cv of box.querySelectorAll('canvas')) {
+    cv.addEventListener('pointermove', e => {
+      const j = indexAt(cv, e.clientX), by = e.pointerType === 'touch' ? 'touch' : 'mouse';
+      if (j !== state.hover || by !== state.hoverBy) { state.hover = j; state.hoverBy = by; render(); }
+      if (by === 'mouse') showTip(cv, j, e);
+      if (cv.id === 'cv-gen' && by === 'mouse') { const l = layerAt(e.clientX, e.clientY); cv.style.cursor = l && l.drill ? 'pointer' : ''; }
+    });
+    cv.addEventListener('pointerleave', hideTip);
+    cv.addEventListener('pointerdown', e => { state.hover = indexAt(cv, e.clientX); state.hoverBy = e.pointerType === 'touch' ? 'touch' : 'mouse'; render(); });
+  }
+  $('cv-gen').addEventListener('click', e => { if (e.pointerType === 'touch') return; const l = layerAt(e.clientX, e.clientY); if (l && l.drill) { hideTip(); drillTo(l.drill); } });
+  for (const box of boxes) {
+    box.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') { state.hover = null; hideTip(); render(); } });
+    box.addEventListener('keydown', e => {
+      if (e.target !== box) return;
+      const by = e.shiftKey ? { '5m': 12, '30m': 2, '1d': 7, '1w': 4, '1mo': 12 }[state.int] : 1;
+      state.hoverBy = 'key';
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        const cur = state.hover == null ? V.n - 1 : state.hover;
+        state.hover = Math.max(0, Math.min(V.n - 1, cur + (e.key === 'ArrowLeft' ? -by : by))); render();
+      } else if (e.key === 'PageUp' || e.key === 'PageDown') { e.preventDefault(); step(e.key === 'PageUp' ? -1 : 1); }
+      else if (e.key === 'Home') { e.preventDefault(); state.hover = 0; render(); }
+      else if (e.key === 'End') { e.preventDefault(); state.hover = V.n - 1; render(); }
+      else if (e.key === 'Escape') { state.hover = null; render(); }
+    });
+  }
+  window.addEventListener('scroll', hideTip, { passive: true });
 
   const updateAsof = () => { const pe = lp(M.END); $('asof').textContent = `Data to ${clock(pe)} ${dayLbl(pe)} ${tzName(M.END)}`; };
   updateAsof();
@@ -719,25 +832,26 @@ export function mountTracker(D, hooks = {}) {
   const mo = new MutationObserver(retheme);
   mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   const ro = new ResizeObserver(() => render());
-  ro.observe(charts);
+  for (const box of boxes) ro.observe(box);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => render());
 
   readColours();
   rebuild();
-  if (saved) setRange(saved);  // reopen on the viewer's last long range once its history has loaded
+  if (saved) setView(saved);  // reopen on the viewer's last long range once its history has loaded
 
   return {
     // new data: keep the viewer's region, range, interval and drill-down; drop the hover point
     update(D2) {
       models.live = buildModel(D2);
       for (const kind of ['hh', 'day']) if (models[kind]) models[kind] = merge(kind);
+      if (state.end == null || state.kind === 'live') state.kind = kindFor(state.range, state.end);
       M = null; useModel(); updateAsof(); rebuild();
       // history gains days a few times a day: refresh what's loaded, at most hourly (history.load checks the age)
-      for (const kind of ['hh', 'day']) if (models[kind]) history.load(kind, models.live.END).then(() => {
+      for (const kind of ['hh', 'day']) if (models[kind]) history.load(kind, models.live.END - 31 * DAY, models.live.END).then(() => {
         models[kind] = merge(kind);
-        if (RANGES[state.range].model === kind) { M = null; useModel(); rebuild(); }
+        if (state.kind === kind) { M = null; useModel(); rebuild(); }
       }).catch(() => {});
     },
-    destroy() { mo.disconnect(); ro.disconnect(); if (mq) mq.removeEventListener('change', retheme); cancelAnimationFrame(raf); },
+    destroy() { window.removeEventListener('scroll', hideTip); mo.disconnect(); ro.disconnect(); if (mq) mq.removeEventListener('change', retheme); cancelAnimationFrame(raf); },
   };
 }

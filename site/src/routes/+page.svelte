@@ -7,12 +7,15 @@
 	const DATA_URL = '/data/tracker.json';
 	const LIVE_MINUTES = 15; // data newer than this counts as live
 
-	type View = { range: string; kind: string; loading: boolean; error: string; liveEnd: number; histFirst: number | null; histEnd: number | null };
+	type View = { range: string; kind: string; past: boolean; loading: boolean; error: string; liveEnd: number; histFirst: number | null; histEnd: number | null };
 
 	let meta = $state<Meta | null>(null);
 	let error = $state('');
 	let view = $state<View | null>(null);
 	let now = $state(Date.now());
+	let infoOpen = $state(false);
+	let infoBtn = $state<HTMLButtonElement>();
+	let infoBox = $state<HTMLDivElement>();
 
 	const PARTS = new Intl.DateTimeFormat('en-NZ', {
 		timeZone: 'Pacific/Auckland', weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true
@@ -33,10 +36,10 @@
 	const notice = $derived.by(() => {
 		if (!meta) return '';
 		if (view && view.kind !== 'live') {
-			if (view.loading) return 'Loading history…';
-			if (view.error) return view.error;
 			if (view.histEnd == null) return '';
 			const step = view.kind === 'day' ? 'Daily averages of half-hourly' : 'Half-hourly';
+			if (view.past)
+				return `${step} dispatch data from ${dayYear(view.histFirst!)} to ${dayYear(view.histEnd)}, from the Electricity Authority's daily EMI files. Prices are final prices where published, otherwise dispatch prices. Rooftop solar is estimated from the EA's monthly record of installed solar capacity and irradiance, and HVDC transfer from the balance between the islands.${view.kind === 'day' ? ' Peak demand is the highest half-hour.' : ''}`;
 			return `${step} dispatch data from ${dayYear(view.histFirst!)} to ${dayYear(view.histEnd)} from the Electricity Authority's daily EMI files (published 1–4 days late), then the live real-time dispatch feed to ${when(view.liveEnd)}. Prices are final prices, except for the live week and any days not yet priced, which show dispatch prices. Rooftop solar is estimated from the EA's monthly record of installed solar capacity and irradiance, and HVDC transfer from the balance between the islands.${view.kind === 'day' ? ' Peak demand is the highest half-hour.' : ''}`;
 		}
 		const mixed = meta.api_from !== null && meta.api_from > meta.end - 7 * 864e5 + 3e5;
@@ -46,6 +49,18 @@
 		const gaps = missing > 0 ? ` ${missing}% of 5-minute intervals have no dispatch case and are filled by interpolation.` : '';
 		return `Dispatch data for the seven days to ${when(meta.end)}${source} Rooftop solar is estimated from installed capacity and irradiance, and HVDC transfer from the balance between the islands.${gaps}`;
 	});
+
+	const status = $derived(error || (view?.loading ? 'Loading history…' : view?.error) || (meta ? '' : 'Loading the latest data…'));
+
+	function closeInfo(e: Event) {
+		if (!infoOpen) return;
+		if (e instanceof KeyboardEvent) {
+			if (e.key === 'Escape') { infoOpen = false; infoBtn?.focus(); }
+			return;
+		}
+		const t = e.target as Node;
+		if (!infoBox?.contains(t) && !infoBtn?.contains(t)) infoOpen = false;
+	}
 
 	onMount(() => {
 		let tracker: ReturnType<typeof mountTracker> | undefined;
@@ -77,33 +92,51 @@
 	});
 </script>
 
+<svelte:window onclick={closeInfo} onkeydown={closeInfo} />
+
 <svelte:head>
-	<title>Elenz · New Zealand electricity, live</title>
+	<title>ELENZ · New Zealand's electricity</title>
 </svelte:head>
 
 <div class="wrap">
 	<header class="masthead">
 		<div class="brand">
-			<svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
-				<rect x="1" y="1" width="28" height="28" rx="7" fill="var(--ink)" />
-				<path d="M5 23 L5 18 C9 17 11 14 15 14 C19 14 21 16 25 15 L25 23 Z" fill="var(--f-hydro)" />
-				<path d="M5 18 C9 17 11 14 15 14 C19 14 21 16 25 15 L25 12 C21 13 19 10 15 10 C11 10 9 13 5 14 Z" fill="var(--f-wind)" />
-				<path d="M5 14 C9 13 11 10 15 10 C19 10 21 13 25 12 L25 9 C21 9.5 19 7 15 7 C11 7 9 9.5 5 10.5 Z" fill="var(--f-solar)" />
+			<!-- the mark: four stacked bars, a tiny generation chart (geothermal, hydro, wind, solar) -->
+			<svg width="32" height="32" viewBox="0 0 30 30" aria-hidden="true">
+				<rect x="3" y="17" width="5" height="10" rx="1" fill="var(--f-geo)" />
+				<rect x="3" y="9" width="5" height="7" rx="1" fill="var(--f-hydro)" />
+				<rect x="9.5" y="17" width="5" height="10" rx="1" fill="var(--f-geo)" />
+				<rect x="9.5" y="5" width="5" height="11" rx="1" fill="var(--f-hydro)" />
+				<rect x="16" y="17" width="5" height="10" rx="1" fill="var(--f-geo)" />
+				<rect x="16" y="8" width="5" height="8" rx="1" fill="var(--f-hydro)" />
+				<rect x="16" y="4" width="5" height="3" rx="1" fill="var(--f-wind)" />
+				<rect x="22.5" y="17" width="5" height="10" rx="1" fill="var(--f-geo)" />
+				<rect x="22.5" y="11" width="5" height="5" rx="1" fill="var(--f-hydro)" />
+				<rect x="22.5" y="6" width="5" height="4" rx="1" fill="var(--f-solar)" />
 			</svg>
 			<div>
 				<h1>Elenz</h1>
-				<p>New Zealand's electricity: generation, prices, demand and emissions</p>
+				<p>New Zealand's electricity</p>
 			</div>
 		</div>
-		{#if meta}
-			{#if view && view.kind !== 'live' && !view.loading && !view.error}
-				<span class="pill hist" title="History from the EA's daily dispatch files, then the live feed">History · since 2020</span>
-			{:else if live}
-				<span class="pill live" title="Updated from the EMI real-time dispatch feed every 5 minutes">Live</span>
-			{:else}
-				<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {when(meta.end)}</span>
+		<div class="status">
+			{#if meta}
+				{#if view && (view.kind !== 'live' || view.past) && !view.loading && !view.error}
+					<span class="pill hist" title="History from the EA's daily dispatch files">History</span>
+				{:else if live}
+					<span class="pill live" title="Updated from the EMI real-time dispatch feed every 5 minutes">Live</span>
+				{:else}
+					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {when(meta.end)}</span>
+				{/if}
 			{/if}
-		{/if}
+			<button type="button" class="info-btn" bind:this={infoBtn} aria-expanded={infoOpen} aria-controls="about-data" aria-label="About this data" title="About this data" onclick={() => (infoOpen = !infoOpen)}>
+				<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg>
+			</button>
+			<div class="info-pop" id="about-data" role="region" aria-label="About this data" bind:this={infoBox} hidden={!infoOpen}>
+				<p>{notice || 'Loading the latest data…'}</p>
+				<a href="#src-h" onclick={() => (infoOpen = false)}>Where the data comes from</a>
+			</div>
+		</div>
 	</header>
 
 	<nav class="toolbar" aria-label="View controls">
@@ -133,23 +166,23 @@
 				<button type="button" data-v="30m">30 min</button>
 			</div>
 		</div>
-		<span class="asof" id="asof"></span>
+		<div class="ctl">
+			<label for="in-date" id="lb-date">24 h ending</label>
+			<div class="datebox">
+				<input type="date" id="in-date" title="Shows the selected range ending on this date" />
+				<button type="button" id="btn-latest" hidden>Latest</button>
+			</div>
+		</div>
+		<span class="asof"><span class="tstatus" role="status">{status}</span><span id="asof"></span></span>
 	</nav>
 
-	{#if error}
-		<p class="notice" role="alert">{error}</p>
-	{:else if meta}
-		<p class="notice">{notice}</p>
-	{:else}
-		<p class="notice">Loading the latest data…</p>
-	{/if}
 	<noscript><p class="notice">The charts need JavaScript turned on.</p></noscript>
 
 	<div class="layout">
 		<!-- The chart panel takes arrow keys to move the time cursor, so it needs to be focusable. -->
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-		<section class="charts" id="charts" tabindex="0" aria-label="Linked charts. Hover or use the left and right arrow keys to read values at a point in time; Escape returns to range totals.">
-			<div class="chart">
+		<section class="charts" id="charts" tabindex="0" aria-label="Generation chart. Hover or use the left and right arrow keys to read values at a point in time, Page Up and Page Down to move by the range; Escape returns to range totals.">
+			<div class="chart gen">
 				<div class="ch-head">
 					<h2 class="crumbs" id="gen-title">Generation</h2><span class="unit" id="gen-unit">MW, stacked by fuel</span>
 					<div class="legends">
@@ -164,9 +197,17 @@
 						</select>
 					</div>
 				</div>
-				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
-				<canvas id="cv-gen" role="img" aria-label="Stacked area chart of generation by fuel"></canvas>
+				<div class="plot">
+					<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
+					<canvas id="cv-gen" role="img" aria-label="Stacked area chart of generation by fuel"></canvas>
+					<button type="button" class="nav prev" id="nav-prev" aria-label="Previous 24 h"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
+					<button type="button" class="nav next" id="nav-next" aria-label="Next 24 h"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
+				</div>
 			</div>
+		</section>
+
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+		<section class="charts" id="charts-more" tabindex="0" aria-label="Price, demand, HVDC, emissions and renewables charts, on the same time axis as generation.">
 			<div class="chart">
 				<div class="ch-head">
 					<h2>Wholesale price</h2><span class="unit">$/MWh</span>
@@ -219,9 +260,12 @@
 				<tfoot><tr><td id="tot-lbl">Total generation</td><td class="n" id="tot-q"></td><td class="n" id="tot-s">100%</td></tr></tfoot>
 			</table>
 			<dl class="sys" id="sys"></dl>
-			<p class="hint">Use the menu above the chart to group sources (by fuel, flexibility, renewables and fossils, and more). Select a name, or click a band in the chart, to break it down by fuel and plant, and by grid connection for plants on more than one bus. Select a colour square to hide that layer. Hover the charts, or focus them and use the arrow keys, to read a single interval.</p>
+			<p class="hint">Use the arrows on the generation chart, or the date box, to step back through history by the selected range. Select a name, or click a band in the chart, to break it down by fuel and plant. Select a colour square to hide that layer. Hover the charts, or focus them and use the arrow keys, to read a single interval.</p>
 		</aside>
 	</div>
+
+	<!-- follows the mouse over the charts; the summary panel carries the same values for keyboard and screen readers -->
+	<div class="tip" id="tip" aria-hidden="true" hidden></div>
 
 	<section class="sources" aria-labelledby="src-h">
 		<h2 id="src-h">Where the data comes from</h2>
