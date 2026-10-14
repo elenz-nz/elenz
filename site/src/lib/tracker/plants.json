@@ -1,23 +1,28 @@
 {
 "Aniwhenua":{
 "owner":"Other generators",
-"scheme":"Rangitaiki"
+"scheme":"Rangitaiki",
+"river":0
 },
 "Arapuni":{
 "owner":"Mercury",
-"scheme":"Waikato"
+"scheme":"Waikato",
+"river":6
 },
 "Aratiatia":{
 "owner":"Mercury",
-"scheme":"Waikato"
+"scheme":"Waikato",
+"river":0
 },
 "Aviemore":{
 "owner":"Meridian",
-"scheme":"Waitaki"
+"scheme":"Waitaki",
+"river":4
 },
 "Benmore":{
 "owner":"Meridian",
-"scheme":"Waitaki"
+"scheme":"Waitaki",
+"river":3
 },
 "Branch River (Arnold)":{
 "owner":"Contact"
@@ -30,7 +35,8 @@
 },
 "Clyde":{
 "owner":"Contact",
-"scheme":"Clutha"
+"scheme":"Clutha",
+"river":0
 },
 "Cobb":{
 "owner":"Contact"
@@ -43,7 +49,8 @@
 },
 "Deep Stream (Waipori A)":{
 "owner":"Contact",
-"scheme":"Waipori"
+"scheme":"Waipori",
+"river":0
 },
 "Fonterra Dairy - Whareroa":{
 "owner":"Nova"
@@ -89,7 +96,8 @@
 },
 "Kaitawa":{
 "owner":"Genesis",
-"scheme":"Waikaremoana"
+"scheme":"Waikaremoana",
+"river":0
 },
 "Kaiwaikawe Wind Farm":{
 "owner":"Mercury"
@@ -105,7 +113,8 @@
 },
 "Karāpiro":{
 "owner":"Mercury",
-"scheme":"Waikato"
+"scheme":"Waikato",
+"river":7
 },
 "Kawerau":{
 "owner":"Mercury"
@@ -136,18 +145,21 @@
 },
 "Manapōuri":{
 "owner":"Meridian",
-"scheme":"Manapōuri"
+"scheme":"Manapōuri",
+"river":0
 },
 "Mangahao":{
 "owner":"Contact"
 },
 "Maraetai":{
 "owner":"Mercury",
-"scheme":"Waikato"
+"scheme":"Waikato",
+"river":4
 },
 "Matahina":{
 "owner":"Contact",
-"scheme":"Rangitaiki"
+"scheme":"Rangitaiki",
+"river":2
 },
 "McKee":{
 "owner":"Nova"
@@ -184,7 +196,8 @@
 },
 "Pirirpaua":{
 "owner":"Genesis",
-"scheme":"Waikaremoana"
+"scheme":"Waikaremoana",
+"river":2
 },
 "Poihipi":{
 "owner":"Contact"
@@ -200,7 +213,8 @@
 },
 "Rangipo":{
 "owner":"Genesis",
-"scheme":"Tongariro"
+"scheme":"Tongariro",
+"river":1
 },
 "Rangitaiki Solar Farm":{
 "owner":"Other generators"
@@ -216,7 +230,8 @@
 },
 "Roxburgh":{
 "owner":"Contact",
-"scheme":"Clutha"
+"scheme":"Clutha",
+"river":1
 },
 "Ruakākā Energy Park":{
 "owner":"Meridian"
@@ -244,11 +259,13 @@
 },
 "Takapō A":{
 "owner":"Genesis",
-"scheme":"Tekapo"
+"scheme":"Tekapo",
+"river":0
 },
 "Takapō B":{
 "owner":"Genesis",
-"scheme":"Tekapo"
+"scheme":"Tekapo",
+"river":1
 },
 "Taranaki Combined Cycle":{
 "owner":"Contact"
@@ -303,11 +320,13 @@
 },
 "Tokaanu":{
 "owner":"Genesis",
-"scheme":"Tongariro"
+"scheme":"Tongariro",
+"river":0
 },
 "Tuai":{
 "owner":"Genesis",
-"scheme":"Waikaremoana"
+"scheme":"Waikaremoana",
+"river":1
 },
 "Turitea Wind Farm":{
 "owner":"Mercury"
@@ -320,18 +339,21 @@
 },
 "Waipori (2A/3/4)":{
 "owner":"Contact",
-"scheme":"Waipori"
+"scheme":"Waipori",
+"river":1
 },
 "Waipāpa":{
 "owner":"Mercury",
-"scheme":"Waikato"
+"scheme":"Waikato",
+"river":5
 },
 "Wairakei":{
 "owner":"Contact"
 },
 "Waitaki":{
 "owner":"Meridian",
-"scheme":"Waitaki"
+"scheme":"Waitaki",
+"river":5
 },
 "West Wind 1":{
 "owner":"Meridian"
@@ -341,11 +363,13 @@
 },
 "Whakamaru":{
 "owner":"Mercury",
-"scheme":"Waikato"
+"scheme":"Waikato",
+"river":3
 },
 "Wheao and Flaxy":{
 "owner":"Contact",
-"scheme":"Rangitaiki"
+"scheme":"Rangitaiki",
+"river":1
 },
 "Whirinaki":{
 "owner":"Contact"
@@ -355,26 +379,31 @@
 },
 "Ātiamuri":{
 "owner":"Mercury",
-"scheme":"Waikato"
+"scheme":"Waikato",
+"river":2
 },
 "Ōhaaki":{
 "owner":"Contact"
 },
 "Ōhakuri":{
 "owner":"Mercury",
-"scheme":"Waikato"
+"scheme":"Waikato",
+"river":1
 },
 "Ōhau A":{
 "owner":"Meridian",
-"scheme":"Waitaki"
+"scheme":"Waitaki",
+"river":0
 },
 "Ōhau B":{
 "owner":"Meridian",
-"scheme":"Waitaki"
+"scheme":"Waitaki",
+"river":1
 },
 "Ōhau C":{
 "owner":"Meridian",
-"scheme":"Waitaki"
+"scheme":"Waitaki",
+"river":2
 },
 "Ōtāhuhu A":{
 "owner":"Contact"

@@ -269,8 +269,12 @@ export function mountTracker(D, hooks = {}) {
       ps.forEach((p, i) => L.push({ id: p.name, name: p.name, tok: f.tok, shade: i < TOP ? i : null, muted: i >= TOP, signed: !!f.signed, s: V.avg(p.s), plant: p, drill: { group: d.group, fuel: d.fuel, plant: p.name } }));
     } else if (d.group && setById(d.group)) {
       // a set's plants, each in a shade of its fuel colour, grouped by fuel in the summary
-      const set = setById(d.group), seen = {};
-      for (const p of [...set.plants].sort((a, b) => FUELS.findIndex(f => f.k === a.fuel) - FUELS.findIndex(f => f.k === b.fuel) || energy(b) - energy(a))) {
+      // a hydro scheme's stations in river order, upstream first; other sets by fuel, then output over the view
+      const set = setById(d.group), seen = {}, river = p => PLANT_META[p.name]?.river ?? 99;
+      const order = set.id.startsWith('s:') && set.id !== 's:Other hydro'
+        ? (a, b) => river(a) - river(b)
+        : (a, b) => FUELS.findIndex(f => f.k === a.fuel) - FUELS.findIndex(f => f.k === b.fuel) || energy(b) - energy(a);
+      for (const p of [...set.plants].sort(order)) {
         const i = seen[p.fuel] = (seen[p.fuel] ?? -1) + 1;
         L.push({ id: 'p:' + p.name, name: p.name, tok: FUEL[p.fuel].tok, shade: i, section: set.fuel ? null : p.fuel, s: V.avg(p.s), plant: p,
                  drill: { group: d.group, fuel: null, plant: p.name } });

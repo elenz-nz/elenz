@@ -1,7 +1,7 @@
 """Plant owner and hydro scheme lookup for the website's "By owner" and "By hydro scheme" views.
 
 Reads the EA plant register (latest row per plant) and facilities/overrides.toml ([owners], [plant_owners],
-[hydro_schemes], [plant_names]) and writes site/src/lib/tracker/plants.json: {plant name: {"owner": ..., "scheme": ...}}.
+[hydro_schemes], [plant_names]) and writes site/src/lib/tracker/plants.json: {plant name: {"owner": ..., "scheme": ..., "river": n}}.
 Plant names match the ones in tracker.json and the history files.
 
 Run from the repo root after refreshing the register or editing those tables, then commit the JSON:
@@ -37,6 +37,7 @@ def main():
             if p not in meta:
                 unknown.append(p)
             meta.setdefault(p, {'owner': 'Other generators'})['scheme'] = scheme
+            meta[p]['river'] = plants.index(p)  # position on the river, upstream first
     if unknown:
         print('WARNING hydro_schemes lists plants not in the register:', unknown)
     with open(OUT, 'w') as f:
