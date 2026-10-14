@@ -49,3 +49,32 @@ SI = "BEN2201"   # Benmore
 # Load connection points shown separately.
 [loads]
 tiwai = "TWI2201"
+
+# Owner shown in the site's "By owner" view: register PlantOperator -> owner. Operators not listed here are shown as
+# "Other generators". Current owners apply to the whole history.
+[owners]
+"Meridian Energy Limited" = "Meridian"
+"Contact Energy Limited" = "Contact"
+"Contact Energy" = "Contact"
+"Manawa Energy Limited" = "Contact"       # Contact completed its takeover of Manawa Energy on 11 Jul 2025
+"TrustPower Ltd" = "Contact"              # Manawa's former name
+"Mercury NZ Limited" = "Mercury"
+"Nga Awa Purua Joint Venture" = "Mercury" # operated by Mercury (joint venture with Tauhara North No. 2 Trust)
+"Genesis Energy Limited" = "Genesis"
+"Nova Energy Limited" = "Nova"
+
+# Owners for plant the register doesn't list yet (see [units] above). Plant name -> owner.
+[plant_owners]
+"Ruakākā Solar Farm" = "Meridian"
+
+# Hydro schemes for the "By hydro scheme" view, each listed upstream to downstream. Hydro stations not listed
+# here are shown as "Other hydro".
+[hydro_schemes]
+Waitaki = ["Takapō A", "Takapō B", "Ōhau A", "Ōhau B", "Ōhau C", "Benmore", "Aviemore", "Waitaki"]
+Waikato = ["Aratiatia", "Ōhakuri", "Ātiamuri", "Whakamaru", "Maraetai", "Waipāpa", "Arapuni", "Karāpiro"]
+"Manapōuri" = ["Manapōuri"]
+Clutha = ["Clyde", "Roxburgh"]
+Tongariro = ["Tokaanu", "Rangipo"]
+Waikaremoana = ["Kaitawa", "Tuai", "Pirirpaua"]
+Rangitaiki = ["Aniwhenua", "Wheao and Flaxy", "Matahina"]
+Waipori = ["Deep Stream (Waipori A)", "Waipori (2A/3/4)"]

@@ -1,0 +1,385 @@
+{
+"Aniwhenua":{
+"owner":"Other generators",
+"scheme":"Rangitaiki"
+},
+"Arapuni":{
+"owner":"Mercury",
+"scheme":"Waikato"
+},
+"Aratiatia":{
+"owner":"Mercury",
+"scheme":"Waikato"
+},
+"Aviemore":{
+"owner":"Meridian",
+"scheme":"Waitaki"
+},
+"Benmore":{
+"owner":"Meridian",
+"scheme":"Waitaki"
+},
+"Branch River (Arnold)":{
+"owner":"Contact"
+},
+"Carter Holt Harvey Energy Ltd CoGen":{
+"owner":"Other generators"
+},
+"Clandeboye Solar Farm":{
+"owner":"Other generators"
+},
+"Clyde":{
+"owner":"Contact",
+"scheme":"Clutha"
+},
+"Cobb":{
+"owner":"Contact"
+},
+"Coleridge":{
+"owner":"Contact"
+},
+"Dannevirke Solar Farm":{
+"owner":"Other generators"
+},
+"Deep Stream (Waipori A)":{
+"owner":"Contact",
+"scheme":"Waipori"
+},
+"Fonterra Dairy - Whareroa":{
+"owner":"Nova"
+},
+"Glenbrook Steel":{
+"owner":"Other generators"
+},
+"Glenbrook-Ohurua Battery":{
+"owner":"Contact"
+},
+"Harapaki":{
+"owner":"Meridian"
+},
+"Highbank":{
+"owner":"Contact"
+},
+"Huntly 5":{
+"owner":"Genesis"
+},
+"Huntly 6":{
+"owner":"Genesis"
+},
+"Huntly Battery":{
+"owner":"Genesis"
+},
+"Huntly Rankine 1":{
+"owner":"Genesis"
+},
+"Huntly Rankine 2":{
+"owner":"Genesis"
+},
+"Huntly Rankine 3":{
+"owner":"Genesis"
+},
+"Huntly Rankine 4":{
+"owner":"Genesis"
+},
+"Junction Road":{
+"owner":"Nova"
+},
+"Kaimai 5":{
+"owner":"Contact"
+},
+"Kaitawa":{
+"owner":"Genesis",
+"scheme":"Waikaremoana"
+},
+"Kaiwaikawe Wind Farm":{
+"owner":"Other generators"
+},
+"Kaiwera Downs (Stage 2)":{
+"owner":"Mercury"
+},
+"Kaiwera Downs Wind Farm":{
+"owner":"Mercury"
+},
+"Kapuni":{
+"owner":"Nova"
+},
+"Karāpiro":{
+"owner":"Mercury",
+"scheme":"Waikato"
+},
+"Kawerau":{
+"owner":"Mercury"
+},
+"Kawerau (TOPP2)":{
+"owner":"Other generators"
+},
+"Kawerau (Te Ahi O Maui)":{
+"owner":"Other generators"
+},
+"Kinleith":{
+"owner":"Contact"
+},
+"Kohirā Solar Farm":{
+"owner":"Other generators"
+},
+"Kōwhai Park Solar Farm":{
+"owner":"Other generators"
+},
+"Kūmara":{
+"owner":"Contact"
+},
+"Lauriston Solar Farm":{
+"owner":"Genesis"
+},
+"Mahinerangi (Waipori B)":{
+"owner":"Contact"
+},
+"Manapōuri":{
+"owner":"Meridian",
+"scheme":"Manapōuri"
+},
+"Mangahao":{
+"owner":"Other generators"
+},
+"Maraetai":{
+"owner":"Mercury",
+"scheme":"Waikato"
+},
+"Matahina":{
+"owner":"Contact",
+"scheme":"Rangitaiki"
+},
+"McKee":{
+"owner":"Nova"
+},
+"Mill Creek":{
+"owner":"Meridian"
+},
+"Mokai":{
+"owner":"Other generators"
+},
+"New Plymouth":{
+"owner":"Other generators"
+},
+"Nga Awa Pūrua":{
+"owner":"Mercury"
+},
+"Ngā Tamariki":{
+"owner":"Mercury"
+},
+"Ngāwhā B":{
+"owner":"Other generators"
+},
+"Norske Skog CoGen":{
+"owner":"Other generators"
+},
+"Omeheu Solar Farm":{
+"owner":"Other generators"
+},
+"Paerau Gorge":{
+"owner":"Contact"
+},
+"Papareireiā":{
+"owner":"Other generators"
+},
+"Pirirpaua":{
+"owner":"Genesis",
+"scheme":"Waikaremoana"
+},
+"Poihipi":{
+"owner":"Contact"
+},
+"Pukenui Solar Farm":{
+"owner":"Other generators"
+},
+"Pāmu Rā ki Whitianga Solar Farm":{
+"owner":"Other generators"
+},
+"Pātea":{
+"owner":"Contact"
+},
+"Rangipo":{
+"owner":"Genesis",
+"scheme":"Tongariro"
+},
+"Rangitaiki Solar Farm":{
+"owner":"Other generators"
+},
+"Roaring Meg":{
+"owner":"Other generators"
+},
+"Rotohiko":{
+"owner":"Other generators"
+},
+"Rotokawa":{
+"owner":"Mercury"
+},
+"Roxburgh":{
+"owner":"Contact",
+"scheme":"Clutha"
+},
+"Ruakākā Energy Park":{
+"owner":"Meridian"
+},
+"Ruakākā Solar Farm":{
+"owner":"Meridian"
+},
+"Southdown":{
+"owner":"Mercury"
+},
+"Southdown 5":{
+"owner":"Mercury"
+},
+"Southdown Battery":{
+"owner":"Mercury"
+},
+"Stratford Peaker 1":{
+"owner":"Contact"
+},
+"Stratford Peaker 2":{
+"owner":"Contact"
+},
+"Taiohi Solar Farm":{
+"owner":"Other generators"
+},
+"Takapō A":{
+"owner":"Genesis",
+"scheme":"Waitaki"
+},
+"Takapō B":{
+"owner":"Genesis",
+"scheme":"Waitaki"
+},
+"Taranaki Combined Cycle":{
+"owner":"Contact"
+},
+"Tararua Wind Farm 3":{
+"owner":"Contact"
+},
+"Tararua stage I":{
+"owner":"Contact"
+},
+"Tararua stage II":{
+"owner":"Contact"
+},
+"Tauhara":{
+"owner":"Contact"
+},
+"Tauhei Solar Farm":{
+"owner":"Other generators"
+},
+"Te Herenga o Te Rā Solar Farm":{
+"owner":"Other generators"
+},
+"Te Huka":{
+"owner":"Contact"
+},
+"Te Huka 3":{
+"owner":"Contact"
+},
+"Te Mihi 1":{
+"owner":"Contact"
+},
+"Te Mihi 2":{
+"owner":"Contact"
+},
+"Te Puna Mauri ō Omaru at Ruawai":{
+"owner":"Other generators"
+},
+"Te Rapa":{
+"owner":"Contact"
+},
+"Te Rere Hau":{
+"owner":"Other generators"
+},
+"Te Uku":{
+"owner":"Meridian"
+},
+"Te Āpiti":{
+"owner":"Meridian"
+},
+"Teviot":{
+"owner":"Other generators"
+},
+"Tokaanu":{
+"owner":"Genesis",
+"scheme":"Tongariro"
+},
+"Tuai":{
+"owner":"Genesis",
+"scheme":"Waikaremoana"
+},
+"Turitea Wind Farm":{
+"owner":"Mercury"
+},
+"Twin Rivers Solar Farm":{
+"owner":"Other generators"
+},
+"Waipipi":{
+"owner":"Genesis"
+},
+"Waipori (2A/3/4)":{
+"owner":"Contact",
+"scheme":"Waipori"
+},
+"Waipāpa":{
+"owner":"Mercury",
+"scheme":"Waikato"
+},
+"Wairakei":{
+"owner":"Contact"
+},
+"Waitaki":{
+"owner":"Meridian",
+"scheme":"Waitaki"
+},
+"West Wind 1":{
+"owner":"Meridian"
+},
+"West Wind 2":{
+"owner":"Meridian"
+},
+"Whakamaru":{
+"owner":"Mercury",
+"scheme":"Waikato"
+},
+"Wheao and Flaxy":{
+"owner":"Contact",
+"scheme":"Rangitaiki"
+},
+"Whirinaki":{
+"owner":"Contact"
+},
+"White Hill":{
+"owner":"Meridian"
+},
+"Ātiamuri":{
+"owner":"Mercury",
+"scheme":"Waikato"
+},
+"Ōhaaki":{
+"owner":"Contact"
+},
+"Ōhakuri":{
+"owner":"Mercury",
+"scheme":"Waikato"
+},
+"Ōhau A":{
+"owner":"Meridian",
+"scheme":"Waitaki"
+},
+"Ōhau B":{
+"owner":"Meridian",
+"scheme":"Waitaki"
+},
+"Ōhau C":{
+"owner":"Meridian",
+"scheme":"Waitaki"
+},
+"Ōtāhuhu A":{
+"owner":"Contact"
+},
+"Ōtāhuhu B":{
+"owner":"Contact"
+}
+}

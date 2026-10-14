@@ -2,6 +2,7 @@
 // Data: tracker.json built by ingest/build_tracker.py. Drawn on <canvas>; the page supplies the markup (ids below).
 
 import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore } from './series.js';
+import PLANT_META from './plants.json';  // owner and hydro scheme per plant (ingest/plant_meta.py)
 export { nzOffset, tzName };
 
 // A model: one segment (series.js) plus what the charts read. NIs/SIs are the island series (same objects).
@@ -67,11 +68,54 @@ export function mountTracker(D, hooks = {}) {
       VRE('Variable'),
     ] },
     rf: { groups: [REN, FOSSIL('Fossils')] },
+    // views built from plants rather than fuels (see plantSets below)
+    site: { by: 'site' }, scheme: { by: 'scheme' }, owner: { by: 'owner' },
     // inverter-based generation (wind and solar) against the synchronous machines (hydro, geothermal, thermal)
     vre: { groups: [{ id: 'resid', name: 'Synchronous', tok: '--g-resid', f: ['geo', 'coal', 'gas', 'diesel', 'hydro'] }, VRE('Inverter-based')] },
   };
   const SIGNED = FUELS.filter(f => f.signed).map(f => f.k);
-  const groupById = id => (VIEWS[state.view].groups || []).find(g => g.id === id);
+  const groupById = id => (VIEWS[state.view].groups || []).find(g => g.id === id) || setById(id);
+
+  // ---------- plant sets: views stacked by site, hydro scheme or owner ----------
+  // A set is a list of plants shown as one layer; drilling into it lists its plants.
+  const SCHEMES = ['Waitaki', 'Waikato', 'Manapōuri', 'Clutha', 'Tongariro', 'Waikaremoana', 'Rangitaiki', 'Waipori', 'Other hydro'];
+  const OWNERS = ['Meridian', 'Contact', 'Mercury', 'Genesis', 'Nova', 'Other generators'];
+  const ownerOf = p => PLANT_META[p.name]?.owner || 'Other generators';
+  const schemeOf = p => PLANT_META[p.name]?.scheme || 'Other hydro';
+  const SITE_SHARE = 0.95, SITE_MAX = 12;  // by site: the plants making up 95% of each fuel (at most 12) get their own layer
+  const energy = p => {  // MWh over the view, cached per view
+    const cache = V.energy || (V.energy = new Map());
+    if (!cache.has(p)) { const a = V.avg(p.s); let e = 0; for (let j = 0; j < V.n; j++) e += a[j] * V.hrs[j]; cache.set(p, e); }
+    return cache.get(p);
+  };
+  function plantSets() {
+    const by = VIEWS[state.view].by, r = state.region, sets = [];
+    const regional = M.plants.filter(p => !FUEL[p.fuel].signed && (r === 'NZ' || p.isl === r));
+    if (by === 'scheme') {
+      for (const sc of SCHEMES) {
+        const ps = regional.filter(p => p.fuel === 'hydro' && schemeOf(p) === sc);
+        if (ps.length) sets.push({ id: 's:' + sc, name: sc, fuel: 'hydro', plants: ps });
+      }
+    } else if (by === 'owner') {
+      OWNERS.forEach((o, i) => {
+        const ps = regional.filter(p => ownerOf(p) === o);
+        if (ps.length) sets.push({ id: 'o:' + o, name: o, tok: `--o${i + 1}`, plants: ps });
+      });
+    } else if (by === 'site') {
+      for (const f of FUELS) {
+        const ps = regional.filter(p => p.fuel === f.k);
+        if (ps.length < 2) continue;
+        const es = ps.map(energy), tot = es.reduce((a, b) => a + b, 0);
+        const order = ps.map((p, i) => i).sort((a, b) => es[b] - es[a]);
+        let cum = 0, keep = 0;
+        for (const i of order) { if (keep >= SITE_MAX || (keep && cum >= SITE_SHARE * tot)) break; cum += es[i]; keep++; }
+        const small = order.slice(keep).map(i => ps[i]);
+        if (small.length > 1) sets.push({ id: 'x:' + f.k, name: `Other ${f.name.toLowerCase().replace(', grid', '')}`, fuel: f.k, plants: small });
+      }
+    }
+    return sets;
+  }
+  const setById = id => (id && /^[sox]:/.test(id) && V ? (V.sets || (V.sets = plantSets())).find(x => x.id === id) : null);
   const TOP_LEVEL = { group: null, fuel: null, plant: null };
 
   // National series = sum of islands
@@ -91,7 +135,8 @@ export function mountTracker(D, hooks = {}) {
   const plantsFor = (fuel, r = state.region) => M.plants.filter(p => p.fuel === fuel && (r === 'NZ' || p.isl === r));
   const plantByName = name => M.plants.find(p => p.name === name);
 
-  const state = { region: 'NZ', range: '1d', end: null, kind: 'live', int: '5m', view: 'detailed', hover: null, hoverBy: null, hidden: new Set(), drill: { ...TOP_LEVEL } };
+  const state = { region: 'NZ', range: '1d', end: null, kind: 'live', int: '5m', view: 'detailed', hover: null, hoverBy: null, hidden: new Set(), drill: { ...TOP_LEVEL },
+                  open: new Set(), filter: '' };
   let saved = null;
   try {
     const s = JSON.parse(localStorage.getItem('elenz-view') || 'null');
@@ -219,8 +264,42 @@ export function mountTracker(D, hooks = {}) {
       const ps = plantsFor(d.fuel), f = FUEL[d.fuel];
       // the largest plants get their own shade of the fuel colour; smaller ones share a muted fill but stay separate layers
       ps.forEach((p, i) => L.push({ id: p.name, name: p.name, tok: f.tok, shade: i < TOP ? i : null, muted: i >= TOP, signed: !!f.signed, s: V.avg(p.s), plant: p, drill: { group: d.group, fuel: d.fuel, plant: p.name } }));
+    } else if (d.group && setById(d.group)) {
+      // a set's plants, each in a shade of its fuel colour, grouped by fuel in the summary
+      const set = setById(d.group), seen = {};
+      for (const p of [...set.plants].sort((a, b) => FUELS.findIndex(f => f.k === a.fuel) - FUELS.findIndex(f => f.k === b.fuel) || energy(b) - energy(a))) {
+        const i = seen[p.fuel] = (seen[p.fuel] ?? -1) + 1;
+        L.push({ id: 'p:' + p.name, name: p.name, tok: FUEL[p.fuel].tok, shade: i, section: set.fuel ? null : p.fuel, s: V.avg(p.s), plant: p,
+                 drill: { group: d.group, fuel: null, plant: p.name } });
+      }
     } else if (d.group) {
       for (const k of groupById(d.group).f) if (present[r].includes(k)) L.push(fuelLayer(k, d.group));
+    } else if (VIEWS[state.view].by) {
+      const by = VIEWS[state.view].by, sets = V.sets || (V.sets = plantSets());
+      const sum = ps => { const o = new Float64Array(V.n); for (const p of ps) { const a = V.avg(p.s); for (let j = 0; j < V.n; j++) o[j] += a[j]; } return o; };
+      const setLayer = (x, shadeIx) => ({ id: x.id, name: x.name, tok: x.tok || FUEL[x.fuel].tok, shade: shadeIx, section: by === 'site' ? x.fuel : null,
+                                          s: sum(x.plants), drill: { group: x.id, fuel: null, plant: null }, count: x.plants.length });
+      if (by === 'owner') {
+        for (const x of sets) L.push(setLayer(x, null));
+        if (present[r].includes('roof')) L.push({ ...fuelLayer('roof', null), name: 'Rooftop solar (households)' });
+      } else {
+        for (const f of FUELS) {
+          if (f.signed || !present[r].includes(f.k)) continue;
+          const mine = sets.filter(x => x.fuel === f.k);
+          if (by === 'scheme' && f.k === 'hydro') { mine.forEach((x, i) => L.push(setLayer(x, i))); continue; }
+          if (by === 'site') {
+            const small = new Set(mine.flatMap(x => x.plants));
+            const ps = plantsFor(f.k).filter(p => !small.has(p)).sort((a, b) => energy(b) - energy(a));
+            if (!ps.length || f.k === 'roof') { L.push({ ...fuelLayer(f.k, null), section: f.k }); continue; }
+            ps.forEach((p, i) => L.push({ id: 'p:' + p.name, name: p.name, tok: f.tok, shade: i, section: f.k, s: V.avg(p.s), plant: p,
+                                          drill: { group: null, fuel: null, plant: p.name } }));
+            for (const x of mine) L.push({ ...setLayer(x, null), light: true });
+            continue;
+          }
+          L.push(fuelLayer(f.k, null));
+        }
+      }
+      for (const k of SIGNED) if (present[r].includes(k)) L.push(fuelLayer(k, null));
     } else if (!groups) {
       for (const k of present[r]) L.push(fuelLayer(k, null));
     } else {
@@ -241,14 +320,14 @@ export function mountTracker(D, hooks = {}) {
   const busLabel = k => { const poc = k.split(' ')[0]; const kv = parseInt(poc.slice(3, 6), 10); return `${kv} kV · ${poc}`; };
   const level = () => state.drill.plant ? 'unit' : state.drill.fuel ? 'plant' : state.drill.group ? 'fuel' : 'top';
   function drillTo(d) {
-    state.drill = d; state.hidden.clear(); relayer(); buildSummary(); render();
+    state.drill = d; state.hidden.clear(); state.filter = ''; relayer(); buildSummary(); render();
   }
 
   // ---------- colours ----------
   let C = {}, PAT = {};
   function readColours() {
     const cs = getComputedStyle(document.documentElement);
-    for (const t of ['--ink', '--ink-2', '--muted', '--line', '--grid', '--surface', '--accent', '--accent-soft', '--co2', '--p-ni', '--p-si', '--f-coal', '--f-gas', '--f-diesel', '--f-geo', '--f-hydro', '--f-wind', '--f-solar', '--f-batt', '--f-hvdc', '--g-fossil', '--g-ren', '--g-fast', '--g-vre', '--g-resid'])
+    for (const t of ['--ink', '--ink-2', '--muted', '--line', '--grid', '--surface', '--accent', '--accent-soft', '--co2', '--p-ni', '--p-si', '--f-coal', '--f-gas', '--f-diesel', '--f-geo', '--f-hydro', '--f-wind', '--f-solar', '--f-batt', '--f-hvdc', '--g-fossil', '--g-ren', '--g-fast', '--g-vre', '--g-resid', '--o1', '--o2', '--o3', '--o4', '--o5', '--o6'])
       C[t] = cs.getPropertyValue(t).trim();
     PAT = {};
     for (const f of FUELS) if (f.hatch) {
@@ -272,7 +351,7 @@ export function mountTracker(D, hooks = {}) {
     const f = t => { t = (t + 1) % 1; return t < 1 / 6 ? p + (q - p) * 6 * t : t < 1 / 2 ? q : t < 2 / 3 ? p + (q - p) * (2 / 3 - t) * 6 : p; };
     return '#' + [f(h + 1 / 3), f(h), f(h - 1 / 3)].map(x => Math.round(x * 255).toString(16).padStart(2, '0')).join('');
   }
-  const colourOf = l => l.muted ? alpha(C['--muted'], 0.5) : l.shade != null ? shade(C[l.tok], l.shade) : C[l.tok];
+  const colourOf = l => l.muted ? alpha(C['--muted'], 0.5) : l.light ? shade(C[l.tok], 3) : l.shade != null ? shade(C[l.tok], l.shade) : C[l.tok];
 
   // ---------- chart frame ----------
   const PADL = 50, PADR = 12;
@@ -479,8 +558,8 @@ export function mountTracker(D, hooks = {}) {
   // ---------- summary ----------
   const REGION = { NZ: 'New Zealand', NI: 'North Island', SI: 'South Island' };
   function crumbs() {
-    const d = state.drill, parts = [{ label: 'Generation', to: d.group || d.fuel ? { ...TOP_LEVEL } : null }];
-    if (d.group) parts.push({ label: groupById(d.group).name, to: d.fuel ? { group: d.group, fuel: null, plant: null } : null });
+    const d = state.drill, parts = [{ label: 'Generation', to: d.group || d.fuel || d.plant ? { ...TOP_LEVEL } : null }];
+    if (d.group) parts.push({ label: groupById(d.group).name, to: d.fuel || d.plant ? { group: d.group, fuel: null, plant: null } : null });
     if (d.fuel) parts.push({ label: FUEL[d.fuel].name, to: d.plant ? { group: d.group, fuel: d.fuel, plant: null } : null });
     if (d.plant) parts.push({ label: d.plant, to: null });
     return parts;
@@ -491,15 +570,16 @@ export function mountTracker(D, hooks = {}) {
     h.querySelectorAll('button').forEach(b => b.addEventListener('click', () => drillTo(parts[+b.dataset.i].to)));
     const lv = level();
     $('gen-unit').textContent = {
-      top: VIEWS[state.view].groups ? 'MW, stacked by group' : 'MW, stacked by fuel',
-      fuel: 'MW, stacked by fuel', plant: 'MW, stacked by plant',
+      top: { site: 'MW, stacked by site', scheme: 'MW, hydro by scheme', owner: 'MW, stacked by owner' }[VIEWS[state.view].by]
+        || (VIEWS[state.view].groups ? 'MW, stacked by group' : 'MW, stacked by fuel'),
+      fuel: setById(d.group) ? 'MW, stacked by plant' : 'MW, stacked by fuel', plant: 'MW, stacked by plant',
       unit: V.layers.length > 1 ? 'MW, by grid connection' : 'MW',
     }[lv];
     const up = lv !== 'top' ? parts[parts.length - 2] : null;
     $('sum-level').hidden = !up;
     if (up) {
       $('sum-level-txt').textContent = {
-        fuel: () => `${groupById(d.group).name} · ${REGION[state.region]}`,
+        fuel: () => `${groupById(d.group).name}${setById(d.group) ? ' plants' : ''} · ${REGION[state.region]}`,
         plant: () => `${FUEL[d.fuel].name} plants · ${REGION[state.region]}`,
         unit: () => V.layers.length > 1 ? `${d.plant} · by grid connection` : d.plant,
       }[lv]();
@@ -507,26 +587,72 @@ export function mountTracker(D, hooks = {}) {
       $('sum-back').onclick = () => drillTo(up.to);
     }
   }
+  // Long lists (the site view, a fuel's plants) get a filter box; the site view groups its rows under collapsible
+  // fuel headings with subtotals. Section headings toggle open; their colour square hides every row in them.
+  const norm = t => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();  // "takapo" finds "Takapō"
+  function toggleHidden(ids, tr) {
+    const off = !ids.every(id => state.hidden.has(id));
+    for (const id of ids) off ? state.hidden.add(id) : state.hidden.delete(id);
+    for (const l of V.layers) if (ids.includes(l.id)) { l.row.classList.toggle('off', off); l.row.querySelector('.sw-btn')?.setAttribute('aria-pressed', String(!off)); }
+    if (tr) { tr.classList.toggle('off', off); tr.querySelector('.sw-btn').setAttribute('aria-pressed', String(!off)); }
+    drawGen();
+  }
+  function applyFilter() {
+    const q = norm(state.filter.trim());
+    for (const l of V.layers) {
+      const sec = V.sections.find(x => x.members.includes(l));
+      l.row.hidden = q ? !norm(l.name).includes(q) : !!(sec && sec.members.length > 1 && !state.open.has(sec.id));
+    }
+    for (const x of V.sections) {
+      if (!x.row) continue;
+      x.row.hidden = !!q && !x.members.some(l => !l.row.hidden);
+      x.row.setAttribute('aria-expanded', String(!!q || state.open.has(x.id)));
+    }
+  }
   function buildSummary() {
     renderCrumbs();
     const body = $('mix-body'); body.innerHTML = '';
-    $('col-name').textContent = { top: 'Source', fuel: 'Fuel', plant: 'Plant', unit: V.layers.length > 1 ? 'Connection' : 'Plant' }[level()];
+    $('col-name').textContent = { top: VIEWS[state.view].by === 'owner' ? 'Owner' : VIEWS[state.view].by === 'site' ? 'Site' : 'Source',
+      fuel: setById(state.drill.group) ? 'Plant' : 'Fuel', plant: 'Plant', unit: V.layers.length > 1 ? 'Connection' : 'Plant' }[level()];
+    const canHide = V.layers.length > 1;
+    V.sections = [];
+    let cur = null;
     for (const l of V.layers) {
+      // a fuel heading before the first row of each section with more than one row
+      if (l.section && (!cur || cur.id !== l.section)) {
+        cur = { id: l.section, name: FUEL[l.section].name, tok: FUEL[l.section].tok, hatch: FUEL[l.section].hatch, members: V.layers.filter(m => m.section === l.section) };
+        V.sections.push(cur);
+        if (cur.members.length > 1) {
+          const x = cur, tr = document.createElement('tr');
+          tr.className = 'sec'; tr.style.setProperty('--c', C[x.tok]);
+          const ids = x.members.map(m => m.id);
+          if (ids.every(id => state.hidden.has(id))) tr.classList.add('off');
+          tr.innerHTML = `<td><div class="row-name"><button type="button" class="sw-btn" aria-pressed="${!ids.every(id => state.hidden.has(id))}" aria-label="Show ${esc(x.name)} in the chart"><span class="sw${x.hatch ? ' hatch' : ''}"></span></button><button type="button" class="sec-btn" aria-label="${esc(x.name)}: show or hide its ${x.members.length} rows">${esc(x.name)} <span class="cnt">${x.members.length}</span></button></div></td><td class="n" data-q></td><td class="n"><div class="share"><span data-s></span><span class="bar" data-b></span></div></td>`;
+          tr.querySelector('.sw-btn').addEventListener('click', () => toggleHidden(ids, tr));
+          tr.querySelector('.sec-btn').addEventListener('click', () => { state.open.has(x.id) ? state.open.delete(x.id) : state.open.add(x.id); applyFilter(); });
+          x.row = tr;
+          body.appendChild(tr);
+        }
+      } else if (!l.section) cur = null;
       const tr = document.createElement('tr'); tr.style.setProperty('--c', colourOf(l));
       if (state.hidden.has(l.id)) tr.className = 'off';
+      if (cur && cur.row) tr.classList.add('in-sec');
       const nameHtml = `${esc(l.name)}${l.tag ? ` <span class="tag">${l.tag}</span>` : ''}`;
-      const canHide = V.layers.length > 1;
       tr.innerHTML = `<td><div class="row-name">${canHide ? `<button type="button" class="sw-btn" aria-pressed="${!state.hidden.has(l.id)}" aria-label="Show ${esc(l.name)} in the chart"><span class="sw${l.hatch ? ' hatch' : ''}"></span></button>` : `<span class="sw-btn"><span class="sw"></span></span>`}${l.drill ? `<button type="button" class="drill">${nameHtml}</button>` : `<span class="nm">${nameHtml}</span>`}</div></td><td class="n" data-q></td><td class="n"><div class="share"><span data-s></span><span class="bar" data-b></span></div></td>`;
       if (canHide) tr.querySelector('.sw-btn').addEventListener('click', () => {
-        state.hidden.has(l.id) ? state.hidden.delete(l.id) : state.hidden.add(l.id);
-        tr.classList.toggle('off', state.hidden.has(l.id));
-        tr.querySelector('.sw-btn').setAttribute('aria-pressed', String(!state.hidden.has(l.id)));
-        drawGen();
+        toggleHidden([l.id]);
+        const x = V.sections.find(sec => sec.members.includes(l));
+        if (x && x.row) { const all = x.members.every(m => state.hidden.has(m.id)); x.row.classList.toggle('off', all); x.row.querySelector('.sw-btn').setAttribute('aria-pressed', String(!all)); }
       });
       if (l.drill) tr.querySelector('.drill').addEventListener('click', () => drillTo(l.drill));
       l.row = tr;
       body.appendChild(tr);
     }
+    const f = $('mix-filter');
+    f.hidden = V.layers.length <= 12;
+    f.value = state.filter;
+    f.placeholder = `Filter ${V.layers.length} ${VIEWS[state.view].by === 'site' && level() === 'top' ? 'sites' : 'rows'}`;
+    applyFilter();
     $('lg-xt').hidden = state.region === 'NI';
   }
   const setSys = rows => { $('sys').innerHTML = rows.filter(Boolean).map(([k, v, s]) => `<dt>${k}</dt><dd>${v}${s ? `<small>${s}</small>` : ''}</dd>`).join(''); };
@@ -575,7 +701,8 @@ export function mountTracker(D, hooks = {}) {
       // energy in GWh, or TWh once totals run past 10,000 GWh
       const tw = Math.abs(tot) >= 1e4, en = v => gwh(tw ? v / 1000 : v).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
       $('col-q').textContent = tw ? 'TWh' : 'GWh';
-      for (const l of layers) {
+      for (const x of V.sections) if (x.row) E.set(x, x.members.reduce((a, m) => a + E.get(m), 0));
+      for (const l of [...layers, ...V.sections.filter(x => x.row)]) {
         const e = E.get(l);
         l.row.querySelector('[data-q]').textContent = en(e);
         l.row.querySelector('[data-s]').textContent = l.signed ? signedTxt(l, e, true) : tot > 0 ? (e / tot * 100).toFixed(1) + '%' : '—';
@@ -609,8 +736,8 @@ export function mountTracker(D, hooks = {}) {
     $('col-q').textContent = long ? 'MW avg' : 'MW';
     let tot = 0;
     if (level() === 'top') tot = V.gen[j]; else for (const l of layers) tot += l.signed ? l.s[j] : Math.max(0, l.s[j]);
-    for (const l of layers) {
-      const v = l.s[j];
+    for (const l of [...layers, ...V.sections.filter(x => x.row)]) {
+      const v = l.members ? l.members.reduce((a, m) => a + m.s[j], 0) : l.s[j];
       l.row.querySelector('[data-q]').textContent = fmt(v);
       l.row.querySelector('[data-s]').textContent = l.signed ? signedTxt(l, v, false) : tot > 0.5 ? (v / tot * 100).toFixed(1) + '%' : '—';
       l.row.querySelector('[data-b]').style.transform = `scaleX(${l.signed || tot <= 0.5 ? 0 : Math.max(0, v / tot)})`;
@@ -727,10 +854,11 @@ export function mountTracker(D, hooks = {}) {
   };
   function rebuild() {
     const d = state.drill;
-    if (d.plant) { const p = plantByName(d.plant); if (state.region !== 'NZ' && p.isl !== state.region) d.plant = null; }
+    V = buildView();  // first: the drill-down checks below look at this view's plant sets
+    if (d.plant) { const p = plantByName(d.plant); if (!p || (state.region !== 'NZ' && p.isl !== state.region)) d.plant = null; }
     if (d.fuel && !plantsFor(d.fuel).length) { d.fuel = null; d.plant = null; }
-    if (d.group && !groupById(d.group)?.f.some(k => present[state.region].includes(k))) d.group = null;
-    V = buildView(); relayer(); state.hover = null; syncControls(); buildSummary(); render(); save(); report();
+    if (d.group && !(setById(d.group)?.plants.length || groupById(d.group)?.f?.some(k => present[state.region].includes(k)))) { d.group = null; d.plant = null; }
+    relayer(); state.hover = null; syncControls(); buildSummary(); render(); save(); report();
   }
 
   $('sel-region').addEventListener('change', e => { if (!['NZ', 'NI', 'SI'].includes(e.target.value)) return; state.region = e.target.value; state.hidden.clear(); rebuild(); });
@@ -746,8 +874,9 @@ export function mountTracker(D, hooks = {}) {
   $('nav-next').addEventListener('click', () => step(1));
   $('sel-view').addEventListener('change', e => {
     if (!Object.hasOwn(VIEWS, e.target.value)) return;
-    state.view = e.target.value; state.drill = { ...TOP_LEVEL }; state.hidden.clear(); rebuild();
+    state.view = e.target.value; state.drill = { ...TOP_LEVEL }; state.hidden.clear(); state.filter = ''; state.open.clear(); rebuild();
   });
+  $('mix-filter').addEventListener('input', e => { state.filter = e.target.value; applyFilter(); });
   $('seg-int').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || !intsFor(state.range, state.kind).includes(b.dataset.v)) return; state.int = b.dataset.v; rebuild(); });
 
   // ---------- pointer and keyboard: one time cursor across both chart panels, a tooltip that follows the mouse ----------

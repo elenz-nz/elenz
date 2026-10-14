@@ -30,8 +30,11 @@ This repository is public: never commit keys, tokens or personal details.
   bundled snapshot, and `/data/history/{index,day,hh/YYYY-MM}.json` from KV keys `hist/*`; its `scheduled` handler
   dispatches the GitHub jobs (live every 5 minutes, history every 6 hours) (Worker secret `GITHUB_TOKEN`: fine-grained,
   elenz only, Actions read/write; it expires, so renew it yearly). KV free plan: 1,000 writes/day (the job uses ~600), 100,000 reads/day.
-- `facilities/overrides.toml`: curated corrections; `facilities/connection_points.csv`: POC → island;
+- `facilities/overrides.toml`: curated corrections, plus `[owners]`, `[plant_owners]` and `[hydro_schemes]` for the
+  site's By owner / By hydro scheme views; `facilities/connection_points.csv`: POC → island;
   `facilities/plant_register.csv`: the EA register (refresh with `sync.py plants`, review the diff).
+- `ingest/plant_meta.py` writes `site/src/lib/tracker/plants.json` (plant → owner, hydro scheme) from the register and
+  those tables. Rerun it and commit the JSON after refreshing the register or editing the tables.
 - `data/`: raw downloads, git-ignored.
 
 ## Facts learned from the data (Oct 2026)
