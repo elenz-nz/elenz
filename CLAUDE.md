@@ -50,7 +50,7 @@ This repository is public: never commit keys, tokens or personal details.
 
 ## Status and next steps
 
-1. Site on Cloudflare Workers (free `*.workers.dev` address; domain elenz.nz to be bought later).
+1. Site live at https://elenz.elenz.workers.dev (Cloudflare Workers; domain elenz.nz to be bought later).
 2. Live data via GitHub Actions + Workers KV (set up Oct 2026). A paid server running `update.py` in a loop is the
    upgrade path if GitHub's schedule delays become a problem.
 3. Then the brief's build order: history and plant pages, map, hydro panel and records, offer stacks and downloads.
