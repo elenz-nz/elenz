@@ -173,7 +173,8 @@ export function mountTracker(D, hooks = {}) {
   // a point's name: short for the hover chip, long for the summary heading
   function chip(j) {
     const p = lp(V.t[j]);
-    return { '1d': `${DOW[p.dow]} ${p.dom} ${MON[p.mon]}`, '1w': `w/c ${p.dom} ${MON[p.mon]}`, '1mo': `${MON[p.mon]} ${p.y}` }[state.int] || `${DOW[p.dow]} ${clock(p)}`;
+    return { '1d': `${DOW[p.dow]} ${p.dom} ${MON[p.mon]} ${p.y}`, '1w': `w/c ${p.dom} ${MON[p.mon]} ${p.y}`, '1mo': `${MON[p.mon]} ${p.y}` }[state.int]
+      || `${DOW[p.dow]} ${p.dom} ${MON[p.mon]}${state.end != null && p.y !== lp(models.live.END).y ? ' ' + p.y : ''}, ${clock(p)}`;
   }
   function heading(j) {
     const p = lp(V.t[j]), last = j === V.n - 1 && V.partial;
@@ -194,12 +195,14 @@ export function mountTracker(D, hooks = {}) {
         const every = { '1d': 3, '3d': 6, '7d': 24 }[r];
         if (p.m !== 0 || p.h % every) continue;
         const midnight = p.h === 0;
+        // day labels carry the month; past windows from an earlier year also carry the year once (drawAxis)
         out.push({ j, line: midnight, strong: midnight,
-                   label: midnight ? `${DOW[p.dow]} ${p.dom}` : r === '1d' || (r === '3d' && p.h === 12) ? hourLbl(p) : null });
+                   label: midnight ? `${DOW[p.dow]} ${p.dom} ${MON[p.mon]}` : r === '1d' || (r === '3d' && p.h === 12) ? hourLbl(p) : null,
+                   yr: midnight && state.end != null && p.y !== lp(models.live.END).y ? p.y : null });
       } else if (r === '30d') {
         if (!q || p.dom === q.dom) continue;
         const monday = p.dow === 1;
-        out.push({ j, line: monday, strong: monday, label: monday ? `${p.dom} ${MON[p.mon]}` : null });
+        out.push({ j, line: monday, strong: monday, label: monday ? `${p.dom} ${MON[p.mon]}` : null, yr: monday ? p.y : null });
       } else if (r === '1y') {
         if (!q || p.mon === q.mon) continue;
         out.push({ j, line: true, strong: p.mon === 0, label: p.mon === 0 ? `${MON[p.mon]} ${p.y}` : MON[p.mon] });
@@ -402,15 +405,18 @@ export function mountTracker(D, hooks = {}) {
   }
   function drawAxis(ctx, X, bottom, x0, x1) {
     ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.font = FONT;
-    let lastX = -1e9;
+    let lastX = -1e9, lastYr = null;
     for (const mk of V.marks) {
       const x = X(mk.j);
       ctx.strokeStyle = C['--line']; ctx.beginPath(); ctx.moveTo(Math.round(x) + 0.5, bottom); ctx.lineTo(Math.round(x) + 0.5, bottom + 4); ctx.stroke();
       if (!mk.label) continue;
-      const tw = ctx.measureText(mk.label).width;
+      // the year goes on the first label drawn and wherever it changes
+      const label = mk.yr != null && mk.yr !== lastYr ? `${mk.label} ${mk.yr}` : mk.label;
+      const tw = ctx.measureText(label).width;
       if (x - tw / 2 < lastX + 10 || x - tw / 2 < x0 - 30 || x + tw / 2 > x1 + 10) continue;
       ctx.fillStyle = mk.strong ? C['--ink-2'] : C['--muted'];
-      ctx.fillText(mk.label, x, bottom + 7); lastX = x + tw / 2;
+      ctx.fillText(label, x, bottom + 7); lastX = x + tw / 2;
+      if (mk.yr != null) lastYr = mk.yr;
     }
   }
   function line(ctx, X, Y, arr, color, width = 1.75, dash) {
