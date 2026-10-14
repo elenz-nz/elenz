@@ -95,10 +95,13 @@ export function mountTracker(D, hooks = {}) {
     const by = VIEWS[state.view].by, r = state.region, sets = [];
     const regional = M.plants.filter(p => !FUEL[p.fuel].signed && (r === 'NZ' || p.isl === r));
     if (by === 'scheme') {
+      // largest scheme by nameplate capacity at the bottom of the stack; "Other hydro" always last
+      const cap = ps => ps.reduce((a, p) => a + (p.cap || 0), 0);
       for (const sc of SCHEMES) {
         const ps = regional.filter(p => p.fuel === 'hydro' && schemeOf(p) === sc);
-        if (ps.length) sets.push({ id: 's:' + sc, name: sc, fuel: 'hydro', plants: ps });
+        if (ps.length) sets.push({ id: 's:' + sc, name: sc, fuel: 'hydro', plants: ps, cap: cap(ps) });
       }
+      sets.sort((a, b) => (a.name === 'Other hydro') - (b.name === 'Other hydro') || b.cap - a.cap);
     } else if (by === 'owner') {
       OWNERS.forEach((o, i) => {
         const ps = regional.filter(p => ownerOf(p) === o);
@@ -611,7 +614,7 @@ export function mountTracker(D, hooks = {}) {
     const q = norm(state.filter.trim());
     for (const l of V.layers) {
       const sec = V.sections.find(x => x.members.includes(l));
-      l.row.hidden = q ? !norm(l.name).includes(q) : !!(sec && sec.members.length > 1 && !state.open.has(sec.id));
+      l.row.hidden = q ? !norm(l.name).includes(q) : !!(sec && sec.row && !state.open.has(sec.id));
     }
     for (const x of V.sections) {
       if (!x.row) continue;
@@ -632,7 +635,8 @@ export function mountTracker(D, hooks = {}) {
       if (l.section && (!cur || cur.id !== l.section)) {
         cur = { id: l.section, name: FUEL[l.section].name, tok: FUEL[l.section].tok, hatch: FUEL[l.section].hatch, members: V.layers.filter(m => m.section === l.section) };
         V.sections.push(cur);
-        if (cur.members.length > 1) {
+        // a heading for each fuel with sites under it, even a single site (Diesel › Whirinaki)
+        if (cur.members.length > 1 || cur.members[0].plant) {
           const x = cur, tr = document.createElement('tr');
           tr.className = 'sec'; tr.style.setProperty('--c', C[x.tok]);
           const ids = x.members.map(m => m.id);
