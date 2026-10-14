@@ -578,7 +578,7 @@ export function mountTracker(D, hooks = {}) {
         ['Peak demand, metered', fmt(pk), 'MW'],
         ['Peak, with rooftop solar', fmt(pku), 'MW'],
         showT && ['Tiwai smelter', fmt(ti / hs), 'MW avg'],
-        Math.abs(hv) >= 1e7 ? ['HVDC, net transfer', (Math.abs(hv) / 1e6).toFixed(2), hv >= 0 ? 'TWh north' : 'TWh south']
+        Math.abs(hv) >= 1e6 ? ['HVDC, net transfer', (Math.abs(hv) / 1e6).toFixed(2), hv >= 0 ? 'TWh north' : 'TWh south']
           : ['HVDC, net transfer', (Math.abs(hv) / 1000).toFixed(1), hv >= 0 ? 'GWh north' : 'GWh south'],
         ['Emissions intensity', fmt(em / gw), 'g/kWh'],
         ['Renewable share', (re / gw).toFixed(1) + '%', ''],
