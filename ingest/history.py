@@ -357,11 +357,19 @@ def month_days(m, last_day):
         d += timedelta(days=1)
 
 
+# overrides.toml tables only the website uses (plant_meta.py): editing them doesn't rebuild history
+SITE_ONLY = ('owners', 'plant_owners', 'hydro_schemes')
+
+
 def mapping_hash():
+    """Fingerprint of everything history months are built from; a change rebuilds every month."""
+    from common import overrides
     h = hashlib.sha256(f'build {BUILD}'.encode())
-    for f in ('plant_register.csv', 'overrides.toml', 'connection_points.csv', 'rooftop_points.csv', 'rooftop_nsp.csv'):
+    for f in ('plant_register.csv', 'connection_points.csv', 'rooftop_points.csv', 'rooftop_nsp.csv'):
         with open(os.path.join(FACILITIES, f), 'rb') as fh:
             h.update(fh.read())
+    o = {k: v for k, v in overrides().items() if k not in SITE_ONLY}
+    h.update(json.dumps(o, sort_keys=True, ensure_ascii=False).encode())
     return h.hexdigest()[:16]
 
 

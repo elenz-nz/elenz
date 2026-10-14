@@ -38,7 +38,8 @@ This repository is public: never commit keys, tokens or personal details.
 - `facilities/rooftop_points.csv`, `rooftop_nsp.csv` (irradiance points and NSP → point; regenerate with
   `analysis/make_points.py`), `rooftop_capacity.json` (capacity snapshot the live job uses until the history job
   has stored `hist/roof_cap.json`).
-- `facilities/overrides.toml`: curated corrections, `[solar_farms_in_registry]` (dispatched farms the
+- `facilities/overrides.toml`: curated corrections (any change rebuilds history, except the site-only `[owners]`,
+  `[plant_owners]` and `[hydro_schemes]`), `[solar_farms_in_registry]` (dispatched farms the
   distributed-generation registry also counts), plus `[owners]`, `[plant_owners]` and `[hydro_schemes]` for the
   site's By owner / By hydro scheme views; `facilities/connection_points.csv`: POC → island;
   `facilities/plant_register.csv`: the EA register (refresh with `sync.py plants`, review the diff).
