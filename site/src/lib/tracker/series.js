@@ -35,13 +35,24 @@ const SERIES = ['geo', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof'
 const F = (a, n) => (a ? Float64Array.from(a) : new Float64Array(n));
 const plantKey = p => `${p.name}|${p.fuel}|${p.isl}`;
 
+// total generation per point, including rooftop solar (output only: no HVDC, no battery charging), as the page sums it
+const GEN = ['geo', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt'];
+export function genTotal(S, region) {
+  const n = S.t.length, o = new Float64Array(n);
+  for (const k of GEN) {
+    const a = region === 'SI' ? null : S.NI[k], b = region === 'NI' ? null : S.SI[k];
+    for (let i = 0; i < n; i++) o[i] += Math.max(0, (a ? a[i] : 0) + (b ? b[i] : 0));
+  }
+  return o;
+}
+
 /** tracker.json or a history file -> segment: Float64Array series with times t and hours per point h. */
 export function fromLayout(D) {
   const n = D.N;
   const t = D.t ? Float64Array.from(D.t) : Float64Array.from({ length: n }, (_, i) => D.t0 + i * D.step);
   const h = D.h ? Float64Array.from(D.h) : new Float64Array(n).fill(D.step / 36e5);
   const isl = s => Object.fromEntries(SERIES.map(k => [k, F(s[k], n)]));
-  const peak = D.peak ? Object.fromEntries(Object.entries(D.peak).map(([r, o]) => [r, { metered: F(o.metered, n), underlying: F(o.underlying, n) }])) : null;
+  const peak = D.peak ? Object.fromEntries(Object.entries(D.peak).map(([r, o]) => [r, Object.fromEntries(Object.entries(o).map(([k, v]) => [k, F(v, n)]))])) : null;
   return {
     n, t, h, NI: isl(D.NI), SI: isl(D.SI), hvdcN: F(D.hvdcN, n), peak,
     plants: D.plants.map(p => ({ ...p, s: F(p.s, n), units: p.units && p.units.map(u => ({ ...u, s: F(u.s, n) })) })),
@@ -74,12 +85,12 @@ export function aggregate(S, key) {
   const max = arr => { const o = new Float64Array(n); groups.forEach(([a, b], j) => { let m = -Infinity; for (let i = a; i < b; i++) m = Math.max(m, arr[i]); o[j] = m; }); return o; };
   const isl = o => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, avg(v)]));
   let peak;
-  if (S.peak) peak = Object.fromEntries(Object.entries(S.peak).map(([r, o]) => [r, { metered: max(o.metered), underlying: max(o.underlying) }]));
+  if (S.peak) peak = Object.fromEntries(Object.entries(S.peak).map(([r, o]) => [r, Object.fromEntries(Object.entries(o).map(([k, v]) => [k, max(v)]))]));
   else {
     const nz = k => S.NI[k].map((v, i) => v + S.SI[k][i]);
     peak = {};
-    for (const [r, met, und] of [['NZ', nz('metered'), nz('underlying')], ['NI', S.NI.metered, S.NI.underlying], ['SI', S.SI.metered, S.SI.underlying]])
-      peak[r] = { metered: max(met), underlying: max(und) };
+    for (const [r, met, und, gen] of [['NZ', nz('metered'), nz('underlying'), genTotal(S, 'NZ')], ['NI', S.NI.metered, S.NI.underlying, genTotal(S, 'NI')], ['SI', S.SI.metered, S.SI.underlying, genTotal(S, 'SI')]])
+      peak[r] = { metered: max(met), underlying: max(und), gen: max(gen) };
   }
   return {
     n, t: Float64Array.from(groups, ([a]) => S.t[a]), h, NI: isl(S.NI), SI: isl(S.SI), hvdcN: avg(S.hvdcN), peak,
@@ -96,7 +107,9 @@ export function concat(segs) {
   const out = { n, t: join(s => s.t), h: join(s => s.h), NI: isl('NI'), SI: isl('SI'), hvdcN: join(s => s.hvdcN), peak: null, plants: [] };
   if (segs.length && segs.every(s => s.peak)) {
     out.peak = {};
-    for (const r of Object.keys(segs[0].peak)) out.peak[r] = { metered: join(s => s.peak[r].metered), underlying: join(s => s.peak[r].underlying) };
+    // a series some segments lack (peak generation in history built before it was added) is dropped
+    for (const r of Object.keys(segs[0].peak))
+      out.peak[r] = Object.fromEntries(Object.keys(segs[0].peak[r]).filter(k => segs.every(s => s.peak[r][k])).map(k => [k, join(s => s.peak[r][k])]));
   }
   const plants = new Map();
   let pos = 0;

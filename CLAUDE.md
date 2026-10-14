@@ -9,7 +9,8 @@ This repository is public: never commit keys, tokens or personal details.
 - `site/`: SvelteKit 3 + Svelte 5, `adapter-static`, every page prerendered. Hosted on Cloudflare Workers as static
   assets (`wrangler.jsonc` at the repo root; build command `cd site && npm ci && npm run build`, deploy command
   `npx wrangler deploy`). Every push to `main` redeploys. The tracker page markup is in
-  `src/routes/+page.svelte`; the canvas chart code is `src/lib/tracker/tracker.js` (vanilla JS, driven by
+  `src/routes/+page.svelte` (About page: `src/routes/about/+page.svelte`, with the data sources table; shared
+  masthead and footer in `src/lib/site/`); the canvas chart code is `src/lib/tracker/tracker.js` (vanilla JS, driven by
   element ids in the page), styles in `src/lib/tracker/tracker.css` (colour tokens, light/dark).
   `src/lib/tracker/series.js` loads the history files and merges them with the live week (24 h/3 d/7 d use the
   live 5-minute data; 30 days uses half-hourly history; 1 year and All use daily history).
@@ -82,6 +83,7 @@ This repository is public: never commit keys, tokens or personal details.
 2. Live data via GitHub Actions + Workers KV (set up Oct 2026). A paid server running `update.py` in a loop is the
    upgrade path if GitHub's schedule delays become a problem.
 3. History since Sep 2020 on the tracker page: 30 days, 1 year, All (Oct 2026).
+   Daily history keeps each day's peak demand and peak generation (total output including rooftop solar), BUILD 3.
 4. Then the brief's build order: plant pages, map, hydro panel and records, offer stacks and downloads.
 
 Open questions: emission factors (and how to treat the Rankines), rooftop solar capacity from GUEHMT, written

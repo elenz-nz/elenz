@@ -10,7 +10,7 @@ Stored (Cloudflare KV in GitHub Actions, data/store locally), one set per NZ cal
                              R|NI and R|SI = island-weighted irradiance (W/m², Open-Meteo) for rooftop solar,
                              F|NI and F|SI = final prices at Haywards and Benmore (fi = 1 while only interim)
   hist/hh/YYYY-MM.json       the month in the tracker.json layout, half-hourly (the website's 30-day view)
-  hist/dd/YYYY-MM.json       daily averages for the month, plus each day's peak demand
+  hist/dd/YYYY-MM.json       daily averages for the month, plus each day's peak demand and peak generation
 and across all months:
   hist/day.json              every day since 2020 (the 1-year and all-time views)
   hist/index.json            months stored, first and last time (published once the backfill has caught up)
@@ -55,7 +55,8 @@ from sync import CITIES, DISPATCH
 warnings.simplefilter("ignore", pd.errors.PerformanceWarning)  # wide monthly frames; harmless
 FINAL = 'Datasets/Wholesale/DispatchAndPricing/FinalEnergyPrices'
 
-BUILD = 2                    # bump to rebuild every month's JSON after changing how it is built (2: final prices)
+BUILD = 3                    # bump to rebuild every month's JSON after changing how it is built (2: final prices, 3: peak generation)
+GEN_FUELS = ('geo', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
 WRITE_BUDGET = 280           # KV writes a day (UTC) for this job; the live job needs ~600 of the 1,000
 FIRST_DAY = date(2020, 9, 10)
 STEP = pd.Timedelta(minutes=30)
@@ -274,9 +275,16 @@ def daily(js, month):
     for isl in ('NI', 'SI'):
         out[isl] = {k: mean(v, 2 if k == 'price' else 0) for k, v in js[isl].items()}
     peak = {}
-    for k in ('metered', 'underlying'):
-        ni, si = np.array(js['NI'][k], float), np.array(js['SI'][k], float)
-        for r, arr in (('NZ', ni + si), ('NI', ni), ('SI', si)):
+    for k in ('metered', 'underlying', 'gen'):
+        if k == 'gen':  # total generation including rooftop solar, as the page sums it (output only, no HVDC)
+            fu = lambda isl: {f: np.array(js[isl].get(f, np.zeros(js['N'])), float) for f in GEN_FUELS}
+            a, b = fu('NI'), fu('SI')
+            ni, si = (sum(np.maximum(v, 0) for v in x.values()) for x in (a, b))
+            nz = sum(np.maximum(a[f] + b[f], 0) for f in GEN_FUELS)
+        else:
+            ni, si = np.array(js['NI'][k], float), np.array(js['SI'][k], float)
+            nz = ni + si
+        for r, arr in (('NZ', nz), ('NI', ni), ('SI', si)):
             peak.setdefault(r, {})[k] = enc(pd.Series(arr, index=day).groupby(level=0).max().reindex(days))
     out['peak'] = peak
     out['plants'] = []

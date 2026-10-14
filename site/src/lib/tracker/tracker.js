@@ -1,7 +1,7 @@
 // Elenz tracker: linked generation, price, demand, HVDC, emissions and renewables charts on one time axis.
 // Data: tracker.json built by ingest/build_tracker.py. Drawn on <canvas>; the page supplies the markup (ids below).
 
-import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore } from './series.js';
+import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTotal } from './series.js';
 import PLANT_META from './plants.json';  // owner and hydro scheme per plant (ingest/plant_meta.py)
 export { nzOffset, tzName };
 
@@ -236,9 +236,10 @@ export function mountTracker(D, hooks = {}) {
     const v = { n, avg, t: groups.map(([a]) => M.t[a]), hrs, fuels: {} };
     FUELS.forEach(f => v.fuels[f.k] = avg(S[f.k]));
     v.metered = avg(S.metered); v.underlying = avg(S.underlying); v.tiwai = avg(S.tiwai);
-    // peak demand: the highest 5-minute or half-hour value, which daily history keeps alongside its averages
+    // peak demand and generation: the highest 5-minute or half-hour value, which daily history keeps alongside its averages
     const pk = M.peak && M.peak[state.region];
-    v.pkMet = max(pk ? pk.metered : S.metered); v.pkUnd = max(pk ? pk.underlying : S.underlying);
+    v.pkMet = max(pk ? pk.metered : S.metered);
+    v.pkGen = pk ? (pk.gen ? max(pk.gen) : null) : max(genTotal(M, state.region));
     // the last day, week or month is incomplete when it runs up to the newest data
     v.partial = state.end == null && isLong() && n > 0 && key(M.END + 3e5) === key(v.t[n - 1]);
     v.pNI = avg(M.NIs.price); v.pSI = avg(M.SIs.price); v.hvdc = avg(M.hvdcN);
@@ -729,10 +730,10 @@ export function mountTracker(D, hooks = {}) {
         l.row.querySelector('[data-b]').style.transform = `scaleX(${l.signed || tot <= 0 ? 0 : Math.max(0, e / tot)})`;
       }
       $('tot-q').textContent = en(tot); $('tot-s').textContent = layers.some(l => l.signed) && !topIsAll() ? 'net' : '100%';
-      let pn = 0, ps = 0, pk = 0, pku = 0, ti = 0, hv = 0, em = 0, gw = 0, re = 0, hs = 0;
+      let pn = 0, ps = 0, pk = 0, pkg = 0, ti = 0, hv = 0, em = 0, gw = 0, re = 0, hs = 0;
       for (let i = 0; i < V.n; i++) {
         const w = V.hrs[i]; hs += w; pn += V.pNI[i] * w; ps += V.pSI[i] * w; ti += V.tiwai[i] * w; hv += V.hvdc[i] * w;
-        pk = Math.max(pk, V.pkMet[i]); pku = Math.max(pku, V.pkUnd[i]);
+        pk = Math.max(pk, V.pkMet[i]); if (V.pkGen) pkg = Math.max(pkg, V.pkGen[i]);
         em += V.co2[i] * V.gen[i] * w; re += V.ren[i] * V.gen[i] * w; gw += V.gen[i] * w;
       }
       setSys([
@@ -740,7 +741,7 @@ export function mountTracker(D, hooks = {}) {
         ['Price, North Island', money(pn / hs), 'avg'],
         ['Price, South Island', money(ps / hs), 'avg'],
         ['Peak demand, metered', fmt(pk), 'MW'],
-        ['Peak, with rooftop solar', fmt(pku), 'MW'],
+        V.pkGen && ['Peak generation', fmt(pkg), 'MW'],
         showT && ['Tiwai smelter', fmt(ti / hs), 'MW avg'],
         Math.abs(hv) >= 1e6 ? ['HVDC, net transfer', (Math.abs(hv) / 1e6).toFixed(2), hv >= 0 ? 'TWh north' : 'TWh south']
           : ['HVDC, net transfer', (Math.abs(hv) / 1000).toFixed(1), hv >= 0 ? 'GWh north' : 'GWh south'],
@@ -770,6 +771,7 @@ export function mountTracker(D, hooks = {}) {
       ['Demand, metered', fmt(V.metered[j]), long ? 'MW avg' : 'MW'],
       ['With rooftop solar', fmt(V.underlying[j]), long ? 'MW avg' : 'MW'],
       long && ['Peak demand, metered', fmt(V.pkMet[j]), 'MW'],
+      long && V.pkGen && ['Peak generation', fmt(V.pkGen[j]), 'MW'],
       showT && ['Tiwai smelter', fmt(V.tiwai[j]), long ? 'MW avg' : 'MW'],
       ['HVDC', hvTxt(V.hvdc[j]), hvDir(V.hvdc[j])],
       ['Emissions intensity', fmt(V.co2[j]), 'g/kWh'],
