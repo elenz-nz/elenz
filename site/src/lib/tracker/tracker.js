@@ -147,7 +147,11 @@ export function mountTracker(D, hooks = {}) {
     for (const r of ['NZ', 'NI', 'SI']) present[r] = FUELS.filter(f => SRC[r][f.k].some(v => Math.abs(v) > 0.5)).map(f => f.k);
   }
   derive();
-  const plantsFor = (fuel, r = state.region) => M.plants.filter(p => p.fuel === fuel && (r === 'NZ' || p.isl === r));
+  // Rooftop solar has no plants: its drill-down shows each island's estimate instead (not drillable further).
+  const roofIslands = () => ['NI', 'SI'].map(isl => ({ name: `Rooftop solar · ${isl === 'NI' ? 'North' : 'South'} Island`, fuel: 'roof', isl, poc: [], cap: null, roof: true,
+                                                       s: M[isl].roof, u: M[isl + 's'].roofU }));
+  const plantsFor = (fuel, r = state.region) => (fuel === 'roof' ? roofIslands().filter(p => p.s.some(v => v > 0.5)) : M.plants)
+    .filter(p => p.fuel === fuel && (r === 'NZ' || p.isl === r));
   const plantByName = name => M.plants.find(p => p.name === name);
 
   const state = { region: 'NZ', range: '1d', end: null, kind: 'live', int: '5m', view: 'detailed', hover: null, hoverBy: null, hidden: new Set(), drill: { ...TOP_LEVEL },
@@ -282,7 +286,8 @@ export function mountTracker(D, hooks = {}) {
     } else if (d.fuel) {
       const ps = plantsFor(d.fuel), f = FUEL[d.fuel];
       // the largest plants get their own shade of the fuel colour; smaller ones share a muted fill but stay separate layers
-      ps.forEach((p, i) => L.push({ id: p.name, name: p.name, tok: f.tok, shade: i < TOP ? i : null, muted: i >= TOP, signed: !!f.signed, s: V.avg(p.s), plant: p, drill: { group: d.group, fuel: d.fuel, plant: p.name } }));
+      ps.forEach((p, i) => L.push({ id: p.name, name: p.name, tok: f.tok, shade: i < TOP ? i : null, muted: i >= TOP, signed: !!f.signed, s: V.avg(p.s), plant: p,
+                                    hatch: p.roof ? 'roof' : null, u: p.roof ? V.avg(p.u) : null, drill: p.roof ? null : { group: d.group, fuel: d.fuel, plant: p.name } }));
     } else if (d.group && setById(d.group)) {
       // a set's plants, each in a shade of its fuel colour, grouped by fuel in the summary
       // a hydro scheme's stations in river order, upstream first; other sets by fuel, then output over the view
@@ -353,14 +358,17 @@ export function mountTracker(D, hooks = {}) {
     for (const t of ['--ink', '--ink-2', '--muted', '--line', '--grid', '--surface', '--accent', '--accent-soft', '--co2', '--p-ni', '--p-si', '--f-coal', '--f-gas', '--f-diesel', '--f-geo', '--f-hydro', '--f-wind', '--f-solar', '--f-batt', '--f-hvdc', '--g-fossil', '--g-ren', '--g-fast', '--g-vre', '--g-resid', '--o1', '--o2', '--o3', '--o4', '--o5', '--o6'])
       C[t] = cs.getPropertyValue(t).trim();
     PAT = {};
-    for (const f of FUELS) if (f.hatch) {
-      const s = 6, oc = document.createElement('canvas'); oc.width = oc.height = s * 4;
-      const x = oc.getContext('2d'); x.scale(4, 4);
-      x.globalAlpha = 0.3; x.fillStyle = C[f.tok]; x.fillRect(0, 0, s, s);
-      x.globalAlpha = 1; x.strokeStyle = C[f.tok]; x.lineWidth = 1.4;
-      x.beginPath(); for (let k = -s; k <= s; k += s) { x.moveTo(k, s); x.lineTo(k + s, 0); } x.stroke();
-      PAT[f.k] = oc;
-    }
+    for (const f of FUELS) if (f.hatch) PAT[f.k] = hatchOf(C[f.tok]);
+  }
+  // diagonal hatching in one colour (estimated series); cached per colour, so shaded layers get their own
+  function hatchOf(col) {
+    if (PAT[col]) return PAT[col];
+    const s = 6, oc = document.createElement('canvas'); oc.width = oc.height = s * 4;
+    const x = oc.getContext('2d'); x.scale(4, 4);
+    x.globalAlpha = 0.3; x.fillStyle = col; x.fillRect(0, 0, s, s);
+    x.globalAlpha = 1; x.strokeStyle = col; x.lineWidth = 1.4;
+    x.beginPath(); for (let k = -s; k <= s; k += s) { x.moveTo(k, s); x.lineTo(k + s, 0); } x.stroke();
+    return (PAT[col] = oc);
   }
   const alpha = (hex, a) => { const h = hex.replace('#', ''); const n = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16); return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`; };
   // lightness steps of the fuel hue for plants and units, alternating so neighbours differ
@@ -480,7 +488,7 @@ export function mountTracker(D, hooks = {}) {
     const F = frame(c, dom, v => fmt(v), { axis: true });
     const { X, Y } = F;
     for (const L of tops) {
-      let fill = L.l.hatch ? ctx.createPattern(PAT[L.l.hatch], 'repeat') : colourOf(L.l);
+      let fill = L.l.hatch ? ctx.createPattern(L.l.shade != null ? hatchOf(colourOf(L.l)) : PAT[L.l.hatch], 'repeat') : colourOf(L.l);
       if (fill && fill.setTransform) fill.setTransform(new DOMMatrix().scale(0.25));
       for (const [b, t] of [[L.p0, L.p1], [L.n0, L.n1]]) {
         let any = false; for (let j = 0; j < n; j++) if (t[j] !== b[j]) { any = true; break; }
@@ -606,7 +614,7 @@ export function mountTracker(D, hooks = {}) {
     $('gen-unit').textContent = {
       top: { site: 'MW, stacked by site', scheme: 'MW, hydro by scheme', owner: 'MW, stacked by owner' }[VIEWS[state.view].by]
         || (VIEWS[state.view].groups ? 'MW, stacked by group' : 'MW, stacked by fuel'),
-      fuel: setById(d.group) ? 'MW, stacked by plant' : 'MW, stacked by fuel', plant: 'MW, stacked by plant',
+      fuel: setById(d.group) ? 'MW, stacked by plant' : 'MW, stacked by fuel', plant: d.fuel === 'roof' ? 'MW, estimated, by island' : 'MW, stacked by plant',
       unit: V.layers.length > 1 ? 'MW, by grid connection' : 'MW',
     }[lv];
     const note = $('gen-note'), txt = NOTES[state.view] || '';
@@ -617,7 +625,7 @@ export function mountTracker(D, hooks = {}) {
     if (up) {
       $('sum-level-txt').textContent = {
         fuel: () => `${groupById(d.group).name}${setById(d.group) ? ' plants' : ''} · ${REGION[state.region]}`,
-        plant: () => `${FUEL[d.fuel].name} plants · ${REGION[state.region]}`,
+        plant: () => d.fuel === 'roof' ? `Rooftop solar (estimated) · ${REGION[state.region]}` : `${FUEL[d.fuel].name} plants · ${REGION[state.region]}`,
         unit: () => V.layers.length > 1 ? `${d.plant} · by grid connection` : d.plant,
       }[lv]();
       $('sum-back').textContent = `‹ ${up.label === 'Generation' ? 'All sources' : up.label}`;
@@ -650,7 +658,7 @@ export function mountTracker(D, hooks = {}) {
     renderCrumbs();
     const body = $('mix-body'); body.innerHTML = '';
     $('col-name').textContent = { top: VIEWS[state.view].by === 'owner' ? 'Owner' : VIEWS[state.view].by === 'site' ? 'Site' : 'Source',
-      fuel: setById(state.drill.group) ? 'Plant' : 'Fuel', plant: 'Plant', unit: V.layers.length > 1 ? 'Connection' : 'Plant' }[level()];
+      fuel: setById(state.drill.group) ? 'Plant' : 'Fuel', plant: state.drill.fuel === 'roof' ? 'Island' : 'Plant', unit: V.layers.length > 1 ? 'Connection' : 'Plant' }[level()];
     const canHide = V.layers.length > 1;
     V.sections = [];
     let cur = null;
@@ -939,7 +947,7 @@ export function mountTracker(D, hooks = {}) {
         if (topIsAll()) tot = V.gen[j]; else for (const x of V.layers) tot += x.signed ? x.s[j] : Math.max(0, x.s[j]);
         if (!l) return head + row(C['--ink'], totalLabel(), fmt(tot), mw);
         const v = l.s[j];
-        const pm = l.id === 'roof' && V.roofU[j] > 0.5 ? ` ± ${fmt(V.roofU[j])}` : '';
+        const uj = l.id === 'roof' ? V.roofU[j] : l.u ? l.u[j] : 0, pm = uj > 0.5 ? ` ± ${fmt(uj)}` : '';
         const extra = l.signed ? `${mw} · ${signedTxt(l, v, false)}` : `${mw}${pm}${tot > 0.5 ? ` · ${(v / tot * 100).toFixed(1)}%` : ''}`;
         return head + row(colourOf(l), l.name, fmt(v), extra, !!l.hatch);
       }
