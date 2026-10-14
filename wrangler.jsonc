@@ -10,7 +10,7 @@
     "directory": "./site/build",
     "binding": "ASSETS",
     "run_worker_first": ["/data/*"]
-  }
-  // The KV namespace the data job writes to is added here once it exists:
-  // "kv_namespaces": [{ "binding": "DATA", "id": "<namespace id>" }]
+  },
+  // Workers KV namespace "elenz-data": the GitHub job (ingest/update.py) writes tracker.json here
+  "kv_namespaces": [{ "binding": "DATA", "id": "dd69ad9aae3343c8b3ca5722ddf45548" }]
 }
