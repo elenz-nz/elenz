@@ -67,8 +67,8 @@ export function mountTracker(D, hooks = {}) {
       VRE('Variable'),
     ] },
     rf: { groups: [REN, FOSSIL('Fossils')] },
-    // inverter-based renewables (wind and solar) against everything else
-    vre: { groups: [{ id: 'resid', name: 'Other', tok: '--g-resid', f: ['geo', 'coal', 'gas', 'diesel', 'hydro'] }, VRE('Inverter-based renewables')] },
+    // inverter-based generation (wind and solar) against the synchronous machines (hydro, geothermal, thermal)
+    vre: { groups: [{ id: 'resid', name: 'Synchronous', tok: '--g-resid', f: ['geo', 'coal', 'gas', 'diesel', 'hydro'] }, VRE('Inverter-based')] },
   };
   const SIGNED = FUELS.filter(f => f.signed).map(f => f.k);
   const groupById = id => (VIEWS[state.view].groups || []).find(g => g.id === id);
