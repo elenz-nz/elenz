@@ -45,10 +45,11 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .brand .home { color: inherit; text-decoration: none; }
 .brand .name { margin: 0; color: var(--ink); font-size: 1.45rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1.05; }
 .brand p { margin: 0; color: var(--muted); font-size: 0.86rem; }
-.pages { margin-left: auto; display: flex; gap: 2px; }
-.pages a { color: var(--ink-2); text-decoration: none; font-weight: 600; font-size: 0.9rem; padding: 6px 11px; border-radius: 8px; }
+.mast-r { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.pages { display: flex; gap: 2px; }
+.pages a { color: var(--ink-2); text-decoration: none; font-weight: 600; font-size: 0.9rem; padding: 6px 11px; border-radius: 4px; }
 .pages a:hover { color: var(--ink); background: var(--grid); }
-.pages a[aria-current="page"] { color: var(--ink); box-shadow: inset 0 -2px 0 var(--accent); border-radius: 8px 8px 0 0; }
+.pages a[aria-current="page"] { color: var(--ink); box-shadow: inset 0 -2px 0 var(--accent); border-radius: 4px 4px 0 0; }
 .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 8px; border-radius: 999px; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; background: var(--accent-soft); color: var(--accent); }
 .pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid currentColor; }
 .status { margin-left: auto; display: flex; align-items: center; gap: 8px; position: relative; }
@@ -57,7 +58,7 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 /* About this data: an info button with a small panel beneath it */
 .info-btn { display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 50%; background: none; color: var(--muted); cursor: pointer; padding: 0; }
 .info-btn:hover, .info-btn[aria-expanded="true"] { color: var(--ink); background: var(--grid); }
-.info-pop { position: absolute; right: 0; top: calc(100% + 8px); z-index: 20; width: min(440px, calc(100vw - 32px)); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.12); display: grid; gap: 8px; }
+.info-pop { position: absolute; right: 0; top: calc(100% + 8px); z-index: 20; width: min(440px, calc(100vw - 32px)); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.12); display: grid; gap: 8px; }
 .info-pop[hidden] { display: none; }
 .info-pop p { margin: 0; color: var(--ink-2); font-size: 0.84rem; }
 .info-pop a { font-size: 0.82rem; }
@@ -68,11 +69,11 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .ctl { display: flex; align-items: center; gap: 7px; }
 .ctl > span { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-weight: 600; }
 .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-.seg { display: inline-flex; gap: 2px; border-radius: 7px; padding: 2px; background: var(--grid); }
-.seg button { font: inherit; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.02em; border: 1px solid transparent; background: transparent; color: var(--ink-2); padding: 2px 9px; min-height: 26px; border-radius: 5px; cursor: pointer; white-space: nowrap; }
+.seg { display: inline-flex; gap: 2px; border-radius: 4px; padding: 2px; background: var(--grid); }
+.seg button { font: inherit; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.02em; border: 1px solid transparent; background: transparent; color: var(--ink-2); padding: 2px 9px; min-height: 26px; border-radius: 3px; cursor: pointer; white-space: nowrap; }
 .seg button:hover { color: var(--ink); background: color-mix(in srgb, var(--surface) 60%, transparent); }
 .seg button[aria-pressed="true"] { background: var(--surface); border-color: var(--ink-2); color: var(--ink); font-weight: 600; }
-select.pick { font: inherit; font-size: 0.95rem; font-weight: 700; color: var(--ink); background-color: transparent; cursor: pointer; border: 1px solid transparent; border-radius: 7px; padding: 3px 24px 3px 6px; margin-left: -6px; appearance: none;
+select.pick { font: inherit; font-size: 0.95rem; font-weight: 700; color: var(--ink); background-color: transparent; cursor: pointer; border: 1px solid transparent; border-radius: 4px; padding: 3px 24px 3px 6px; margin-left: -6px; appearance: none;
   background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
   background-position: right 11px center, right 7px center; background-size: 4px 4px; background-repeat: no-repeat; }
 select.pick:hover { border-color: var(--line); }
@@ -88,10 +89,10 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 /* End date: the chosen range ends on this date */
 .ctl > label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-weight: 600; white-space: nowrap; }
 .datebox { display: inline-flex; align-items: center; gap: 4px; }
-.datebox input { font: inherit; font-size: 0.8rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 7px; padding: 2px 6px; min-height: 28px; color-scheme: inherit; }
+.datebox input { font: inherit; font-size: 0.8rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2px 6px; min-height: 28px; color-scheme: inherit; }
 .datebox input:disabled { color: var(--muted); }
 .datebox input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.datebox button { font: inherit; font-size: 0.78rem; border: 1px solid var(--line); background: var(--surface); color: var(--accent); border-radius: 7px; padding: 3px 9px; min-height: 28px; cursor: pointer; }
+.datebox button { font: inherit; font-size: 0.78rem; border: 1px solid var(--line); background: var(--surface); color: var(--accent); border-radius: 4px; padding: 3px 9px; min-height: 28px; cursor: pointer; }
 .datebox button:hover { background: var(--grid); }
 
 /* Main layout */
@@ -110,7 +111,7 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 /* Tooltip that follows the mouse */
 .chart-note { margin: 2px 0 4px; color: var(--muted); font-size: 0.76rem; }
 .chart-note[hidden] { display: none; }
-.tip { position: fixed; left: 0; top: 0; z-index: 30; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; box-shadow: 0 6px 18px rgb(0 0 0 / 0.14); font-size: 0.8rem; display: grid; gap: 3px; min-width: 170px; max-width: 320px; }
+.tip { position: fixed; left: 0; top: 0; z-index: 30; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 7px 10px; box-shadow: 0 6px 18px rgb(0 0 0 / 0.14); font-size: 0.8rem; display: grid; gap: 3px; min-width: 170px; max-width: 320px; }
 .tip[hidden] { display: none; }
 .tip-t { font-weight: 600; color: var(--ink); margin-bottom: 1px; }
 .tip-r { display: grid; grid-template-columns: 10px 1fr auto auto; align-items: baseline; column-gap: 7px; color: var(--ink-2); }
@@ -119,7 +120,7 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 .tip-r i.hatch { background: repeating-linear-gradient(135deg, var(--c) 0 2px, transparent 2px 4px); box-shadow: inset 0 0 0 1px var(--c); }
 .tip-r b { font-family: var(--font-data); font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
 .tip-r small { color: var(--muted); font-size: 0.74rem; white-space: nowrap; }
-.charts { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 6px 4px 8px; min-width: 0; touch-action: pan-y; }
+.charts { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 6px 4px 8px; min-width: 0; touch-action: pan-y; }
 .chart { padding: 8px 10px 0; }
 .chart + .chart { border-top: 1px solid var(--grid); }
 .ch-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; min-height: 22px; }
@@ -135,7 +136,7 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 /* Grouping menu beside the generation chart's total */
 select.grp {
   font: inherit; font-size: 0.8rem; color: var(--ink); background-color: var(--surface); cursor: pointer;
-  border: 1px solid var(--line); border-radius: 6px; padding: 3px 26px 3px 9px; appearance: none;
+  border: 1px solid var(--line); border-radius: 3px; padding: 3px 26px 3px 9px; appearance: none;
   background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
   background-position: right 13px center, right 9px center; background-size: 4px 4px; background-repeat: no-repeat;
 }
@@ -147,13 +148,13 @@ canvas { display: block; width: 100%; }
 /* Summary */
 /* the sidebar column: the generation table, then the stats card; it stays in view, and the table scrolls if both don't fit */
 .side { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); max-height: calc(100vh - 24px); display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.summary, .stats { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; min-width: 0; }
+.summary, .stats { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; min-width: 0; }
 .summary { flex: 0 1 auto; min-height: 0; overflow-y: auto; padding: 14px 14px 12px; display: grid; align-content: start; gap: 12px; }
 .stats { flex: none; padding: 12px 14px; }
 .sum-head { display: flex; align-items: flex-start; gap: 8px; }
 .sum-head > div { flex: 1; min-width: 0; }
 .sum-head .info-btn { margin: -4px -6px 0 0; flex: none; }
-.help { display: grid; gap: 6px; background: var(--bg); border: 1px solid var(--grid); border-radius: 8px; padding: 10px 12px; }
+.help { display: grid; gap: 6px; background: var(--bg); border: 1px solid var(--grid); border-radius: 4px; padding: 10px 12px; }
 .help[hidden] { display: none; }
 .help p { margin: 0; color: var(--ink-2); font-size: 0.8rem; }
 .sum-when { font-size: 1.12rem; font-weight: 700; letter-spacing: -0.01em; }
@@ -168,7 +169,7 @@ table { border-collapse: collapse; width: 100%; }
 .crumbs button, .back { font: inherit; border: 0; background: none; padding: 0; color: var(--accent); cursor: pointer; }
 .crumbs button:hover, .back:hover { text-decoration: underline; text-underline-offset: 3px; }
 .crumbs .sep { color: var(--muted); font-weight: 400; }
-.sum-level { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 0.82rem; font-weight: 600; padding: 7px 10px; border-radius: 7px; background: var(--accent-soft); }
+.sum-level { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 0.82rem; font-weight: 600; padding: 7px 10px; border-radius: 4px; background: var(--accent-soft); }
 .sum-level[hidden] { display: none; }
 .sum-level .back { font-size: 0.8rem; font-weight: 500; white-space: nowrap; }
 .row-name { display: flex; align-items: center; gap: 4px; min-width: 0; }
@@ -187,7 +188,7 @@ tr.off .sw { background: transparent; box-shadow: inset 0 0 0 1.5px var(--c); }
 .share { display: grid; justify-items: end; gap: 2px; }
 .bar { height: 3px; border-radius: 2px; background: var(--c); justify-self: stretch; transform-origin: right; }
 /* Sidebar: filter box and collapsible fuel sections */
-.mix-filter { font: inherit; font-size: 0.82rem; width: 100%; padding: 5px 9px; border: 1px solid var(--line); border-radius: 7px; background: var(--bg); color: var(--ink); }
+.mix-filter { font: inherit; font-size: 0.82rem; width: 100%; padding: 5px 9px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); color: var(--ink); }
 .mix-filter:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .mix-filter[hidden] { display: none; }
 .mix tr.sec td { background: color-mix(in srgb, var(--grid) 55%, transparent); }
@@ -213,7 +214,7 @@ tr.sec[aria-expanded="true"] .sec-btn::before { transform: rotate(90deg); }
 .sources { display: grid; gap: 10px; padding-top: 8px; }
 .sources h2 { font-size: 1rem; font-weight: 600; }
 .sources p { margin: 0; color: var(--ink-2); max-width: 78ch; font-size: 0.88rem; }
-.tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); }
 .src { min-width: 720px; font-size: 0.84rem; }
 .src th, .src td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--grid); vertical-align: top; }
 .src th { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-weight: 600; border-bottom-color: var(--line); }
@@ -242,6 +243,12 @@ a { color: var(--accent); }
 }
 @media (max-width: 560px) {
   .wrap { padding-inline: 16px; }
+  .masthead { flex-wrap: nowrap; gap: 8px; }
+  .brand { gap: 8px; }
+  .brand .name { font-size: 1.3rem; }
+  .brand p { font-size: 0.76rem; }
+  .mast-r { gap: 0; }
+  .pages a { padding: 6px 7px; font-size: 0.86rem; }
   #cv-gen { height: 264px; }
   .nav { width: 26px; height: 26px; }
   .seg button { padding: 2px 7px; }
