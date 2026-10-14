@@ -65,6 +65,13 @@ This repository is public: never commit keys, tokens or personal details.
   of ~180 MW in Jul 2026. History uses it month by month, capped at the live page's 1,000 MW assumption.
 - Open-Meteo's archive API rate-limits some shared addresses (HTTP 429). The history job stores missing irradiance
   as blank and retries it on later runs.
+- Final prices (`FinalEnergyPrices`): `ByMonth/YYYYMM_FinalEnergyPrices.csv` for past months (~10 MB, every node),
+  `YYYYMMDD_FinalEnergyPrices.csv` daily for the last year, `_I` suffix while interim (the last day or two, and
+  occasionally days under review, e.g. 31 Aug and 1 Sep 2026). Trading period k starts (k−1) half-hours after local
+  midnight. History uses final prices; dispatch prices can be wildly different under scarcity pricing (9 Aug 2021:
+  dispatch peak $356,621/MWh, final peak $2,698).
+- `history.py` keeps to `WRITE_BUDGET` (280) KV writes per UTC day, counted in `hist/progress.json`; a rebuild that
+  hits it resumes next run (`rebuild_left`), and `hist/index.json`/`day.json` are only republished when complete.
 
 ## Status and next steps
 

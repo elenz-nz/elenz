@@ -7,7 +7,8 @@ so the first run backfills everything and later runs add the newest days.
 Stored (Cloudflare KV in GitHub Actions, data/store locally), one set per NZ calendar month:
   hist/state/YYYY-MM.csv.gz  half-hourly compact state: unit MW, island load, Tiwai, reference prices (state.py
                              columns averaged over each trading period), n = 5-minute intervals present (0-6),
-                             R|NI and R|SI = island-weighted irradiance (W/m², Open-Meteo) for rooftop solar
+                             R|NI and R|SI = island-weighted irradiance (W/m², Open-Meteo) for rooftop solar,
+                             F|NI and F|SI = final prices at Haywards and Benmore (fi = 1 while only interim)
   hist/hh/YYYY-MM.json       the month in the tracker.json layout, half-hourly (the website's 30-day view)
   hist/dd/YYYY-MM.json       daily averages for the month, plus each day's peak demand
 and across all months:
@@ -16,8 +17,16 @@ and across all months:
   hist/progress.json         the job's own record: months stored and finished, and the plant mapping used
   hist/solar_capacity.csv    EA report GUEHMT: installed distributed solar by month (rooftop solar model)
 
+Prices are the EA's final prices wherever published (monthly files for past months, daily files for the current
+one, interim for the last day or two), and dispatch prices only for days not yet priced. Interim days are fetched
+again until final.
+
 The JSON is rebuilt from the stored state when the plant register, overrides or this file's BUILD number change,
-so mapping fixes apply to history as they do to the live page.
+so mapping fixes apply to history as they do to the live page. A rebuild that runs out of time or KV writes carries
+on from where it stopped on the next run.
+
+KV allows 1,000 writes a day (UTC) on the free plan and the live job uses ~600, so this job keeps to WRITE_BUDGET a
+day, counted in hist/progress.json.
 
 Run from the repo root:  python3 ingest/history.py [--budget MINUTES] [--rebuild] [--from YYYY-MM-DD]
 """
@@ -32,6 +41,8 @@ from datetime import date, datetime, timedelta
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+import warnings
+
 import numpy as np
 import pandas as pd
 
@@ -41,7 +52,11 @@ from common import BLOB, FACILITIES, NZ
 from store import open_store
 from sync import CITIES, DISPATCH
 
-BUILD = 1                    # bump to rebuild every month's JSON after changing how it is built
+warnings.simplefilter("ignore", pd.errors.PerformanceWarning)  # wide monthly frames; harmless
+FINAL = 'Datasets/Wholesale/DispatchAndPricing/FinalEnergyPrices'
+
+BUILD = 2                    # bump to rebuild every month's JSON after changing how it is built (2: final prices)
+WRITE_BUDGET = 280           # KV writes a day (UTC) for this job; the live job needs ~600 of the 1,000
 FIRST_DAY = date(2020, 9, 10)
 STEP = pd.Timedelta(minutes=30)
 WORKERS = 6
@@ -163,6 +178,65 @@ def roof_mw(cap, month):
     return {isl: total * v / sum(ROOF_CAP.values()) for isl, v in ROOF_CAP.items()}
 
 
+# ---------- final prices ----------
+
+def parse_final(raw, interim=False):
+    """An EA FinalEnergyPrices CSV -> rows per trading period (UTC start): F|NI, F|SI, fi."""
+    from common import overrides
+    ref = overrides()['reference_nodes']   # NI: HAY2201, SI: BEN2201
+    d = pd.read_csv(io.BytesIO(raw), usecols=['TradingDate', 'TradingPeriod', 'PointOfConnection', 'DollarsPerMegawattHour'])
+    d = d[d.PointOfConnection.isin(ref.values())]
+    if d.empty:
+        return None
+    # trading period k starts (k-1) half-hours after local midnight, counting straight through a clock change
+    midnight = pd.to_datetime(d.TradingDate).dt.tz_localize(NZ).dt.tz_convert('UTC')
+    d['t'] = midnight + pd.to_timedelta((d.TradingPeriod - 1) * 30, unit='min')
+    out = d.pivot_table(index='t', columns='PointOfConnection', values='DollarsPerMegawattHour', aggfunc='mean')
+    out = out.rename(columns={node: f'F|{isl}' for isl, node in ref.items()})
+    out['fi'] = 1.0 if interim else 0.0
+    return out
+
+
+def final_prices(m, days):
+    """Final (or interim) reference prices for the given days of month m: the monthly file once it exists,
+    otherwise one daily file per day."""
+    current = m >= datetime.now(NZ).date().replace(day=1)
+    if not current:
+        raw = get(f'{BLOB}/{FINAL}/ByMonth/{m:%Y%m}_FinalEnergyPrices.csv')
+        if raw is not None:
+            return parse_final(raw)
+
+    def one(d):
+        raw = get(f'{BLOB}/{FINAL}/{d:%Y%m%d}_FinalEnergyPrices.csv')
+        if raw is not None:
+            return parse_final(raw)
+        raw = get(f'{BLOB}/{FINAL}/{d:%Y%m%d}_FinalEnergyPrices_I.csv')
+        return parse_final(raw, interim=True) if raw is not None else None
+    with ThreadPoolExecutor(WORKERS) as ex:
+        parts = [x for x in ex.map(one, days) if x is not None]
+    return pd.concat(parts) if parts else None
+
+
+def add_final(s, m):
+    """Fill in final prices for trading periods that lack them (or have interim ones). True if anything changed."""
+    for c in ('F|NI', 'F|SI', 'fi'):
+        if c not in s:
+            s[c] = np.nan
+    need = s.index[s['F|NI'].isna() | s['F|SI'].isna() | (s['fi'] == 1)]
+    if not len(need):
+        return False
+    days = sorted(set(need.tz_convert(NZ).date))
+    f = final_prices(m, days)
+    if f is None:
+        return False
+    f = f.reindex(need).dropna(subset=['F|NI', 'F|SI'], how='all')
+    if f.empty:
+        return False
+    before = s.loc[f.index, ['F|NI', 'F|SI', 'fi']].copy()
+    s.loc[f.index, ['F|NI', 'F|SI', 'fi']] = f[['F|NI', 'F|SI', 'fi']].values
+    return not before.equals(s.loc[f.index, ['F|NI', 'F|SI', 'fi']])
+
+
 # ---------- one month: state -> tracker-layout JSON and daily summary ----------
 
 def build_month(s, month, roof_cap, log):
@@ -172,11 +246,18 @@ def build_month(s, month, roof_cap, log):
     full = pd.date_range(have.min(), have.max(), freq='30min')
     g = s.reindex(full).copy()
     g['src'] = np.where(g.n > 0, 'file', None)
+    final = pd.Series(False, index=full)
+    if 'F|NI' in g:
+        # final prices where published; dispatch prices only for trading periods not yet priced
+        for isl in ('NI', 'SI'):
+            g[f'P|{isl}'] = g[f'F|{isl}'].combine_first(g[f'P|{isl}'])
+        final = g['F|NI'].notna() & (g['fi'] != 1)
     roof = {isl: (roof_cap[isl] * g[f'R|{isl}'].interpolate(limit_direction='both').fillna(0) / 1000 * ROOF_PR) for isl in ('NI', 'SI')}
     js = assemble(g, full, roof, log)
     n = g.n.fillna(0)
     js['meta'] = {'month': month, 'intervals': int((n > 0).sum()), 'expected': len(full),
                   'five_min': round(float(n.sum() / (6 * len(full))), 4), 'roof_mw': round(sum(roof_cap.values())),
+                  'final_prices': round(float(final.mean()), 4),
                   'end': js['t0'] + (len(full) - 1) * js['step']}
     return js, daily(js, month)
 
@@ -294,23 +375,49 @@ def put_json(store, key, obj):
     store.put(key, json.dumps(obj, separators=(',', ':'), allow_nan=False).encode(), 'application/json')
 
 
+class Counted:
+    """The store, counting writes against the job's daily KV allowance."""
+    def __init__(self, store, used):
+        self.store, self.used = store, used
+
+    def get(self, key):
+        return self.store.get(key)
+
+    def put(self, key, body, ctype='application/octet-stream'):
+        self.used += 1
+        self.store.put(key, body, ctype)
+
+    def room(self, n):
+        return self.used + n <= WRITE_BUDGET
+
+
 def main(budget_min=300, rebuild=False, start=None, log=print):
     t_start = time.time()
     if os.environ.get('GITHUB_ACTIONS') and not all(os.environ.get(k) for k in ('CF_ACCOUNT_ID', 'CF_API_TOKEN')):
         print('::notice::Skipped: add the CF_ACCOUNT_ID and CF_API_TOKEN secrets to turn on history updates.')
         return
-    store = open_store()
+    base = open_store()
     # the job's own record of what's stored; hist/index.json is the public copy, written once history is complete
-    index = json.loads(store.get('hist/progress.json') or b'{}')
+    index = json.loads(base.get('hist/progress.json') or b'{}')
+    today = pd.Timestamp.now(tz='UTC').strftime('%Y-%m-%d')   # KV's daily limit resets at midnight UTC
+    used = index.get('writes', {}).get(today)
+    if used is None:  # no count yet today: assume a full build already ran today if the public index is from today
+        pub = json.loads(base.get('hist/index.json') or b'{}')
+        built_today = pub.get('built') and pd.Timestamp(pub['built'], unit='ms', tz='UTC').strftime('%Y-%m-%d') == today
+        used = 230 if built_today else 0
+    store = Counted(base, used)
     mhash = mapping_hash()
-    rebuild = rebuild or index.get('hash') != mhash
+    stored = set(index.get('months', []))
+    # months still to rebuild under the current mapping (all of them when the mapping or BUILD changes)
+    left = set(index.get('rebuild_left', []))
+    if rebuild or index.get('hash') != mhash:
+        left = set(stored)
     cap = solar_capacity(store)
     yesterday = datetime.now(NZ).date() - timedelta(days=1)
     caps_before = index.get('roof_mw', {})
-    stored = set(index.get('months', []))
-    done = set(index.get('done', [])) if not rebuild else set()   # complete months: nothing left to fetch
+    done = set(index.get('done', [])) - left   # complete months: nothing left to fetch or rebuild
     changed_dd = {}
-    out_of_time = False
+    stopped = ''
     repairs = 0
 
     for m in months_between(start or FIRST_DAY, yesterday):
@@ -319,17 +426,21 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
         rc = roof_mw(cap, month)
         if month in done and month in stored and caps_before.get(month) == round(sum(rc.values())):
             continue
+        if stopped:
+            continue
+        if time.time() - t_start > budget_min * 60:
+            stopped = f'time budget used at {month}'
+            continue
+        if not store.room(3 + 4):  # this month's three files, plus the closing day/index/progress writes
+            stopped = f'daily KV write allowance used at {month}'
+            continue
         s = load_state(store, key)
         have_days = set(s.index.tz_convert(NZ).date) if s is not None else set()
         todo = [d for d in month_days(m, yesterday) if d not in have_days]
         new = []
-        if todo and not out_of_time:
-            if time.time() - t_start > budget_min * 60:
-                out_of_time = True
-                log(f'time budget used; {month} onwards is left for the next run')
-            else:
-                with ThreadPoolExecutor(WORKERS) as ex:
-                    new = [x for x in ex.map(fetch_day, todo) if x is not None]
+        if todo:
+            with ThreadPoolExecutor(WORKERS) as ex:
+                new = [x for x in ex.map(fetch_day, todo) if x is not None]
         if new:
             add = pd.concat(new).sort_index()
             add = add.join(irradiance(add.index.min(), add.index.max()))
@@ -338,39 +449,45 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
             continue
         gaps = s.index[s['R|NI'].isna() | s['R|SI'].isna()]
         fixed = False
-        if len(gaps) and not new and repairs < 12 and not out_of_time:
+        if len(gaps) and not new and repairs < 12:
             # irradiance a previous run couldn't get (Open-Meteo rate limit or outage): try again
             repairs += 1
             r = irradiance(gaps.min(), gaps.max())
             before = int(s[['R|NI', 'R|SI']].isna().sum().sum())
             s.loc[gaps, ['R|NI', 'R|SI']] = r.reindex(gaps).values
             fixed = int(s[['R|NI', 'R|SI']].isna().sum().sum()) < before
-        if new or fixed:
+        priced = add_final(s, m)
+        if new or fixed or priced:
             store.put(key, dump_state(s))
             missing_r = int(s['R|NI'].isna().sum())
+            unpriced = int((s['F|NI'].isna() | (s['fi'] == 1)).sum())
             log(f'{month}: +{len(new)} days ({len(todo) - len(new)} not published yet), {len(set(s.index.tz_convert(NZ).date))} days stored'
-                + (f'; irradiance missing for {missing_r} trading periods, retried next run' if missing_r else ''))
+                + (f'; irradiance missing for {missing_r} trading periods' if missing_r else '')
+                + (f'; {unpriced} trading periods without final prices yet' if unpriced else ''))
         last_day = list(month_days(m, yesterday))[-1:]
-        if (last_day and last_day[0] < yesterday - timedelta(days=14) and
-                not s[['R|NI', 'R|SI']].isna().any().any() and len(set(s.index.tz_convert(NZ).date)) == len(list(month_days(m, yesterday)))):
-            done.add(month)  # every day stored, irradiance complete, and the month long over
-        if new or fixed or rebuild or month not in stored or caps_before.get(month) != round(sum(rc.values())):
+        if (last_day and last_day[0] < yesterday - timedelta(days=14)
+                and not s[['R|NI', 'R|SI', 'F|NI', 'F|SI']].isna().any().any() and not (s['fi'] == 1).any()
+                and len(set(s.index.tz_convert(NZ).date)) == len(list(month_days(m, yesterday)))):
+            done.add(month)  # every day stored, irradiance and final prices complete, and the month long over
+        if new or fixed or priced or month in left or month not in stored or caps_before.get(month) != round(sum(rc.values())):
             hh, dd = build_month(s, month, rc, lambda *a: log(f'  {month}:', *a))
             put_json(store, f'hist/hh/{month}.json', hh)
             put_json(store, f'hist/dd/{month}.json', dd)
             changed_dd[month] = dd
             stored.add(month)
+            left.discard(month)
             caps_before[month] = hh['meta']['roof_mw']
 
-    if not changed_dd:
-        log('history: nothing new')
-        return
     months = sorted(stored)
-    progress = {'months': months, 'done': sorted(done), 'hash': mhash, 'roof_mw': caps_before}
-    put_json(store, 'hist/progress.json', progress)
-    if out_of_time:
-        # months are saved as they're done; publish the combined files only once there are no gaps
-        log(f'history: {len(changed_dd)} months saved; the rest continues next run')
+    progress = {'months': months, 'done': sorted(done), 'rebuild_left': sorted(left), 'hash': mhash, 'roof_mw': caps_before,
+                'writes': {today: store.used + 1}}
+    if not changed_dd:
+        log('history: nothing new' + (f' ({stopped}; continues next run)' if stopped else ''))
+        return
+    if stopped or left:
+        put_json(store, 'hist/progress.json', progress)
+        # months are saved as they're done; publish the combined files only once nothing is missing or out of date
+        log(f'history: {len(changed_dd)} months saved; {stopped or "some months still to rebuild"}; the rest continues next run')
         return
     dds = [changed_dd.get(mo) or json.loads(store.get(f'hist/dd/{mo}.json')) for mo in months]
     day = combine_days(dds)
@@ -378,9 +495,11 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
     day['meta'] = {'first': day['t'][0], 'end': end, 'built': int(time.time() * 1000)}
     put_json(store, 'hist/day.json', day)
     index = {**progress, 'first': day['t'][0], 'end': end, 'built': int(time.time() * 1000)}
+    index['writes'] = {today: store.used + 2}
     put_json(store, 'hist/index.json', index)
+    put_json(store, 'hist/progress.json', index)
     log(f'history: {len(months)} months, {day["N"]} days to {pd.Timestamp(index["end"], unit="ms", tz="UTC").tz_convert(NZ)}, '
-        f'{len(changed_dd)} months rebuilt in {time.time() - t_start:.0f} s')
+        f'{len(changed_dd)} months rebuilt in {time.time() - t_start:.0f} s, {store.used} KV writes today')
 
 
 if __name__ == '__main__':
