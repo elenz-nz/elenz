@@ -4,7 +4,7 @@
   --line: #d6dfde; --grid: #e5ebeb; --accent: #0d6275; --accent-soft: #d6e8eb; --warn-bg: #f6ecd9; --warn-ink: #6b4a0d;
   --f-coal: #4b4744; --f-gas: #d9731f; --f-geo: #a63a78; --f-hydro: #2f6db8; --f-wind: #2f9a78;
   --f-solar: #c48e10; --f-batt: #7356c4; --f-hvdc: #71838f; --co2: #6d5a4c;
-  --f-diesel: #b23a2a; --g-fossil: #96501a; --g-ren: #208a68; --g-slow: #a8435e; --g-fast: #2b7fa8; --g-vre: #a39a1a; --g-resid: #2f5aa8;
+  --f-diesel: #b23a2a; --g-fossil: #96501a; --g-ren: #208a68; --g-fast: #2b7fa8; --g-vre: #a39a1a; --g-resid: #2f5aa8;
   --p-ni: #132020; --p-si: #0d6275; --live-bg: #dcefe4; --live-ink: #1d6440;
   --font-ui: "Schibsted Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
@@ -13,9 +13,9 @@
   :root:not([data-theme="light"]) {
     --bg: #0c1212; --surface: #121a1a; --ink: #e1e9e9; --ink-2: #b3c1c0; --muted: #849493;
     --line: #253131; --grid: #1c2727; --accent: #5cb5c8; --accent-soft: #163239; --warn-bg: #2e2412; --warn-ink: #e9c98a;
-    --f-coal: #77716d; --f-gas: #cc7a2e; --f-geo: #c4508f; --f-hydro: #4f8bd6; --f-wind: #2fa883;
+    --f-coal: #5f5a57; --f-gas: #cc7a2e; --f-geo: #c4508f; --f-hydro: #4f8bd6; --f-wind: #2fa883;
     --f-solar: #bb8c18; --f-batt: #8a72d8; --f-hvdc: #7f909b; --co2: #a8927f;
-    --f-diesel: #bf3a52; --g-fossil: #a8693a; --g-ren: #2ea88a; --g-slow: #c75c78; --g-fast: #3c97c2; --g-vre: #9a9020; --g-resid: #5784d0;
+    --f-diesel: #bf3a52; --g-fossil: #a8693a; --g-ren: #2ea88a; --g-fast: #3c97c2; --g-vre: #9a9020; --g-resid: #5784d0;
     --p-ni: #e1e9e9; --p-si: #5cb5c8; --live-bg: #16301f; --live-ink: #8fd3a8;
     color-scheme: dark;
   }
@@ -23,9 +23,9 @@
 :root[data-theme="dark"] {
   --bg: #0c1212; --surface: #121a1a; --ink: #e1e9e9; --ink-2: #b3c1c0; --muted: #849493;
   --line: #253131; --grid: #1c2727; --accent: #5cb5c8; --accent-soft: #163239; --warn-bg: #2e2412; --warn-ink: #e9c98a;
-  --f-coal: #77716d; --f-gas: #cc7a2e; --f-geo: #c4508f; --f-hydro: #4f8bd6; --f-wind: #2fa883;
+  --f-coal: #5f5a57; --f-gas: #cc7a2e; --f-geo: #c4508f; --f-hydro: #4f8bd6; --f-wind: #2fa883;
   --f-solar: #bb8c18; --f-batt: #8a72d8; --f-hvdc: #7f909b; --co2: #a8927f;
-  --f-diesel: #bf3a52; --g-fossil: #a8693a; --g-ren: #2ea88a; --g-slow: #c75c78; --g-fast: #3c97c2; --g-vre: #9a9020; --g-resid: #5784d0;
+  --f-diesel: #bf3a52; --g-fossil: #a8693a; --g-ren: #2ea88a; --g-fast: #3c97c2; --g-vre: #9a9020; --g-resid: #5784d0;
   --p-ni: #e1e9e9; --p-si: #5cb5c8; --live-bg: #16301f; --live-ink: #8fd3a8;
   color-scheme: dark;
 }
@@ -103,11 +103,12 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 .tip { position: fixed; left: 0; top: 0; z-index: 30; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; box-shadow: 0 6px 18px rgb(0 0 0 / 0.14); font-size: 0.8rem; display: grid; gap: 3px; min-width: 170px; max-width: 320px; }
 .tip[hidden] { display: none; }
 .tip-t { font-weight: 600; color: var(--ink); margin-bottom: 1px; }
-.tip-r { display: grid; grid-template-columns: 10px 1fr auto; align-items: center; column-gap: 7px; color: var(--ink-2); }
+.tip-r { display: grid; grid-template-columns: 10px 1fr auto auto; align-items: baseline; column-gap: 7px; color: var(--ink-2); }
+.tip-r i { align-self: center; }
 .tip-r i { width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
 .tip-r i.hatch { background: repeating-linear-gradient(135deg, var(--c) 0 2px, transparent 2px 4px); box-shadow: inset 0 0 0 1px var(--c); }
 .tip-r b { font-family: var(--font-data); font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
-.tip-r small { grid-column: 2 / 4; color: var(--muted); font-size: 0.74rem; text-align: right; }
+.tip-r small { color: var(--muted); font-size: 0.74rem; white-space: nowrap; }
 .charts { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 6px 4px 8px; min-width: 0; touch-action: pan-y; }
 .chart { padding: 8px 10px 0; }
 .chart + .chart { border-top: 1px solid var(--grid); }

@@ -60,14 +60,15 @@ export function mountTracker(D, hooks = {}) {
   const VIEWS = {
     detailed: { groups: null },
     simple: { groups: [one('geo'), FOSSIL('Thermal'), one('hydro'), one('wind'), { id: 'solar', name: 'Solar', tok: '--f-solar', f: ['solar', 'roof'] }] },
-    cgr: { groups: [REN, one('coal'), one('gas'), one('diesel')] },
     flex: { groups: [
-      { id: 'slow', name: 'Slow flexible', tok: '--g-slow', f: ['geo', 'coal'] },
+      { ...one('geo'), name: 'Inflexible' },        // geothermal runs flat out, around the clock
+      { ...one('coal'), name: 'Slow flexible' },    // Huntly's Rankine units: hours to start, slow to ramp
       { id: 'fast', name: 'Fast flexible', tok: '--g-fast', f: ['gas', 'diesel', 'hydro'] },
       VRE('Variable'),
     ] },
     rf: { groups: [REN, FOSSIL('Fossils')] },
-    vre: { groups: [{ id: 'resid', name: 'Residual', tok: '--g-resid', f: ['geo', 'coal', 'gas', 'diesel', 'hydro'] }, VRE('Variable renewables')] },
+    // inverter-based renewables (wind and solar) against everything else
+    vre: { groups: [{ id: 'resid', name: 'Other', tok: '--g-resid', f: ['geo', 'coal', 'gas', 'diesel', 'hydro'] }, VRE('Inverter-based renewables')] },
   };
   const SIGNED = FUELS.filter(f => f.signed).map(f => f.k);
   const groupById = id => (VIEWS[state.view].groups || []).find(g => g.id === id);
@@ -247,7 +248,7 @@ export function mountTracker(D, hooks = {}) {
   let C = {}, PAT = {};
   function readColours() {
     const cs = getComputedStyle(document.documentElement);
-    for (const t of ['--ink', '--ink-2', '--muted', '--line', '--grid', '--surface', '--accent', '--accent-soft', '--co2', '--p-ni', '--p-si', '--f-coal', '--f-gas', '--f-diesel', '--f-geo', '--f-hydro', '--f-wind', '--f-solar', '--f-batt', '--f-hvdc', '--g-fossil', '--g-ren', '--g-slow', '--g-fast', '--g-vre', '--g-resid'])
+    for (const t of ['--ink', '--ink-2', '--muted', '--line', '--grid', '--surface', '--accent', '--accent-soft', '--co2', '--p-ni', '--p-si', '--f-coal', '--f-gas', '--f-diesel', '--f-geo', '--f-hydro', '--f-wind', '--f-solar', '--f-batt', '--f-hvdc', '--g-fossil', '--g-ren', '--g-fast', '--g-vre', '--g-resid'])
       C[t] = cs.getPropertyValue(t).trim();
     PAT = {};
     for (const f of FUELS) if (f.hatch) {

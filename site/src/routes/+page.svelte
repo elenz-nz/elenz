@@ -196,10 +196,9 @@
 						<select class="grp" id="sel-view" aria-label="Group the generation sources">
 							<option value="detailed">Detailed</option>
 							<option value="simple">Simplified</option>
-							<option value="cgr">Coal/Gas/Renewables</option>
 							<option value="flex">Flexibility</option>
 							<option value="rf">Renewables/Fossils</option>
-							<option value="vre">VRE/Residual</option>
+							<option value="vre">IBR/Other</option>
 						</select>
 					</div>
 				</div>
@@ -287,7 +286,7 @@
 					<tr><td>HVDC transfer</td><td>Estimated</td><td>Mean of the South Island surplus and the North Island shortfall, since the dispatch feed doesn't include HVDC flow. Positive is northward</td></tr>
 					<tr><td>Emissions intensity</td><td>Calculated</td><td>Fuel mix × emission factors. Provisional factors: coal/gas Rankine 0.95, gas 0.50, diesel 0.80, geothermal 0.07 t CO₂e/MWh</td></tr>
 					<tr><td>History</td><td>EMI daily dispatch files (<code>NodalPricesAndVolumes</code>), from 10 Sep 2020; final prices from <code>FinalEnergyPrices</code></td><td>The same dispatch cases as the live feed, published 1–4 days late. Each trading period is the average of its 5-minute intervals; the 30-day view shows half-hours, longer ranges daily averages, with each day's highest half-hour kept for peak demand. The live week fills in the latest days. Rooftop solar uses the EA's monthly installed distributed solar capacity (report GUEHMT, about 140 MW in 2020), up to the 1,000 MW assumed for the live week, with Open-Meteo hourly irradiance</td></tr>
-					<tr><td>Source groups</td><td>Grouped from the fuel mix</td><td>Groupings follow Open Electricity's. Thermal and fossils are coal/gas Rankine, gas and diesel. Renewables are geothermal, hydro, wind and solar (grid and rooftop). Flexibility: slow flexible is geothermal and the Huntly Rankines; fast flexible is gas, diesel and hydro; variable is wind and solar. VRE/Residual splits wind and solar from everything else. Batteries and HVDC are always shown separately, because they can charge or export. Grouping is by fuel, so gas cogeneration plant counts as fast flexible</td></tr>
+					<tr><td>Source groups</td><td>Grouped from the fuel mix</td><td>Groupings follow Open Electricity's. Thermal and fossils are coal/gas Rankine, gas and diesel. Renewables are geothermal, hydro, wind and solar (grid and rooftop). Flexibility: inflexible is geothermal, slow flexible is Huntly's Rankine units, fast flexible is gas, diesel and hydro, and variable is wind and solar. IBR/Other splits the inverter-based renewables (wind and solar) from everything else. Batteries and HVDC are always shown separately, because they can charge or export. Grouping is by fuel, so gas cogeneration plant counts as fast flexible</td></tr>
 				</tbody>
 			</table>
 		</div>
