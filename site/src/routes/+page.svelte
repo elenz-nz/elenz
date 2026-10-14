@@ -24,6 +24,10 @@
 		const p = Object.fromEntries(PARTS.formatToParts(new Date(t)).map((x) => [x.type, x.value]));
 		return `${p.hour}:${p.minute} ${String(p.dayPeriod).toLowerCase()} ${p.weekday} ${p.day} ${p.month}`;
 	}
+	const clockOnly = (t: number) => {
+		const p = Object.fromEntries(PARTS.formatToParts(new Date(t)).map((x) => [x.type, x.value]));
+		return `${p.hour}:${p.minute} ${String(p.dayPeriod).toLowerCase()}`;
+	};
 	const dayOnly = (t: number) => new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', day: 'numeric', month: 'short' }).format(new Date(t));
 	const dayYear = (t: number) => {
 		const p = Object.fromEntries(new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', day: 'numeric', month: 'numeric', year: 'numeric' }).formatToParts(new Date(t)).map((x) => [x.type, x.value]));
@@ -119,12 +123,50 @@
 				<p>New Zealand's electricity</p>
 			</div>
 		</div>
+		<!-- page links will go here -->
+	</header>
+
+	<nav class="toolbar" aria-label="View controls">
+		<div class="ctl">
+			<label for="sel-region" class="vh">Region</label>
+			<select class="pick" id="sel-region">
+				<option value="NZ">New Zealand</option>
+				<option value="NI">North Island</option>
+				<option value="SI">South Island</option>
+			</select>
+		</div>
+		<div class="ctl">
+			<span id="lb-range">Range</span>
+			<div class="seg" role="group" aria-labelledby="lb-range" id="seg-range">
+				<button type="button" data-v="1d" title="24 hours">1D</button>
+				<button type="button" data-v="3d" title="3 days">3D</button>
+				<button type="button" data-v="7d" title="7 days">7D</button>
+				<button type="button" data-v="30d" title="30 days">30D</button>
+				<button type="button" data-v="1y" title="1 year">1Y</button>
+				<button type="button" data-v="all" title="All history, from September 2020">ALL</button>
+			</div>
+		</div>
+		<div class="ctl">
+			<span id="lb-int">Interval</span>
+			<div class="seg" role="group" aria-labelledby="lb-int" id="seg-int">
+				<button type="button" data-v="5m">5m</button>
+				<button type="button" data-v="30m">30m</button>
+			</div>
+		</div>
+		<div class="ctl">
+			<label for="in-date" id="lb-date">24 hours ending</label>
+			<div class="datebox">
+				<input type="date" id="in-date" title="Shows the selected range ending on this date" />
+				<button type="button" id="btn-latest" hidden>Latest</button>
+			</div>
+		</div>
 		<div class="status">
+			<span class="tstatus" role="status">{status}</span>
 			{#if meta}
 				{#if view && (view.kind !== 'live' || view.past) && !view.loading && !view.error}
 					<span class="pill hist" title="History from the EA's daily dispatch files">History</span>
 				{:else if live}
-					<span class="pill live" title="Updated from the EMI real-time dispatch feed every 5 minutes">Live</span>
+					<span class="pill live" title="Data to {when(meta.end)}. Updated from the EMI real-time dispatch feed every 5 minutes">Live · {clockOnly(meta.end)}</span>
 				{:else}
 					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {when(meta.end)}</span>
 				{/if}
@@ -133,47 +175,11 @@
 				<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg>
 			</button>
 			<div class="info-pop" id="about-data" role="region" aria-label="About this data" bind:this={infoBox} hidden={!infoOpen}>
+				<p class="asof" id="asof"></p>
 				<p>{notice || 'Loading the latest data…'}</p>
 				<a href="#src-h" onclick={() => (infoOpen = false)}>Where the data comes from</a>
 			</div>
 		</div>
-	</header>
-
-	<nav class="toolbar" aria-label="View controls">
-		<div class="ctl">
-			<span id="lb-region">Region</span>
-			<div class="seg" role="group" aria-labelledby="lb-region" id="seg-region">
-				<button type="button" id="r-NZ" data-v="NZ">New Zealand</button>
-				<button type="button" id="r-NI" data-v="NI">North Island</button>
-				<button type="button" id="r-SI" data-v="SI">South Island</button>
-			</div>
-		</div>
-		<div class="ctl">
-			<span id="lb-range">Range</span>
-			<div class="seg" role="group" aria-labelledby="lb-range" id="seg-range">
-				<button type="button" data-v="1d">24 h</button>
-				<button type="button" data-v="3d">3 days</button>
-				<button type="button" data-v="7d">7 days</button>
-				<button type="button" data-v="30d">30 days</button>
-				<button type="button" data-v="1y">1 year</button>
-				<button type="button" data-v="all">All</button>
-			</div>
-		</div>
-		<div class="ctl">
-			<span id="lb-int">Interval</span>
-			<div class="seg" role="group" aria-labelledby="lb-int" id="seg-int">
-				<button type="button" data-v="5m">5 min</button>
-				<button type="button" data-v="30m">30 min</button>
-			</div>
-		</div>
-		<div class="ctl">
-			<label for="in-date" id="lb-date">24 h ending</label>
-			<div class="datebox">
-				<input type="date" id="in-date" title="Shows the selected range ending on this date" />
-				<button type="button" id="btn-latest" hidden>Latest</button>
-			</div>
-		</div>
-		<span class="asof"><span class="tstatus" role="status">{status}</span><span id="asof"></span></span>
 	</nav>
 
 	<noscript><p class="notice">The charts need JavaScript turned on.</p></noscript>

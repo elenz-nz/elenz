@@ -23,8 +23,8 @@ const RANGES = {
 };
 const DAY = 864e5;
 const INTS = {
-  '5m': { label: '5 min', key: null, live: true },
-  '30m': { label: '30 min', key: KEY.hh },
+  '5m': { label: '5m', key: null, live: true },
+  '30m': { label: '30m', key: KEY.hh },
   '1d': { label: 'Day', key: KEY.day },
   '1w': { label: 'Week', key: KEY.week },
   '1mo': { label: 'Month', key: KEY.month },
@@ -666,7 +666,8 @@ export function mountTracker(D, hooks = {}) {
     next.disabled = state.end == null;
     prev.setAttribute('aria-label', `Previous ${R.label}`); next.setAttribute('aria-label', `Next ${R.label}`);
     prev.title = `Previous ${R.label}`; next.title = state.end == null ? 'Showing the latest data' : `Next ${R.label}`;
-    for (const [id, val] of [['seg-region', state.region], ['seg-range', state.range], ['seg-int', state.int]])
+    $('sel-region').value = state.region;
+    for (const [id, val] of [['seg-range', state.range], ['seg-int', state.int]])
       for (const b of $(id).querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v === val));
     $('sel-view').value = state.view;
   }
@@ -731,7 +732,7 @@ export function mountTracker(D, hooks = {}) {
     V = buildView(); relayer(); state.hover = null; syncControls(); buildSummary(); render(); save(); report();
   }
 
-  $('seg-region').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; state.region = b.dataset.v; state.hidden.clear(); rebuild(); });
+  $('sel-region').addEventListener('change', e => { if (!['NZ', 'NI', 'SI'].includes(e.target.value)) return; state.region = e.target.value; state.hidden.clear(); rebuild(); });
   $('seg-range').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || !Object.hasOwn(RANGES, b.dataset.v)) return; setView(b.dataset.v); });
   $('in-date').addEventListener('change', e => {
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(e.target.value);
