@@ -1,0 +1,36 @@
+point,island,lat,lon,name,mw
+NI01,NI,-35.396,173.811,Bay of Islands (Top Energy),18.7
+NI02,NI,-35.874,174.283,Whangārei and Kaipara (Northpower),30.3
+NI03,NI,-36.693,174.653,Waitemata (Vector),53.0
+NI04,NI,-36.957,174.854,Auckland (Vector),85.7
+NI05,NI,-37.194,174.906,Counties (Counties Power),17.4
+NI06,NI,-37.601,175.65,Thames Valley (Powerco),53.7
+NI07,NI,-37.683,175.209,Waikato (WEL Networks),47.7
+NI08,NI,-37.733,176.183,Tauranga (Powerco),42.8
+NI09,NI,-37.937,175.401,Waipa (Waipa Networks),12.7
+NI10,NI,-38.0,176.85,Eastern Bay of Plenty (Horizon Energy),6.9
+NI11,NI,-38.133,176.233,Rotorua (Unison Networks),9.3
+NI12,NI,-38.464,175.248,King Country (The Lines Company),5.3
+NI13,NI,-38.626,176.105,Taupō (Unison Networks),4.6
+NI14,NI,-38.805,177.151,Tairāwhiti and Wairoa (Firstlight Network),11.3
+NI15,NI,-39.176,174.182,Taranaki (Powerco),36.4
+NI16,NI,-39.582,176.824,Hawke's Bay (Unison Networks),34.0
+NI17,NI,-39.919,176.447,Central Hawke's Bay (Centralines),4.7
+NI18,NI,-39.923,175.151,Whanganui (Powerco),9.1
+NI19,NI,-40.328,175.67,Manawatū (Powerco),20.9
+NI20,NI,-40.825,175.138,Kāpiti and Horowhenua (Electra),16.6
+NI21,NI,-41.021,175.558,Wairarapa (Powerco),18.1
+NI22,NI,-41.201,174.888,Wellington (Wellington Electricity),30.0
+SI01,SI,-41.322,173.233,Tasman (Network Tasman),37.4
+SI02,SI,-41.498,173.933,Marlborough (Marlborough Lines),40.7
+SI03,SI,-42.355,171.292,West Coast (Westpower),2.9
+SI04,SI,-43.274,172.636,North Canterbury (MainPower NZ),37.8
+SI05,SI,-43.535,172.528,Central Canterbury (Orion New Zealand),75.3
+SI06,SI,-43.942,171.802,Ashburton (Electricity Ashburton),24.8
+SI07,SI,-44.351,171.086,South Canterbury (Alpine Energy),9.3
+SI08,SI,-44.932,170.749,Waitaki (Network Waitaki),6.2
+SI09,SI,-45.01,168.74,Queenstown (Aurora Energy),9.8
+SI10,SI,-45.085,169.216,Central Otago (Aurora Energy),22.4
+SI11,SI,-45.812,170.069,Otago (OtagoNet),4.5
+SI12,SI,-45.865,170.484,Dunedin (Aurora Energy),6.3
+SI13,SI,-46.315,168.461,Southland (The Power Company),7.9

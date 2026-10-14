@@ -20,6 +20,10 @@ This repository is public: never commit keys, tokens or personal details.
   via the Cloudflare REST API, or `data/store` locally), `sync.py` (EMI blob container + Open-Meteo), `common.py`
   (paths, overrides). `history.py`: history since 10 Sep 2020 from the daily dispatch files (see its docstring for
   the KV keys `hist/*`); bump its `BUILD` number to rebuild every month after changing how months are built.
+  `rooftop.py` (rooftop solar: registry capacity by Root NSP less dispatched farms, 35 irradiance points, Himawari
+  satellite irradiance via Open-Meteo, PV model `pv.py`, calibration and uncertainty) and `hvdc.py` (metered HVDC
+  parsing and the fitted estimate). `analysis/` holds the development scripts and `analysis/README.md` the evidence
+  behind every constant in them.
 - `.github/workflows/update-data.yml`: runs `update.py` on GitHub (free because the repo is public). Triggered every
   5 minutes by the Worker's Cloudflare cron through the workflow_dispatch API, because GitHub's own schedule never
   fired for this new repo (it stays as a 30-minute backup). Secrets: `EMI_KEY`, `CF_ACCOUNT_ID`, `CF_API_TOKEN`
@@ -31,7 +35,11 @@ This repository is public: never commit keys, tokens or personal details.
   bundled snapshot, and `/data/history/{index,day,hh/YYYY-MM}.json` from KV keys `hist/*`; its `scheduled` handler
   dispatches the GitHub jobs (live every 5 minutes, history every 6 hours) (Worker secret `GITHUB_TOKEN`: fine-grained,
   elenz only, Actions read/write; it expires, so renew it yearly). KV free plan: 1,000 writes/day (the job uses ~600), 100,000 reads/day.
-- `facilities/overrides.toml`: curated corrections, plus `[owners]`, `[plant_owners]` and `[hydro_schemes]` for the
+- `facilities/rooftop_points.csv`, `rooftop_nsp.csv` (irradiance points and NSP → point; regenerate with
+  `analysis/make_points.py`), `rooftop_capacity.json` (capacity snapshot the live job uses until the history job
+  has stored `hist/roof_cap.json`).
+- `facilities/overrides.toml`: curated corrections, `[solar_farms_in_registry]` (dispatched farms the
+  distributed-generation registry also counts), plus `[owners]`, `[plant_owners]` and `[hydro_schemes]` for the
   site's By owner / By hydro scheme views; `facilities/connection_points.csv`: POC → island;
   `facilities/plant_register.csv`: the EA register (refresh with `sync.py plants`, review the diff).
 - `ingest/plant_meta.py` writes `site/src/lib/tracker/plants.json` (plant → owner, hydro scheme) from the register and
@@ -60,15 +68,18 @@ This repository is public: never commit keys, tokens or personal details.
 - The plant register lags reality: Kaiwaikawe (MPE1101 KWK0), Kōwhai Park (ISL0661 KPS0) and Ruakākā solar
   (BRB0331 RUS0) were missing; Pātea moved from HWA1101 to OHG1101 in June 2026 and OHG1101 has no island in
   the feed. These are fixed in `facilities/overrides.toml`.
-- HVDC flow isn't in the dispatch feed; it is estimated from the island balance until `HVDC_Flows` arrives (~2 weeks).
+- HVDC flow isn't in the dispatch feed. History uses metered `HVDC_Flows` (Benmore and Haywards ends, ~2 weeks
+  after each month); the live week and newer history use `hvdc.estimate`, fitted to the metered flows (~10 MW
+  mean error). The NI series is what arrives at Haywards, the SI series what leaves Benmore, `hvdcN` mid-link.
 - Daily dispatch files start on 10 Sep 2020 (`Pre1November2022Archive` holds solver case files, not volumes), about
   11 MB a day. Earlier history would need `Generation_MD` (metered, from 1997) and final prices.
 - The register's dated rows matter for history: `register()` keeps retired units (Taranaki Combined Cycle) and
   old connections (Pātea on HWA1101), latest row winning. A unit idle all window is left out of its plant.
-- Installed distributed solar (EMI report GUEHMT) grew from ~140 MW (Sep 2020) to ~1,240 MW (Aug 2026), with a jump
-  of ~180 MW in Jul 2026. History uses it month by month, capped at the live page's 1,000 MW assumption.
-- Open-Meteo's archive API rate-limits some shared addresses (HTTP 429). The history job stores missing irradiance
-  as blank and retries it on later runs.
+- Installed distributed solar (EMI report GUEHMT) was 1,270 MW in Sep 2026, but ~410 MW of it is dispatched solar
+  farms on local networks (Kōwhai Park is the Jul 2026 jump), so rooftop solar is ~860 MW. See analysis/README.md.
+- Renewable dispatch MW reflect actual output unless constrained (matches metered injection within ~1–2%).
+- Open-Meteo rate-limits some shared addresses (HTTP 429). The history job stores missing irradiance as blank and
+  retries it on later runs (up to `IRR_MONTHS_PER_RUN` months a run).
 - Final prices (`FinalEnergyPrices`): `ByMonth/YYYYMM_FinalEnergyPrices.csv` for past months (~10 MB, every node),
   `YYYYMMDD_FinalEnergyPrices.csv` daily for the last year, `_I` suffix while interim (the last day or two, and
   occasionally days under review, e.g. 31 Aug and 1 Sep 2026). Trading period k starts (k−1) half-hours after local
@@ -86,5 +97,5 @@ This repository is public: never commit keys, tokens or personal details.
    Daily history keeps each day's peak demand and peak generation (total output including rooftop solar), BUILD 3.
 4. Then the brief's build order: plant pages, map, hydro panel and records, offer stacks and downloads.
 
-Open questions: emission factors (and how to treat the Rankines), rooftop solar capacity from GUEHMT, written
-confirmation of terms from the EA before launch.
+Open questions: emission factors (and how to treat the Rankines), written confirmation of terms from the EA
+before launch, farm mounting (tracking or fixed) to confirm, Taiohi's metered output above its dispatch.

@@ -7,15 +7,21 @@ so the first run backfills everything and later runs add the newest days.
 Stored (Cloudflare KV in GitHub Actions, data/store locally), one set per NZ calendar month:
   hist/state/YYYY-MM.csv.gz  half-hourly compact state: unit MW, island load, Tiwai, reference prices (state.py
                              columns averaged over each trading period), n = 5-minute intervals present (0-6),
-                             R|NI and R|SI = island-weighted irradiance (W/m², Open-Meteo) for rooftop solar,
-                             F|NI and F|SI = final prices at Haywards and Benmore (fi = 1 while only interim)
+                             G|<point>, D|<point> = satellite global and diffuse irradiance (W/m², Open-Meteo,
+                             Himawari) at each rooftop solar point (facilities/rooftop_points.csv),
+                             F|NI and F|SI = final prices at Haywards and Benmore (fi = 1 while only interim),
+                             H|BEN, H|HAY = metered HVDC transfer northward at each end (MW, once published)
   hist/hh/YYYY-MM.json       the month in the tracker.json layout, half-hourly (the website's 30-day view)
   hist/dd/YYYY-MM.json       daily averages for the month, plus each day's peak demand and peak generation
 and across all months:
   hist/day.json              every day since 2020 (the 1-year and all-time views)
   hist/index.json            months stored, first and last time (published once the backfill has caught up)
   hist/progress.json         the job's own record: months stored and finished, and the plant mapping used
-  hist/solar_capacity.csv    EA report GUEHMT: installed distributed solar by month (rooftop solar model)
+  hist/roof_cap.json         rooftop solar capacity by point and month (EA report GUEHMT by Root NSP, less the
+                             dispatched farms it also counts); the live job reads it too
+
+HVDC is metered (EMI HVDC_Flows) wherever published, about two weeks after each month, and estimated from the
+island balances before that (hvdc.py).
 
 Prices are the EA's final prices wherever published (monthly files for past months, daily files for the current
 one, interim for the last day or two), and dispatch prices only for days not yet priced. Interim days are fetched
@@ -46,23 +52,26 @@ import warnings
 import numpy as np
 import pandas as pd
 
+import hvdc
+import rooftop
 import state as st
-from build_tracker import KEYS, ROOF_CAP, ROOF_PR, ROOF_W, assemble, enc
+from build_tracker import KEYS, assemble, enc
 from common import BLOB, FACILITIES, NZ
 from store import open_store
-from sync import CITIES, DISPATCH
+from sync import DISPATCH
 
 warnings.simplefilter("ignore", pd.errors.PerformanceWarning)  # wide monthly frames; harmless
 FINAL = 'Datasets/Wholesale/DispatchAndPricing/FinalEnergyPrices'
+HVDC_FLOWS = 'Datasets/Wholesale/Metered_data/HVDC_Flows'
 
-BUILD = 3                    # bump to rebuild every month's JSON after changing how it is built (2: final prices, 3: peak generation)
+BUILD = 4                    # bump to rebuild every month's JSON after changing how it is built (2: final prices, 3: peak generation,
+                             # 4: satellite rooftop solar model by point, metered HVDC)
 GEN_FUELS = ('geo', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
 WRITE_BUDGET = 280           # KV writes a day (UTC) for this job; the live job needs ~600 of the 1,000
 FIRST_DAY = date(2020, 9, 10)
+IRR_MONTHS_PER_RUN = 20      # months of missing satellite irradiance fetched per run (~100 Open-Meteo calls each)
 STEP = pd.Timedelta(minutes=30)
 WORKERS = 6
-GUEHMT = ('https://www.emi.ea.govt.nz/Retail/Download/DataReport/CSV/GUEHMT?DateFrom=20130101&DateTo={to}'
-          '&_rsdr=ALL&RegionType=NZ&FuelType=solar_all&MarketSegment=All&Capacity=All_Total&Show=Cap_Total&_si=v|3')
 
 
 def get(url, timeout=120):
@@ -99,84 +108,72 @@ def fetch_day(d):
     return out
 
 
-# ---------- rooftop solar inputs ----------
+# ---------- rooftop solar and HVDC inputs ----------
+
+def irr_cols():
+    pts, _ = rooftop.points()
+    return [f'{k}|{p[0]}' for p in pts for k in ('G', 'D')]
+
 
 def irradiance(start, end):
-    """Island-weighted irradiance (W/m²) per trading period from start to end (UTC timestamps), from Open-Meteo:
-    the ERA5 archive, with the forecast service's recent past filling the archive's last ~5 days. Periods neither
-    service could supply are NaN, and are retried on later runs (see main)."""
-    lat = ','.join(str(c[0]) for c in CITIES)
-    lon = ','.join(str(c[1]) for c in CITIES)
-    d0, d1 = (start - pd.Timedelta(hours=2)).date(), (end + pd.Timedelta(hours=2)).date()
-    q = f'latitude={lat}&longitude={lon}&start_date={d0}&end_date={d1}&hourly=shortwave_radiation&timezone=GMT'
-    frames = []
-    bases = ['https://archive-api.open-meteo.com/v1/archive']
-    if end > pd.Timestamp.now(tz='UTC') - pd.Timedelta(days=80):  # the forecast service keeps ~3 months of past data
-        bases.append('https://api.open-meteo.com/v1/forecast')
-    for base in bases:
-        try:
-            locs = json.loads(get(f'{base}?{q}'))
-        except Exception as e:  # the forecast service only reaches ~3 months back; the archive covers the rest
-            print(f'  irradiance: {base.split("/")[2]} unavailable for {d0}..{d1} ({e})')
-            continue
-        idx = pd.DatetimeIndex(pd.to_datetime(locs[0]['hourly']['time'])).tz_localize('UTC')
-        frames.append(pd.DataFrame({i: pd.Series(l['hourly']['shortwave_radiation'], index=idx, dtype=float) for i, l in enumerate(locs)}))
+    """Satellite irradiance (G|<point>, D|<point>, W/m²) averaged over each trading period from start to end (UTC
+    period starts). Periods the service couldn't supply (outage, rate limit, or too recent) are NaN and are fetched
+    again on later runs (see main)."""
     tps = pd.date_range(start, end, freq='30min')
-    if not frames:
-        return pd.DataFrame({'R|NI': np.nan, 'R|SI': np.nan}, index=pd.DatetimeIndex(tps, name='t'))
-    ghi = frames[0]
-    for f in frames[1:]:
-        ghi = ghi.combine_first(f)
-    # an hourly value is the mean over the preceding hour, so it belongs to the half-way point
-    ghi.index = ghi.index - pd.Timedelta(minutes=30)
-    tps = tps + pd.Timedelta(minutes=15)
-    out = {}
-    for isl in ('NI', 'SI'):
-        cols = [i for i, (i2, _) in enumerate(ROOF_W) if i2 == isl]
-        w = np.array([ROOF_W[i][1] for i in cols])
-        series = (ghi[cols] * w).sum(axis=1, min_count=len(cols)) / w.sum()
-        series = series.reindex(series.index.union(tps)).interpolate(limit_area='inside', limit=3).reindex(tps)
-        out[f'R|{isl}'] = series.clip(lower=0).values
-    return pd.DataFrame(out, index=pd.DatetimeIndex(tps - pd.Timedelta(minutes=15), name='t'))
+    today = pd.Timestamp.now(tz='UTC').date()
+    d0, d1 = start.date(), min(end.date(), today)
+    try:
+        sat = rooftop.satellite(get, d0, d1)
+    except Exception as e:
+        print(f'  irradiance: satellite service unavailable for {d0}..{d1} ({e})')
+        return pd.DataFrame(np.nan, index=pd.DatetimeIndex(tps, name='t'), columns=irr_cols())
+    out = rooftop.half_hourly(sat, tps).reindex(columns=irr_cols())
+    out.index.name = 't'
+    return out
 
 
 def solar_capacity(store):
-    """Installed distributed solar MW by month (EA report GUEHMT), as {'YYYY-MM': MW}. Kept in the store so a
-    failed download falls back to the last copy."""
-    raw = None
+    """Rooftop solar capacity by point and month (rooftop.capacity_table + by_point), saved to the store when it
+    changes (the live job reads it); a failed download falls back to the stored copy, then the committed snapshot."""
+    old_raw = store.get('hist/roof_cap.json')
     try:
-        raw = get(GUEHMT.format(to=date.today().strftime('%Y%m%d')))
-        fresh = parse_capacity(raw)
-        old = store.get('hist/solar_capacity.csv')
-        if old is None or parse_capacity(old) != fresh:  # KV writes are limited: only save a changed report
-            store.put('hist/solar_capacity.csv', raw, 'text/csv')
+        small, large = rooftop.download_guehmt(get, date.today())
+        cap = rooftop.by_point(rooftop.capacity_table(small, large))
+        body = json.dumps(cap, separators=(',', ':')).encode()
+        if old_raw != body:  # KV writes are limited: only save a changed table
+            store.put('hist/roof_cap.json', body, 'application/json')
+        return cap
     except Exception as e:
-        print('solar capacity download failed, using the stored copy:', e)
-        raw = store.get('hist/solar_capacity.csv')
+        print('rooftop solar capacity download failed, using the stored copy:', e)
+    if old_raw:
+        return json.loads(old_raw)
+    with open(os.path.join(FACILITIES, 'rooftop_capacity.json')) as f:
+        return json.load(f)
+
+
+def cap_total(cap, month):
+    """Installed rooftop solar at the end of a month (MW, one decimal): a change means the month needs rebuilding."""
+    end = pd.Timestamp(month + '-01', tz='UTC') + pd.offsets.MonthEnd(0)
+    c = rooftop.capacity_at(cap, [end])
+    return round(float(c['small'].values.sum() + c['large'].values.sum()), 1)
+
+
+def add_hvdc(s, m):
+    """Fill in metered HVDC transfer (H|BEN, H|HAY) for month m once EMI publishes it. True if anything changed."""
+    for c in ('H|BEN', 'H|HAY'):
+        if c not in s:
+            s[c] = np.nan
+    need = s.index[s['H|BEN'].isna() | s['H|HAY'].isna()]
+    if not len(need):
+        return False
+    raw = get(f'{BLOB}/{HVDC_FLOWS}/{m:%Y%m}_HVDC_flows.csv')
     if raw is None:
-        raise SystemExit('No solar capacity data (EMI report GUEHMT).')
-    return parse_capacity(raw)
-
-
-def parse_capacity(raw):
-    lines = raw.decode('utf-8-sig').splitlines()
-    head = next(i for i, l in enumerate(lines) if l.startswith('Month end,'))
-    df = pd.read_csv(io.StringIO('\n'.join(lines[head:])))
-    col = next(c for c in df.columns if c.startswith('Total capacity installed'))
-    months = pd.to_datetime(df['Month end'], dayfirst=True).dt.strftime('%Y-%m')
-    cap = dict(zip(months, df[col].astype(float)))
-    if len(cap) < 12:
-        raise ValueError('solar capacity report looks incomplete')
-    return cap
-
-
-def roof_mw(cap, month):
-    """Rooftop solar capacity by island for a month: the EA's installed distributed solar, capped at the live
-    page's assumed total (build_tracker.ROOF_CAP) so history and the live week agree where they meet."""
-    known = sorted(cap)
-    m = month if month in cap else (known[-1] if month > known[-1] else known[0])
-    total = min(cap[m], sum(ROOF_CAP.values()))
-    return {isl: total * v / sum(ROOF_CAP.values()) for isl, v in ROOF_CAP.items()}
+        return False
+    f = hvdc.parse_metered(raw).reindex(need).dropna(how='all')
+    if f.empty:
+        return False
+    s.loc[f.index, ['H|BEN', 'H|HAY']] = f[['H|BEN', 'H|HAY']].values
+    return True
 
 
 # ---------- final prices ----------
@@ -240,7 +237,7 @@ def add_final(s, m):
 
 # ---------- one month: state -> tracker-layout JSON and daily summary ----------
 
-def build_month(s, month, roof_cap, log):
+def build_month(s, month, cap, log):
     """Half-hourly state for one month -> (hh JSON, dd JSON)."""
     s = s.sort_index()
     have = s.index[s.n > 0]
@@ -253,11 +250,15 @@ def build_month(s, month, roof_cap, log):
         for isl in ('NI', 'SI'):
             g[f'P|{isl}'] = g[f'F|{isl}'].combine_first(g[f'P|{isl}'])
         final = g['F|NI'].notna() & (g['fi'] != 1)
-    roof = {isl: (roof_cap[isl] * g[f'R|{isl}'].interpolate(limit_direction='both').fillna(0) / 1000 * ROOF_PR) for isl in ('NI', 'SI')}
+    irr = g.reindex(columns=irr_cols()).interpolate(limit_area='inside', limit=2)
+    roof = rooftop.output(irr.set_axis(full + pd.Timedelta(minutes=15)), full + pd.Timedelta(minutes=15), cap)
+    roof = {k: pd.Series(v.values, index=full) for k, v in roof.items()}
     js = assemble(g, full, roof, log)
+    hv_ok = g['H|BEN'].notna() if 'H|BEN' in g else pd.Series(False, index=full)
     n = g.n.fillna(0)
     js['meta'] = {'month': month, 'intervals': int((n > 0).sum()), 'expected': len(full),
-                  'five_min': round(float(n.sum() / (6 * len(full))), 4), 'roof_mw': round(sum(roof_cap.values())),
+                  'five_min': round(float(n.sum() / (6 * len(full))), 4), 'roof_mw': cap_total(cap, month),
+                  'hvdc_metered': round(float(hv_ok.mean()), 4),
                   'final_prices': round(float(final.mean()), 4),
                   'end': js['t0'] + (len(full) - 1) * js['step']}
     return js, daily(js, month)
@@ -358,7 +359,7 @@ def month_days(m, last_day):
 
 def mapping_hash():
     h = hashlib.sha256(f'build {BUILD}'.encode())
-    for f in ('plant_register.csv', 'overrides.toml', 'connection_points.csv'):
+    for f in ('plant_register.csv', 'overrides.toml', 'connection_points.csv', 'rooftop_points.csv', 'rooftop_nsp.csv'):
         with open(os.path.join(FACILITIES, f), 'rb') as fh:
             h.update(fh.read())
     return h.hexdigest()[:16]
@@ -427,12 +428,13 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
     changed_dd = {}
     stopped = ''
     repairs = 0
+    icols = irr_cols()
 
     for m in months_between(start or FIRST_DAY, yesterday):
         month = f'{m:%Y-%m}'
         key = f'hist/state/{month}.csv.gz'
-        rc = roof_mw(cap, month)
-        if month in done and month in stored and caps_before.get(month) == round(sum(rc.values())):
+        rc = cap_total(cap, month)
+        if month in done and month in stored and caps_before.get(month) == rc:
             continue
         if stopped:
             continue
@@ -455,30 +457,54 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
             s = add if s is None else pd.concat([s[~s.index.isin(add.index)], add]).sort_index()
         if s is None or s.empty:
             continue
-        gaps = s.index[s['R|NI'].isna() | s['R|SI'].isna()]
+        dropped = [c for c in ('R|NI', 'R|SI') if c in s]   # BUILD 3's island-weighted reanalysis irradiance
+        s = s.drop(columns=dropped)
+        for c in icols:
+            if c not in s:
+                s[c] = np.nan
+        # satellite irradiance is only meaningful by day; a trading period counts as missing if any point lacks it
+        gaps = s.index[s[icols].isna().any(axis=1)]
+        last_day = list(month_days(m, yesterday))[-1:]
+        recent = bool(last_day) and last_day[0] >= yesterday - timedelta(days=30)
         fixed = False
-        if len(gaps) and not new and repairs < 12:
-            # irradiance a previous run couldn't get (Open-Meteo rate limit or outage): try again
+        # retry missing irradiance for recent months (the service can lag), or anywhere days of it are missing (a new
+        # point, the BUILD 4 switch); a few hours missing long ago are satellite outages and stay interpolated
+        if len(gaps) and repairs < IRR_MONTHS_PER_RUN and ((recent and not new) or len(gaps) > 3 * 48):
+            # irradiance not stored yet (a new point, the BUILD 4 switch) or that a previous run couldn't get
             repairs += 1
             r = irradiance(gaps.min(), gaps.max())
-            before = int(s[['R|NI', 'R|SI']].isna().sum().sum())
-            s.loc[gaps, ['R|NI', 'R|SI']] = r.reindex(gaps).values
-            fixed = int(s[['R|NI', 'R|SI']].isna().sum().sum()) < before
+            before = int(s[icols].isna().sum().sum())
+            s.loc[gaps, icols] = r.reindex(gaps)[icols].values
+            fixed = int(s[icols].isna().sum().sum()) < before
+        # days of irradiance still missing (BUILD 4 switch, beyond this run's share): leave the month for a later run
+        # rather than spend KV writes saving and rebuilding it twice
+        irr_short = int(s.loc[s.index < pd.Timestamp.now(tz='UTC') - pd.Timedelta(days=2), icols].isna().any(axis=1).sum()) > 3 * 48
+        if irr_short and month in stored and not new and not fixed:
+            continue
         priced = add_final(s, m)
-        if new or fixed or priced:
+        metered = add_hvdc(s, m)
+        if new or fixed or priced or metered or dropped:
             store.put(key, dump_state(s))
-            missing_r = int(s['R|NI'].isna().sum())
+            missing_r = int(s[icols].isna().any(axis=1).sum())
             unpriced = int((s['F|NI'].isna() | (s['fi'] == 1)).sum())
             log(f'{month}: +{len(new)} days ({len(todo) - len(new)} not published yet), {len(set(s.index.tz_convert(NZ).date))} days stored'
                 + (f'; irradiance missing for {missing_r} trading periods' if missing_r else '')
-                + (f'; {unpriced} trading periods without final prices yet' if unpriced else ''))
-        last_day = list(month_days(m, yesterday))[-1:]
+                + (f'; {unpriced} trading periods without final prices yet' if unpriced else '')
+                + ('; metered HVDC added' if metered else ''))
+        hv_missing = s[['H|BEN', 'H|HAY']].isna().any().any()
+        irr_missing = int(s[icols].isna().any(axis=1).sum())
         if (last_day and last_day[0] < yesterday - timedelta(days=14)
-                and not s[['R|NI', 'R|SI', 'F|NI', 'F|SI']].isna().any().any() and not (s['fi'] == 1).any()
+                and (irr_missing == 0 or (not recent and irr_missing <= 3 * 48))
+                and not s[['F|NI', 'F|SI']].isna().any().any() and not (s['fi'] == 1).any()
+                and (not hv_missing or last_day[0] < yesterday - timedelta(days=90))
                 and len(set(s.index.tz_convert(NZ).date)) == len(list(month_days(m, yesterday)))):
-            done.add(month)  # every day stored, irradiance and final prices complete, and the month long over
-        if new or fixed or priced or month in left or month not in stored or caps_before.get(month) != round(sum(rc.values())):
-            hh, dd = build_month(s, month, rc, lambda *a: log(f'  {month}:', *a))
+            done.add(month)  # every day stored, irradiance, final prices and HVDC complete, and the month long over
+        # wait for irradiance before rebuilding a month with days of it missing (except the newest two days)
+        irr_short = int(s.loc[s.index < pd.Timestamp.now(tz='UTC') - pd.Timedelta(days=2), icols].isna().any(axis=1).sum()) > 3 * 48
+        if irr_short and month in stored:
+            continue   # stays in rebuild_left: a later run fetches the irradiance, then rebuilds it
+        if new or fixed or priced or metered or month in left or month not in stored or caps_before.get(month) != rc:
+            hh, dd = build_month(s, month, cap, lambda *a: log(f"  {month}:", *a))
             put_json(store, f'hist/hh/{month}.json', hh)
             put_json(store, f'hist/dd/{month}.json', dd)
             changed_dd[month] = dd

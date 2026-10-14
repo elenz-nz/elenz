@@ -31,7 +31,8 @@ export const KEY = {
   year: t => new Date(local(t)).getUTCFullYear(),
 };
 
-const SERIES = ['geo', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt', 'hvdc', 'metered', 'underlying', 'tiwai', 'price'];
+// roofU: uncertainty of the rooftop solar estimate (one standard deviation, MW); zero in data built before it existed
+const SERIES = ['geo', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'roofU', 'batt', 'hvdc', 'metered', 'underlying', 'tiwai', 'price'];
 const F = (a, n) => (a ? Float64Array.from(a) : new Float64Array(n));
 const plantKey = p => `${p.name}|${p.fuel}|${p.isl}`;
 

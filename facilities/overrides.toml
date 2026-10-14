@@ -10,6 +10,25 @@
 "ISL0661 KPS0" = { fuel = "solar", plant = "Kōwhai Park Solar Farm" }
 "BRB0331 RUS0" = { fuel = "solar", plant = "Ruakākā Solar Farm" }
 
+# Dispatched solar farms on local networks that the distributed generation registry (EMI report GUEHMT) also counts.
+# The tracker shows them as grid solar, so the rooftop solar model removes them: key = plant, nsp = the Root NSP where
+# the registry records it, steps = [month the registry added it (YYYY-MM), MW added] (some arrived in two steps).
+# The history job warns when the registry jumps 5 MW or more (systems over 10 kW) at an NSP where a solar unit
+# dispatches: add the farm here. Not in the registry yet (check again): Clandeboye (TMK0331), Dannevirke (DVK0111),
+# Te Herenga o Te Rā (WAI0331). Tauhei is grid-connected and never in it.
+[solar_farms_in_registry]
+"Kohirā Solar Farm" = { nsp = "KOE1101TOPEGN", steps = [["2023-11", 23.7]] }
+"Lauriston Solar Farm" = { nsp = "ASB0661EASHGN", steps = [["2024-11", 48.3]] }
+"Te Puna Mauri ō Omaru at Ruawai" = { nsp = "MTO0331NPOWGN", steps = [["2024-12", 16.8]] }
+"Pukenui Solar Farm" = { nsp = "KOE1101TOPEGN", steps = [["2025-05", 20.0]] }
+"Rangitaiki Solar Farm" = { nsp = "EDG0331HEDLGN", steps = [["2025-08", 23.9]] }   # ~17 months after commissioning
+"Twin Rivers Solar Farm" = { nsp = "KOE1101TOPEGN", steps = [["2025-09", 24.0]] }
+"Taiohi Solar Farm" = { nsp = "HLY0331WAIKGN", steps = [["2025-10", 12.8], ["2025-11", 9.6]] }
+"Pāmu Rā ki Whitianga Solar Farm" = { nsp = "KPU0661POCOGN", steps = [["2025-11", 23.8]] }
+"Papareireiā" = { nsp = "MTO0331NPOWGN", steps = [["2025-11", 9.1], ["2026-04", 8.6]] }
+"Omeheu Solar Farm" = { nsp = "EDG0331HEDLGN", steps = [["2026-05", 28.9]] }
+"Kōwhai Park Solar Farm" = { nsp = "ISL0661ORONGN", steps = [["2026-07", 160.1]] }
+
 # Register fuel name -> tracker fuel key.
 # Huntly Rankine units 1, 2 and 4 burn coal or gas with no change visible to the market, so they are
 # "Coal/gas" and get their own layer. Huntly 5 and 6 are gas only (Fuel = Gas in the register).

@@ -3,7 +3,7 @@
 Usage (from the repo root):
   python3 ingest/sync.py plants                       # latest DispatchedGenerationPlant.csv -> facilities/plant_register.csv
   python3 ingest/sync.py daily 2026-10-06 2026-10-12  # NodalPricesAndVolumes daily files for a date range
-  python3 ingest/sync.py irradiance                   # Open-Meteo 15-minute irradiance, last 9 days (rooftop solar model)
+  python3 ingest/sync.py irradiance                   # satellite irradiance for the rooftop solar points, last 8 days
   python3 ingest/sync.py all                          # plants + irradiance + the last 7 days of daily files that exist
 """
 import os
@@ -17,8 +17,7 @@ from common import BLOB, FACILITIES, RAW_DAILY, REF
 
 DISPATCH = 'Datasets/Wholesale/DispatchAndPricing/NodalPricesAndVolumes'
 FLEET = 'Datasets/Wholesale/Generation/GenerationFleet/Existing'
-# weighted population centres for the rooftop solar model: Auckland, Hamilton, Tauranga, Wellington, Christchurch, Nelson, Dunedin
-CITIES = [(-36.85, 174.76), (-37.79, 175.28), (-37.69, 176.17), (-41.29, 174.78), (-43.53, 172.63), (-41.27, 173.28), (-45.87, 170.50)]
+
 
 
 def list_blobs(prefix):
@@ -46,12 +45,13 @@ def daily(start, end):
 
 
 def irradiance():
-    lat = ','.join(str(c[0]) for c in CITIES)
-    lon = ','.join(str(c[1]) for c in CITIES)
-    url = (f'https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&past_days=9&forecast_days=1'
-           '&minutely_15=shortwave_radiation&timezone=Pacific%2FAuckland')
-    urlretrieve(url, os.path.join(REF, 'irradiance.json'))
-    print('irradiance updated')
+    import time
+    import rooftop
+    get = lambda url, timeout=120: urlopen(url, timeout=timeout).read()
+    sat = rooftop.satellite(get, past_hours=8 * 24)
+    with open(os.path.join(REF, 'irradiance.json'), 'wb') as f:
+        f.write(rooftop.irr_dumps(sat, None, time.time()))
+    print('irradiance updated, satellite to', sat.dropna(how='all').index.max())
 
 
 if __name__ == '__main__':

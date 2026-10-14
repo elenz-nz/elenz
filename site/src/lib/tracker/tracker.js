@@ -140,6 +140,7 @@ export function mountTracker(D, hooks = {}) {
     FUELS.forEach(f => NZ[f.k] = f.k === 'hvdc' ? new Float64Array(M.N) : add(M.NI[f.k], M.SI[f.k]));
     NZ.metered = add(M.NIs.metered, M.SIs.metered);
     NZ.underlying = add(M.NIs.underlying, M.SIs.underlying);
+    NZ.roofU = add(M.NIs.roofU, M.SIs.roofU);   // the islands' errors share the calibration, so they add
     NZ.tiwai = M.SIs.tiwai;
     SRC = { NZ, NI: { ...M.NI, ...M.NIs }, SI: { ...M.SI, ...M.SIs } };
     present = {};
@@ -243,7 +244,7 @@ export function mountTracker(D, hooks = {}) {
     const S = SRC[state.region];
     const v = { n, avg, t: groups.map(([a]) => M.t[a]), hrs, fuels: {} };
     FUELS.forEach(f => v.fuels[f.k] = avg(S[f.k]));
-    v.metered = avg(S.metered); v.underlying = avg(S.underlying); v.tiwai = avg(S.tiwai);
+    v.metered = avg(S.metered); v.underlying = avg(S.underlying); v.tiwai = avg(S.tiwai); v.roofU = avg(S.roofU);
     // peak demand and generation: the highest 5-minute or half-hour value, which daily history keeps alongside its averages
     const pk = M.peak && M.peak[state.region];
     v.pkMet = max(pk ? pk.metered : S.metered);
@@ -433,6 +434,12 @@ export function mountTracker(D, hooks = {}) {
     if (dash) ctx.setLineDash(dash);
     ctx.beginPath(); for (let j = 0; j < V.n; j++) { const x = X(j), y = Y(arr[j]); j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.stroke(); ctx.restore();
   }
+  function band(ctx, X, Y, lo, hi, fill) {
+    ctx.fillStyle = fill; ctx.beginPath();
+    for (let j = 0; j < V.n; j++) { const x = X(j), y = Y(hi[j]); j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+    for (let j = V.n - 1; j >= 0; j--) ctx.lineTo(X(j), Y(lo[j]));
+    ctx.closePath(); ctx.fill();
+  }
   function area(ctx, X, Y, arr, base, fill) {
     ctx.fillStyle = fill; ctx.beginPath(); ctx.moveTo(X(0), Y(base));
     for (let j = 0; j < V.n; j++) ctx.lineTo(X(j), Y(arr[j]));
@@ -539,6 +546,8 @@ export function mountTracker(D, hooks = {}) {
     for (let j = 0; j < V.n; j++) { mx = Math.max(mx, V.underlying[j], V.metered[j]); mn = Math.min(mn, showXT ? xt[j] : V.metered[j]); }
     const dom = nice(mn * 0.95, mx * 1.02, 3);
     const F = frame(c, dom, v => fmt(v)), { X, Y } = F;
+    // the rooftop solar estimate's uncertainty (± one standard deviation) as a band around the dashed line
+    if (V.roofU.some(u => u > 0.5)) band(ctx, X, Y, V.underlying.map((v, j) => v - V.roofU[j]), V.underlying.map((v, j) => v + V.roofU[j]), alpha(C['--ink-2'], 0.22));
     if (showXT) line(ctx, X, Y, xt, C['--accent']);
     line(ctx, X, Y, V.underlying, C['--ink-2'], 1.5, [4, 3]);
     line(ctx, X, Y, V.metered, C['--ink']);
@@ -778,6 +787,7 @@ export function mountTracker(D, hooks = {}) {
       ['Price, South Island', money(V.pSI[j]), '/MWh'],
       ['Demand, metered', fmt(V.metered[j]), long ? 'MW avg' : 'MW'],
       ['With rooftop solar', fmt(V.underlying[j]), long ? 'MW avg' : 'MW'],
+      ['Rooftop solar (est.)', fmt(V.fuels.roof[j]), (long ? 'MW avg' : 'MW') + (V.roofU[j] > 0.5 ? ` ± ${fmt(V.roofU[j])}` : '')],
       long && ['Peak demand, metered', fmt(V.pkMet[j]), 'MW'],
       long && V.pkGen && ['Peak generation', fmt(V.pkGen[j]), 'MW'],
       showT && ['Tiwai smelter', fmt(V.tiwai[j]), long ? 'MW avg' : 'MW'],
@@ -929,13 +939,14 @@ export function mountTracker(D, hooks = {}) {
         if (topIsAll()) tot = V.gen[j]; else for (const x of V.layers) tot += x.signed ? x.s[j] : Math.max(0, x.s[j]);
         if (!l) return head + row(C['--ink'], totalLabel(), fmt(tot), mw);
         const v = l.s[j];
-        const extra = l.signed ? `${mw} · ${signedTxt(l, v, false)}` : `${mw}${tot > 0.5 ? ` · ${(v / tot * 100).toFixed(1)}%` : ''}`;
+        const pm = l.id === 'roof' && V.roofU[j] > 0.5 ? ` ± ${fmt(V.roofU[j])}` : '';
+        const extra = l.signed ? `${mw} · ${signedTxt(l, v, false)}` : `${mw}${pm}${tot > 0.5 ? ` · ${(v / tot * 100).toFixed(1)}%` : ''}`;
         return head + row(colourOf(l), l.name, fmt(v), extra, !!l.hatch);
       }
       case 'cv-price':
         return head + row(C['--p-ni'], 'North Island · Haywards', money(V.pNI[j]), '/MWh') + row(C['--p-si'], 'South Island · Benmore', money(V.pSI[j]), '/MWh');
       case 'cv-demand':
-        return head + row(C['--ink'], 'Metered', fmt(V.metered[j]), mw) + row(C['--ink-2'], 'With rooftop solar', fmt(V.underlying[j]), mw)
+        return head + row(C['--ink'], 'Metered', fmt(V.metered[j]), mw) + row(C['--ink-2'], 'With rooftop solar', fmt(V.underlying[j]), V.roofU[j] > 0.5 ? `${mw} ± ${fmt(V.roofU[j])}` : mw)
           + (state.region !== 'NI' ? row(C['--accent'], 'Without Tiwai', fmt(V.metered[j] - V.tiwai[j]), mw) : '')
           + (isLong() ? row(C['--muted'], 'Peak, metered', fmt(V.pkMet[j]), 'MW') : '');
       case 'cv-hvdc':

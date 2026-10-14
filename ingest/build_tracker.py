@@ -1,8 +1,8 @@
 """Build the tracker JSON the website reads: 5-minute island, fuel and plant series for the last 7 days.
 
-build(state, irradiance) turns the compact state (state.py) into the tracker data. Run as a script, it builds the
-state from whatever raw files are in data/raw (daily files and API CSVs) and writes site/static/data/tracker.json;
-the scheduled job (update.py) calls build() directly instead.
+build(state, irradiance, capacity) turns the compact state (state.py) into the tracker data. Run as a script, it
+builds the state from whatever raw files are in data/raw (daily files and API CSVs) and writes
+site/static/data/tracker.json; the scheduled job (update.py) calls build() directly instead.
 """
 import glob
 import json
@@ -12,15 +12,13 @@ import sys
 import numpy as np
 import pandas as pd
 
-from common import OUT, RAW_API, RAW_DAILY, REF, connection_islands, island_of, overrides
+from common import FACILITIES, OUT, RAW_API, RAW_DAILY, REF, connection_islands, island_of, overrides
+import hvdc
+import rooftop
 import state as st
 
 WINDOW = 7 * 288
 KEYS = ['coal', 'gas', 'diesel', 'geo', 'hydro', 'wind', 'solar', 'batt']
-# rooftop solar model: Open-Meteo GHI for seven weighted cities (order matches sync.CITIES), installed MW, performance ratio
-ROOF_W = [('NI', .22), ('NI', .14), ('NI', .16), ('NI', .16), ('SI', .18), ('SI', .09), ('SI', .05)]
-ROOF_CAP = {'NI': 680, 'SI': 320}
-ROOF_PR = 0.78
 
 
 def register():
@@ -49,34 +47,33 @@ def enc(s, dp=0):
     return [round(float(v), dp) if dp else int(round(float(v))) for v in s]
 
 
-def rooftop(irr, full):
-    out = {}
-    idx = pd.DatetimeIndex(pd.to_datetime(irr[0]['minutely_15']['time'])).tz_localize('Pacific/Auckland', ambiguous='NaT', nonexistent='NaT')
-    for isl in ['NI', 'SI']:
-        acc, wsum = pd.Series(0.0, index=idx), 0
-        for (i2, w), loc in zip(ROOF_W, irr):
-            if i2 == isl:
-                acc += pd.Series(loc['minutely_15']['shortwave_radiation'], index=idx, dtype=float).fillna(0) * w
-                wsum += w
-        acc = acc[acc.index.notna()].tz_convert('UTC')
-        ghi = (acc / wsum).reindex(acc.index.union(full)).interpolate(limit_area='inside').reindex(full)
-        out[isl] = (ROOF_CAP[isl] * ghi / 1000 * ROOF_PR).fillna(0)
-    return out
+def default_capacity():
+    """Rooftop solar capacity by point when the store has none yet (facilities/rooftop_capacity.json, a snapshot;
+    the history job keeps the current table in the store as hist/roof_cap.json)."""
+    with open(os.path.join(FACILITIES, 'rooftop_capacity.json')) as f:
+        return json.load(f)
 
 
-def build(state, irr, log=print):
+def build(state, irr, cap=None, log=print):
+    """irr: (satellite, forecast fallback) irradiance DataFrames (rooftop.irr_loads); cap: rooftop capacity by point."""
     real = state[state.src != 'empty']
     last = real.index.max()
     full = pd.date_range(last - pd.Timedelta(minutes=5 * (WINDOW - 1)), last, freq='5min')
     s = real[real.index >= full[0]].reindex(full)  # missing intervals become NaN rows, interpolated below
-    js = assemble(s, full, rooftop(irr, full), log)
+    sat, fc = irr
+    roof, n_now = rooftop.live(sat, fc, full, cap or default_capacity())
+    js = assemble(s, full, roof, log)
     src = s.src.dropna()
     api_t = src[src == 'api'].index
     t0 = js['t0']
+    sat_end = sat.dropna(how='all').index.max() if sat is not None and not sat.empty else None
     js['meta'] = {'intervals': int(s.src.notna().sum()), 'expected': len(full), 'end': t0 + (len(full) - 1) * 300000,
                   'api_from': int(api_t.min().timestamp() * 1000) if len(api_t) else None,
+                  'sat_end': int(sat_end.timestamp() * 1000) if sat_end is not None else None,
                   'built': int(pd.Timestamp.now(tz='UTC').timestamp() * 1000)}
-    log(f'built {len(full)} intervals ({int(s.src.notna().sum())} with data) to {last}, {len(js["plants"])} plants')
+    log(f'built {len(full)} intervals ({int(s.src.notna().sum())} with data) to {last}, {len(js["plants"])} plants; '
+        f'rooftop solar now {roof["NI"].iloc[-1] + roof["SI"].iloc[-1]:.0f} MW'
+        + (f' (satellite to {sat_end}, {n_now} intervals carried forward)' if sat_end is not None else ' (no satellite data)'))
     return js
 
 
@@ -133,15 +130,27 @@ def assemble(s, full, roof, log=print):
         S['tiwai'] = fill(s['T']) if isl == 'SI' and 'T' in s else pd.Series(0.0, index=full)
         S['price'] = fill(s.get(f'P|{isl}', pd.Series(np.nan, index=full)))
         out[isl] = S
-    # HVDC transfer, estimated from the island balance (not in the dispatch feed)
+    # HVDC transfer: metered where the state has it (history, once EMI publishes HVDC_Flows), otherwise estimated
+    # from the island balances (the dispatch feed has no HVDC row). NI gets what arrives at Haywards, the SI gives
+    # what leaves Benmore; the headline figure is the mid-link transfer.
     genNI = sum(out['NI'][k] for k in KEYS)
     genSI = sum(out['SI'][k] for k in KEYS)
-    hv = ((genSI - out['SI']['metered']) + (out['NI']['metered'] - genNI)) / 2
+    hv = hvdc.estimate(genNI, genSI, out['NI']['metered'], out['SI']['metered'])
+    ben, hay = hvdc.ends(hv)
+    if 'H|BEN' in s and 'H|HAY' in s:
+        ok = s['H|BEN'].notna() & s['H|HAY'].notna()
+        ben = ben.where(~ok, s['H|BEN'])
+        hay = hay.where(~ok, s['H|HAY'])
+        hv = hv.where(~ok, (s['H|BEN'] + s['H|HAY']) / 2)
     for isl in ['NI', 'SI']:
-        out[isl]['roof'] = roof[isl]
-        out[isl]['underlying'] = out[isl]['metered'] + roof[isl]
-    out['NI']['hvdc'] = hv
-    out['SI']['hvdc'] = -hv
+        # short gaps in irradiance are bridged; anything else without irradiance shows as zero, never extrapolated
+        r = roof[isl].interpolate(limit_area='inside', limit=6).fillna(0).clip(lower=0)
+        out[isl]['roof'] = r
+        out[isl]['underlying'] = out[isl]['metered'] + r
+        if isl + 'u' in roof:
+            out[isl]['roofU'] = roof[isl + 'u'].interpolate(limit_area='inside', limit=6).fillna(0).clip(lower=0)
+    out['NI']['hvdc'] = hay
+    out['SI']['hvdc'] = -ben
 
     t0 = int(full[0].timestamp() * 1000)
     js = {'t0': t0, 'step': int(full.freq.nanos // 1_000_000), 'N': len(full), 'hvdcN': enc(hv)}
@@ -187,7 +196,8 @@ def write_json(js, path):
 
 if __name__ == '__main__':
     log = (lambda *a: None) if '--quiet' in sys.argv else print
-    js = build(state_from_raw(), json.load(open(os.path.join(REF, 'irradiance.json'))), log)
+    sat, fc, _ = rooftop.irr_loads(open(os.path.join(REF, 'irradiance.json'), 'rb').read())
+    js = build(state_from_raw(), (sat, fc), None, log)
     path = os.path.join(OUT, 'tracker.json')
     write_json(js, path)
     log('wrote', path, f'({os.path.getsize(path) // 1024} KB)')
