@@ -1,11 +1,16 @@
-// Cloudflare Workers config: serve the static site built by SvelteKit (site/build).
-// Build command in Cloudflare: cd site && npm ci && npm run build   Deploy command: npx wrangler deploy
+// Cloudflare Workers config. Build command in Cloudflare: cd site && npm ci && npm run build
+// Deploy command: npx wrangler deploy. Every push to main redeploys the site.
 {
   "name": "elenz",
+  "main": "worker/index.js",
   "compatibility_date": "2026-09-01",
   "workers_dev": true,
   "preview_urls": false,
   "assets": {
-    "directory": "./site/build"
+    "directory": "./site/build",
+    "binding": "ASSETS",
+    "run_worker_first": ["/data/*"]
   }
+  // The KV namespace the data job writes to is added here once it exists:
+  // "kv_namespaces": [{ "binding": "DATA", "id": "<namespace id>" }]
 }

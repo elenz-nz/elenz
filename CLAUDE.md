@@ -11,9 +11,17 @@ This repository is public: never commit keys, tokens or personal details.
   `npx wrangler deploy`). Every push to `main` redeploys. The tracker page markup is in
   `src/routes/+page.svelte`; the canvas chart code is `src/lib/tracker/tracker.js` (vanilla JS, driven by
   element ids in the page), styles in `src/lib/tracker/tracker.css` (colour tokens, light/dark).
-- `ingest/`: Python. `emi_live.py` (API client: latest / range / watch), `sync.py` (EMI blob container +
-  Open-Meteo), `build_tracker.py` (builds `site/static/data/tracker.json`), `common.py` (paths, overrides).
-- `facilities/overrides.toml`: curated corrections; `facilities/connection_points.csv`: POC → island.
+- `ingest/`: Python. `update.py` (the scheduled job), `state.py` (compact 7-day state: one row per interval,
+  columns `U|POC UNIT`, `C|...` charging, `L|NI`, `L|SI`, `T`, `P|NI`, `P|SI`, `src`), `build_tracker.py`
+  (state → tracker.json), `emi_live.py` (API client), `store.py` (Workers KV via the Cloudflare REST API, or
+  `data/store` locally), `sync.py` (EMI blob container + Open-Meteo), `common.py` (paths, overrides).
+- `.github/workflows/update-data.yml`: runs `update.py` every 5 minutes on GitHub (free because the repo is public).
+  Secrets: `EMI_KEY`, `CF_ACCOUNT_ID`, `CF_API_TOKEN` (Workers KV Storage: Edit). KV namespace id lives in
+  `wrangler.jsonc`. GitHub disables schedules in public repos after 60 days without commits.
+- `worker/index.js`: serves static assets, and `/data/tracker.json` from KV (binding `DATA`), falling back to the
+  bundled snapshot. KV free plan: 1,000 writes/day (the job uses ~600), 100,000 reads/day.
+- `facilities/overrides.toml`: curated corrections; `facilities/connection_points.csv`: POC → island;
+  `facilities/plant_register.csv`: the EA register (refresh with `sync.py plants`, review the diff).
 - `data/`: raw downloads, git-ignored.
 
 ## Facts learned from the data (Oct 2026)
@@ -43,8 +51,8 @@ This repository is public: never commit keys, tokens or personal details.
 ## Status and next steps
 
 1. Site on Cloudflare Workers (free `*.workers.dev` address; domain elenz.nz to be bought later).
-2. Move the poller onto an always-on Ubuntu server: `emi_live.py watch --build`, publish `tracker.json` to
-   Cloudflare R2, and point the site at it instead of the committed snapshot.
+2. Live data via GitHub Actions + Workers KV (set up Oct 2026). A paid server running `update.py` in a loop is the
+   upgrade path if GitHub's schedule delays become a problem.
 3. Then the brief's build order: history and plant pages, map, hydro panel and records, offer stacks and downloads.
 
 Open questions: emission factors (and how to treat the Rankines), rooftop solar capacity from GUEHMT, written

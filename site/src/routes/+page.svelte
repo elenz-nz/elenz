@@ -48,13 +48,16 @@
 			else tracker = mountTracker(D);
 		}
 		load().catch((e) => (error = `The data couldn't be loaded. ${e.message} Try reloading the page.`));
-		// new 5-minute data arrives about a minute after each interval; check every minute
-		const poll = setInterval(() => {
+		// new data lands every 5–15 minutes; check every 2 minutes while the page is on screen, and on return
+		const check = () => {
 			now = Date.now();
-			load().catch(() => {});
-		}, 60_000);
+			if (document.visibilityState === 'visible') load().catch(() => {});
+		};
+		const poll = setInterval(check, 120_000);
+		document.addEventListener('visibilitychange', check);
 		return () => {
 			clearInterval(poll);
+			document.removeEventListener('visibilitychange', check);
 			tracker?.destroy();
 		};
 	});

@@ -1,7 +1,7 @@
 """Download reference and backfill files from the EMI public data container (no key needed).
 
 Usage (from the repo root):
-  python3 ingest/sync.py plants                       # latest DispatchedGenerationPlant.csv
+  python3 ingest/sync.py plants                       # latest DispatchedGenerationPlant.csv -> facilities/plant_register.csv
   python3 ingest/sync.py daily 2026-10-06 2026-10-12  # NodalPricesAndVolumes daily files for a date range
   python3 ingest/sync.py irradiance                   # Open-Meteo 15-minute irradiance, last 9 days (rooftop solar model)
   python3 ingest/sync.py all                          # plants + irradiance + the last 7 days of daily files that exist
@@ -13,7 +13,7 @@ from datetime import date, timedelta
 from urllib.error import HTTPError
 from urllib.request import urlopen, urlretrieve
 
-from common import BLOB, RAW_DAILY, REF
+from common import BLOB, FACILITIES, RAW_DAILY, REF
 
 DISPATCH = 'Datasets/Wholesale/DispatchAndPricing/NodalPricesAndVolumes'
 FLEET = 'Datasets/Wholesale/Generation/GenerationFleet/Existing'
@@ -28,8 +28,8 @@ def list_blobs(prefix):
 
 def plants():
     name = sorted(n for n in list_blobs(FLEET + '/') if n.endswith('_DispatchedGenerationPlant.csv'))[-1]
-    urlretrieve(f'{BLOB}/{name}', os.path.join(REF, 'DispatchedGenerationPlant.csv'))
-    print('plant register:', os.path.basename(name))
+    urlretrieve(f'{BLOB}/{name}', os.path.join(FACILITIES, 'plant_register.csv'))
+    print('plant register:', os.path.basename(name), '-> facilities/plant_register.csv (review the diff, then commit)')
 
 
 def daily(start, end):

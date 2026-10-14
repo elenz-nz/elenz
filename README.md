@@ -47,6 +47,15 @@ The live API needs a free key from [emi.developer.azure-api.net](https://emi.dev
 "Wholesale market prices"). Put it in a file called `.emi_key` in this folder, or set the `EMI_KEY` environment
 variable. `.emi_key` is git-ignored; never commit the key.
 
+## How the live data updates
+
+`.github/workflows/update-data.yml` runs `ingest/update.py` on GitHub every 5 minutes. It fetches new intervals from
+the EMI API, keeps a compact 7-day store (`state.csv.gz`) and rebuilds `tracker.json`, saving both to Cloudflare
+Workers KV. The site's Worker (`worker/index.js`) serves `/data/tracker.json` from KV, so code changes and data
+updates never overwrite each other. It needs three repository secrets: `EMI_KEY`, `CF_ACCOUNT_ID`, `CF_API_TOKEN`.
+
+Run the same job on your own computer with `python3 ingest/update.py` (it uses `data/store/` instead of KV).
+
 ## When the build warns about a unit
 
 New plant appears in the dispatch feed months before the EA's plant register catches up. If
