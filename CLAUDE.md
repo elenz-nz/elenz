@@ -20,7 +20,9 @@ This repository is public: never commit keys, tokens or personal details.
   via the Cloudflare REST API, or `data/store` locally), `sync.py` (EMI blob container + Open-Meteo), `common.py`
   (paths, overrides). `history.py`: history since 10 Sep 2020 from the daily dispatch files (see its docstring for
   the KV keys `hist/*`); bump its `BUILD` number to rebuild every month after changing how months are built.
-  `rooftop.py` (rooftop solar: registry capacity by Root NSP less dispatched farms, 35 irradiance points, Himawari
+  `rooftop.py` (embedded solar, shown on the site as "Embedded solar", data key `roof`: rooftops and ground-mounted
+  arrays up to ~10 MW on local networks; registry capacity by Root NSP less dispatched farms, three types (small,
+  large, ground), 35 irradiance points, Himawari
   satellite irradiance via Open-Meteo, PV model `pv.py`, calibration and uncertainty) and `hvdc.py` (metered HVDC
   parsing and the fitted estimate). `analysis/` holds the development scripts and `analysis/README.md` the evidence
   behind every constant in them.

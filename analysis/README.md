@@ -1,4 +1,7 @@
-# Analysis behind the rooftop solar and HVDC estimates
+# Analysis behind the embedded solar and HVDC estimates
+
+"Embedded solar" on the site (data key `roof`): solar on local networks that isn't dispatched, rooftops and
+ground-mounted arrays up to ~10 MW. Earlier notes below say "rooftop" for the same thing.
 
 Development scripts, not run by the jobs. Results as of 15 Oct 2026; rerun them when the inputs change a lot.
 
@@ -71,6 +74,26 @@ capacity, ~1,264 kWh per kW of panels, before calibration.
   90th percentile ~20%.
 - Uncertainty shown on the site (one standard deviation): capacity 4%, calibration 6%, model 5% when clear rising
   to 18% under cloud, plus 12% for carried-forward intervals: about ±9% clear, ±19% cloudy.
+
+## Ground-mounted embedded arrays (`ground_cal.py`, `gxp_fit.py`, 15 Oct 2026)
+
+- At Blenheim (BLN0331) and Southbrook (SBK0661) most September 2026 solar exports come from one or two trader
+  series with flat-topped clear-day output: ~22 MW at Blenheim (MERX, ETRN; 3.5 GWh) and ~11 MW at Southbrook (MERX,
+  MEEN; 1.9 GWh), 10 am to 3-4 pm. Ground-mounted arrays, not rooftops. Modelled as rooftops they came out ~20%
+  low at both places.
+- Their metered output fits fixed north-facing panels at 15-25° with DC/AC 1.3-1.4 (the flat tops are inverter
+  clipping), 8% losses, metered/model energy 1.02-1.05: the 'ground' type in `ingest/rooftop.py` (20°, 1.35, 8%,
+  open rack, no calibration factor).
+- Which registry capacity is ground-mounted: growth in systems over 10 kW in months when an NSP's new systems
+  averaged 1 MW or more (`GROUND_KW`): ~101 MW nationally in Sep 2026 (131 MW at 500 kW; 70 MW at 2 MW). Largest at
+  Paeroa (18 MW), Blenheim, Southbrook, Huntly (the Taiohi extension), Takanini. At Blenheim and Southbrook the
+  model then gives 5.39 and 3.38 GWh for September, against 5.5 and 3.4 GWh from metered arrays plus modelled
+  rooftops; national September generation 95 → 102 GWh.
+- Grid exit point load (`gxp_fit.py`): regressing metered net offtake (EMI `Grid_export` − `Grid_import`) on the
+  model brackets it rather than pinning it down: in levels (time-of-day, weekend and overnight-load controls) the
+  ratio is 1.12 (Blenheim) and 1.21 (Southbrook) over Oct 2025 – Sep 2026, higher in winter when cloudy days also
+  bring heating load; in half-hour changes it is 0.64-0.71, pulled towards zero because area-average satellite
+  irradiance doesn't place every cloud. Neither GXP sees reverse flow (Ashburton does).
 
 ## HVDC (`hvdc_build.py`, `hvdc_fit.py`)
 

@@ -31,12 +31,12 @@ export const KEY = {
   year: t => new Date(local(t)).getUTCFullYear(),
 };
 
-// roofU: uncertainty of the rooftop solar estimate (one standard deviation, MW); zero in data built before it existed
+// roof: embedded solar (rooftops and small ground-mounted arrays, estimated); roofU: its uncertainty (one standard deviation, MW); zero in data built before it existed
 const SERIES = ['geo', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'roofU', 'batt', 'hvdc', 'metered', 'underlying', 'tiwai', 'price'];
 const F = (a, n) => (a ? Float64Array.from(a) : new Float64Array(n));
 const plantKey = p => `${p.name}|${p.fuel}|${p.isl}`;
 
-// total generation per point, including rooftop solar (output only: no HVDC, no battery charging), as the page sums it
+// total generation per point, including embedded solar (output only: no HVDC, no battery charging), as the page sums it
 const GEN = ['geo', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt'];
 export function genTotal(S, region) {
   const n = S.t.length, o = new Float64Array(n);

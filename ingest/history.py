@@ -152,10 +152,10 @@ def solar_capacity(store):
 
 
 def cap_total(cap, month):
-    """Installed rooftop solar at the end of a month (MW, one decimal): a change means the month needs rebuilding."""
+    """Installed embedded solar at the end of a month (MW, one decimal): a change means the month needs rebuilding."""
     end = pd.Timestamp(month + '-01', tz='UTC') + pd.offsets.MonthEnd(0)
     c = rooftop.capacity_at(cap, [end])
-    return round(float(c['small'].values.sum() + c['large'].values.sum()), 1)
+    return round(float(sum(df.values.sum() for df in c.values())), 1)
 
 
 def add_hvdc(s, m):

@@ -47,15 +47,15 @@
 			if (view.histEnd == null) return '';
 			const step = view.kind === 'day' ? 'Daily averages of half-hourly' : 'Half-hourly';
 			if (view.past)
-				return `${step} dispatch data from ${dayYear(view.histFirst!)} to ${dayYear(view.histEnd)}, from the Electricity Authority's daily EMI files. Prices are final prices where published, otherwise dispatch prices. Rooftop solar is estimated from the EA's record of installed solar and satellite irradiance (the band on the demand chart shows its uncertainty). HVDC transfer is metered where published, otherwise estimated from the balance between the islands.${view.kind === 'day' ? ' Peak demand is the highest half-hour.' : ''}`;
-			return `${step} dispatch data from ${dayYear(view.histFirst!)} to ${dayYear(view.histEnd)} from the Electricity Authority's daily EMI files (published 1–4 days late), then the live real-time dispatch feed to ${when(view.liveEnd)}. Prices are final prices, except for the live week and any days not yet priced, which show dispatch prices. Rooftop solar is estimated from the EA's record of installed solar and satellite irradiance (the band on the demand chart shows its uncertainty). HVDC transfer is metered where published, otherwise estimated from the balance between the islands.${view.kind === 'day' ? ' Peak demand is the highest half-hour.' : ''}`;
+				return `${step} dispatch data from ${dayYear(view.histFirst!)} to ${dayYear(view.histEnd)}, from the Electricity Authority's daily EMI files. Prices are final prices where published, otherwise dispatch prices. Embedded solar (rooftops and small ground-mounted arrays on local networks) is estimated from the EA's record of installed solar and satellite irradiance (the band on the demand chart shows its uncertainty). HVDC transfer is metered where published, otherwise estimated from the balance between the islands.${view.kind === 'day' ? ' Peak demand is the highest half-hour.' : ''}`;
+			return `${step} dispatch data from ${dayYear(view.histFirst!)} to ${dayYear(view.histEnd)} from the Electricity Authority's daily EMI files (published 1–4 days late), then the live real-time dispatch feed to ${when(view.liveEnd)}. Prices are final prices, except for the live week and any days not yet priced, which show dispatch prices. Embedded solar (rooftops and small ground-mounted arrays on local networks) is estimated from the EA's record of installed solar and satellite irradiance (the band on the demand chart shows its uncertainty). HVDC transfer is metered where published, otherwise estimated from the balance between the islands.${view.kind === 'day' ? ' Peak demand is the highest half-hour.' : ''}`;
 		}
 		const mixed = meta.api_from !== null && meta.api_from > meta.end - 7 * 864e5 + 3e5;
 		const source = mixed
 			? `: the Electricity Authority's daily EMI files up to ${dayOnly(meta.api_from! - 864e5)}, then the live real-time dispatch feed.`
 			: " from the Electricity Authority's real-time dispatch feed.";
 		const gaps = missing > 0 ? ` ${missing}% of 5-minute intervals have no dispatch case and are filled by interpolation.` : '';
-		return `Dispatch data for the seven days to ${when(meta.end)}${source} Rooftop solar is estimated from installed capacity and satellite irradiance (the band on the demand chart shows its uncertainty), and HVDC transfer from the balance between the islands, fitted to metered flows.${gaps}`;
+		return `Dispatch data for the seven days to ${when(meta.end)}${source} Embedded solar (rooftops and small ground-mounted arrays on local networks) is estimated from installed capacity and satellite irradiance (the band on the demand chart shows its uncertainty), and HVDC transfer from the balance between the islands, fitted to metered flows.${gaps}`;
 	});
 
 	const status = $derived(error || (view?.loading ? 'Loading history…' : view?.error) || (meta ? '' : 'Loading the latest data…'));
@@ -219,7 +219,7 @@
 					<h2>Demand</h2><span class="unit">MW</span>
 					<div class="legends">
 						<span class="lg"><i style="--c:var(--ink)"></i>Metered <b id="v-met"></b></span>
-						<span class="lg"><i class="dash" style="--c:var(--ink-2)"></i>With rooftop solar <b id="v-und"></b></span>
+						<span class="lg"><i class="dash" style="--c:var(--ink-2)"></i>With embedded solar <b id="v-und"></b></span>
 						<span class="lg" id="lg-xt"><i style="--c:var(--accent)"></i>Without Tiwai <b id="v-xt"></b></span>
 					</div>
 				</div>

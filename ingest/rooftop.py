@@ -1,13 +1,15 @@
-"""Rooftop (distributed) solar: installed capacity and modelled output.
+"""Embedded solar (on local networks and not dispatched: rooftops plus ground-mounted arrays): installed capacity and
+modelled output. Shown on the site as "Embedded solar" (data key 'roof').
 
-Capacity: the EA's installed distributed solar (EMI report GUEHMT) by Root NSP, for systems of 10 kW or less and
-over 10 kW, less the dispatched solar farms the registry also counts (facilities/overrides.toml
-[solar_farms_in_registry]): the tracker already shows those as grid solar. Each NSP belongs to one of ~22 irradiance
-points (facilities/rooftop_points.csv, rooftop_nsp.csv), clusters weighted by installed capacity.
+Capacity: the EA's installed distributed solar (EMI report GUEHMT) by Root NSP, in three types: systems of 10 kW or
+less ('small', mostly homes); over 10 kW ('large', businesses, farm sheds); and 'ground', the growth in systems over
+10 kW in months when that NSP's new systems averaged GROUND_KW or more (ground-mounted arrays of a megawatt or more).
+Less the dispatched solar farms the registry also counts (facilities/overrides.toml [solar_farms_in_registry]): the
+tracker already shows those as grid solar. Each NSP belongs to one of 35 irradiance points (facilities/
+rooftop_points.csv, rooftop_nsp.csv), one per network reporting region.
 
-Output: Himawari satellite irradiance for each point (Open-Meteo Satellite Radiation API, 10-minute, ~1 hour behind
-real time, archive back to 2016), through a PV model (pv.py) with a mix of roof orientations and tilts, cell
-temperature, inverter clipping and losses, then a calibration factor from the analysis in analysis/.
+Output: Himawari satellite irradiance for each point (Open-Meteo Satellite Radiation API, 10-minute, ~45 minutes
+behind real time, archive back to 2016), through a PV model (pv.py) for each type, then calibration (analysis/).
 """
 import csv
 import io
@@ -27,19 +29,25 @@ GUEHMT_NSP = ('https://www.emi.ea.govt.nz/Retail/Download/DataReport/CSV/GUEHMT?
 SATELLITE = 'https://satellite-api.open-meteo.com/v1/archive'
 FORECAST = 'https://api.open-meteo.com/v1/forecast'
 
-# Roof orientations: (tilt°, azimuth° clockwise from north, share). Small: systems of 10 kW or less (mostly homes,
-# pitched roofs facing north-ish); large: over 10 kW (businesses, farm sheds, schools: flatter roofs, more east-west).
-# Assumptions, not measured: see the About page and analysis/README.md.
+# Orientations: (tilt°, azimuth° clockwise from north, share). Small: pitched home roofs facing north-ish; large:
+# flatter business and farm roofs, more east-west (assumptions, not measured). Ground: fixed north-facing arrays,
+# fitted to the metered output of ground-mounted arrays at Blenheim and Southbrook (analysis/README.md).
 ORIENT = {
     'small': [(20, 0, .40), (20, 45, .15), (20, 315, .15), (20, 90, .10), (20, 270, .10), (10, 0, .10)],
     'large': [(10, 0, .35), (10, 90, .20), (10, 270, .20), (25, 0, .25)],
+    'ground': [(20, 0, 1.0)],
 }
-DC_AC = 1.2          # panel (DC) to inverter (AC) ratio; the registry records the lesser of the two, about the AC rating
-LOSSES = 0.115       # soiling 2%, shading 3%, wiring and mismatch 3%, ageing 2.5%, downtime 1.5% (combined)
+CLASSES = tuple(ORIENT)
+GROUND_KW = 1000     # a month's new systems over 10 kW averaging this or more at an NSP count as ground-mounted
+# panel (DC) to inverter (AC) ratio; the registry records the lesser of the two, about the AC rating
+DC_AC = {'small': 1.2, 'large': 1.2, 'ground': 1.35}
+# rooftops: soiling 2%, shading 3%, wiring and mismatch 3%, ageing 2.5%, downtime 1.5%; ground arrays: no shading, newer
+LOSSES = {'small': 0.115, 'large': 0.115, 'ground': 0.08}
+MOUNT = {'small': 'roof', 'large': 'roof', 'ground': 'rack'}   # cell temperature: close roof mount or open rack
 # Calibration (analysis/README.md, Oct 2026): established dispatched farms produce 88-98% of what this chain
 # predicts from satellite irradiance, and satellite sunshine totals run up to ~5% above NIWA's long-term figures in
-# places, so the model is scaled by 0.95 (about ±6%).
-CAL = 0.95
+# places, so rooftops are scaled by 0.95 (about ±6%). Ground arrays are fitted directly to metered output.
+CAL = {'small': 0.95, 'large': 0.95, 'ground': 1.0}
 UNCERTAINTY = {'capacity': 0.04, 'calibration': 0.06, 'clear': 0.05, 'cloudy': 0.18, 'nowcast': 0.12}   # one std dev
 EXTRAPOLATE_DAYS = 120    # carry the recent growth beyond the latest report for at most this long
 
@@ -98,7 +106,7 @@ def solar_units():
 
 def capacity_table(raw_small, raw_large, log=print, warn_from=None):
     """Monthly installed distributed solar by Root NSP, less dispatched farms: {'months', 'nsps', 'small', 'large',
-    'farms'}. Logs a warning for any unexplained step of 5 MW or more at an NSP with a dispatched solar unit."""
+    'ground', 'farms'}. Logs a warning for any unexplained step of 5 MW or more at an NSP with a dispatched solar unit."""
     small, large = parse_guehmt(raw_small), parse_guehmt(raw_large)
     months = sorted(set(small.index) | set(large.index))
     nsps = sorted(set(small.columns) | set(large.columns))
@@ -126,31 +134,37 @@ def capacity_table(raw_small, raw_large, log=print, warn_from=None):
             for m, v in big.items():
                 log(f'WARNING distributed solar at {nsp} rose {v:.1f} MW (>10 kW) in {m}, and {units[nsp[:7]]} dispatches '
                     f'there: if that is the farm entering the registry, add it to [solar_farms_in_registry] in overrides.toml')
+    # ground-mounted: growth in months whose new systems averaged GROUND_KW or more, never more than is installed
+    ground = step.fillna(0).where((new_kw >= GROUND_KW) & (step > 0), 0.0).cumsum()
+    ground = np.minimum(ground, net)
+    rest = net - ground
     total = (small + net).sum(axis=1)
-    log(f'rooftop solar capacity: {total.iloc[-1]:.0f} MW at the end of {months[-1]} '
-        f'({small.iloc[-1].sum():.0f} MW of 10 kW or less), after removing {removed.iloc[-1].sum():.0f} MW of dispatched farms')
-    return {'months': months, 'nsps': nsps, 'small': {n: [round(float(x), 3) for x in small[n]] for n in nsps},
-            'large': {n: [round(float(x), 3) for x in net[n]] for n in nsps},
+    log(f'embedded solar capacity: {total.iloc[-1]:.0f} MW at the end of {months[-1]} ({small.iloc[-1].sum():.0f} MW of '
+        f'10 kW or less, {ground.iloc[-1].sum():.0f} MW ground-mounted), after removing {removed.iloc[-1].sum():.0f} MW of dispatched farms')
+    r3 = lambda df: {n: [round(float(x), 3) for x in df[n]] for n in nsps}
+    return {'months': months, 'nsps': nsps, 'small': r3(small), 'large': r3(rest), 'ground': r3(ground),
             'farms': round(float(removed.iloc[-1].sum()), 1)}
 
 
 def by_point(table):
-    """Capacity table by NSP -> by irradiance point: {'months', 'small': {point: [MW]}, 'large': {...}}."""
+    """Capacity table by NSP -> by irradiance point: {'months', 'small': {point: [MW]}, 'large': {...}, 'ground': ...}."""
     pts, nsp_pt = points()
-    out = {'months': table['months'], 'small': {p[0]: np.zeros(len(table['months'])) for p in pts},
-           'large': {p[0]: np.zeros(len(table['months'])) for p in pts}}
+    classes = [c for c in CLASSES if c in table]
+    out = {'months': table['months']}
+    for cls in classes:
+        out[cls] = {p[0]: np.zeros(len(table['months'])) for p in pts}
     for n in table['nsps']:
         p = point_of(n, nsp_pt, pts)
-        for cls in ('small', 'large'):
+        for cls in classes:
             out[cls][p] += np.array(table[cls][n])
-    for cls in ('small', 'large'):
+    for cls in classes:
         out[cls] = {p: [round(float(x), 2) for x in v] for p, v in out[cls].items()}
     out['farms'] = table.get('farms')
     return out
 
 
 def capacity_at(cap, times):
-    """MW installed at each time, by class and point: {'small': DataFrame (times x points), 'large': ...}.
+    """MW installed at each time, by class and point: {'small': DataFrame (times x points), 'large': ..., 'ground': ...}.
     Each month's figure is taken at the month's end and interpolated by day between them; after the latest month the
     last six months' average growth carries on for up to EXTRAPOLATE_DAYS, then holds."""
     times = pd.DatetimeIndex(times)
@@ -160,7 +174,7 @@ def capacity_at(cap, times):
     x = np.asarray((ends - epoch) / pd.Timedelta(days=1), float)
     xt = np.asarray((times.tz_convert('UTC') - epoch) / pd.Timedelta(days=1), float)
     out = {}
-    for cls in ('small', 'large'):
+    for cls in [c for c in CLASSES if c in cap]:   # older stored tables have no 'ground'
         cols = {}
         for p, v in cap[cls].items():
             v = np.asarray(v, float)
@@ -285,10 +299,10 @@ def t_air(times, lat):
 
 def yields(irr, times):
     """Output per MW installed (0-1) by class and point at `times` (interval midpoints, UTC), from the irradiance
-    columns G|<point>, D|<point>: {'small': DataFrame, 'large': DataFrame, 'kt': DataFrame (clear-sky index)}."""
+    columns G|<point>, D|<point>: {'small', 'large', 'ground': DataFrames, 'kt': DataFrame (clear-sky index)}."""
     pts, _ = points()
     times = pd.DatetimeIndex(times)
-    out = {'small': {}, 'large': {}, 'kt': {}}
+    out = {**{c: {} for c in CLASSES}, 'kt': {}}
     for pid, isl, lat, lon in pts:
         zen, az, dex = pv.sun(times, lat, lon)
         ghi = irr[f'G|{pid}'].values if f'G|{pid}' in irr else np.full(len(times), np.nan)
@@ -299,15 +313,16 @@ def yields(irr, times):
             y = np.zeros(len(times))
             for tilt, saz, w in mix:
                 eff, tot = pv.poa(ghi, dhi, zen, az, dex, tilt, saz)
-                y += w * pv.ac_output(eff, pv.cell_temp(tot, ta), DC_AC, LOSSES)
-            out[cls][pid] = np.where(missing, np.nan, y * CAL)
+                tc = pv.cell_temp(tot, ta) if MOUNT[cls] == 'roof' else pv.cell_temp(tot, ta, a=-3.56, b=-0.075, dt=3)
+                y += w * pv.ac_output(eff, tc, DC_AC[cls], LOSSES[cls])
+            out[cls][pid] = np.where(missing, np.nan, y * CAL[cls])
         cs = pv.clearsky_ghi(zen)
         out['kt'][pid] = np.where(cs > 50, np.nan_to_num(ghi) / np.maximum(cs, 1), np.nan)
     return {k: pd.DataFrame(v, index=times) for k, v in out.items()}
 
 
 def output(irr, times, cap):
-    """Rooftop solar MW by island at `times` (interval midpoints, UTC), plus its uncertainty (one standard
+    """Embedded solar MW by island at `times` (interval midpoints, UTC), plus its uncertainty (one standard
     deviation, MW): {'NI': Series, 'SI': Series, 'NIu': Series, 'SIu': Series}."""
     pts, _ = points()
     y = yields(irr, times)
@@ -315,7 +330,7 @@ def output(irr, times, cap):
     res = {}
     for isl in ('NI', 'SI'):
         ids = [p[0] for p in pts if p[1] == isl]
-        mw = sum(y[cls][ids].fillna(np.nan).values * c[cls][ids].values for cls in ('small', 'large'))
+        mw = sum(y[cls][ids].values * c[cls][ids].values for cls in c)
         total = pd.Series(np.nansum(mw, axis=1), index=times)
         total[np.isnan(mw).all(axis=1)] = np.nan
         # uncertainty: capacity (registry) plus the model, larger under cloud (clear-sky index below ~0.6)

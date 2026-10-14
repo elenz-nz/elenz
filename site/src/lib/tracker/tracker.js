@@ -47,7 +47,7 @@ export function mountTracker(D, hooks = {}) {
     { k: 'hydro', name: 'Hydro', tok: '--f-hydro', ren: 1 },
     { k: 'wind', name: 'Wind', tok: '--f-wind', ren: 1 },
     { k: 'solar', name: 'Solar, grid', tok: '--f-solar', ren: 1 },
-    { k: 'roof', name: 'Rooftop solar', tok: '--f-solar', hatch: 1, ren: 1, tag: 'est.' },
+    { k: 'roof', name: 'Embedded solar', tok: '--f-solar', hatch: 1, ren: 1, tag: 'est.' },
     { k: 'batt', name: 'Battery', tok: '--f-batt', signed: 1 },
     { k: 'hvdc', name: 'HVDC', tok: '--f-hvdc', hatch: 1, signed: 1 },
   ];
@@ -76,10 +76,10 @@ export function mountTracker(D, hooks = {}) {
   const SIGNED = FUELS.filter(f => f.signed).map(f => f.k);
   // what each grouping shows, in a note under the generation chart
   const NOTES = {
-    simple: 'Simplified groups the fuels into five: geothermal; thermal (Huntly\'s coal/gas Rankine units, gas and diesel); hydro; wind; and solar, grid-scale and estimated rooftop together.',
+    simple: 'Simplified groups the fuels into five: geothermal; thermal (Huntly\'s coal/gas Rankine units, gas and diesel); hydro; wind; and solar, grid-scale and estimated embedded solar together.',
     flex: 'Groups generation by how readily it can follow demand. Inflexible: geothermal, which runs flat out around the clock. Slow flexible: Huntly\'s coal/gas Rankine units, which take hours to start and ramp slowly. Fast flexible: hydro, gas and diesel, which can change output quickly. Variable: wind and solar, which follow the weather. Grouping is by fuel, so gas cogeneration counts as fast flexible.',
-    rf: 'Renewables are geothermal, hydro, wind and solar (grid-scale and estimated rooftop). Fossils are Huntly\'s coal/gas Rankine units, gas and diesel. Geothermal counts as renewable, although it emits some CO₂ (0.07 t/MWh on this site).',
-    vre: 'Inverter-based is wind and solar (grid-scale and estimated rooftop), connected through power electronics. Synchronous is hydro, geothermal and thermal plant, whose spinning generators add inertia and system strength. Batteries are also inverter-based but are shown separately, because they charge as well as generate.',
+    rf: 'Renewables are geothermal, hydro, wind and solar (grid-scale and estimated embedded solar). Fossils are Huntly\'s coal/gas Rankine units, gas and diesel. Geothermal counts as renewable, although it emits some CO₂ (0.07 t/MWh on this site).',
+    vre: 'Inverter-based is wind and solar (grid-scale and estimated embedded solar), connected through power electronics. Synchronous is hydro, geothermal and thermal plant, whose spinning generators add inertia and system strength. Batteries are also inverter-based but are shown separately, because they charge as well as generate.',
     owner: "Owners as of October 2026, from each plant's operator in the EA register (Manawa Energy's stations counted as Contact's). Today's owners are applied to the whole history, so earlier sales and transfers aren't shown.",
   };
   const groupById = id => (VIEWS[state.view].groups || []).find(g => g.id === id) || setById(id);
@@ -147,8 +147,8 @@ export function mountTracker(D, hooks = {}) {
     for (const r of ['NZ', 'NI', 'SI']) present[r] = FUELS.filter(f => SRC[r][f.k].some(v => Math.abs(v) > 0.5)).map(f => f.k);
   }
   derive();
-  // Rooftop solar has no plants: its drill-down shows each island's estimate instead (not drillable further).
-  const roofIslands = () => ['NI', 'SI'].map(isl => ({ name: `Rooftop solar · ${isl === 'NI' ? 'North' : 'South'} Island`, fuel: 'roof', isl, poc: [], cap: null, roof: true,
+  // Embedded solar has no plants: its drill-down shows each island's estimate instead (not drillable further).
+  const roofIslands = () => ['NI', 'SI'].map(isl => ({ name: `Embedded solar · ${isl === 'NI' ? 'North' : 'South'} Island`, fuel: 'roof', isl, poc: [], cap: null, roof: true,
                                                        s: M[isl].roof, u: M[isl + 's'].roofU }));
   const plantsFor = (fuel, r = state.region) => (fuel === 'roof' ? roofIslands().filter(p => p.s.some(v => v > 0.5)) : M.plants)
     .filter(p => p.fuel === fuel && (r === 'NZ' || p.isl === r));
@@ -309,7 +309,7 @@ export function mountTracker(D, hooks = {}) {
                                           s: sum(x.plants), drill: { group: x.id, fuel: null, plant: null }, count: x.plants.length });
       if (by === 'owner') {
         for (const x of sets) L.push(setLayer(x, null));
-        if (present[r].includes('roof')) L.push({ ...fuelLayer('roof', null), name: 'Rooftop solar (households)' });
+        if (present[r].includes('roof')) L.push({ ...fuelLayer('roof', null), name: 'Embedded solar (homes, businesses, small farms)' });
       } else {
         for (const f of FUELS) {
           if (f.signed || !present[r].includes(f.k)) continue;
@@ -554,7 +554,7 @@ export function mountTracker(D, hooks = {}) {
     for (let j = 0; j < V.n; j++) { mx = Math.max(mx, V.underlying[j], V.metered[j]); mn = Math.min(mn, showXT ? xt[j] : V.metered[j]); }
     const dom = nice(mn * 0.95, mx * 1.02, 3);
     const F = frame(c, dom, v => fmt(v)), { X, Y } = F;
-    // the rooftop solar estimate's uncertainty (± one standard deviation) as a band around the dashed line
+    // the embedded solar estimate's uncertainty (± one standard deviation) as a band around the dashed line
     if (V.roofU.some(u => u > 0.5)) band(ctx, X, Y, V.underlying.map((v, j) => v - V.roofU[j]), V.underlying.map((v, j) => v + V.roofU[j]), alpha(C['--ink-2'], 0.22));
     if (showXT) line(ctx, X, Y, xt, C['--accent']);
     line(ctx, X, Y, V.underlying, C['--ink-2'], 1.5, [4, 3]);
@@ -625,7 +625,7 @@ export function mountTracker(D, hooks = {}) {
     if (up) {
       $('sum-level-txt').textContent = {
         fuel: () => `${groupById(d.group).name}${setById(d.group) ? ' plants' : ''} · ${REGION[state.region]}`,
-        plant: () => d.fuel === 'roof' ? `Rooftop solar (estimated) · ${REGION[state.region]}` : `${FUEL[d.fuel].name} plants · ${REGION[state.region]}`,
+        plant: () => d.fuel === 'roof' ? `Embedded solar (estimated) · ${REGION[state.region]}` : `${FUEL[d.fuel].name} plants · ${REGION[state.region]}`,
         unit: () => V.layers.length > 1 ? `${d.plant} · by grid connection` : d.plant,
       }[lv]();
       $('sum-back').textContent = `‹ ${up.label === 'Generation' ? 'All sources' : up.label}`;
@@ -794,8 +794,8 @@ export function mountTracker(D, hooks = {}) {
       ['Price, North Island', money(V.pNI[j]), '/MWh'],
       ['Price, South Island', money(V.pSI[j]), '/MWh'],
       ['Demand, metered', fmt(V.metered[j]), long ? 'MW avg' : 'MW'],
-      ['With rooftop solar', fmt(V.underlying[j]), long ? 'MW avg' : 'MW'],
-      ['Rooftop solar (est.)', fmt(V.fuels.roof[j]), (long ? 'MW avg' : 'MW') + (V.roofU[j] > 0.5 ? ` ± ${fmt(V.roofU[j])}` : '')],
+      ['With embedded solar', fmt(V.underlying[j]), long ? 'MW avg' : 'MW'],
+      ['Embedded solar (est.)', fmt(V.fuels.roof[j]), (long ? 'MW avg' : 'MW') + (V.roofU[j] > 0.5 ? ` ± ${fmt(V.roofU[j])}` : '')],
       long && ['Peak demand, metered', fmt(V.pkMet[j]), 'MW'],
       long && V.pkGen && ['Peak generation', fmt(V.pkGen[j]), 'MW'],
       showT && ['Tiwai smelter', fmt(V.tiwai[j]), long ? 'MW avg' : 'MW'],
@@ -954,7 +954,7 @@ export function mountTracker(D, hooks = {}) {
       case 'cv-price':
         return head + row(C['--p-ni'], 'North Island · Haywards', money(V.pNI[j]), '/MWh') + row(C['--p-si'], 'South Island · Benmore', money(V.pSI[j]), '/MWh');
       case 'cv-demand':
-        return head + row(C['--ink'], 'Metered', fmt(V.metered[j]), mw) + row(C['--ink-2'], 'With rooftop solar', fmt(V.underlying[j]), V.roofU[j] > 0.5 ? `${mw} ± ${fmt(V.roofU[j])}` : mw)
+        return head + row(C['--ink'], 'Metered', fmt(V.metered[j]), mw) + row(C['--ink-2'], 'With embedded solar', fmt(V.underlying[j]), V.roofU[j] > 0.5 ? `${mw} ± ${fmt(V.roofU[j])}` : mw)
           + (state.region !== 'NI' ? row(C['--accent'], 'Without Tiwai', fmt(V.metered[j] - V.tiwai[j]), mw) : '')
           + (isLong() ? row(C['--muted'], 'Peak, metered', fmt(V.pkMet[j]), 'MW') : '');
       case 'cv-hvdc':
