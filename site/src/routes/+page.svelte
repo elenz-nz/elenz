@@ -40,19 +40,20 @@
 	let narrow = $state(false);
 	const W = $derived(narrow ? VIEW.w + 20 : 640);
 	const pct = (x: number, y: number) => `left:${(x / W) * 100}%;top:${(y / VIEW.h) * 100}%`;
-	const hvNote = (code: string, mw: number) => {
-		const m = fmt(Math.abs(mw));
-		if (Math.abs(mw) < 1) return 'No transfer over the HVDC';
-		return code === 'NI' ? (mw > 0 ? `Receives ${m} MW from the South Island over the HVDC` : `Sends ${m} MW south over the HVDC`)
-			: (mw > 0 ? `Sends ${m} MW north over the HVDC` : `Receives ${m} MW from the North Island over the HVDC`);
-	};
 	const hvWidth = $derived(2 + Math.min(1, Math.abs(hv) / 1200) * 6);
 
-	// each island's generation by fuel, as a thin stacked bar
-	const barOf = (r: Region) => {
+	// each island's generation by fuel as a ring over the island (viewBox coordinates), largest fuel first
+	const RING = { NI: { x: 300, y: 190 }, SI: { x: 133, y: 402 } };
+	const RING_R = 40, RING_C = 2 * Math.PI * RING_R;
+	const ringOf = (r: Region) => {
 		const parts = (now?.mix ?? []).map((f) => ({ ...f, mw: Math.max(0, r.fuels[f.k] ?? 0) })).filter((f) => f.mw > 0.5);
 		const total = parts.reduce((a, f) => a + f.mw, 0) || 1;
-		return parts.map((f) => ({ ...f, pct: (f.mw / total) * 100 }));
+		let start = 0;
+		return parts.map((f) => {
+			const full = (f.mw / total) * RING_C, seg = { ...f, pct: (f.mw / total) * 100, start, len: Math.max(0.5, full - (parts.length > 1 ? 1.2 : 0)) };
+			start += full;
+			return seg;
+		});
 	};
 
 	onMount(() => {
@@ -94,7 +95,7 @@
 		<section class="hero" aria-labelledby="home-h">
 			<div>
 				<h1 id="home-h">New Zealand's electricity, right now</h1>
-				<p class="lede">Live from the Electricity Authority's dispatch data, every five minutes. <a href="/tracker">Open the tracker</a> for history back to 2020, every plant, and prices.</p>
+				<p class="lede"><a href="/tracker">Open the tracker</a> for history back to 2020.</p>
 			</div>
 			<div class="status">
 				{#if error}
@@ -113,7 +114,7 @@
 			<div class="kpi">
 				<span class="k-lbl">Demand</span>
 				<span class="k-val">{nz ? fmt(nz.demand) : '–'}<small>MW</small></span>
-				<span class="k-sub">{nz ? `${fmt(nz.underlying)} MW with embedded solar` : ''}</span>
+				<span class="k-sub">{#if nz}{fmt(nz.underlying)} MW with embedded solar <span class="tag">est.</span>{/if}</span>
 			</div>
 			<div class="kpi">
 				<span class="k-lbl">Renewable share</span>
@@ -123,10 +124,9 @@
 			<div class="kpi">
 				<span class="k-lbl">Wholesale price</span>
 				<span class="k-val prices">
-					<span><b class="isl">NI</b>{now ? money(now.regions.NI.price ?? 0) : '–'}</span>
-					<span><b class="isl">SI</b>{now ? money(now.regions.SI.price ?? 0) : '–'}</span>
+					<span title="North Island reference price, Haywards"><b class="isl">HAY</b>{now ? money(now.regions.NI.price ?? 0) : '–'}<small>/MWh</small></span>
+					<span title="South Island reference price, Benmore"><b class="isl">BEN</b>{now ? money(now.regions.SI.price ?? 0) : '–'}<small>/MWh</small></span>
 				</span>
-				<span class="k-sub">per MWh at Haywards and Benmore</span>
 			</div>
 			<div class="kpi">
 				<span class="k-lbl">HVDC</span>
@@ -146,8 +146,7 @@
 		</section>
 
 		<div class="grid">
-			<section class="panel map-panel" aria-labelledby="map-h">
-				<div class="p-head"><h2 id="map-h">The two islands</h2><span class="unit">MW, $/MWh</span></div>
+			<section class="panel map-panel" aria-label="The two islands">
 				<div class="map" style="aspect-ratio: {W} / {VIEW.h}">
 					<svg viewBox="0 0 {W} {VIEW.h}" role="img"
 						aria-label={now ? `Map of New Zealand. North Island: generation ${fmt(now.regions.NI.gen)} MW, demand ${fmt(now.regions.NI.demand)} MW, price ${money(now.regions.NI.price ?? 0)} per MWh. South Island: generation ${fmt(now.regions.SI.gen)} MW, demand ${fmt(now.regions.SI.demand)} MW, price ${money(now.regions.SI.price ?? 0)} per MWh. HVDC ${fmt(Math.abs(hv))} MW ${hvDir}.` : 'Map of New Zealand'}>
@@ -164,25 +163,44 @@
 						{/if}
 						<circle class="node" cx={bx} cy={by} r="4" /><text class="node-lbl" x={bx - 8} y={by + 18} text-anchor="middle">Benmore</text>
 						<circle class="node" cx={hx} cy={hy} r="4" /><text class="node-lbl" x={hx + 8} y={hy - 9}>Haywards</text>
+						{#if now}
+							<!-- each island's generation mix as a ring, its total in the middle -->
+							{#each [[RING.NI, now.regions.NI, 'North Island'], [RING.SI, now.regions.SI, 'South Island']] as [pos, r, name]}
+								{@const P = pos as { x: number; y: number }}
+								{@const R = r as Region}
+								<g class="ring" transform="translate({P.x},{P.y})">
+									<circle class="ring-bg" r={RING_R} />
+									{#each ringOf(R) as f}
+										<circle class="seg" r={RING_R} transform="rotate(-90)"
+											style="stroke:{f.hatch ? 'url(#hatch-roof)' : `var(${f.tok})`};stroke-dasharray:{f.len} {RING_C - f.len};stroke-dashoffset:{-f.start}">
+											<title>{name}: {f.name} {fmt(f.mw)} MW ({f.pct.toFixed(1)}%)</title>
+										</circle>
+									{/each}
+									<text class="ring-v" y="2" text-anchor="middle">{fmt(R.gen)}</text>
+									<text class="ring-u" y="15" text-anchor="middle">MW</text>
+								</g>
+							{/each}
+						{/if}
+						<defs>
+							<pattern id="hatch-roof" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+								<rect width="4" height="4" class="hatch-bg" /><rect width="2" height="4" class="hatch-fg" />
+							</pattern>
+						</defs>
 					</svg>
 					{#if now}
 						<div class="hv-tag" style={pct(HV_MID.x + 14, HV_MID.y)}>
 							<b>HVDC</b> {fmt(Math.abs(hv))} MW {hvDir === 'north' ? '↑ north' : hvDir === 'south' ? '↓ south' : ''}
 						</div>
-						{#each [['NI', 'North Island', 'Haywards', 'ni', now.regions.NI], ['SI', 'South Island', 'Benmore', 'si', now.regions.SI]] as [code, name, node, cls, r]}
+						{#each [['North Island', 'HAY', 'ni', now.regions.NI], ['South Island', 'BEN', 'si', now.regions.SI]] as [name, node, cls, r]}
 							{@const R = r as Region}
 							<div class="icard {cls}">
 								<h3>{name}</h3>
-								<div class="ibar" aria-hidden="true">
-									{#each barOf(R) as f}<span class:hatch={f.hatch} style="--c:var({f.tok});width:{f.pct}%" title="{f.name} {fmt(f.mw)} MW"></span>{/each}
-								</div>
 								<dl>
 									<dt>Generation</dt><dd>{fmt(R.gen)} <small>MW</small></dd>
 									<dt>Demand</dt><dd>{fmt(R.demand)} <small>MW</small></dd>
-									<dt>Price</dt><dd>{money(R.price ?? 0)} <small>/MWh</small></dd>
+									<dt>Price <span class="node-code">{node}</span></dt><dd>{money(R.price ?? 0)} <small>/MWh</small></dd>
 									<dt>Renewables</dt><dd>{R.ren.toFixed(1)}<small>%</small></dd>
 								</dl>
-								<p class="inote">{hvNote(code as string, code === 'NI' ? now.hvdc.ni : now.hvdc.si)}. Price at {node}.</p>
 							</div>
 						{/each}
 					{/if}
@@ -208,7 +226,7 @@
 						</tbody>
 						<tfoot><tr><th scope="row">Total</th><td class="n">{fmt(nz.gen)}</td><td class="n">100%</td></tr></tfoot>
 					</table>
-					<p class="mix-note">Battery counts while discharging. Generation is dispatch, the market's 5-minute targets; embedded solar is estimated.</p>
+					<p class="mix-note">Generation is dispatch, the market's 5-minute targets; embedded solar is estimated.</p>
 					<a class="cta" href="/tracker">See the last 24 hours in the tracker →</a>
 				{:else}
 					<p class="mix-note">{error || 'Loading…'}</p>
@@ -236,6 +254,7 @@
 	.k-val.prices { display: grid; gap: 2px; font-size: 1.25rem; }
 	.k-val .isl { font-family: var(--font-ui); font-size: 0.72rem; font-weight: 700; color: var(--muted); margin-right: 7px; letter-spacing: 0.04em; }
 	.k-sub { color: var(--muted); font-size: 0.76rem; }
+	.k-val.prices small { font-size: 0.72rem; margin-left: 3px; }
 	.tag { font-size: 0.68rem; color: var(--muted); letter-spacing: 0.04em; font-weight: 500; margin-left: 4px; }
 
 	.grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 14px; align-items: start; }
@@ -266,10 +285,17 @@
 	.icard dt { color: var(--ink-2); }
 	.icard dd { margin: 0; text-align: right; font-family: var(--font-data); }
 	.icard dd small, .mixtab small { color: var(--muted); font-family: var(--font-ui); }
-	.inote { margin: 0; color: var(--muted); font-size: 0.74rem; }
-	.ibar, .stack { display: flex; height: 8px; border-radius: 2px; overflow: hidden; background: var(--grid); }
+	.node-code { color: var(--muted); font-size: 0.7rem; letter-spacing: 0.04em; margin-left: 3px; }
+	.ring-bg { fill: color-mix(in srgb, var(--surface) 82%, transparent); stroke: none; }
+	.seg { fill: none; stroke-width: 13; }
+	.seg:hover { stroke-width: 16; }
+	.ring-v { fill: var(--ink); font-family: var(--font-data); font-size: 14px; font-weight: 600; }
+	.ring-u { fill: var(--muted); font-family: var(--font-ui); font-size: 10px; }
+	.hatch-bg { fill: color-mix(in srgb, var(--f-solar) 30%, transparent); }
+	.hatch-fg { fill: var(--f-solar); }
+	.stack { display: flex; height: 8px; border-radius: 2px; overflow: hidden; background: var(--grid); }
 	.stack { height: 14px; margin: 2px 0 10px; }
-	.ibar span, .stack span { background: var(--c); height: 100%; }
+	.stack span { background: var(--c); height: 100%; }
 	.hatch { background: repeating-linear-gradient(135deg, var(--c) 0 2px, color-mix(in srgb, var(--c) 30%, transparent) 2px 4px) !important; }
 
 	.mixtab { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
