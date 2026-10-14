@@ -74,6 +74,14 @@ export function mountTracker(D, hooks = {}) {
     vre: { groups: [{ id: 'resid', name: 'Synchronous', tok: '--g-resid', f: ['geo', 'coal', 'gas', 'diesel', 'hydro'] }, VRE('Inverter-based')] },
   };
   const SIGNED = FUELS.filter(f => f.signed).map(f => f.k);
+  // what each grouping shows, in a note under the generation chart
+  const NOTES = {
+    simple: 'Simplified groups the fuels into five: geothermal; thermal (Huntly\'s coal/gas Rankine units, gas and diesel); hydro; wind; and solar, grid-scale and estimated rooftop together.',
+    flex: 'Groups generation by how readily it can follow demand. Inflexible: geothermal, which runs flat out around the clock. Slow flexible: Huntly\'s coal/gas Rankine units, which take hours to start and ramp slowly. Fast flexible: hydro, gas and diesel, which can change output quickly. Variable: wind and solar, which follow the weather. Grouping is by fuel, so gas cogeneration counts as fast flexible.',
+    rf: 'Renewables are geothermal, hydro, wind and solar (grid-scale and estimated rooftop). Fossils are Huntly\'s coal/gas Rankine units, gas and diesel. Geothermal counts as renewable, although it emits some CO₂ (0.07 t/MWh on this site).',
+    vre: 'Inverter-based is wind and solar (grid-scale and estimated rooftop), connected through power electronics. Synchronous is hydro, geothermal and thermal plant, whose spinning generators add inertia and system strength. Batteries are also inverter-based but are shown separately, because they charge as well as generate.',
+    owner: "Owners as of October 2026, from each plant's operator in the EA register (Manawa Energy's stations counted as Contact's). Today's owners are applied to the whole history, so earlier sales and transfers aren't shown.",
+  };
   const groupById = id => (VIEWS[state.view].groups || []).find(g => g.id === id) || setById(id);
 
   // ---------- plant sets: views stacked by site, hydro scheme or owner ----------
@@ -592,9 +600,9 @@ export function mountTracker(D, hooks = {}) {
       fuel: setById(d.group) ? 'MW, stacked by plant' : 'MW, stacked by fuel', plant: 'MW, stacked by plant',
       unit: V.layers.length > 1 ? 'MW, by grid connection' : 'MW',
     }[lv];
-    const note = $('gen-note'), by = VIEWS[state.view].by;
-    note.hidden = by !== 'owner';
-    note.textContent = by === 'owner' ? "Owners as of October 2026, from each plant's operator in the EA register (Manawa Energy's stations counted as Contact's). Today's owners are applied to the whole history, so earlier sales and transfers aren't shown." : '';
+    const note = $('gen-note'), txt = NOTES[state.view] || '';
+    note.hidden = !txt;
+    note.textContent = txt;
     const up = lv !== 'top' ? parts[parts.length - 2] : null;
     $('sum-level').hidden = !up;
     if (up) {
