@@ -1,0 +1,11 @@
+// Cloudflare Workers config: serve the static site built by SvelteKit (site/build).
+// Build command in Cloudflare: cd site && npm ci && npm run build   Deploy command: npx wrangler deploy
+{
+  "name": "elenz",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": {
+    "directory": "./site/build"
+  }
+}

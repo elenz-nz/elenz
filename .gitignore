@@ -1,0 +1,20 @@
+# secrets: never commit the EMI API key
+.emi_key
+.env
+.env.*
+
+# raw and reference data (downloaded by ingest/sync.py and ingest/emi_live.py)
+/data/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# site build output
+site/node_modules/
+site/.svelte-kit/
+site/build/
+*.tmp
+
+.DS_Store

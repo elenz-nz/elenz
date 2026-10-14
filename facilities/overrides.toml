@@ -1,0 +1,51 @@
+# Curated corrections to the EA plant register (DispatchedGenerationPlant.csv).
+#
+# The register is updated roughly every six months, so new plant and moved connections show up in the
+# dispatch feed before they show up there. The ingester warns about any generating unit it can't map;
+# add it here, then rerun.
+
+# Units that dispatch but aren't in the register yet. Key is "POC UNIT".
+[units]
+"MPE1101 KWK0" = { fuel = "wind",  plant = "Kaiwaikawe Wind Farm" }
+"ISL0661 KPS0" = { fuel = "solar", plant = "Kōwhai Park Solar Farm" }
+"BRB0331 RUS0" = { fuel = "solar", plant = "Ruakākā Solar Farm" }
+
+# Register fuel name -> tracker fuel key.
+# Huntly Rankine units 1, 2 and 4 burn coal or gas with no change visible to the market, so they are
+# "Coal/gas" and get their own layer. Huntly 5 and 6 are gas only (Fuel = Gas in the register).
+[fuels]
+"Hydro" = "hydro"
+"Gas" = "gas"
+"Wind" = "wind"
+"Geothermal" = "geo"
+"Solar" = "solar"
+"Electrical energy" = "batt"
+"Coal/Gas" = "coal"
+"Diesel" = "diesel"
+
+# Battery charging is dispatched as load on a separate unit. Charging unit -> battery unit.
+[battery_charging]
+RUK99 = "RUK0"   # Ruakākā Energy Park
+GLB99 = "GLB0"   # Glenbrook-Ohurua
+RHO99 = "RHO0"   # Rotohiko
+HLY91 = "HLY11"  # Huntly battery
+
+# Several register entries that are one station.
+[plant_names]
+"Patea unit 1" = "Pātea"
+"Patea unit 2" = "Pātea"
+"Patea unit 3" = "Pātea"
+
+# Connection points the feed leaves without an island.
+[islands]
+OHG1101 = "NI"   # took over Pātea hydro from HWA1101 in June 2026
+OHG2201 = "NI"
+
+# Island reference nodes for the headline prices.
+[reference_nodes]
+NI = "HAY2201"   # Haywards
+SI = "BEN2201"   # Benmore
+
+# Load connection points shown separately.
+[loads]
+tiwai = "TWI2201"
