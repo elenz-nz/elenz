@@ -1,6 +1,7 @@
 // Elenz tracker: linked generation, price, demand, HVDC, emissions and renewables charts on one time axis.
 // Data: tracker.json built by ingest/build_tracker.py. Drawn on <canvas>; the page supplies the markup (ids below).
 
+import { FUELS } from './fuels.js';
 import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTotal } from './series.js';
 import PLANT_META from './plants.json';  // owner and hydro scheme per plant (ingest/plant_meta.py)
 export { nzOffset, tzName };
@@ -38,19 +39,6 @@ export function mountTracker(D, hooks = {}) {
   let M = models.live;
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  // Stack order, bottom to top: geothermal (baseload) first, then thermal, hydro and the variable sources.
-  const FUELS = [
-    { k: 'geo', name: 'Geothermal', tok: '--f-geo', ef: 0.07, ren: 1 },
-    { k: 'coal', name: 'Coal/gas, Rankine', tok: '--f-coal', ef: 0.95 },
-    { k: 'gas', name: 'Gas', tok: '--f-gas', ef: 0.50 },
-    { k: 'diesel', name: 'Diesel', tok: '--f-diesel', ef: 0.80 },
-    { k: 'hydro', name: 'Hydro', tok: '--f-hydro', ren: 1 },
-    { k: 'wind', name: 'Wind', tok: '--f-wind', ren: 1 },
-    { k: 'solar', name: 'Solar, grid', tok: '--f-solar', ren: 1 },
-    { k: 'roof', name: 'Embedded solar', tok: '--f-solar', hatch: 1, ren: 1, tag: 'est.' },
-    { k: 'batt', name: 'Battery', tok: '--f-batt', signed: 1 },
-    { k: 'hvdc', name: 'HVDC', tok: '--f-hvdc', hatch: 1, signed: 1 },
-  ];
   const FUEL = Object.fromEntries(FUELS.map(f => [f.k, f]));
   // Source groupings for the generation chart, after Open Electricity's. Each group lists its fuels in stack order.
   // Battery and HVDC are signed (charging, export), so they stay separate layers in every view.

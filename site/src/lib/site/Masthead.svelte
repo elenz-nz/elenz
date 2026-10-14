@@ -46,7 +46,8 @@
 	</div>
 	<div class="mast-r">
 		<nav class="pages" aria-label="Pages">
-			<a href="/" aria-current={page.url.pathname === '/' ? 'page' : undefined}>Tracker</a>
+			<a href="/" aria-current={page.url.pathname === '/' ? 'page' : undefined}>Now</a>
+			<a href="/tracker" aria-current={page.url.pathname.startsWith('/tracker') ? 'page' : undefined}>Tracker</a>
 			<a href="/about" aria-current={page.url.pathname.startsWith('/about') ? 'page' : undefined}>About</a>
 		</nav>
 		<button type="button" class="info-btn theme-btn" onclick={toggleTheme} aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'} title={dark ? 'Light mode' : 'Dark mode'}>
