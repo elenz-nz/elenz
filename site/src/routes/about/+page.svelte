@@ -21,7 +21,7 @@
 		<section aria-labelledby="shows-h">
 			<h2 id="shows-h">What the tracker shows</h2>
 			<ul>
-				<li>Generation stacked by fuel, or grouped by site, hydro scheme, owner, flexibility, renewable vs fossil, or inverter-based vs synchronous.</li>
+				<li>Generation stacked by fuel, or grouped by site, hydro scheme, owner, flexibility, renewable vs fossil, or inverter-based vs synchronous; in MW, or with % as each source's share of total generation.</li>
 				<li>Wholesale prices at the island reference nodes, Haywards and Benmore.</li>
 				<li>Demand, metered at the grid and with embedded solar added back, with the Tiwai Point smelter's load in the summary table.</li>
 				<li>HVDC transfer between the islands, emissions intensity and renewable share.</li>

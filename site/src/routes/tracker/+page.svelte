@@ -209,6 +209,10 @@
 							<option value="rf">Renewable vs fossil</option>
 							<option value="vre">Inverter-based vs synchronous</option>
 						</select>
+						<div class="seg" role="group" aria-label="Show generation in MW or as a share of total generation" id="seg-unit">
+							<button type="button" data-v="mw" aria-pressed="true">MW</button>
+							<button type="button" data-v="pct" aria-pressed="false">%</button>
+						</div>
 					</div>
 				</div>
 				<div class="plot">

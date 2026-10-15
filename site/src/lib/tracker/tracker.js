@@ -143,7 +143,7 @@ export function mountTracker(D, hooks = {}) {
     .filter(p => p.fuel === fuel && (r === 'NZ' || p.isl === r));
   const plantByName = name => M.plants.find(p => p.name === name);
 
-  const state = { region: 'NZ', range: '1d', end: null, kind: 'live', int: '5m', view: 'detailed', hover: null, hoverBy: null, hidden: new Set(), drill: { ...TOP_LEVEL },
+  const state = { region: 'NZ', range: '1d', end: null, kind: 'live', int: '5m', view: 'detailed', unit: 'mw', hover: null, hoverBy: null, hidden: new Set(), drill: { ...TOP_LEVEL },
                   open: new Set(), filter: '' };
   let saved = null;
   try {
@@ -154,10 +154,11 @@ export function mountTracker(D, hooks = {}) {
     if (s && Object.hasOwn(INTS, s.int)) state.int = s.int;
     else if (s?.agg === 6) state.int = '30m';
     if (s && Object.hasOwn(VIEWS, s.view)) state.view = s.view;
+    if (s?.unit === 'pct') state.unit = 'pct';
   } catch (e) {}
   if (saved && RANGES[saved].model === 'live') { state.range = saved; saved = null; }
   if (!RANGES[state.range].ints.includes(state.int)) state.int = RANGES[state.range].def || RANGES[state.range].ints[0];
-  const save = () => { try { localStorage.setItem('elenz-view', JSON.stringify({ region: state.region, range: state.range, int: state.int, view: state.view })); } catch (e) {} };
+  const save = () => { try { localStorage.setItem('elenz-view', JSON.stringify({ region: state.region, range: state.range, int: state.int, view: state.view, unit: state.unit })); } catch (e) {} };
 
   // ---------- time helpers ----------
   const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -470,21 +471,28 @@ export function mountTracker(D, hooks = {}) {
     const c = V.layers.reduce((a, l) => a + (l.cap || 0), 0);
     return c || plantByName(state.drill.plant).cap || null;
   }
+  // % view: each layer as a share of the region's total generation (V.gen: all output, battery discharge included,
+  // HVDC and charging left out). Hidden layers leave gaps rather than rescaling the rest, so shares stay true;
+  // below the top level the axis fits the drilled layers (wind as a share of all generation, not of wind).
+  const pctMode = () => state.unit === 'pct';
+  const pctOf = (v, j) => V.gen[j] > 0.5 ? Math.max(0, v) / V.gen[j] * 100 : 0;
   function drawGen() {
-    const c = setup($('cv-gen')), { ctx } = c, n = V.n;
-    const layers = V.layers.filter(l => !state.hidden.has(l.id));
+    const c = setup($('cv-gen')), { ctx } = c, n = V.n, pct = pctMode();
+    const layers = V.layers.filter(l => !state.hidden.has(l.id) && !(pct && l.id === 'hvdc'));
     const pos = new Float64Array(n), neg = new Float64Array(n), tops = [];
     for (const l of layers) {
-      const a = l.s, p0 = Float64Array.from(pos), n0 = Float64Array.from(neg);
+      const a = pct ? Float64Array.from(l.s, pctOf) : l.s, p0 = Float64Array.from(pos), n0 = Float64Array.from(neg);
       for (let j = 0; j < n; j++) { const v = a[j]; if (v > 0) pos[j] += v; else neg[j] += v; }
       tops.push({ l, p0, p1: Float64Array.from(pos), n0, n1: Float64Array.from(neg) });
     }
     let mx = 0, mn = 0; for (let j = 0; j < n; j++) { mx = Math.max(mx, pos[j]); mn = Math.min(mn, neg[j]); }
-    const cap = capacityOf();
+    const cap = pct ? null : capacityOf();
     if (cap) mx = Math.max(mx, cap * 1.04);
-    const dom = nice(0, Math.max(mx, 1), 5);
+    if (pct) mx = Math.min(mx, 100);  // rounding can push a full stack a hair over 100
+    const full = pct && topIsAll();  // the whole mix: a fixed 0–100% axis
+    const dom = full ? { lo: 0, hi: 100, ticks: [0, 25, 50, 75, 100] } : nice(0, Math.max(mx, pct ? 0.1 : 1), 5);
     if (mn < 0) dom.lo = mn * 1.2;
-    const F = frame(c, dom, v => fmt(v), { axis: true });
+    const F = frame(c, dom, pct ? v => (Number.isInteger(v) ? v : v.toFixed(1)) + '%' : v => fmt(v), { axis: true });
     const { X, Y } = F;
     for (const L of tops) {
       let fill = L.l.hatch ? ctx.createPattern(L.l.shade != null ? hatchOf(colourOf(L.l)) : PAT[L.l.hatch], 'repeat') : colourOf(L.l);
@@ -610,12 +618,13 @@ export function mountTracker(D, hooks = {}) {
     h.innerHTML = parts.map((p, i) => (i ? '<span class="sep" aria-hidden="true">›</span>' : '') + (p.to ? `<button type="button" data-i="${i}">${esc(p.label)}</button>` : `<span aria-current="${i === parts.length - 1 ? 'page' : 'false'}">${esc(p.label)}</span>`)).join('');
     h.querySelectorAll('button').forEach(b => b.addEventListener('click', () => drillTo(parts[+b.dataset.i].to)));
     const lv = level();
-    $('gen-unit').textContent = {
+    const unitTxt = {
       top: { site: 'MW, stacked by site', scheme: 'MW, hydro by scheme', owner: 'MW, stacked by owner' }[VIEWS[state.view].by]
         || (VIEWS[state.view].groups ? 'MW, stacked by group' : 'MW, stacked by fuel'),
       fuel: setById(d.group) ? 'MW, stacked by plant' : 'MW, stacked by fuel', plant: d.fuel === 'roof' ? 'MW, estimated, by island' : 'MW, stacked by plant',
       unit: V.layers.length > 1 ? 'MW, by grid connection' : 'MW',
     }[lv];
+    $('gen-unit').textContent = pctMode() ? unitTxt.replace(/^MW/, '% of all generation') : unitTxt;
     const note = $('gen-note'), txt = NOTES[state.view] || '';
     note.hidden = !txt;
     note.textContent = txt;
@@ -844,6 +853,7 @@ export function mountTracker(D, hooks = {}) {
     for (const [id, val] of [['seg-range', state.range], ['seg-int', state.int]])
       for (const b of $(id).querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v === val));
     $('sel-view').value = state.view;
+    for (const b of $('seg-unit').querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v === state.unit));
   }
 
   // ---------- models: the live week, and history merged with it (loaded when a long range is first chosen) ----------
@@ -922,6 +932,11 @@ export function mountTracker(D, hooks = {}) {
     if (!Object.hasOwn(VIEWS, e.target.value)) return;
     state.view = e.target.value; state.drill = { ...TOP_LEVEL }; state.hidden.clear(); state.filter = ''; state.open.clear(); rebuild();
   });
+  $('seg-unit').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b || !['mw', 'pct'].includes(b.dataset.v) || b.dataset.v === state.unit) return;
+    state.unit = b.dataset.v; syncControls(); renderCrumbs(); render(); save();
+  });
   $('mix-filter').addEventListener('input', e => { state.filter = e.target.value; applyFilter(); });
   $('seg-int').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || !intsFor(state.range, state.kind).includes(b.dataset.v)) return; state.int = b.dataset.v; rebuild(); });
 
@@ -945,6 +960,7 @@ export function mountTracker(D, hooks = {}) {
         if (!l) return head + row(C['--ink'], totalLabel(), fmt(tot), mw);
         const v = l.s[j];
         const uj = l.id === 'roof' ? V.roofU[j] : l.u ? l.u[j] : 0, pm = uj > 0.5 ? ` ± ${fmt(uj)}` : '';
+        if (pctMode() && !l.signed) return head + row(colourOf(l), l.name, pctOf(v, j).toFixed(1) + '%', `of all generation · ${fmt(v)} ${mw}${pm}`, !!l.hatch);
         const extra = l.signed ? `${mw} · ${signedTxt(l, v, false)}` : `${mw}${pm}${tot > 0.5 ? ` · ${(v / tot * 100).toFixed(1)}%` : ''}`;
         return head + row(colourOf(l), l.name, fmt(v), extra, !!l.hatch);
       }
