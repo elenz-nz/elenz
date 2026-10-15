@@ -43,3 +43,30 @@ export function summarise(D) {
     mix,
   };
 }
+
+/** One region's generation as ring segments (largest first, in `mix` order), for an SVG circle of radius r:
+ * each { k, name, tok, hatch, mw, pct, start, len } with start and len along the circumference. */
+export function ring(mix, region, r) {
+  const C = 2 * Math.PI * r;
+  const parts = mix.map((f) => ({ ...f, mw: Math.max(0, region.fuels[f.k] ?? 0) })).filter((f) => f.mw > 0.5);
+  const total = parts.reduce((a, f) => a + f.mw, 0) || 1;
+  let start = 0;
+  return parts.map((f) => {
+    const full = (f.mw / total) * C;
+    const seg = { ...f, pct: (f.mw / total) * 100, start, len: Math.max(0.5, full - (parts.length > 1 ? 1.2 : 0)) };
+    start += full;
+    return seg;
+  });
+}
+
+/** New Zealand's generation by fuel over the last `hours`, every `every`th interval, for a small stacked chart:
+ * { t: [ms], layers: [{ ...fuel, v: [MW] }] } in stack order, fuels with no output dropped. */
+export function recent(D, hours = 24, every = 3) {
+  const n = Math.min(D.N, Math.round((hours * 3600000) / D.step) + 1);
+  const idx = [];
+  for (let j = D.N - 1; j >= D.N - n; j -= every) idx.unshift(j);
+  const val = (k, j) => Math.max(0, (D.NI[k]?.[j] ?? 0) + (D.SI[k]?.[j] ?? 0));
+  const layers = GEN.filter((f) => !f.signed).map((f) => ({ ...f, v: idx.map((j) => val(f.k, j)) }))
+    .filter((f) => f.v.some((x) => x > 0.5));
+  return { t: idx.map((j) => D.t0 + j * D.step), layers };
+}
