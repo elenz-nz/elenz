@@ -28,7 +28,8 @@
 			<ul class="a-list">
 				{#each listed as a (a.slug)}
 					<li>
-						<a href="/articles/{a.slug}">
+						<a href="/articles/{a.slug}" class:has-img={a.image}>
+							{#if a.image}<img class="a-thumb" src={a.image} alt="" width="1200" height="630" loading="lazy" />{/if}
 							<span class="a-meta"><span class="a-kind">{a.kind}</span><time datetime={a.date}>{longDate(a.date)}</time>{#if a.draft}<span class="a-draft">Draft</span>{/if}</span>
 							<h2>{a.title}</h2>
 							<p>{a.dek}</p>

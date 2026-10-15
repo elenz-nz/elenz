@@ -8,9 +8,10 @@
 
 <div class="art-peek">
 	{#if first}
+		{#if first.image}<img src={first.image} alt="" width="1200" height="630" loading="lazy" />{/if}
 		<p class="meta"><span class="kind">{first.kind}</span>{longDate(first.date)}</p>
 		<p class="title">{first.title}</p>
-		<p class="dek">{first.dek}</p>
+		{#if !first.image}<p class="dek">{first.dek}</p>{/if}
 		{#if rest.length}
 			<ul>
 				{#each rest.slice(0, 2) as a}<li><span class="kind">{a.kind}</span>{a.title}</li>{/each}
@@ -23,6 +24,7 @@
 
 <style>
 	.art-peek { display: grid; gap: 8px; padding: 6px 4px; text-align: left; }
+	img { width: 100%; height: auto; border-radius: 4px; display: block; margin-bottom: 4px; }
 	p { margin: 0; }
 	.meta { font-size: 0.74rem; color: var(--muted); display: flex; gap: 10px; align-items: baseline; }
 	.kind { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--accent); margin-right: 8px; }

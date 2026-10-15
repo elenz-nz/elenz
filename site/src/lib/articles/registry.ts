@@ -24,6 +24,7 @@ export type Meta = {
 	kind: Kind;
 	draft?: boolean;
 	updated?: string; // YYYY-MM-DD, if revised after publishing
+	image?: string; // link-preview image under site/static, e.g. '/articles/winter-2026.png' (analysis/cover_png.py)
 };
 
 export type Article = Meta & { slug: string; component: any };
@@ -38,6 +39,9 @@ export const articles: Article[] = Object.entries(modules)
 export const listed = articles.filter((a) => !ARTICLES_PUBLIC || !a.draft);
 
 export const find = (slug: string) => articles.find((a) => a.slug === slug);
+
+// the site's public address, for absolute links in link previews; change it when elenz.nz is attached
+export const SITE_URL = 'https://elenz.elenz.workers.dev';
 
 // search engines skip the whole section while hidden, and drafts always
 export const noindex = (a?: Article) => !ARTICLES_PUBLIC || !!a?.draft;

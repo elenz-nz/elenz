@@ -92,3 +92,12 @@
 .ch-axisword { fill: var(--ink-2); font-size: 11px; font-weight: 700; font-family: var(--font-ui); letter-spacing: 0.04em; text-transform: uppercase; }
 .ch-line.thin { stroke-width: 1.5; }
 .ch-dot.small { stroke-width: 1.5; }
+
+/* index thumbnails: the cover image to the right of the text, above it on phones */
+.a-list a.has-img { grid-template-columns: minmax(0, 1fr) 220px; column-gap: 22px; align-items: start; }
+.a-list a.has-img > :not(.a-thumb) { grid-column: 1; }
+.a-thumb { grid-column: 2; grid-row: 1 / span 3; width: 100%; height: auto; border-radius: 4px; display: block; }
+@media (max-width: 600px) {
+  .a-list a.has-img { grid-template-columns: minmax(0, 1fr); }
+  .a-thumb { grid-column: 1; grid-row: auto; order: -1; margin-bottom: 6px; }
+}

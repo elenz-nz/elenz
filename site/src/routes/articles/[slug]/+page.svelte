@@ -2,7 +2,7 @@
 	// One article: header, the article's own body (from #lib/articles/posts), then sources and a link back.
 	import Masthead from '#lib/site/Masthead.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
-	import { longDate, noindex } from '#lib/articles/registry.js';
+	import { longDate, noindex, SITE_URL } from '#lib/articles/registry.js';
 	import '#lib/articles/articles.css';
 	import type { PageProps } from './$types';
 
@@ -17,6 +17,13 @@
 	<meta property="og:title" content={a.title} />
 	<meta property="og:description" content={a.dek} />
 	<meta property="og:type" content="article" />
+	<meta property="og:url" content="{SITE_URL}/articles/{a.slug}" />
+	{#if a.image}
+		<meta property="og:image" content="{SITE_URL}{a.image}" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta name="twitter:card" content="summary_large_image" />
+	{/if}
 	{#if noindex(a)}<meta name="robots" content="noindex" />{/if}
 </svelte:head>
 

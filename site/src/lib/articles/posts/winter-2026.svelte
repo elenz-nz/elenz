@@ -4,6 +4,7 @@
 		dek: 'Demand set a new high in an August cold snap, South Island water flowed north in record amounts, and new solar farms set records in mid-winter. Thermal generation fell to its smallest winter share.',
 		date: '2026-10-15',
 		kind: 'Quarterly review',
+		image: '/articles/winter-2026.png',
 	} as const;
 </script>
 
@@ -21,6 +22,8 @@
 	import { num } from '#lib/articles/charts/util.js';
 	type Table = { [k: string]: number[] };
 	import D from '#lib/articles/data/winter-2026.json';
+	import ReviewCover from '#lib/articles/ReviewCover.svelte';
+	import cover from '#lib/articles/covers/winter-2026.json';
 
 	const years = D.years.map(String);
 	const hi26 = (ys: (number | string)[], tok = '--accent', rest = '--f-hvdc') => ys.map((y) => (String(y) === '2026' ? tok : rest));
@@ -68,6 +71,8 @@
 	const DAYF = new Intl.DateTimeFormat('en-NZ', { day: 'numeric', month: 'short', timeZone: 'UTC' });
 	const farmDate = (d: string) => DAYF.format(new Date(d + 'T00:00:00Z'));
 </script>
+
+<ReviewCover data={cover} season="Winter" year={2026} range="1 June – 31 August 2026" />
 
 <p>This review compares winter 2026, from 1 June to 31 August, with the five winters before it, back to 2021. Every figure comes from the Electricity Authority's market data, averaged over trading periods, the half-hours the wholesale market is settled in. A record here means the highest or lowest of those six winters.</p>
 
