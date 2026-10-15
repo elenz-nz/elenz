@@ -29,6 +29,8 @@ from common import NZ, OUT
 from store import LocalStore, open_store
 
 BUDGET = 220          # API calls per run for filling older gaps (~4-5 minutes at the 50/min pace)
+WAIT = 200            # seconds a run waits for the interval that has just begun (published 1-2 minutes after it starts)
+POLL = 15             # seconds between checks while waiting
 IRRADIANCE_MAX_AGE = 1800     # one store write per refresh: 48 a day
 
 
@@ -120,6 +122,18 @@ def main(log=print):
         if (part.src != 'empty').any():
             s = st.merge(s, part)
     t_latest = s.index[s.src != 'empty'].max()
+    # the cron fires just after each 5-minute mark, a minute or two before that interval is published: rather than
+    # save the one before (and run 6-11 minutes behind), wait for it and save it within seconds of publication
+    if t_latest == now5 - pd.Timedelta(minutes=5):
+        waited = 0
+        while t_latest < now5 and time.time() - started < WAIT:
+            time.sleep(POLL)
+            waited += POLL
+            part = fetch_interval(now5)
+            if (part.src != 'empty').any():
+                s = st.merge(s, part)
+                t_latest = now5
+        log(f'waited {waited} s for {now5}: ' + ('published' if t_latest == now5 else 'not published yet, saving what there is'))
 
     # newest first: everything after the last stored real interval, plus the two before it (possible re-runs)
     have = set(s.index[s.src != 'empty']) | set(s.index[s.src == 'empty'])

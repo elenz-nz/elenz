@@ -10,7 +10,7 @@
   "keep_vars": true,
   // every 5 minutes, just after each interval's dispatch case is published: triggers the GitHub live data job.
   // every 6 hours at :40: triggers the history job (newly published daily dispatch files). See worker/index.js.
-  "triggers": { "crons": ["2-59/5 * * * *", "40 */6 * * *"] },
+  "triggers": { "crons": ["*/5 * * * *", "40 */6 * * *"] },
   "assets": {
     "directory": "./site/build",
     "binding": "ASSETS",

@@ -2,12 +2,11 @@
 //  fetch:     serves the site's static files, except /data/tracker.json and /data/history/*, which come from
 //             Workers KV (written by the GitHub Actions jobs). Until KV has data, the bundled snapshot is served for
 //             tracker.json; history returns 404 until the first history run.
-//  scheduled: asks GitHub to run the data jobs. Every 5 minutes, at 2 minutes past each 5-minute mark: the live
-//             update (update-data.yml). The EMI API publishes each 5-minute interval 1-2 minutes after it starts, so a
-//             run at :x2 (it starts about 50 s later) picks up the interval that began at :x0 rather than the one before. Every 6 hours:
+//  scheduled: asks GitHub to run the data jobs. Every 5 minutes: the live update (update-data.yml), which waits
+//             for the interval that has just begun (the EMI API publishes each 1-2 minutes after it starts). Every 6 hours:
 //             the history update (history.yml), which adds newly published daily dispatch files. GitHub's own
 //             schedule is unreliable for new repositories; on-demand runs start within seconds. Every 15 minutes
-//             (at :12, :27, :42, :57) also the watchdog (watchdog.yml), which raises an issue when data goes stale.
+//             (at :10, :25, :40, :55) also the watchdog (watchdog.yml), which raises an issue when data goes stale.
 //             Needs the Worker secret GITHUB_TOKEN: a fine-grained token for stubzy19/elenz with Actions: read and write.
 const WORKFLOWS = 'https://api.github.com/repos/stubzy19/elenz/actions/workflows';
 const HISTORY_CRON = '40 */6 * * *'; // must match wrangler.jsonc
@@ -72,7 +71,7 @@ export default {
       return r.status === 204 ? 'ok' : `GitHub said HTTP ${r.status}: ${(await r.text()).slice(0, 300)}`;
     };
     const result = await dispatch(workflow);
-    if (!history && new Date(event.scheduledTime).getUTCMinutes() % 15 === 12) {
+    if (!history && new Date(event.scheduledTime).getUTCMinutes() % 15 === 10) {
       const w = await dispatch('watchdog.yml');
       if (w !== 'ok') console.log('watchdog: ' + w);
     }
