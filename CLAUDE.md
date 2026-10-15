@@ -13,7 +13,12 @@ This repository is public: never commit keys, tokens or personal details.
   add a page to its `PAGES` list with a preview component in `src/lib/landing/`); `/now` the live page
   (`src/routes/now/+page.svelte`: live figures, the island map with each island's mix ring, the generation mix now,
   from tracker.json's newest interval via `src/lib/home/now.js`; island outlines in `src/lib/home/nzmap.js`, made by
-  `analysis/make_nz_map.py`). The tracker page markup
+  `analysis/make_nz_map.py`); `/articles` records, quarterly reviews and analysis (`src/routes/articles/`; one
+  Svelte file per article in `src/lib/articles/posts/<slug>.svelte` exporting `meta` {title, dek, date, kind, draft}
+  from a module script, with `Record`, `Figure` and `Note` components and `articles.css` alongside; the registry is
+  `src/lib/articles/registry.ts`). The section is hidden while `ARTICLES_PUBLIC` there is false: no nav link,
+  `noindex` on every page, drafts listed for review; set it true to add the nav link and drop drafts from the index
+  (also add a landing `PAGES` entry then). `article-template` is a draft layout sample. The tracker page markup
   is in `src/routes/tracker/+page.svelte` (About page: `src/routes/about/+page.svelte`, a card per chart on how it's built; shared
   masthead, footer, logo mark and Buy Me a Coffee link in `src/lib/site/`); the canvas chart code is `src/lib/tracker/tracker.js` (vanilla JS, driven by
   element ids in the page), styles in `src/lib/tracker/tracker.css` (colour tokens, light/dark). The fuel table
@@ -120,7 +125,7 @@ This repository is public: never commit keys, tokens or personal details.
 3. History since Sep 2020 on the tracker page: 30 days, 1 year, All (Oct 2026).
    Daily history keeps each day's peak demand and peak generation (total output including embedded solar). BUILD 4
    (embedded solar model, metered HVDC) rebuilt from 15 Oct 2026 over about four runs.
-4. Pages: landing (`/`), live (`/now`), tracker, About. Stale-data watchdog, Cloudflare Web Analytics and a Buy Me a
+4. Pages: landing (`/`), live (`/now`), tracker, About, and a hidden Articles section (`/articles`, Oct 2026). Stale-data watchdog, Cloudflare Web Analytics and a Buy Me a
    Coffee link are in place.
 5. Then the brief's build order: plant pages, map, hydro panel and records (planned as short record articles),
    offer stacks and downloads.

@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import Mark from './Mark.svelte';
+	import { ARTICLES_PUBLIC } from '#lib/articles/registry.js';
 
 	// the tracker's masthead carries the page's h1; other pages use their own heading
 	// the landing page shows the mark large in its own hero, so its masthead is just the navigation
@@ -40,6 +41,7 @@
 		<nav class="pages" aria-label="Pages">
 			<a href="/now" aria-current={page.url.pathname.startsWith('/now') ? 'page' : undefined}>Now</a>
 			<a href="/tracker" aria-current={page.url.pathname.startsWith('/tracker') ? 'page' : undefined}>Tracker</a>
+			{#if ARTICLES_PUBLIC}<a href="/articles" aria-current={page.url.pathname.startsWith('/articles') ? 'page' : undefined}>Articles</a>{/if}
 			<a href="/about" aria-current={page.url.pathname.startsWith('/about') ? 'page' : undefined}>About</a>
 		</nav>
 		<button type="button" class="info-btn theme-btn" onclick={toggleTheme} aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'} title={dark ? 'Light mode' : 'Dark mode'}>
