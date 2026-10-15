@@ -190,8 +190,11 @@ def main():
     dur = {}
     for y in YEARS:
         x = np.sort(hv[winter(hv.index, y)].values)[::-1]
-        dur[y] = [int(round(v)) for v in np.percentile(x, np.linspace(100, 0, 101))]
+        # duration curve: the transfer reached or exceeded in c trading periods, sampled at ~200 values of c
+        cs = sorted(set(np.linspace(1, len(x), 201).round().astype(int)))
+        dur[y] = [int(round(x[c - 1])) for c in cs]
     J['hvdc_duration'] = dur
+    J['hvdc_duration_tp'] = [int(c) for c in cs]   # every winter has 4,416 trading periods (92 days)
     F['hvdc'] = {y: {'net_gwh': round(gwh(hv[winter(hv.index, y)])),
                      'north_pct': round(100 * float((hv[winter(hv.index, y)] > 0).mean())),
                      'hh_1000': int((hv[winter(hv.index, y)] >= 1000).sum()),
@@ -217,6 +220,9 @@ def main():
     J['farms'] = sorted(farms, key=lambda f: f['first'])
     F['solar_winter_gwh'] = {y: round(gwh(df.NZ_solar[winter(df.index, y)]), 1) for y in YEARS}
     F['solar_best'] = (int(df.NZ_solar.max()), str(df.NZ_solar.idxmax()))
+    dd = df.NZ_solar.resample('D').sum() / 2
+    F['solar_best_days_ever'] = {str(k.date()): round(float(v)) for k, v in dd.sort_values(ascending=False).head(6).items()}
+    F['solar_best_day_before_winter'] = (round(float(dd[:'2026-05'].max())), str(dd[:'2026-05'].idxmax().date()))
     pre = df.NZ_solar[:'2026-05']
     F['solar_best_before_winter'] = (int(pre.max()), str(pre.idxmax()))
     d = W.NZ_solar.resample('D').sum() / 2
