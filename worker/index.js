@@ -3,6 +3,8 @@
 //             Workers KV (written by the GitHub Actions jobs). Until KV has data, the bundled snapshot is served for
 //             tracker.json; history returns 404 until the first history run. tracker.json carries an ETag (the
 //             version tag the live job stores as KV metadata) and answers If-None-Match with 304.
+//  health:    /data/health is 200 while live data and history are fresh, 503 with the reasons when not (for an
+//             outside uptime monitor, which still works if the cron below stops).
 //  scheduled: asks GitHub to run the data jobs. Every 5 minutes: the live update (update-data.yml), which waits
 //             for the interval that has just begun (the EMI API publishes each 1-2 minutes after it starts). Every 6 hours:
 //             the history update (history.yml), which adds newly published daily dispatch files. GitHub's own
@@ -12,11 +14,41 @@
 const WORKFLOWS = 'https://api.github.com/repos/stubzy19/elenz/actions/workflows';
 const HISTORY_CRON = '40 */6 * * *'; // must match wrangler.jsonc
 // history files the site may request: the index, all days, and one half-hourly file per month
-const HISTORY_FILE = /^\/data\/history\/(index\.json|day\.json|hh\/\d{4}-\d{2}\.json)$/;
+// /data/health: the same limits as the GitHub watchdog (watchdog.yml)
+const HEALTH = { liveMinutes: 30, historyDays: 5 };
+const HISTORY_FILE =/^\/data\/history\/(index\.json|day\.json|hh\/\d{4}-\d{2}\.json)$/;
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === '/data/health' && env.DATA) {
+      // for an outside uptime monitor: 200 while the data is fresh, 503 (with the reasons) when it isn't. Unlike the
+      // GitHub watchdog, it doesn't depend on the Worker's cron, so it also catches the cron itself stopping.
+      const now = Date.now();
+      const [live, index, cron] = await Promise.all([
+        env.DATA.getWithMetadata('tracker.json', { type: 'stream' }),
+        env.DATA.get('hist/index.json', 'json'),
+        env.DATA.get('cron-status', 'json'),
+      ]);
+      if (live.value) await live.value.cancel();  // only the version tag (metadata) is needed, not the file
+      const problems = [];
+      const end = live.metadata && live.metadata.end;
+      if (!end) problems.push('live data has no version tag (the live job has not saved since the tag was added)');
+      else if (now - end > HEALTH.liveMinutes * 60e3) problems.push(`live data is ${Math.round((now - end) / 60e3)} minutes old`);
+      if (!index || !index.end) problems.push('history index missing');
+      else if (now - index.end > HEALTH.historyDays * 864e5) problems.push(`history is ${((now - index.end) / 864e5).toFixed(1)} days behind`);
+      if (cron && cron.result !== 'ok') problems.push(`the Worker could not start the live job: ${cron.result}`);
+      const body = {
+        ok: !problems.length, problems,
+        live_minutes_old: end ? Math.round((now - end) / 60e3) : null,
+        history_days_behind: index && index.end ? +((now - index.end) / 864e5).toFixed(1) : null,
+        last_trigger: cron ? cron.at : null,
+      };
+      return new Response(JSON.stringify(body), {
+        status: problems.length ? 503 : 200,
+        headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
+      });
+    }
     if (url.pathname === '/data/status.json' && env.DATA) {
       // last outcome of the scheduled trigger, for checking the pipeline without the Cloudflare dashboard
       const [live, history] = await Promise.all([env.DATA.get('cron-status', 'json'), env.DATA.get('cron-status-history', 'json')]);

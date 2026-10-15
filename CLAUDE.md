@@ -139,7 +139,8 @@ This repository is public: never commit keys, tokens or personal details.
   code in `src/lib/tracker/*.js` and `src/lib/home/now.js` is untyped JavaScript and gave ~800 false alarms).
 - GitHub's own schedules (the backups in the three workflows) fire only now and then (9 scheduled runs in two days,
   checked 15 Oct 2026), so they don't protect against the Worker's cron stopping: nothing outside Cloudflare alerts
-  if it does.
+  if it does. `/data/health` (Worker) covers that: 200 while live data is under 30 minutes old and history under 5
+  days behind, 503 with the reasons otherwise; an outside uptime monitor checks it every 5 minutes and emails the owner.
 
 ## Status and next steps
 
