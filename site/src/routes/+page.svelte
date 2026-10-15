@@ -10,6 +10,7 @@
 	import HeroBackdrop from '#lib/landing/HeroBackdrop.svelte';
 	import { Tween } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
+	import { fly } from 'svelte/transition';
 	import { summarise } from '#lib/home/now.js';
 
 	const DATA_URL = '/data/tracker.json';
@@ -34,6 +35,30 @@
 	const clockOnly = (t: number) => { const p = parts(t); return `${p.hour}:${p.minute} ${String(p.dayPeriod).toLowerCase()}`; };
 	const when = (t: number) => { const p = parts(t); return `${p.hour}:${p.minute} ${String(p.dayPeriod).toLowerCase()} ${p.weekday} ${p.day} ${p.month}`; };
 	const fmt = (v: number) => Math.round(v).toLocaleString('en-NZ');
+	const money = (v: number) => (v < 0 ? '−$' : '$') + Math.abs(v).toLocaleString('en-NZ', { maximumFractionDigits: 0 });
+
+	// the second figure rotates through a few others every few seconds; hovering pauses it, the dots pick one
+	const ROTATE_MS = 4500;
+	type Fact = { k: string; n: string; v: string; l: string; v2?: string; l2?: string; c: string };
+	const facts = $derived.by((): Fact[] => {
+		if (!now || !nz) return [];
+		const hv = now.hvdc.mid, out: Fact[] = [
+			{ k: 'ren', n: 'Renewable share', v: `${nz.ren.toFixed(1)}%`, l: 'renewable', c: '--g-ren' },
+			{ k: 'price', n: 'Wholesale price', v: money(now.regions.NI.price ?? 0), l: '/MWh at Haywards', v2: money(now.regions.SI.price ?? 0), l2: 'at Benmore', c: '--accent' },
+			Math.abs(hv) < 1
+				? { k: 'hvdc', n: 'HVDC', v: '0 MW', l: 'on the HVDC link', c: '--f-hvdc' }
+				: { k: 'hvdc', n: 'HVDC', v: `${fmt(Math.abs(hv))} MW`, l: `flowing ${hv > 0 ? 'north' : 'south'} on the HVDC link`, c: '--f-hvdc' },
+			{ k: 'co2', n: 'Emissions intensity', v: `${fmt(nz.co2)} g`, l: 'CO₂e per kWh', c: '--co2' },
+		];
+		if (nz.roof >= 5) out.push({ k: 'roof', n: 'Embedded solar', v: `${fmt(nz.roof)} MW`, l: 'from embedded solar (est.)', c: '--f-solar' });
+		return out;
+	});
+	let rot = $state(0);
+	let paused = $state(false);
+	let lastTurn = 0;
+	const fact = $derived(facts.length ? facts[rot % facts.length] : null);
+	const reduced = () => typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+	function pick(i: number) { rot = i; lastTurn = Date.now(); }
 
 	const nz = $derived(now?.regions.NZ);
 	// the big figure counts up on arrival and glides to each new value
@@ -60,8 +85,14 @@
 			if (document.visibilityState === 'visible') load().catch(() => {});
 		};
 		const poll = setInterval(check, 120_000);
+		lastTurn = Date.now() + 1500; // let the big figure finish counting up before the first turn
+		const turn = setInterval(() => {
+			if (paused || document.visibilityState !== 'visible' || Date.now() - lastTurn < ROTATE_MS - 50 || !facts.length) return;
+			rot = (rot + 1) % facts.length;
+			lastTurn = Date.now();
+		}, 250);
 		document.addEventListener('visibilitychange', check);
-		return () => { clearInterval(poll); document.removeEventListener('visibilitychange', check); };
+		return () => { clearInterval(poll); clearInterval(turn); document.removeEventListener('visibilitychange', check); };
 	});
 </script>
 
@@ -83,7 +114,22 @@
 				{#if nz}
 					<p class="big"><span class="fig">{fmt(gen.current)}</span><span class="u">MW</span></p>
 					<p class="big-sub">being generated across New Zealand right now</p>
-					<p class="ren"><b>{nz.ren.toFixed(1)}%</b> renewable</p>
+					<div class="rot" role="group" aria-label="More figures" onpointerenter={() => (paused = true)} onpointerleave={() => (paused = false)} onfocusin={() => (paused = true)} onfocusout={() => (paused = false)}>
+						<div class="rot-v">
+							{#key fact?.k}
+								{#if fact}
+									<p class="fact" style="--fc:var({fact.c})" in:fly={{ y: 14, duration: reduced() ? 0 : 450, easing: cubicOut }} out:fly={{ y: -14, duration: reduced() ? 0 : 300 }}>
+										<b>{fact.v}</b> {fact.l}{#if fact.v2}<span class="sep">·</span><b>{fact.v2}</b> {fact.l2}{/if}
+									</p>
+								{/if}
+							{/key}
+						</div>
+						<div class="dots">
+							{#each facts as f, i}
+								<button type="button" class:on={f.k === fact?.k} aria-label="Show {f.n}" aria-pressed={f.k === fact?.k} onclick={() => pick(i)}></button>
+							{/each}
+						</div>
+					</div>
 					<div class="stack" role="img" aria-label={`Generation now: ${now.mix.map((f: any) => `${f.name} ${((f.mw / nz.gen) * 100).toFixed(0)}%`).join(', ')}`}>
 						{#each now.mix as f}<span class:hatch={f.hatch} style="--c:var({f.tok});width:{(f.mw / nz.gen) * 100}%" title="{f.name} {fmt(f.mw)} MW"></span>{/each}
 					</div>
@@ -144,8 +190,17 @@
 	.big .fig { font-size: clamp(3.6rem, 14vw, 6.4rem); }
 	.big .u { font-family: var(--font-ui); font-size: clamp(1.3rem, 4vw, 1.9rem); font-weight: 600; color: var(--muted); margin-left: 10px; letter-spacing: 0; }
 	.big-sub { margin: 0; color: var(--ink-2); }
-	.ren { margin: 6px 0 0; font-size: 1.15rem; color: var(--ink-2); }
-	.ren b { font-family: var(--font-data); font-weight: 600; color: var(--g-ren); font-size: 1.5rem; margin-right: 4px; }
+	.rot { display: grid; justify-items: center; gap: 6px; margin-top: 6px; }
+	.rot-v { display: grid; min-height: 2.2rem; align-items: center; }
+	.fact { grid-area: 1 / 1; margin: 0; font-size: 1.15rem; color: var(--ink-2); white-space: nowrap; }
+	.fact b { font-family: var(--font-data); font-weight: 600; color: var(--fc); font-size: 1.5rem; margin-right: 3px; }
+	.fact .sep { color: var(--muted); margin: 0 10px; }
+	.dots { display: flex; gap: 2px; }
+	.dots button { width: 18px; height: 18px; padding: 0; border: 0; background: none; cursor: pointer; display: grid; place-items: center; }
+	.dots button::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--line); transition: background 0.2s, transform 0.2s; }
+	.dots button.on::before { background: var(--ink-2); transform: scale(1.25); }
+	.dots button:hover::before { background: var(--muted); }
+	.dots button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-radius: 50%; }
 	.stack { display: flex; width: 100%; height: 22px; border-radius: 4px; overflow: hidden; background: var(--grid); margin-top: 14px; animation: wipe 1.3s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s both; }
 	.stack span { background: var(--c); height: 100%; transition: width 0.9s ease; }
 	.stack span + span { box-shadow: inset 2px 0 0 var(--bg); }
@@ -184,6 +239,9 @@
 		.pg.flip .pg-text { order: 0; }
 	}
 	@media (max-width: 640px) {
+		.fact { font-size: 0.95rem; }
+		.fact b { font-size: 1.2rem; }
+		.fact .sep { margin: 0 6px; }
 		.hero { min-height: min(80svh, 640px); }
 		.live-fig { margin-top: 24px; }
 		.view { padding: 12px; }
