@@ -77,32 +77,45 @@ def fetch(interval_nz=None, tries=6):
 
 
 _isl = None
-def to_frame(rows):
-    """API rows -> DataFrame in the daily-file layout."""
+FIELDS = ('PointOfConnectionCode', 'FiveMinuteIntervalDatetime', 'RunDateTime', 'SPDLoadMegawatt', 'SPDGenerationMegawatt',
+          'DollarsPerMegawattHour')
+
+
+def to_frame(rows, interval_nz=None):
+    """API rows -> DataFrame in the daily-file layout. interval_nz: the interval asked for, if one was."""
     global _isl
     _isl = _isl or connection_islands()
     out = []
-    # Now and then the API returns rows with fields missing (seen: RunDateTime null, ~3 times a day). A row without
-    # its run time takes the newest run time in the same response; rows without a connection point or interval are
-    # skipped rather than failing the whole update.
+    # Now and then the API returns rows with fields missing (seen: RunDateTime null, ~3 times a day; on 15 Oct 2026
+    # every row of the newest interval for a while). A row without its run time takes the newest run time in the same
+    # response, or a minute before its interval (when each case runs); a row without its interval takes the one asked
+    # for. Rows still without a connection point or interval are skipped rather than failing the whole update.
+    missing = {f: sum(1 for r in rows if r.get(f) is None) for f in FIELDS}
+    if any(missing.values()):
+        print('emi_live: rows with fields missing: ' + ', '.join(f'{f} {n}' for f, n in missing.items() if n)
+              + (f' (of {len(rows)}; first row has {sorted(rows[0])})' if rows else ''), file=sys.stderr)
     runs = [r.get('RunDateTime') for r in rows if isinstance(r.get('RunDateTime'), str)]
     fallback_run = max(runs) if runs else None
+    asked = interval_nz.strftime('%Y-%m-%dT%H:%M:%S') if interval_nz is not None else None
     skipped = 0
     for r in rows:
-        if not isinstance(r.get('PointOfConnectionCode'), str) or not isinstance(r.get('FiveMinuteIntervalDatetime'), str) \
-                or not isinstance(r.get('RunDateTime') or fallback_run, str):
+        when = r.get('FiveMinuteIntervalDatetime') if isinstance(r.get('FiveMinuteIntervalDatetime'), str) else asked
+        if not isinstance(r.get('PointOfConnectionCode'), str) or not isinstance(when, str):
             skipped += 1
             continue
         poc, _, unit = r['PointOfConnectionCode'].partition(' ')
-        local = datetime.fromisoformat(r['FiveMinuteIntervalDatetime']).replace(tzinfo=NZ)       # NZ local, no offset
-        run = datetime.fromisoformat(r.get('RunDateTime') or fallback_run).replace(tzinfo=ZoneInfo('UTC')).astimezone(NZ)  # UTC, no marker
+        local = datetime.fromisoformat(when).replace(tzinfo=NZ)       # NZ local, no offset
+        if isinstance(r.get('RunDateTime') or fallback_run, str):
+            run = datetime.fromisoformat(r.get('RunDateTime') or fallback_run).replace(tzinfo=ZoneInfo('UTC')).astimezone(NZ)  # UTC, no marker
+        else:
+            run = local - timedelta(minutes=1)
         out.append({
             'TradingDate': local.date().isoformat(), 'TradingPeriodNumber': (local.hour * 60 + local.minute) // 30 + 1,
             'IntervalDateTime': local.isoformat(timespec='milliseconds'), 'RunDateTime': run.isoformat(timespec='milliseconds'),
             'PointOfConnectionCode': poc, 'UnitCode': unit or 'N/A', 'PlantName': 'N/A',
             'Island': ISLAND_NAME[island_of(poc, _isl)],
-            'LoadMegawatts': r['SPDLoadMegawatt'], 'GenerationMegawatts': r['SPDGenerationMegawatt'],
-            'DollarsPerMegawattHour': r['DollarsPerMegawattHour'], 'IsDeadFlag': 'N'})
+            'LoadMegawatts': r.get('SPDLoadMegawatt'), 'GenerationMegawatts': r.get('SPDGenerationMegawatt'),
+            'DollarsPerMegawattHour': r.get('DollarsPerMegawattHour'), 'IsDeadFlag': 'N'})
     if skipped:
         print(f'emi_live: skipped {skipped} of {len(rows)} rows with missing fields', file=sys.stderr)
     return pd.DataFrame(out, columns=COLS)

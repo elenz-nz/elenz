@@ -36,9 +36,10 @@ def fetch_interval(t_utc):
     """State rows for one interval (UTC timestamp); an 'empty' marker if the API has no case for it."""
     local = t_utc.tz_convert(NZ).tz_localize(None).to_pydatetime()
     rows = emi_live.fetch(local)
-    if not rows:
+    f = emi_live.to_frame(rows, local) if rows else None
+    if f is None or f.empty:
         return st.empty_rows([t_utc])
-    return st.compact(emi_live.to_frame(rows), 'api')
+    return st.compact(f, 'api')
 
 
 def fetch_many(times):
@@ -102,9 +103,23 @@ def main(log=print):
     log('state:', 'none yet' if s is None else f'{len(s)} intervals to {s.index.max()}')
     before = None if s is None else (len(s), s.index[s.src != 'empty'].max())
 
-    latest = st.compact(emi_live.to_frame(emi_live.fetch()), 'api')
-    t_latest = latest.index.max()
-    s = st.merge(s, latest)
+    latest = emi_live.to_frame(emi_live.fetch())
+    if len(latest):
+        latest = st.compact(latest, 'api')
+        s = st.merge(s, latest)
+    elif s is None:
+        raise SystemExit('the API returned no usable rows and there is no stored state yet')
+    else:
+        log('the API returned no usable rows for its latest interval; asking for each newer interval by time instead')
+    t_latest = s.index[s.src != 'empty'].max()
+    # intervals after the newest stored one, up to now, asked for by time: covers a broken "latest" reply, and a run
+    # that comes after more than one new interval. Ones not published yet are left alone (no 'empty' marker).
+    now5 = pd.Timestamp.now(tz='UTC').floor('5min')
+    newer = list(pd.date_range(t_latest + pd.Timedelta(minutes=5), now5, freq='5min'))[-6:]
+    for part in fetch_many(newer):
+        if (part.src != 'empty').any():
+            s = st.merge(s, part)
+    t_latest = s.index[s.src != 'empty'].max()
 
     # newest first: everything after the last stored real interval, plus the two before it (possible re-runs)
     have = set(s.index[s.src != 'empty']) | set(s.index[s.src == 'empty'])
