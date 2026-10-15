@@ -127,7 +127,9 @@
 				<article class="method" id="m-co2">
 					<h3>Emissions intensity</h3>
 					<p class="m-src"><span>Source</span>Calculated from the fuel mix, with factors checked against Genesis's reported emissions</p>
-					<p>Each fuel's output × its emission factor, in t CO₂e/MWh:</p>
+					<p><b>What it means.</b> Emissions intensity is how much greenhouse gas is released for each unit of electricity generated, in grams of CO₂-equivalent per kilowatt-hour (g CO₂e/kWh). A kilowatt-hour is enough to run a 1 kW heater for an hour. CO₂-equivalent counts other greenhouse gases, such as methane, as the amount of CO₂ with the same warming effect.</p>
+					<p>Hydro, wind and solar release almost nothing as they generate, so intensity is low when they supply most of the power and rises when gas and coal plants run. Geothermal sits in between, since the steam carries some CO₂ up from underground. Because it is per unit, intensity shows how clean the electricity is at any moment, whether demand is high or low.</p>
+					<p>It is the emissions from every generating plant divided by total generation, including estimated embedded solar. Each fuel's output is multiplied by its emission factor, in tonnes of CO₂e per MWh (the same as kg per kWh):</p>
 					<ul class="figs wide">
 						<li><b>0.65–1.0</b> Huntly Rankines<small>Varies with how much of their fuel was coal. Genesis reports the coal share each quarter (24% in Apr–Jun 2026); the latest is carried forward until the next report</small></li>
 						<li><b>0.80</b> diesel</li>

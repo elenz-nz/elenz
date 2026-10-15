@@ -3,7 +3,6 @@
 	import Masthead from '#lib/site/Masthead.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import { summarise, ring } from '#lib/home/now.js';
-	import { rankineQuarter } from '#lib/tracker/emissions.js';
 	import { VIEW, NI as NI_PATH, SI as SI_PATH, PTS } from '#lib/home/nzmap.js';
 
 	const DATA_URL = '/data/tracker.json';
@@ -128,7 +127,7 @@
 			<div class="kpi">
 				<span class="k-lbl">Emissions intensity</span>
 				<span class="k-val">{nz ? fmt(nz.co2) : '–'}<small>g CO₂e/kWh</small></span>
-				<span class="k-sub">{#if now}{@const rq = rankineQuarter(now.t)}<span title="Huntly's Rankine units burn coal or gas; their factor uses the coal share Genesis reports each quarter{rq.carried ? ', carried forward until the next report' : ''}">Huntly Rankines {Math.round(rq.share * 100)}% coal ({rq.quarter})</span>{/if}</span>
+				<span class="k-sub"><a class="k-link" href="/about#m-co2">CO₂ per kWh generated</a></span>
 			</div>
 			<div class="kpi">
 				<span class="k-lbl">Embedded solar <span class="tag">est.</span></span>
@@ -246,6 +245,8 @@
 	.k-val.prices { display: grid; gap: 2px; font-size: 1.25rem; }
 	.k-val .isl { font-family: var(--font-ui); font-size: 0.72rem; font-weight: 700; color: var(--muted); margin-right: 7px; letter-spacing: 0.04em; }
 	.k-sub { color: var(--muted); font-size: 0.76rem; }
+	.k-link { color: inherit; text-decoration: underline dotted; text-underline-offset: 2px; }
+	.k-link:hover { color: var(--accent); }
 	.k-val.prices small { font-size: 0.72rem; margin-left: 3px; }
 	.tag { font-size: 0.68rem; color: var(--muted); letter-spacing: 0.04em; font-weight: 500; margin-left: 4px; }
 
