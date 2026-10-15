@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Masthead from '#lib/site/Masthead.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
+	import Coffee from '#lib/site/Coffee.svelte';
 </script>
 
 <svelte:head>
@@ -26,6 +27,12 @@
 				<li>HVDC transfer between the islands, emissions intensity and renewable share.</li>
 				<li>Any range from the last 24 hours to the whole history since 2020, for New Zealand or either island.</li>
 			</ul>
+		</section>
+
+		<section class="support" id="support" aria-labelledby="sup-h">
+			<h2 id="sup-h">Support Elenz</h2>
+			<p>Elenz is free and has no ads. If you find it useful, a coffee helps keep it running and improving.</p>
+			<div><Coffee label="Buy Elenz a coffee" /></div>
 		</section>
 
 		<section class="sources" id="sources" aria-labelledby="src-h">
