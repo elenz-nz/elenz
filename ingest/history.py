@@ -55,7 +55,7 @@ import pandas as pd
 import hvdc
 import rooftop
 import state as st
-from build_tracker import KEYS, assemble, enc
+from build_tracker import assemble, enc
 from common import BLOB, FACILITIES, NZ
 from store import open_store
 from sync import DISPATCH
@@ -433,6 +433,7 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
     yesterday = datetime.now(NZ).date() - timedelta(days=1)
     caps_before = index.get('roof_mw', {})
     done = set(index.get('done', [])) - left   # complete months: nothing left to fetch or rebuild
+    done_before = set(done)
     changed_dd = {}
     stopped = ''
     repairs = 0
@@ -524,6 +525,10 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
     progress = {'months': months, 'done': sorted(done), 'rebuild_left': sorted(left), 'hash': mhash, 'roof_mw': caps_before,
                 'writes': {today: store.used + 1}}
     if not changed_dd:
+        # no month rebuilt, but a run can still have saved files (a month's state, the solar capacity table) or
+        # finished months: record them, so the day's KV write count stays right and finished months aren't revisited
+        if store.used > used or done != done_before:
+            put_json(store, 'hist/progress.json', progress)
         log('history: nothing new' + (f' ({stopped}; continues next run)' if stopped else ''))
         return
     if stopped or left:

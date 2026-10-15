@@ -72,7 +72,7 @@ def build(state, irr, cap=None, log=print):
                   'sat_end': int(sat_end.timestamp() * 1000) if sat_end is not None else None,
                   'built': int(pd.Timestamp.now(tz='UTC').timestamp() * 1000)}
     log(f'built {len(full)} intervals ({int(s.src.notna().sum())} with data) to {last}, {len(js["plants"])} plants; '
-        f'embedded solar now {roof["NI"].iloc[-1] + roof["SI"].iloc[-1]:.0f} MW'
+        f'embedded solar now {js["NI"]["roof"][-1] + js["SI"]["roof"][-1]} MW'
         + (f' (satellite to {sat_end}, {n_now} intervals carried forward)' if sat_end is not None else ' (no satellite data)'))
     return js
 

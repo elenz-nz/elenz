@@ -7,7 +7,7 @@ Raw dispatch rows (daily files or API) are reduced to what the tracker needs:
   T            Tiwai smelter load MW
   P|NI, P|SI   island reference price $/MWh
 plus 'src' ('api', 'file', or 'empty' for intervals with no dispatch case, so they aren't fetched again).
-About 140 columns × 2,016 rows: roughly 0.5 MB gzipped.
+About 110-140 columns × ~2,300 rows (KEEP_DAYS): roughly 0.3 MB gzipped.
 """
 import io
 

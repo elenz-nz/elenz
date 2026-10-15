@@ -79,7 +79,9 @@ This repository is public: never commit keys, tokens or personal details.
 - Each interval appears in the API about 1:10–2:00 after its start (measured 15 Oct 2026), while the cron's run
   starts ~10–50 s after the mark, so it used to save the interval before and run 6–11 minutes behind. `update.py` now
   waits (up to `WAIT`, polling every 15 s) for the interval that has just begun, so data lands within seconds of
-  publication (1–7 minutes old). Pages poll every minute; the Worker caches tracker.json for 30 s. (Changing the cron in
+  publication (1–7 minutes old) when the API keeps up. It doesn't always: on the evening of 15 Oct 2026 it ran
+  10–13 minutes behind with RunDateTime missing on every row, and each run waited out `WAIT` for nothing (harmless).
+  Pages poll every minute and download the whole file each time (no ETag yet); the Worker caches tracker.json for 30 s. (Changing the cron in
   wrangler.jsonc didn't take effect: the automatic deploy updates code, not cron triggers.)
 - The API's "latest" reply can come back broken: on 15 Oct 2026 (~09:01–09:11 UTC) every row lacked fields, which
   crashed the job. `update.py` now logs the missing fields and asks for each interval after the newest stored one by time.
@@ -124,8 +126,16 @@ This repository is public: never commit keys, tokens or personal details.
   occasionally days under review, e.g. 31 Aug and 1 Sep 2026). Trading period k starts (k−1) half-hours after local
   midnight. History uses final prices; dispatch prices can be wildly different under scarcity pricing (9 Aug 2021:
   dispatch peak $356,621/MWh, final peak $2,698).
-- `history.py` keeps to `WRITE_BUDGET` (280) KV writes per UTC day, counted in `hist/progress.json`; a rebuild that
-  hits it resumes next run (`rebuild_left`), and `hist/index.json`/`day.json` are only republished when complete.
+- `history.py` keeps to `WRITE_BUDGET` (280) KV writes per UTC day, counted in `hist/progress.json` (saved by every
+  run that writes anything, including runs that rebuild no month); a rebuild that hits it resumes next run
+  (`rebuild_left`), and `hist/index.json`/`day.json` are only republished when complete.
+- `ingest/requirements.txt` pins major versions (pandas 3, numpy 2): the live job installs them on every run, so
+  check a new major version locally before widening the pin.
+- `npm run check` type-checks the Svelte/TypeScript files only (`checkJs` is off in `site/tsconfig.json`: the chart
+  code in `src/lib/tracker/*.js` and `src/lib/home/now.js` is untyped JavaScript and gave ~800 false alarms).
+- GitHub's own schedules (the backups in the three workflows) fire only now and then (9 scheduled runs in two days,
+  checked 15 Oct 2026), so they don't protect against the Worker's cron stopping: nothing outside Cloudflare alerts
+  if it does.
 
 ## Status and next steps
 
@@ -134,7 +144,8 @@ This repository is public: never commit keys, tokens or personal details.
    upgrade path if GitHub's schedule delays become a problem.
 3. History since Sep 2020 on the tracker page: 30 days, 1 year, All (Oct 2026).
    Daily history keeps each day's peak demand and peak generation (total output including embedded solar). BUILD 4
-   (embedded solar model, metered HVDC) rebuilt from 15 Oct 2026 over about four runs.
+   (embedded solar model, metered HVDC) rebuilding from 15 Oct 2026 over about four runs (still in progress at
+   11:20 pm 15 Oct: the public `hist/index.json` is from 14 Oct until it finishes).
 4. Pages: landing (`/`), live (`/now`), tracker, About, and Articles (`/articles`, published 15 Oct 2026 with the Winter 2026 review). Stale-data watchdog, Cloudflare Web Analytics and a Buy Me a
    Coffee link are in place.
 5. Then the brief's build order: plant pages, map, hydro panel and records (planned as short record articles),

@@ -1,2 +1,4 @@
-pandas>=2.2
-numpy>=1.26
+# Major versions pinned: the live job installs these every 5 minutes, so a new major release must not arrive
+# unannounced. Tested with pandas 3.0 and numpy 2.5 (Oct 2026); widen after checking a new major version.
+pandas>=3.0,<4
+numpy>=2.0,<3

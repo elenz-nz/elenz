@@ -123,6 +123,7 @@
 
 <svelte:head>
 	<title>Tracker · ELENZ</title>
+	<meta name="description" content="New Zealand's electricity generation by fuel, plant, owner or hydro scheme, with wholesale prices, demand, HVDC transfer and emissions, from the last 24 hours back to 2020." />
 </svelte:head>
 
 <div class="wrap">

@@ -2,10 +2,11 @@
 
 Each run:
   1. loads the state (and irradiance) from the store (Cloudflare KV, or data/store locally)
-  2. fetches the newest intervals, re-reads the last two in case they were re-run, then fills older gaps in the
+  2. fetches the newest intervals (waiting up to WAIT seconds for the one that has just begun, when the API is
+     keeping up), re-reads the two before the newest in case they were re-run, then fills older gaps in the
      7-day window, newest first, up to a per-run budget (so the first runs fill the week over ~30-40 minutes)
-  3. refreshes irradiance if it is more than half an hour old (Himawari satellite for the rooftop solar points,
-     about an hour behind; the forecast service only if the satellite feed is down)
+  3. refreshes irradiance if it is more than half an hour old (Himawari satellite for the embedded solar points,
+     ~45 minutes behind; the forecast service only if the satellite feed is down)
   4. builds tracker.json and saves it and the state back to the store
 
 Run from the repo root:  python3 ingest/update.py   (needs EMI_KEY; uses Cloudflare KV when CF_ACCOUNT_ID and
@@ -13,10 +14,8 @@ CF_API_TOKEN are set, otherwise data/store and site/static/data/tracker.json).
 """
 import json
 import os
-import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta, timezone
 from urllib.request import Request, urlopen
 
 import pandas as pd

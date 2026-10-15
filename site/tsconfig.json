@@ -1,7 +1,9 @@
 {
 	"extends": "$app/tsconfig",
 	"compilerOptions": {
-		"strict": true
+		"strict": true,
+		// the chart code is plain JavaScript without type annotations: check the Svelte and TypeScript files only
+		"checkJs": false
 	},
 	"include": ["src", "vite.config.ts"]
 }

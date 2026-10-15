@@ -16,7 +16,6 @@ import io
 import json
 import os
 import warnings
-from urllib.request import Request, urlopen
 
 import numpy as np
 import pandas as pd
