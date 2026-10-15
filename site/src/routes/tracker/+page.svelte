@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
 	import { mountTracker } from '#lib/tracker/tracker.js';
 	import Masthead from '#lib/site/Masthead.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
@@ -80,11 +81,13 @@
 
 	onMount(() => {
 		let tracker: ReturnType<typeof mountTracker> | undefined;
+		let due = 0; // when to fetch again (#lib/site/poll)
 		let stamp = 0;
 		async function load() {
 			const r = await fetch(DATA_URL, { cache: 'no-cache' });
 			if (!r.ok) throw new Error(`The data file returned ${r.status}.`);
 			const D = await r.json();
+			due = nextDue(D.meta.end);
 			if (D.meta.end === stamp) return;
 			stamp = D.meta.end;
 			meta = D.meta;
@@ -93,12 +96,12 @@
 			else tracker = mountTracker(D, { status: (v: View) => (view = v) });
 		}
 		load().catch((e) => (error = `The data couldn't be loaded. ${e.message} Try reloading the page.`));
-		// new data lands every 5–15 minutes; check every minute while the page is on screen, and on return
+		// tick every minute (clock and labels); fetch only once the next interval is due, while on screen
 		const check = () => {
 			now = Date.now();
-			if (document.visibilityState === 'visible') load().catch(() => {});
+			if (document.visibilityState === 'visible' && Date.now() >= due) load().catch(() => {});
 		};
-		const poll = setInterval(check, 60_000);
+		const poll = setInterval(check, CHECK_EVERY);
 		document.addEventListener('visibilitychange', check);
 		return () => {
 			clearInterval(poll);

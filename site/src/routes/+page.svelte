@@ -2,6 +2,7 @@
 	// The landing page: the mark, one live figure and the generation mix, then a glimpse of each page.
 	// To add a page, add an entry to PAGES with a preview component in #lib/landing.
 	import { onMount } from 'svelte';
+	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
 	import Masthead from '#lib/site/Masthead.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import Mark from '#lib/site/Mark.svelte';
@@ -67,11 +68,13 @@
 	const live = $derived(now !== null && (clock - now.end) / 60000 < LIVE_MINUTES);
 
 	onMount(() => {
+		let due = 0; // when to fetch again (#lib/site/poll)
 		let stamp = 0, stampSeen = false;
 		async function load() {
 			const r = await fetch(DATA_URL, { cache: 'no-cache' });
 			if (!r.ok) throw new Error(`The data file returned ${r.status}.`);
 			const d = await r.json();
+			due = nextDue(d.meta.end);
 			if (d.meta.end === stamp) return;
 			stamp = d.meta.end;
 			D = d;
@@ -83,9 +86,9 @@
 		load().catch((e) => (error = `The live data couldn't be loaded. ${e.message}`));
 		const check = () => {
 			clock = Date.now();
-			if (document.visibilityState === 'visible') load().catch(() => {});
+			if (document.visibilityState === 'visible' && Date.now() >= due) load().catch(() => {});
 		};
-		const poll = setInterval(check, 60_000);
+		const poll = setInterval(check, CHECK_EVERY);
 		lastTurn = Date.now() + 1500; // let the big figure finish counting up before the first turn
 		const turn = setInterval(() => {
 			if (paused || document.visibilityState !== 'visible' || Date.now() - lastTurn < ROTATE_MS - 50 || !facts.length) return;

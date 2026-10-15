@@ -151,7 +151,9 @@ def main(log=print):
     js = build(s, irradiance(store, log), capacity(store), log)
     body = json.dumps(js, separators=(',', ':'), allow_nan=False).encode()
     store.put('state.csv.gz', st.dumps(s))
-    store.put('tracker.json', body, 'application/json')
+    # the version tag rides along in the same KV write: the Worker sends it as an ETag, so pages that already have
+    # this version get a 304 Not Modified instead of the whole file
+    store.put('tracker.json', body, 'application/json', {'v': str(js['meta']['built']), 'end': js['meta']['end']})
     if isinstance(store, LocalStore):
         write_json(js, os.path.join(OUT, 'tracker.json'))
     log(f'saved tracker.json ({len(body) // 1024} KB) in {time.time() - started:.0f} s')

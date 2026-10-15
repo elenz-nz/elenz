@@ -81,7 +81,11 @@ This repository is public: never commit keys, tokens or personal details.
   waits (up to `WAIT`, polling every 15 s) for the interval that has just begun, so data lands within seconds of
   publication (1–7 minutes old) when the API keeps up. It doesn't always: on the evening of 15 Oct 2026 it ran
   10–13 minutes behind with RunDateTime missing on every row, and each run waited out `WAIT` for nothing (harmless).
-  Pages poll every minute and download the whole file each time (no ETag yet); the Worker caches tracker.json for 30 s. (Changing the cron in
+  Pages tick every minute but fetch only once the next interval is due (`site/src/lib/site/poll.js`: 6½ minutes after
+  the newest interval's start, then every minute until it lands). The live job stores a version tag with tracker.json
+  as KV metadata in the same write (`store.put(..., metadata=)`, multipart; saved plainly if KV refuses it); the Worker
+  sends it as a weak ETag and answers a matching If-None-Match with 304, so repeat checks carry no body. The Worker
+  caches tracker.json (and its metadata) for 30 s. (Changing the cron in
   wrangler.jsonc didn't take effect: the automatic deploy updates code, not cron triggers.)
 - The API's "latest" reply can come back broken: on 15 Oct 2026 (~09:01–09:11 UTC) every row lacked fields, which
   crashed the job. `update.py` now logs the missing fields and asks for each interval after the newest stored one by time.

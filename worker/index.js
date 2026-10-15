@@ -1,7 +1,8 @@
 // The Elenz Worker.
 //  fetch:     serves the site's static files, except /data/tracker.json and /data/history/*, which come from
 //             Workers KV (written by the GitHub Actions jobs). Until KV has data, the bundled snapshot is served for
-//             tracker.json; history returns 404 until the first history run.
+//             tracker.json; history returns 404 until the first history run. tracker.json carries an ETag (the
+//             version tag the live job stores as KV metadata) and answers If-None-Match with 304.
 //  scheduled: asks GitHub to run the data jobs. Every 5 minutes: the live update (update-data.yml), which waits
 //             for the interval that has just begun (the EMI API publishes each 1-2 minutes after it starts). Every 6 hours:
 //             the history update (history.yml), which adds newly published daily dispatch files. GitHub's own
@@ -25,15 +26,25 @@ export default {
       });
     }
     if (url.pathname === '/data/tracker.json' && env.DATA) {
-      const body = await env.DATA.get('tracker.json', { type: 'stream', cacheTtl: 30 });
+      // the live job stores a version tag with the file (KV metadata, same write): sent as the ETag, so a browser
+      // that already has this version gets 304 Not Modified (no body) instead of ~110 KB. Weak, because Cloudflare
+      // compresses the response; the comparison ignores the W/ prefix either way.
+      const { value: body, metadata } = await env.DATA.getWithMetadata('tracker.json', { type: 'stream', cacheTtl: 30 });
       if (body) {
-        return new Response(body, {
-          headers: {
-            'content-type': 'application/json; charset=utf-8',
-            'cache-control': 'public, max-age=30',
-            'access-control-allow-origin': '*',
-          },
-        });
+        const headers = {
+          'content-type': 'application/json; charset=utf-8',
+          'cache-control': 'public, max-age=30',
+          'access-control-allow-origin': '*',
+        };
+        if (metadata && metadata.v) {
+          headers.etag = `W/"${metadata.v}"`;
+          const seen = (request.headers.get('if-none-match') || '').split(',').map((s) => s.trim().replace(/^W\//, ''));
+          if (seen.includes(`"${metadata.v}"`) || seen.includes('*')) {
+            await body.cancel();
+            return new Response(null, { status: 304, headers });
+          }
+        }
+        return new Response(body, { headers });
       }
     }
     const hist = url.pathname.match(HISTORY_FILE);

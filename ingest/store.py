@@ -7,6 +7,7 @@ import json
 import os
 import re
 import time
+import uuid
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -44,15 +45,35 @@ class KVStore:
                     return None
                 if e.code in (401, 403):
                     raise SystemExit(f'Cloudflare refused the API token (HTTP {e.code}). It needs "Workers KV Storage: Edit".')
-                if attempt == 3:
+                if attempt == 3 or (400 <= e.code < 500 and e.code != 429):   # a bad request won't improve on retry
                     raise
             time.sleep(2 ** attempt)
 
     def get(self, key):
         return self._req('GET', key)
 
-    def put(self, key, body, ctype='application/octet-stream'):
-        self._req('PUT', key, body, ctype)
+    def put(self, key, body, ctype='application/octet-stream', metadata=None):
+        """Save a value. metadata: a small dict stored with it in the same write (the Worker reads it with
+        getWithMetadata, e.g. a version tag for tracker.json), sent as a multipart form as the KV API requires."""
+        if metadata is None:
+            self._req('PUT', key, body, ctype)
+            return
+        boundary = uuid.uuid4().hex
+        form = b''.join([
+            f'--{boundary}\r\nContent-Disposition: form-data; name="metadata"\r\n\r\n'.encode(),
+            json.dumps(metadata, separators=(',', ':')).encode(), b'\r\n',
+            f'--{boundary}\r\nContent-Disposition: form-data; name="value"; filename="{os.path.basename(key)}"\r\n'
+            f'Content-Type: {ctype}\r\n\r\n'.encode(), body, b'\r\n',
+            f'--{boundary}--\r\n'.encode(),
+        ])
+        try:
+            self._req('PUT', key, form, f'multipart/form-data; boundary={boundary}')
+        except HTTPError as e:
+            if e.code != 400:
+                raise
+            # never lose the data over its metadata: save it plainly (pages then just miss the version tag)
+            print(f'store: KV refused metadata for {key} (HTTP 400: {e.read()[:200]!r}); saved without it')
+            self._req('PUT', key, body, ctype)
 
 
 class LocalStore:
@@ -64,7 +85,7 @@ class LocalStore:
         path = os.path.join(self.folder, key)
         return open(path, 'rb').read() if os.path.exists(path) else None
 
-    def put(self, key, body, ctype=None):
+    def put(self, key, body, ctype=None, metadata=None):   # metadata: only kept by KV
         path = os.path.join(self.folder, key)
         os.makedirs(os.path.dirname(path), exist_ok=True)  # keys like hist/hh/2026-09.json
         with open(path + '.tmp', 'wb') as f:
