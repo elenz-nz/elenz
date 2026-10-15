@@ -85,7 +85,7 @@
 			clock = Date.now();
 			if (document.visibilityState === 'visible') load().catch(() => {});
 		};
-		const poll = setInterval(check, 120_000);
+		const poll = setInterval(check, 60_000);
 		lastTurn = Date.now() + 1500; // let the big figure finish counting up before the first turn
 		const turn = setInterval(() => {
 			if (paused || document.visibilityState !== 'visible' || Date.now() - lastTurn < ROTATE_MS - 50 || !facts.length) return;

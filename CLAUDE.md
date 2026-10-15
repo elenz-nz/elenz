@@ -51,7 +51,7 @@ This repository is public: never commit keys, tokens or personal details.
   ~225 for a full backfill or rebuild, on top of the live job's ~600/day, so avoid more than one full rebuild a day.
 - `worker/index.js`: serves static assets, `/data/tracker.json` from KV (binding `DATA`), falling back to the
   bundled snapshot, and `/data/history/{index,day,hh/YYYY-MM}.json` from KV keys `hist/*`; its `scheduled` handler
-  dispatches the GitHub jobs (live every 5 minutes, history every 6 hours, watchdog every 15 minutes) (Worker secret `GITHUB_TOKEN`: fine-grained,
+  dispatches the GitHub jobs (live every 5 minutes at :x2, history every 6 hours, watchdog every 15 minutes) (Worker secret `GITHUB_TOKEN`: fine-grained,
   elenz only, Actions read/write; it expires, so renew it yearly). KV free plan: 1,000 writes/day (the job uses ~600), 100,000 reads/day.
 - `facilities/rooftop_points.csv`, `rooftop_nsp.csv` (irradiance points and NSP → point; regenerate with
   `analysis/make_points.py`), `rooftop_capacity.json` (capacity snapshot the live job uses until the history job
@@ -76,6 +76,11 @@ This repository is public: never commit keys, tokens or personal details.
   bus nodes with no load or generation.
 - `FiveMinuteIntervalDatetime` is NZ local time without an offset; `RunDateTime` is UTC without a marker.
   The case for interval T runs at about T−1 min.
+- Each interval appears in the API 1:10–2:00 after its start (measured 15 Oct 2026), so the live cron runs at 2 minutes
+  past each 5-minute mark (the run starts ~50 s later); at :x0 it always got the interval before. The site's data is then
+  3–8 minutes old; pages poll every minute and the Worker caches tracker.json for 30 s.
+- The API's "latest" reply can come back broken: on 15 Oct 2026 (~09:01–09:11 UTC) every row lacked fields, which
+  crashed the job. `update.py` now logs the missing fields and asks for each interval after the newest stored one by time.
 - The API keeps roughly one month of history (`$filter=FiveMinuteIntervalDatetime eq datetime'YYYY-MM-DDTHH:MM'`).
   Older data must come from the EMI files, so every interval must be stored as it arrives.
 - Limits: 60 calls/min, 60 MB/hour. Send `Accept-Encoding: gzip` (168 KB → 11 KB per interval).

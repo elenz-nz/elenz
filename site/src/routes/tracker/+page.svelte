@@ -93,12 +93,12 @@
 			else tracker = mountTracker(D, { status: (v: View) => (view = v) });
 		}
 		load().catch((e) => (error = `The data couldn't be loaded. ${e.message} Try reloading the page.`));
-		// new data lands every 5–15 minutes; check every 2 minutes while the page is on screen, and on return
+		// new data lands every 5–15 minutes; check every minute while the page is on screen, and on return
 		const check = () => {
 			now = Date.now();
 			if (document.visibilityState === 'visible') load().catch(() => {});
 		};
-		const poll = setInterval(check, 120_000);
+		const poll = setInterval(check, 60_000);
 		document.addEventListener('visibilitychange', check);
 		return () => {
 			clearInterval(poll);
