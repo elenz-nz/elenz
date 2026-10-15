@@ -2,7 +2,7 @@
 // Totals follow the tracker: generation is the sum of each fuel's output (battery discharge only, no HVDC), the
 // renewable share and emissions intensity are of that total.
 import { FUELS } from '#lib/tracker/fuels.js';
-import { efAt } from '#lib/tracker/emissions.js';
+import { efAt, geoFactor } from '#lib/tracker/emissions.js';
 
 const GEN = FUELS.filter((f) => f.k !== 'hvdc');
 
@@ -11,7 +11,10 @@ export function summarise(D) {
   const j = D.N - 1;
   const at = (isl, k) => (D[isl][k] ? D[isl][k][j] ?? 0 : 0);
   const t = D.t0 + j * D.step;
-  const region = (pick) => {
+  // geothermal: each station's own factor, weighted by its output now (falls back to the fuel's factor)
+  const geoPlants = (isl) => (D.plants || []).filter((p) => p.fuel === 'geo' && (!isl || p.isl === isl));
+  const efOf = (f, isl) => (f.k === 'geo' ? geoFactor(geoPlants(isl), j, t) ?? efAt(f, t) : efAt(f, t));
+  const region = (pick, isl) => {
     const fuels = Object.fromEntries(GEN.map((f) => [f.k, pick(f.k)]));
     let gen = 0, ren = 0, co2 = 0;
     for (const f of GEN) {
@@ -19,12 +22,12 @@ export function summarise(D) {
       if (x <= 0) continue;
       gen += x;
       if (f.ren) ren += x;
-      co2 += x * efAt(f, t);
+      co2 += x * efOf(f, isl);
     }
     return { fuels, gen, ren: gen > 0 ? (ren / gen) * 100 : 0, co2: gen > 0 ? (co2 / gen) * 1000 : 0 };
   };
   const isl = (r) => ({
-    ...region((k) => at(r, k)),
+    ...region((k) => at(r, k), r),
     demand: at(r, 'metered'), underlying: at(r, 'underlying'), price: at(r, 'price'),
     roof: at(r, 'roof'), roofU: at(r, 'roofU'),
   });

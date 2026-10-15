@@ -49,3 +49,67 @@ export function rankineQuarter(t) {
   const next = STEPS[i][0] + 92 * 86400e3;
   return { quarter: RANKINE_COAL_SHARE[i][0], share: RANKINE_COAL_SHARE[i][1], carried: t >= next };
 }
+
+// ---------- geothermal ----------
+// Operational emissions (non-condensable gases released from the field) per station, g CO₂e/kWh (= kg/MWh), from the
+// NZ Geothermal Association's emissions working group (McLean et al.): CY2020 from NZGW 2021 (Table 3); CY2022 from
+// the NZGA 2023 update (published as lifecycle, less its 10 g/kWh plant-cycle allowance); CY2023 from McLean et al.
+// 2024 (as used by TIMES-NZ). Each year uses the newest figures published for it or before it; years before 2020
+// use 2020's. Stations reinject more CO₂ each year (Ngāwhā, Te Huka, Ngā Tamariki), so add new years as published
+// (each November, at the NZ Geothermal Workshop).
+const GEO_YEARS = {
+  //               2020  2022  2023
+  wairakei:      [  18,   19,   21],
+  te_mihi:       [  38,   37,   34],
+  poihipi:       [  38,   38,   39],
+  ohaaki:        [ 305,  282,  302],
+  te_huka:       [  51,   49,   24],
+  rotokawa:      [  99,   57,   58],
+  nga_awa_purua: [  55,   56,   59],
+  mokai:         [  32,   25,   27],
+  ngatamariki:   [  52,   40,   43],
+  kawerau_kgl:   [ 119,  126,  122],
+  te_ahi_o_maui: [  49,   60,   61],
+  ngawha_oec4:   [ 313,  313,   95],   // commissioned 2021; until 2023 the field's pre-reinjection figure (2020, OEC1–3)
+};
+const GEO_YEAR_COLS = [2020, 2022, 2023];
+// stations without published figures yet: estimates (TIMES-NZ assumptions), until the NZGA publishes them
+const GEO_ASSUMED = { tauhara: 32, te_huka_3: 0, topp2: 0 };
+const GEO_DEFAULT = 57;   // fleet average, CY2023: for anything unmatched
+
+// dispatch plant name → station
+const GEO_PLANT = {
+  'Wairakei': 'wairakei', 'Te Mihi 1': 'te_mihi', 'Te Mihi 2': 'te_mihi', 'Poihipi': 'poihipi', 'Ōhaaki': 'ohaaki',
+  'Te Huka': 'te_huka', 'Te Huka 3': 'te_huka_3', 'Tauhara': 'tauhara', 'Rotokawa': 'rotokawa',
+  'Nga Awa Pūrua': 'nga_awa_purua', 'Mokai': 'mokai', 'Ngā Tamariki': 'ngatamariki', 'Kawerau': 'kawerau_kgl',
+  'Kawerau (Te Ahi O Maui)': 'te_ahi_o_maui', 'Kawerau (TOPP2)': 'topp2', 'Ngāwhā B': 'ngawha_oec4',
+  // 'Carter Holt Harvey Energy Ltd CoGen' (Kawerau mill, KAW0112): to confirm; uses the fleet default meanwhile
+};
+
+const geoCache = new Map();
+/** Geothermal factor (t CO₂e/MWh) for a dispatch plant at time t. */
+export function geoEf(name, t) {
+  const year = new Date(t + 13 * 3600e3).getUTCFullYear();   // NZ year, near enough
+  const key = name + '|' + year;
+  let ef = geoCache.get(key);
+  if (ef === undefined) {
+    const st = GEO_PLANT[name], row = st && GEO_YEARS[st];
+    if (row) {
+      let i = 0;
+      while (i + 1 < GEO_YEAR_COLS.length && year >= GEO_YEAR_COLS[i + 1]) i++;
+      ef = row[i] / 1000;
+    } else ef = (st && st in GEO_ASSUMED ? GEO_ASSUMED[st] : GEO_DEFAULT) / 1000;
+    geoCache.set(key, ef);
+  }
+  return ef;
+}
+
+/** Generation-weighted geothermal factor at index i of a set of plant series (plants with fuel 'geo'), or null. */
+export function geoFactor(plants, i, t) {
+  let mw = 0, em = 0;
+  for (const p of plants) {
+    const x = p.s[i];
+    if (x > 0) { mw += x; em += x * geoEf(p.name, t); }
+  }
+  return mw > 0 ? em / mw : null;
+}

@@ -2,7 +2,7 @@
 // Data: tracker.json built by ingest/build_tracker.py. Drawn on <canvas>; the page supplies the markup (ids below).
 
 import { FUELS } from './fuels.js';
-import { efAt } from './emissions.js';
+import { efAt, geoEf } from './emissions.js';
 import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTotal } from './series.js';
 import PLANT_META from './plants.json';  // owner and hydro scheme per plant (ingest/plant_meta.py)
 export { nzOffset, tzName };
@@ -246,13 +246,19 @@ export function mountTracker(D, hooks = {}) {
     v.partial = state.end == null && isLong() && n > 0 && key(M.END + 3e5) === key(v.t[n - 1]);
     v.pNI = avg(M.NIs.price); v.pSI = avg(M.SIs.price); v.hvdc = avg(M.hvdcN);
     v.marks = marks(v);
+    // geothermal: each station's own factor by year, weighted by its output (emissions.js)
+    const geo = M.plants.filter(p => p.fuel === 'geo' && (state.region === 'NZ' || p.isl === state.region));
+    const gEm = new Float64Array(M.N), gMw = new Float64Array(M.N);
+    for (const p of geo) for (let i = 0; i < M.N; i++) { const x = p.s[i]; if (x > 0) { gMw[i] += x; gEm[i] += x * geoEf(p.name, M.t[i]); } }
+    const gEmA = avg(gEm), gMwA = avg(gMw);
     v.gen = new Float64Array(n); v.co2 = new Float64Array(n); v.ren = new Float64Array(n);
     for (let j = 0; j < n; j++) {
       let tot = 0, em = 0, re = 0;
       for (const f of FUELS) {
         if (f.k === 'hvdc') continue;
         const x = v.fuels[f.k][j];
-        if (x > 0) { tot += x; em += x * efAt(f, v.t[j]); if (f.ren) re += x; }
+        const ef = f.k === 'geo' && gMwA[j] > 0 ? gEmA[j] / gMwA[j] : efAt(f, v.t[j]);
+        if (x > 0) { tot += x; em += x * ef; if (f.ren) re += x; }
       }
       v.gen[j] = tot; v.co2[j] = tot ? em / tot * 1000 : 0; v.ren[j] = tot ? re / tot * 100 : 0;
     }

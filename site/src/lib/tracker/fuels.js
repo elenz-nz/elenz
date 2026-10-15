@@ -3,7 +3,7 @@
 // emissions.js, which every emissions calculation goes through); ren: renewable;
 // signed: can be negative (charging, export), so never part of shares or totals.
 export const FUELS = [
-  { k: 'geo', name: 'Geothermal', tok: '--f-geo', ef: 0.07, ren: 1 },
+  { k: 'geo', name: 'Geothermal', tok: '--f-geo', ef: 0.057, ren: 1 },  // fallback: each station's own factor applies (emissions.js)
   { k: 'coal', name: 'Coal/gas, Rankine', tok: '--f-coal', ef: 0.95 },  // fallback only: emissions.js sets the Rankines' factor by quarter
   { k: 'gas', name: 'Gas', tok: '--f-gas', ef: 0.46 },
   { k: 'diesel', name: 'Diesel', tok: '--f-diesel', ef: 0.80 },
