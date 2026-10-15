@@ -13,7 +13,7 @@
 // index tell search engines not to list them. The pages still work at /articles for anyone with the address.
 // Set it to true to put Articles in the navigation; drafts then drop off the index (their own address still works,
 // marked as a draft and not indexed) until their `draft` flag is removed.
-export const ARTICLES_PUBLIC = false;
+export const ARTICLES_PUBLIC = true;
 
 export type Kind = 'Record' | 'Quarterly review' | 'Analysis' | 'Guide';
 

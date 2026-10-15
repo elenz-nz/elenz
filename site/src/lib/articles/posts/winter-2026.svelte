@@ -4,7 +4,6 @@
 		dek: 'Demand set a new high in an August cold snap, South Island water flowed north in record amounts, and new solar farms set records in mid-winter. Thermal generation fell to its smallest winter share.',
 		date: '2026-10-15',
 		kind: 'Quarterly review',
-		draft: true,
 	} as const;
 </script>
 

@@ -7,6 +7,7 @@
 	import Mark from '#lib/site/Mark.svelte';
 	import NowPeek from '#lib/landing/NowPeek.svelte';
 	import TrackerPeek from '#lib/landing/TrackerPeek.svelte';
+	import ArticlesPeek from '#lib/landing/ArticlesPeek.svelte';
 	import HeroBackdrop from '#lib/landing/HeroBackdrop.svelte';
 	import { Tween } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
@@ -21,6 +22,8 @@
 			blurb: 'The system this five minutes: demand, prices at Haywards and Benmore, the HVDC link, emissions, and each island’s generation mix on the map.' },
 		{ href: '/tracker', name: 'Tracker', peek: TrackerPeek,
 			blurb: 'Generation by fuel, plant, owner or scheme, with prices, demand and the HVDC link, from the last 24 hours back to 2020.' },
+		{ href: '/articles', name: 'Articles', peek: ArticlesPeek,
+			blurb: 'New records, quarterly reviews and closer looks at how the system is running, written from the same data as the tracker.' },
 	];
 
 	let D = $state<any>(null);

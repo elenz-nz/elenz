@@ -16,9 +16,9 @@ This repository is public: never commit keys, tokens or personal details.
   `analysis/make_nz_map.py`); `/articles` records, quarterly reviews and analysis (`src/routes/articles/`; one
   Svelte file per article in `src/lib/articles/posts/<slug>.svelte` exporting `meta` {title, dek, date, kind, draft}
   from a module script, with `Record`, `Figure` and `Note` components and `articles.css` alongside; the registry is
-  `src/lib/articles/registry.ts`). The section is hidden while `ARTICLES_PUBLIC` there is false: no nav link,
-  `noindex` on every page, drafts listed for review; set it true to add the nav link and drop drafts from the index
-  (also add a landing `PAGES` entry then). `article-template` is a draft layout sample. Article charts are Svelte SVG components in `src/lib/articles/charts/` (Columns, HBars, DotRank, Lines, TimeStack; site colour tokens, hover readouts, a data table under each) plus `Stats` for headline figures; an article's chart data is a JSON file in `src/lib/articles/data/`, written by a script in `analysis/` (`winter_2026.py` for the Winter 2026 review, which also prints every figure quoted in the text). The tracker page markup
+  `src/lib/articles/registry.ts`). `ARTICLES_PUBLIC` there is true (published 15 Oct 2026 with the Winter 2026 review): Articles is in the
+  navigation and on the landing page (`ArticlesPeek`); drafts (`draft: true`) stay off the index and are `noindex`, but
+  their own address still works for review. `article-template` is a draft layout sample. Article charts are Svelte SVG components in `src/lib/articles/charts/` (Columns, HBars, DotRank, Lines, TimeStack; site colour tokens, hover readouts, a data table under each) plus `Stats` for headline figures; an article's chart data is a JSON file in `src/lib/articles/data/`, written by a script in `analysis/` (`winter_2026.py` for the Winter 2026 review, which also prints every figure quoted in the text). The tracker page markup
   is in `src/routes/tracker/+page.svelte` (About page: `src/routes/about/+page.svelte`, a card per chart on how it's built; shared
   masthead, footer, logo mark and Buy Me a Coffee link in `src/lib/site/`); the canvas chart code is `src/lib/tracker/tracker.js` (vanilla JS, driven by
   element ids in the page), styles in `src/lib/tracker/tracker.css` (colour tokens, light/dark). The fuel table
@@ -125,7 +125,7 @@ This repository is public: never commit keys, tokens or personal details.
 3. History since Sep 2020 on the tracker page: 30 days, 1 year, All (Oct 2026).
    Daily history keeps each day's peak demand and peak generation (total output including embedded solar). BUILD 4
    (embedded solar model, metered HVDC) rebuilt from 15 Oct 2026 over about four runs.
-4. Pages: landing (`/`), live (`/now`), tracker, About, and a hidden Articles section (`/articles`, Oct 2026). Stale-data watchdog, Cloudflare Web Analytics and a Buy Me a
+4. Pages: landing (`/`), live (`/now`), tracker, About, and Articles (`/articles`, published 15 Oct 2026 with the Winter 2026 review). Stale-data watchdog, Cloudflare Web Analytics and a Buy Me a
    Coffee link are in place.
 5. Then the brief's build order: plant pages, map, hydro panel and records (planned as short record articles),
    offer stacks and downloads.
