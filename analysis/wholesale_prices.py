@@ -227,16 +227,25 @@ def main():
     P('Share of trading periods at Haywards under $1 / over $300:'); P(ext.round(1).to_string())
     out['extremes'] = {'years': ys, 'low': [r1(v) for v in ext.low], 'high': [r1(v) for v in ext.high]}
 
-    # ---- the shape of a day: average price by half-hour of the day
+    # ---- the shape of a day: average price by half-hour of the day, each year since 1997, also as a % of that
+    # year's average (the shape the chart compares)
     hh = loc.hour * 2 + loc.minute // 30
-    prof = {}
-    for y in [2022, 2023, 2024, 2025, 2026]:
+    prof, rows = {}, []
+    for y in range(1997, 2027):
         sel = loc.year == y
-        prof[y] = H[sel].groupby(hh[sel]).mean()
-        q = prof[y]
-        P(f'{y} profile: low {q.min():.0f} at {q.idxmin() / 2:.1f} h, high {q.max():.0f} at {q.idxmax() / 2:.1f} h, '
-          f'12-3 pm {q.loc[24:29].mean():.0f}, 5-8 pm {q.loc[34:39].mean():.0f}, ratio {q.loc[24:29].mean() / q.loc[34:39].mean():.2f}')
-    out['profile'] = {str(y): [r1(v, 0) for v in prof[y].loc[0:47]] for y in prof}
+        q = H[sel].groupby(hh[sel]).mean().reindex(range(48))
+        prof[y] = q
+        ix = 100 * q / q.mean()
+        rows.append({'y': y, 'low': ix.min(), 'low_t': ix.idxmin() / 2, 'am': ix.loc[10:22].max(), 'am_t': ix.loc[10:22].idxmax() / 2,
+                     'mid': ix.loc[24:29].mean(), 'pm': ix.loc[30:44].max(), 'pm_t': ix.loc[30:44].idxmax() / 2})
+    R = pd.DataFrame(rows).set_index('y')
+    P('Daily shape, % of each year\'s average (mid = noon to 3 pm):'); P(R.round(1).to_string())
+    P(f'  midday 1997-2022: {R.mid.loc[:2022].min():.0f}-{R.mid.loc[:2022].max():.0f}%; 2023-2025 {R.mid.loc[2023:2025].min():.0f}-'
+      f'{R.mid.loc[2023:2025].max():.0f}%; 2026 {R.mid[2026]:.0f}%; lowest year {R.mid.idxmin()}')
+    P(f'  morning peak times {sorted(set(R.am_t))}, evening peak times {sorted(set(R.pm_t))}')
+    q = prof[2026]
+    P(f'  2026: noon-3 pm ${q.loc[24:29].mean():.0f}, 5-8 pm ${q.loc[34:39].mean():.0f}')
+    out['profile'] = {'years': list(prof), 'values': [[r1(v, 0) for v in prof[y]] for y in prof]}
 
     # ---- nodes: the last 12 months
     nodes = []

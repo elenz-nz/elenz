@@ -75,7 +75,7 @@
 					{/if}
 				{/each}
 				<line class="os-load" x1={x(load)} x2={x(load)} y1={-4} y2={ph} />
-				<text class="os-lab" x={x(load) + (x(load) > pw * 0.7 ? -6 : 6)} y={10} text-anchor={x(load) > pw * 0.7 ? 'end' : 'start'}>Needed {num(load)} MW</text>
+				<text class="os-lab" x={x(load) - 6} y={10} text-anchor="end">Needed {num(load)} MW</text>
 				<line class="os-price" x1="0" x2={pw} y1={y(Math.min(price, ymax))} y2={y(Math.min(price, ymax))} />
 				<text class="os-lab" x="6" y={y(Math.min(price, ymax)) - 6}>{priceName} {dollars(price)}</text>
 				<rect class="ch-hit" x="0" y="-8" width={pw} height={ph + RIB + 12} onpointermove={move} onpointerleave={() => (hi = -1)} role="presentation" />

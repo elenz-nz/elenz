@@ -19,6 +19,7 @@
 	import Columns from '#lib/articles/charts/Columns.svelte';
 	import HBars from '#lib/articles/charts/HBars.svelte';
 	import Lines from '#lib/articles/charts/Lines.svelte';
+	import Ridgeline from '#lib/articles/charts/Ridgeline.svelte';
 	import Scatter from '#lib/articles/charts/Scatter.svelte';
 	import OfferStack from '#lib/articles/charts/OfferStack.svelte';
 	import Legend from '#lib/articles/charts/Legend.svelte';
@@ -73,10 +74,10 @@
 
 	const hxs = Array.from({ length: 48 }, (_, i) => i / 2);
 	const clock = (h: number) => { const hh = Math.floor(h) % 24, mm = h % 1 ? '30' : '00'; return `${hh % 12 || 12}${mm === '30' ? ':30' : ''} ${hh < 12 ? 'am' : 'pm'}`; };
-	const P = D.profile as { [y: string]: number[] };
-	const profSeries = ['2022', '2023', '2024', '2025', '2026'].map((y) => ({
-		name: y === '2026' ? '2026 (Jan–Sep)' : y, values: P[y],
-		tok: y === '2026' ? '--accent' : y === '2024' ? '--f-gas' : '--f-hvdc', faint: y !== '2026' && y !== '2024',
+	const P = D.profile as { years: number[]; values: number[][] };
+	const ridgeRows = P.years.map((y, i) => ({
+		name: y === 2026 ? '2026*' : String(y), values: P.values[i].map((v) => (v === null ? NaN : v)),
+		tok: y === 2026 ? '--accent' : y === 2024 ? '--f-gas' : '--f-hvdc', strong: y === 2026 || y === 2024,
 	}));
 
 	const SI = new Set(['MAN2201', 'INV2201', 'BEN2201', 'ISL2201', 'KIW2201']);
@@ -97,7 +98,7 @@
 ]} />
 
 <h2>How the price is set</h2>
-<p>Every generator offers its output for each trading period, the half-hour the market is settled in: up to five blocks of megawatts per unit, each at a price. Every five minutes the system operator's dispatch software stacks those offers from cheapest to dearest and runs the cheapest combination that meets demand, allowing for transmission losses, line limits and reserves. The price at each point on the grid is what one more megawatt would cost there. In practice, that is roughly the price of the last offer needed to meet demand.</p>
+<p>Every generator offers its output for each trading period, the half-hour the market is settled in: up to five blocks of megawatts per site, each at a price. Every five minutes the system operator's dispatch software stacks those offers from cheapest to most expensive and runs the cheapest combination that meets demand, allowing for transmission losses, line limits and reserves. The price at each point on the grid is what one more megawatt would cost there. In practice, that is roughly the price of the last offer needed to meet demand.</p>
 
 <p>Two trading periods at the same time of day show the whole story. At 6 pm on Wednesday 7 August 2024 the country needed <strong>{num(s24.load)} MW</strong>. At 6 pm on Wednesday 21 January 2026 it needed {num(s26.load)} MW.</p>
 
@@ -107,11 +108,11 @@
 	<OfferStack title="6:00 pm, Wednesday 21 January 2026" blocks={s26.blocks} fuels={FUELS} load={s26.load} price={s26.price.HAY} priceName="Haywards" xmax={9000} ymax={1200} />
 </Figure>
 
-<p>In both, the first 5,500 MW or so was offered at $1/MWh or less: geothermal stations, wind farms, river stations that must pass the water downstream anyway, and the minimum running levels of other plant. These generators want to run whatever the price, so they offer low to make sure they are dispatched, and are paid the market price like everyone else.</p>
+<p>In both, the first 5,500 MW or so was offered at $1/MWh or less: geothermal stations, wind farms, hydro stations that must pass water downstream anyway, and the minimum running levels of other plant. These generators want to run whatever the price, so they offer low to make sure they are dispatched, and are paid the market price like everyone else.</p>
 
 <p>The difference is what came next. In August 2024, 4,792 MW of hydro was offered, and 1,991 MW of it was priced above $300/MWh. Most gas was priced above $300 too, and gas and diesel peakers, with some hydro, above $1,000. Meeting 6,644 MW reached offers of around $750, and Haywards cleared at <strong>$882/MWh</strong>. In January 2026, 3,626 MW of hydro was offered at $1 or less on its own. Demand never reached the expensive part of the stack, and Haywards cleared at <strong>$1.14/MWh</strong>.</p>
 
-<p>Why would a hydro station, whose fuel falls from the sky, offer at $800? Because water used now can't be used later. Hydro generators price their stored water at what it is expected to be worth in the future, its water value. When the lakes are low and winter is ahead, using water now risks needing expensive gas, coal or diesel later, or running out, so the water value is high. When the lakes are full and water would otherwise be spilled, it is worth almost nothing. The Authority's review of winter 2024 found that hydro offers rose as storage fell, and that they reflected genuine fuel scarcity.</p>
+<p>Why would a hydro station, whose fuel falls from the sky, offer at $800? Because water used now can't be used later. Hydro generators price their stored water at what it is expected to be worth in the future, its water value. When the lakes are low partway through winter, and the spring and summer inflows that refill them are still months away, using water now risks needing expensive gas, coal or diesel later, or running out, so the water value is high. When the lakes are full and water would otherwise be spilled, it is worth almost nothing. The Authority's review of winter 2024 found that hydro offers rose as storage fell, and that they reflected genuine fuel scarcity.</p>
 
 <h2>Thirty years of prices</h2>
 
@@ -135,7 +136,7 @@
 <p>The drier the lakes, the higher the price, in every era. But the whole cloud moved up after 2017. In months when storage was within 5% of normal, prices averaged <strong>$55/MWh</strong> from 1997 to 2017 and <strong>$126/MWh</strong> from 2018 to 2024. At almost every level of storage the price roughly doubled; only when the lakes were very full did it stay below $100.</p>
 
 <h2>Gas</h2>
-<p>The reason is the backup. When hydro runs short, gas and coal fill the gap, so the cost and availability of thermal fuel set the value of the water that remains. That backup has become scarce and dear. The first shock came in spring 2018, when an outage at Pohokura, the largest gas field, coincided with low lakes and October averaged $290/MWh. Gas production then kept falling. The Authority's winter review records an average of 435 TJ a day in 2020 and 304 TJ a day in 2024, most of the fall from Pohokura, and gas spot prices rising from about $15/GJ at the start of 2024 to $54/GJ in August.</p>
+<p>When hydro runs short, gas and coal fill the gap, so the cost and availability of thermal fuel set the value of the water that remains. That backup has become scarce and expensive. The first shock came in spring 2018, when an outage at Pohokura, the largest gas field, coincided with low lakes and October averaged $290/MWh. Gas production then kept falling. The Authority's winter review records an average of 435 TJ a day in 2020 and 304 TJ a day in 2024, most of the fall from Pohokura, and gas spot prices rising from about $15/GJ at the start of 2024 to $54/GJ in August.</p>
 
 <p>Prices rose even as less thermal generation ran: thermal plant supplied 27% of metered generation from 1998 to 2017, and 15% from 2018 to 2025. It is the risk of needing gas, and its price when it is needed, that sets the value of water, more than how much gas is actually burnt.</p>
 
@@ -151,7 +152,7 @@
 
 <Record label="Cheapest month, Haywards" value="$3.52" unit="/MWh" when="January 2026 (Benmore: $1.87)" previous="$13.60/MWh in February 2004" fuel="--f-hydro" />
 
-<p>Water wasn't the only change. A run of new geothermal stations has steadily added generation that runs around the clock at almost no marginal cost. From January to August 2026, geothermal generated <strong>6,838 GWh</strong>, 23% (1,282 GWh) more than in the same months of 2024. Wind added 203 GWh and solar 135 GWh. With hydro also up, thermal generation fell by 69%, to 5.8% of the total, its smallest share for those months since at least 1998.</p>
+<p>Water wasn't the only change. A run of new geothermal stations has steadily added generation that runs around the clock. Like the rest of the geothermal fleet it is offered at very low prices so that it stays on, which pushes more expensive offers further up the stack. From January to August 2026, geothermal generated <strong>6,838 GWh</strong>, 23% (1,282 GWh) more than in the same months of 2024. Wind added 203 GWh and solar 135 GWh. With hydro also up, thermal generation fell by 69%, to 5.8% of the total, its smallest share for those months since at least 1998.</p>
 
 <Figure caption="Generation from January to August each year by fuel, with the average Haywards price over the same months above each column" source="EMI metered generation (Generation_MD); EMI final energy prices">
 	<Columns cats={mixYears} series={mixSeries} stacked tops={D.mix.price.map((v) => `$${v}`)} unit="GWh" height={290} label="January–August"
@@ -161,7 +162,9 @@
 <p>Even the futures market didn't see how far prices would fall. On 20 January 2026, with spot prices at a few dollars, the Authority's snapshot reported forward prices for June 2026 of about $170/MWh at Benmore and $194/MWh at Ōtāhuhu, on the expectation that winter would bring the usual squeeze. June 2026 averaged <strong>$35/MWh</strong> at Benmore and $41/MWh at Ōtāhuhu.</p>
 
 <h2>An all-or-nothing market</h2>
-<p>As more zero-priced generation is built, the price spends more time at the extremes. Before 2021, prices fell below $1/MWh in more than 3% of trading periods only in the wet years of 2009–2011. They have done so every year since 2022, and in 11–13% of trading periods in 2022, 2025 and 2026. Meanwhile dry spells have pushed the share above $300/MWh to new highs: 16% in 2024. 2025 had both: 11% of trading periods under $1 and 13% over $300, almost all of the expensive ones between February and May.</p>
+<p>As more low-priced generation is built, the price spends more time at the extremes. One way to see it is to count, each year, how many trading periods cleared under $1/MWh, when there was more cheap supply than needed, and how many cleared over $300/MWh, when supply was tight.</p>
+
+<p>Until 2021, prices under $1 were rare: fewer than 1 trading period in 30 in most years, a little more in the wet years of 2009–2011. Since 2022 they have become common, about 1 in 9 in 2022 and 2025 and 1 in 7 so far in 2026. Prices over $300 have become more common too, reaching 1 in 6 trading periods in 2024. 2025 had plenty of both: 11% of trading periods under $1 and 13% over $300, almost all of the expensive ones between February and May.</p>
 
 <Figure caption="Share of trading periods each year with a Haywards price under $1/MWh and over $300/MWh (* 2026 is January to September)" source="EMI final energy prices">
 	<Columns cats={extYears} xlabels={extX} series={[{ name: 'Under $1/MWh', tok: '--f-hydro', values: D.extremes.low }, { name: 'Over $300/MWh', tok: '--f-gas', values: D.extremes.high }]}
@@ -169,15 +172,17 @@
 </Figure>
 
 <h2>The shape of the day</h2>
-<p>Prices follow demand through the day, with a morning and an evening peak. The level of the whole curve moves far more than its shape, but the shape is changing too. In 2026 the price from noon to 3 pm averaged <strong>$51/MWh</strong>, 57% of the evening price from 5 to 8 pm ($89). From 2022 to 2025 the afternoon ran at 79–89% of the evening. Solar farms, rooftop panels and spilling hydro all push the middle of the day down, while the evening peak still needs water or gas.</p>
+<p>Prices follow demand through the day: cheapest in the small hours, with a morning peak and a bigger evening one. For most of the market's history that shape barely changed. In most years the morning peak came at 7:30 or 8 am, the evening peak between 5:30 and 6:30 pm, and the cheapest time between 3:30 and 4:30 am. The middle of the day sat a little above the day's average: from 1997 to 2022 the price from noon to 3 pm ran at 97–112% of the year's average.</p>
 
-<Figure caption="Average Haywards price by time of day, each year" source="EMI final energy prices, by trading period (each point is the trading period starting at that time)" wide>
-	<Lines xs={hxs} series={profSeries} xticks={[0, 3, 6, 9, 12, 15, 18, 21]} xfmt={(v) => clock(v)} titleFmt={(v) => `Trading period from ${clock(v)}`} fmt={dollars} unit="$/MWh" height={280}
-		legend={[{ name: '2026 (Jan–Sep)', tok: '--accent', kind: 'line' }, { name: '2024', tok: '--f-gas', kind: 'line' }, { name: '2022, 2023 and 2025', tok: '--f-hvdc', kind: 'line', faint: true }]} />
+<p>That has started to change. In 2023–2025 the middle of the day slipped just below average, and in 2026 it fell to <strong>79%</strong> of it, the lowest of the 30 years, while the morning and evening peaks rose to about one and a half times the average. Solar farms, rooftop panels and spilling hydro all push the middle of the day down; the evening peak still needs water or gas. Noon to 3 pm averaged $51/MWh in 2026, against $89 from 5 to 8 pm.</p>
+
+<Figure caption="Average Haywards price by time of day, one row per year since 1997 (2026 is January to September). Each row is drawn as a share of that year's own average, so the rows compare the shape of the day rather than the price level; hover for the price." source="EMI final energy prices, by trading period (each point is the trading period starting at that time)" wide>
+	<Ridgeline rows={ridgeRows} xs={hxs} xticks={[0, 3, 6, 9, 12, 15, 18, 21]} xfmt={(v) => clock(v)} titleFmt={(v) => `trading period from ${clock(v)}`} fmt={dollars} label="Year"
+		band={[12, 15]} bandLabel="noon–3 pm" />
 </Figure>
 
 <h2>Where you are</h2>
-<p>There isn't one wholesale price but one at each of about 250 points on the grid. Power loses some energy on its way along the lines, and when a line is full, cheaper generation on one side can't reach the other. Over the past year (October 2025 to September 2026) the cheapest point was Manapōuri, at $49/MWh, and the dearest Kikiwa, near Nelson, at $69. Haywards ran at least $10 above Benmore in 12% of trading periods, mostly when the HVDC link or the lines north were carrying all they could; the reverse happened in under 1%.</p>
+<p>There isn't one wholesale price but one at each of about 250 points on the grid. Power loses some energy on its way along the lines, and when a line is full, cheaper generation on one side can't reach the other. Over the past year (October 2025 to September 2026) the cheapest point was Manapōuri, at $49/MWh, and the most expensive Kikiwa, near Nelson, at $69. Haywards ran at least $10 above Benmore in 12% of trading periods, mostly when the HVDC link or the lines north were carrying all they could; the reverse happened in under 1%.</p>
 
 <Figure caption="Average price at selected grid points, October 2025 to September 2026" source="EMI final energy prices">
 	<HBars rows={nodeRows} fmt={(v) => `$${v.toFixed(0)}`} label="Grid point" valueLabel="Average price ($/MWh)"
@@ -185,9 +190,16 @@
 </Figure>
 
 <h2>What to watch</h2>
-<p>The price will keep following the lakes and the gas fields. New geothermal, wind and solar make wet, mild periods cheaper and more often near zero. They do less for a dry winter evening with little wind, when the price is still set by water values and the cost of thermal backup. How much gas is left, how batteries and demand response grow, and what replaces Huntly's role as the backstop will decide how high the next dry year goes.</p>
+<p>The price will keep following the lakes and the gas fields. New geothermal, wind and solar make wet, mild periods cheaper and more often near zero. They do less for a dry winter evening with little wind, when the price is still set by water values and the cost of thermal backup.</p>
+
+<p>That backup will be there for a while yet. Genesis, Contact, Meridian and Mercury agreed in 2025 to keep capacity from Huntly's coal-capable Rankine units available as a reserve for dry years until the end of 2035, an arrangement the Commerce Commission authorised in November 2025. Huntly also matters to the grid in its own right, as one of the few large stations near Auckland. So the next dry year will turn less on whether there is backup than on what it costs: how much gas is left, how big the coal stockpile is, and how quickly batteries and demand response grow.</p>
 
 <Note title="How these figures are measured">
-	<p>Prices are the Electricity Authority's final energy prices, averaged over trading periods (not weighted by demand) and in dollars of the day, not adjusted for inflation. Haywards and Benmore are the island reference points. Storage is from the Authority's Hydrological Modelling Dataset, which ends in December 2024: the ten main lakes' active storage, converted to energy with the dataset's derived storage capacities and compared with the 1980–2024 average for each date. The Authority's own figures (1,500 GWh in August 2024) cover more storage and differ slightly. Storage figures after 2024 and forward prices are from the Authority's weekly security of supply snapshots. Generation by fuel is metered generation (Generation_MD). The offer stacks add up every final energy offer for the trading period, capped at each unit's maximum output and, for wind and solar, its forecast potential; they ignore transmission limits, losses and reserves, which the dispatch takes into account, so they show how the price is set rather than reproduce it exactly.</p>
-	<p>Sources: EMI final energy prices, generator offers, metered generation and the Hydrological Modelling Dataset; the Authority's <a href="https://www.ea.govt.nz/documents/7069/Review_of_winter_2024.pdf">Review of winter 2024</a> (April 2025) and security of supply snapshots of <a href="https://www.ea.govt.nz/documents/9072/Security_of_Supply_Snapshot_-_22_December_2025.pdf">22 December 2025</a> and <a href="https://www.ea.govt.nz/documents/9192/Security_of_Supply_Snapshot_-_20_January_2026.pdf">20 January 2026</a>.</p>
+	<ul>
+		<li><strong>Prices</strong> are the Electricity Authority's final energy prices. Averages give every trading period equal weight (they aren't weighted by demand) and are in the dollars of the day, not adjusted for inflation. Haywards and Benmore are the North and South Island reference points.</li>
+		<li><strong>Hydro storage</strong> comes from the Authority's Hydrological Modelling Dataset, which covers the ten main lakes up to December 2024. Each day is compared with the 1980–2024 average for that date. The Authority's own storage figures are worked out differently, so its numbers (about 1,500 GWh in early August 2024) are higher than this series; the comparison with each date's average is what matters here. Storage after 2024, and the forward prices, come from the Authority's weekly security of supply snapshots.</li>
+		<li><strong>Generation by fuel</strong> is metered generation from the Authority's Generation_MD files.</li>
+		<li><strong>The offer stacks</strong> add up every generator's final offers for the trading period, limited to what each could actually produce. The real dispatch also allows for transmission limits, losses and reserves, so the stacks show how the price is set rather than reproducing it exactly.</li>
+	</ul>
+	<p>Sources: EMI final energy prices, generator offers, metered generation and the Hydrological Modelling Dataset; the Authority's <a href="https://www.ea.govt.nz/documents/7069/Review_of_winter_2024.pdf">Review of winter 2024</a> (April 2025); its security of supply snapshots of <a href="https://www.ea.govt.nz/documents/9072/Security_of_Supply_Snapshot_-_22_December_2025.pdf">22 December 2025</a> and <a href="https://www.ea.govt.nz/documents/9192/Security_of_Supply_Snapshot_-_20_January_2026.pdf">20 January 2026</a>; and the Commerce Commission's <a href="https://www.comcom.govt.nz/news-and-media/news-and-events/2025/commission-authorises-gentailers-application-for-strategic-energy-reserve-huntly-firming-option/">authorisation of the Huntly firming option</a> (November 2025).</p>
 </Note>
