@@ -5,6 +5,7 @@
 		date: '2026-10-16',
 		kind: 'Analysis',
 		draft: true,
+		image: '/articles/wholesale-prices.png',
 	} as const;
 </script>
 
@@ -23,6 +24,7 @@
 	import Legend from '#lib/articles/charts/Legend.svelte';
 	import { num } from '#lib/articles/charts/util.js';
 	import D from '#lib/articles/data/wholesale-prices.json';
+	import PriceCover from '#lib/articles/PriceCover.svelte';
 
 	const dollars = (v: number) => `$${num(v)}/MWh`;
 	const MON = new Intl.DateTimeFormat('en-NZ', { month: 'long', year: 'numeric', timeZone: 'UTC' });
@@ -81,6 +83,9 @@
 	const nodeRows = [...D.nodes].sort((a, b) => b.price - a.price)
 		.map((n) => ({ label: n.name, value: n.price, tok: SI.has(n.poc) ? '--p-si' : '--p-ni' }));
 </script>
+
+<PriceCover values={D.months.HAY} start={D.months.start} kicker="Analysis" title={['What sets the', 'wholesale price']}
+	note="Each column is one month's average price at Haywards, 1996–2026" />
 
 <p>In August 2024 the wholesale price of electricity at Haywards, the North Island's reference point, averaged <strong>$465/MWh</strong>, the highest of any month since the market opened in October 1996. Seventeen months later, in January 2026, it averaged <strong>$3.52/MWh</strong>, the lowest. Nothing about the market's rules changed in between. What changed was how much water was in the lakes, how much gas there was to burn, and how much new generation had been built. This piece uses the Electricity Authority's market data to show how the price is set, and why it swings so far.</p>
 

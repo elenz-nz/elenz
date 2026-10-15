@@ -152,7 +152,7 @@ def main():
     P('Highest Haywards months:', m.HAY2201.nlargest(5).round(1).to_dict())
     P('Lowest Haywards months:', m.HAY2201.nsmallest(5).round(1).to_dict())
     P('Lowest Benmore months:', m.BEN2201.nsmallest(3).round(1).to_dict())
-    out['months'] = {'start': str(m.index[0]), 'HAY': [r1(v) for v in m.HAY2201], 'BEN': [r1(v) for v in m.BEN2201]}
+    out['months'] = {'start': str(m.index[0]), 'HAY': [r1(v, 2) for v in m.HAY2201], 'BEN': [r1(v, 2) for v in m.BEN2201]}
     yr = p.groupby(loc.year).HAY2201.mean()
     P('Haywards by year:', yr.round(0).astype(int).to_dict())
     P('Haywards average 1997-2017:', round(H.loc['1997':'2017'].mean(), 1), ' 2018-2023:', round(H.loc['2018':'2023'].mean(), 1),
