@@ -17,7 +17,9 @@ This repository is public: never commit keys, tokens or personal details.
   is in `src/routes/tracker/+page.svelte` (About page: `src/routes/about/+page.svelte`, a card per chart on how it's built; shared
   masthead, footer, logo mark and Buy Me a Coffee link in `src/lib/site/`); the canvas chart code is `src/lib/tracker/tracker.js` (vanilla JS, driven by
   element ids in the page), styles in `src/lib/tracker/tracker.css` (colour tokens, light/dark). The fuel table
-  (colours, emission factors, renewable flags) is `src/lib/tracker/fuels.js`, shared with the home page.
+  (colours, renewable flags, fallback emission factors) is `src/lib/tracker/fuels.js`, shared with the home pages;
+  every emissions calculation goes through `src/lib/tracker/emissions.js` (the Rankines' quarterly factor, each
+  geothermal station's own factor by year; evidence in `analysis/emission_factors.py` and `analysis/README.md`).
   `src/lib/tracker/series.js` loads the history files and merges them with the live week (24 h/3 d/7 d use the
   live 5-minute data; 30 days uses half-hourly history; 1 year and All use daily history).
 - `ingest/`: Python. `update.py` (the scheduled job), `state.py` (compact 7-day state: one row per interval,
@@ -90,6 +92,16 @@ This repository is public: never commit keys, tokens or personal details.
 - Installed distributed solar (EMI report GUEHMT) was 1,270 MW in Sep 2026, but ~410 MW of it is dispatched solar
   farms on local networks (Kōwhai Park is the Jul 2026 jump), so rooftop solar is ~860 MW. See analysis/README.md.
 - Renewable dispatch MW reflect actual output unless constrained (matches metered injection within ~1–2%).
+- Emissions: Huntly Rankines follow Genesis's quarterly "Rankines fuelled by coal %" (performance reports) at
+  11.2 GJ/MWh; coal 91.8, gas 54.1 kg CO₂e/GJ; gas plant 0.46 t/MWh; geothermal per station by year (NZGA). These
+  reproduce Genesis's reported Huntly emissions within ±5% in most quarters. The dispatch data's Rankine output
+  matches Genesis's reported Rankine output within 1–2% a quarter.
+- Fuel labels in the EA register to correct at the next history rebuild: Kinleith (KIN0112, wood-waste
+  cogeneration) and the Kawerau pulp mill (KAW0112 ONU0, listed as geothermal) → bioenergy; Glenbrook (GLN0332,
+  waste gas from NZ Steel's ironmaking) → waste heat, zero emissions. Until then emissions.js counts the Kawerau
+  mill as zero; Kinleith and Glenbrook count as gas.
+- The live API now and then returns rows with fields missing (RunDateTime null, ~3 a day); `emi_live.to_frame`
+  skips or patches them instead of failing.
 - Open-Meteo rate-limits some shared addresses (HTTP 429). The history job stores missing irradiance as blank and
   retries it on later runs (up to `IRR_MONTHS_PER_RUN` months a run).
 - Final prices (`FinalEnergyPrices`): `ByMonth/YYYYMM_FinalEnergyPrices.csv` for past months (~10 MB, every node),
@@ -106,8 +118,16 @@ This repository is public: never commit keys, tokens or personal details.
 2. Live data via GitHub Actions + Workers KV (set up Oct 2026). A paid server running `update.py` in a loop is the
    upgrade path if GitHub's schedule delays become a problem.
 3. History since Sep 2020 on the tracker page: 30 days, 1 year, All (Oct 2026).
-   Daily history keeps each day's peak demand and peak generation (total output including rooftop solar), BUILD 3.
-4. Then the brief's build order: plant pages, map, hydro panel and records, offer stacks and downloads.
+   Daily history keeps each day's peak demand and peak generation (total output including embedded solar). BUILD 4
+   (embedded solar model, metered HVDC) rebuilt from 15 Oct 2026 over about four runs.
+4. Pages: landing (`/`), live (`/now`), tracker, About. Stale-data watchdog, Cloudflare Web Analytics and a Buy Me a
+   Coffee link are in place.
+5. Then the brief's build order: plant pages, map, hydro panel and records (planned as short record articles),
+   offer stacks and downloads.
 
-Open questions: emission factors (and how to treat the Rankines), written confirmation of terms from the EA
-before launch, farm mounting (tracking or fixed) to confirm, Taiohi's metered output above its dispatch.
+Recurring upkeep: add Genesis's Rankine coal share to `emissions.js` each quarter (performance report ~3 weeks
+after quarter end; FY27 Q1 due late Oct 2026); add each year's NZGA geothermal figures (NZ Geothermal Workshop,
+November); renew the Worker's `GITHUB_TOKEN` before it expires (~Oct 2027).
+
+Open questions: written confirmation of terms from the EA before launch; the fuel relabelling above (bundle with
+the next history rebuild); farm mounting (tracking or fixed) to confirm.

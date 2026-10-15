@@ -7,17 +7,29 @@ Electricity Authority data (CC BY 4.0).
 ## How it fits together
 
 ```
-EMI real-time dispatch API ──► ingest/emi_live.py ──► data/raw/api/      ┐
-EMI daily dispatch files   ──► ingest/sync.py     ──► data/raw/daily/    ├─► ingest/build_tracker.py ──► site/static/data/tracker.json ──► website
-EA plant register, irradiance ► ingest/sync.py    ──► data/ref/          ┘                ▲
-                                                        facilities/ (curated corrections) ┘
+                    Cloudflare cron (in the site's Worker)
+                     │ every 5 min        │ every 6 h             │ every 15 min
+                     ▼                    ▼                       ▼
+EMI dispatch API ─► ingest/update.py   EMI daily files ─► ingest/history.py   .github/workflows/watchdog.yml
+                     │ (GitHub Actions)  final prices,        │ (GitHub Actions)   opens an issue if data
+                     │                   metered HVDC ────────┤                    goes stale
+                     ▼                                        ▼
+              Workers KV: tracker.json (7 days)     Workers KV: hist/* (since Sep 2020)
+                     └──────────────► worker/index.js ◄───────┘
+                                      serves the site (site/) and /data/*
 ```
+
+Embedded solar is modelled (`ingest/rooftop.py`, `ingest/pv.py`: installed capacity from the EA registry, Himawari
+satellite irradiance), and HVDC is metered or estimated (`ingest/hvdc.py`). Emissions are calculated in the
+browser (`site/src/lib/tracker/emissions.js`). `analysis/` holds the scripts and evidence behind every estimate.
 
 | Folder | What's in it |
 | --- | --- |
 | `site/` | The website (SvelteKit, built to static files and hosted on Cloudflare Workers; see `wrangler.jsonc`) |
+| `worker/` | The Cloudflare Worker: serves the site and the data from KV, and starts the GitHub jobs on a schedule |
 | `ingest/` | Python jobs that download EMI data and build the JSON the website reads |
-| `facilities/` | Hand-maintained corrections to the EA plant register: new plant, moved connections, fuel labels |
+| `facilities/` | Hand-maintained corrections to the EA plant register, and the embedded solar points and capacity |
+| `analysis/` | Development scripts and the evidence for the embedded solar, HVDC and emission factor estimates |
 | `data/` | Downloaded raw data. Not committed; recreate it with the ingest scripts |
 
 ## Running it on your own computer
@@ -57,6 +69,9 @@ updates never overwrite each other. It needs three repository secrets: `EMI_KEY`
 
 Run the same job on your own computer with `python3 ingest/update.py` (it uses `data/store/` instead of KV).
 
+History: `.github/workflows/history.yml` runs `ingest/history.py` every 6 hours, adding newly published daily
+dispatch files, final prices and metered HVDC flows to the monthly history in KV (at most 280 KV writes a day).
+
 ## When the build warns about a unit
 
 New plant appears in the dispatch feed months before the EA's plant register catches up. If
@@ -66,4 +81,4 @@ New plant appears in the dispatch feed months before the EA's plant register cat
 ## Data and licence
 
 Data from www.emi.ea.govt.nz provided by the Electricity Authority (New Zealand), CC BY 4.0.
-Irradiance from Open-Meteo, CC BY 4.0.
+Irradiance: Himawari satellite data (JMA/JAXA) via Open-Meteo, CC BY 4.0.

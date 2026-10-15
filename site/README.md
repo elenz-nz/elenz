@@ -1,54 +1,21 @@
-# sv
+# Elenz website
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+SvelteKit (Svelte 5) with `adapter-static`: every page is prerendered and served by the Worker in `../worker/`.
+See the root `README.md` and `CLAUDE.md` for how the data gets here.
 
-## Creating a project
+| Page | Route | Main files |
+| --- | --- | --- |
+| Landing | `/` | `src/routes/+page.svelte`, previews in `src/lib/landing/` |
+| Now (live) | `/now` | `src/routes/now/+page.svelte`, `src/lib/home/` |
+| Tracker | `/tracker` | `src/routes/tracker/+page.svelte`, `src/lib/tracker/` (canvas charts in `tracker.js`) |
+| About | `/about` | `src/routes/about/+page.svelte` |
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```sh
-# create a new project
-npx sv create my-app
-```
-
-To recreate this project with the same configuration:
-
-```sh
-# recreate this project
-npx sv@1.1.1 create --template minimal --types ts --add sveltekit-adapter="adapter:static" --install npm site
-```
-
-## Adding features
-
-Add features to your project with `sv add`:
+Shared: `src/lib/site/` (masthead, footer, logo, Buy Me a Coffee link), `src/lib/tracker/tracker.css` (colour tokens,
+light and dark), `src/lib/tracker/fuels.js` (fuel colours and order), `src/lib/tracker/emissions.js` (emission factors).
 
 ```sh
-npx sv add
+npm install
+npm run dev        # http://localhost:5173, using the snapshot in static/data/
+npm run build      # static site in build/
+npm run preview    # serve the build (history views need the live Worker, so they stay empty locally)
 ```
-
-For example, to add Tailwind CSS:
-
-```sh
-npx sv add tailwindcss
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.

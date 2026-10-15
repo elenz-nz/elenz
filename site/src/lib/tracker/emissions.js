@@ -80,7 +80,7 @@ const GEO_ASSUMED = { tauhara: 32, te_huka_3: 0, topp2: 0,
   kawerau_mill: 0 };
 const GEO_DEFAULT = 57;   // fleet average, CY2023: for anything unmatched
 
-// dispatch plant name → station (confirmed with Cam, 15 Oct 2026): 'Wairakei' is the whole site (A, B and binary);
+// dispatch plant name → station (confirmed by the owner, 15 Oct 2026): 'Wairakei' is the whole site (A, B and binary);
 // 'Ngāwhā B' (OEC4) is the only dispatched Ngāwhā plant (Ngāwhā A, ~20 MW, isn't); TOPP1 and GDL aren't dispatched;
 // Te Ahi O Maui and TOPP2 share a 33 kV bus on Kawerau's 220 kV since TOPP2 came online.
 const GEO_PLANT = {
