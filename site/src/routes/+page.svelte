@@ -220,6 +220,7 @@
 
 	.pages-list { display: grid; gap: 22px; scroll-margin-top: 16px; }
 	.pg { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 28px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 24px; }
+	.pg.flip { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); }
 	.pg.flip .pg-text { order: 2; }
 	.pg-text h2 { margin: 0 0 8px; font-size: 1.5rem; letter-spacing: -0.01em; }
 	.pg-text h2 a { color: inherit; text-decoration: none; }
@@ -232,12 +233,14 @@
 	.bar { display: flex; align-items: center; gap: 5px; padding: 7px 10px; border-bottom: 1px solid var(--line); background: var(--surface); }
 	.bar i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
 	.bar .path { margin-left: 8px; font-family: var(--font-data); font-size: 0.7rem; color: var(--muted); }
-	.view { display: block; padding: 16px; min-height: 200px; }
+	/* every preview window the same height side by side (the tallest, Now's map), its content centred */
+	.view { display: grid; align-content: center; padding: 16px; min-height: 376px; }
 	.ph { display: grid; place-items: center; min-height: 200px; color: var(--muted); font-size: 0.85rem; }
 
 	@media (max-width: 820px) {
-		.pg { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 18px; }
+		.pg, .pg.flip { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 18px; }
 		.pg.flip .pg-text { order: 0; }
+		.view { min-height: 200px; }
 	}
 	@media (max-width: 640px) {
 		.fact { font-size: 0.95rem; }

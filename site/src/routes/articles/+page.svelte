@@ -12,27 +12,25 @@
 	{#if noindex()}<meta name="robots" content="noindex" />{/if}
 </svelte:head>
 
-<div class="wrap">
+<div class="wrap fill">
 	<Masthead />
 
 	<main class="a-index">
 		<header>
-			{#if !ARTICLES_PUBLIC}
-				<p class="hidden-note"><b>Hidden.</b> This section isn't linked from the site or listed by search engines yet. Drafts are shown here for review.</p>
-			{/if}
 			<h1>Articles</h1>
-			<p>New records, quarterly reviews and closer looks at how New Zealand's electricity system is running, written from the same data as the tracker.</p>
+			{#if !ARTICLES_PUBLIC}
+				<p class="hidden-note"><b>Hidden.</b> Not linked from the site or listed by search engines yet; drafts shown for review.</p>
+			{/if}
 		</header>
 
 		{#if listed.length}
-			<ul class="a-list">
+			<ul class="a-grid">
 				{#each listed as a (a.slug)}
 					<li>
-						<a href="/articles/{a.slug}" class:has-img={a.image}>
-							{#if a.image}<img class="a-thumb" src={a.image} alt="" width="1200" height="630" loading="lazy" />{/if}
-							<span class="a-meta"><span class="a-kind">{a.kind}</span><time datetime={a.date}>{longDate(a.date)}</time>{#if a.draft}<span class="a-draft">Draft</span>{/if}</span>
+						<a href="/articles/{a.slug}">
+							<span class="a-meta"><span class="a-tag">{a.kind}</span>{#if a.draft}<span class="a-draft">Draft</span>{/if}<time datetime={a.date}>{longDate(a.date)}</time></span>
 							<h2>{a.title}</h2>
-							<p>{a.dek}</p>
+							{#if a.image}<img src={a.image} alt="" width="1200" height="630" loading="lazy" />{/if}
 						</a>
 					</li>
 				{/each}
