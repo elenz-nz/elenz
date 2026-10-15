@@ -77,7 +77,9 @@ const GEO_YEAR_COLS = [2020, 2022, 2023];
 const GEO_ASSUMED = { tauhara: 32, te_huka_3: 0, topp2: 0 };
 const GEO_DEFAULT = 57;   // fleet average, CY2023: for anything unmatched
 
-// dispatch plant name → station
+// dispatch plant name → station (confirmed with Cam, 15 Oct 2026): 'Wairakei' is the whole site (A, B and binary);
+// 'Ngāwhā B' (OEC4) is the only dispatched Ngāwhā plant (Ngāwhā A, ~20 MW, isn't); TOPP1 and GDL aren't dispatched;
+// Te Ahi O Maui and TOPP2 share a 33 kV bus on Kawerau's 220 kV since TOPP2 came online.
 const GEO_PLANT = {
   'Wairakei': 'wairakei', 'Te Mihi 1': 'te_mihi', 'Te Mihi 2': 'te_mihi', 'Poihipi': 'poihipi', 'Ōhaaki': 'ohaaki',
   'Te Huka': 'te_huka', 'Te Huka 3': 'te_huka_3', 'Tauhara': 'tauhara', 'Rotokawa': 'rotokawa',
