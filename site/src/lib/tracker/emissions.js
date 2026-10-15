@@ -74,7 +74,10 @@ const GEO_YEARS = {
 };
 const GEO_YEAR_COLS = [2020, 2022, 2023];
 // stations without published figures yet: estimates (TIMES-NZ assumptions), until the NZGA publishes them
-const GEO_ASSUMED = { tauhara: 32, te_huka_3: 0, topp2: 0 };
+const GEO_ASSUMED = { tauhara: 32, te_huka_3: 0, topp2: 0,
+  // Kawerau pulp mill cogeneration (KAW0112 ONU0): likely mostly black liquor and wood, so treated as bioenergy
+  // (biogenic CO₂, counted as zero) until it moves to a Bioenergy fuel with Kinleith at the next history rebuild
+  kawerau_mill: 0 };
 const GEO_DEFAULT = 57;   // fleet average, CY2023: for anything unmatched
 
 // dispatch plant name → station (confirmed with Cam, 15 Oct 2026): 'Wairakei' is the whole site (A, B and binary);
@@ -85,7 +88,7 @@ const GEO_PLANT = {
   'Te Huka': 'te_huka', 'Te Huka 3': 'te_huka_3', 'Tauhara': 'tauhara', 'Rotokawa': 'rotokawa',
   'Nga Awa Pūrua': 'nga_awa_purua', 'Mokai': 'mokai', 'Ngā Tamariki': 'ngatamariki', 'Kawerau': 'kawerau_kgl',
   'Kawerau (Te Ahi O Maui)': 'te_ahi_o_maui', 'Kawerau (TOPP2)': 'topp2', 'Ngāwhā B': 'ngawha_oec4',
-  // 'Carter Holt Harvey Energy Ltd CoGen' (Kawerau mill, KAW0112): to confirm; uses the fleet default meanwhile
+  'Carter Holt Harvey Energy Ltd CoGen': 'kawerau_mill', 'Norske Skog CoGen': 'kawerau_mill',
 };
 
 const geoCache = new Map();

@@ -125,7 +125,8 @@ burned for generation, and generation emissions. 24 quarters, FY21 Q1 (Jul–Sep
   within ±5% in 20 of 23 quarters, −0.4% overall. FY22 Q3 emissions were revised in a later report from 404 to 611 kt.
 - Geothermal: each station's operational emissions by year (NZGA emissions working group, McLean et al.: CY2020,
   CY2022 published as lifecycle less 10 g/kWh, CY2023), the latest carried forward; Tauhara 32, Te Huka 3 and TOPP2 0
-  (TIMES-NZ assumptions) until published. Generation-weighted over the dispatch data: 2021 70, 2022 69, 2023 60,
+  (TIMES-NZ assumptions) until published. The Kawerau pulp mill cogeneration (KAW0112 ONU0, 'Carter Holt Harvey Energy
+  Ltd CoGen', 53 MW, listed as geothermal) counts as zero: likely mostly black liquor and wood (Cam, 15 Oct 2026). Generation-weighted over the dispatch data: 2021 70, 2022 69, 2023 60,
   2025 54 g/kWh (NZGA MW-weighted fleet incl. undispatched stations: 2020 69, 2023 57).
 - Open questions: Kinleith (wood-waste cogeneration, turbine failed 2025) and Glenbrook (NZ Steel, waste gas from the
   ironmaking kilns; two of four kilns replaced by the arc furnace in 2026) are classed as gas in the EA register.

@@ -132,7 +132,7 @@
 						<li><b>0.65–1.0</b> Huntly Rankines<small>Varies with how much of their fuel was coal. Genesis reports the coal share each quarter (24% in Apr–Jun 2026); the latest is carried forward until the next report</small></li>
 						<li><b>0.80</b> diesel</li>
 						<li><b>0.46</b> gas<small>Average of the gas fleet: Huntly 5 combined cycle about 0.41, peakers and cogeneration about 0.5–0.57</small></li>
-						<li><b>0.02–0.30</b> geothermal<small>Each station's own operational emissions by year (NZ Geothermal Association): from about 0.02 at Wairakei to 0.30 at Ōhaaki, and falling as stations reinject CO₂; about 0.05 across the fleet now. The latest published year carries forward until the next</small></li>
+						<li><b>0.02–0.30</b> geothermal<small>Each station's own operational emissions by year (NZ Geothermal Association): from about 0.02 at Wairakei to 0.30 at Ōhaaki, and falling as stations reinject CO₂; about 0.05 across the fleet now. The latest published year carries forward until the next. The Kawerau pulp mill's cogeneration, listed as geothermal, is counted as bioenergy (zero), since it mostly burns black liquor and wood</small></li>
 					</ul>
 					<dl>
 						<dt>How</dt>
