@@ -6,17 +6,19 @@
 	import { linear, ticks, nice, num, compact, barPath } from './util';
 
 	type Series = { name: string; tok: string; values: number[] };
+	// an optional thin line drawn behind the columns, on its own right-hand axis starting at zero
+	type Line = { name: string; tok: string; values: number[]; unit: string; fmt: (v: number) => string };
 	let {
 		cats, series, stacked = false, percent = false, colors = [], tops = [], unit = '', height = 260,
-		fmt = (v: number) => num(v), label = 'Category', legend = undefined, table = true, xlabels = undefined,
+		fmt = (v: number) => num(v), label = 'Category', legend = undefined, table = true, xlabels = undefined, line = undefined,
 	}: {
 		cats: string[]; series: Series[]; stacked?: boolean; percent?: boolean; colors?: (string | null)[];
 		tops?: (string | null)[]; unit?: string; height?: number; fmt?: (v: number) => string; label?: string;
-		legend?: boolean; table?: boolean; xlabels?: (string | null)[];
+		legend?: boolean; table?: boolean; xlabels?: (string | null)[]; line?: Line;
 	} = $props();
 
 	let w = $state(680);
-	const m = { l: 46, r: 8, t: 26, b: 28 };
+	const m = $derived({ l: 46, r: line ? 46 : 8, t: 26, b: 28 });
 	const pw = $derived(Math.max(100, w - m.l - m.r));
 	const ph = $derived(height - m.t - m.b);
 	const n = $derived(cats.length);
@@ -38,6 +40,16 @@
 	});
 	const y = $derived(linear(extent[0], extent[1], ph, 0));
 	const yt = $derived(ticks(extent[0], extent[1], 5));
+	// right axis: zero-based, with a round step chosen so its ticks sit on the left axis's gridlines
+	const rmax = $derived.by(() => {
+		if (!line) return 1;
+		const k = Math.max(1, yt.length - 1);
+		const raw = Math.max(...line.values) / k;
+		const mag = 10 ** Math.floor(Math.log10(raw));
+		const step = [1, 2, 2.5, 4, 5, 10].map((q) => q * mag).find((q) => q >= raw) ?? 10 * mag;
+		return step * k;
+	});
+	const yr = $derived(linear(0, rmax, ph, 0));
 	const ns = $derived(stacked ? 1 : series.length);
 	const bw = $derived(Math.min(24, (band * 0.62 - (ns - 1) * 2) / ns));
 	const gw = $derived(ns * bw + (ns - 1) * 2);
@@ -80,13 +92,19 @@
 		if (stacked) rows.reverse();
 		if (stacked && !percent && series.length > 1)
 			rows.push({ tok: '', name: 'Total', value: fmt(series.reduce((a, s) => a + s.values[hover], 0)) });
-		return rows.filter((r) => r.value !== '0' && r.value !== '0.0%');
+		const out = rows.filter((r) => r.value !== '0' && r.value !== '0.0%');
+		if (line) out.push({ tok: line.tok, name: line.name, value: line.fmt(line.values[hover]) });
+		return out;
 	})());
-	const showLegend = $derived(legend ?? series.length > 1);
+	const showLegend = $derived(legend ?? (series.length > 1 || !!line));
+	const legendItems = $derived([
+		...series.map((s) => ({ name: line ? `${s.name} (left)` : s.name, tok: s.tok })),
+		...(line ? [{ name: `${line.name} (right)`, tok: line.tok, kind: 'line' as const }] : []),
+	]);
 </script>
 
 <div class="ch" bind:clientWidth={w}>
-	{#if showLegend}<Legend items={series.map((s) => ({ name: s.name, tok: s.tok }))} />{/if}
+	{#if showLegend}<Legend items={legendItems} />{/if}
 	<div class="ch-plot">
 		<svg width={w} {height} role="img" aria-label={`${series.map((s) => s.name).join(', ')} by ${label.toLowerCase()}`}>
 			<g transform="translate({m.l},{m.t})">
@@ -95,14 +113,25 @@
 					<line class="ch-grid" class:zero={t === 0} x1="0" x2={pw} y1={y(t)} y2={y(t)} />
 					<text class="ch-tick" x="-8" y={y(t)} dy="0.32em" text-anchor="end">{percent ? `${t}%` : compact(t)}</text>
 				{/each}
+				{#if line}
+					<text class="ch-unit" x={pw + m.r} y={-12} text-anchor="end">{line.unit}</text>
+					{#each yt as t, k}
+						{@const v = (rmax * k) / Math.max(1, yt.length - 1)}
+						<text class="ch-tick" x={pw + 8} y={yr(v)} dy="0.32em">{compact(v)}</text>
+					{/each}
+				{/if}
 				{#if hover >= 0}<rect class="ch-band" x={band * hover} y="0" width={band} height={ph} />{/if}
+				{#if line}
+					<path class="ch-line thin" style="stroke: var({line.tok})" d={line.values.map((v, i) => `${i ? 'L' : 'M'}${band * i + band / 2},${yr(v)}`).join('')} />
+					{#each line.values as v, i}<circle class="ch-dot small" cx={band * i + band / 2} cy={yr(v)} r="3" style="fill: var({line.tok})" />{/each}
+				{/if}
 				{#each bars as b}
 					<path d={b.d} style="fill: var({b.tok})" class:dim={hover >= 0 && hover !== b.i} />
 				{/each}
 				{#each cats as c, i}
 					<text class="ch-tick" x={band * i + band / 2} y={ph + 18} text-anchor="middle">{xlabels ? (xlabels[i] ?? '') : c}</text>
 					{#if tops[i]}<text class="ch-top" x={band * i + band / 2} y={topY(i) - 7} text-anchor="middle">{tops[i]}</text>{/if}
-					<rect class="ch-hit" x={band * i} y="0" width={band} height={ph} tabindex="0" role="button" aria-label="{c}: {series.map((s) => `${s.name} ${fmt(s.values[i])}`).join(', ')}"
+					<rect class="ch-hit" x={band * i} y="0" width={band} height={ph} tabindex="0" role="button" aria-label="{c}: {series.map((s) => `${s.name} ${fmt(s.values[i])}`).join(', ')}{line ? `, ${line.name} ${line.fmt(line.values[i])}` : ''}"
 						onpointerenter={() => (hover = i)} onpointermove={(e) => (py = e.offsetY - 10)} onpointerleave={() => (hover = -1)}
 						onfocus={() => { hover = i; py = m.t; }} onblur={() => (hover = -1)} />
 				{/each}
@@ -116,9 +145,9 @@
 		<details class="ch-data">
 			<summary>Data table</summary>
 			<table>
-				<thead><tr><th>{label}</th>{#each series as s}<th class="n">{s.name}</th>{/each}</tr></thead>
+				<thead><tr><th>{label}</th>{#each series as s}<th class="n">{s.name}</th>{/each}{#if line}<th class="n">{line.name}</th>{/if}</tr></thead>
 				<tbody>
-					{#each cats as c, i}<tr><td>{c}</td>{#each series as s}<td class="n">{fmt(s.values[i])}</td>{/each}</tr>{/each}
+					{#each cats as c, i}<tr><td>{c}</td>{#each series as s}<td class="n">{fmt(s.values[i])}</td>{/each}{#if line}<td class="n">{line.fmt(line.values[i])}</td>{/if}</tr>{/each}
 				</tbody>
 			</table>
 		</details>

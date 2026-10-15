@@ -100,9 +100,10 @@
 
 <p>Total winter demand barely moved, at 11.1 TWh, the same as 2023. What changed was the shape of the day. Winter peaks used to come at about 6 pm; this year 30% of winter days peaked in the morning, against 13–16% in 2021–2023.</p>
 
-<Figure caption="Share of winter days whose highest trading period came before noon" source="EMI real-time dispatch">
+<Figure caption="Share of winter days whose highest trading period came before noon, with each winter's total demand" source="EMI real-time dispatch">
 	<Columns cats={years} series={[{ name: 'Morning peaks', tok: '--f-hvdc', values: D.morning }]} colors={hi26(D.years)} tops={D.morning.map((v) => `${v}%`)}
-		unit="% of days" height={200} fmt={(v) => `${v}%`} label="Winter" />
+		line={{ name: 'Total winter demand', tok: '--ink', values: D.demand_gwh, unit: 'GWh', fmt: (v) => `${num(v)} GWh` }}
+		unit="% of days" height={220} fmt={(v) => `${v}%`} label="Winter" />
 </Figure>
 
 <h2>A wet south and a dry north</h2>
@@ -132,7 +133,7 @@
 
 <Figure caption="How long the link ran at each level: every trading period of each winter, sorted by transfer, with the highest northward transfer at the right (each winter has 4,416 trading periods)" source="EMI metered HVDC flows, mid-link">
 	<Lines xs={D.hvdc_duration_tp} series={durSeries} reverse xfmt={(v) => num(v)} xtitle="Trading periods at or above each level"
-		titleFmt={(v) => `Reached or beaten in ${num(v)} trading periods`} fmt={(v) => `${num(Math.abs(v))} MW ${v < 0 ? 'south' : 'north'}`}
+		titleFmt={(v) => `${num(v)} trading periods at or above`} fmt={(v) => `${num(Math.abs(v))} MW ${v < 0 ? 'south' : 'north'}`}
 		ytick={(v) => `${num(Math.abs(v))} MW`} ytop="North" ybottom="South" left={66} height={310}
 		legend={[{ name: 'Winter 2026', tok: '--accent', kind: 'line' }, { name: '2023', tok: '--f-gas', kind: 'line' }, { name: '2024', tok: '--f-diesel', kind: 'line' }, { name: '2021, 2022 and 2025', tok: '--f-hvdc', kind: 'line', faint: true }]} />
 </Figure>

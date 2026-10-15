@@ -120,6 +120,7 @@ def main():
     J['morning'] = [morning[y] for y in YEARS]
     F['winter_peak'] = {y: int(s[winter(s.index, y)].max()) for y in YEARS}
     F['winter_demand_gwh'] = {y: round(gwh(s[winter(s.index, y)])) for y in YEARS}
+    J['demand_gwh'] = [F['winter_demand_gwh'][y] for y in YEARS]
 
     # ---- the cold snap: Mon 3 to Sat 8 Aug 2026, half-hourly
     c = df['2026-08-03':'2026-08-08']

@@ -90,3 +90,5 @@
 .ch-data table { margin-top: 6px; }
 .a-body figure .f-body { padding: 14px 14px 10px; }
 .ch-axisword { fill: var(--ink-2); font-size: 11px; font-weight: 700; font-family: var(--font-ui); letter-spacing: 0.04em; text-transform: uppercase; }
+.ch-line.thin { stroke-width: 1.5; }
+.ch-dot.small { stroke-width: 1.5; }
