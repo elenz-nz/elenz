@@ -37,7 +37,7 @@
 
 		<section class="sources" id="sources" aria-labelledby="src-h">
 			<h2 id="src-h">Where the data comes from</h2>
-			<p>Live series come from the Electricity Authority's EMI real-time dispatch feed, about a minute after each 5-minute dispatch case runs. The EA's daily dispatch files carry the same data, fill any gaps, and provide the history back to September 2020. Both are published under CC BY 4.0.</p>
+			<p>Live series come from the Electricity Authority's EMI real-time dispatch feed, about a minute after each 5-minute dispatch case runs. The EA's daily dispatch files carry the same data, fill any gaps, and provide the history back to September 2020. Both are published under CC BY 4.0. About 7–8% of 5-minute intervals have no dispatch case in either source; they are filled by interpolation.</p>
 			<nav class="m-toc" aria-label="Charts">
 				{#each [['m-gen', 'Generation'], ['m-roof', 'Embedded solar'], ['m-price', 'Wholesale price'], ['m-demand', 'Demand'], ['m-hvdc', 'HVDC transfer'], ['m-co2', 'Emissions intensity'], ['m-hist', 'History'], ['m-groups', 'Source groups']] as [id, name]}
 					<a href="#{id}">{name}</a>

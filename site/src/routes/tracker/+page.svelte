@@ -41,22 +41,20 @@
 
 	const age = $derived(meta ? (now - meta.end) / 60000 : 0);
 	const live = $derived(meta !== null && age < LIVE_MINUTES);
-	const missing = $derived(meta ? Math.round(100 * (1 - meta.intervals / meta.expected)) : 0);
+	// The info button says only where the data comes from; how each series is built is on the About page.
 	const notice = $derived.by(() => {
 		if (!meta) return '';
 		if (view && view.kind !== 'live') {
 			if (view.histEnd == null) return '';
-			const step = view.kind === 'day' ? 'Daily averages of half-hourly' : 'Half-hourly';
-			if (view.past)
-				return `${step} dispatch data from ${dayYear(view.histFirst!)} to ${dayYear(view.histEnd)}, from the Electricity Authority's daily EMI files. Prices are final prices where published, otherwise dispatch prices. Embedded solar (rooftops and small ground-mounted arrays on local networks) is estimated from the EA's record of installed solar and satellite irradiance (the band on the demand chart shows its uncertainty). HVDC transfer is metered where published, otherwise estimated from the balance between the islands.${view.kind === 'day' ? ' Peak demand is the highest half-hour.' : ''}`;
-			return `${step} dispatch data from ${dayYear(view.histFirst!)} to ${dayYear(view.histEnd)} from the Electricity Authority's daily EMI files (published 1–4 days late), then the live real-time dispatch feed to ${when(view.liveEnd)}. Prices are final prices, except for the live week and any days not yet priced, which show dispatch prices. Embedded solar (rooftops and small ground-mounted arrays on local networks) is estimated from the EA's record of installed solar and satellite irradiance (the band on the demand chart shows its uncertainty). HVDC transfer is metered where published, otherwise estimated from the balance between the islands.${view.kind === 'day' ? ' Peak demand is the highest half-hour.' : ''}`;
+			const days = `${dayYear(view.histFirst!)} to ${dayYear(view.histEnd)}`;
+			return view.past
+				? `Dispatch data from the Electricity Authority's daily dispatch files, ${days}.`
+				: `Dispatch data from the Electricity Authority: its daily dispatch files, ${days}, then its real-time dispatch feed to ${when(view.liveEnd)}.`;
 		}
 		const mixed = meta.api_from !== null && meta.api_from > meta.end - 7 * 864e5 + 3e5;
-		const source = mixed
-			? `: the Electricity Authority's daily EMI files up to ${dayOnly(meta.api_from! - 864e5)}, then the live real-time dispatch feed.`
-			: " from the Electricity Authority's real-time dispatch feed.";
-		const gaps = missing > 0 ? ` ${missing}% of 5-minute intervals have no dispatch case and are filled by interpolation.` : '';
-		return `Dispatch data for the seven days to ${when(meta.end)}${source} Embedded solar (rooftops and small ground-mounted arrays on local networks) is estimated from installed capacity and satellite irradiance (the band on the demand chart shows its uncertainty), and HVDC transfer from the balance between the islands, fitted to metered flows.${gaps}`;
+		return mixed
+			? `Dispatch data from the Electricity Authority: its daily dispatch files to ${dayOnly(meta.api_from! - 864e5)}, then its real-time dispatch feed, updated every 5 minutes.`
+			: "Dispatch data from the Electricity Authority's real-time dispatch feed, updated every 5 minutes.";
 	});
 
 	const status = $derived(error || (view?.loading ? 'Loading history…' : view?.error) || (meta ? '' : 'Loading the latest data…'));
@@ -183,7 +181,7 @@
 			<div class="info-pop" id="about-data" role="region" aria-label="About this data" bind:this={infoBox} hidden={!infoOpen}>
 				<p class="asof" id="asof"></p>
 				<p>{notice || 'Loading the latest data…'}</p>
-				<a href="/about#sources">Where the data comes from</a>
+				<a href="/about#sources">How each chart is built</a>
 			</div>
 		</div>
 	</nav>
