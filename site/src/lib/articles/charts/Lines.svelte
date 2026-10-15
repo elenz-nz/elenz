@@ -7,7 +7,7 @@
 	type Series = { name: string; tok: string; values: number[]; faint?: boolean; label?: string };
 	let {
 		xs, series, unit = '', xfmt = (v: number) => num(v), xtitle = '', fmt = (v: number) => num(v), height = 280, legend = [], titleFmt = undefined,
-		reverse = false, ytick = undefined, ytop = '', ybottom = '', left = 46,
+		reverse = false, ytick = undefined, ytop = '', ybottom = '', left = 46, xzero = true, xticks = undefined,
 	}: {
 		xs: number[]; series: Series[]; unit?: string; xfmt?: (v: number) => string; xtitle?: string;
 		fmt?: (v: number) => string; height?: number; legend?: LegendItem[]; titleFmt?: (v: number) => string;
@@ -15,6 +15,8 @@
 		ytick?: (v: number) => string;            // y tick labels (default compact numbers)
 		ytop?: string; ybottom?: string;          // words above the top tick and below the bottom one (e.g. North / South)
 		left?: number;                            // left margin for the y tick labels
+		xzero?: boolean;                          // x ticks counted from zero (false for an axis of years)
+		xticks?: number[];                        // explicit x tick positions
 	} = $props();
 
 	let w = $state(680);
@@ -26,7 +28,7 @@
 	const x = $derived(reverse ? linear(xs[0], xs[xs.length - 1], pw, 0) : linear(xs[0], xs[xs.length - 1], 0, pw));
 	const y = $derived(linear(ext[0], ext[1], ph, 0));
 	const yt = $derived(ticks(ext[0], ext[1], 5));
-	const xt = $derived(ticks(Math.min(0, xs[0]), xs[xs.length - 1], 5));
+	const xt = $derived(xticks ?? ticks(xzero ? Math.min(0, xs[0]) : Math.ceil(xs[0]), xs[xs.length - 1], 5).filter((t) => t >= xs[0] - 1e-9 || xzero));
 	const xlab = $derived(ybottom ? ph + 30 : ph + 18);
 	const path = (v: number[]) => v.map((q, i) => `${i ? 'L' : 'M'}${x(xs[i]).toFixed(1)},${y(q).toFixed(1)}`).join('');
 	// draw faint series first so the emphasised ones sit on top
