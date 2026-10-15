@@ -121,8 +121,16 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 .tip-r b { font-family: var(--font-data); font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
 .tip-r small { color: var(--muted); font-size: 0.74rem; white-space: nowrap; }
 .charts { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 6px 4px 8px; min-width: 0; touch-action: pan-y; }
-.chart { padding: 8px 10px 0; }
-.chart + .chart { border-top: 1px solid var(--grid); }
+.chart { padding: 12px 10px 6px; position: relative; }
+.chart .ch-head { padding-right: 30px; }
+.chart + .chart { border-top: 1px solid var(--line); }
+/* enlarge one of the smaller charts over the page */
+.pop-btn { position: absolute; top: 9px; right: 6px; display: grid; place-items: center; width: 26px; height: 26px; padding: 0; border: 1px solid transparent; border-radius: 4px; background: none; color: var(--muted); cursor: pointer; }
+.pop-btn:hover, .pop-btn[aria-pressed="true"] { color: var(--ink); background: var(--grid); }
+.chart.popped .pop-btn { top: 11px; right: 10px; }
+.chart.popped { position: fixed; z-index: 26; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(1180px, calc(100vw - 32px)); background: var(--surface); border: 1px solid var(--line) !important; border-radius: 6px; padding: 14px 16px 12px; box-shadow: 0 18px 50px rgb(0 0 0 / 0.28); }
+.chart.popped canvas { height: min(62vh, 560px) !important; }
+.pop-backdrop { position: fixed; inset: 0; z-index: 25; border: 0; padding: 0; background: rgb(10 16 16 / 0.45); cursor: zoom-out; }
 .ch-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; min-height: 22px; }
 .ch-head h2 { font-size: 0.86rem; font-weight: 600; letter-spacing: 0.01em; }
 .ch-head .unit { color: var(--muted); font-size: 0.78rem; }

@@ -387,8 +387,11 @@ export function mountTracker(D, hooks = {}) {
     const W = Math.round(w * dpr), H = Math.round(h * dpr);
     if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
     const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
-    return { ctx, w, h, dpr };
+    // an enlarged chart (the page's popout) draws its own time axis
+    return { ctx, w, h, dpr, popped: !!cv.closest('.popped') };
   }
+  // an enlarged chart has room for about three times as many gridlines
+  const ticksFor = (id, n) => ($(id).closest('.popped') ? n * 3 : n);
   function nice(min, max, count) {
     if (max === min) { max += 1; }
     const span = max - min; let step = Math.pow(10, Math.floor(Math.log10(span / count)));
@@ -399,7 +402,8 @@ export function mountTracker(D, hooks = {}) {
   }
   function frame(c, dom, tickFmt, opt = {}) {
     const { ctx, w, h } = c;
-    const top = 8, bottom = h - (opt.axis ? 24 : 6);
+    const axis = opt.axis || c.popped;
+    const top = 8, bottom = h - (axis ? 24 : 6);
     const x0 = PADL, x1 = w - PADR, n = V.n;
     const X = j => x0 + (n <= 1 ? 0 : j / (n - 1)) * (x1 - x0);
     const Y = v => bottom - (v - dom.lo) / (dom.hi - dom.lo) * (bottom - top);
@@ -413,7 +417,7 @@ export function mountTracker(D, hooks = {}) {
     }
     ctx.strokeStyle = C['--line'];
     for (const mk of V.marks) if (mk.line) { const x = Math.round(X(mk.j)) + 0.5; ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke(); }
-    if (opt.axis) drawAxis(ctx, X, bottom, x0, x1);
+    if (axis) drawAxis(ctx, X, bottom, x0, x1);
     return { X, Y, Yinv, x0, x1, top, bottom };
   }
   function drawAxis(ctx, X, bottom, x0, x1) {
@@ -525,7 +529,7 @@ export function mountTracker(D, hooks = {}) {
   function drawPrice() {
     const c = setup($('cv-price')), { ctx } = c;
     let mx = 0; for (let j = 0; j < V.n; j++) mx = Math.max(mx, V.pNI[j], V.pSI[j]);
-    const dom = nice(0, mx * 1.08, 3);
+    const dom = nice(0, mx * 1.08, ticksFor('cv-price', 3));
     const F = frame(c, dom, v => '$' + fmt(v)), { X, Y } = F;
     const r = state.region, aNI = r === 'SI' ? 0.35 : 1, aSI = r === 'NI' ? 0.35 : 1;
     line(ctx, X, Y, V.pSI, alpha(C['--p-si'], aSI));
@@ -543,24 +547,22 @@ export function mountTracker(D, hooks = {}) {
     if (state.hover != null) { const j = state.hover; dot(ctx, X(j), Y(V.pSI[j]), alpha(C['--p-si'], aSI)); dot(ctx, X(j), Y(V.pNI[j]), alpha(C['--p-ni'], aNI)); }
   }
   function drawDemand() {
-    const c = setup($('cv-demand')), { ctx } = c, showXT = state.region !== 'NI';
-    const xt = V.metered.map((v, j) => v - V.tiwai[j]);
+    const c = setup($('cv-demand')), { ctx } = c;
     let mn = Infinity, mx = 0;
-    for (let j = 0; j < V.n; j++) { mx = Math.max(mx, V.underlying[j], V.metered[j]); mn = Math.min(mn, showXT ? xt[j] : V.metered[j]); }
-    const dom = nice(mn * 0.95, mx * 1.02, 3);
+    for (let j = 0; j < V.n; j++) { mx = Math.max(mx, V.underlying[j], V.metered[j]); mn = Math.min(mn, V.metered[j]); }
+    const dom = nice(mn * 0.95, mx * 1.02, ticksFor('cv-demand', 3));
     const F = frame(c, dom, v => fmt(v)), { X, Y } = F;
     // the embedded solar estimate's uncertainty (± one standard deviation) as a band around the dashed line
     if (V.roofU.some(u => u > 0.5)) band(ctx, X, Y, V.underlying.map((v, j) => v - V.roofU[j]), V.underlying.map((v, j) => v + V.roofU[j]), alpha(C['--ink-2'], 0.22));
-    if (showXT) line(ctx, X, Y, xt, C['--accent']);
     line(ctx, X, Y, V.underlying, C['--ink-2'], 1.5, [4, 3]);
     line(ctx, X, Y, V.metered, C['--ink']);
     cursor(ctx, F);
-    if (state.hover != null) { const j = state.hover; if (showXT) dot(ctx, X(j), Y(xt[j]), C['--accent']); dot(ctx, X(j), Y(V.underlying[j]), C['--ink-2']); dot(ctx, X(j), Y(V.metered[j]), C['--ink']); }
+    if (state.hover != null) { const j = state.hover; dot(ctx, X(j), Y(V.underlying[j]), C['--ink-2']); dot(ctx, X(j), Y(V.metered[j]), C['--ink']); }
   }
   function drawHvdc() {
     const c = setup($('cv-hvdc')), { ctx } = c;
     let mn = 0, mx = 0; for (let j = 0; j < V.n; j++) { mn = Math.min(mn, V.hvdc[j]); mx = Math.max(mx, V.hvdc[j]); }
-    const dom = nice(mn, mx, 2);
+    const dom = nice(mn, mx, ticksFor('cv-hvdc', 2));
     const F = frame(c, dom, v => fmt(v)), { X, Y } = F;
     area(ctx, X, Y, V.hvdc, 0, alpha(C['--f-hvdc'], 0.35));
     line(ctx, X, Y, V.hvdc, C['--f-hvdc'], 1.5);
@@ -573,7 +575,7 @@ export function mountTracker(D, hooks = {}) {
   function drawCo2() {
     const c = setup($('cv-co2')), { ctx } = c;
     let mx = 0; for (let j = 0; j < V.n; j++) mx = Math.max(mx, V.co2[j]);
-    const dom = nice(0, Math.max(mx, 10) * 1.1, 2);
+    const dom = nice(0, Math.max(mx, 10) * 1.1, ticksFor('cv-co2', 2));
     const F = frame(c, dom, v => fmt(v)), { X, Y } = F;
     area(ctx, X, Y, V.co2, 0, alpha(C['--co2'], 0.28));
     line(ctx, X, Y, V.co2, C['--co2'], 1.5);
@@ -584,7 +586,9 @@ export function mountTracker(D, hooks = {}) {
     const c = setup($('cv-ren')), { ctx } = c;
     let mn = 100; for (let j = 0; j < V.n; j++) mn = Math.min(mn, V.ren[j]);
     const lo = Math.max(0, Math.floor((mn - 4) / 10) * 10);
-    const dom = { lo, hi: 100, ticks: lo <= 50 ? [lo, 50, 100].filter((v, i, a) => a.indexOf(v) === i) : [lo, Math.round((lo + 100) / 2 / 5) * 5, 100] };
+    const big = !!$('cv-ren').closest('.popped'), st = 100 - lo <= 25 ? 5 : 100 - lo <= 50 ? 10 : 20;
+    const dom = { lo, hi: 100, ticks: big ? Array.from({ length: Math.floor((100 - lo) / st) + 1 }, (_, i) => lo + i * st)
+      : lo <= 50 ? [lo, 50, 100].filter((v, i, a) => a.indexOf(v) === i) : [lo, Math.round((lo + 100) / 2 / 5) * 5, 100] };
     const F = frame(c, dom, v => v + '%', { axis: true }), { X, Y } = F;
     area(ctx, X, Y, V.ren, lo, alpha(C['--accent'], 0.14));
     line(ctx, X, Y, V.ren, C['--accent']);
@@ -694,7 +698,6 @@ export function mountTracker(D, hooks = {}) {
     f.value = state.filter;
     f.placeholder = `Filter ${V.layers.length} ${VIEWS[state.view].by === 'site' && level() === 'top' ? 'sites' : 'rows'}`;
     applyFilter();
-    $('lg-xt').hidden = state.region === 'NI';
   }
   const setSys = rows => { $('sys').innerHTML = rows.filter(Boolean).map(([k, v, s]) => `<dt>${k}</dt><dd>${v}${s ? `<small>${s}</small>` : ''}</dd>`).join(''); };
   const hvTxt = v => Math.abs(v) < 1 ? '0' : `${fmt(Math.abs(v))}`;
@@ -768,7 +771,7 @@ export function mountTracker(D, hooks = {}) {
         ['Emissions intensity', fmt(em / gw), 'g/kWh'],
         ['Renewable share', (re / gw).toFixed(1) + '%', ''],
       ]);
-      for (const id of ['v-gen', 'v-pni', 'v-psi', 'v-met', 'v-und', 'v-xt', 'v-hv', 'v-co2', 'v-ren']) $(id).textContent = '';
+      for (const id of ['v-gen', 'v-pni', 'v-psi', 'v-met', 'v-und', 'v-hv', 'v-co2', 'v-ren']) $(id).textContent = '';
       return;
     }
     const [when, sub] = heading(j), long = isLong();
@@ -801,7 +804,6 @@ export function mountTracker(D, hooks = {}) {
     $('v-gen').textContent = fmt(tot) + ' MW';
     $('v-pni').textContent = money(V.pNI[j]); $('v-psi').textContent = money(V.pSI[j]);
     $('v-met').textContent = fmt(V.metered[j]); $('v-und').textContent = fmt(V.underlying[j]);
-    $('v-xt').textContent = showT ? fmt(V.metered[j] - V.tiwai[j]) : '';
     $('v-hv').textContent = `${hvTxt(V.hvdc[j])} ${V.hvdc[j] > 0.5 ? 'north' : V.hvdc[j] < -0.5 ? 'south' : ''}`;
     $('v-co2').textContent = fmt(V.co2[j]); $('v-ren').textContent = V.ren[j].toFixed(1) + '%';
   }
@@ -950,12 +952,11 @@ export function mountTracker(D, hooks = {}) {
         return head + row(C['--p-ni'], 'North Island · Haywards', money(V.pNI[j]), '/MWh') + row(C['--p-si'], 'South Island · Benmore', money(V.pSI[j]), '/MWh');
       case 'cv-demand':
         return head + row(C['--ink'], 'Metered', fmt(V.metered[j]), mw) + row(C['--ink-2'], 'With embedded solar', fmt(V.underlying[j]), V.roofU[j] > 0.5 ? `${mw} ± ${fmt(V.roofU[j])}` : mw)
-          + (state.region !== 'NI' ? row(C['--accent'], 'Without Tiwai', fmt(V.metered[j] - V.tiwai[j]), mw) : '')
           + (isLong() ? row(C['--muted'], 'Peak, metered', fmt(V.pkMet[j]), 'MW') : '');
       case 'cv-hvdc':
         return head + row(C['--f-hvdc'], 'Benmore ⇄ Haywards', hvTxt(V.hvdc[j]), hvDir(V.hvdc[j]));
       case 'cv-co2':
-        return head + row(C['--co2'], 'Emissions intensity', fmt(V.co2[j]), 'g CO₂e/kWh');
+        return head + row(C['--co2'], 'Generation mix', fmt(V.co2[j]), 'g CO₂e/kWh');
       default:
         return head + row(C['--accent'], 'Renewable share', V.ren[j].toFixed(1) + '%');
     }

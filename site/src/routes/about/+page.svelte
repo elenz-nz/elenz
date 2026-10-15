@@ -23,7 +23,7 @@
 			<ul>
 				<li>Generation stacked by fuel, or grouped by site, hydro scheme, owner, flexibility, renewable vs fossil, or inverter-based vs synchronous.</li>
 				<li>Wholesale prices at the island reference nodes, Haywards and Benmore.</li>
-				<li>Demand, metered at the grid and with embedded solar added back, and the Tiwai Point smelter's share.</li>
+				<li>Demand, metered at the grid and with embedded solar added back, with the Tiwai Point smelter's load in the summary table.</li>
 				<li>HVDC transfer between the islands, emissions intensity and renewable share.</li>
 				<li>Any range from the last 24 hours to the whole history since 2020, for New Zealand or either island.</li>
 			</ul>
@@ -109,7 +109,7 @@
 					<ul>
 						<li>Metered grid demand.</li>
 						<li>The dashed line adds embedded solar back.</li>
-						<li>Tiwai is the Tiwai Point smelter (TWI2201).</li>
+						<li>The summary table shows the Tiwai Point smelter's load (TWI2201) on its own.</li>
 					</ul>
 				</article>
 
