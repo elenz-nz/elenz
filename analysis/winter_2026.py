@@ -1,6 +1,7 @@
 """Figures and chart data for the article "Winter 2026" (site/src/lib/articles/posts/winter-2026.svelte).
 
-Winter is 1 June to 31 August; every winter in the history (2021-2026) is compared. All figures are half-hourly.
+Winter is 1 June to 31 August. Winter 2026 is compared with the five winters before it (2021-2025); a "record" in
+the article means the highest or lowest of those six winters. All figures are half-hourly.
 
 Inputs (downloaded into data/articles/ if missing):
   hist/hh/YYYY-MM.json   the site's half-hourly history (https://elenz.elenz.workers.dev/data/history/hh/...)
@@ -29,9 +30,10 @@ NZ = 'Pacific/Auckland'
 YEARS = list(range(2021, 2027))
 GEN = ['geo', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar']
 REN = ['geo', 'hydro', 'wind', 'solar']
-SCHEMES = {  # facilities/overrides.toml [hydro_schemes], with each scheme's island
-    'Waitaki': 'SI', 'Manapōuri': 'SI', 'Clutha': 'SI', 'Tekapo': 'SI', 'Waipori': 'SI',
-    'Waikato': 'NI', 'Tongariro': 'NI', 'Waikaremoana': 'NI', 'Rangitaiki': 'NI'}
+SCHEMES = {  # the main schemes in facilities/overrides.toml [hydro_schemes], with each scheme's island (the small
+    # Waipori and Rangitaiki schemes are left out)
+    'Waitaki': 'SI', 'Manapōuri': 'SI', 'Clutha': 'SI', 'Tekapo': 'SI',
+    'Waikato': 'NI', 'Tongariro': 'NI', 'Waikaremoana': 'NI'}
 
 
 def fetch(url, path):
@@ -92,16 +94,23 @@ def main():
     F = {}  # figures quoted in the text
     J = {'years': YEARS}
 
-    # ---- demand: distinct peaks (one per morning and one per evening), all half-hours since Sep 2020
-    s = df.NZ_metered
+    inw = np.zeros(len(df), bool)
+    for y in YEARS:
+        inw |= winter(df.index, y)
+    W = df[inw]  # every half-hour of the six winters
+
+    # ---- demand: distinct peaks (one per morning and one per evening) across the six winters
+    s = W.NZ_metered
     g = s.groupby([s.index.date, s.index.hour < 12]).agg(['max', 'idxmax']).sort_values('max', ascending=False).head(12)
     J['peaks'] = [{'t': r['idxmax'].strftime('%-d %b %Y, %-I:%M %p').replace('AM', 'am').replace('PM', 'pm'),
                    'y': r['idxmax'].year, 'mw': int(r['max'])} for _, r in g.iterrows()]
     F['peaks'] = J['peaks'][:10]
-    F['halfhours_7000'] = {y: int((s[s.index.year == y] >= 7000).sum()) for y in range(2020, 2027)}
-    F['peak_NI'] = (int(df.NI_metered.max()), str(df.NI_metered.idxmax()))
-    F['peak_SI'] = (int(df.SI_metered.max()), str(df.SI_metered.idxmax()))
-    xt = s - df.SI_tiwai
+    F['halfhours_7000'] = {y: int((s[s.index.year == y] >= 7000).sum()) for y in YEARS}
+    F['peak_NI'] = (int(W.NI_metered.max()), str(W.NI_metered.idxmax()))
+    F['peak_SI'] = (int(W.SI_metered.max()), str(W.SI_metered.idxmax()))
+    for k in ('NZ_hydro', 'SI_hydro', 'NZ_batt', 'NZ_wind', 'NZ_solar'):
+        F[f'max_{k}'] = (int(W[k].max()), str(W[k].idxmax()))
+    xt = s - W.SI_tiwai
     F['peak_ex_tiwai'] = (int(xt.max()), str(xt.idxmax()))
     morning = {}
     for y in YEARS:
@@ -140,8 +149,20 @@ def main():
     F['thermal_max'] = {y: int(th[winter(th.index, y)].max()) for y in YEARS}
     F['price'] = price
     F['hay_over_ben_10'] = {y: round(100 * float(((df.NI_price - df.SI_price)[winter(df.index, y)] > 10).mean()), 1) for y in YEARS}
-    wd = df.NZ_wind
-    F['wind_best_halfhour'] = (int(wd.max()), str(wd.idxmax()))
+    # what changed at each wind and geothermal plant, winter 2025 to winter 2026
+    F['plants'] = {}
+    for fuel in ('wind', 'geo'):
+        rows = []
+        for (name, f, isl) in P.columns:
+            if f != fuel:
+                continue
+            x = P[(name, f, isl)]
+            on = x[x > 0.5]
+            g25, g26 = gwh(x[winter(x.index, 2025)]), gwh(x[winter(x.index, 2026)])
+            rows.append((round(g26 - g25, 1), name, isl, str(on.index.min().date()) if len(on) else None, round(g25, 1), round(g26, 1),
+                         int(x[winter(x.index, 2025)].fillna(0).max()), int(x[winter(x.index, 2026)].fillna(0).max())))
+        F['plants'][fuel] = sorted(rows, reverse=True)[:5] + sorted(rows)[:3]
+    F['si_wind_gwh'] = {y: round(gwh(df.SI_wind[winter(df.index, y)])) for y in YEARS}
 
     # ---- hydro by island and scheme
     J['hydro'] = {i: [round(gwh(df[f'{i}_hydro'][winter(df.index, y)])) for y in YEARS] for i in ('NI', 'SI')}
@@ -164,20 +185,20 @@ def main():
     J['schemes'] = sorted(rows, key=lambda r: -r['pct'])
 
     # ---- HVDC (metered, mid-link)
-    J['hvdc_net'] = [round(gwh(hv[winter(hv.index, y)])) for y in [2020] + YEARS]
-    J['hvdc_years'] = [2020] + YEARS
+    J['hvdc_net'] = [round(gwh(hv[winter(hv.index, y)])) for y in YEARS]
+    J['hvdc_years'] = YEARS
     dur = {}
-    for y in [2020] + YEARS:
+    for y in YEARS:
         x = np.sort(hv[winter(hv.index, y)].values)[::-1]
         dur[y] = [int(round(v)) for v in np.percentile(x, np.linspace(100, 0, 101))]
     J['hvdc_duration'] = dur
     F['hvdc'] = {y: {'net_gwh': round(gwh(hv[winter(hv.index, y)])),
                      'north_pct': round(100 * float((hv[winter(hv.index, y)] > 0).mean())),
                      'hh_1000': int((hv[winter(hv.index, y)] >= 1000).sum()),
-                     'hh_900': int((hv[winter(hv.index, y)] >= 900).sum())} for y in [2020] + YEARS}
+                     'hh_900': int((hv[winter(hv.index, y)] >= 900).sum())} for y in YEARS}
     w26 = hv[winter(hv.index, 2026)]
     F['hvdc_days_no_south'] = int((w26.groupby(w26.index.date).min() > 0).sum())
-    mo = hv.resample('MS').sum() / 2 / 1000
+    mo = hv['2021-01':].resample('MS').sum() / 2 / 1000  # every month since 2021
     F['hvdc_top_months'] = {str(k.date()): round(v) for k, v in mo.sort_values(ascending=False).head(4).items()}
 
     # ---- grid solar: monthly energy since Jan 2024, and when each farm first generated
@@ -198,7 +219,7 @@ def main():
     F['solar_best'] = (int(df.NZ_solar.max()), str(df.NZ_solar.idxmax()))
     pre = df.NZ_solar[:'2026-05']
     F['solar_best_before_winter'] = (int(pre.max()), str(pre.idxmax()))
-    d = df.NZ_solar.resample('D').sum() / 2
+    d = W.NZ_solar.resample('D').sum() / 2
     F['solar_best_day_mwh'] = (round(float(d.max())), str(d.idxmax().date()))
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)

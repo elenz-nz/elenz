@@ -18,7 +18,8 @@
 	const m = $derived({ l: narrow ? 104 : 132, r: 54, t: 6, b: 24 });
 	const pw = $derived(Math.max(80, w - m.l - m.r));
 	const ph = $derived(rows.length * rowH);
-	const ext = $derived(nice(Math.min(0, ...rows.map((r) => r.value)), Math.max(0, ...rows.map((r) => r.value)), 5));
+	// a little headroom past the longest bar on each side, so its value label fits inside the plot
+	const ext = $derived(nice(Math.min(0, ...rows.map((r) => r.value)) * 1.25, Math.max(0, ...rows.map((r) => r.value)) * 1.25, 5));
 	const x = $derived(linear(ext[0], ext[1], 0, pw));
 	const xt = $derived(ticks(ext[0], ext[1], narrow ? 4 : 6));
 	let hover = $state(-1);
