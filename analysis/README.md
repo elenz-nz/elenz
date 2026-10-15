@@ -104,3 +104,24 @@ Estimate from the dispatch feed (72 days, Dec 2025 – Oct 2026, 2,877 half-hour
 island balances had a mean error of 22 MW and read ~22 MW low. A linear fit on both balances and both island loads
 (`hvdc.FIT`) has a mean error of ~10 MW and no bias, tested on held-out days and on each month left out of the
 fit (better in five of six months). Link loss between the ends ≈ 5.86e-5 × flow² (59 MW at 1,000 MW).
+
+## Emission factors (`emission_factors.py`, 15 Oct 2026)
+
+Huntly's Rankine units burn coal or gas and the market data doesn't say which. Genesis's quarterly performance
+reports give, for the Rankines combined (not per unit): output, the share of their fuel that was coal, coal and gas
+burned for generation, and generation emissions. 24 quarters, FY21 Q1 (Jul–Sep 2020) to FY26 Q4 (Apr–Jun 2026).
+
+- Our dispatch data's Rankine output matches Genesis's reported Rankine output within 1–2% every full quarter.
+- Gas: 54.1 kg CO₂e/GJ (MfE Measuring Emissions guide, natural gas, stationary combustion). Coal: 91.8, fitted to
+  Genesis's emissions with gas fixed (fitting both gives coal 89.7, gas 57.1).
+- Rankine heat rate 11.2 GJ/MWh (median coal PJ per coal-fired GWh, quarters ≥85% coal; range 10.8–11.9), so
+  0.61 t/MWh on gas to 1.03 on coal; each quarter's factor follows Genesis's coal share, carried forward until the
+  next report.
+- Huntly 5 heat rate 7.6 GJ/MWh (Genesis gas burned less the Rankines' gas, per Huntly 5 GWh): 0.41 t/MWh.
+- Gas fleet (assumed heat rates for the rest: Huntly 6, McKee 10.5; Stratford 9.0; Junction Road and cogeneration
+  9.5): 0.455 t/MWh generation-weighted over the history; by quarter 0.44–0.52, depending on how much Huntly 5 ran.
+  The site uses 0.46 for all gas.
+- Check: Rankines, Huntly 5 and 6 modelled from the dispatch data reproduce Genesis's reported generation emissions
+  within ±5% in 20 of 23 quarters, −0.4% overall. FY22 Q3 emissions were revised in a later report from 404 to 611 kt.
+- Open questions: Kinleith (pulp mill cogeneration, largely wood waste and black liquor) and Glenbrook (NZ Steel,
+  heat from iron-making) are classed as gas in the EA register; geothermal stays at a provisional 0.07.

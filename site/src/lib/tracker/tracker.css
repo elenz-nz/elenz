@@ -271,6 +271,7 @@ a { color: var(--accent); }
 .method ul.figs { list-style: none; padding: 0; gap: 4px; }
 .method ul.figs li { display: grid; grid-template-columns: 4.5rem 1fr; column-gap: 10px; }
 .method ul.figs b { font-family: var(--font-data); font-weight: 600; color: var(--ink); text-align: right; grid-row: span 2; }
+.method ul.figs.wide li { grid-template-columns: 5.8rem 1fr; }
 .method ul.figs small { grid-column: 2; font-size: 0.78rem; color: var(--muted); }
 @media (max-width: 640px) {
   .method { padding: 14px; }

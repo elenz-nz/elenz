@@ -2,6 +2,7 @@
 // Data: tracker.json built by ingest/build_tracker.py. Drawn on <canvas>; the page supplies the markup (ids below).
 
 import { FUELS } from './fuels.js';
+import { efAt } from './emissions.js';
 import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTotal } from './series.js';
 import PLANT_META from './plants.json';  // owner and hydro scheme per plant (ingest/plant_meta.py)
 export { nzOffset, tzName };
@@ -251,7 +252,7 @@ export function mountTracker(D, hooks = {}) {
       for (const f of FUELS) {
         if (f.k === 'hvdc') continue;
         const x = v.fuels[f.k][j];
-        if (x > 0) { tot += x; if (f.ef) em += x * f.ef; if (f.ren) re += x; }
+        if (x > 0) { tot += x; em += x * efAt(f, v.t[j]); if (f.ren) re += x; }
       }
       v.gen[j] = tot; v.co2[j] = tot ? em / tot * 1000 : 0; v.ren[j] = tot ? re / tot * 100 : 0;
     }

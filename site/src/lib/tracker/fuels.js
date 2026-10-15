@@ -1,10 +1,11 @@
 // Fuels in stack order, bottom to top: geothermal (baseload) first, then thermal, hydro and the variable sources.
-// Shared by the tracker and the home page. ef: emission factor (t CO₂e/MWh, provisional); ren: renewable;
+// Shared by the tracker and the home page. ef: emission factor (t CO₂e/MWh; the Rankines' varies by quarter, see
+// emissions.js, which every emissions calculation goes through); ren: renewable;
 // signed: can be negative (charging, export), so never part of shares or totals.
 export const FUELS = [
   { k: 'geo', name: 'Geothermal', tok: '--f-geo', ef: 0.07, ren: 1 },
-  { k: 'coal', name: 'Coal/gas, Rankine', tok: '--f-coal', ef: 0.95 },
-  { k: 'gas', name: 'Gas', tok: '--f-gas', ef: 0.50 },
+  { k: 'coal', name: 'Coal/gas, Rankine', tok: '--f-coal', ef: 0.95 },  // fallback only: emissions.js sets the Rankines' factor by quarter
+  { k: 'gas', name: 'Gas', tok: '--f-gas', ef: 0.46 },
   { k: 'diesel', name: 'Diesel', tok: '--f-diesel', ef: 0.80 },
   { k: 'hydro', name: 'Hydro', tok: '--f-hydro', ren: 1 },
   { k: 'wind', name: 'Wind', tok: '--f-wind', ren: 1 },

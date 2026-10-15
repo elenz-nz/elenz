@@ -126,14 +126,20 @@
 
 				<article class="method" id="m-co2">
 					<h3>Emissions intensity</h3>
-					<p class="m-src"><span>Source</span>Calculated from the fuel mix</p>
-					<p>Each fuel's output × its emission factor. Provisional factors, in t CO₂e/MWh:</p>
-					<ul class="figs">
-						<li><b>0.95</b> coal/gas Rankine</li>
+					<p class="m-src"><span>Source</span>Calculated from the fuel mix, with factors checked against Genesis's reported emissions</p>
+					<p>Each fuel's output × its emission factor, in t CO₂e/MWh:</p>
+					<ul class="figs wide">
+						<li><b>0.65–1.0</b> Huntly Rankines<small>Varies with how much of their fuel was coal. Genesis reports the coal share each quarter (24% in Apr–Jun 2026); the latest is carried forward until the next report</small></li>
 						<li><b>0.80</b> diesel</li>
-						<li><b>0.50</b> gas</li>
-						<li><b>0.07</b> geothermal</li>
+						<li><b>0.46</b> gas<small>Average of the gas fleet: Huntly 5 combined cycle about 0.41, peakers and cogeneration about 0.5–0.57</small></li>
+						<li><b>0.07</b> geothermal<small>Provisional</small></li>
 					</ul>
+					<dl>
+						<dt>How</dt>
+						<dd><p>Gas 54.1 kg CO₂e/GJ (the Ministry for the Environment's factor for natural gas); coal 91.8, fitted to Genesis's quarterly fuel use and emissions. The Rankines use about 11.2 GJ of fuel per MWh, from Genesis's coal burned per coal-fired MWh.</p></dd>
+						<dt>Check</dt>
+						<dd><p>Applied to the dispatch data, these reproduce Genesis's reported Huntly emissions to within about 5% in most quarters since 2020, and 0.4% over the whole period. The dispatch data's Rankine output matches Genesis's reported Rankine output within 1–2% each quarter.</p></dd>
+					</dl>
 				</article>
 
 				<article class="method" id="m-hist">
