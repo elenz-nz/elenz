@@ -38,7 +38,7 @@
 	const money = (v: number) => (v < 0 ? '−$' : '$') + Math.abs(v).toLocaleString('en-NZ', { maximumFractionDigits: 0 });
 
 	// the second figure rotates through a few others every few seconds; hovering pauses it, the dots pick one
-	const ROTATE_MS = 4500;
+	const ROTATE_MS = 5500;
 	type Fact = { k: string; n: string; v: string; l: string; v2?: string; l2?: string; c: string };
 	const facts = $derived.by((): Fact[] => {
 		if (!now || !nz) return [];
