@@ -4,7 +4,7 @@
 	export const meta = {
 		title: 'Article template',
 		dek: 'A sample of every building block an article can use: headings, a record callout, a figure with its source, a note and a table.',
-		date: '2026-10-15',
+		date: '2026-10-14',
 		kind: 'Guide',
 		draft: true,
 	} as const;
