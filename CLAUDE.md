@@ -8,11 +8,14 @@ This repository is public: never commit keys, tokens or personal details.
 
 - `site/`: SvelteKit 3 + Svelte 5, `adapter-static`, every page prerendered. Hosted on Cloudflare Workers as static
   assets (`wrangler.jsonc` at the repo root; build command `cd site && npm ci && npm run build`, deploy command
-  `npx wrangler deploy`). Every push to `main` redeploys. The home page (`/`: live figures, the island map and the
-  generation mix now, from tracker.json's newest interval via `src/lib/home/now.js`; island outlines in
-  `src/lib/home/nzmap.js`, made by `analysis/make_nz_map.py`) is `src/routes/+page.svelte`. The tracker page markup
-  is in `src/routes/tracker/+page.svelte` (About page: `src/routes/about/+page.svelte`, with the data sources table; shared
-  masthead and footer in `src/lib/site/`); the canvas chart code is `src/lib/tracker/tracker.js` (vanilla JS, driven by
+  `npx wrangler deploy`). Every push to `main` redeploys. Pages: `/` the landing page (`src/routes/+page.svelte`: the
+  mark, live total generation, a rotating second figure, the mix bar and a 24-hour line, then a glimpse of each page;
+  add a page to its `PAGES` list with a preview component in `src/lib/landing/`); `/now` the live page
+  (`src/routes/now/+page.svelte`: live figures, the island map with each island's mix ring, the generation mix now,
+  from tracker.json's newest interval via `src/lib/home/now.js`; island outlines in `src/lib/home/nzmap.js`, made by
+  `analysis/make_nz_map.py`). The tracker page markup
+  is in `src/routes/tracker/+page.svelte` (About page: `src/routes/about/+page.svelte`, a card per chart on how it's built; shared
+  masthead, footer, logo mark and Buy Me a Coffee link in `src/lib/site/`); the canvas chart code is `src/lib/tracker/tracker.js` (vanilla JS, driven by
   element ids in the page), styles in `src/lib/tracker/tracker.css` (colour tokens, light/dark). The fuel table
   (colours, emission factors, renewable flags) is `src/lib/tracker/fuels.js`, shared with the home page.
   `src/lib/tracker/series.js` loads the history files and merges them with the live week (24 h/3 d/7 d use the
@@ -38,7 +41,7 @@ This repository is public: never commit keys, tokens or personal details.
   ~225 for a full backfill or rebuild, on top of the live job's ~600/day, so avoid more than one full rebuild a day.
 - `worker/index.js`: serves static assets, `/data/tracker.json` from KV (binding `DATA`), falling back to the
   bundled snapshot, and `/data/history/{index,day,hh/YYYY-MM}.json` from KV keys `hist/*`; its `scheduled` handler
-  dispatches the GitHub jobs (live every 5 minutes, history every 6 hours) (Worker secret `GITHUB_TOKEN`: fine-grained,
+  dispatches the GitHub jobs (live every 5 minutes, history every 6 hours, watchdog every 15 minutes) (Worker secret `GITHUB_TOKEN`: fine-grained,
   elenz only, Actions read/write; it expires, so renew it yearly). KV free plan: 1,000 writes/day (the job uses ~600), 100,000 reads/day.
 - `facilities/rooftop_points.csv`, `rooftop_nsp.csv` (irradiance points and NSP → point; regenerate with
   `analysis/make_points.py`), `rooftop_capacity.json` (capacity snapshot the live job uses until the history job
@@ -50,6 +53,9 @@ This repository is public: never commit keys, tokens or personal details.
   `facilities/plant_register.csv`: the EA register (refresh with `sync.py plants`, review the diff).
 - `ingest/plant_meta.py` writes `site/src/lib/tracker/plants.json` (plant → owner, hydro scheme) from the register and
   those tables. Rerun it and commit the JSON after refreshing the register or editing the tables.
+- `.github/workflows/watchdog.yml`: checks the live site every 15 minutes; opens an issue labelled `stale-data`
+  (GitHub emails it to the owner) when live data is over 30 minutes old, history over 5 days behind, or the Worker
+  can't start a job, and closes it when the data recovers.
 - `data/`: raw downloads, git-ignored.
 
 ## Facts learned from the data (Oct 2026)

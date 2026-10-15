@@ -4,7 +4,8 @@
 //             tracker.json; history returns 404 until the first history run.
 //  scheduled: asks GitHub to run the data jobs. Every 5 minutes: the live update (update-data.yml). Every 6 hours:
 //             the history update (history.yml), which adds newly published daily dispatch files. GitHub's own
-//             schedule is unreliable for new repositories; on-demand runs start within seconds.
+//             schedule is unreliable for new repositories; on-demand runs start within seconds. Every 15 minutes
+//             (at :10, :25, :40, :55) also the watchdog (watchdog.yml), which raises an issue when data goes stale.
 //             Needs the Worker secret GITHUB_TOKEN: a fine-grained token for stubzy19/elenz with Actions: read and write.
 const WORKFLOWS = 'https://api.github.com/repos/stubzy19/elenz/actions/workflows';
 const HISTORY_CRON = '40 */6 * * *'; // must match wrangler.jsonc
@@ -54,11 +55,9 @@ export default {
     const history = event.cron === HISTORY_CRON;
     const workflow = history ? 'history.yml' : 'update-data.yml';
     const statusKey = history ? 'cron-status-history' : 'cron-status';
-    let result;
-    if (!env.GITHUB_TOKEN) {
-      result = 'GITHUB_TOKEN secret not set';
-    } else {
-      const r = await fetch(`${WORKFLOWS}/${workflow}/dispatches`, {
+    const dispatch = async (wf) => {
+      if (!env.GITHUB_TOKEN) return 'GITHUB_TOKEN secret not set';
+      const r = await fetch(`${WORKFLOWS}/${wf}/dispatches`, {
         method: 'POST',
         headers: {
           authorization: `Bearer ${env.GITHUB_TOKEN}`,
@@ -68,7 +67,12 @@ export default {
         },
         body: JSON.stringify({ ref: 'main' }),
       });
-      result = r.status === 204 ? 'ok' : `GitHub said HTTP ${r.status}: ${(await r.text()).slice(0, 300)}`;
+      return r.status === 204 ? 'ok' : `GitHub said HTTP ${r.status}: ${(await r.text()).slice(0, 300)}`;
+    };
+    const result = await dispatch(workflow);
+    if (!history && new Date(event.scheduledTime).getUTCMinutes() % 15 === 10) {
+      const w = await dispatch('watchdog.yml');
+      if (w !== 'ok') console.log('watchdog: ' + w);
     }
     if (result !== 'ok') console.log(result);
     // record the outcome when it changes, or hourly, to stay well inside KV's free daily write limit
