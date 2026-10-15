@@ -7,6 +7,9 @@
 	import Mark from '#lib/site/Mark.svelte';
 	import NowPeek from '#lib/landing/NowPeek.svelte';
 	import TrackerPeek from '#lib/landing/TrackerPeek.svelte';
+	import HeroBackdrop from '#lib/landing/HeroBackdrop.svelte';
+	import { Tween } from 'svelte/motion';
+	import { cubicOut } from 'svelte/easing';
 	import { summarise } from '#lib/home/now.js';
 
 	const DATA_URL = '/data/tracker.json';
@@ -33,10 +36,12 @@
 	const fmt = (v: number) => Math.round(v).toLocaleString('en-NZ');
 
 	const nz = $derived(now?.regions.NZ);
+	// the big figure counts up on arrival and glides to each new value
+	const gen = new Tween(0, { duration: 1400, easing: cubicOut });
 	const live = $derived(now !== null && (clock - now.end) / 60000 < LIVE_MINUTES);
 
 	onMount(() => {
-		let stamp = 0;
+		let stamp = 0, stampSeen = false;
 		async function load() {
 			const r = await fetch(DATA_URL, { cache: 'no-cache' });
 			if (!r.ok) throw new Error(`The data file returned ${r.status}.`);
@@ -45,6 +50,8 @@
 			stamp = d.meta.end;
 			D = d;
 			now = summarise(d);
+			gen.set(now.regions.NZ.gen, { duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : stampSeen ? 900 : 1400 });
+			stampSeen = true;
 			error = '';
 		}
 		load().catch((e) => (error = `The live data couldn't be loaded. ${e.message}`));
@@ -68,14 +75,15 @@
 
 	<main class="landing">
 		<section class="hero" aria-labelledby="land-h">
-			<div class="mark"><Mark size={84} /></div>
+			<div class="mark"><Mark size={84} grow /></div>
 			<h1 id="land-h" class="word">Elenz</h1>
 			<p class="tagline">New Zealand's electricity, live</p>
 
 			<div class="live-fig" aria-live="polite">
 				{#if nz}
-					<p class="big"><span class="num">{nz.ren.toFixed(1)}</span><span class="pc">%</span></p>
-					<p class="big-sub">renewable, of the <b>{fmt(nz.gen)} MW</b> being generated right now</p>
+					<p class="big"><span class="fig">{fmt(gen.current)}</span><span class="u">MW</span></p>
+					<p class="big-sub">being generated across New Zealand right now</p>
+					<p class="ren"><b>{nz.ren.toFixed(1)}%</b> renewable</p>
 					<div class="stack" role="img" aria-label={`Generation now: ${now.mix.map((f: any) => `${f.name} ${((f.mw / nz.gen) * 100).toFixed(0)}%`).join(', ')}`}>
 						{#each now.mix as f}<span class:hatch={f.hatch} style="--c:var({f.tok});width:{(f.mw / nz.gen) * 100}%" title="{f.name} {fmt(f.mw)} MW"></span>{/each}
 					</div>
@@ -93,6 +101,8 @@
 					<p class="big-sub" role="status">{error || 'Loading the latest data…'}</p>
 				{/if}
 			</div>
+
+			<div class="horizon">{#if D}<HeroBackdrop {D} />{/if}</div>
 
 			<a class="down" href="#pages" aria-label="See what's on Elenz">
 				<svg width="22" height="22" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 8l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -124,25 +134,30 @@
 
 <style>
 	.landing { display: grid; gap: 28px; }
-	.hero { min-height: min(76svh, 720px); display: grid; justify-items: center; align-content: center; text-align: center; gap: 6px; padding-block: 12px 4px; position: relative; }
+	.hero { min-height: min(80svh, 760px); display: grid; justify-items: center; align-content: center; text-align: center; gap: 6px; padding-block: 12px 4px; position: relative; }
 	.mark { margin-bottom: 4px; }
 	.word { margin: 0; font-size: clamp(2.4rem, 7vw, 3.6rem); font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; line-height: 1; }
 	.tagline { margin: 4px 0 0; color: var(--muted); font-size: 1.05rem; }
 
 	.live-fig { margin-top: 34px; display: grid; justify-items: center; gap: 8px; width: min(100%, 560px); }
-	.big { margin: 0; font-family: var(--font-data); font-weight: 600; line-height: 1; letter-spacing: -0.03em; }
-	.big .num { font-size: clamp(3.2rem, 11vw, 5rem); }
-	.big .pc { font-size: clamp(1.6rem, 5vw, 2.2rem); color: var(--muted); margin-left: 4px; }
+	.big { margin: 0; font-family: var(--font-ui); font-weight: 800; line-height: 1; letter-spacing: -0.035em; }
+	.big .fig { font-size: clamp(3.6rem, 14vw, 6.4rem); }
+	.big .u { font-family: var(--font-ui); font-size: clamp(1.3rem, 4vw, 1.9rem); font-weight: 600; color: var(--muted); margin-left: 10px; letter-spacing: 0; }
 	.big-sub { margin: 0; color: var(--ink-2); }
-	.big-sub b { font-family: var(--font-data); font-weight: 600; color: var(--ink); }
-	.stack { display: flex; width: 100%; height: 16px; border-radius: 3px; overflow: hidden; background: var(--grid); margin-top: 10px; }
-	.stack span { background: var(--c); height: 100%; }
+	.ren { margin: 6px 0 0; font-size: 1.15rem; color: var(--ink-2); }
+	.ren b { font-family: var(--font-data); font-weight: 600; color: var(--g-ren); font-size: 1.5rem; margin-right: 4px; }
+	.stack { display: flex; width: 100%; height: 22px; border-radius: 4px; overflow: hidden; background: var(--grid); margin-top: 14px; animation: wipe 1.3s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s both; }
+	.stack span { background: var(--c); height: 100%; transition: width 0.9s ease; }
+	.stack span + span { box-shadow: inset 2px 0 0 var(--bg); }
+	@keyframes wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+	@media (prefers-reduced-motion: reduce) { .stack { animation: none; } .stack span { transition: none; } }
 	.key { list-style: none; margin: 2px 0 6px; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; font-size: 0.8rem; color: var(--ink-2); }
 	.key .pct { font-family: var(--font-data); color: var(--muted); margin-left: 2px; }
 	.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--c); margin-right: 6px; vertical-align: -1px; }
 	.hatch { background: repeating-linear-gradient(135deg, var(--c) 0 2px, color-mix(in srgb, var(--c) 30%, transparent) 2px 4px) !important; }
 
-	.down { margin-top: 26px; color: var(--muted); display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); animation: nudge 2.4s ease-in-out infinite; }
+	.horizon { width: calc(100% - 24px); margin-top: 26px; min-height: clamp(90px, 16vh, 150px); }
+	.down { margin-top: 18px; color: var(--muted); display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); animation: nudge 2.4s ease-in-out infinite; }
 	.down:hover { color: var(--ink); border-color: var(--ink-2); }
 	@keyframes nudge { 50% { transform: translateY(4px); } }
 	@media (prefers-reduced-motion: reduce) { .down { animation: none; } }
