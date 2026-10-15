@@ -232,7 +232,7 @@
 				<canvas id="cv-hvdc" role="img" aria-label="Area chart of HVDC transfer between the islands"></canvas>
 			</div>
 			<div class="chart">
-				<div class="ch-head"><h2>Emissions intensity</h2><span class="unit">g CO₂e/kWh</span><div class="legends"><span class="lg"><i class="area" style="--c:var(--co2)"></i>Generation <b id="v-co2"></b></span></div></div>
+				<div class="ch-head"><h2>Emissions intensity</h2><span class="unit">g CO₂e/kWh · <a class="unit-link" href="/about#m-co2">CO₂ per kWh generated</a></span><div class="legends"><span class="lg"><i class="area" style="--c:var(--co2)"></i>Generation <b id="v-co2"></b></span></div></div>
 				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
 				<canvas id="cv-co2" role="img" aria-label="Area chart of emissions intensity"></canvas>
 			</div>

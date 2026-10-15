@@ -126,6 +126,8 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 .ch-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; min-height: 22px; }
 .ch-head h2 { font-size: 0.86rem; font-weight: 600; letter-spacing: 0.01em; }
 .ch-head .unit { color: var(--muted); font-size: 0.78rem; }
+.ch-head .unit-link { color: inherit; text-decoration: underline dotted; text-underline-offset: 2px; }
+.ch-head .unit-link:hover { color: var(--accent); }
 .lg { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); font-size: 0.8rem; }
 .lg i { width: 14px; height: 0; border-top: 2px solid var(--c); display: inline-block; }
 .lg i.dash { border-top-style: dashed; }
