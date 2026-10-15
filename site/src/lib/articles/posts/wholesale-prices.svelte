@@ -20,6 +20,7 @@
 	import HBars from '#lib/articles/charts/HBars.svelte';
 	import Lines from '#lib/articles/charts/Lines.svelte';
 	import Ridgeline from '#lib/articles/charts/Ridgeline.svelte';
+	import TimeMoney from '#lib/articles/charts/TimeMoney.svelte';
 	import Scatter from '#lib/articles/charts/Scatter.svelte';
 	import OfferStack from '#lib/articles/charts/OfferStack.svelte';
 	import Legend from '#lib/articles/charts/Legend.svelte';
@@ -95,6 +96,19 @@
 	const MON3 = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 	const billMonth = (i: number) => { const j = bm0 - 1 + Math.round(i); return monthName(`${by0 + Math.floor(j / 12)}-${String((j % 12) + 1).padStart(2, '0')}`); };
 	const billTick = (i: number) => { const j = bm0 - 1 + Math.round(i); return MON3[j % 12] + (j % 12 === 0 ? ` ${by0 + Math.floor(j / 12)}` : ''); };
+
+	const MO = D.money;
+	const moneyRows = MO.years.map((y, i) => ({
+		name: y === 2026 ? '2026*' : String(y), time: MO.time[i], money: MO.money[i], total: MO.money[i].reduce((a, v) => a + v, 0),
+	}));
+	const REL = D.reliance as { [k: string]: number };
+	const relRows = [
+		{ k: 'diesel', name: 'Diesel', tok: '--f-diesel' }, { k: 'batt', name: 'Batteries', tok: '--f-batt' },
+		{ k: 'coal', name: 'Coal/gas, Rankine', tok: '--f-coal' }, { k: 'gas', name: 'Gas', tok: '--f-gas' },
+		{ k: 'hydro', name: 'Hydro', tok: '--f-hydro' }, { k: 'geo', name: 'Geothermal', tok: '--f-geo' },
+		{ k: 'solar', name: 'Solar', tok: '--f-solar' }, { k: 'wind', name: 'Wind', tok: '--f-wind' },
+		{ k: 'all', name: 'All generation', tok: '--ink' },
+	].map((r) => ({ label: r.name, value: REL[r.k], tok: r.tok })).sort((a, b) => b.value - a.value);
 
 	const SI = new Set(['MAN2201', 'INV2201', 'BEN2201', 'ISL2201', 'KIW2201']);
 	const nodeRows = [...D.nodes].sort((a, b) => b.price - a.price)
@@ -187,6 +201,23 @@
 		unit="% of trading periods" height={240} fmt={(v) => `${v.toFixed(1)}%`} label="Year" />
 </Figure>
 
+<h2>Where the money is made</h2>
+<p>Every generator is paid the price of the trading period for what it generates, so the spot market's takings for a year are each trading period's generation multiplied by its price. On the grid that came to <strong>$8.6 billion</strong> in 2024 and $4.8 billion in 2022, for almost exactly the same amount of electricity, about 41 TWh each year.</p>
+
+<p>Very little of that money is earned in the cheap periods. In 2024, the quarter of trading periods that cleared under $50/MWh brought in 1.4% of the year's revenue. The 4.5% that cleared over $500 brought in <strong>20%</strong>, $1.7 billion, more than everything earned under $150. Most years the money comes from the long middle: the $150–300 band earned between 42% and 67% of revenue in 2021–2025. In 2026 so far, with half of all trading periods under $50, the spot market has taken $2.0 billion in nine months.</p>
+
+<Figure caption="Each year, the share of trading periods spent in each price band (time) against the share of the spot market's revenue earned in it (money), with the year's total (* 2026 is January to September)" source="Elenz half-hourly history: grid generation from EMI dispatch data, paid at the island reference price (Haywards or Benmore); EMI final energy prices" wide>
+	<TimeMoney rows={moneyRows} bands={MO.bands} />
+</Figure>
+
+<p>New Zealand's high prices tend to come in runs, through a dry month or a gas shortage, rather than in single spikes, so no one depends on a handful of half-hours. Across 2021–2025, the most expensive 1% of each year's trading periods earned between 3% and 6.4% of revenue, and the most expensive 5% about 17%. Who earns that money differs by fuel. Diesel peakers, which run only when prices are high, earned 83% of their revenue in the most expensive 5% of trading periods. Wind earned just 11% there: high prices often coincide with calm spells, when wind farms have little to sell.</p>
+
+<Figure caption="Share of each fuel's 2021–2025 spot revenue earned in the most expensive 5% of each year's trading periods" source="Elenz half-hourly history: grid generation from EMI dispatch data, paid at the island reference price; EMI final energy prices. Batteries earned about $2 million over the period">
+	<HBars rows={relRows} fmt={(v) => `${v.toFixed(0)}%`} label="Fuel" valueLabel="Share of revenue in the dearest 5% of trading periods" />
+</Figure>
+
+<p>This is spot revenue, before contracts. Most generation is sold forward through hedges and to the generators' own retail customers at agreed prices, so a generator's income swings far less than these totals. But the spot price is what those contracts are priced against, and what any electricity that isn't covered by a contract earns.</p>
+
 <h2>The shape of the day</h2>
 <p>Prices follow demand through the day: cheapest in the small hours, with a morning peak and a bigger evening one. For most of the market's history that shape barely changed. In most years the morning peak came at 7:30 or 8 am, the evening peak between 5:30 and 6:30 pm, and the cheapest time between 3:30 and 4:30 am. The middle of the day sat a little above the day's average: from 1997 to 2022 the price from noon to 3 pm ran at 97–112% of the year's average.</p>
 
@@ -233,6 +264,7 @@
 		<li><strong>Prices</strong> are the Electricity Authority's final energy prices. Averages give every trading period equal weight (they aren't weighted by demand) and are in the dollars of the day, not adjusted for inflation. Haywards and Benmore are the North and South Island reference points.</li>
 		<li><strong>Hydro storage</strong> comes from the Authority's Hydrological Modelling Dataset, which covers the ten main lakes up to December 2024. Each day is compared with the 1980–2024 average for that date. The Authority's own storage figures are worked out differently, so its numbers (about 1,500 GWh in early August 2024) are higher than this series; the comparison with each date's average is what matters here. Storage after 2024, and the forward prices, come from the Authority's weekly security of supply snapshots.</li>
 		<li><strong>Generation by fuel</strong> is metered generation from the Authority's Generation_MD files.</li>
+		<li><strong>Spot revenue</strong> multiplies each trading period's grid generation (dispatch data, so not embedded generation) by its island's reference price: Haywards for the North Island, Benmore for the South. Real payments use each station's own node price and metered output, so the totals are approximate.</li>
 		<li><strong>Retail figures</strong> are the Authority's retail gross margin disclosures (each retailer's financial year, which ends in June for the four generator-retailers; before GST) and its regional power prices (the average of every network region's standard-user price per kWh, including GST; the chart shows it before GST, in dollars per MWh). The electricity cost in the disclosures is what each retailer reports; for the generator-retailers it can include an internal transfer price between their generation and retail businesses.</li>
 		<li><strong>The offer stacks</strong> add up every generator's final offers for the trading period, limited to what each could actually produce. The real dispatch also allows for transmission limits, losses and reserves, so the stacks show how the price is set rather than reproducing it exactly.</li>
 	</ul>

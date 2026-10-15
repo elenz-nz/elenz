@@ -48,6 +48,7 @@ NODES = {'MAN2201': 'Manapōuri', 'INV2201': 'Invercargill', 'BEN2201': 'Benmore
          'HAY2201': 'Haywards (Wellington)', 'WKM2201': 'Whakamaru', 'HLY2201': 'Huntly', 'SFD2201': 'Stratford',
          'OTA2201': 'Ōtāhuhu (Auckland)', 'KIW2201': 'Kikiwa (Nelson)'}
 P = lambda *a: print(*a, flush=True)
+GEN8 = ['coal', 'gas', 'diesel', 'geo', 'hydro', 'wind', 'solar', 'batt']
 RETAIL = f'{BLOB}/Datasets/Retail'
 GENTAILERS = ['Contact Energy', 'Genesis Energy', 'Mercury NZ', 'Meridian Energy']  # financial years end 30 June
 
@@ -133,6 +134,17 @@ def offer_stack(day, tp):
     d['mw'] = np.clip(np.minimum(cum, lim) - (cum - d.Megawatts), 0, None)
     d = d[d.mw > 0.05].sort_values(['DollarsPerMegawattHour', 'fuel'], kind='stable')
     return d
+
+
+def history(first='2021-01', last='2026-09'):
+    """The site's half-hourly history for whole months: generation by island and fuel (MW) and island prices."""
+    frames = []
+    for m in pd.period_range(first, last, freq='M'):
+        d = json.load(open(fetch(f'{SITE}/hh/{m}.json', os.path.join(DATA, 'hist', 'hh', f'{m}.json'))))
+        idx = pd.to_datetime(d['t0'] + np.arange(d['N']) * d['step'], unit='ms', utc=True).tz_convert(NZ)
+        frames.append(pd.DataFrame({f'{i}_{k}': d[i][k] for i in ('NI', 'SI') for k in GEN8 + ['price']}, index=idx))
+    h = pd.concat(frames)
+    return h[~h.index.duplicated()].sort_index()
 
 
 def history_at(t):
@@ -268,6 +280,47 @@ def main():
     P({v: round(avg[k], 1) for k, v in NODES.items()})
     sp = (H - B).loc['2025-10':'2026-09']
     P(f'HAY-BEN Oct25-Sep26: mean {sp.mean():.1f}; HAY>BEN+10 {100 * (sp > 10).mean():.1f}%; BEN>HAY+10 {100 * (sp < -10).mean():.1f}%')
+
+    # ---- where the money is made: every trading period's grid generation (dispatch) paid at its island's reference
+    # price (Haywards for the North Island, Benmore for the South), before any hedge contracts
+    hh = history()
+    rev = {f: sum(hh[f'{i}_{f}'] * 0.5 * hh[f'{i}_price'] for i in ('NI', 'SI')) for f in GEN8}
+    R = pd.DataFrame(rev)
+    gen = sum(hh[f'{i}_{f}'] * 0.5 for i in ('NI', 'SI') for f in GEN8)
+    tot = R.sum(axis=1)
+    price = tot / gen   # the generation-weighted national price of each trading period
+    yr = hh.index.year
+    BANDS = [-np.inf, 50, 150, 300, 500, np.inf]
+    blab = ['Under $50', '$50–150', '$150–300', '$300–500', 'Over $500']
+    band = pd.cut(price, BANDS, labels=blab)
+    money = tot.groupby([yr, band], observed=False).sum().unstack() / 1e9
+    time = band.groupby([yr, band], observed=False).size().unstack()
+    time = 100 * time.div(time.sum(axis=1), axis=0)
+    P('Spot revenue by band ($bn):'); P(money.round(2).to_string()); P('Share of trading periods by band (%):'); P(time.round(1).to_string())
+    share = 100 * money.div(money.sum(axis=1), axis=0)
+    P('Share of revenue by band (%):'); P(share.round(1).to_string())
+    for y in sorted(set(yr)):
+        s = price[yr == y].sort_values(ascending=False)
+        c = tot.reindex(s.index).cumsum() / tot[yr == y].sum()
+        n = len(s)
+        P(f'  {y}: revenue ${tot[yr == y].sum() / 1e9:.2f}bn from {gen[yr == y].sum() / 1e6:.1f} TWh; most expensive 1% of trading periods '
+          f'{100 * c.iloc[int(np.ceil(.01 * n)) - 1]:.1f}% of revenue, 5% {100 * c.iloc[int(np.ceil(.05 * n)) - 1]:.1f}%, '
+          f'25% {100 * c.iloc[int(np.ceil(.25 * n)) - 1]:.1f}%; cheapest half {100 * (1 - c.iloc[n // 2 - 1]):.1f}%')
+    ys = [y for y in sorted(set(yr)) if y <= 2026]
+    out['money'] = {'years': ys, 'bands': blab, 'money': [[r1(money.loc[y, b], 2) for b in blab] for y in ys],
+                    'time': [[r1(time.loc[y, b]) for b in blab] for y in ys]}
+    # each fuel's reliance on the dearest trading periods: the share of its 2021-2025 revenue earned in the most
+    # expensive 5% of each year's trading periods
+    full = (yr >= 2021) & (yr <= 2025)
+    top = pd.Series(False, index=hh.index)
+    for y in range(2021, 2026):
+        sel = yr == y
+        top[sel] = price[sel] >= price[sel].quantile(0.95)
+    fs = {f: 100 * R.loc[full & top, f].sum() / R.loc[full, f].sum() for f in GEN8}
+    fs['all'] = 100 * tot[full & top].sum() / tot[full].sum()
+    P('Share of 2021-2025 spot revenue earned in each year\'s most expensive 5% of trading periods:', {k: round(v, 1) for k, v in fs.items()},
+      ' revenue $m:', {f: round(R.loc[full, f].sum() / 1e6) for f in GEN8})
+    out['reliance'] = {k: r1(v) for k, v in fs.items()}
 
     # ---- wholesale to retail
     # the four gentailers' mass-market revenue per MWh by component (weighted by MWh sold), against the Haywards
