@@ -80,6 +80,22 @@
 		tok: y === 2026 ? '--accent' : y === 2024 ? '--f-gas' : '--f-hvdc', strong: y === 2026 || y === 2024,
 	}));
 
+	const RR = D.retail;
+	const rrCats = RR.years.map((y) => `Year to June ${y}`);
+	const rrX = RR.years.map((y) => `FY${y}`);
+	const rrSeries = [
+		{ name: 'Electricity', tok: '--f-hydro', values: RR.electricity },
+		{ name: 'Lines (distribution)', tok: '--f-hvdc', values: RR.distribution },
+		{ name: 'Metering', tok: '--f-solar', values: RR.metering },
+		{ name: 'Levies', tok: '--f-diesel', values: RR.levies },
+		{ name: 'Retail margin', tok: '--f-wind', values: RR.margin },
+	];
+	const [by0, bm0] = D.bills.start.split('-').map(Number);
+	const bxs = D.bills.household.map((_, i) => i);
+	const MON3 = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+	const billMonth = (i: number) => { const j = bm0 - 1 + Math.round(i); return monthName(`${by0 + Math.floor(j / 12)}-${String((j % 12) + 1).padStart(2, '0')}`); };
+	const billTick = (i: number) => { const j = bm0 - 1 + Math.round(i); return MON3[j % 12] + (j % 12 === 0 ? ` ${by0 + Math.floor(j / 12)}` : ''); };
+
 	const SI = new Set(['MAN2201', 'INV2201', 'BEN2201', 'ISL2201', 'KIW2201']);
 	const nodeRows = [...D.nodes].sort((a, b) => b.price - a.price)
 		.map((n) => ({ label: n.name, value: n.price, tok: SI.has(n.poc) ? '--p-si' : '--p-ni' }));
@@ -189,6 +205,24 @@
 		legend={[{ name: 'North Island', tok: '--p-ni' }, { name: 'South Island', tok: '--p-si' }]} />
 </Figure>
 
+<h2>From the wholesale price to the power bill</h2>
+<p>The wholesale price is only part of a power bill, and it reaches the bill slowly. The Authority collects a breakdown from each large retailer of what it earns for every MWh it sells to households and small businesses, before GST. For the four generator-retailers in the year to June 2025, that averaged <strong>$299/MWh</strong>, or 29.9 cents a kWh. About half, $156, paid for the electricity itself. Lines charges took $121 (40%), metering $13 and industry levies $2, leaving $6.50 to cover the cost of running the retail business and any profit.</p>
+
+<Figure caption="What the four generator-retailers (Contact, Genesis, Mercury and Meridian) earned per MWh sold to households and small businesses, by component, before GST, with the average Haywards wholesale price over the same year" source="EA retail gross margin disclosures (weighted by each retailer's MWh sold); EMI final energy prices">
+	<Columns cats={rrCats} xlabels={rrX} series={rrSeries} stacked unit="$/MWh" height={280} label="Financial year" fmt={(v) => `$${v.toFixed(0)}/MWh`}
+		marks={{ name: 'Haywards wholesale average', tok: '--ink', values: RR.spot, fmt: (v) => `$${v.toFixed(0)}/MWh` }} />
+</Figure>
+
+<p>The electricity part moves much more slowly than the spot price. Over those four years it rose steadily, from $106 to $156/MWh, while the Haywards average for the same years went from $136 to $80, then $175 and $193. Retailers buy most of what they sell at prices agreed in advance, from their own power stations or through contracts, so a dry year raises their costs over the years that follow rather than all at once, and a wet year doesn't cut them at once either. Over the same years the retail margin shrank from $36 to $6.50/MWh, as costs rose faster than the prices retailers charged.</p>
+
+<p>Household prices show the same lag. Across the Authority's 39 network regions, a standard household's price per kWh averaged 28.6 cents including GST in January 2025 and 32.4 cents in May 2026, up 13%. In between, the monthly wholesale price fell from $320/MWh in April 2025 to $3.52 in January 2026. Lines charges, about 42% of a household bill, rose when the lines companies' new regulated price limits began in April 2025. A summer of almost free wholesale power never showed up on household bills.</p>
+
+<Figure caption="A standard household's price per kWh (average of all network regions, before GST) against the monthly Haywards wholesale price, both in $/MWh" source="EA regional power prices (standard users, variable price per kWh); EMI final energy prices" wide>
+	<Lines xs={bxs} series={[{ name: 'Household price per kWh, before GST', tok: '--accent', values: D.bills.household }, { name: 'Haywards wholesale, monthly average', tok: '--p-ni', values: D.bills.hay }]}
+		xticks={bxs.filter((i) => i % 3 === 0)} xfmt={billTick} titleFmt={billMonth} fmt={dollars} unit="$/MWh" height={260}
+		legend={[{ name: 'Household price per kWh, before GST', tok: '--accent', kind: 'line' }, { name: 'Haywards wholesale, monthly average', tok: '--p-ni', kind: 'line' }]} />
+</Figure>
+
 <h2>What to watch</h2>
 <p>The price will keep following the lakes and the gas fields. New geothermal, wind and solar make wet, mild periods cheaper and more often near zero. They do less for a dry winter evening with little wind, when the price is still set by water values and the cost of thermal backup.</p>
 
@@ -199,7 +233,8 @@
 		<li><strong>Prices</strong> are the Electricity Authority's final energy prices. Averages give every trading period equal weight (they aren't weighted by demand) and are in the dollars of the day, not adjusted for inflation. Haywards and Benmore are the North and South Island reference points.</li>
 		<li><strong>Hydro storage</strong> comes from the Authority's Hydrological Modelling Dataset, which covers the ten main lakes up to December 2024. Each day is compared with the 1980–2024 average for that date. The Authority's own storage figures are worked out differently, so its numbers (about 1,500 GWh in early August 2024) are higher than this series; the comparison with each date's average is what matters here. Storage after 2024, and the forward prices, come from the Authority's weekly security of supply snapshots.</li>
 		<li><strong>Generation by fuel</strong> is metered generation from the Authority's Generation_MD files.</li>
+		<li><strong>Retail figures</strong> are the Authority's retail gross margin disclosures (each retailer's financial year, which ends in June for the four generator-retailers; before GST) and its regional power prices (the average of every network region's standard-user price per kWh, including GST; the chart shows it before GST, in dollars per MWh). The electricity cost in the disclosures is what each retailer reports; for the generator-retailers it can include an internal transfer price between their generation and retail businesses.</li>
 		<li><strong>The offer stacks</strong> add up every generator's final offers for the trading period, limited to what each could actually produce. The real dispatch also allows for transmission limits, losses and reserves, so the stacks show how the price is set rather than reproducing it exactly.</li>
 	</ul>
-	<p>Sources: EMI final energy prices, generator offers, metered generation and the Hydrological Modelling Dataset; the Authority's <a href="https://www.ea.govt.nz/documents/7069/Review_of_winter_2024.pdf">Review of winter 2024</a> (April 2025); its security of supply snapshots of <a href="https://www.ea.govt.nz/documents/9072/Security_of_Supply_Snapshot_-_22_December_2025.pdf">22 December 2025</a> and <a href="https://www.ea.govt.nz/documents/9192/Security_of_Supply_Snapshot_-_20_January_2026.pdf">20 January 2026</a>; and the Commerce Commission's <a href="https://www.comcom.govt.nz/news-and-media/news-and-events/2025/commission-authorises-gentailers-application-for-strategic-energy-reserve-huntly-firming-option/">authorisation of the Huntly firming option</a> (November 2025).</p>
+	<p>Sources: EMI final energy prices, generator offers, metered generation and the Hydrological Modelling Dataset; the Authority's <a href="https://www.ea.govt.nz/documents/7069/Review_of_winter_2024.pdf">Review of winter 2024</a> (April 2025); its security of supply snapshots of <a href="https://www.ea.govt.nz/documents/9072/Security_of_Supply_Snapshot_-_22_December_2025.pdf">22 December 2025</a> and <a href="https://www.ea.govt.nz/documents/9192/Security_of_Supply_Snapshot_-_20_January_2026.pdf">20 January 2026</a>; the Authority's <a href="https://www.ea.govt.nz/industry/monitoring/retail-gross-margin">retail gross margin</a> and regional power price data; and the Commerce Commission's <a href="https://www.comcom.govt.nz/news-and-media/news-and-events/2025/commission-authorises-gentailers-application-for-strategic-energy-reserve-huntly-firming-option/">authorisation of the Huntly firming option</a> (November 2025).</p>
 </Note>

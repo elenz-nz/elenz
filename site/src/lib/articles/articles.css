@@ -102,3 +102,4 @@
 .ch-line.thin { stroke-width: 1.5; }
 .ch-dot.small { stroke-width: 1.5; }
 
+.ch-mark { stroke-width: 3; stroke-linecap: round; }

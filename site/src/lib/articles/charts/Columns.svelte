@@ -8,13 +8,15 @@
 	type Series = { name: string; tok: string; values: number[] };
 	// an optional thin line drawn behind the columns, on its own right-hand axis starting at zero
 	type Line = { name: string; tok: string; values: number[]; unit: string; fmt: (v: number) => string };
+	// optional marks on the same axis as the columns: a short level line across each column (e.g. a comparison price)
+	type Mark = { name: string; tok: string; values: number[]; fmt: (v: number) => string };
 	let {
 		cats, series, stacked = false, percent = false, colors = [], tops = [], unit = '', height = 260,
-		fmt = (v: number) => num(v), label = 'Category', legend = undefined, table = true, xlabels = undefined, line = undefined,
+		fmt = (v: number) => num(v), label = 'Category', legend = undefined, table = true, xlabels = undefined, line = undefined, marks = undefined,
 	}: {
 		cats: string[]; series: Series[]; stacked?: boolean; percent?: boolean; colors?: (string | null)[];
 		tops?: (string | null)[]; unit?: string; height?: number; fmt?: (v: number) => string; label?: string;
-		legend?: boolean; table?: boolean; xlabels?: (string | null)[]; line?: Line;
+		legend?: boolean; table?: boolean; xlabels?: (string | null)[]; line?: Line; marks?: Mark;
 	} = $props();
 
 	let w = $state(680);
@@ -36,6 +38,7 @@
 			if (stacked) hi = Math.max(hi, vals.reduce((a, s) => a + Math.max(0, s[i]), 0));
 			else for (const s of vals) { hi = Math.max(hi, s[i]); lo = Math.min(lo, s[i]); }
 		}
+		if (marks) hi = Math.max(hi, ...marks.values);
 		return percent ? [0, 100] : nice(lo, hi, 5);
 	});
 	const y = $derived(linear(extent[0], extent[1], ph, 0));
@@ -94,12 +97,14 @@
 			rows.push({ tok: '', name: 'Total', value: fmt(series.reduce((a, s) => a + s.values[hover], 0)) });
 		const out = rows.filter((r) => r.value !== '0' && r.value !== '0.0%');
 		if (line) out.push({ tok: line.tok, name: line.name, value: line.fmt(line.values[hover]) });
+		if (marks) out.push({ tok: marks.tok, name: marks.name, value: marks.fmt(marks.values[hover]) });
 		return out;
 	})());
-	const showLegend = $derived(legend ?? (series.length > 1 || !!line));
+	const showLegend = $derived(legend ?? (series.length > 1 || !!line || !!marks));
 	const legendItems = $derived([
 		...series.map((s) => ({ name: line ? `${s.name} (left)` : s.name, tok: s.tok })),
 		...(line ? [{ name: `${line.name} (right)`, tok: line.tok, kind: 'line' as const }] : []),
+		...(marks ? [{ name: marks.name, tok: marks.tok, kind: 'line' as const }] : []),
 	]);
 </script>
 
@@ -128,10 +133,16 @@
 				{#each bars as b}
 					<path d={b.d} style="fill: var({b.tok})" class:dim={hover >= 0 && hover !== b.i} />
 				{/each}
+				{#if marks}
+					{#each marks.values as v, i}
+						{@const x0 = band * i + (band - gw) / 2}
+						<line class="ch-mark" x1={x0 - 6} x2={x0 + gw + 6} y1={y(v)} y2={y(v)} style="stroke: var({marks.tok})" />
+					{/each}
+				{/if}
 				{#each cats as c, i}
 					<text class="ch-tick" x={band * i + band / 2} y={ph + 18} text-anchor="middle">{xlabels ? (xlabels[i] ?? '') : c}</text>
 					{#if tops[i]}<text class="ch-top" x={band * i + band / 2} y={topY(i) - 7} text-anchor="middle">{tops[i]}</text>{/if}
-					<rect class="ch-hit" x={band * i} y="0" width={band} height={ph} tabindex="0" role="button" aria-label="{c}: {series.map((s) => `${s.name} ${fmt(s.values[i])}`).join(', ')}{line ? `, ${line.name} ${line.fmt(line.values[i])}` : ''}"
+					<rect class="ch-hit" x={band * i} y="0" width={band} height={ph} tabindex="0" role="button" aria-label="{c}: {series.map((s) => `${s.name} ${fmt(s.values[i])}`).join(', ')}{line ? `, ${line.name} ${line.fmt(line.values[i])}` : ''}{marks ? `, ${marks.name} ${marks.fmt(marks.values[i])}` : ''}"
 						onpointerenter={() => (hover = i)} onpointermove={(e) => (py = e.offsetY - 10)} onpointerleave={() => (hover = -1)}
 						onfocus={() => { hover = i; py = m.t; }} onblur={() => (hover = -1)} />
 				{/each}
@@ -145,9 +156,9 @@
 		<details class="ch-data">
 			<summary>Data table</summary>
 			<table>
-				<thead><tr><th>{label}</th>{#each series as s}<th class="n">{s.name}</th>{/each}{#if line}<th class="n">{line.name}</th>{/if}</tr></thead>
+				<thead><tr><th>{label}</th>{#each series as s}<th class="n">{s.name}</th>{/each}{#if line}<th class="n">{line.name}</th>{/if}{#if marks}<th class="n">{marks.name}</th>{/if}</tr></thead>
 				<tbody>
-					{#each cats as c, i}<tr><td>{c}</td>{#each series as s}<td class="n">{fmt(s.values[i])}</td>{/each}{#if line}<td class="n">{line.fmt(line.values[i])}</td>{/if}</tr>{/each}
+					{#each cats as c, i}<tr><td>{c}</td>{#each series as s}<td class="n">{fmt(s.values[i])}</td>{/each}{#if line}<td class="n">{line.fmt(line.values[i])}</td>{/if}{#if marks}<td class="n">{marks.fmt(marks.values[i])}</td>{/if}</tr>{/each}
 				</tbody>
 			</table>
 		</details>

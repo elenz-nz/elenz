@@ -11,6 +11,11 @@ Inputs (all Electricity Authority, EMI, CC BY 4.0; downloaded into data/articles
                            into energy. The dataset ends on 31 Dec 2024.
   offers/YYYYMMDD_Offers.csv   generator offers (Wholesale/BidsAndOffers/Offers) for the two example trading periods
   hist/hh/YYYY-MM.json     the site's half-hourly history (generation at the example trading periods)
+  retail/rgm.xlsx          EA retail gross margins (Datasets/Retail/RetailGrossMargins): each large retailer's mass-market
+                           revenue per MWh split into electricity, distribution, metering, levies and margin, by
+                           financial year, excluding GST
+  retail/rpp.csv           EA regional power prices (Datasets/Retail/RegionalPowerPrices): household prices and bills by
+                           network region and month, including GST
 
 Output: site/src/lib/articles/data/wholesale-prices.json, plus every figure quoted in the text, printed.
 
@@ -43,6 +48,8 @@ NODES = {'MAN2201': 'Manapōuri', 'INV2201': 'Invercargill', 'BEN2201': 'Benmore
          'HAY2201': 'Haywards (Wellington)', 'WKM2201': 'Whakamaru', 'HLY2201': 'Huntly', 'SFD2201': 'Stratford',
          'OTA2201': 'Ōtāhuhu (Auckland)', 'KIW2201': 'Kikiwa (Nelson)'}
 P = lambda *a: print(*a, flush=True)
+RETAIL = f'{BLOB}/Datasets/Retail'
+GENTAILERS = ['Contact Energy', 'Genesis Energy', 'Mercury NZ', 'Meridian Energy']  # financial years end 30 June
 
 
 def fetch(url, path):
@@ -261,6 +268,42 @@ def main():
     P({v: round(avg[k], 1) for k, v in NODES.items()})
     sp = (H - B).loc['2025-10':'2026-09']
     P(f'HAY-BEN Oct25-Sep26: mean {sp.mean():.1f}; HAY>BEN+10 {100 * (sp > 10).mean():.1f}%; BEN>HAY+10 {100 * (sp < -10).mean():.1f}%')
+
+    # ---- wholesale to retail
+    # the four gentailers' mass-market revenue per MWh by component (weighted by MWh sold), against the Haywards
+    # average over the same financial year (July to June)
+    x = pd.read_excel(fetch(f'{RETAIL}/RetailGrossMargins/Retail%20gross%20margins.xlsx', os.path.join(DATA, 'retail', 'rgm.xlsx')), sheet_name=None)
+    comp = ['Electricity', 'Distribution', 'Metering', 'Levies', 'Margin']
+    rr = {'years': [], 'revenue': [], 'spot': [], **{c.lower(): [] for c in comp}}
+    for fy in sorted(x):
+        d = x[fy][x[fy]['Participant name'].isin(GENTAILERS)].copy()
+        if len(d) != len(GENTAILERS):
+            sys.exit(f'retail gross margins {fy}: expected the four gentailers, found {d["Participant name"].tolist()}')
+        wt = pd.to_numeric(d['Electricity sold MWh'])
+        avg = lambda c: float((pd.to_numeric(d[f'{c} $/MWh']) * wt).sum() / wt.sum())
+        y = int(fy)
+        spot = H.loc[f'{y - 1}-07':f'{y}-06'].mean()
+        rr['years'].append(y); rr['revenue'].append(r1(avg('Revenue'))); rr['spot'].append(r1(spot))
+        for c in comp:
+            rr[c.lower()].append(r1(avg(c)))
+        P(f'Gentailers FY{y}: revenue {avg("Revenue"):.0f}/MWh ({wt.sum() / 1e6:.1f} TWh sold), ' +
+          ', '.join(f'{c.lower()} {avg(c):.1f}' for c in comp) + f'; electricity share {100 * avg("Electricity") / avg("Revenue"):.0f}%, '
+          f'distribution {100 * avg("Distribution") / avg("Revenue"):.0f}%; Haywards Jul-Jun {spot:.0f}')
+    out['retail'] = rr
+
+    # households: average of every network region's standard-user price per kWh, against the Haywards monthly average
+    b = pd.read_csv(fetch(f'{RETAIL}/RegionalPowerPrices/20260531_AveragePowerUseAndCosts.csv', os.path.join(DATA, 'retail', 'rpp.csv')),
+                    encoding='utf-8-sig', parse_dates=['MonthEnd'])
+    s = b[b.LoadType == 'Standard user'].copy()
+    s['share'] = s.NetworkMonthlyChargeDollarsInclGST / s.TotalMonthlyBillDollarsInclGST
+    g = s.groupby(s.MonthEnd.dt.to_period('M')).agg(var=('VariableDollarPerkWhInclGST', 'mean'), fixed=('FixedDollarPerDayInclGST', 'mean'),
+                                                     share=('share', 'mean'), n=('NetworkReportingRegionCode', 'nunique'))
+    g['var_ex'] = g['var'] / 1.15 * 1000   # $/MWh excluding GST, to compare with wholesale
+    g['hay'] = m.HAY2201.reindex(g.index)
+    P('Households, standard users (mean of regions):'); P(g.round(3).to_string())
+    P(f'  variable price {g["var"].iloc[0] * 100:.1f} c/kWh incl GST ({g.index[0]}) to {g["var"].iloc[-1] * 100:.1f} ({g.index[-1]}), '
+      f'{100 * (g["var"].iloc[-1] / g["var"].iloc[0] - 1):+.0f}%; network share of the bill {g.share.min() * 100:.0f}-{g.share.max() * 100:.0f}%')
+    out['bills'] = {'start': str(g.index[0]), 'household': [r1(v, 0) for v in g.var_ex], 'hay': [r1(v, 0) for v in g.hay]}
 
     # ---- the two example trading periods
     out['stacks'] = []
