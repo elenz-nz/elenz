@@ -48,9 +48,7 @@
 			Math.abs(hv) < 1
 				? { k: 'hvdc', n: 'HVDC', v: '0 MW', l: 'on the HVDC link', c: '--f-hvdc' }
 				: { k: 'hvdc', n: 'HVDC', v: `${fmt(Math.abs(hv))} MW`, l: `flowing ${hv > 0 ? 'north' : 'south'} on the HVDC link`, c: '--f-hvdc' },
-			{ k: 'co2', n: 'Emissions intensity', v: `${fmt(nz.co2)} g`, l: 'CO₂e per kWh', c: '--co2' },
 		];
-		if (nz.roof >= 5) out.push({ k: 'roof', n: 'Embedded solar', v: `${fmt(nz.roof)} MW`, l: 'from embedded solar (est.)', c: '--f-solar' });
 		return out;
 	});
 	let rot = $state(0);
