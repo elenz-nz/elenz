@@ -300,11 +300,20 @@
 		const I = view.P[bandKey === 'BEN' ? 'SI' : 'NI'];
 		return [{ tok: '--o1', label: 'Over $500', value: String(I.n500[i]), unit: 'half-hours' }, { tok: '--o1', label: 'Over $1,000', value: String(I.n1000[i]), unit: 'half-hours' }];
 	}
+	// the mouse leaving the charts returns the summary to the range (after a moment, so moving from one chart to the next
+	// doesn't flicker); a touch keeps its point, since there's no hover to follow
+	let leaveTimer: ReturnType<typeof setTimeout> | undefined;
 	const point = (chart: string) => (e: PointerEvent, i: number) => {
+		clearTimeout(leaveTimer);
 		if (e.pointerType === 'touch') { tipS = null; return; }
 		tipS = { chart, i, x: e.clientX, y: e.clientY };
 	};
-	const leave = () => (tipS = null);
+	const leave = (e?: PointerEvent) => {
+		tipS = null;
+		if (e && e.pointerType === 'touch') return;
+		clearTimeout(leaveTimer);
+		leaveTimer = setTimeout(() => (hover = -1), 150);
+	};
 	const tipPos = $derived.by(() => {
 		if (!tipS) return '';
 		const w = 260, h = 110, pad = 8;

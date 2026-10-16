@@ -20,7 +20,7 @@
 		t: ArrayLike<number>; t0: number; t1: number; height?: number; y: Scale; fmt?: (v: number) => string; layers?: Layer[];
 		shade?: [number, number][]; marks?: { i: number; label: string }[]; hover?: number; xTicks?: { t: number; label: string; minor?: boolean }[];
 		showX?: boolean; label?: string; zero?: boolean; note?: { i: number; v: number; text: string; tok?: string } | null;
-		onpoint?: (e: PointerEvent, i: number) => void; onleave?: () => void;
+		onpoint?: (e: PointerEvent, i: number) => void; onleave?: (e: PointerEvent) => void;
 	} = $props();
 
 	let W = $state(600);
@@ -96,7 +96,7 @@
 </script>
 
 <div class="tc" bind:clientWidth={W}>
-	<svg width={W} {height} viewBox="0 0 {W} {height}" role="img" aria-label={label} onpointermove={move} onpointerdown={move} onpointerleave={() => onleave?.()}>
+	<svg width={W} {height} viewBox="0 0 {W} {height}" role="img" aria-label={label} onpointermove={move} onpointerdown={move} onpointerleave={(e) => onleave?.(e)}>
 		{#each shade as [a, b]}
 			<rect class="shade" x={Math.max(x0, X(t[a]) - half(a))} y={yTop} width={Math.max(1, X(t[b - 1]) + half(b - 1) - Math.max(x0, X(t[a]) - half(a)))} height={yBot - yTop}></rect>
 		{/each}
