@@ -1,7 +1,10 @@
 <script lang="ts">
 	// The hero-to-Tracker hand-off, in three stages as the page scrolls:
 	//   1. lift: the hero's horizon line (HeroBackdrop, data-handoff="from") shrinks into its "now" dot;
-	//   2. fly: the dot, with a short tail, travels down the page past whatever lies between;
+	//   2. fly: the dot, with a short tail, travels down the page through the Now preview's map (NowPeek,
+	//      data-handoff="via"): to the North Island ring, which has filled by the time it gets there, then down the
+	//      HVDC route from Haywards to Benmore, drawing the link behind it, and past the South Island ring, which fills
+	//      as it passes (build.svelte.js carries how far each part has built);
 	//   3. land: near the Tracker preview (TrackerPeek, data-handoff="to") the line grows back out of the dot and settles
 	//      on the top of the stack, which fills in beneath it; once landed, the Tracker's own outline takes over.
 	// Drawn in a fixed overlay between the two charts' positions on screen, read afresh each frame, so it starts on one
@@ -10,6 +13,8 @@
 	// for prefers-reduced-motion.
 	import { onMount } from 'svelte';
 	import { HZ, TK, horizon, tracker } from './geometry.js';
+	import { build } from './build.svelte.js';
+	import { RING, hvAt } from '#lib/home/maplayout.js';
 
 	let { D }: { D: any } = $props();
 
@@ -40,25 +45,61 @@
 			// the line is gone into the dot after the first ~160 px of scroll, and grows back over the last ~320 px
 			const sA = Math.min(160, travel * 0.2), sC = travel - Math.min(320, travel * 0.3);
 			const kA = travel <= 0 ? 1 : smooth(s / sA);
-			const kB = travel <= 0 ? 1 : smooth((s - sA) / (sC - sA));
 			const kC = travel <= 0 ? 1 : smooth((s - sC) / (travel - sC));
 			root.style.setProperty('--ho-lift', kA.toFixed(4));
 			root.style.setProperty('--ho', kC.toFixed(4));
-			show = s > 0 && kC < 1;
-			if (show) root.setAttribute('data-ho', ''); else root.removeAttribute('data-ho');
-			if (!show) return;
-
 			const n = src.tot.length;
 			const P = (i: number) => ({ x: a.left + (i / Math.max(1, n - 1)) * a.width, y: a.top + (src.y(src.tot[i]) / HZ.H) * a.height });
 			// the landing points are the Tracker's own, so the line ends exactly on the outline it hands over to
 			const m = dst.tot.length;
 			const Q = (i: number) => ({ x: b.left + (i / Math.max(1, m - 1)) * b.width, y: b.top + (dst.y(dst.tot[i]) / TK.H) * b.height });
 			const pEnd = P(n - 1), qEnd = Q(m - 1);
-			// the dot's path down the page: a gentle swing out to the side and back, rather than a straight drop
-			const at = (k: number) => {
-				const m = lerp(pEnd, qEnd, k);
-				return { x: m.x - Math.sin(Math.PI * k) * Math.min(120, innerWidth * 0.18), y: m.y };
+
+			// the dot's route, in page coordinates, each stop with the scroll position at which the dot reaches it: it
+			// reaches each stop on the map as that stop crosses the middle of the screen, so between stops it rides
+			// at mid-screen while the page moves under it
+			const page = (p: Pt) => ({ x: p.x, y: p.y + s });
+			const via = document.querySelector('[data-handoff="via"]') as SVGSVGElement | null;
+			const ctm = via?.getScreenCTM();
+			type Stop = { p: Pt; at: number; hv?: boolean };
+			const stops: Stop[] = [{ p: page(pEnd), at: sA }];
+			const mapStops: Record<string, number> = {};
+			if (ctm) {
+				const onMap = (v: Pt) => { const q = new DOMPoint(v.x, v.y).matrixTransform(ctm); return { x: q.x, y: q.y + s }; };
+				const add = (key: string, v: Pt, hv = false) => {
+					const p = onMap(v), prev = stops[stops.length - 1].at;
+					const at = Math.min(sC - 1, Math.max(prev + 1, p.y - vh * 0.5));
+					stops.push({ p, at, hv });
+					mapStops[key] = at;
+				};
+				add('ni', RING.NI);
+				add('hay', hvAt(1));
+				add('ben', hvAt(0), true); // reached by following the route from Haywards
+				add('si', RING.SI);
+			}
+			stops.push({ p: page(qEnd), at: sC });
+			// where the dot is (page coordinates) at scroll position v
+			const route = (v: number): Pt => {
+				let i = 0;
+				while (i < stops.length - 2 && v > stops[i + 1].at) i++;
+				const A = stops[i], B = stops[i + 1], u = Math.min(1, Math.max(0, (v - A.at) / (B.at - A.at || 1)));
+				if (B.hv && ctm) { const q = new DOMPoint(hvAt(1 - u).x, hvAt(1 - u).y).matrixTransform(ctm); return { x: q.x, y: q.y + s }; }
+				return lerp(A.p, B.p, u);
 			};
+
+			// the Now preview builds as the dot passes
+			if (ctm) {
+				const { ni, hay, ben, si } = mapStops;
+				const clamp = (v: number) => (v <= 0 ? 0 : v >= 1 ? 1 : v);
+				build.ni = smooth((s - (ni - 280)) / 280);
+				build.link = clamp((s - hay) / (ben - hay || 1));
+				const siFrom = ben - 0.3 * (ben - hay);
+				build.si = smooth((s - siFrom) / (si + 100 - siFrom));
+			}
+
+			show = s > 0 && kC < 1;
+			if (show) root.setAttribute('data-ho', ''); else root.removeAttribute('data-ho');
+			if (!show) return;
 
 			const pts: string[] = [];
 			if (kC > 0) {
@@ -73,9 +114,10 @@
 				tail = [];
 			} else {
 				// stage 2: the dot in flight, with a tail of where it was a moment ago
-				dot = at(kB);
+				const screen = (p: Pt) => ({ x: p.x, y: p.y - s });
+				dot = screen(route(s));
 				tail = Array.from({ length: 7 }, (_, j) => {
-					const p = at(Math.max(0, kB - (j + 1) * 0.018));
+					const p = screen(route(Math.max(sA, s - (j + 1) * 14)));
 					return { ...p, r: 3.6 - j * 0.42, o: 0.45 - j * 0.06 };
 				});
 			}
@@ -93,6 +135,7 @@
 			root.style.removeProperty('--ho');
 			root.style.removeProperty('--ho-lift');
 			root.removeAttribute('data-ho');
+			build.ni = build.link = build.si = 1;
 		};
 	});
 	// a new interval reshapes both charts; redraw at the current scroll

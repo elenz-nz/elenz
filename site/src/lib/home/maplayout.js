@@ -11,6 +11,11 @@ export const RING_R = 40;
 // HVDC route: Benmore, up the east of the South Island to the Cook Strait cable, then Haywards
 const [bx, by] = PTS.ben, [hx, hy] = PTS.hay;
 const c1 = [bx + 60, by - 40], c2 = [hx - 40, hy + 70];
-export const HV = { ben: { x: bx, y: by }, hay: { x: hx, y: hy } };
+export const HV = { ben: { x: bx, y: by }, hay: { x: hx, y: hy }, c1: { x: c1[0], y: c1[1] }, c2: { x: c2[0], y: c2[1] } };
 export const HV_PATH = `M${bx},${by} C${c1[0]},${c1[1]} ${c2[0]},${c2[1]} ${hx},${hy}`;
+// a point along the route, t = 0 at Benmore to 1 at Haywards
+export function hvAt(t) {
+  const u = 1 - t, a = u * u * u, b = 3 * u * u * t, c = 3 * u * t * t, d = t * t * t;
+  return { x: a * bx + b * c1[0] + c * c2[0] + d * hx, y: a * by + b * c1[1] + c * c2[1] + d * hy };
+}
 export const HV_MID = { x: (bx + 3 * c1[0] + 3 * c2[0] + hx) / 8, y: (by + 3 * c1[1] + 3 * c2[1] + hy) / 8 };
