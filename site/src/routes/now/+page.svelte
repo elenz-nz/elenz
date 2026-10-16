@@ -119,6 +119,7 @@
 					<span title="North Island reference price, Haywards"><b class="isl">HAY</b>{now ? money(now.regions.NI.price ?? 0) : '–'}<small>/MWh</small></span>
 					<span title="South Island reference price, Benmore"><b class="isl">BEN</b>{now ? money(now.regions.SI.price ?? 0) : '–'}<small>/MWh</small></span>
 				</span>
+				<span class="k-sub"><a class="k-link" href="/about#m-price">Spot market, every 5 minutes</a></span>
 			</div>
 			<div class="kpi">
 				<span class="k-lbl">HVDC</span>
