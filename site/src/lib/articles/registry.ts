@@ -88,7 +88,7 @@ export const entries: Entry[] = (() => {
 export const find = (slug: string) => articles.find((a) => a.slug === slug);
 
 // the site's public address, for absolute links in link previews; change it when elenz.nz is attached
-export const SITE_URL = 'https://elenz.elenz.workers.dev';
+export const SITE_URL = 'https://elenz.co.nz';
 
 // search engines skip the whole section while hidden, and drafts and scheduled articles always
 export const noindex = (a?: Article) => !ARTICLES_PUBLIC || (!!a && hidden(a));

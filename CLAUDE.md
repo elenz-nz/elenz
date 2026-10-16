@@ -184,8 +184,8 @@ This repository is public: never commit keys, tokens or personal details.
 
 ## Status and next steps
 
-1. Site live at https://elenz.co.nz (Cloudflare Workers custom domain; https://elenz.elenz.workers.dev stays on until
-   the monitors move).
+1. Site live at https://elenz.co.nz (Cloudflare Workers custom domain). The watchdog, UptimeRobot and article link
+   previews use elenz.co.nz; https://elenz.elenz.workers.dev still works (the analysis scripts download from it).
 2. Live data via GitHub Actions + Workers KV (set up Oct 2026). A paid server running `update.py` in a loop is the
    upgrade path if GitHub's schedule delays become a problem.
 3. History since Aug 1997 on the tracker page: 30 days, 1 year, All (BUILD 6, Oct 2026; was Sep 2020).
