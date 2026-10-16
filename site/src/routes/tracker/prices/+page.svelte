@@ -104,7 +104,7 @@
 		const r = (RANGES as any)[range];
 		const latest = live.t[live.n - 1];
 		const to = r.days == null || endT === null ? latest + 1 : Math.min(endT, latest + 1);
-		const from = r.days == null ? 0 : to - r.days * 864e5;
+		const from = r.days == null ? 0 : endT !== null && to === endT ? addDays(to, -r.days) : to - r.days * 864e5;   // whole local days, like the Generation tab
 		const iv = effInt;
 		viewError = '';
 		try {
