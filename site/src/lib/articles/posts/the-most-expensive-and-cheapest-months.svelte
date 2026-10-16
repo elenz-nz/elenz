@@ -8,6 +8,7 @@
 		series: 'wholesale-market',
 		part: 4,
 		image: '/articles/the-most-expensive-and-cheapest-months.png',
+		imageLight: '/articles/the-most-expensive-and-cheapest-months-light.png',
 	} as const;
 </script>
 

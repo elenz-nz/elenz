@@ -1,9 +1,9 @@
 <script lang="ts">
 	// Cover image for a pricing article: one column per month of average wholesale price, coloured from blue (cheap)
-	// to orange (dear), under the article's title, with the dearest and cheapest months labelled. Always drawn dark,
-	// in fixed colours, like ReviewCover, so it looks the same in light and dark mode and as the link-preview PNG
-	// (analysis/cover_png.py).
+	// to orange (dear), under the article's title, with the dearest and cheapest months labelled. Drawn light or
+	// dark to match the site, like ReviewCover (cover.css); link previews use the dark version (analysis/cover_png.py).
 	//   <PriceCover values={D.months.HAY} start="1996-10" kicker="Analysis" title={['What sets the', 'wholesale price']} />
+	import './cover.css';
 	let { values, start, kicker, title, note = '' }: {
 		values: number[]; start: string; kicker: string; title: string[]; note?: string;
 	} = $props();
@@ -16,7 +16,7 @@
 	const lo = $derived(values.indexOf(Math.min(...values)));
 
 	// cheap months blue (hydro), dear months orange (gas), in four bands
-	const fill = (v: number) => (v < 40 ? '#4f8bd6' : v < 100 ? '#86aee0' : v < 200 ? '#dfa46c' : '#d9772a');
+	const fill = (v: number) => (v < 40 ? 'var(--cv-p1)' : v < 100 ? 'var(--cv-p2)' : v < 200 ? 'var(--cv-p3)' : 'var(--cv-p4)');
 	const ym = $derived(start.split('-').map(Number));
 	const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 	const label = (i: number) => { const j = ym[1] - 1 + i; return `${MON[j % 12]} ${ym[0] + Math.floor(j / 12)}`; };
@@ -24,19 +24,19 @@
 	const xOf = (i: number) => i * step + step / 2;
 </script>
 
-<figure class="cover">
+<figure class="cover cv">
 	<svg viewBox="0 0 {W} {H}" role="img" aria-label="{title.join(' ')}: average wholesale price each month since {label(0)}">
 		<defs>
 			<linearGradient id="pc-bg" x1="0" y1="0" x2="1" y2="1">
-				<stop offset="0" stop-color="#16262a" />
-				<stop offset="1" stop-color="#0e1617" />
+				<stop offset="0" style="stop-color: var(--cv-bg-1)" />
+				<stop offset="1" style="stop-color: var(--cv-bg-2)" />
 			</linearGradient>
 		</defs>
 		<rect width={W} height={H} fill="url(#pc-bg)" />
 
 		{#each values as v, i}
 			{@const h = Math.max(2, v * k)}
-			<rect x={i * step + 0.3} y={BASE - h} width={Math.max(0.8, step - 0.6)} height={h} rx="0.8" fill={fill(v)} />
+			<rect x={i * step + 0.3} y={BASE - h} width={Math.max(0.8, step - 0.6)} height={h} rx="0.8" style="fill: {fill(v)}" />
 		{/each}
 
 		<!-- the dearest and cheapest months, labelled in the clear space above the columns -->
@@ -49,10 +49,10 @@
 
 		<!-- the Elenz mark and wordmark -->
 		<g transform="translate(72,60) scale(1.6)">
-			<rect x="3" y="17" width="5" height="10" rx="1" fill="#c4508f" /><rect x="3" y="9" width="5" height="7" rx="1" fill="#4f8bd6" />
-			<rect x="9.5" y="17" width="5" height="10" rx="1" fill="#c4508f" /><rect x="9.5" y="5" width="5" height="11" rx="1" fill="#4f8bd6" />
-			<rect x="16" y="17" width="5" height="10" rx="1" fill="#c4508f" /><rect x="16" y="8" width="5" height="8" rx="1" fill="#4f8bd6" /><rect x="16" y="4" width="5" height="3" rx="1" fill="#2fa883" />
-			<rect x="22.5" y="17" width="5" height="10" rx="1" fill="#c4508f" /><rect x="22.5" y="11" width="5" height="5" rx="1" fill="#4f8bd6" /><rect x="22.5" y="6" width="5" height="4" rx="1" fill="#d4a21c" />
+			<rect x="3" y="17" width="5" height="10" rx="1" style="fill: var(--cv-geo)" /><rect x="3" y="9" width="5" height="7" rx="1" style="fill: var(--cv-hydro)" />
+			<rect x="9.5" y="17" width="5" height="10" rx="1" style="fill: var(--cv-geo)" /><rect x="9.5" y="5" width="5" height="11" rx="1" style="fill: var(--cv-hydro)" />
+			<rect x="16" y="17" width="5" height="10" rx="1" style="fill: var(--cv-geo)" /><rect x="16" y="8" width="5" height="8" rx="1" style="fill: var(--cv-hydro)" /><rect x="16" y="4" width="5" height="3" rx="1" style="fill: var(--cv-wind)" />
+			<rect x="22.5" y="17" width="5" height="10" rx="1" style="fill: var(--cv-geo)" /><rect x="22.5" y="11" width="5" height="5" rx="1" style="fill: var(--cv-hydro)" /><rect x="22.5" y="6" width="5" height="4" rx="1" style="fill: var(--cv-solar)" />
 		</g>
 		<text x="130" y="96" class="word">ELENZ</text>
 
@@ -64,14 +64,8 @@
 </figure>
 
 <style>
-	.cover { margin: 0 0 6px; border-radius: 6px; overflow: hidden; background: #0e1617; line-height: 0; }
-	svg { display: block; width: 100%; height: auto; }
-	text { font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif; }
-	.word { font-size: 30px; font-weight: 800; letter-spacing: 0.08em; fill: #e8eeee; }
-	.kicker { font-size: 22px; font-weight: 700; letter-spacing: 0.16em; fill: #5cb5c8; }
-	.title { font-size: 72px; font-weight: 800; letter-spacing: -0.02em; fill: #f3f6f6; }
-	.note { font-size: 17px; font-weight: 500; fill: #7d8f8e; }
-	.flag { font-size: 30px; font-weight: 800; fill: #f3f6f6; }
-	.flag-sub { font-size: 18px; font-weight: 500; fill: #9fb0af; }
-	.tick { stroke: #9fb0af; stroke-width: 1.5; }
+	.title { font-size: 72px; font-weight: 800; letter-spacing: -0.02em; }
+	.flag { font-size: 30px; font-weight: 800; fill: var(--cv-ink); }
+	.flag-sub { font-size: 18px; font-weight: 500; fill: var(--cv-ink-2); }
+	.tick { stroke: var(--cv-ink-2); stroke-width: 1.5; }
 </style>

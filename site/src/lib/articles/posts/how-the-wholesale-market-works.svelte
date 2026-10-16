@@ -8,6 +8,7 @@
 		series: 'wholesale-market',
 		part: 1,
 		image: '/articles/how-the-wholesale-market-works.png',
+		imageLight: '/articles/how-the-wholesale-market-works-light.png',
 	} as const;
 </script>
 

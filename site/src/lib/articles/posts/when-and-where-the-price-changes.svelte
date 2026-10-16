@@ -8,6 +8,7 @@
 		series: 'wholesale-market',
 		part: 7,
 		image: '/articles/when-and-where-the-price-changes.png',
+		imageLight: '/articles/when-and-where-the-price-changes-light.png',
 	} as const;
 </script>
 

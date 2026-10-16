@@ -8,6 +8,7 @@
 		series: 'wholesale-market',
 		part: 5,
 		image: '/articles/where-the-money-is-made.png',
+		imageLight: '/articles/where-the-money-is-made-light.png',
 	} as const;
 </script>
 

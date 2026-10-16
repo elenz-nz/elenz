@@ -169,7 +169,6 @@
 						<a class="go" href={p.href}>Open {p.name} →</a>
 					</div>
 					<a class="window" href={p.href} aria-label="Open {p.name}" tabindex="-1">
-						<span class="bar"><i></i><i></i><i></i><span class="path">elenz{p.href}</span></span>
 						<span class="view">
 							{#if D && now}<Peek {D} {now} />{:else}<span class="ph">{error ? 'Preview unavailable' : 'Loading…'}</span>{/if}
 						</span>
@@ -221,27 +220,28 @@
 	@keyframes nudge { 50% { transform: translateY(4px); } }
 	@media (prefers-reduced-motion: reduce) { .down { animation: none; } }
 
-	.pages-list { display: grid; gap: 22px; scroll-margin-top: 16px; }
-	.pg { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 28px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 24px; }
+	.pages-list { display: grid; gap: 96px; scroll-margin-top: 16px; padding-block: 40px 56px; counter-reset: pg; }
+	.pg { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 48px; align-items: center; counter-increment: pg; }
 	.pg.flip { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); }
 	.pg.flip .pg-text { order: 2; }
-	.pg-text h2 { margin: 0 0 8px; font-size: 1.5rem; letter-spacing: -0.01em; }
+	.pg-text h2 { margin: 0 0 8px; font-size: 2rem; letter-spacing: -0.01em; }
+	/* each section numbered 01, 02, … above its heading */
+	.pg-text h2::before { content: '0' counter(pg); display: block; font-family: var(--font-data); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 10px; }
 	.pg-text h2 a { color: inherit; text-decoration: none; }
 	.pg-text p { margin: 0 0 14px; color: var(--ink-2); max-width: 46ch; font-size: 0.95rem; }
 	.go { color: var(--accent); font-weight: 600; }
 
-	.window { display: grid; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--bg); color: inherit; text-decoration: none; transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s; }
-	.window:hover { border-color: var(--ink-2); box-shadow: 0 8px 24px rgb(0 0 0 / 0.12); transform: translateY(-2px); }
+	/* the preview sits straight on the page, no frame; it lifts a little on hover */
+	.window { display: grid; color: inherit; text-decoration: none; transition: transform 0.15s; }
+	.window:hover { transform: translateY(-2px); }
 	@media (prefers-reduced-motion: reduce) { .window, .window:hover { transition: none; transform: none; } }
-	.bar { display: flex; align-items: center; gap: 5px; padding: 7px 10px; border-bottom: 1px solid var(--line); background: var(--surface); }
-	.bar i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
-	.bar .path { margin-left: 8px; font-family: var(--font-data); font-size: 0.7rem; color: var(--muted); }
-	/* every preview window the same height side by side (the tallest, Now's map), its content centred */
-	.view { display: grid; align-content: center; padding: 16px; min-height: 376px; }
+	/* every preview the same height side by side (the tallest, Now's map), its content centred */
+	.view { display: grid; align-content: center; min-height: 340px; }
 	.ph { display: grid; place-items: center; min-height: 200px; color: var(--muted); font-size: 0.85rem; }
 
 	@media (max-width: 820px) {
-		.pg, .pg.flip { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 18px; }
+		.pg, .pg.flip { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+		.pages-list { gap: 64px; }
 		.pg.flip .pg-text { order: 0; }
 		.view { min-height: 200px; }
 	}
@@ -251,6 +251,5 @@
 		.fact .sep { margin: 0 6px; }
 		.hero { min-height: min(80svh, 640px); }
 		.live-fig { margin-top: 24px; }
-		.view { padding: 12px; }
 	}
 </style>

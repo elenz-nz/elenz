@@ -8,6 +8,7 @@
 		series: 'wholesale-market',
 		part: 3,
 		image: '/articles/water-gas-and-the-price.png',
+		imageLight: '/articles/water-gas-and-the-price-light.png',
 	} as const;
 </script>
 

@@ -8,6 +8,7 @@
 		series: 'wholesale-market',
 		part: 2,
 		image: '/articles/thirty-years-of-wholesale-prices.png',
+		imageLight: '/articles/thirty-years-of-wholesale-prices-light.png',
 	} as const;
 </script>
 

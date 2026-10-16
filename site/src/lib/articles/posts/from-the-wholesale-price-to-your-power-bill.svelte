@@ -8,6 +8,7 @@
 		series: 'wholesale-market',
 		part: 6,
 		image: '/articles/from-the-wholesale-price-to-your-power-bill.png',
+		imageLight: '/articles/from-the-wholesale-price-to-your-power-bill-light.png',
 	} as const;
 </script>
 

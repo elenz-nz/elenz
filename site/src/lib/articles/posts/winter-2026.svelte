@@ -5,6 +5,7 @@
 		date: '2026-10-15',
 		kind: 'Quarterly review',
 		image: '/articles/winter-2026.png',
+		imageLight: '/articles/winter-2026-light.png',
 	} as const;
 </script>
 

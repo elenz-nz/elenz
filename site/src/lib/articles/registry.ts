@@ -35,6 +35,7 @@ export type Meta = {
 	draft?: boolean;
 	updated?: string; // YYYY-MM-DD, if revised after publishing
 	image?: string; // link-preview image under site/static, e.g. '/articles/winter-2026.png' (analysis/cover_png.py)
+	imageLight?: string; // its light-mode version, shown on the landing page in light mode ('/articles/winter-2026-light.png')
 	series?: string; // a key of SERIES
 	part?: number; // its part number in that series, from 1
 };
