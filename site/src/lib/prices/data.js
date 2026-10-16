@@ -75,9 +75,10 @@ export function captured(S, region, a = 0, b = S.n) {
 
 // ---------- ranges ----------
 export const RANGES = {
-  '1d': { mode: 'time', src: 'live', days: 1, ints: ['5m', '30m'], label: '24 hours' },
-  '3d': { mode: 'time', src: 'live', days: 3, ints: ['5m', '30m'], label: '3 days' },
-  '7d': { mode: 'time', src: 'live', days: 7, ints: ['5m', '30m'], label: '7 days' },
+  // past: the intervals once the window reaches back past the live week (half-hourly history), as on the Generation tab
+  '1d': { mode: 'time', src: 'live', days: 1, ints: ['5m', '30m'], past: ['30m'], label: '24 hours' },
+  '3d': { mode: 'time', src: 'live', days: 3, ints: ['5m', '30m'], past: ['30m'], label: '3 days' },
+  '7d': { mode: 'time', src: 'live', days: 7, ints: ['5m', '30m'], past: ['30m', '1d'], label: '7 days' },
   '30d': { mode: 'time', src: 'hh', days: 30, ints: ['30m', '1d'], label: '30 days' },
   '1y': { mode: 'long', src: 'day', days: 365, ints: ['1d', '1w', '1mo'], label: '12 months' },
   'all': { mode: 'long', src: 'day', days: null, ints: ['1d', '1w', '1mo'], def: '1w', label: 'All history' },

@@ -52,7 +52,7 @@
 	const FIRST = Date.UTC(2020, 8, 10) - 12 * 36e5; // history starts 10 Sep 2020 (NZ)
 
 	const store = historyStore();
-	const R = $derived(RANGES[range as keyof typeof RANGES] as { mode: string; src: string; days: number | null; ints: string[]; label: string; def?: string });
+	const R = $derived(RANGES[range as keyof typeof RANGES] as { mode: string; src: string; days: number | null; ints: string[]; past?: string[]; label: string; def?: string });
 	const age = $derived(meta ? (now - meta.end) / 60000 : 0);
 	const isLive = $derived(meta !== null && age < LIVE_MINUTES);
 
@@ -94,7 +94,7 @@
 	const latestT = $derived(live ? live.t[live.n - 1] : 0);
 	// a window ending before the live week reaches back past it: the live ranges then come from half-hourly history
 	const pastLive = $derived(R.src === 'live' && endT !== null && live && endT - (R.days ?? 0) * 864e5 < live.t[0]);
-	const intChoices = $derived(pastLive ? ['30m'] : R.ints);
+	const intChoices = $derived(pastLive && R.past ? R.past : R.ints);
 	const effInt = $derived(intPicked && intChoices.includes(int) ? int : R.def && intChoices.includes(R.def) ? R.def : intChoices[0]);
 
 	let token = 0;
