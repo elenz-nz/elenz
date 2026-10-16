@@ -4,7 +4,6 @@
 		dek: 'For two decades the wholesale price mostly sat between $30 and $80/MWh, broken by dry years. Since 2018 it has run about twice as high, and in the last two years it set both its highest and its lowest month.',
 		date: '2026-10-16',
 		kind: 'Analysis',
-		draft: true,
 		series: 'wholesale-market',
 		part: 2,
 		image: '/articles/thirty-years-of-wholesale-prices.png',
@@ -20,7 +19,8 @@
 	import PriceCover from '#lib/articles/PriceCover.svelte';
 	import Lines from '#lib/articles/charts/Lines.svelte';
 	import Columns from '#lib/articles/charts/Columns.svelte';
-	import { D, dollars, monthName, cover, PARTS } from '#lib/articles/series/wholesale.js';
+	import { D, dollars, monthName, cover } from '#lib/articles/series/wholesale.js';
+	import PartLink from '#lib/articles/series/PartLink.svelte';
 
 	const C = cover(2, ['Thirty years of', 'wholesale prices']);
 	const [y0, m0] = D.months.start.split('-').map(Number);
@@ -63,9 +63,9 @@
 </Figure>
 
 <h2>A higher floor from 2018</h2>
-<p>From 2018 the floor lifted. Haywards averaged $62/MWh from 1997 to 2017 and $120 from 2018 to 2023, about twice as much, and stayed above $100 even in years without a serious drought. Eight months averaged above $150/MWh in those first 21 years; eighteen did in the next six. The reason, explored in <a href={PARTS.water}>Part 3</a>, is gas: as the gas fields declined, the backup that hydro relies on in a dry year became scarce and expensive, and that raised the value of the water in the lakes.</p>
+<p>From 2018 the floor lifted. Haywards averaged $62/MWh from 1997 to 2017 and $120 from 2018 to 2023, about twice as much, and stayed above $100 even in years without a serious drought. Eight months averaged above $150/MWh in those first 21 years; eighteen did in the next six. The reason, explored in <PartLink to="water">Part 3</PartLink>, is gas: as the gas fields declined, the backup that hydro relies on in a dry year became scarce and expensive, and that raised the value of the water in the lakes.</p>
 
-<p>Then came the two extremes. 2024 set the record, with a dry winter and short gas pushing August to $465/MWh. Two summers later the lakes were overflowing and a wave of new geothermal was running, and January 2026 averaged $3.52. So far 2026 has been the cheapest year since 2016, at $64/MWh to the end of September. <a href={PARTS.extremes}>Part 4</a> looks at those two months side by side.</p>
+<p>Then came the two extremes. 2024 set the record, with a dry winter and short gas pushing August to $465/MWh. Two summers later the lakes were overflowing and a wave of new geothermal was running, and January 2026 averaged $3.52. So far 2026 has been the cheapest year since 2016, at $64/MWh to the end of September. <PartLink to="extremes">Part 4</PartLink> looks at those two months side by side.</p>
 
 <Note title="How these figures are measured">
 	<ul>

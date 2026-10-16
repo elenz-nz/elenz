@@ -21,7 +21,8 @@
 	import Columns from '#lib/articles/charts/Columns.svelte';
 	import HBars from '#lib/articles/charts/HBars.svelte';
 	import TimeMoney from '#lib/articles/charts/TimeMoney.svelte';
-	import { D, cover, PARTS } from '#lib/articles/series/wholesale.js';
+	import { D, cover } from '#lib/articles/series/wholesale.js';
+	import PartLink from '#lib/articles/series/PartLink.svelte';
 
 	const C = cover(5, ['Where the money', 'is made']);
 	const extYears = D.extremes.years.map((y) => (y === 2026 ? '2026*' : String(y)));
@@ -43,7 +44,7 @@
 
 <PriceCover {...C} />
 
-<p>Every generator is paid the wholesale price of each trading period for what it generates (see <a href={PARTS.works}>Part 1</a>). As more low-priced generation is built, that price spends more of its time at the extremes, so a year's earnings depend more and more on the stretches when supply is tight. This part looks at how often the price sits at each extreme, and who earns the money when it is high.</p>
+<p>Every generator is paid the wholesale price of each trading period for what it generates (see <PartLink to="works">Part 1</PartLink>). As more low-priced generation is built, that price spends more of its time at the extremes, so a year's earnings depend more and more on the stretches when supply is tight. This part looks at how often the price sits at each extreme, and who earns the money when it is high.</p>
 
 <Stats items={[
 	{ label: 'Spot market takings, 2024', value: '$8.6', unit: 'billion', note: 'against $4.8 billion in 2022, for about the same 41 TWh', tok: '--accent' },
@@ -77,7 +78,7 @@
 	<HBars rows={relRows} fmt={(v) => `${v.toFixed(0)}%`} label="Fuel" valueLabel="Share of revenue in the most expensive 5% of trading periods" />
 </Figure>
 
-<p>This is spot revenue, before contracts. Most generation is sold forward through hedges and to the generators' own retail customers at agreed prices, so a generator's income swings far less than these totals. But the spot price is what those contracts are priced against, and what any electricity that isn't covered by a contract earns. <a href={PARTS.bill}>Part 6</a> follows the money on to the power bill.</p>
+<p>This is spot revenue, before contracts. Most generation is sold forward through hedges and to the generators' own retail customers at agreed prices, so a generator's income swings far less than these totals. But the spot price is what those contracts are priced against, and what any electricity that isn't covered by a contract earns. <PartLink to="bill">Part 6</PartLink> follows the money on to the power bill.</p>
 
 <Note title="How these figures are measured">
 	<ul>

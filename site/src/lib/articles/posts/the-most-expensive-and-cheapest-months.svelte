@@ -24,7 +24,8 @@
 	import TimeStack from '#lib/articles/charts/TimeStack.svelte';
 	import { num } from '#lib/articles/charts/util.js';
 	import M from '#lib/articles/data/wholesale-months.json';
-	import { D, FUELS, cover, PARTS } from '#lib/articles/series/wholesale.js';
+	import { D, FUELS, cover } from '#lib/articles/series/wholesale.js';
+	import PartLink from '#lib/articles/series/PartLink.svelte';
 
 	const C = cover(4, ['The most expensive', 'and cheapest months']);
 	type Month = { t0: number; step: number; demand: number[]; price: number[]; [k: string]: number[] | number };
@@ -62,7 +63,7 @@
 ]} />
 
 <h2>Winter 2024: everything at once</h2>
-<p>Winter 2024 combined both problems behind high prices (see <a href={PARTS.water}>Part 3</a>). According to the Authority's review, there were no significant inflows to the lakes after mid-April, and national storage fell to about 1,500 GWh in early August, a six-year low, with Pūkaki at its lowest since 1997. Gas was short. Wind output often dropped below 300 MW, and a cold snap in early August lifted demand. Every day from 3 to 10 August averaged more than $760/MWh at Haywards, peaking at <strong>$878</strong> on Wednesday 7 August, the most expensive day since the market began.</p>
+<p>Winter 2024 combined both problems behind high prices (see <PartLink to="water">Part 3</PartLink>). According to the Authority's review, there were no significant inflows to the lakes after mid-April, and national storage fell to about 1,500 GWh in early August, a six-year low, with Pūkaki at its lowest since 1997. Gas was short. Wind output often dropped below 300 MW, and a cold snap in early August lifted demand. Every day from 3 to 10 August averaged more than $760/MWh at Haywards, peaking at <strong>$878</strong> on Wednesday 7 August, the most expensive day since the market began.</p>
 
 <Figure caption="August 2024: generation by fuel and grid demand, with the Haywards price, two-hourly averages" source="Elenz history (EMI dispatch data); EMI final energy prices" wide>
 	<TimeStack {...aug} panel={pricePanel(M['2024-08'] as unknown as Month)} height={300} labelEvery={4} {ymax} {pmax} />

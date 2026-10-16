@@ -4,7 +4,6 @@
 		dek: "Every five minutes, New Zealand's generators compete to supply the grid, and the last offer needed sets the price for everyone. Here is how that works, who is involved, and why most people never pay that price directly.",
 		date: '2026-10-16',
 		kind: 'Guide',
-		draft: true,
 		series: 'wholesale-market',
 		part: 1,
 		image: '/articles/how-the-wholesale-market-works.png',
@@ -22,7 +21,8 @@
 	import MarketDiagram from '#lib/articles/charts/MarketDiagram.svelte';
 	import Legend from '#lib/articles/charts/Legend.svelte';
 	import { num } from '#lib/articles/charts/util.js';
-	import { D, FUELS, cover, PARTS } from '#lib/articles/series/wholesale.js';
+	import { D, FUELS, cover } from '#lib/articles/series/wholesale.js';
+	import PartLink from '#lib/articles/series/PartLink.svelte';
 
 	const C = cover(1, ['How the wholesale', 'market works']);
 	const [s24, s26] = D.stacks as unknown as { load: number; price: { HAY: number }; blocks: [string, number, number][] }[];
@@ -73,7 +73,7 @@
 
 <p>The difference is what came next. In August 2024, 4,792 MW of hydro was offered, and 1,991 MW of it was priced above $300/MWh. Most gas was priced above $300 too, and gas and diesel peakers, with some hydro, above $1,000. Meeting 6,644 MW reached offers of around $750, and Haywards cleared at <strong>$882/MWh</strong>. In January 2026, 3,626 MW of hydro was offered at $1 or less on its own. Demand never reached the expensive part of the stack, and Haywards cleared at <strong>$1.14/MWh</strong>.</p>
 
-<p>Why would a hydro station, whose fuel falls from the sky, offer at $800? Because water used now can't be used later, so generators price it at what it is expected to be worth when it is needed most. That idea, the water value, runs through everything that follows; <a href={PARTS.water}>Part 3</a> looks at it in detail.</p>
+<p>Why would a hydro station, whose fuel falls from the sky, offer at $800? Because water used now can't be used later, so generators price it at what it is expected to be worth when it is needed most. That idea, the water value, runs through everything that follows; <PartLink to="water">Part 3</PartLink> looks at it in detail.</p>
 
 <h2>Who pays whom</h2>
 <p>Once the trading period is over and the meters are read, every generator is paid the final price at its grid point for what it generated, and every retailer and large user is charged the price at its own grid point for what its customers used. Each calendar month is a billing period: the market's clearing manager works out what every participant owes and is owed, and the money changes hands on the 20th of the following month.</p>
@@ -83,7 +83,7 @@
 <h2>Why the price matters</h2>
 <p>The price decides which stations run and when. A high price tells generators to run everything they have and large users to cut back; a low one tells hydro stations to save their water. Over years, the prices people expect are what new power stations are built against. When the price swings from $878/MWh one winter's day to about a dollar on a summer evening, it is telling everyone something about how much electricity there is to go round.</p>
 
-<p>The rest of the series follows that signal: <a href={PARTS.history}>thirty years of prices</a>, the <a href={PARTS.water}>water and gas</a> behind them, the <a href={PARTS.extremes}>most expensive and cheapest months</a>, <a href={PARTS.money}>where the money is made</a>, <a href={PARTS.bill}>how it reaches a power bill</a>, and <a href={PARTS.when}>when and where the price changes</a>.</p>
+<p>The rest of the series follows that signal: <PartLink to="history">thirty years of prices</PartLink>, the <PartLink to="water">water and gas</PartLink> behind them, the <PartLink to="extremes">most expensive and cheapest months</PartLink>, <PartLink to="money">where the money is made</PartLink>, <PartLink to="bill">how it reaches a power bill</PartLink>, and <PartLink to="when">when and where the price changes</PartLink>.</p>
 
 <p class="a-src">The market's rules are in the Electricity Industry Participation Code: offers, gate closure and the trading conduct rule in <a href="https://www.ea.govt.nz/code-and-compliance/the-code-electricity-industry-participation-code-2010/part-13-trading-arrangements/">Part 13</a> (clauses 13.5A to 13.17), interim and final prices in clauses 13.134A and 13.182A, and settlement in <a href="https://www.ea.govt.nz/code-and-compliance/the-code-electricity-industry-participation-code-2010/part-14-clearing-and-settlement/">Part 14</a> (clause 14.31).</p>
 

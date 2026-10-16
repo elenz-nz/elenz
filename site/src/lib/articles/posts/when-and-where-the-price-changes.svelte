@@ -20,7 +20,8 @@
 	import PriceCover from '#lib/articles/PriceCover.svelte';
 	import Ridgeline from '#lib/articles/charts/Ridgeline.svelte';
 	import HBars from '#lib/articles/charts/HBars.svelte';
-	import { D, dollars, cover, PARTS } from '#lib/articles/series/wholesale.js';
+	import { D, dollars, cover } from '#lib/articles/series/wholesale.js';
+	import PartLink from '#lib/articles/series/PartLink.svelte';
 
 	const C = cover(7, ['When and where', 'the price changes']);
 	const hxs = Array.from({ length: 48 }, (_, i) => i / 2);
@@ -56,7 +57,7 @@
 <p>That has started to change. In 2023–2025 the middle of the day slipped just below average, and in 2026 it fell to <strong>79%</strong> of it, the lowest of the 30 years, while the morning and evening peaks rose to about one and a half times the average. Solar farms, rooftop panels and spilling hydro all push the middle of the day down; the evening peak still needs water or gas. Noon to 3 pm averaged $51/MWh in 2026, against $89 from 5 to 8 pm. A gap like that is exactly what grid batteries are built to earn from, charging in the middle of the day and selling into the evening peak.</p>
 
 <h2>Where you are on the grid</h2>
-<p>There isn't one wholesale price but one at each of about 250 points on the grid (see <a href={PARTS.works}>Part 1</a>). Power loses some energy on its way along the lines, and when a line is full, cheaper generation on one side can't reach the other. Over the past year (October 2025 to September 2026) the cheapest point was Manapōuri, at $49/MWh, and the most expensive Wellsford, north of Auckland, at $65. Haywards ran at least $10 above Benmore in 12% of trading periods; the reverse happened in under 1%. Those gaps open when the HVDC link between the islands is carrying a lot of power north: in 78% of them it was carrying at least 700 MW, against 19% of all trading periods. The link can carry up to 1,050 MW north, but how much it can safely carry at any moment also depends on outages and on the reserve held in the North Island in case it trips.</p>
+<p>There isn't one wholesale price but one at each of about 250 points on the grid (see <PartLink to="works">Part 1</PartLink>). Power loses some energy on its way along the lines, and when a line is full, cheaper generation on one side can't reach the other. Over the past year (October 2025 to September 2026) the cheapest point was Manapōuri, at $49/MWh, and the most expensive Wellsford, north of Auckland, at $65. Haywards ran at least $10 above Benmore in 12% of trading periods; the reverse happened in under 1%. Those gaps open when the HVDC link between the islands is carrying a lot of power north: in 78% of them it was carrying at least 700 MW, against 19% of all trading periods. The link can carry up to 1,050 MW north, but how much it can safely carry at any moment also depends on outages and on the reserve held in the North Island in case it trips.</p>
 
 <Figure caption="Average price at selected grid points, October 2025 to September 2026" source="EMI final energy prices">
 	<HBars rows={nodeRows} fmt={(v) => `$${v.toFixed(0)}`} label="Grid point" valueLabel="Average price ($/MWh)" labelWidth={150}

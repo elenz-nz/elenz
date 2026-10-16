@@ -20,7 +20,8 @@
 	import PriceCover from '#lib/articles/PriceCover.svelte';
 	import Scatter from '#lib/articles/charts/Scatter.svelte';
 	import { num } from '#lib/articles/charts/util.js';
-	import { D, dollars, monthName, cover, PARTS } from '#lib/articles/series/wholesale.js';
+	import { D, dollars, monthName, cover } from '#lib/articles/series/wholesale.js';
+	import PartLink from '#lib/articles/series/PartLink.svelte';
 
 	const C = cover(3, ['Water, gas and', 'the price']);
 	const sc = D.scatter;
@@ -62,7 +63,7 @@
 <h2>Gas, the backup</h2>
 <p>When hydro runs short, gas and coal fill the gap, so the cost and availability of thermal fuel set the value of the water that remains. That backup has become scarce and expensive. The first shock came in spring 2018, when an outage at Pohokura, the largest gas field, coincided with low lakes and October averaged $290/MWh. Gas production then kept falling. The Authority's winter review records an average of 435 TJ a day in 2020 and 304 TJ a day in 2024, most of the fall from Pohokura, and gas spot prices rising from about $15/GJ at the start of 2024 to $54/GJ in August.</p>
 
-<p>Prices rose even as less thermal generation ran: thermal plant supplied 27% of metered generation from 1998 to 2017, and 15% from 2018 to 2025. It is the risk of needing gas, and its price when it is needed, that sets the value of water, more than how much gas is actually burnt. Dry-year backup is set to stay: the big four generators have agreed to keep capacity from Huntly's coal-capable Rankine units in reserve until the end of 2035. What that backup costs, and how much gas is left to run it, will go on shaping the price in every dry year. <a href={PARTS.extremes}>Part 4</a> shows what happened when low lakes and short gas arrived together in 2024.</p>
+<p>Prices rose even as less thermal generation ran: thermal plant supplied 27% of metered generation from 1998 to 2017, and 15% from 2018 to 2025. It is the risk of needing gas, and its price when it is needed, that sets the value of water, more than how much gas is actually burnt. Dry-year backup is set to stay: the big four generators have agreed to keep capacity from Huntly's coal-capable Rankine units in reserve until the end of 2035. What that backup costs, and how much gas is left to run it, will go on shaping the price in every dry year. <PartLink to="extremes">Part 4</PartLink> shows what happened when low lakes and short gas arrived together in 2024.</p>
 
 <Note title="How these figures are measured">
 	<ul>

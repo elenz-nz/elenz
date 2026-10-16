@@ -22,7 +22,8 @@
 	import Lines from '#lib/articles/charts/Lines.svelte';
 	import HBars from '#lib/articles/charts/HBars.svelte';
 	import SplitBar from '#lib/articles/charts/SplitBar.svelte';
-	import { D, dollars, monthName, cover, PARTS } from '#lib/articles/series/wholesale.js';
+	import { D, dollars, monthName, cover } from '#lib/articles/series/wholesale.js';
+	import PartLink from '#lib/articles/series/PartLink.svelte';
 
 	const C = cover(6, ['From wholesale to', 'your power bill']);
 
@@ -82,7 +83,7 @@
 <p>Less than half of the price, 15.6 cents, paid for the electricity itself. The lines companies and Transpower took 12.1 cents for carrying it, metering 1.3 cents, industry levies 0.2 cents, and GST 4.5 cents. That left 0.65 cents to cover the cost of running the retail business and any profit.</p>
 
 <h2>The electricity cost moves slowly</h2>
-<p>The electricity part of the bill moves much more slowly than the spot price. Over the four years the Authority has published, it rose steadily, from $106 to $156/MWh, while the Haywards average for the same years went from $136 to $80, then $175 and $193. Retailers buy most of what they sell at prices agreed in advance, from their own power stations or through contracts (see <a href={PARTS.works}>Part 1</a>), so a dry year raises their costs over the years that follow rather than all at once, and a wet year doesn't cut them at once either. Over the same years the retail margin shrank from $36 to $6.50/MWh, as costs rose faster than the prices retailers charged.</p>
+<p>The electricity part of the bill moves much more slowly than the spot price. Over the four years the Authority has published, it rose steadily, from $106 to $156/MWh, while the Haywards average for the same years went from $136 to $80, then $175 and $193. Retailers buy most of what they sell at prices agreed in advance, from their own power stations or through contracts (see <PartLink to="works">Part 1</PartLink>), so a dry year raises their costs over the years that follow rather than all at once, and a wet year doesn't cut them at once either. Over the same years the retail margin shrank from $36 to $6.50/MWh, as costs rose faster than the prices retailers charged.</p>
 
 <Figure caption="What the four generator-retailers earned per MWh sold to households and small businesses, by component, before GST, with the average Haywards wholesale price over the same year" source="EA retail gross margin disclosures (weighted by each retailer's MWh sold); EMI final energy prices">
 	<Columns cats={rrCats} xlabels={rrX} series={rrSeries} stacked unit="$/MWh" height={280} label="Financial year" fmt={(v) => `$${v.toFixed(0)}/MWh`}
