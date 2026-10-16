@@ -27,7 +27,7 @@ concurrency:
 
 jobs:
   history:
-    if: github.repository == 'stubzy19/elenz'
+    if: github.repository == 'elenz-nz/elenz'
     runs-on: ubuntu-latest
     timeout-minutes: 330
     steps:

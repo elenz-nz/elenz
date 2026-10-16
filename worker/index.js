@@ -10,8 +10,8 @@
 //             the history update (history.yml), which adds newly published daily dispatch files. GitHub's own
 //             schedule is unreliable for new repositories; on-demand runs start within seconds. Every 15 minutes
 //             (at :10, :25, :40, :55) also the watchdog (watchdog.yml), which raises an issue when data goes stale.
-//             Needs the Worker secret GITHUB_TOKEN: a fine-grained token for stubzy19/elenz with Actions: read and write.
-const WORKFLOWS = 'https://api.github.com/repos/stubzy19/elenz/actions/workflows';
+//             Needs the Worker secret GITHUB_TOKEN: a fine-grained token for elenz-nz/elenz with Actions: read and write.
+const WORKFLOWS = 'https://api.github.com/repos/elenz-nz/elenz/actions/workflows';
 const HISTORY_CRON = '40 */6 * * *'; // must match wrangler.jsonc
 // history files the site may request: the index, all days, and one half-hourly file per month
 // /data/health: the same limits as the GitHub watchdog (watchdog.yml)

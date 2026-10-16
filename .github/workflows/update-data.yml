@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   update:
-    if: github.repository == 'stubzy19/elenz'   # copies of the repo don't run it
+    if: github.repository == 'elenz-nz/elenz'   # copies of the repo don't run it
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
