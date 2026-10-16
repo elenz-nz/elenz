@@ -47,7 +47,9 @@ FUEL_MD = {'Coal': 'thermal', 'Gas': 'thermal', 'Gas&Oil': 'thermal', 'Diesel': 
 EXAMPLES = [('2024-08-07', 37), ('2026-01-21', 37)]
 NODES = {'MAN2201': 'Manapōuri', 'INV2201': 'Invercargill', 'BEN2201': 'Benmore', 'ISL2201': 'Islington (Christchurch)',
          'HAY2201': 'Haywards (Wellington)', 'WKM2201': 'Whakamaru', 'HLY2201': 'Huntly', 'SFD2201': 'Stratford',
-         'OTA2201': 'Ōtāhuhu (Auckland)', 'KIW2201': 'Kikiwa (Nelson)'}
+         'OTA2201': 'Ōtāhuhu (Auckland)', 'STK2201': 'Stoke (Nelson)', 'WEL0331': 'Wellsford (north of Auckland)'}
+# (KIW2201 is Kaiwera Downs wind farm in Southland, priced only since February 2026, not Kikiwa (KIK2201): grid points are
+# compared only over months they were priced in every one of)
 P = lambda *a: print(*a, flush=True)
 GEN8 = ['coal', 'gas', 'diesel', 'geo', 'hydro', 'wind', 'solar', 'batt']
 RETAIL = f'{BLOB}/Datasets/Retail'
@@ -277,7 +279,13 @@ def main():
             nodes.append(pd.read_csv(f))
     n = pd.concat(nodes)
     n['s'] = n['mean'] * n['count']
+    months = n.groupby('poc').s.size()
+    full = months[months == months.max()].index   # grid points priced in all 12 months; a point priced for part of the
+    # year would be averaged over different months from the rest
+    n = n[n.poc.isin(full)]
     avg = (n.groupby('poc').s.sum() / n.groupby('poc')['count'].sum()).sort_values()
+    P(f'  grid points priced all year: {len(full)} of {len(months)}; the five most expensive: ' +
+      ', '.join(f'{k} {v:.1f}' for k, v in avg.tail(5).items()) + '; five cheapest: ' + ', '.join(f'{k} {v:.1f}' for k, v in avg.head(5).items()))
     P(f'Nodes Oct 2025-Sep 2026: {len(avg)} nodes, lowest {avg.index[0]} {avg.iloc[0]:.1f}, highest {avg.index[-1]} {avg.iloc[-1]:.1f}')
     out['nodes'] = [{'poc': k, 'name': v, 'price': r1(avg[k])} for k, v in NODES.items()]
     P({v: round(avg[k], 1) for k, v in NODES.items()})

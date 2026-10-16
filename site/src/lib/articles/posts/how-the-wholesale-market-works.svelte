@@ -49,7 +49,7 @@
 </ul>
 
 <h2>From offers to a price</h2>
-<p>Each generator offers its output for every trading period, the half-hour the market is settled in: up to five price bands for each station (some large thermal units are offered unit by unit), each a quantity of megawatts at a price. Offers must be in about a day and a half ahead, and can be revised until gate closure, an hour before the trading period starts for most generators; from then on the prices are locked. Some large users can also bid to cut their demand when the price is high.</p>
+<p>Each generator offers its output for every trading period, the half-hour the market is settled in: up to five price bands for each station (some large thermal units are offered unit by unit), each a quantity of megawatts at a price. Offers must be in about a day and a half ahead, and can be revised until gate closure, an hour before the trading period starts for most generators; from then on the prices are locked. The Code also sets a standard for the prices: each offer must be what the generator, acting rationally, would offer if no generator could exercise significant market power. Some large users can also bid to cut their demand when the price is high.</p>
 
 <p>Every five minutes the system operator's dispatch software stacks those offers from cheapest to most expensive and runs the cheapest combination that meets demand. It does this for the whole grid at once, allowing for the energy lost on the lines, the limits of each line, and the reserve that must be held back in case a station or line trips.</p>
 
@@ -84,7 +84,7 @@
 
 <p>The rest of the series follows that signal: <a href={PARTS.history}>thirty years of prices</a>, the <a href={PARTS.water}>water and gas</a> behind them, the <a href={PARTS.extremes}>most expensive and cheapest months</a>, <a href={PARTS.money}>where the money is made</a>, <a href={PARTS.bill}>how it reaches a power bill</a>, and <a href={PARTS.when}>when and where the price changes</a>.</p>
 
-<p class="a-src">The market's rules are in the Electricity Industry Participation Code: offers and gate closure in <a href="https://www.ea.govt.nz/code-and-compliance/the-code-electricity-industry-participation-code-2010/part-13-trading-arrangements/">Part 13</a> (clauses 13.6 to 13.17), interim and final prices in clauses 13.134A and 13.182A, and settlement in <a href="https://www.ea.govt.nz/code-and-compliance/the-code-electricity-industry-participation-code-2010/part-14-clearing-and-settlement/">Part 14</a> (clause 14.31).</p>
+<p class="a-src">The market's rules are in the Electricity Industry Participation Code: offers, gate closure and the trading conduct rule in <a href="https://www.ea.govt.nz/code-and-compliance/the-code-electricity-industry-participation-code-2010/part-13-trading-arrangements/">Part 13</a> (clauses 13.5A to 13.17), interim and final prices in clauses 13.134A and 13.182A, and settlement in <a href="https://www.ea.govt.nz/code-and-compliance/the-code-electricity-industry-participation-code-2010/part-14-clearing-and-settlement/">Part 14</a> (clause 14.31).</p>
 
 <Note title="Words used in this series">
 	<dl class="gloss">

@@ -45,7 +45,7 @@
 
 <p>The main lakes, Pūkaki, Tekapo, Taupō, Manapōuri and Te Anau among them, hold only a few weeks of the country's winter demand. They fill with spring snowmelt and rain and draw down through autumn and winter, when inflows are low and demand is high. When they are low partway through winter, with the spring and summer inflows that refill them still months away, every unit of water saved is insurance against running short. Using it now risks needing expensive gas, coal or diesel later, or running out, so the water value is high. When the lakes are full and water would otherwise be spilled over the dams, it is worth almost nothing, and is offered that way.</p>
 
-<p>The Authority's review of winter 2024 found exactly this: hydro offers rose as storage fell, and the generators' offers reflected genuine scarcity of fuel.</p>
+<p>The market's rules expect this. The Code's trading conduct rule (clause 13.5A) requires every offer to be what a generator acting rationally would offer if no generator could exercise significant market power, so a hydro offer has to be explainable by what the water is worth. The Authority's review of winter 2024 found exactly this: hydro offers rose as storage fell, the offers were consistent with the trading conduct rule, and they reflected genuine scarcity of fuel.</p>
 
 <h2>Lakes and prices, month by month</h2>
 <p>The Authority's hydrological dataset tracks the ten main storage lakes back to 1980. Measured against the average for each date, storage fell to <strong>53% of normal</strong> in August 2024, the lowest month since October 2001. Plotted against the price, the pattern is plain.</p>

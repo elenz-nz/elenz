@@ -1,7 +1,7 @@
 <script module lang="ts">
 	export const meta = {
 		title: 'When and where the price changes',
-		dek: 'For 30 years the wholesale price followed the same daily shape, with the middle of the day a little above average. In 2026 midday became the cheapest part of the day after the small hours. And the price differs across the grid, from $49/MWh at Manapōuri to $69 near Nelson.',
+		dek: 'For 30 years the wholesale price followed the same daily shape, with the middle of the day a little above average. In 2026 midday became the cheapest part of the day after the small hours. And the price differs across the grid, from $49/MWh at Manapōuri to $65 north of Auckland.',
 		date: '2026-10-16',
 		kind: 'Analysis',
 		draft: true,
@@ -29,7 +29,7 @@
 		name: y === 2026 ? '2026*' : String(y), values: P.values[i].map((v) => (v === null ? NaN : v)),
 		tok: y === 2026 ? '--accent' : y === 2024 ? '--f-gas' : '--f-hvdc', strong: y === 2026 || y === 2024,
 	}));
-	const SI = new Set(['MAN2201', 'INV2201', 'BEN2201', 'ISL2201', 'KIW2201']);
+	const SI = new Set(['MAN2201', 'INV2201', 'BEN2201', 'ISL2201', 'STK2201']);
 	const nodeRows = [...D.nodes].sort((a, b) => b.price - a.price)
 		.map((n) => ({ label: n.name, value: n.price, tok: SI.has(n.poc) ? '--p-si' : '--p-ni' }));
 </script>
@@ -41,7 +41,7 @@
 <Stats items={[
 	{ label: 'Midday price, 2026', value: '79%', note: 'of the year’s average, noon to 3 pm; 97–112% every year to 2022', tok: '--accent' },
 	{ label: 'Cheapest grid point', value: '$49', unit: '/MWh', note: 'Manapōuri, October 2025 to September 2026', tok: '--p-si' },
-	{ label: 'Most expensive', value: '$69', unit: '/MWh', note: 'Kikiwa, near Nelson, over the same year', tok: '--f-gas' },
+	{ label: 'Most expensive', value: '$65', unit: '/MWh', note: 'Wellsford, north of Auckland, over the same year', tok: '--f-gas' },
 ]} />
 
 <h2>The shape of the day</h2>
@@ -55,18 +55,19 @@
 <p>That has started to change. In 2023–2025 the middle of the day slipped just below average, and in 2026 it fell to <strong>79%</strong> of it, the lowest of the 30 years, while the morning and evening peaks rose to about one and a half times the average. Solar farms, rooftop panels and spilling hydro all push the middle of the day down; the evening peak still needs water or gas. Noon to 3 pm averaged $51/MWh in 2026, against $89 from 5 to 8 pm. A gap like that is exactly what grid batteries are built to earn from, charging in the middle of the day and selling into the evening peak.</p>
 
 <h2>Where you are on the grid</h2>
-<p>There isn't one wholesale price but one at each of about 250 points on the grid (see <a href={PARTS.works}>Part 1</a>). Power loses some energy on its way along the lines, and when a line is full, cheaper generation on one side can't reach the other. Over the past year (October 2025 to September 2026) the cheapest point was Manapōuri, at $49/MWh, and the most expensive Kikiwa, near Nelson, at $69. Haywards ran at least $10 above Benmore in 12% of trading periods, mostly when the HVDC link or the lines north were carrying all they could; the reverse happened in under 1%.</p>
+<p>There isn't one wholesale price but one at each of about 250 points on the grid (see <a href={PARTS.works}>Part 1</a>). Power loses some energy on its way along the lines, and when a line is full, cheaper generation on one side can't reach the other. Over the past year (October 2025 to September 2026) the cheapest point was Manapōuri, at $49/MWh, and the most expensive Wellsford, north of Auckland, at $65. Haywards ran at least $10 above Benmore in 12% of trading periods, mostly when the HVDC link or the lines north were carrying all they could; the reverse happened in under 1%.</p>
 
 <Figure caption="Average price at selected grid points, October 2025 to September 2026" source="EMI final energy prices">
 	<HBars rows={nodeRows} fmt={(v) => `$${v.toFixed(0)}`} label="Grid point" valueLabel="Average price ($/MWh)" labelWidth={150}
 		legend={[{ name: 'North Island', tok: '--p-ni' }, { name: 'South Island', tok: '--p-si' }]} />
 </Figure>
 
-<p>Most of the cheap power is in the south, where the big hydro schemes are, and most of the demand is in the north, so the price generally rises with distance from the southern lakes. Kikiwa is the outlier: it feeds Nelson and Marlborough from the end of long lines, with little large generation nearby, so the losses on the way lift its price above even Auckland's.</p>
+<p>Most of the cheap power is in the south, where the big hydro schemes are, and most of the demand is in the north, so the price generally rises with distance from the southern lakes. The five most expensive points over the year were all at the northern end of the grid, in Northland and on the Coromandel: Wellsford, Maungaturoto, Maungatapere, Kopu and Marsden, all at $63–65/MWh. Nelson's main grid point, Stoke, averaged $56, close to Haywards.</p>
 
 <Note title="How these figures are measured">
 	<ul>
 		<li>Prices are the Electricity Authority's final energy prices for every trading period, averaged with every trading period weighted equally, in the dollars of the day.</li>
+		<li>The grid-point averages cover the points priced in every month from October 2025 to September 2026 (243 of 246); a point priced for only part of the year, such as a newly connected wind farm, would be averaged over different months from the rest.</li>
 		<li>The daily shape uses Haywards. Each trading period is placed by its start time in New Zealand time; each year's row is that year's average for each half-hour, drawn as a share of the year's overall average.</li>
 	</ul>
 </Note>
