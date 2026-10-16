@@ -21,6 +21,7 @@ from urllib.request import Request, urlopen
 import pandas as pd
 
 import emi_live
+import explain
 import rooftop
 import state as st
 from build_tracker import WINDOW, build, write_json
@@ -161,6 +162,11 @@ def main(log=print):
         log(f'no new intervals since the last run (latest {t_latest}); nothing saved')
         return
     js = build(s, irradiance(store, log), capacity(store), log)
+    # the price explainer on /now: usual values and the latest offers (the history job keeps both); never fatal
+    try:
+        js['explain'] = explain.live(js, *explain.load(store))
+    except Exception as e:  # noqa: BLE001
+        log(f'explain: left out ({type(e).__name__}: {e})')
     body = json.dumps(js, separators=(',', ':'), allow_nan=False).encode()
     store.put('state.csv.gz', st.dumps(s))
     # the version tag rides along in the same KV write: the Worker sends it as an ETag, so pages that already have

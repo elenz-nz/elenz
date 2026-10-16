@@ -139,5 +139,31 @@ h26 = hvdc.parse_metered(met_get('x/202609_HVDC_flows.csv'))
 check(len(h97) == 48 and h97['H|BEN'].abs().max() > 50, 'hvdc: 1997 layout (HVDC_BN/BS/HN/HS) parsed')
 check(len(h26) == 48 and (h26['H|BEN'] - h26['H|HAY']).abs().mean() < 80, 'hvdc: current layout parsed, ends within link losses')
 
+# the /now price explainer (explain.py): usual values from history, offer stacks, the live block and price setter
+import explain as ex  # noqa: E402
+
+base = ex.baseline([ex.factors(hhj)])
+check(len(base['hi']['med']) == ex.SLOTS and len(base['NZ']['wind']) == ex.SLOTS and base['level'] > 0,
+      'explain: usual values for every half-hour of the week, and a year median')
+run = [p for p in js['plants'] if p['isl'] == 'NI' and p['fuel'] in ('hydro', 'gas', 'geo') and p['s'][-1] > 20]
+pl = run[0]
+mw, price = float(pl['s'][-1]), float(js['NI']['price'][-1])
+tp = ex.trading_period(pd.Timestamp(js['t0'] + (js['N'] - 1) * js['step'], unit='ms', tz='UTC'))
+rows = [f'2026-10-15,{tp},XX,XXX0001,U1,Energy,Injection,,,2026-10-14,00:00,1,Y,{i + 1},999,999,,999,,{m},{p}'
+        for i, (m, p) in enumerate([(mw - 10, 0.01), (20, round(price * 1.05, 2)), (50, 9999)])]
+rows.append(f'2026-10-15,{tp},XX,XXX0001,U1,Energy,Injection,,,2026-10-14,00:00,1,N,1,999,999,,999,,500,0.01')  # superseded
+head = ('TradingDate,TradingPeriod,ParticipantCode,PointOfConnection,Unit,ProductType,ProductClass,ReserveType,'
+        'ProductDescription,UTCSubmissionDate,UTCSubmissionTime,SubmissionOrder,IsLatestYesNo,Tranche,'
+        'MaximumRampUpMegawattsPerHour,MaximumRampDownMegawattsPerHour,PartiallyLoadedSpinningReservePercent,'
+        'MaximumOutputMegawatts,ForecastOfGenerationPotentialMegawatts,Megawatts,DollarsPerMegawattHour')
+import io as _io  # noqa: E402
+stacks = ex.reduce_offers(_io.StringIO('\n'.join([head] + rows)), {('XXX0001', 'U1'): pl['name']})
+check(len(stacks.get(pl['name'], [])) == tp and len(stacks[pl['name']][tp - 1]) == 3, 'explain: offers reduced to a stack (final offers only)')
+E = ex.live(js, base, {'day': '2026-10-15', 'plants': stacks})
+check(E is not None and len(E['typ']['med']) >= 52 and set(E['now']) >= {'NZ', 'NI', 'SI', 'hvdc', 'gap'}, 'explain: live block written')
+check((E['setter']['NI'] or {}).get('plant') == pl['name'], f'explain: price setter found part way up a tranche ({pl["name"]})')
+json.dumps(E, allow_nan=False)
+check(ex.live(js, None) is None, 'explain: no block without usual values')
+
 print(f'\n{len(failures)} failed' if failures else '\nall passed')
 sys.exit(1 if failures else 0)

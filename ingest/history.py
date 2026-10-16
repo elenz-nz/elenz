@@ -27,6 +27,9 @@ and across all months:
   hist/progress.json         the job's own record: months stored and finished, and the plant mapping used
   hist/roof_cap.json         rooftop solar capacity by point and month (EA report GUEHMT by Root NSP, less the
                              dispatched farms it also counts); the live job reads it too
+  hist/explain.json, hist/offers.json   the /now price explainer's usual values and the newest day of generator
+                             offers (explain.py; written only when history moves on or a new offers day appears, within
+                             the write allowance); the live job reads both
 
 HVDC is metered (EMI HVDC_Flows) wherever published, about two weeks after each month, and estimated from the
 island balances before that (hvdc.py).
@@ -60,6 +63,7 @@ import warnings
 import numpy as np
 import pandas as pd
 
+import explain
 import hvdc
 import metered as mt
 import rooftop
@@ -639,6 +643,9 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
             stored.add(month)
             left.discard(month)
             caps_before[month] = hh['meta']['roof_mw']
+
+    # the /now price explainer's usual values (when history has moved on) and the newest day of offers (once a day)
+    explain.update(store, log)
 
     months = sorted(stored)
     # 'at': when this run saved it; the Worker's health check and the watchdog treat a stale index as expected while a

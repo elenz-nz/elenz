@@ -16,7 +16,9 @@ This repository is public: never commit keys, tokens or personal details.
   it out onto the Tracker preview; shared chart geometry in `geometry.js`, map positions in `src/lib/home/maplayout.js`); `/now` the live page
   (`src/routes/now/+page.svelte`: live figures, the island map with each island's mix ring, the generation mix now,
   from tracker.json's newest interval via `src/lib/home/now.js`; island outlines in `src/lib/home/nzmap.js`, made by
-  `analysis/make_nz_map.py`); `/articles` records, quarterly reviews and analysis (`src/routes/articles/`; one
+  `analysis/make_nz_map.py`; under the price tiles the price explainer, "Why is the price high?": rules and wording in
+  `src/lib/now/explain.js`, drawn by `src/lib/now/PriceExplainer.svelte`, from tracker.json's `explain` block (see
+  `ingest/explain.py`); quiet, highlighted or open by itself, rules tested in `analysis/price_triggers.py`); `/articles` records, quarterly reviews and analysis (`src/routes/articles/`; one
   Svelte file per article in `src/lib/articles/posts/<slug>.svelte` exporting `meta` {title, dek, date, kind, draft}
   from a module script, with `Record`, `Figure` and `Note` components and `articles.css` alongside; the registry is
   `src/lib/articles/registry.ts`). `ARTICLES_PUBLIC` there is true (published 15 Oct 2026 with the Winter 2026 review): Articles is in the
@@ -52,6 +54,14 @@ This repository is public: never commit keys, tokens or personal details.
   residual over Generation_MD) to a plant, fuel and island, with date ranges and shares; `metered_islands.csv` gives
   islands for the many retired or local connection points in the metered files (from EMI's NetworkSupplyPointsTable).
   The build warns about any Generation_MD code not in the table.
+  `explain.py`: the /now price explainer's data. The history job (`update()`, after the months) writes
+  `hist/explain.json` (each factor's and the price's usual value for each half-hour of the week over the last 28 days of
+  `hist/hh`, and the past year's median price) when history has moved on, and `hist/offers.json` (gzipped: the newest
+  day of EMI `BidsAndOffers/Offers`, ~290 MB, reduced to each plant's offer stack per trading period, final offers only;
+  ~2 minutes) when a newer day is published, both within `WRITE_BUDGET`. The live job reads both (two KV reads) and adds
+  `explain` to tracker.json (usual values for the last 26 hours and this half-hour, factor values now, running peakers in
+  `PEAKERS`, and the likely price setter: a plant part way up a tranche priced within 25% of its island's price). If
+  either file is missing the block is left out and /now shows no explainer.
   `rooftop.py` (embedded solar, shown on the site as "Embedded solar", data key `roof`: rooftops and ground-mounted
   arrays up to ~10 MW on local networks; registry capacity by Root NSP less dispatched farms, three types (small,
   large, ground), 35 irradiance points, Himawari

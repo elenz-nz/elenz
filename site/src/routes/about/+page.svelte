@@ -108,6 +108,19 @@
 					</ul>
 				</article>
 
+				<article class="method" id="m-explain">
+					<h3>Price explainer</h3>
+					<p class="m-src"><span>Source</span>EMI real-time dispatch, the site's history, and EMI generator offers</p>
+					<ul>
+						<li>On the Now page, under the price tiles. It compares the price and the things that move it (wind, solar, hydro, gas and coal, peaking plants, demand and the HVDC link) with what is usual: the median for the same half-hour of the week over the last four weeks of history.</li>
+						<li>Highlighted when Haywards or Benmore is at least 1.5 times usual and at least 1.25 times the past year's median price, when the islands are more than $50 and 25% apart, or for the first two hours of a new low (under $5 after a day without one). Over 2021–26 that was about 13% of the time.</li>
+						<li>It opens by itself only at extremes: at least 3 times usual, 3 times the year's median and $300, or $800 at any time. That was about 34 times a year since 2021, and it would have opened on 9 Aug 2021 and through the dry winter of 2024. Low prices never open it: they were under $5 for 14% of the time since 2021.</li>
+						<li>The tests use the 30-minute average of the 5-minute prices, and each state lasts 30 minutes after its condition ends. They were checked against every half-hour of the EA's final prices since 1997.</li>
+						<li>The likely price setter is an estimate: a plant running part way up an offer block priced within a quarter of its island's price, in the newest published offers (generators' offers are published the day after, so it is matched against the previous day's offers for the same half-hour).</li>
+						<li>Not in the explanation yet: hydro lake storage, reserves and outages, which can all move the price.</li>
+					</ul>
+				</article>
+
 				<article class="method" id="m-demand">
 					<h3>Demand</h3>
 					<p class="m-src"><span>Source</span>EMI real-time dispatch: load by connection point; metered grid flows in history</p>

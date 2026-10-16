@@ -200,6 +200,8 @@ over the previous 365 days. Each state holds 30 minutes after its condition ends
 - **Lows never open it.** Under $5 is 14.4% of the recent time (25.7% of 2026; nearly always both islands), runs
   last a median 1.5 h but 7.5 h at the 90th percentile, and the longest was 354 h at $0.01, 22 Dec 2025 to 6 Jan 2026.
   Highlighting every low would highlight 14% of the time on its own; a new low is ~45 times a year.
+- **Built** (17 Oct 2026): `ingest/explain.py` (usual values, offers, the live block) and `site/src/lib/now/explain.js`
+  (these rules, on the 30-minute average of dispatch prices, and the wording).
 - **Live use:** these are half-hourly final prices. /now has 5-minute dispatch prices, which spike more and can be
   revised (9 Aug 2021: dispatch peak $356,621, final $2,698), so test the 30-minute average of dispatch prices, and
   check the live rates after a month.

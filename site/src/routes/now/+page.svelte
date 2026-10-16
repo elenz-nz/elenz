@@ -4,6 +4,9 @@
 	import Masthead from '#lib/site/Masthead.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import { summarise, ring } from '#lib/home/now.js';
+	import { explainNow } from '#lib/now/explain.js';
+	import PriceExplainer from '#lib/now/PriceExplainer.svelte';
+	import PLANT_META from '#lib/tracker/plants.json';
 	import { VIEW, NI as NI_PATH, SI as SI_PATH, PTS } from '#lib/home/nzmap.js';
 	import { RING, RING_R, HV_PATH, HV_MID } from '#lib/home/maplayout.js';
 
@@ -16,6 +19,8 @@
 	type Now = { t: number; end: number; regions: { NZ: Region; NI: Region; SI: Region }; hvdc: { mid: number; ni: number; si: number }; mix: Fuel[] };
 
 	let now = $state<Now | null>(null);
+	// the price explainer (#lib/now/explain.js): null until tracker.json carries its `explain` block
+	let ex = $state<ReturnType<typeof explainNow>>(null);
 	let error = $state('');
 	let clock = $state(Date.now());
 
@@ -61,6 +66,7 @@
 			if (D.meta.end === stamp) return;
 			stamp = D.meta.end;
 			now = summarise(D) as Now;
+			try { ex = explainNow(D, PLANT_META); } catch (e) { console.warn('price explainer left out:', e); ex = null; }   // never let it break the page
 			error = '';
 		}
 		load().catch((e) => (error = `The data couldn't be loaded. ${e.message} Try reloading the page.`));
@@ -113,7 +119,7 @@
 				<span class="k-val">{nz ? nz.ren.toFixed(1) : '–'}<small>%</small></span>
 				<span class="k-sub">of generation</span>
 			</div>
-			<div class="kpi">
+			<div class="kpi" class:k-up={ex && ex.tier !== 'quiet' && (ex.variant === 'high' || ex.variant === 'split')} class:k-low={ex && ex.tier !== 'quiet' && ex.variant === 'low'}>
 				<span class="k-lbl">Wholesale price</span>
 				<span class="k-val prices">
 					<span title="North Island reference price, Haywards"><b class="isl">HAY</b>{now ? money(now.regions.NI.price ?? 0) : '–'}<small>/MWh</small></span>
@@ -137,6 +143,8 @@
 				<span class="k-sub">rooftops and small arrays on local networks</span>
 			</div>
 		</section>
+
+		{#if ex}<PriceExplainer x={ex} />{/if}
 
 		<div class="grid">
 			<section class="panel map-panel" aria-label="The two islands">
@@ -247,6 +255,9 @@
 	.k-val.prices { display: grid; gap: 2px; font-size: 1.25rem; }
 	.k-val .isl { font-family: var(--font-ui); font-size: 0.72rem; font-weight: 700; color: var(--muted); margin-right: 7px; letter-spacing: 0.04em; }
 	.k-sub { color: var(--muted); font-size: 0.76rem; }
+	/* the price tile follows the explainer when it is highlighted or open */
+	.kpi.k-up { border-color: color-mix(in srgb, var(--warn-ink) 45%, var(--line)); background: color-mix(in srgb, var(--warn-bg) 55%, var(--surface)); }
+	.kpi.k-low { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
 	.k-link { color: inherit; text-decoration: underline dotted; text-underline-offset: 2px; }
 	.k-link:hover { color: var(--accent); }
 	.k-val.prices small { font-size: 0.72rem; margin-left: 3px; }
