@@ -16,16 +16,21 @@
 	import { cubicOut } from 'svelte/easing';
 	import { fly } from 'svelte/transition';
 	import { summarise } from '#lib/home/now.js';
+	import { listed } from '#lib/articles/registry.js';
 
 	const DATA_URL = '/data/tracker.json';
 	const LIVE_MINUTES = 15;
 
-	const PAGES = [
+	// the Articles preview shows the newest article's cover, so it opens that article
+	const latest = listed[0];
+	type Page = { href: string; name: string; peek: any; blurb: string; window?: { href: string; label: string } };
+	const PAGES: Page[] = [
 		{ href: '/now', name: 'Now', peek: NowPeek,
 			blurb: 'The system this five minutes: demand, prices at Haywards and Benmore, the HVDC link, emissions, and each island’s generation mix on the map.' },
 		{ href: '/tracker', name: 'Tracker', peek: TrackerPeek,
 			blurb: 'Generation by fuel, plant, owner or scheme, and prices at six grid nodes with the island spread and what each fuel earned, from the last 24 hours back to 1997.' },
 		{ href: '/articles', name: 'Articles', peek: ArticlesPeek,
+			window: latest ? { href: `/articles/${latest.slug}`, label: `Read ${latest.title}` } : undefined,
 			blurb: 'New records, quarterly reviews and closer looks at how the system is running, written from the same data as the tracker.' },
 	];
 
@@ -157,7 +162,7 @@
 						<p>{p.blurb}</p>
 						<a class="go" href={p.href}>Open {p.name} →</a>
 					</div>
-					<a class="window" href={p.href} aria-label="Open {p.name}" tabindex="-1">
+					<a class="window" href={p.window?.href ?? p.href} aria-label={p.window?.label ?? `Open ${p.name}`} tabindex="-1">
 						<span class="view">
 							{#if D && now}<Peek {D} {now} />{:else}<span class="ph">{error ? 'Preview unavailable' : 'Loading…'}</span>{/if}
 						</span>
