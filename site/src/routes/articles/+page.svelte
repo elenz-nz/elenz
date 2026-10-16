@@ -38,11 +38,11 @@
 					{:else}
 						<li class="a-series">
 							<a href="/articles/{e.lead.slug}">
-								<span class="a-meta"><span class="a-tag">Series</span><span>{e.parts.length} {e.parts.length === 1 ? 'part' : 'parts'}</span></span>
+								<span class="a-meta"><span class="a-tag">Series</span><span>{e.parts.length} {e.parts.length === 1 ? 'part' : 'parts'}</span><time datetime={e.latest}>{longDate(e.latest)}</time></span>
 								<h2>{e.name}</h2>
-								<p class="a-sdek">{e.dek}</p>
 								{#if e.lead.image}<img src={e.lead.image} alt="" width="1200" height="630" loading="lazy" />{/if}
 							</a>
+							<p class="a-sdek">{e.dek}</p>
 							<ol class="a-parts">
 								{#each e.parts as p (p.slug)}
 									<li><a href="/articles/{p.slug}"><span>{p.part}</span>{p.title}</a>{#if hidden(p)}<span class="a-draft">{p.draft ? 'Draft' : 'Scheduled'}</span>{/if}</li>

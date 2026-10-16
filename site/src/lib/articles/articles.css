@@ -106,7 +106,9 @@
 
 /* series: the part label in an article's header, and a series card on the index */
 .a-part { display: inline-block; margin-left: 10px; font-size: 0.76rem; font-weight: 600; color: var(--ink-2); }
-.a-sdek { margin: 0; font-size: 0.9rem; color: var(--ink-2); max-width: 60ch; }
+.a-sdek { margin: 12px 0 0; font-size: 0.9rem; color: var(--ink-2); max-width: 60ch; }
+/* side by side, every card's title gets two lines, so the cover images start level */
+@media (min-width: 821px) { .a-grid > li > a > h2 { min-height: 2.5em; } }
 .a-grid .a-parts { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 1px; }
 .a-grid .a-parts li { display: flex; align-items: baseline; gap: 8px; }
 .a-grid .a-parts a { display: inline-flex; gap: 10px; padding: 4px 0; border-top: 0; font-size: 0.92rem; color: var(--ink); }

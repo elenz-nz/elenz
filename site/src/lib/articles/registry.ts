@@ -70,7 +70,7 @@ export function seriesOf(a: Article) {
 }
 
 // the index: articles, with each series folded into one entry, placed by its newest listed part
-export type Entry = { kind: 'article'; a: Article } | { kind: 'series'; key: string; name: string; dek: string; parts: Article[]; lead: Article };
+export type Entry = { kind: 'article'; a: Article } | { kind: 'series'; key: string; name: string; dek: string; parts: Article[]; lead: Article; latest: string };
 export const entries: Entry[] = (() => {
 	const out: Entry[] = [];
 	const seen = new Set<string>();
@@ -79,7 +79,7 @@ export const entries: Entry[] = (() => {
 			if (seen.has(a.series)) continue;
 			seen.add(a.series);
 			const parts = listed.filter((p) => p.series === a.series).sort((p, q) => (p.part ?? 0) - (q.part ?? 0));
-			out.push({ kind: 'series', key: a.series, ...SERIES[a.series], parts, lead: parts[0] });
+			out.push({ kind: 'series', key: a.series, ...SERIES[a.series], parts, lead: parts[0], latest: parts.reduce((m, p) => (p.date > m ? p.date : m), '') });
 		} else out.push({ kind: 'article', a });
 	}
 	return out;
