@@ -576,7 +576,7 @@
 						<h2>Island spread</h2><span class="unit">Haywards − Benmore, $/MWh{view.mode === 'long' ? ', average' : ''}</span>
 						<div class="legends">
 							<span class="lg"><i class="area" style="--c: var(--o1)"></i>North Island dearer</span>
-							<span class="lg"><i class="area" style="--c: var(--o2)"></i>South Island dearer <b>{signedMoney(valOf(view.mode === 'time' ? view.spread : view.P.spread))}</b></span>
+							<span class="lg"><i class="area" style="--c: var(--o2)"></i>South Island dearer</span>
 						</div>
 						{@render popBtn('spread', 'island spread')}
 					</div>
@@ -705,7 +705,11 @@
 	</div>
 
 	<section class="card notes">
-		<div><h3>Scales</h3><p><b>Spike-proof</b> is linear up to about $100 and compressed above it (logarithmic), so one spike doesn't flatten everything else; equal steps up the axis are equal ratios. <b>Capped</b> is linear up to ${CAP} and clips anything higher, marking the highest prices at the top. <b>Linear</b> is a plain scale, where a spike shows at its true size.</p></div>
+		<div><h3>Scales</h3><ul>
+			<li><b>Spike-proof:</b> linear up to about $100, compressed above it, so one spike doesn't flatten everything else.</li>
+			<li><b>Capped:</b> linear up to ${CAP}; anything higher is clipped and marked at the top.</li>
+			<li><b>Linear:</b> a plain scale, showing spikes at their true size.</li>
+		</ul></div>
 		<div><h3>Dispatch or final prices</h3><p>The live week shows dispatch prices from the real-time feed. History uses the Electricity Authority's final prices once published, usually the next day; under scarcity the two can differ a lot.</p></div>
 		<div><h3>Two kinds of average</h3><p>Time-weighted counts every interval the same. Generation-weighted counts each interval by how much was generated, so busy peaks count for more.</p></div>
 		<div><h3>Islands priced apart</h3><p>Shaded where Haywards and Benmore differ by more than $10 and 10%, usually because the HVDC link or the grid near it is at a limit.</p></div>
@@ -729,6 +733,7 @@
 	.notes { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px 22px; }
 	.notes h3 { font-size: 0.82rem; margin: 0 0 3px; }
 	.notes p { margin: 0; font-size: 0.8rem; color: var(--ink-2); line-height: 1.5; }
+	.notes ul { margin: 0; padding-left: 1.1em; font-size: 0.8rem; color: var(--ink-2); line-height: 1.5; display: grid; gap: 2px; }
 	@media (max-width: 900px) {
 		.p-row { grid-template-columns: minmax(0, 1fr); }
 	}
