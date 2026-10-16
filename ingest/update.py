@@ -31,6 +31,11 @@ BUDGET = 220          # API calls per run for filling older gaps (~4-5 minutes a
 WAIT = 200            # seconds a run waits for the interval that has just begun (published 1-2 minutes after it starts)
 POLL = 15             # seconds between checks while waiting
 IRRADIANCE_MAX_AGE = 1800     # one store write per refresh: 48 a day
+# The extra price nodes ([price_nodes]) were added on 16 Oct 2026: intervals stored from the API before then are
+# fetched again, newest first, up to NODE_BACKFILL a run when there are no gaps to fill, so the week gains them.
+# Self-expiring: those intervals leave the 7-day window by 24 Oct 2026, and this then does nothing.
+NODES_SINCE = pd.Timestamp('2026-10-16 00:20', tz='UTC')
+NODE_BACKFILL = 120
 
 
 def fetch_interval(t_utc):
@@ -140,6 +145,13 @@ def main(log=print):
     recent = [t for t in window if t > t_latest - pd.Timedelta(minutes=15) and t != t_latest]
     missing = [t for t in reversed(window) if t not in have and t not in recent]
     todo = recent + missing[:BUDGET]
+    room = min(NODE_BACKFILL, BUDGET - len(missing))
+    if room > 0 and 'P|OTA' in s:
+        old = s[(s.src == 'api') & (s.index < NODES_SINCE) & s['P|OTA'].isna()].index
+        refill = [t for t in reversed(old) if t not in todo][:room]
+        if refill:
+            log(f'fetching {len(refill)} older intervals again for the extra price nodes ({len(old) - len(refill)} left)')
+            todo += refill
     for part in fetch_many(todo):
         s = st.merge(s, part)
     log(f'latest {t_latest}, fetched {len(todo)} intervals, {max(0, len(missing) - BUDGET)} older gaps left for later runs')
