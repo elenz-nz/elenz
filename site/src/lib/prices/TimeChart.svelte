@@ -120,7 +120,7 @@
 
 <style>
 	.tc { width: 100%; touch-action: pan-y; }
-	svg { display: block; cursor: crosshair; overflow: visible; }
+	svg { display: block; cursor: crosshair; overflow: hidden; }
 	text { font-family: var(--font-data); font-size: 10.5px; fill: var(--muted); }
 	.grid { stroke: var(--grid); }
 	.zero { stroke: var(--ink-2); stroke-width: 1; }

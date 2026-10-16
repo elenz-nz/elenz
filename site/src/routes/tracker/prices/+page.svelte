@@ -143,7 +143,7 @@
 		let lo = Infinity, hi = -Infinity;
 		const scan = (a: ArrayLike<number>) => { for (let i = 0; i < a.length; i++) { const v = a[i]; if (v === v) { if (v < lo) lo = v; if (v > hi) hi = v; } } };
 		if (view.mode === 'time') for (const s of shown) scan(s.values);
-		else { const I = view.P[bandKey === 'BEN' ? 'SI' : 'NI']; scan(I.pmin); scan(I.pmax); }
+		else { const I = view.P[bandKey === 'BEN' ? 'SI' : 'NI']; scan(I.pmin); scan(I.pmax); scan(view.P.NI.price); scan(view.P.SI.price); }
 		if (lo === Infinity) { lo = 0; hi = 100; }
 		return priceScale(scale, lo, hi);
 	});
