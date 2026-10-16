@@ -15,7 +15,7 @@
 	<main class="about">
 		<section>
 			<h1>About Elenz</h1>
-			<p>Elenz shows how New Zealand's electricity system is running: what is generating, by fuel and by plant, the wholesale price in each island, demand, transfer on the HVDC link between the islands, and the emissions intensity of the mix. The live view updates every five minutes from the Electricity Authority's market data, and history goes back to September 2020.</p>
+			<p>Elenz shows how New Zealand's electricity system is running: what is generating, by fuel and by plant, the wholesale price in each island, demand, transfer on the HVDC link between the islands, and the emissions intensity of the mix. The live view updates every five minutes from the Electricity Authority's market data, and history goes back to August 1997.</p>
 		</section>
 
 		<section aria-labelledby="shows-h">
@@ -25,7 +25,7 @@
 				<li>Wholesale prices at the island reference nodes, Haywards and Benmore.</li>
 				<li>Demand, metered at the grid and with embedded solar added back, with the Tiwai Point smelter's load in the summary table.</li>
 				<li>HVDC transfer between the islands, emissions intensity and renewable share.</li>
-				<li>Any range from the last 24 hours to the whole history since 2020, for New Zealand or either island.</li>
+				<li>Any range from the last 24 hours to the whole history since August 1997, for New Zealand or either island.</li>
 			</ul>
 		</section>
 
@@ -37,7 +37,7 @@
 
 		<section class="sources" id="sources" aria-labelledby="src-h">
 			<h2 id="src-h">Where the data comes from</h2>
-			<p>Live series come from the Electricity Authority's EMI real-time dispatch feed, about a minute after each 5-minute dispatch case runs. The EA's daily dispatch files carry the same data, fill any gaps, and provide the history back to September 2020. Both are published under CC BY 4.0. About 7–8% of 5-minute intervals have no dispatch case in either source; they are filled by interpolation.</p>
+			<p>Live series come from the Electricity Authority's EMI real-time dispatch feed, about a minute after each 5-minute dispatch case runs. The EA's daily dispatch files carry the same data and fill any gaps; about 7–8% of 5-minute intervals have no dispatch case in either source, and are filled by interpolation. Most of the history, back to August 1997, comes from the EA's metered data instead: what each station actually delivered, as the market settles it. All of it is published under CC BY 4.0.</p>
 			<nav class="m-toc" aria-label="Charts">
 				{#each [['m-gen', 'Generation'], ['m-roof', 'Embedded solar'], ['m-price', 'Wholesale price'], ['m-demand', 'Demand'], ['m-hvdc', 'HVDC transfer'], ['m-co2', 'Emissions intensity'], ['m-hist', 'History'], ['m-groups', 'Source groups']] as [id, name]}
 					<a href="#{id}">{name}</a>
@@ -47,9 +47,10 @@
 			<div class="methods">
 				<article class="method" id="m-gen">
 					<h3>Generation</h3>
-					<p class="m-src"><span>Source</span>EMI real-time dispatch: MW per connection point and unit</p>
+					<p class="m-src"><span>Source</span>EMI real-time dispatch: MW per connection point and unit; metered generation in history</p>
 					<ul>
 						<li>Each unit is mapped to a plant and fuel through the EA plant register (<code>DispatchedGenerationPlant.csv</code>) plus a curated list of newer plant, then summed by plant, fuel and island.</li>
+						<li>A few stations are shown as one plant, because the metered history only sees them whole: Huntly's Rankine units, Stratford (Taranaki Combined Cycle and the peakers), Waikaremoana (Tuai, Piripaua and Kaitawa) and Te Mihi. Where dispatch data has them, their units can still be shown one by one.</li>
 						<li>Peak generation is the highest 5-minute total (half-hour in history), including embedded solar.</li>
 						<li>Huntly's Rankine units are shown as coal/gas, because the market data doesn't say which fuel they burned.</li>
 					</ul>
@@ -109,9 +110,10 @@
 
 				<article class="method" id="m-demand">
 					<h3>Demand</h3>
-					<p class="m-src"><span>Source</span>EMI real-time dispatch: load by connection point</p>
+					<p class="m-src"><span>Source</span>EMI real-time dispatch: load by connection point; metered grid flows in history</p>
 					<ul>
-						<li>Metered grid demand.</li>
+						<li>Grid demand: what leaves the grid for consumers in each island, the dispatch data's island load.</li>
+						<li>In metered history, the same thing from the grid meters: energy leaving the grid, less energy entering it at local networks and stations, plus generation. Embedded stations netted off at their grid point are added back, as dispatch counts them. Over 2020–26 this matches the dispatch data's island load within 1–2%. Before October 2000 there is no grid import file, so metered generation stands in for it.</li>
 						<li>The dashed line adds embedded solar back.</li>
 						<li>The summary table shows the Tiwai Point smelter's load (TWI2201) on its own.</li>
 					</ul>
@@ -135,10 +137,10 @@
 					<p>Hydro, wind and solar release almost nothing as they generate, so intensity is low when they supply most of the power and rises when gas and coal plants run. Geothermal sits in between, since the steam carries some CO₂ up from underground. Because it is per unit, intensity shows how clean the electricity is at any moment, whether demand is high or low.</p>
 					<p>It is the emissions from every generating plant divided by total generation, including estimated embedded solar. Each fuel's output is multiplied by its emission factor, in tonnes of CO₂e per MWh (the same as kg per kWh):</p>
 					<ul class="figs wide">
-						<li><b>0.65–1.0</b> Huntly Rankines<small>Varies with how much of their fuel was coal. Genesis reports the coal share each quarter (24% in Apr–Jun 2026); the latest is carried forward until the next report</small></li>
+						<li><b>0.6–1.0</b> Huntly Rankines<small>Varies with how much of their fuel was coal. Genesis reports the coal share each quarter (24% in Apr–Jun 2026); the latest is carried forward until the next report. Before July 2020 it comes from MBIE's quarterly generation from coal, less Glenbrook, over the Rankines' metered output: about a quarter coal around 2000, when Huntly burned Maui gas, and mostly coal from 2004 to 2015</small></li>
 						<li><b>0.80</b> diesel</li>
-						<li><b>0.46</b> gas<small>Average of the gas fleet: Huntly 5 combined cycle about 0.41, peakers and cogeneration about 0.5–0.57</small></li>
-						<li><b>0.02–0.30</b> geothermal<small>Each station's own operational emissions by year (NZ Geothermal Association): from about 0.02 at Wairakei to 0.30 at Ōhaaki, and falling as stations reinject CO₂; about 0.05 across the fleet now. The latest published year carries forward until the next</small></li>
+						<li><b>0.46</b> gas<small>Average of the gas fleet: Huntly 5 combined cycle about 0.41, peakers and cogeneration about 0.5–0.57. Plants that have closed get their own estimate from typical heat rates: Otahuhu B and Taranaki Combined Cycle 0.40, Southdown and Te Awamutu 0.45, New Plymouth (steam) 0.60, Otahuhu A (open cycle) 0.62</small></li>
+						<li><b>0.02–0.30</b> geothermal<small>Each station's own operational emissions by year (NZ Geothermal Association): from about 0.02 at Wairakei to 0.30 at Ōhaaki, and falling as stations reinject CO₂; about 0.05 across the fleet now. The latest published year carries forward until the next; years before 2020 use 2020's, which probably understates them, as reinjection was less common</small></li>
 						<li><b>0</b> bioenergy<small>Kinleith (wood waste) and the Kawerau pulp mill's cogeneration (black liquor and wood): biogenic CO₂, counted as zero, as in national inventories. The EA register lists them as gas and geothermal</small></li>
 						<li><b>0</b> waste heat<small>Glenbrook's cogeneration runs on waste gas and heat from NZ Steel's ironmaking, not pipeline gas. Its emissions are counted with the ironmaking (industrial processes), so the electricity counts as zero</small></li>
 					</ul>
@@ -152,12 +154,16 @@
 
 				<article class="method" id="m-hist">
 					<h3>History</h3>
-					<p class="m-src"><span>Source</span>EMI daily dispatch files (<code>NodalPricesAndVolumes</code>) from 10 Sep 2020; final prices from <code>FinalEnergyPrices</code></p>
+					<p class="m-src"><span>Source</span>EMI metered data from August 1997; daily dispatch files from 10 Sep 2020; final prices from <code>FinalEnergyPrices</code></p>
 					<ul>
-						<li>The same dispatch cases as the live feed, published 1–4 days late. The live week fills in the latest days.</li>
-						<li>Each trading period is the average of its 5-minute intervals. The 30-day view shows half-hours; longer ranges show daily averages, keeping each day's highest half-hour for peak demand and peak generation.</li>
-						<li>Embedded solar uses the same model with each month's installed capacity (about 140 MW in September 2020) and the satellite archive.</li>
-						<li>HVDC is metered wherever published.</li>
+						<li>Every month the EA has published metering for (about five to six weeks after it ends) uses metered generation: <code>Generation_MD</code>, half-hourly by station, and <code>Embedded_generation</code> for stations on local networks. Grid flows (<code>Grid_export</code>, <code>Grid_import</code>), the Tiwai smelter and the HVDC link are metered too.</li>
+						<li>The weeks since come from the daily dispatch files (the same cases as the live feed, 1–4 days late), and the live week from the real-time feed.</li>
+						<li>Metered and dispatch figures differ a little. Over September 2020 to September 2026, dispatch totals ran 1–2% above metered ones (wind about 3.5%, hydro 1–2%), probably because dispatch measures output at the generator and metering at the grid connection. So where the history switches from metered to dispatch data, about six weeks back, totals can step up slightly.</li>
+						<li>Where the metering lacks a plant (batteries, solar farms not in it yet), its dispatch figures are used.</li>
+						<li>Some meters see more than one plant: Deep Stream hydro and Mahinerangi wind share one, split 30/70 by their shares in the dispatch data. Where a grid-point meter is net of local load (Mangahao, Cobb), the embedded meter's gross figure is used where it exists.</li>
+						<li>The 30-day view shows half-hours; longer ranges show daily averages, keeping each day's highest half-hour for peak demand and peak generation.</li>
+						<li>Embedded solar uses the same model with each month's installed capacity: none before the registry starts in August 2013 (there was little); ERA5 reanalysis sunshine for 2013–15, before the satellite archive; the satellite from 2016.</li>
+						<li>Prices are the EA's final prices throughout. HVDC is metered wherever published.</li>
 					</ul>
 				</article>
 

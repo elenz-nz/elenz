@@ -62,6 +62,17 @@ HLY91 = "HLY11"  # Huntly battery
 "Patea unit 1" = "Pātea"
 "Patea unit 2" = "Pātea"
 "Patea unit 3" = "Pātea"
+"Kaimai 5" = "Kaimai"     # the Kaimai scheme's one dispatched unit; the metered history has the scheme as "kaimai"
+"Ngāwhā B" = "Ngāwhā"     # OEC4; the metered history has the whole station (Ngāwhā A and B) as one
+
+# Stations the metered history (Generation_MD, before Sep 2020 and for every month it covers) sees only as a whole:
+# shown as one plant everywhere, with the register's plants as its units where the dispatch data has them.
+[plant_groups]
+"Huntly Rankines" = ["Huntly Rankine 1", "Huntly Rankine 2", "Huntly Rankine 3", "Huntly Rankine 4"]
+"Stratford" = ["Taranaki Combined Cycle", "Stratford Peaker 1", "Stratford Peaker 2"]
+"Waikaremoana" = ["Tuai", "Pirirpaua", "Kaitawa"]
+"Te Mihi" = ["Te Mihi 1", "Te Mihi 2"]
+"Southdown" = ["Southdown", "Southdown 5"]
 
 # Connection points the feed leaves without an island.
 [islands]
@@ -104,6 +115,12 @@ tiwai = "TWI2201"
 "Kaiwaikawe Wind Farm" = "Mercury"
 "Kōwhai Park Solar Farm" = "Contact"
 "Mangahao" = "Contact"                    # King Country Energy, part of Manawa
+# plants only in the metered history (retired, or never dispatched)
+"Otahuhu A" = "Contact"
+"Otahuhu B" = "Contact"
+"New Plymouth" = "Contact"
+"Southdown" = "Mercury"
+"Kawerau (TOPP1)" = "Other generators"
 
 # Hydro schemes for the "By hydro scheme" view, each listed upstream to downstream. Hydro stations not listed
 # here are shown as "Other hydro".
@@ -114,6 +131,6 @@ Waikato = ["Aratiatia", "Ōhakuri", "Ātiamuri", "Whakamaru", "Maraetai", "Waip�
 "Manapōuri" = ["Manapōuri"]
 Clutha = ["Clyde", "Roxburgh"]
 Tongariro = ["Tokaanu", "Rangipo"]
-Waikaremoana = ["Kaitawa", "Tuai", "Pirirpaua"]
+Waikaremoana = ["Waikaremoana"]
 Rangitaiki = ["Aniwhenua", "Wheao and Flaxy", "Matahina"]
 Waipori = ["Deep Stream (Waipori A)", "Waipori (2A/3/4)"]

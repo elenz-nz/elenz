@@ -12,7 +12,7 @@ import { KEY, nzOffset } from '#lib/tracker/series.js';
 
 const REGIONS = ['NZ', 'NI', 'SI'];
 const RANGES = ['1d', '3d', '7d', '30d', '1y', 'all'];
-const INTS = ['5m', '30m', '1d', '1w', '1mo'];
+const INTS = ['5m', '30m', '1d', '1w', '1mo', '1yr'];
 const OLD_RANGE = { 288: '1d', 864: '3d', 2016: '7d' };
 const DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
 

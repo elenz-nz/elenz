@@ -52,6 +52,9 @@
 "scheme":"Waipori",
 "river":0
 },
+"Edgecumbe":{
+"owner":"Other generators"
+},
 "Fonterra Dairy - Whareroa":{
 "owner":"Nova"
 },
@@ -76,28 +79,14 @@
 "Huntly Battery":{
 "owner":"Genesis"
 },
-"Huntly Rankine 1":{
-"owner":"Genesis"
-},
-"Huntly Rankine 2":{
-"owner":"Genesis"
-},
-"Huntly Rankine 3":{
-"owner":"Genesis"
-},
-"Huntly Rankine 4":{
+"Huntly Rankines":{
 "owner":"Genesis"
 },
 "Junction Road":{
 "owner":"Nova"
 },
-"Kaimai 5":{
+"Kaimai":{
 "owner":"Contact"
-},
-"Kaitawa":{
-"owner":"Genesis",
-"scheme":"Waikaremoana",
-"river":0
 },
 "Kaiwaikawe Wind Farm":{
 "owner":"Mercury"
@@ -118,6 +107,9 @@
 },
 "Kawerau":{
 "owner":"Mercury"
+},
+"Kawerau (TOPP1)":{
+"owner":"Other generators"
 },
 "Kawerau (TOPP2)":{
 "owner":"Other generators"
@@ -174,7 +166,7 @@
 "owner":"Other generators"
 },
 "New Plymouth":{
-"owner":"Other generators"
+"owner":"Contact"
 },
 "Nga Awa Pūrua":{
 "owner":"Mercury"
@@ -182,7 +174,7 @@
 "Ngā Tamariki":{
 "owner":"Mercury"
 },
-"Ngāwhā B":{
+"Ngāwhā":{
 "owner":"Other generators"
 },
 "Norske Skog CoGen":{
@@ -191,16 +183,17 @@
 "Omeheu Solar Farm":{
 "owner":"Other generators"
 },
+"Otahuhu A":{
+"owner":"Contact"
+},
+"Otahuhu B":{
+"owner":"Contact"
+},
 "Paerau Gorge":{
 "owner":"Contact"
 },
 "Papareireiā":{
 "owner":"Other generators"
-},
-"Pirirpaua":{
-"owner":"Genesis",
-"scheme":"Waikaremoana",
-"river":2
 },
 "Poihipi":{
 "owner":"Contact"
@@ -245,16 +238,10 @@
 "Southdown":{
 "owner":"Mercury"
 },
-"Southdown 5":{
-"owner":"Mercury"
-},
 "Southdown Battery":{
 "owner":"Mercury"
 },
-"Stratford Peaker 1":{
-"owner":"Contact"
-},
-"Stratford Peaker 2":{
+"Stratford":{
 "owner":"Contact"
 },
 "Taiohi Solar Farm":{
@@ -269,9 +256,6 @@
 "owner":"Genesis",
 "scheme":"Tekapo",
 "river":1
-},
-"Taranaki Combined Cycle":{
-"owner":"Contact"
 },
 "Tararua Wind Farm 3":{
 "owner":"Contact"
@@ -288,6 +272,9 @@
 "Tauhei Solar Farm":{
 "owner":"Other generators"
 },
+"Te Awamutu":{
+"owner":"Other generators"
+},
 "Te Herenga o Te Rā Solar Farm":{
 "owner":"Other generators"
 },
@@ -297,10 +284,7 @@
 "Te Huka 3":{
 "owner":"Contact"
 },
-"Te Mihi 1":{
-"owner":"Contact"
-},
-"Te Mihi 2":{
+"Te Mihi":{
 "owner":"Contact"
 },
 "Te Puna Mauri ō Omaru at Ruawai":{
@@ -326,16 +310,16 @@
 "scheme":"Tongariro",
 "river":0
 },
-"Tuai":{
-"owner":"Genesis",
-"scheme":"Waikaremoana",
-"river":1
-},
 "Turitea Wind Farm":{
 "owner":"Mercury"
 },
 "Twin Rivers Solar Farm":{
 "owner":"Other generators"
+},
+"Waikaremoana":{
+"owner":"Genesis",
+"scheme":"Waikaremoana",
+"river":0
 },
 "Waipipi":{
 "owner":"Genesis"

@@ -91,5 +91,53 @@ day = history.combine_days([dd, dd])
 check(day['N'] == 2 * len(dd['t']) and len(day['nodes']['OTA']) == day['N'], 'combine_days: node prices joined')
 check(len(day['NI']['p10']) == day['N'], 'combine_days: price spread joined')
 
+# ---------- metered history path (metered.py) ----------
+# one day of each metered file (15 Sep 2026, and 15 Aug 1997 in the early file layouts), in sample_metered/
+import gzip  # noqa: E402
+from datetime import date  # noqa: E402
+
+import hvdc  # noqa: E402
+import metered as mt  # noqa: E402
+
+MET = os.path.join(HERE, 'sample_metered')
+
+
+def met_get(url, timeout=None):
+    p = os.path.join(MET, url.split('/')[-1] + '.gz')
+    return gzip.open(p).read() if os.path.exists(p) else None
+
+
+ms = mt.fetch_month(met_get, date(2026, 9, 1), log=lambda *a: None)
+check(ms is not None and len(ms) == 48, f'metered: one day of trading periods ({0 if ms is None else len(ms)})')
+check(mt.complete(ms, date(2026, 9, 1)), 'metered: Generation_MD, grid flows and embedded generation all present')
+mgen = mt.generation(ms, '2026-09', log=lambda *a: None)
+mtot = sum(sum(v.values()) for v in mgen.values())
+check(3500 < float(mtot.mean()) < 7000, f'metered: NZ generation plausible ({float(mtot.mean()):.0f} MW)')
+mnames = {k[0] for k in mgen}
+check({'Huntly Rankines', 'Manapōuri', 'Mangahao', 'Kinleith'} <= mnames, 'metered: stations mapped by metered_plants.csv')
+mang = sum(mgen[[k for k in mgen if k[0] == 'Mangahao'][0]].values())
+net = ms['M|MHO0331 mangahao'].mean()
+check(float(mang.mean()) > 3 * net, f'metered: Mangahao gross from the embedded meter ({float(mang.mean()):.1f} MW, net {net:.1f})')
+mfull = pd.date_range(ms.index.min(), ms.index.max(), freq='30min')
+mg = ms.reindex(mfull)
+mg['src'] = 'file'
+mg['n'] = 0
+mjs = bt.assemble(mg, mfull, {'NI': pd.Series(0.0, index=mfull), 'SI': pd.Series(0.0, index=mfull)}, log=lambda *a: None, metered=mgen)
+dem = np.array(mjs['NI']['metered']) + np.array(mjs['SI']['metered'])
+mgent = sum(np.array(mjs[i][k]) for i in ('NI', 'SI') for k in bt.KEYS)
+check(0.9 < dem.mean() / mgent.mean() < 1.0, f'metered: demand a little under generation (losses; {dem.mean():.0f} vs {mgent.mean():.0f} MW)')
+check(np.mean(mjs['SI']['tiwai']) > 300, 'metered: Tiwai from Grid_export_to_Tiwai')
+hl = [p for p in mjs['plants'] if p['name'] == 'Huntly Rankines']
+check(bool(hl) and hl[0]['cap'] and hl[0]['units'], 'metered: Huntly Rankines one plant with capacity and units')
+o97 = mt.fetch_month(met_get, date(1997, 8, 1), log=lambda *a: None)
+check(o97 is not None and len(o97) == 48 and mt.complete(o97, date(1997, 8, 1)), 'metered 1997: early layout (dd/mm/yyyy dates) read')
+g97 = mt.generation(o97, '1997-08', log=lambda *a: None)
+t97 = sum(sum(v.values()) for v in g97.values())
+check(3000 < float(t97.mean()) < 6000, f'metered 1997: generation plausible ({float(t97.mean()):.0f} MW)')
+h97 = hvdc.parse_metered(met_get('x/199708_HVDC_flows.csv'))
+h26 = hvdc.parse_metered(met_get('x/202609_HVDC_flows.csv'))
+check(len(h97) == 48 and h97['H|BEN'].abs().max() > 50, 'hvdc: 1997 layout (HVDC_BN/BS/HN/HS) parsed')
+check(len(h26) == 48 and (h26['H|BEN'] - h26['H|HAY']).abs().mean() < 80, 'hvdc: current layout parsed, ends within link losses')
+
 print(f'\n{len(failures)} failed' if failures else '\nall passed')
 sys.exit(1 if failures else 0)

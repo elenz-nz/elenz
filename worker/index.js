@@ -15,8 +15,8 @@ const WORKFLOWS = 'https://api.github.com/repos/stubzy19/elenz/actions/workflows
 const HISTORY_CRON = '40 */6 * * *'; // must match wrangler.jsonc
 // history files the site may request: the index, all days, and one half-hourly file per month
 // /data/health: the same limits as the GitHub watchdog (watchdog.yml)
-const HEALTH = { liveMinutes: 30, historyDays: 5 };
-const HISTORY_FILE =/^\/data\/history\/(index\.json|day\.json|hh\/\d{4}-\d{2}\.json)$/;
+const HEALTH = { liveMinutes: 30, historyDays: 5, rebuildDays: 12 };   // history may lag up to rebuildDays during a rebuild
+const HISTORY_FILE =/^\/data\/history\/(index\.json|progress\.json|day\.json|hh\/\d{4}-\d{2}\.json)$/;
 
 export default {
   async fetch(request, env) {
@@ -25,23 +25,29 @@ export default {
       // for an outside uptime monitor: 200 while the data is fresh, 503 (with the reasons) when it isn't. Unlike the
       // GitHub watchdog, it doesn't depend on the Worker's cron, so it also catches the cron itself stopping.
       const now = Date.now();
-      const [live, index, cron] = await Promise.all([
+      const [live, index, cron, progress] = await Promise.all([
         env.DATA.getWithMetadata('tracker.json', { type: 'stream' }),
         env.DATA.get('hist/index.json', 'json'),
         env.DATA.get('cron-status', 'json'),
+        env.DATA.get('hist/progress.json', 'json'),
       ]);
+      // a rebuild republishes the index only when every month is done (a few days for the full history), so while
+      // one is under way (months left, the job saving progress) the index may lag up to rebuildDays
+      const rebuilding = !!(progress && progress.rebuild_left && progress.rebuild_left.length && progress.at && now - progress.at < 2 * 864e5);
+      const histLimit = (rebuilding ? HEALTH.rebuildDays : HEALTH.historyDays) * 864e5;
       if (live.value) await live.value.cancel();  // only the version tag (metadata) is needed, not the file
       const problems = [];
       const end = live.metadata && live.metadata.end;
       if (!end) problems.push('live data has no version tag (the live job has not saved since the tag was added)');
       else if (now - end > HEALTH.liveMinutes * 60e3) problems.push(`live data is ${Math.round((now - end) / 60e3)} minutes old`);
       if (!index || !index.end) problems.push('history index missing');
-      else if (now - index.end > HEALTH.historyDays * 864e5) problems.push(`history is ${((now - index.end) / 864e5).toFixed(1)} days behind`);
+      else if (now - index.end > histLimit) problems.push(`history is ${((now - index.end) / 864e5).toFixed(1)} days behind`);
       if (cron && cron.result !== 'ok') problems.push(`the Worker could not start the live job: ${cron.result}`);
       const body = {
         ok: !problems.length, problems,
         live_minutes_old: end ? Math.round((now - end) / 60e3) : null,
         history_days_behind: index && index.end ? +((now - index.end) / 864e5).toFixed(1) : null,
+        history_rebuild_months_left: rebuilding ? progress.rebuild_left.length : 0,
         last_trigger: cron ? cron.at : null,
       };
       return new Response(JSON.stringify(body), {

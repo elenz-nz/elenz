@@ -1,12 +1,13 @@
 """Plant owner and hydro scheme lookup for the website's "By owner" and "By hydro scheme" views.
 
 Reads the EA plant register (latest row per plant) and facilities/overrides.toml ([owners], [plant_owners],
-[hydro_schemes], [plant_names]) and writes site/src/lib/tracker/plants.json: {plant name: {"owner": ..., "scheme": ..., "river": n}}.
+[hydro_schemes], [plant_names], [plant_groups]) and facilities/metered_plants.csv, and writes site/src/lib/tracker/plants.json: {plant name: {"owner": ..., "scheme": ..., "river": n}}.
 Plant names match the ones in tracker.json and the history files.
 
 Run from the repo root after refreshing the register or editing those tables, then commit the JSON:
   python3 ingest/plant_meta.py
 """
+import csv
 import json
 import os
 
@@ -23,12 +24,17 @@ def main():
     owners = O.get('owners', {})
     reg = pd.read_csv(os.path.join(FACILITIES, 'plant_register.csv'))
     reg = reg.sort_values('EffectiveEndDate').drop_duplicates('PlantName', keep='last')  # the current row per plant
+    groups = {m: g for g, members in O.get('plant_groups', {}).items() for m in members}
     meta = {}
     for r in reg.itertuples():
         name = rename.get(r.PlantName, r.PlantName)
-        meta[name] = {'owner': owners.get(r.PlantOperator, 'Other generators')}
+        meta[groups.get(name, name)] = {'owner': owners.get(r.PlantOperator, 'Other generators')}
     for unit in O.get('units', {}).values():
         meta.setdefault(unit['plant'], {'owner': 'Other generators'})
+    with open(os.path.join(FACILITIES, 'metered_plants.csv'), encoding='utf-8') as f:   # plants only in metered history
+        for r in csv.DictReader(f):
+            if r['plant'] != '-':
+                meta.setdefault(r['plant'], {'owner': 'Other generators'})
     for name, owner in O.get('plant_owners', {}).items():
         meta.setdefault(name, {})['owner'] = owner
     unknown = []

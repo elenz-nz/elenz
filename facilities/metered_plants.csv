@@ -1,0 +1,168 @@
+poc,code,plant,fuel,isl,from,to,share,cap,max_mw,note
+ANI0111,aniwhenua,Aniwhenua,hydro,NI,,,,,,
+ARA2201,aratiatia,Aratiatia,hydro,,,,,,,
+ARG1101,argyle_wairau,Branch River (Arnold),hydro,,,,,,,
+ARI1101,arapuni,Arapuni,hydro,,,,,,,
+ARI1102,arapuni,Arapuni,hydro,,,,,,,
+ASB0661,Lauriston,Lauriston Solar Farm,solar,,,,,,,
+ASB0661,highbank,Highbank,hydro,,,,,,,
+ASB0661,*,Highbank,hydro,,,,,,,embedded meter; the residual over Generation_MD is Highbank
+ATI2201,atiamuri,Ātiamuri,hydro,,,,,,,
+AVI2201,aviemore,Aviemore,hydro,,,,,,,
+BEN0162,benmore,Benmore,hydro,,,,,,,second connection 2009-2012
+BEN0163,benmore,Benmore,hydro,,,,,,,second connection 2009-2011
+BEN2202,benmore,Benmore,hydro,,,,,,,
+BPE0331,twf_12,Tararua stage II,wind,,,,,,,
+BPE0331,*,Tararua stage II,wind,,,,,,,
+BRB0331,ruakākā_energy_park,Ruakākā Energy Park,batt,,,,,,,
+BWK1101,waipori,Waipori (2A/3/4),hydro,,,,,,,
+CML0331,roaring_meg,-,,,,,,,,one empty month
+COB0661,cobb,Cobb,hydro,,,,,,,
+COL0661,coleridge,Coleridge,hydro,,,,,,,
+CYD0331,teviot,Teviot,hydro,SI,,,,12,,not dispatched
+CYD2201,clyde,Clyde,hydro,,,,,,,
+DVK0111,dannevirke_solar_farm,Dannevirke Solar Farm,solar,,,,,,,
+EDG0331,Rangitaiki,Rangitaiki Solar Farm,solar,,,,,,,
+EDG0331,edgecumbe,Edgecumbe,gas,,,,,10,,Fonterra Edgecumbe cogeneration (not dispatched)
+EDG0331,*,Edgecumbe,gas,,,2026-04,,,,
+EDG0331,*,Omeheu Solar Farm,solar,,2026-05,,,,,
+GLN0111,glenbrook_kilns,Glenbrook Steel,waste,,,,,,,
+GLN0332,glenbrook_kilns,Glenbrook Steel,waste,,,,,,,
+GLN0111,*,Glenbrook Steel,waste,,,,,,,
+GLN0332,*,Glenbrook Steel,waste,,,,,,,
+GOR0331,KaiweraDowns,Kaiwera Downs Wind Farm,wind,,,,,,,
+GOR0331,*,Kaiwera Downs Wind Farm,wind,,,,,,,
+HLY0331,rotohiko,Rotohiko,batt,,,,,,,
+HLY2201,huntly_1_4,Huntly Rankines,coal,,,,,,,units 1-4 (coal or gas)
+HLY2201,huntly_e3p,Huntly 5,gas,,,,,,,
+HLY2201,huntly_p40,Huntly 6,gas,,,,,,,
+HRP2201,Harapaki,Harapaki,wind,,,,,,,
+HWA1101,patea,Pātea,hydro,,,,,,,
+HWA1101,whareroa,Fonterra Dairy - Whareroa,gas,,,,,,,
+HWA1102,whareroa,Fonterra Dairy - Whareroa,gas,,,,,,,
+HWB0331,Waipori,Deep Stream (Waipori A),hydro,,,,,,,
+JRD1101,junctionroad,Junction Road,gas,,,,,,,
+KAW0111,kawerau,Kawerau (Te Ahi O Maui),geo,,,,,,,
+KAW0111,kawerau_geo,Kawerau (TOPP1),geo,,,,,8,,binary plant on the Kawerau field (not dispatched)
+KAW0111,*,Kawerau (TOPP1),geo,,,2017-12,,,,
+KAW0111,*,Kawerau (Te Ahi O Maui),geo,,2018-01,,,,,
+KAW0112,norskeskog,Kawerau Mill CoGen,bio,,,,,,,pulp mill cogeneration (see overrides.toml)
+KAW1101,kawerau_new,Kawerau,geo,,,,,,,
+KAW2201,kawerau_(topp2),Kawerau (Te Ahi O Maui),geo,,,2025-11,,,,Te Ahi O Maui moved here from KAW0111 in Sep 2025
+KAW2201,kawerau_(topp2),Kawerau (Te Ahi O Maui),geo,,2025-12,,0.35,,,one code for both plants once TOPP2 runs (Dec 2025): split by their dispatch shares
+KAW2201,kawerau_(topp2),Kawerau (TOPP2),geo,,2025-12,,0.65,,,
+KIN0112,kinleith,Kinleith,bio,,,,,,,
+KIN0112,*,Kinleith,bio,,,,,,,
+KIW2201,kaiwera_downs_(stage_2),Kaiwera Downs (Stage 2),wind,,,,,,,
+KOE0331,ngawha,Ngāwhā,geo,,,,,,,
+KOE0331,*,Ngāwhā,geo,,,,,,,
+KOE1101,ngawha,Ngāwhā,geo,,,,,,,Ngāwhā A and B
+KOE1101,Kohira,Kohirā Solar Farm,solar,,,,,,,
+KOE1101,Pukenui,Pukenui Solar Farm,solar,,,,,,,
+KOE1101,*,Ngāwhā,geo,,,,,,,
+KPA1101,kapuni,Kapuni,gas,,,,,,,
+KPO1101,karapiro,Karāpiro,hydro,,,,,,,
+KPU0661,pāmu_rā_ki_whitianga_solar_farm,Pāmu Rā ki Whitianga Solar Farm,solar,,,,,,,
+KUM0111,Kumara,Kūmara,hydro,SI,,,,,,
+KUM0661,Kumara,Kūmara,hydro,,,,,,,
+KUM0661,kumara_dillmans,Kūmara,hydro,,,,,,,
+KUM0661,*,Kūmara,hydro,,,,,,,
+LTN0331,twf_12,Tararua stage I,wind,,,,,,,
+LTN0331,*,Tararua stage I,wind,,,,,,,
+LTN2201,turitea,Turitea Wind Farm,wind,,,,,,,
+MAN2201,manapouri,Manapōuri,hydro,,,,,,,
+MAT1101,aniwhenua,Aniwhenua,hydro,,,,,,,
+MAT1101,matahina,Matahina,hydro,,,,,,,
+MAT1101,*,Aniwhenua,hydro,,,,,,,
+MAT1102,matahina,Matahina,hydro,,,,,,,
+MHO0331,mangahao,Mangahao,hydro,,,,,,,Generation_MD is net of local load here; the embedded meter is gross
+MHO0331,*,Mangahao,hydro,,,,,,,
+MKE1101,McKee,McKee,gas,,,,,,,
+MTI2201,maraetai,Maraetai,hydro,,,,,,,
+MTO0331,papareireiā_solar_at_maungaturoto,Papareireiā,solar,,,,,,,
+MTO0331,*,Te Puna Mauri ō Omaru at Ruawai,solar,,,,,,,
+NAP2201,nap,Nga Awa Pūrua,geo,,,,,,,
+NAP2202,Ngatamariki,Ngā Tamariki,geo,,,,,,,
+NMA0331,white_hill,White Hill,wind,,,,,,,
+NMA0331,*,White Hill,wind,,,,,,,
+NPL1101,new_plymouth,New Plymouth,gas,,,,,,,gas and oil steam plant (closed 2008)
+NPL2201,new_plymouth,New Plymouth,gas,,,,,,,
+NSY0331,paerau,Paerau Gorge,hydro,,,,,,,
+NSY0331,*,Paerau Gorge,hydro,,,,,,,
+OHA2201,ohau_a,Ōhau A,hydro,,,,,,,
+OHB2201,ohau_b,Ōhau B,hydro,,,,,,,
+OHC2201,ohau_c,Ōhau C,hydro,,,,,,,
+OHG1101,patea_unit_1,Pātea,hydro,,,,,,,each patea_unit row repeats the station total: keep one
+OHG1101,patea_unit_2,-,,,,,,,,
+OHG1101,patea_unit_3,-,,,,,,,,
+OHK2201,ohakuri,Ōhakuri,hydro,,,,,,,
+OKI2201,ohaaki,Ōhaaki,geo,,,,,,,
+OTA1101,otahuhu_a,Otahuhu A,gas,,,,,100,,
+OTA2221,otahuhu_a,Otahuhu A,gas,,,,,,,
+OTA2202,otahuhu_b,Otahuhu B,gas,,,,,404,,combined cycle (closed 2015)
+PPI2201,poihipi,Poihipi,geo,,,,,,,
+ROT1101,wheao_flaxy,Wheao and Flaxy,hydro,,,,,,,
+ROX1101,roxburgh,Roxburgh,hydro,,,,,,,
+ROX2201,roxburgh,Roxburgh,hydro,,,,,,,
+RPO2201,rangipo,Rangipo,hydro,,,,,,,
+SFD2201,stratford,Stratford,gas,,,,,,,Taranaki Combined Cycle and the peakers
+STK0661,cobb,Cobb,hydro,,,,,,,
+STK0661,*,Cobb,hydro,,,,,,,
+SWN2201,southdown,Southdown,gas,,,,,,,
+TAB0331,te_huka_3,Te Huka 3,geo,,,,,,,
+TAB0331,*,Te Huka 3,geo,,,,,,,
+TAB2201,Tauhara,Tauhara,geo,,,,,,,
+TGA0331,kaimai,Kaimai,hydro,,,,,,,
+TGA0331,*,Kaimai,hydro,,,,,,,
+THI2201,Te_Mihi,Te Mihi,geo,,,,,,,
+THI2201,te_mihi,Te Mihi,geo,,,,,,,
+TKA0111,tekapo_a,Takapō A,hydro,,,,,,,
+TKB2201,tekapo_b,Takapō B,hydro,,,,,,,
+TKU2201,tokaanu,Tokaanu,hydro,,,,,,,
+TMU1101,te_awamutu,Te Awamutu,gas,,,,,54,,dairy factory cogeneration (closed 2007)
+TUI1101,waikaremoana,Waikaremoana,hydro,,,,,,,Tuai Piripaua and Kaitawa
+TWC2201,te_rere_hau,Te Rere Hau,wind,,,,,,,
+TWC2201,twf_3,Tararua Wind Farm 3,wind,,,,,,,
+TWC2201,*,Tararua Wind Farm 3,wind,,,,,,,
+TWH0331,te_rapa,Te Rapa,gas,,,,,,,
+TWH0331,te_uku,Te Uku,wind,,,,,,,
+TWH0331,*,Te Rapa,gas,,,2023-06,,,,
+TWH0331,*,Te Uku,wind,,2023-07,,,,,
+WAI0331,te_herenga_o_te_rā_solar_farm,Te Herenga o Te Rā Solar Farm,solar,,,,,,,
+WDV1101,te_apiti,Te Āpiti,wind,,,,,,,
+WHI2201,whirinaki,Whirinaki,diesel,,,,,,,
+WHU1101,tauhei_solar_farm,Tauhei Solar Farm,solar,,,,,,,
+WIL0331,mill_creek,Mill Creek,wind,,,,,,,
+WIL0331,*,Mill Creek,wind,,,,,,,
+WKM2201,mokai,Mokai,geo,,,,,,,
+WKM2201,whakamaru,Whakamaru,hydro,,,,,,,
+WPA2201,waipapa,Waipāpa,hydro,,,,,,,
+WPG0331,waipori,Deep Stream (Waipori A),hydro,,,2011-05,,,,
+WPG0331,waipori,Deep Stream (Waipori A),hydro,,2011-06,,0.3,,,"one meter for Deep Stream hydro and Mahinerangi wind (from Jun 2011): split by their average shares in the dispatch data, 2020-26"
+WPG0331,waipori,Mahinerangi (Waipori B),wind,,2011-06,,0.7,,,
+WPG0331,*,Deep Stream (Waipori A),hydro,,,2011-05,,,,
+WPG0331,*,Deep Stream (Waipori A),hydro,,2011-06,,0.3,,,
+WPG0331,*,Mahinerangi (Waipori B),wind,,2011-06,,0.7,,,
+WRK0331,rotokawa,Rotokawa,geo,,,,,,,
+WRK0331,tehuka,Te Huka,geo,,,,,,,
+WRK0331,*,Rotokawa,geo,,,2008-12,,,,"Apr-Dec 2008: Rotokawa, before Generation_MD has it"
+WRK0331,*,Te Huka,geo,,2009-01,,,,,
+WRK2201,wairakei,Wairakei,geo,,,,,,,
+WTK0111,waitaki,Waitaki,hydro,,,,,,,
+WVY1101,waipipi,Waipipi,wind,,,,,,,
+WWD1102,west_wind,West Wind 1,wind,,,,,,,
+WWD1103,west_wind,West Wind 2,wind,,,,,,,
+RKA0111,*,Rotokawa,geo,NI,,,,,35,old embedded code (to Mar 2008); flat output; Rotokawa moves to WRK0331 in 2008
+NGA0331,*,Ngāwhā,geo,NI,,,,,12,old embedded code (to Mar 2008); Ngāwhā moves to KOE0331
+KMI0331,*,Kaimai,hydro,NI,,,,,42,old embedded code (to Mar 2008); Kaimai moves to TGA0331
+KMI0332,*,Kaimai,hydro,NI,,,,,42,
+TRC0331,*,Te Rapa,gas,NI,,,,,50,old embedded code (to Mar 2008); Te Rapa cogeneration moves to TWH0331
+TWF0331,*,Tararua stage I,wind,NI,,,,,32,old embedded code (to Mar 2008); Tararua stages I and II move to LTN0331 and BPE0331
+TWF0332,*,Tararua stage I,wind,NI,,2004-03,,,32,until Stage II (2004) this meter carries part of Stage I (with TWF0331)
+TWF0332,*,Tararua stage II,wind,NI,2004-04,,,,36,
+HBK0661,*,Highbank,hydro,SI,,,,,26,old embedded code (to Mar 2008); Highbank moves to ASB0661
+PRU0111,*,Paerau Gorge,hydro,SI,,,,,12,old embedded code (to Mar 2008); Paerau and Patearoa move to NSY0331
+PTR0111,*,Paerau Gorge,hydro,SI,,,,,12,
+WPI0112,*,Deep Stream (Waipori A),hydro,SI,,,,,30,old embedded code (to Mar 2008); moves to WPG0331
+WHL0661,*,White Hill,wind,SI,,,,,58,old embedded code (2007-08); White Hill moves to NMA0331
+TVT0111,*,Teviot,hydro,SI,,,,,12,old embedded code (to Mar 2008)

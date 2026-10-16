@@ -22,7 +22,7 @@
 		{ href: '/now', name: 'Now', peek: NowPeek,
 			blurb: 'The system this five minutes: demand, prices at Haywards and Benmore, the HVDC link, emissions, and each island’s generation mix on the map.' },
 		{ href: '/tracker', name: 'Tracker', peek: TrackerPeek,
-			blurb: 'Generation by fuel, plant, owner or scheme, and prices at six grid nodes with the island spread and what each fuel earned, from the last 24 hours back to 2020.' },
+			blurb: 'Generation by fuel, plant, owner or scheme, and prices at six grid nodes with the island spread and what each fuel earned, from the last 24 hours back to 1997.' },
 		{ href: '/articles', name: 'Articles', peek: ArticlesPeek,
 			blurb: 'New records, quarterly reviews and closer looks at how the system is running, written from the same data as the tracker.' },
 	];
@@ -102,7 +102,7 @@
 
 <svelte:head>
 	<title>ELENZ · New Zealand's electricity</title>
-	<meta name="description" content="New Zealand's electricity, live: the generation mix and renewable share now, and a tracker of generation, prices, demand and the HVDC link back to 2020." />
+	<meta name="description" content="New Zealand's electricity, live: the generation mix and renewable share now, and a tracker of generation, prices, demand and the HVDC link back to 1997." />
 </svelte:head>
 
 <div class="wrap">

@@ -41,8 +41,14 @@ This repository is public: never commit keys, tokens or personal details.
   columns `U|POC UNIT`, `C|...` charging, `L|NI`, `L|SI`, `T`, `P|NI`, `P|SI`, `P|<node>` for `[price_nodes]`, `src`), `build_tracker.py`
   (state → tracker.json; `assemble()` is shared with history), `emi_live.py` (API client), `store.py` (Workers KV
   via the Cloudflare REST API, or `data/store` locally), `sync.py` (EMI blob container + Open-Meteo), `common.py`
-  (paths, overrides). `history.py`: history since 10 Sep 2020 from the daily dispatch files (see its docstring for
-  the KV keys `hist/*`); bump its `BUILD` number to rebuild every month after changing how months are built.
+  (paths, overrides). `history.py`: history since 1 Aug 1997 (see its docstring for the KV keys `hist/*`): metered data
+  (`metered.py`: Generation_MD, Embedded_generation, Grid_export/import, Tiwai) for every month the EA has published it
+  (~5-6 weeks behind), the daily dispatch files (from 10 Sep 2020) for the weeks since and to fill what the metering
+  lacks; bump its `BUILD` number to rebuild every month after changing how months are built.
+  `facilities/metered_plants.csv` maps each Generation_MD generator code (and, `*`, each listed embedded meter's
+  residual over Generation_MD) to a plant, fuel and island, with date ranges and shares; `metered_islands.csv` gives
+  islands for the many retired or local connection points in the metered files (from EMI's NetworkSupplyPointsTable).
+  The build warns about any Generation_MD code not in the table.
   `rooftop.py` (embedded solar, shown on the site as "Embedded solar", data key `roof`: rooftops and ground-mounted
   arrays up to ~10 MW on local networks; registry capacity by Root NSP less dispatched farms, three types (small,
   large, ground), 35 irradiance points, Himawari
@@ -64,7 +70,9 @@ This repository is public: never commit keys, tokens or personal details.
   `analysis/make_points.py`), `rooftop_capacity.json` (capacity snapshot the live job uses until the history job
   has stored `hist/roof_cap.json`).
 - `facilities/overrides.toml`: curated corrections (any change rebuilds history, except the site-only `[owners]`,
-  `[plant_owners]` and `[hydro_schemes]`), `[solar_farms_in_registry]` (dispatched farms the
+  `[plant_owners]` and `[hydro_schemes]`), `[plant_groups]` (stations the metered history only sees whole: Huntly
+  Rankines, Stratford, Waikaremoana, Te Mihi, Southdown, shown as one plant everywhere with their register plants as
+  units), `[solar_farms_in_registry]` (dispatched farms the
   distributed-generation registry also counts), plus `[owners]`, `[plant_owners]` and `[hydro_schemes]` for the
   site's By owner / By hydro scheme views; `facilities/connection_points.csv`: POC → island;
   `facilities/plant_register.csv`: the EA register (refresh with `sync.py plants`, review the diff).
@@ -156,13 +164,30 @@ This repository is public: never commit keys, tokens or personal details.
   checked 15 Oct 2026), so they don't protect against the Worker's cron stopping: nothing outside Cloudflare alerts
   if it does. `/data/health` (Worker) covers that: 200 while live data is under 30 minutes old and history under 5
   days behind, 503 with the reasons otherwise; an outside uptime monitor checks it every 5 minutes and emails the owner.
+  During a full rebuild the index is republished only at the end (a few days for BUILD 6), so both checks allow up to
+  12 days while `hist/progress.json` shows months left and was saved in the last two days.
+- Metered history (BUILD 6, Oct 2026; analysis/metered_check.py, analysis/README.md): `Generation_MD` from Aug 1997
+  covers grid stations, and embedded stations only from Jan 2009; before that they are in `Embedded_generation`
+  (Oct 1998 on) under old codes (RKA0111 Rotokawa, NGA0331 Ngāwhā, KMI0331 Kaimai, TRC0331 Te Rapa, TWF0331/2
+  Tararua ...). Only embedded stations the tracker shows later are included, so totals don't jump in 2009.
+  Generation_MD is net of local load at some embedded points (Mangahao ~10% of gross, Cobb ~35%); the embedded meter
+  there has the gross figure. Over Sep 2020-Sep 2026 dispatch MW ran 1-2% above metered (wind ~3.5%, hydro 1-2%), with
+  half-hourly national correlation 0.999. Plant-level differences: river chains are block dispatched (Waikato above
+  all: Mercury only has to meet the chain's total), so per-station dispatch there isn't what each station did.
+  `Grid_import` starts Oct 2000 and until ~2003 covered only local networks' injections, so Generation_MD stands in
+  for connection points it lacks (J| columns). HVDC_Flows changed layout three times (HVDC_BN/BS/HN/HS to ~1999,
+  DCP1/DCP2 poles, then BEN/HAY connection points; the 3501 rows repeat totals); `hvdc.parse_metered` reads all.
+  Generation_MD gaps: Huntly's Rankines and unit 5 are missing for Sep 2020 (dispatch fills from 10 Sep), Matahina
+  from Oct 2021 (dispatch fills).
+- Rankine coal share before FY21 (emissions.js): MBIE quarterly generation from coal less Glenbrook's metered output
+  (MBIE counts Glenbrook as coal), over the Rankines' metered output; reproduces Genesis's FY21-25 figures closely.
 
 ## Status and next steps
 
 1. Site live at https://elenz.elenz.workers.dev (Cloudflare Workers; domain elenz.nz to be bought later).
 2. Live data via GitHub Actions + Workers KV (set up Oct 2026). A paid server running `update.py` in a loop is the
    upgrade path if GitHub's schedule delays become a problem.
-3. History since Sep 2020 on the tracker page: 30 days, 1 year, All (Oct 2026).
+3. History since Aug 1997 on the tracker page: 30 days, 1 year, All (BUILD 6, Oct 2026; was Sep 2020).
    Daily history keeps each day's peak demand and peak generation (total output including embedded solar). BUILD 4
    (embedded solar model, metered HVDC) finished 16 Oct 2026. BUILD 5 (Prices page fields, bioenergy and waste heat)
    pushed 16 Oct 2026: every month's state gains the other nodes' final prices (one monthly final-prices file each),

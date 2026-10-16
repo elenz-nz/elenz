@@ -1,8 +1,8 @@
-# Build the history (half-hourly since 10 Sep 2020) from the EA's daily dispatch files and save it to Cloudflare
-# Workers KV, where the site reads it. The site's Worker triggers this every 6 hours through the API
-# (workflow_dispatch); each run adds the daily files published since the last run. The first run backfills
-# everything (about 2,200 files, 24 GB of downloads), oldest first, and stops at the time budget; the next run
-# carries on. Run it by hand from the Actions tab ("History" → "Run workflow"), ticking "rebuild" to rebuild every
+# Build the history (half-hourly since 1 Aug 1997) from the EA's metered data and daily dispatch files and save it
+# to Cloudflare Workers KV, where the site reads it. The site's Worker triggers this every 6 hours through the API
+# (workflow_dispatch); each run adds whatever has been published since the last run. A full build or rebuild (351
+# months) goes oldest first and stops at the time budget or the day's KV write allowance (~90 months a day); later
+# runs carry on, and the site keeps the previous history until it is complete. Run it by hand from the Actions tab ("History" → "Run workflow"), ticking "rebuild" to rebuild every
 # month's JSON from the stored data.
 #
 # Secrets: CF_ACCOUNT_ID, CF_API_TOKEN (the same ones as the live job). No EMI key needed: the files are public.

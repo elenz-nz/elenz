@@ -43,6 +43,32 @@ def register():
     return fuel, names, cap
 
 
+def plant_capacity():
+    """Plant (shown) name -> the most nameplate MW it ever had installed at once, from the register's dated rows
+    (Whirinaki's re-registered units aren't counted twice; Stratford counts Taranaki Combined Cycle and the peakers
+    while both ran). For plants the metered history shows outside the dispatch data's lifetime."""
+    O = overrides()
+    reg = pd.read_csv(os.path.join(FACILITIES, 'plant_register.csv'))
+    rename, groups = O.get('plant_names', {}), plant_groups()
+    reg['plant'] = [groups.get(rename.get(n, n), rename.get(n, n)) for n in reg.PlantName]
+    reg = reg.dropna(subset=['NameplateMegawatts'])
+    out = {}
+    for p, d in reg.groupby('plant'):
+        best = 0.0
+        for t in d.EffectiveStartDate:
+            on = d[(d.EffectiveStartDate <= t) & (d.EffectiveEndDate > t)]
+            best = max(best, float(on.drop_duplicates(['PointOfConnectionCode', 'UnitCode']).NameplateMegawatts.sum()))
+        out[p] = best
+    return out
+
+
+def plant_groups():
+    """Register plant name -> the station it is shown as ([plant_groups] in overrides.toml): stations the metered
+    history can only see as a whole (Huntly's Rankines, Stratford, Waikaremoana, Te Mihi) are one plant everywhere,
+    with the register's plants as its units."""
+    return {m: g for g, members in overrides().get('plant_groups', {}).items() for m in members}
+
+
 def enc(s, dp=0):
     return [round(float(v), dp) if dp else int(round(float(v))) for v in s]
 
@@ -82,14 +108,21 @@ def build(state, irr, cap=None, log=print):
     return js
 
 
-def assemble(s, full, roof, log=print):
+def assemble(s, full, roof, log=print, metered=None):
     """Rows of the compact state on a regular time grid (NaN rows where no data) -> the tracker data layout:
     island series by fuel, demand, Tiwai, prices, rooftop solar, estimated HVDC, and plant series.
-    Shared by the live tracker (5-minute) and the history files (half-hourly)."""
+    Shared by the live tracker (5-minute) and the history files (half-hourly).
+
+    metered: for history months with metered data (metered.py), {(plant, fuel, island): {POC: MW}}. Plants then come
+    from the metering; a plant's dispatch series replaces it only where the metering lacks it (a battery, a plant not
+    in the metered data yet, or metered energy under half the dispatch energy over the dispatch intervals). Demand is
+    then the metered demand, and Tiwai the metered smelter load."""
     O = overrides()
     charge = O['battery_charging']
     isl_tab = connection_islands()
     fuel, names, cap = register()
+    groups = plant_groups()
+    group_names = set(groups.values())
     present = s.src.notna()
     gen_cols = [c for c in s.columns if c.startswith('U|')]
     chg_cols = [c for c in s.columns if c.startswith('C|')]
@@ -101,6 +134,7 @@ def assemble(s, full, roof, log=print):
     lost, unmapped = set(), set()
     island_gen = {isl: {k: pd.Series(0.0, index=full) for k in KEYS} for isl in ['NI', 'SI']}
     plant_units = {}  # (plant, fuel, island) -> {unit key: series}
+    member_of = {}    # unit key -> register plant name (a group's member)
     for col in gen_cols + chg_cols:
         poc, unit, isl = unit_info(col)
         is_chg = col.startswith('C|')
@@ -118,8 +152,10 @@ def assemble(s, full, roof, log=print):
         island_gen[isl][f] = island_gen[isl][f] + series.fillna(0).where(present)
         if (series.fillna(0).abs() <= 0.5).all():
             continue  # idle all window (e.g. a unit's old connection point): not part of the plant here
-        key = (names.get((poc, bunit), f'{poc} {bunit}'), f, isl)
+        member = names.get((poc, bunit), f'{poc} {bunit}')
+        key = (groups.get(member, member), f, isl)
         ukey = f'{poc} {bunit}'
+        member_of[ukey] = member
         plant_units.setdefault(key, {})
         plant_units[key][ukey] = plant_units[key].get(ukey, 0) + series.fillna(0).where(present)
     if unmapped:
@@ -128,6 +164,31 @@ def assemble(s, full, roof, log=print):
         log('WARNING generation with no island (add to [islands] in facilities/overrides.toml):', sorted(lost))
 
     fill = lambda x: x.interpolate(limit_direction='both').fillna(0)
+    if metered is not None:
+        # metered month: plants from the metering, dispatch where the metering lacks a plant (see above)
+        dpres = (s['n'].fillna(0) > 0) if 'n' in s else present
+        mpres = (s['mg'] == 1) if 'mg' in s else pd.Series(True, index=full)
+        final = {k: {poc: v.where(mpres) for poc, v in by_poc.items()} for k, by_poc in metered.items()}
+        for k, us in plant_units.items():
+            d = sum(us.values())
+            ed = float(d[dpres].sum())
+            m = sum(final[k].values()) if k in final else None
+            em = float(m[dpres].sum()) if m is not None else 0.0
+            # batteries: always dispatch where it has them (net of charging, which the metering doesn't net)
+            if (k[1] == 'batt' and bool(dpres.any())) or (ed > 0 and em < 0.5 * ed):
+                new = {u: v.where(dpres) for u, v in us.items()}
+                if m is not None:   # metered output outside the dispatch intervals (before 10 Sep 2020)
+                    new.update({poc: v.where(~dpres) for poc, v in final[k].items()})
+                final[k] = new
+        plant_units = {k: {u: v.fillna(0) for u, v in us.items()} for k, us in final.items()}
+        island_gen = {isl: {k: pd.Series(0.0, index=full) for k in KEYS} for isl in ['NI', 'SI']}
+        for (pname, f, isl), us in plant_units.items():
+            if isl in island_gen and f in island_gen[isl]:
+                island_gen[isl][f] = island_gen[isl][f] + sum(us.values())
+        fill_plant = lambda x: x
+    else:
+        fill_plant = fill
+
     out = {}
     for isl in ['NI', 'SI']:
         S = {k: fill(island_gen[isl][k]) for k in KEYS}
@@ -135,6 +196,13 @@ def assemble(s, full, roof, log=print):
         S['tiwai'] = fill(s['T']) if isl == 'SI' and 'T' in s else pd.Series(0.0, index=full)
         S['price'] = fill(s.get(f'P|{isl}', pd.Series(np.nan, index=full)))
         out[isl] = S
+    if metered is not None:
+        import metered as mt   # history only
+        dem = mt.demand(s, {isl: sum(out[isl][k] for k in KEYS) for isl in ['NI', 'SI']})
+        for isl in ['NI', 'SI']:
+            out[isl]['metered'] = fill(dem[isl])
+        if 'MT' in s and s['MT'].notna().any():
+            out['SI']['tiwai'] = fill(s['MT'])
     # HVDC transfer: metered where the state has it (history, once EMI publishes HVDC_Flows), otherwise estimated
     # from the island balances (the dispatch feed has no HVDC row). NI gets what arrives at Haywards, the SI gives
     # what leaves Benmore; the headline figure is the mid-link transfer.
@@ -171,17 +239,38 @@ def assemble(s, full, roof, log=print):
     if nodes:
         js['nodes'] = {k: enc_na(v) for k, v in nodes.items()}
 
+    # nameplate MW for plants seen only in metered data: the most the register ever had installed at once
+    plant_cap = plant_capacity() if metered is not None else {}
+    if metered is not None:
+        import metered as mt
+        plant_cap.update({p: c for p, c in mt.capacities().items() if p not in plant_cap})
     plants = []
     for (pname, f, isl), us in plant_units.items():
-        us = {k: fill(v) for k, v in us.items()}
+        us = {k: fill_plant(v) for k, v in us.items()}
         total = sum(us.values())
         if total.abs().max() < 0.5:
             continue
         caps = [cap[tuple(k.split(' '))] for k in us if tuple(k.split(' ')) in cap]
         pocs = sorted({k.split(' ')[0] for k in us})
-        entry = {'name': pname, 'fuel': f, 'isl': isl, 'poc': pocs, 'cap': round(sum(caps)) if caps else None, 's': enc(total)}
-        if len(pocs) > 1:  # a plant on more than one bus (Arapuni, Roxburgh) can be split by grid connection
-            entry['units'] = [{'name': k, 'cap': cap.get(tuple(k.split(' '))), 's': enc(us[k])} for k in sorted(us)]
+        pcap = round(sum(caps)) if caps else (round(plant_cap[pname]) if pname in plant_cap else None)
+        entry = {'name': pname, 'fuel': f, 'isl': isl, 'poc': pocs, 'cap': pcap, 's': enc(total)}
+        if pname in group_names:
+            # a station shown as one plant: its register plants as units; metered output (station total) as one
+            by = {}
+            for k, v in us.items():
+                m = member_of.get(k, 'All units') if ' ' in k else 'All units'
+                by.setdefault(m, []).append((k, v))
+            entry['units'] = [{'name': m if m != 'All units' else f'{pname} (all units)', 'label': m,
+                               'cap': (sum(cap.get(tuple(k.split(' ')), 0) for k, _ in kv) or None) if m != 'All units' else pcap,
+                               's': enc(sum(v for _, v in kv))} for m, kv in sorted(by.items())]
+        elif len(pocs) > 1:  # a plant on more than one bus (Arapuni, Roxburgh) can be split by grid connection
+            by = {}
+            for k, v in us.items():
+                by.setdefault(k.split(' ')[0], []).append((k, v))
+            # each connection's nameplate: the register units this plant has there (present or not)
+            conn_cap = lambda poc: sum(c for (p, u), c in cap.items() if p == poc and groups.get(names.get((p, u)), names.get((p, u))) == pname)
+            entry['units'] = [{'name': poc, 'cap': round(conn_cap(poc)) or None,
+                               's': enc(sum(v for _, v in kv))} for poc, kv in sorted(by.items())]
         plants.append(entry)
     plants.sort(key=lambda p: (p['fuel'], -sum(p['s'])))
     js['plants'] = plants

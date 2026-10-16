@@ -89,7 +89,7 @@
 		<section class="hero" aria-labelledby="home-h">
 			<div>
 				<h1 id="home-h">New Zealand's electricity, right now</h1>
-				<p class="lede"><a href="/tracker">Open the tracker</a> for history back to 2020.</p>
+				<p class="lede"><a href="/tracker">Open the tracker</a> for history back to 1997.</p>
 			</div>
 			<div class="status">
 				{#if error}

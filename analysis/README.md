@@ -137,3 +137,42 @@ burned for generation, and generation emissions. 24 quarters, FY21 Q1 (Jul–Sep
   mill as Bioenergy; Glenbrook (NZ Steel, waste gas from the ironmaking kilns; two of four kilns replaced by the arc
   furnace in Aug 2026) as zero-emission waste heat (UN CDM ACM0004 counts waste-gas generation as zero; the
   ironmaking emissions sit in industrial processes). Both are 'gas' in the EA register.
+
+## Metered history (`metered_check.py`, BUILD 6, 16 Oct 2026)
+
+History back to Aug 1997 comes from the EA's metering (`ingest/metered.py`, `facilities/metered_plants.csv`); the daily
+dispatch files (from 10 Sep 2020) cover the weeks since the latest published month and fill what the metering lacks.
+
+**Overlap, Sep 2020 - Sep 2026 (73 months).** Generation_MD against the site's dispatch history, matched by connection
+point: half-hourly national correlation 0.999 every month; dispatch energy 1-2% above metered every year (by fuel:
+wind +3-4%, hydro +1-2%, geothermal within ±2%, gas and coal within 2%), most likely dispatch MW at the generator
+against metering at the grid connection. Plant level: some embedded points are metered net of local load in
+Generation_MD (Mangahao ~10% of dispatch, Cobb ~35%, Whareroa ~50%); `Embedded_generation` at those points matches
+dispatch within ~1% (Mangahao 12.4 vs 12.3 GWh, Sep 2026; Te Huka 3 26.7 vs 27.2; Omeheu + Rangitaiki 8.6 vs 8.7), so
+where an embedded meter reads more than Generation_MD at a listed point the difference goes to that point's plant.
+Waikato stations correlate only 0.4-0.7 by half-hour: the chain is block dispatched (the owner's note), so a station's
+dispatch isn't its output. Glenbrook's Generation_MD is ~1.45 × dispatch (dispatch sees part of the plant).
+
+**Data quirks.** Generation_MD covers embedded stations only from Jan 2009; before that they are in
+`Embedded_generation` (Oct 1998 on, most from Apr 1999) under old codes, only those the tracker shows later being
+used (so totals don't jump in 2009). Trustpower's embedded meters (Kaimai, Rotokawa, Tararua, Highbank, Paerau,
+Waipori, Teviot) read double until Jul 2005 (peaks at twice nameplate; halved where a month's peak exceeds 1.4 ×
+`max_mw`). `Grid_import` starts Oct 2000 and until ~2003 covered only local networks' injections (~240 MW against
+~4,200 MW of generation), so Generation_MD stands in for connection points it lacks. Generation_MD's `patea_unit_1/2/3`
+rows (Jun 2026 on) each repeat the station total; `kawerau_(topp2)` covers Te Ahi O Maui too (split 35/65 from Dec
+2025); WPG0331 is Deep Stream hydro and Mahinerangi wind together (split 30/70 from Jun 2011, their 2020-26 dispatch
+shares). Gaps: Huntly's Rankines and unit 5 have no Generation_MD rows for Sep 2020 (dispatch fills from 10 Sep, so
+1-9 Sep 2020 have no Huntly), Matahina none from Oct 2021 (dispatch fills).
+
+**Against MBIE's annual net generation** (Energy in New Zealand; MBIE also counts industrial cogeneration and small
+embedded plant the EA's metering doesn't see): total 1.4-3.2% below MBIE 2000-08 and 3.9-5.7% below 2009-19; hydro
+1.3-2.9% below throughout; geothermal within ±5% from 2001 (1998-2000 lack Rotokawa, Ngāwhā and Mokai before their
+meters start, up to 15% below); thermal 6-15% below (MBIE counts Glenbrook as coal and more cogeneration). The ~2%
+step in 2009 is in MBIE's thermal and geothermal series, not in the tracker's hydro or wind.
+
+**Emissions** (site factors, emissions.js) against the national inventory's "energy industries" (which also holds
+refining and gas processing, ~1.2 Mt): tracker coal + gas + diesel 4.4 Mt in 1998 against 5.6 - 1.2; 6.8 against 8.0 -
+1.2 in 2001; 8.8 against 10.3 - 1.2 in 2005; 8.2 against 9.7 - 1.2 in 2008; 5.3 against 6.9 - 1.2 in 2010. The year-to-
+year pattern matches (the 2001 and 2005-06 peaks, the 2007 dip, the 2011 low). Rankine coal share before FY21: MBIE
+quarterly generation from coal less Glenbrook's metered output, over the Rankines' metered output; over FY21-FY25 it
+reproduces Genesis's figures to a few points in most quarters (FY23 Q1 24 against 24 GWh of coal, FY24 Q1 201 against 200).

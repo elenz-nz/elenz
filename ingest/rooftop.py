@@ -212,6 +212,34 @@ def satellite(get, start=None, end=None, past_hours=None):
     return df.dropna(how='all')
 
 
+REANALYSIS = 'https://archive-api.open-meteo.com/v1/archive'
+SATELLITE_FROM = pd.Timestamp('2016-01-01', tz='UTC')   # Himawari archive start (blank before)
+
+
+def reanalysis(get, start, end):
+    """Hourly ERA5 reanalysis GHI and diffuse (W/m², Open-Meteo Historical Weather API) for every point, spread over
+    10-minute slots in the satellite layout (G|<point>, D|<point>, indexed by slot midpoints, UTC): the history's
+    embedded solar before the satellite archive starts (2013-15, when there were 6-40 MW of it). Coarser than the
+    satellite (hourly, ~30 km): fine for daily and monthly totals, smoother within the day."""
+    pts, _ = points()
+    lat = ','.join(str(p[2]) for p in pts)
+    lon = ','.join(str(p[3]) for p in pts)
+    q = (f'{REANALYSIS}?latitude={lat}&longitude={lon}&hourly=shortwave_radiation,diffuse_radiation'
+         f'&models=era5_seamless&timezone=GMT&start_date={start}&end_date={end}')
+    locs = json.loads(get(q))
+    if isinstance(locs, dict):
+        locs = [locs]
+    t = pd.DatetimeIndex(pd.to_datetime(locs[0]['hourly']['time'])).tz_localize('UTC')
+    # each hourly value is the mean of the hour before it: give it to that hour's six 10-minute slots
+    slots = pd.DatetimeIndex(np.concatenate([t - pd.Timedelta(minutes=55 - 10 * k) for k in range(6)])).sort_values()
+    cols = {}
+    for p, l in zip(pts, locs):
+        for key, c in (('shortwave_radiation', 'G'), ('diffuse_radiation', 'D')):
+            hourly = pd.Series(l['hourly'][key], index=t, dtype=float)
+            cols[f'{c}|{p[0]}'] = hourly.reindex(slots.ceil('h')).set_axis(slots)
+    return pd.DataFrame(cols).dropna(how='all')
+
+
 def fill_gaps(irr):
     """Satellite values come back blank while the sun is low (until it is roughly 10° up) and for a couple of
     Himawari housekeeping slots a day. Fill them from the clear-sky index (cloudiness) of the nearest valid values

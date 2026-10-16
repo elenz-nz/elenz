@@ -1,11 +1,15 @@
-"""History: half-hourly generation, prices and demand since 10 September 2020, from the EA's daily dispatch files.
+"""History: half-hourly generation, prices and demand since 1 August 1997, from the EA's metered data and daily
+dispatch files.
 
-The daily NodalPricesAndVolumes files (the same RTD cases as the live feed) start on 10 Sep 2020 and arrive
-1-4 days late. Each run fetches any published days that aren't stored yet, oldest first, within a time budget,
-so the first run backfills everything and later runs add the newest days.
+Every month the EA has published metering for (Generation_MD and friends, ~5-6 weeks after the month; metered.py)
+uses metered generation and demand, back to Aug 1997. The daily NodalPricesAndVolumes files (the same RTD cases as
+the live feed) start on 10 Sep 2020 and arrive 1-4 days late: they cover the weeks since the latest metered month and
+fill in plants the metering lacks. Each run fetches anything published that isn't stored yet, oldest first, within a
+time budget and the day's KV write allowance, so the first run starts a backfill that later runs finish.
 
 Stored (Cloudflare KV in GitHub Actions, data/store locally), one set per NZ calendar month:
-  hist/state/YYYY-MM.csv.gz  half-hourly compact state: unit MW, island load, Tiwai, reference prices (state.py
+  hist/state/YYYY-MM.csv.gz  half-hourly compact state: the metered columns (metered.py: M|, E|, X|, I|, J|, MT, mg,
+                             me) where published, and from Sep 2020 unit MW, island load, Tiwai, reference prices (state.py
                              columns averaged over each trading period), n = 5-minute intervals present (0-6),
                              G|<point>, D|<point> = satellite global and diffuse irradiance (W/m², Open-Meteo,
                              Himawari) at each rooftop solar point (facilities/rooftop_points.csv),
@@ -57,6 +61,7 @@ import numpy as np
 import pandas as pd
 
 import hvdc
+import metered as mt
 import rooftop
 import state as st
 from build_tracker import assemble, enc, enc_na
@@ -68,12 +73,16 @@ warnings.simplefilter("ignore", pd.errors.PerformanceWarning)  # wide monthly fr
 FINAL = 'Datasets/Wholesale/DispatchAndPricing/FinalEnergyPrices'
 HVDC_FLOWS = 'Datasets/Wholesale/Metered_data/HVDC_Flows'
 
-BUILD = 5                    # bump to rebuild every month's JSON after changing how it is built (2: final prices, 3: peak generation,
+BUILD = 6                    # bump to rebuild every month's JSON after changing how it is built (2: final prices, 3: peak generation,
                              # 4: satellite rooftop solar model by point, metered HVDC; 5: more price nodes, daily price
-                             # spread and revenue by fuel, bioenergy and waste heat)
+                             # spread and revenue by fuel, bioenergy and waste heat; 6: metered history back to Aug 1997,
+                             # metered generation wherever published, plant groups)
 GEN_FUELS = ('geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
 WRITE_BUDGET = 280           # KV writes a day (UTC) for this job; the live job needs ~600 of the 1,000
-FIRST_DAY = date(2020, 9, 10)
+FIRST_DAY = date(2020, 9, 10)  # first daily dispatch file
+FIRST_MONTH = mt.FIRST_MONTH   # first month of metered history (Generation_MD): Aug 1997
+ROOF_FROM = pd.Timestamp('2013-08-01', tz=NZ).tz_convert('UTC')   # embedded solar: the registry's first month
+METERED_WAIT = 100           # days after a month ends before its metered data must be there for the month to be done
 IRR_MONTHS_PER_RUN = 20      # months of missing satellite irradiance fetched per run (~100 Open-Meteo calls each)
 STEP = pd.Timedelta(minutes=30)
 WORKERS = 6
@@ -122,19 +131,39 @@ def irr_cols():
 
 def irradiance(start, end):
     """Satellite irradiance (G|<point>, D|<point>, W/m²) averaged over each trading period from start to end (UTC
-    period starts). Periods the service couldn't supply (outage, rate limit, or too recent) are NaN and are fetched
-    again on later runs (see main)."""
+    period starts): Himawari from 2016, ERA5 reanalysis before (rooftop.reanalysis), none before embedded solar's
+    registry starts (Aug 2013). Periods the service couldn't supply (outage, rate limit, or too recent) are NaN and
+    are fetched again on later runs (see main)."""
     tps = pd.date_range(start, end, freq='30min')
+    blank = pd.DataFrame(np.nan, index=pd.DatetimeIndex(tps, name='t'), columns=irr_cols())
+    if end < ROOF_FROM:
+        return blank
+    start = max(start, ROOF_FROM)
     today = pd.Timestamp.now(tz='UTC').date()
-    d0, d1 = start.date(), min(end.date(), today)
-    try:
-        sat = rooftop.satellite(get, d0, d1)
-    except Exception as e:
-        print(f'  irradiance: satellite service unavailable for {d0}..{d1} ({e})')
-        return pd.DataFrame(np.nan, index=pd.DatetimeIndex(tps, name='t'), columns=irr_cols())
-    out = rooftop.half_hourly(sat, tps).reindex(columns=irr_cols())
+    parts = []
+    sat_from = rooftop.SATELLITE_FROM
+    for a, b, fn, label in ((start, min(end, sat_from - STEP), rooftop.reanalysis, 'reanalysis'),
+                            (max(start, sat_from), end, rooftop.satellite, 'satellite')):
+        if a > b:
+            continue
+        d0, d1 = a.date(), min(b.date(), today)
+        try:
+            parts.append(fn(get, d0, d1))
+        except Exception as e:
+            print(f'  irradiance: {label} service unavailable for {d0}..{d1} ({e})')
+    if not parts:
+        return blank
+    out = rooftop.half_hourly(pd.concat(parts).sort_index(), tps).reindex(columns=irr_cols())
     out.index.name = 't'
     return out
+
+
+def irr_missing(s, icols, before=None):
+    """Trading periods (from ROOF_FROM on, and before `before` if given) missing irradiance at any point."""
+    keep = s.index >= ROOF_FROM
+    if before is not None:
+        keep &= s.index < before
+    return s.index[keep & s[icols].isna().any(axis=1).values]
 
 
 def solar_capacity(store):
@@ -257,17 +286,23 @@ def add_final(s, m):
 # ---------- one month: state -> tracker-layout JSON and daily summary ----------
 
 def build_month(s, month, cap, log):
-    """Half-hourly state for one month -> (hh JSON, dd JSON)."""
+    """Half-hourly state for one month -> (hh JSON, dd JSON). Metered generation and demand wherever the month has
+    metered data (metered.py; dispatch fills in what the metering lacks), dispatch data otherwise."""
     s = s.sort_index()
-    have = s.index[s.n > 0]
+    if 'n' not in s:
+        s['n'] = np.nan
+    m0 = date.fromisoformat(month + '-01')
+    met = mt.complete(s, m0)
+    n_ok = s['n'].fillna(0) > 0
+    have = s.index[n_ok | (s['mg'] == 1)] if met else s.index[n_ok]
     full = pd.date_range(have.min(), have.max(), freq='30min')
     g = s.reindex(full).copy()
-    g['src'] = np.where(g.n > 0, 'file', None)
+    g['src'] = np.where((g['n'].fillna(0) > 0) | ((g['mg'] == 1) if met else False), 'file', None)
     final = pd.Series(False, index=full)
     if 'F|NI' in g:
         # final prices where published; dispatch prices only for trading periods not yet priced
         for isl in ('NI', 'SI'):
-            g[f'P|{isl}'] = g[f'F|{isl}'].combine_first(g[f'P|{isl}'])
+            g[f'P|{isl}'] = g[f'F|{isl}'].combine_first(g[f'P|{isl}']) if f'P|{isl}' in g else g[f'F|{isl}']
         final = g['F|NI'].notna() & (g['fi'] != 1)
     for k in overrides().get('price_nodes', {}):   # the other nodes: final prices (dispatch only for WKM2201)
         if f'F|{k}' in g:
@@ -275,13 +310,15 @@ def build_month(s, month, cap, log):
     irr = g.reindex(columns=irr_cols()).interpolate(limit_area='inside', limit=2)
     roof = rooftop.output(irr.set_axis(full + pd.Timedelta(minutes=15)), full + pd.Timedelta(minutes=15), cap)
     roof = {k: pd.Series(v.values, index=full) for k, v in roof.items()}
-    js = assemble(g, full, roof, log)
+    gen = mt.generation(g, month, log) if met else None
+    js = assemble(g, full, roof, log, metered=gen)
     hv_ok = g['H|BEN'].notna() if 'H|BEN' in g else pd.Series(False, index=full)
-    n = g.n.fillna(0)
+    n = g['n'].fillna(0)
     js['meta'] = {'month': month, 'intervals': int((n > 0).sum()), 'expected': len(full),
                   'five_min': round(float(n.sum() / (6 * len(full))), 4), 'roof_mw': cap_total(cap, month),
                   'hvdc_metered': round(float(hv_ok.mean()), 4),
                   'final_prices': round(float(final.mean()), 4),
+                  'source': 'metered' if met else 'dispatch',
                   'end': js['t0'] + (len(full) - 1) * js['step']}
     return js, daily(js, month)
 
@@ -403,6 +440,24 @@ def month_days(m, last_day):
         d += timedelta(days=1)
 
 
+def dispatch_days(s):
+    """NZ dates with dispatch data in a month's state (none for months before Sep 2020)."""
+    if s is None or 'n' not in s:
+        return set()
+    return set(s.index[s['n'].fillna(0) > 0].tz_convert(NZ).date)
+
+
+METERED_COLS = ('M|', 'E|', 'X|', 'I|', 'J|')
+
+
+def merge_metered(s, mf):
+    """A month's state with its metered columns replaced by a newly fetched set (rows the dispatch data lacks are added)."""
+    if s is None:
+        return mf.sort_index()
+    old = [c for c in s.columns if c[:2] in METERED_COLS or c in ('MT', 'mg', 'me')]
+    return s.drop(columns=old).join(mf, how='outer').sort_index()
+
+
 # overrides.toml tables only the website uses (plant_meta.py): editing them doesn't rebuild history
 SITE_ONLY = ('owners', 'plant_owners', 'hydro_schemes')
 
@@ -411,7 +466,8 @@ def mapping_hash():
     """Fingerprint of everything history months are built from; a change rebuilds every month."""
     from common import overrides
     h = hashlib.sha256(f'build {BUILD}'.encode())
-    for f in ('plant_register.csv', 'connection_points.csv', 'rooftop_points.csv', 'rooftop_nsp.csv'):
+    for f in ('plant_register.csv', 'connection_points.csv', 'rooftop_points.csv', 'rooftop_nsp.csv',
+              'metered_plants.csv', 'metered_islands.csv'):
         with open(os.path.join(FACILITIES, f), 'rb') as fh:
             h.update(fh.read())
     o = {k: v for k, v in overrides().items() if k not in SITE_ONLY}
@@ -485,7 +541,7 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
     repairs = 0
     icols = irr_cols()
 
-    for m in months_between(start or FIRST_DAY, yesterday):
+    for m in months_between(start or FIRST_MONTH, yesterday):
         month = f'{m:%Y-%m}'
         key = f'hist/state/{month}.csv.gz'
         rc = cap_total(cap, month)
@@ -500,7 +556,9 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
             stopped = f'daily KV write allowance used at {month}'
             continue
         s = load_state(store, key)
-        have_days = set(s.index.tz_convert(NZ).date) if s is not None else set()
+        nxt = date(m.year + (m.month == 12), m.month % 12 + 1, 1)
+        month_last = min(nxt - timedelta(days=1), yesterday)
+        have_days = dispatch_days(s)
         todo = [d for d in month_days(m, yesterday) if d not in have_days]
         new = []
         if todo:
@@ -509,7 +567,17 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
         if new:
             add = pd.concat(new).sort_index()
             add = add.join(irradiance(add.index.min(), add.index.max()))
+            if s is not None:
+                keep = [c for c in s.columns if c not in add.columns]   # metered columns stay with their rows
+                add = add.join(s.loc[s.index.isin(add.index), keep])
             s = add if s is None else pd.concat([s[~s.index.isin(add.index)], add]).sort_index()
+        # metered data (Generation_MD and friends), once the EA publishes the month; fetched again until complete
+        got_m = False
+        if not mt.complete(s, m):
+            mf = mt.fetch_month(get, m, log)
+            if mf is not None:
+                s = merge_metered(s, mf)
+                got_m = True
         if s is None or s.empty:
             continue
         dropped = [c for c in ('R|NI', 'R|SI') if c in s]   # BUILD 3's island-weighted reanalysis irradiance
@@ -517,48 +585,53 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
         for c in icols:
             if c not in s:
                 s[c] = np.nan
-        # satellite irradiance is only meaningful by day; a trading period counts as missing if any point lacks it
-        gaps = s.index[s[icols].isna().any(axis=1)]
-        last_day = list(month_days(m, yesterday))[-1:]
-        recent = bool(last_day) and last_day[0] >= yesterday - timedelta(days=30)
+        # irradiance is only meaningful by day; a trading period counts as missing if any point lacks it (and only
+        # from Aug 2013, when the embedded solar registry starts)
+        gaps = irr_missing(s, icols)
+        recent = month_last >= yesterday - timedelta(days=30)
         fixed = False
         # retry missing irradiance for recent months (the service can lag), or anywhere days of it are missing (a new
-        # point, the BUILD 4 switch); a few hours missing long ago are satellite outages and stay interpolated
+        # point, a backfill); a few hours missing long ago are outages and stay interpolated
         if len(gaps) and repairs < IRR_MONTHS_PER_RUN and ((recent and not new) or len(gaps) > 3 * 48):
-            # irradiance not stored yet (a new point, the BUILD 4 switch) or that a previous run couldn't get
             repairs += 1
             r = irradiance(gaps.min(), gaps.max())
             before = int(s[icols].isna().sum().sum())
             s.loc[gaps, icols] = r.reindex(gaps)[icols].values
             fixed = int(s[icols].isna().sum().sum()) < before
-        # days of irradiance still missing (BUILD 4 switch, beyond this run's share): leave the month for a later run
-        # rather than spend KV writes saving and rebuilding it twice
-        irr_short = int(s.loc[s.index < pd.Timestamp.now(tz='UTC') - pd.Timedelta(days=2), icols].isna().any(axis=1).sum()) > 3 * 48
-        if irr_short and month in stored and not new and not fixed:
+        # days of irradiance still missing (beyond this run's share): leave the month for a later run rather than
+        # spend KV writes saving and rebuilding it twice
+        two_days_ago = pd.Timestamp.now(tz='UTC') - pd.Timedelta(days=2)
+        irr_short = len(irr_missing(s, icols, two_days_ago)) > 3 * 48
+        if irr_short and month in stored and not new and not fixed and not got_m:
             continue
         priced = add_final(s, m)
-        metered = add_hvdc(s, m)
-        if new or fixed or priced or metered or dropped:
+        hv_metered = add_hvdc(s, m)
+        if new or fixed or priced or hv_metered or dropped or got_m:
             store.put(key, dump_state(s))
-            missing_r = int(s[icols].isna().any(axis=1).sum())
+            missing_r = len(irr_missing(s, icols))
             unpriced = int((s['F|NI'].isna() | (s['fi'] == 1)).sum())
-            log(f'{month}: +{len(new)} days ({len(todo) - len(new)} not published yet), {len(set(s.index.tz_convert(NZ).date))} days stored'
+            log(f'{month}: +{len(new)} days ({len(todo) - len(new)} not published yet), {len(dispatch_days(s))} days of dispatch data'
+                + ('; metered data' + (' (complete)' if mt.complete(s, m) else ' (part published)') if 'mg' in s else '')
                 + (f'; irradiance missing for {missing_r} trading periods' if missing_r else '')
                 + (f'; {unpriced} trading periods without final prices yet' if unpriced else '')
-                + ('; metered HVDC added' if metered else ''))
+                + ('; metered HVDC added' if hv_metered else ''))
         hv_missing = s[['H|BEN', 'H|HAY']].isna().any().any()
-        irr_missing = int(s[icols].isna().any(axis=1).sum())
-        if (last_day and last_day[0] < yesterday - timedelta(days=14)
-                and (irr_missing == 0 or (not recent and irr_missing <= 3 * 48))
+        irr_n = len(irr_missing(s, icols))
+        met_ok = mt.complete(s, m) or month_last < yesterday - timedelta(days=METERED_WAIT)
+        if (month_last < yesterday - timedelta(days=14)
+                and (irr_n == 0 or (not recent and irr_n <= 3 * 48))
                 and not s[['F|NI', 'F|SI']].isna().any().any() and not (s['fi'] == 1).any()
-                and (not hv_missing or last_day[0] < yesterday - timedelta(days=90))
-                and len(set(s.index.tz_convert(NZ).date)) == len(list(month_days(m, yesterday)))):
-            done.add(month)  # every day stored, irradiance, final prices and HVDC complete, and the month long over
+                and (not hv_missing or month_last < yesterday - timedelta(days=90))
+                and met_ok
+                and len(dispatch_days(s)) == len(list(month_days(m, yesterday)))):
+            done.add(month)  # every day stored, metering, irradiance, final prices and HVDC complete, and the month long over
         # wait for irradiance before rebuilding a month with days of it missing (except the newest two days)
-        irr_short = int(s.loc[s.index < pd.Timestamp.now(tz='UTC') - pd.Timedelta(days=2), icols].isna().any(axis=1).sum()) > 3 * 48
-        if irr_short and month in stored:
-            continue   # stays in rebuild_left: a later run fetches the irradiance, then rebuilds it
-        if new or fixed or priced or metered or month in left or month not in stored or caps_before.get(month) != rc:
+        irr_short = len(irr_missing(s, icols, two_days_ago)) > 3 * 48
+        if irr_short:
+            # stays in rebuild_left (or unbuilt): a later run fetches the irradiance, then builds it, rather than
+            # spending KV writes building it twice
+            continue
+        if new or fixed or priced or hv_metered or got_m or month in left or month not in stored or caps_before.get(month) != rc:
             hh, dd = build_month(s, month, cap, lambda *a: log(f"  {month}:", *a))
             put_json(store, f'hist/hh/{month}.json', hh)
             put_json(store, f'hist/dd/{month}.json', dd)
@@ -568,8 +641,10 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
             caps_before[month] = hh['meta']['roof_mw']
 
     months = sorted(stored)
+    # 'at': when this run saved it; the Worker's health check and the watchdog treat a stale index as expected while a
+    # rebuild is under way (rebuild_left not empty, progress saved within two days)
     progress = {'months': months, 'done': sorted(done), 'rebuild_left': sorted(left), 'hash': mhash, 'roof_mw': caps_before,
-                'writes': {today: store.used + 1}}
+                'writes': {today: store.used + 1}, 'at': int(time.time() * 1000)}
     if not changed_dd:
         # no month rebuilt, but a run can still have saved files (a month's state, the solar capacity table) or
         # finished months: record them, so the day's KV write count stays right and finished months aren't revisited

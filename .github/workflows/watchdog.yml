@@ -28,6 +28,7 @@ env:
   SITE: https://elenz.elenz.workers.dev
   LIVE_MINUTES: '30'
   HISTORY_DAYS: '5'
+  REBUILD_DAYS: '12'   # allowed while a full history rebuild is under way (see the history check below)
 
 jobs:
   check:
@@ -57,9 +58,14 @@ jobs:
             else if (now - live.meta.end > process.env.LIVE_MINUTES * 60e3)
               problems.push(`Live data is ${ago(now - live.meta.end)} old (newest interval ${nz(live.meta.end)}).`);
             const hist = await get('/data/history/index.json');
+            // while the history job rebuilds every month (months left, progress saved in the last two days), the index
+            // is republished only at the end, so it may lag up to REBUILD_DAYS
+            const prog = await get('/data/history/progress.json');
+            const rebuilding = !prog.error && prog.rebuild_left && prog.rebuild_left.length && prog.at && now - prog.at < 2 * 86400e3;
+            const histDays = rebuilding ? process.env.REBUILD_DAYS : process.env.HISTORY_DAYS;
             if (hist.error) problems.push(`The history index can't be read (${hist.error}).`);
-            else if (now - hist.end > process.env.HISTORY_DAYS * 86400e3)
-              problems.push(`History is ${ago(now - hist.end)} behind (newest half-hour ${nz(hist.end)}).`);
+            else if (now - hist.end > histDays * 86400e3)
+              problems.push(`History is ${ago(now - hist.end)} behind (newest half-hour ${nz(hist.end)})${rebuilding ? `, with ${prog.rebuild_left.length} months still to rebuild` : ''}.`);
             const status = await get('/data/status.json');
             if (!status.error) {
               if (status.result !== 'ok') problems.push(`The Worker couldn't start the live job: ${status.result}`);

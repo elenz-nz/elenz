@@ -12,9 +12,39 @@
 const RANKINE_HEAT_RATE = 11.2;     // GJ per MWh
 const COAL = 91.8, GAS = 54.1;      // kg CO₂e per GJ
 
-// Genesis performance reports: share of Huntly Rankine fuel that was coal, by Genesis financial quarter
-// (FY ends 30 June: FY21 Q1 = Jul–Sep 2020). Add each new quarter as Genesis reports it (about 3 weeks after it ends).
-export const RANKINE_COAL_SHARE = [
+// Share of Huntly Rankine fuel that was coal, by Genesis financial quarter (FY ends 30 June: FY21 Q1 = Jul–Sep 2020).
+// From FY21: Genesis performance reports. Add each new quarter as Genesis reports it (about 3 weeks after it ends).
+// Before FY21 (the metered history, from Aug 1997) Genesis's reports aren't used: the share is derived from MBIE's
+// quarterly electricity generation from coal (Energy in New Zealand, electricity data tables, sheet 1) less Glenbrook's
+// metered output (MBIE counts Glenbrook's cogeneration, on gases from NZ Steel's coal-fed ironmaking, as coal), over the
+// Rankines' metered output (Generation_MD). Over FY21-FY25 this reproduces Genesis's own figures to within a few
+// points in most quarters. Quarters with under 100 GWh of Rankine output keep the quarter before's share.
+const RANKINE_COAL_SHARE_MBIE = [
+  ['FY98 Q1', 0.48], ['FY98 Q2', 0.57], ['FY98 Q3', 0.49], ['FY98 Q4', 0.56],
+  ['FY99 Q1', 0.72], ['FY99 Q2', 0.72], ['FY99 Q3', 0.25], ['FY99 Q4', 0.37],
+  ['FY00 Q1', 0.37], ['FY00 Q2', 0.32], ['FY00 Q3', 0.31], ['FY00 Q4', 0.27],
+  ['FY01 Q1', 0.19], ['FY01 Q2', 0.10], ['FY01 Q3', 0.19], ['FY01 Q4', 0.21],
+  ['FY02 Q1', 0.28], ['FY02 Q2', 0.28], ['FY02 Q3', 0.27], ['FY02 Q4', 0.28],
+  ['FY03 Q1', 0.20], ['FY03 Q2', 0.39], ['FY03 Q3', 0.56], ['FY03 Q4', 0.53],
+  ['FY04 Q1', 0.54], ['FY04 Q2', 0.70], ['FY04 Q3', 0.67], ['FY04 Q4', 0.81],
+  ['FY05 Q1', 0.81], ['FY05 Q2', 0.76], ['FY05 Q3', 0.63], ['FY05 Q4', 0.83],
+  ['FY06 Q1', 0.84], ['FY06 Q2', 0.82], ['FY06 Q3', 0.77], ['FY06 Q4', 0.77],
+  ['FY07 Q1', 0.78], ['FY07 Q2', 0.68], ['FY07 Q3', 0.49], ['FY07 Q4', 0.54],
+  ['FY08 Q1', 0.47], ['FY08 Q2', 0.50], ['FY08 Q3', 0.88], ['FY08 Q4', 0.85],
+  ['FY09 Q1', 0.82], ['FY09 Q2', 0.64], ['FY09 Q3', 0.82], ['FY09 Q4', 0.90],
+  ['FY10 Q1', 0.92], ['FY10 Q2', 0.66], ['FY10 Q3', 0.68], ['FY10 Q4', 0.37],
+  ['FY11 Q1', 0.38], ['FY11 Q2', 0.60], ['FY11 Q3', 0.72], ['FY11 Q4', 0.65],
+  ['FY12 Q1', 0.90], ['FY12 Q2', 0.89], ['FY12 Q3', 0.98], ['FY12 Q4', 0.97],
+  ['FY13 Q1', 0.95], ['FY13 Q2', 0.89], ['FY13 Q3', 0.92], ['FY13 Q4', 0.91],
+  ['FY14 Q1', 0.80], ['FY14 Q2', 0.28], ['FY14 Q3', 0.78], ['FY14 Q4', 0.87],
+  ['FY15 Q1', 0.89], ['FY15 Q2', 1.00], ['FY15 Q3', 0.97], ['FY15 Q4', 1.00],
+  ['FY16 Q1', 0.76], ['FY16 Q2', 0.81], ['FY16 Q3', 0.59], ['FY16 Q4', 0.55],
+  ['FY17 Q1', 0.55], ['FY17 Q2', 0.23], ['FY17 Q3', 0.23], ['FY17 Q4', 0.52],
+  ['FY18 Q1', 0.65], ['FY18 Q2', 0.60], ['FY18 Q3', 0.60], ['FY18 Q4', 0.76],
+  ['FY19 Q1', 0.87], ['FY19 Q2', 0.84], ['FY19 Q3', 0.94], ['FY19 Q4', 0.81],
+  ['FY20 Q1', 0.95], ['FY20 Q2', 0.93], ['FY20 Q3', 0.79], ['FY20 Q4', 0.59],
+];
+const RANKINE_COAL_SHARE_GENESIS = [
   ['FY21 Q1', 0.95], ['FY21 Q2', 0.90], ['FY21 Q3', 0.99], ['FY21 Q4', 0.96],
   ['FY22 Q1', 0.87], ['FY22 Q2', 0.29], ['FY22 Q3', 0.86], ['FY22 Q4', 0.93],
   ['FY23 Q1', 0.15], ['FY23 Q2', 0.13], ['FY23 Q3', 0.43], ['FY23 Q4', 0.11],
@@ -22,12 +52,13 @@ export const RANKINE_COAL_SHARE = [
   ['FY25 Q1', 0.91], ['FY25 Q2', 0.21], ['FY25 Q3', 0.91], ['FY25 Q4', 0.95],
   ['FY26 Q1', 0.88], ['FY26 Q2', 0.14], ['FY26 Q3', 0.28], ['FY26 Q4', 0.24],
 ];
+export const RANKINE_COAL_SHARE = [...RANKINE_COAL_SHARE_MBIE, ...RANKINE_COAL_SHARE_GENESIS];
 
 export const rankineFactor = (coalShare) => (RANKINE_HEAT_RATE * (coalShare * COAL + (1 - coalShare) * GAS)) / 1000;
 
 // each quarter's start as a timestamp (NZ midnight, near enough: 12:00 UTC the day before) and its Rankine factor
 const STEPS = RANKINE_COAL_SHARE.map(([q, s]) => {
-  const fy = 2000 + Number(q.slice(2, 4)), n = Number(q.slice(-1));
+  const yy = Number(q.slice(2, 4)), fy = (yy >= 90 ? 1900 : 2000) + yy, n = Number(q.slice(-1));   // FY98 = year to June 1998
   const month = (6 + 3 * (n - 1)) % 12, year = n <= 2 ? fy - 1 : fy;   // Q1 Jul, Q2 Oct, Q3 Jan, Q4 Apr
   return [Date.UTC(year, month, 1) - 12 * 3600e3, rankineFactor(s)];
 });
@@ -88,6 +119,8 @@ const GEO_PLANT = {
   'Te Huka': 'te_huka', 'Te Huka 3': 'te_huka_3', 'Tauhara': 'tauhara', 'Rotokawa': 'rotokawa',
   'Nga Awa Pūrua': 'nga_awa_purua', 'Mokai': 'mokai', 'Ngā Tamariki': 'ngatamariki', 'Kawerau': 'kawerau_kgl',
   'Kawerau (Te Ahi O Maui)': 'te_ahi_o_maui', 'Kawerau (TOPP2)': 'topp2', 'Ngāwhā B': 'ngawha_oec4',
+  // names since BUILD 6 (Oct 2026): stations the metered history sees whole (overrides.toml [plant_groups], [plant_names])
+  'Te Mihi': 'te_mihi', 'Ngāwhā': 'ngawha_oec4',
   'Carter Holt Harvey Energy Ltd CoGen': 'kawerau_mill', 'Norske Skog CoGen': 'kawerau_mill',
 };
 
@@ -109,12 +142,41 @@ export function geoEf(name, t) {
   return ef;
 }
 
-/** Generation-weighted geothermal factor at index i of a set of plant series (plants with fuel 'geo'), or null. */
-export function geoFactor(plants, i, t) {
+// ---------- gas ----------
+// The gas fleet factor, 0.46, is the generation-weighted average of today's fleet. The metered history (back to 1997)
+// also has plants that have closed, much more or less efficient than that; they get factors from their typical heat
+// rates at 54.1 kg CO₂e/GJ (estimates, not reported figures): combined cycle ~7.4 GJ/MWh, conventional steam and
+// open-cycle turbines ~11-11.5.
+const GAS_FLEET = 0.46;
+const GAS_PLANT = {
+  'Otahuhu B': 0.40,       // combined cycle, 1999-2015
+  'New Plymouth': 0.60,    // steam, gas and some oil, to 2008
+  'Otahuhu A': 0.62,       // open-cycle turbines
+  'Southdown': 0.45,       // combined cycle, to 2016
+  'Te Awamutu': 0.45,      // dairy factory cogeneration, to 2007
+};
+const TCC_END = Date.UTC(2022, 5, 1);   // Taranaki Combined Cycle (in 'Stratford' with the peakers) closed mid-2022
+const STRATFORD_TCC = 0.40;
+
+/** Gas factor (t CO₂e/MWh) for a plant at time t: a closed plant's own, otherwise the fleet average. */
+export function gasEf(name, t) {
+  if (name === 'Stratford' && t < TCC_END) return STRATFORD_TCC;
+  return GAS_PLANT[name] ?? GAS_FLEET;
+}
+
+/** A plant's own factor for fuels that vary by plant (geothermal, gas), or null for the others. */
+export const plantEf = (fuel, name, t) => (fuel === 'geo' ? geoEf(name, t) : fuel === 'gas' ? gasEf(name, t) : null);
+export const BY_PLANT = ['geo', 'gas'];
+
+/** Generation-weighted factor of a fuel at index i of a set of plant series (plants with that fuel), or null. */
+export function plantFactor(fuel, plants, i, t) {
   let mw = 0, em = 0;
   for (const p of plants) {
     const x = p.s[i];
-    if (x > 0) { mw += x; em += x * geoEf(p.name, t); }
+    if (x > 0) { mw += x; em += x * plantEf(fuel, p.name, t); }
   }
   return mw > 0 ? em / mw : null;
 }
+
+/** Generation-weighted geothermal factor at index i of a set of plant series (plants with fuel 'geo'), or null. */
+export const geoFactor = (plants, i, t) => plantFactor('geo', plants, i, t);

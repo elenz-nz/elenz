@@ -125,7 +125,7 @@
 
 <svelte:head>
 	<title>Tracker · ELENZ</title>
-	<meta name="description" content="New Zealand's electricity generation by fuel, plant, owner or hydro scheme, with wholesale prices, demand, HVDC transfer and emissions, from the last 24 hours back to 2020." />
+	<meta name="description" content="New Zealand's electricity generation by fuel, plant, owner or hydro scheme, with wholesale prices, demand, HVDC transfer and emissions, from the last 24 hours back to 1997." />
 </svelte:head>
 
 <div class="wrap">
@@ -149,7 +149,7 @@
 				<button type="button" data-v="7d" title="7 days">7D</button>
 				<button type="button" data-v="30d" title="30 days">30D</button>
 				<button type="button" data-v="1y" title="1 year">1Y</button>
-				<button type="button" data-v="all" title="All history, from September 2020">ALL</button>
+				<button type="button" data-v="all" title="All history, from August 1997">ALL</button>
 			</div>
 		</div>
 		<div class="ctl">

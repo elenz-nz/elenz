@@ -36,16 +36,32 @@ def ends(mid):
 
 def parse_metered(raw):
     """An HVDC_Flows monthly CSV -> half-hourly MW northward at each end: columns H|BEN (leaving the SI at Benmore)
-    and H|HAY (arriving in the NI at Haywards), indexed by trading period start (UTC)."""
-    x = pd.read_csv(io.BytesIO(raw))
-    tps = [c for c in x.columns if c.startswith('TP')]
-    m = x.melt(id_vars=['POC', 'Flow_Direction', 'Trading_Date'], value_vars=tps, var_name='tp', value_name='kwh').dropna(subset=['kwh'])
-    m['k'] = m.tp.str[2:].astype(int)
-    midnight = pd.to_datetime(m.Trading_Date).dt.tz_localize(NZ).dt.tz_convert('UTC')
-    m['t'] = midnight + pd.to_timedelta((m.k - 1) * 30, unit='min')   # blank TP47-50 on normal days were dropped above
-    p =m.pivot_table(index='t', columns=['POC', 'Flow_Direction'], values='kwh', aggfunc='sum').fillna(0) * 2 / 1000
-    col = lambda poc, f: p[(poc, f)] if (poc, f) in p else 0.0
-    out = pd.DataFrame({'H|BEN': col('BEN2201', 'X') - col('BEN2201', 'I'), 'H|HAY': col('HAY2201', 'I') - col('HAY2201', 'X')},
-                       index=p.index)
-    out.index.name = 't'
+    and H|HAY (arriving in the NI at Haywards), indexed by trading period start (UTC).
+
+    The file's layout changed over the years: to about 1999, one row per direction at each end (HVDC_BN/BS, HVDC_HN/HS:
+    Benmore and Haywards, northward and southward, all exports); then per pole (DCP1_BN ...); from the mid-2000s, flows
+    at the Benmore and Haywards connection points (BEN2201, BEN0161, HAY2201, HAY1101; X out of the AC grid, I into it;
+    the 350 kV rows, BEN3501/HAY3501, repeat totals and are left out)."""
+    from metered import read_emi
+    m = read_emi(raw)
+    m['dir'] = m.flow_direction.str.upper()
+    end = m.poc.str.upper()
+    ben = pd.Series(0.0, index=sorted(m.t.unique()))
+    hay = ben.copy()
+    for (poc, d), g in m.groupby([end, 'dir']):
+        v = g.groupby('t').mw.sum().reindex(ben.index).fillna(0)
+        if poc.endswith('_BN'):
+            ben += v
+        elif poc.endswith('_BS'):
+            ben -= v
+        elif poc.endswith('_HN'):
+            hay += v
+        elif poc.endswith('_HS'):
+            hay -= v
+        elif poc.startswith('BEN') and not poc.endswith('3501'):
+            ben += v if d == 'X' else -v
+        elif poc.startswith('HAY') and not poc.endswith('3501'):
+            hay += v if d == 'I' else -v
+    out = pd.DataFrame({'H|BEN': ben, 'H|HAY': hay})
+    out.index = pd.DatetimeIndex(out.index, name='t')
     return out

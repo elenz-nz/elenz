@@ -49,9 +49,8 @@
 	let infoOpen = $state(false), helpOpen = $state(false);
 	let infoBtn = $state<HTMLButtonElement>(), infoBox = $state<HTMLDivElement>(), helpBtn = $state<HTMLButtonElement>();
 	let tipS = $state<{ chart: string; i: number; x: number; y: number } | null>(null); // the tooltip that follows the mouse
-	const FIRST = Date.UTC(2020, 8, 10) - 12 * 36e5; // history starts 10 Sep 2020 (NZ)
-
 	const store = historyStore();
+	const FIRST = Date.UTC(1997, 6, 31, 12); // history starts 1 Aug 1997 (NZ), the metered history's first month
 	const R = $derived(RANGES[range as keyof typeof RANGES] as { mode: string; src: string; days: number | null; ints: string[]; past?: string[]; label: string; def?: string });
 	const age = $derived(meta ? (now - meta.end) / 60000 : 0);
 	const isLive = $derived(meta !== null && age < LIVE_MINUTES);
@@ -448,7 +447,7 @@
 
 <svelte:head>
 	<title>Prices · Tracker · ELENZ</title>
-	<meta name="description" content="New Zealand wholesale electricity prices at six grid nodes, every 5 minutes: the gap between the islands, HVDC transfer, the price each fuel earned, and price ranges and spikes back to 2020." />
+	<meta name="description" content="New Zealand wholesale electricity prices at six grid nodes, every 5 minutes: the gap between the islands, HVDC transfer, the price each fuel earned, and price ranges and spikes back to 1997." />
 </svelte:head>
 
 <div class="wrap">
@@ -484,7 +483,7 @@
 			<div class="ctl">
 				<label for="p-date">{R.label} ending</label>
 				<div class="datebox">
-					<input type="date" id="p-date" value={dateValue} min="2020-09-10" max={live ? isoDay(latestT) : undefined}
+					<input type="date" id="p-date" value={dateValue} min="1997-08-01" max={live ? isoDay(latestT) : undefined}
 						title="Shows the selected range ending on this date" onchange={(e) => pickDate((e.currentTarget as HTMLInputElement).value)} />
 					{#if !atLatest}<button type="button" onclick={() => setEnd(null)}>Latest</button>{/if}
 				</div>

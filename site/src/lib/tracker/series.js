@@ -1,9 +1,9 @@
 // Time series for the tracker, from three sources merged per range:
 //   live  /data/tracker.json             the last 7 days, 5-minute (the 24 h, 3 day and 7 day views)
-//   hh    /data/history/hh/YYYY-MM.json   half-hourly months since 10 Sep 2020 (the 30-day view)
-//   day   /data/history/day.json         daily averages since 10 Sep 2020 (the 1-year and all-time views)
-// History comes from the EA's daily dispatch files, which arrive 1-4 days late, so the long views end with the live
-// week averaged to half-hours or days. Built by ingest/history.py; layout as in tracker.json, with explicit times
+//   hh    /data/history/hh/YYYY-MM.json   half-hourly months since 1 Aug 1997 (the 30-day view)
+//   day   /data/history/day.json         daily averages since 1 Aug 1997 (the 1-year and all-time views)
+// History is metered data wherever the EA has published it (about six weeks behind), then the EA's daily dispatch
+// files, which arrive 1-4 days late, so the long views end with the live week averaged to half-hours or days. Built by ingest/history.py; layout as in tracker.json, with explicit times
 // (t) and hours per point (h) where the step isn't constant.
 
 // ---------- New Zealand time (handles the NZST/NZDT change; offset cached per hour) ----------

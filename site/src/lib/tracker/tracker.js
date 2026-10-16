@@ -2,7 +2,7 @@
 // Data: tracker.json built by ingest/build_tracker.py. Drawn on <canvas>; the page supplies the markup (ids below).
 
 import { FUELS } from './fuels.js';
-import { efAt, geoEf } from './emissions.js';
+import { efAt, plantEf, BY_PLANT } from './emissions.js';
 import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTotal } from './series.js';
 import PLANT_META from './plants.json';
 import { readView, writeView } from '#lib/site/view.js';  // owner and hydro scheme per plant (ingest/plant_meta.py)
@@ -23,7 +23,7 @@ const RANGES = {
   '7d': { model: 'live', n: 2016, days: 7, label: '7 days', ints: ['5m', '30m'], past: ['30m', '1d'], span: 'Last 7 days' },
   '30d': { model: 'hh', days: 30, label: '30 days', ints: ['30m', '1d'], span: 'Last 30 days' },
   '1y': { model: 'day', days: 365, label: '1 year', ints: ['1d', '1w', '1mo'], def: '1w', span: 'Last 12 months' },
-  'all': { model: 'day', label: 'All', fixed: true, ints: ['1d', '1w', '1mo'], def: '1mo', span: null },
+  'all': { model: 'day', label: 'All', fixed: true, ints: ['1d', '1w', '1mo', '1yr'], def: '1mo', span: null },
 };
 const DAY = 864e5;
 const INTS = {
@@ -32,6 +32,7 @@ const INTS = {
   '1d': { label: 'Day', key: KEY.day },
   '1w': { label: 'Week', key: KEY.week },
   '1mo': { label: 'Month', key: KEY.month },
+  '1yr': { label: 'Year', key: KEY.year },
 };
 
 export function mountTracker(D, hooks = {}) {
@@ -178,7 +179,7 @@ export function mountTracker(D, hooks = {}) {
   // a point's name: short for the hover chip, long for the summary heading
   function chip(j) {
     const p = lp(V.t[j]);
-    return { '1d': `${DOW[p.dow]} ${p.dom} ${MON[p.mon]} ${p.y}`, '1w': `w/c ${p.dom} ${MON[p.mon]} ${p.y}`, '1mo': `${MON[p.mon]} ${p.y}` }[state.int]
+    return { '1d': `${DOW[p.dow]} ${p.dom} ${MON[p.mon]} ${p.y}`, '1w': `w/c ${p.dom} ${MON[p.mon]} ${p.y}`, '1mo': `${MON[p.mon]} ${p.y}`, '1yr': `${p.y}` }[state.int]
       || `${DOW[p.dow]} ${p.dom} ${MON[p.mon]}${state.end != null && p.y !== lp(models.live.END).y ? ' ' + p.y : ''}, ${clock(p)}`;
   }
   function heading(j) {
@@ -187,6 +188,7 @@ export function mountTracker(D, hooks = {}) {
       '1d': [`${DOW[p.dow]} ${p.dom} ${MON[p.mon]} ${p.y}`, last ? 'daily average so far' : 'daily average'],
       '1w': [`Week of ${p.dom} ${MON[p.mon]} ${p.y}`, last ? 'average for the week so far' : 'weekly average'],
       '1mo': [`${MONTH[p.mon]} ${p.y}`, last ? 'average for the month so far' : 'monthly average'],
+      '1yr': [`${p.y}`, last ? 'average for the year so far' : 'yearly average'],
     }[state.int];
     return h || [clock(p), `${dayLbl(p)} · TP ${tp(p)} · ${state.int === '5m' ? '5-minute' : 'half-hour average'}`];
   }
@@ -213,7 +215,9 @@ export function mountTracker(D, hooks = {}) {
         out.push({ j, line: true, strong: p.mon === 0, label: p.mon === 0 ? `${MON[p.mon]} ${p.y}` : MON[p.mon] });
       } else {
         if (!q || p.y === q.y) continue;
-        out.push({ j, line: true, strong: true, label: String(p.y) });
+        // the whole history spans decades: a line each year, labels every 5 years once it covers more than 12
+        const span = lp(v.t[v.n - 1]).y - lp(v.t[0]).y, every = span > 12 ? 5 : 1;
+        out.push({ j, line: true, strong: p.y % every === 0, label: p.y % every === 0 ? String(p.y) : null });
       }
     }
     return out;
@@ -249,18 +253,23 @@ export function mountTracker(D, hooks = {}) {
     v.partial = state.end == null && isLong() && n > 0 && key(M.END + 3e5) === key(v.t[n - 1]);
     v.pNI = avg(M.NIs.price); v.pSI = avg(M.SIs.price); v.hvdc = avg(M.hvdcN);
     v.marks = marks(v);
-    // geothermal: each station's own factor by year, weighted by its output (emissions.js)
-    const geo = M.plants.filter(p => p.fuel === 'geo' && (state.region === 'NZ' || p.isl === state.region));
-    const gEm = new Float64Array(M.N), gMw = new Float64Array(M.N);
-    for (const p of geo) for (let i = 0; i < M.N; i++) { const x = p.s[i]; if (x > 0) { gMw[i] += x; gEm[i] += x * geoEf(p.name, M.t[i]); } }
-    const gEmA = avg(gEm), gMwA = avg(gMw);
+    // geothermal and gas: each plant's own factor (geothermal stations by year, closed gas plants), weighted by its
+    // output (emissions.js)
+    const own = {};
+    for (const k of BY_PLANT) {
+      const ps = M.plants.filter(p => p.fuel === k && (state.region === 'NZ' || p.isl === state.region));
+      const em = new Float64Array(M.N), mw = new Float64Array(M.N);
+      for (const p of ps) for (let i = 0; i < M.N; i++) { const x = p.s[i]; if (x > 0) { mw[i] += x; em[i] += x * plantEf(k, p.name, M.t[i]); } }
+      own[k] = { em: avg(em), mw: avg(mw) };
+    }
     v.gen = new Float64Array(n); v.co2 = new Float64Array(n); v.ren = new Float64Array(n);
     for (let j = 0; j < n; j++) {
       let tot = 0, em = 0, re = 0;
       for (const f of FUELS) {
         if (f.k === 'hvdc') continue;
         const x = v.fuels[f.k][j];
-        const ef = f.k === 'geo' && gMwA[j] > 0 ? gEmA[j] / gMwA[j] : efAt(f, v.t[j]);
+        const o = own[f.k];
+        const ef = o && o.mw[j] > 0 ? o.em[j] / o.mw[j] : efAt(f, v.t[j]);
         if (x > 0) { tot += x; em += x * ef; if (f.ren) re += x; }
       }
       v.gen[j] = tot; v.co2[j] = tot ? em / tot * 1000 : 0; v.ren[j] = tot ? re / tot * 100 : 0;
@@ -279,7 +288,7 @@ export function mountTracker(D, hooks = {}) {
     const r = state.region, d = state.drill, L = [], groups = VIEWS[state.view].groups;
     if (d.plant) {
       const p = plantByName(d.plant), f = FUEL[p.fuel];
-      if (p.units) p.units.forEach((u, i) => L.push({ id: u.name, name: busLabel(u.name), tok: f.tok, shade: i, signed: !!f.signed, s: V.avg(u.s), cap: u.cap }));
+      if (p.units) p.units.forEach((u, i) => L.push({ id: u.name, name: u.label || busLabel(u.name), tok: f.tok, shade: i, signed: !!f.signed, s: V.avg(u.s), cap: u.cap }));
       else L.push({ id: p.name, name: p.name, tok: f.tok, signed: !!f.signed, s: V.avg(p.s), cap: p.cap });
     } else if (d.fuel) {
       const ps = plantsFor(d.fuel), f = FUEL[d.fuel];
@@ -829,7 +838,7 @@ export function mountTracker(D, hooks = {}) {
   const addDays = (m, k) => midnightOf(m + k * DAY + 3 * 36e5);
   const endOfToday = () => addDays(midnightOf(models.live.END), 1);
   const ymd = t => { const p = lp(t); return `${p.y}-${String(p.mon + 1).padStart(2, '0')}-${String(p.dom).padStart(2, '0')}`; };
-  const firstDay = () => history.index?.first ?? Date.UTC(2020, 8, 9, 12);
+  const firstDay = () => history.index?.first ?? Date.UTC(1997, 6, 31, 12);
   function syncControls() {
     const seg = $('seg-int'), ints = intsFor(state.range, state.kind);
     if (seg.dataset.for !== ints.join()) {  // each range offers its own intervals
@@ -1007,7 +1016,7 @@ export function mountTracker(D, hooks = {}) {
     box.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') { state.hover = null; hideTip(); render(); } });
     box.addEventListener('keydown', e => {
       if (e.target !== box) return;
-      const by = e.shiftKey ? { '5m': 12, '30m': 2, '1d': 7, '1w': 4, '1mo': 12 }[state.int] : 1;
+      const by = e.shiftKey ? { '5m': 12, '30m': 2, '1d': 7, '1w': 4, '1mo': 12, '1yr': 5 }[state.int] : 1;
       state.hoverBy = 'key';
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         e.preventDefault();

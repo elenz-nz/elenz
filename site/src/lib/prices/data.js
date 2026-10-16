@@ -241,11 +241,12 @@ export function timeTicks(t0, t1) {
     return out;
   }
   const p0 = nzParts(t0), months = span <= 400 * 864e5 ? 1 : span <= 1200 * 864e5 ? 3 : 12;
+  const years = span > 12 * 365 * 864e5 ? 5 : 1;   // the whole history spans decades: a year label every 5 years
   for (let y = p0.y, m = p0.mo; ; m++) {
     if (m > 11) { m = 0; y++; }
     const t = Date.UTC(y, m, 1) - nzOffset(Date.UTC(y, m, 1));
     if (t > t1) break;
-    if (t < t0 || m % months) continue;
+    if (t < t0 || m % months || (months === 12 && y % years)) continue;
     out.push({ t, label: months === 12 || m === 0 ? (months === 12 ? String(y) : `${MON[m]} ${y}`) : MON[m] });
   }
   return out;
