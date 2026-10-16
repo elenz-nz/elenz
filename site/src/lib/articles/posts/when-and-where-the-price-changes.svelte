@@ -62,7 +62,7 @@
 		legend={[{ name: 'North Island', tok: '--p-ni' }, { name: 'South Island', tok: '--p-si' }]} />
 </Figure>
 
-<p>Most of the cheap power is in the south, where the big hydro schemes are, and most of the demand is in the north, so the price generally rises with distance from the southern lakes. The five most expensive points over the year were all at the northern end of the grid, in Northland and on the Coromandel: Wellsford, Maungaturoto, Maungatapere, Kopu and Marsden, all at $63–65/MWh. Nelson's main grid point, Stoke, averaged $56, close to Haywards.</p>
+<p>Most of the cheap power is in the south, where the big hydro schemes are, and most of the demand is in the north, so the price generally rises with distance from the southern lakes. The five most expensive points over the year were all in the upper North Island, in Northland and on the Coromandel: Wellsford, Maungaturoto, Maungatapere, Kopu and Marsden, all at $63–65/MWh. Nelson's main grid point, Stoke, averaged $56, close to Haywards.</p>
 
 <Note title="How these figures are measured">
 	<ul>

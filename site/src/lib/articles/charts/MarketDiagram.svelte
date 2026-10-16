@@ -5,7 +5,7 @@
 	const B: Box[] = [
 		{ k: 'gen', name: 'Generators', lines: ['offer MW at a price for', 'every trading period'] },
 		{ k: 'disp', name: 'Dispatch', lines: ['Transpower runs the', 'cheapest mix every 5 min'] },
-		{ k: 'price', name: 'Spot price', lines: ['set at every grid point,', 'final the next day'], main: true },
+		{ k: 'price', name: 'Spot price', lines: ['set at every grid point,', 'final next business day'], main: true },
 		{ k: 'settle', name: 'Settlement', lines: ['generators paid and', 'retailers charged at it'] },
 		{ k: 'retail', name: 'Retailers', lines: ['buy at spot for what', 'their customers use'] },
 		{ k: 'cust', name: 'Homes and businesses', lines: ['pay tariffs set months', 'in advance'] },
