@@ -166,4 +166,6 @@
 	.mark { fill: var(--o1); }
 	.ml { fill: var(--ink); font-weight: 500; }
 	.note { fill: var(--ink-2); }
+	/* a halo in the panel colour keeps labels readable over the lines */
+	.ml, .note { paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; }
 </style>
