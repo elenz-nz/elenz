@@ -2,16 +2,14 @@
 	// A glimpse of the Now page for the landing page: the two islands with their generation rings and the HVDC link,
 	// and three of its figures.
 	import { ring } from '#lib/home/now.js';
-	import { VIEW, NI as NI_PATH, SI as SI_PATH, PTS } from '#lib/home/nzmap.js';
+	import { VIEW, NI as NI_PATH, SI as SI_PATH } from '#lib/home/nzmap.js';
+	import { RING as AT, RING_R as R, HV, HV_PATH } from '#lib/home/maplayout.js';
 
 	let { now }: { now: any; D?: any } = $props();
 
 	const fmt = (v: number) => Math.round(v).toLocaleString('en-NZ');
 	const money = (v: number) => (v < 0 ? '−$' : '$') + Math.abs(v).toLocaleString('en-NZ', { maximumFractionDigits: 0 });
-	const [bx, by] = PTS.ben, [hx, hy] = PTS.hay;
-	const HV_PATH = `M${bx},${by} C${bx + 60},${by - 40} ${hx - 40},${hy + 70} ${hx},${hy}`;
-	const R = 46, C = 2 * Math.PI * R;
-	const AT = { NI: { x: 300, y: 190 }, SI: { x: 133, y: 402 } };
+	const C = 2 * Math.PI * R;
 	const hv = $derived(now.hvdc.mid as number);
 	const dir = $derived(Math.abs(hv) < 1 ? '' : hv > 0 ? 'north' : 'south');
 </script>
@@ -27,6 +25,7 @@
 		<path class="land" d={SI_PATH} />
 		<path class="hv" d={HV_PATH} />
 		{#if dir}<path class="hv-flow {dir}" d={HV_PATH} />{/if}
+		<circle class="node" cx={HV.ben.x} cy={HV.ben.y} r="4" /><circle class="node" cx={HV.hay.x} cy={HV.hay.y} r="4" />
 		{#each [['NI', now.regions.NI], ['SI', now.regions.SI]] as [k, reg]}
 			{@const P = AT[k as 'NI' | 'SI']}
 			<g transform="translate({P.x},{P.y})">
@@ -57,7 +56,8 @@
 	@keyframes flow { to { stroke-dashoffset: -32; } }
 	@media (prefers-reduced-motion: reduce) { .hv-flow { animation: none; } }
 	.bg { fill: color-mix(in srgb, var(--surface) 82%, transparent); }
-	.seg { fill: none; stroke-width: 15; }
+	.seg { fill: none; stroke-width: 13; }
+	.node { fill: var(--surface); stroke: var(--ink-2); stroke-width: 1.5; }
 	.v { fill: var(--ink); font-family: var(--font-data); font-size: 17px; font-weight: 600; }
 	.u { fill: var(--muted); font-size: 11px; }
 	.hb { fill: color-mix(in srgb, var(--f-solar) 30%, transparent); }

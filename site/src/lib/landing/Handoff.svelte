@@ -3,7 +3,7 @@
 	//   1. lift: the hero's horizon line (HeroBackdrop, data-handoff="from") shrinks into its "now" dot;
 	//   2. fly: the dot, with a short tail, travels down the page past whatever lies between;
 	//   3. land: near the Tracker preview (TrackerPeek, data-handoff="to") the line grows back out of the dot and settles
-	//      on the top of the stack, which fills in beneath it.
+	//      on the top of the stack, which fills in beneath it; once landed, the Tracker's own outline takes over.
 	// Drawn in a fixed overlay between the two charts' positions on screen, read afresh each frame, so it starts on one
 	// and ends on the other wherever they are. Progress goes on <html>: --ho-lift (stage 1, the hero's fill fades),
 	// --ho (stage 3, the Tracker's stack fills in; 1 once landed) and data-ho while the line is away. Nothing happens
@@ -15,13 +15,10 @@
 
 	const src = $derived(horizon(D));
 	const dst = $derived(tracker(D));
-	// each point's place along the Tracker's time axis
-	const tf = $derived(src.t.map((t) => Math.min(1, Math.max(0, (t - dst.t0) / (dst.t1 - dst.t0 || 1)))));
 
 	let path = $state('');
 	let dot = $state<{ x: number; y: number } | null>(null);
 	let tail = $state<{ x: number; y: number; r: number; o: number }[]>([]);
-	let fade = $state(1); // the line fades out as it settles on the stack
 	let ink = $state(0.55); // starts as faint as the horizon line, firms up to sit on the stack
 	let show = $state(false);
 
@@ -53,8 +50,10 @@
 
 			const n = src.tot.length;
 			const P = (i: number) => ({ x: a.left + (i / Math.max(1, n - 1)) * a.width, y: a.top + (src.y(src.tot[i]) / HZ.H) * a.height });
-			const Q = (i: number) => ({ x: b.left + tf[i] * b.width, y: b.top + (dst.y(src.tot[i]) / TK.H) * b.height });
-			const pEnd = P(n - 1), qEnd = Q(n - 1);
+			// the landing points are the Tracker's own, so the line ends exactly on the outline it hands over to
+			const m = dst.tot.length;
+			const Q = (i: number) => ({ x: b.left + (i / Math.max(1, m - 1)) * b.width, y: b.top + (dst.y(dst.tot[i]) / TK.H) * b.height });
+			const pEnd = P(n - 1), qEnd = Q(m - 1);
 			// the dot's path down the page: a gentle swing out to the side and back, rather than a straight drop
 			const at = (k: number) => {
 				const m = lerp(pEnd, qEnd, k);
@@ -64,7 +63,7 @@
 			const pts: string[] = [];
 			if (kC > 0) {
 				// stage 3: grow out of the dot onto the stack
-				for (let i = 0; i < n; i++) { const p = lerp(qEnd, Q(i), kC); pts.push(`${p.x.toFixed(1)},${p.y.toFixed(1)}`); }
+				for (let i = 0; i < m; i++) { const p = lerp(qEnd, Q(i), kC); pts.push(`${p.x.toFixed(1)},${p.y.toFixed(1)}`); }
 				dot = qEnd;
 				tail = [];
 			} else if (kA < 1) {
@@ -81,7 +80,6 @@
 				});
 			}
 			path = pts.length ? `M${pts.join('L')}` : '';
-			fade = 1 - smooth((kC - 0.8) / 0.2);
 			ink = kC > 0 ? 0.55 + 0.35 * kC : 0.55;
 		}
 		const go = () => { if (!raf) raf = requestAnimationFrame(frame); };
@@ -102,7 +100,7 @@
 </script>
 
 {#if show}
-	<svg class="ho" aria-hidden="true" style="opacity:{fade}">
+	<svg class="ho" aria-hidden="true">
 		{#if path}<path d={path} style="stroke-opacity:{ink}" />{/if}
 		{#each tail as t}<circle class="t" cx={t.x} cy={t.y} r={t.r} style="opacity:{t.o}" />{/each}
 		{#if dot}<circle class="halo" cx={dot.x} cy={dot.y} r="9" /><circle cx={dot.x} cy={dot.y} r="4.5" />{/if}

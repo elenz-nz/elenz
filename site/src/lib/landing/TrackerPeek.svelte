@@ -21,6 +21,8 @@
 			return { ...l, d: `M${top.join('L')}L${bot.join('L')}Z` };
 		});
 	});
+	// the outline along the top of the stack, where the hero's line lands
+	const top = $derived(`M${G.tot.map((v: number, i: number) => `${x(i).toFixed(1)},${G.y(v).toFixed(1)}`).join('L')}`);
 	const end = $derived({ left: 100, top: (G.y(G.tot[G.tot.length - 1] ?? 0) / H) * 100 });
 	// a tick at every six hours, New Zealand time
 	const HOUR = new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', hour: 'numeric', hour12: true });
@@ -49,6 +51,7 @@
 			{#each [0.25, 0.5, 0.75] as g}<line class="grid" x1="0" x2={W} y1={G.y(G.max * g)} y2={G.y(G.max * g)} />{/each}
 			<g class="fill">{#each areas as a}<path d={a.d} style="fill:{a.hatch ? 'url(#pk-hatch-trk)' : `var(${a.tok})`}" />{/each}</g>
 			<line class="axis" x1="0" x2={W} y1={H} y2={H} />
+			<path class="top" d={top} vector-effect="non-scaling-stroke" />
 		</svg>
 		<span class="now" style="left:{end.left}%;top:{end.top}%"></span>
 	</div>
@@ -67,6 +70,9 @@
 	.axis { stroke: var(--line); stroke-width: 1; }
 	/* --ho is the hand-off's landing (0 until the line starts opening out here, 1 once it has landed); unset, all shows */
 	.fill { opacity: var(--ho, 1); }
+	/* the landed line: shown once the hand-off has finished (the flying line is drawn in Handoff.svelte until then) */
+	.top { fill: none; stroke: var(--accent); stroke-opacity: 0.9; stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round;
+		opacity: calc((var(--ho, 1) - 0.999) * 1000); }
 	.now { position: absolute; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--accent); pointer-events: none;
 		opacity: calc((var(--ho, 1) - 0.97) * 34); }
 	.now::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--accent); animation: ping 2.2s ease-out infinite; }

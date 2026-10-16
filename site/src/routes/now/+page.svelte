@@ -5,6 +5,7 @@
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import { summarise, ring } from '#lib/home/now.js';
 	import { VIEW, NI as NI_PATH, SI as SI_PATH, PTS } from '#lib/home/nzmap.js';
+	import { RING, RING_R, HV_PATH, HV_MID } from '#lib/home/maplayout.js';
 
 	const DATA_URL = '/data/tracker.json';
 	const LIVE_MINUTES = 15;
@@ -32,10 +33,8 @@
 	const hv = $derived(now ? now.hvdc.mid : 0);
 	const hvDir = $derived(Math.abs(hv) < 1 ? '' : hv > 0 ? 'north' : 'south');
 
-	// HVDC route on the map: Benmore, up the east of the South Island to the Cook Strait cable, then Haywards
+	// HVDC route and ring positions on the map (shared with the landing page's preview)
 	const [bx, by] = PTS.ben, [hx, hy] = PTS.hay;
-	const HV_PATH = `M${bx},${by} C${bx + 60},${by - 40} ${hx - 40},${hy + 70} ${hx},${hy}`;
-	const HV_MID = { x: (bx + 3 * (bx + 60) + 3 * (hx - 40) + hx) / 8, y: (by + 3 * (by - 40) + 3 * (hy + 70) + hy) / 8 };
 	// the map's viewBox is wider than New Zealand, leaving room for the island cards on the right; on phones the cards
 	// sit below the map, so the viewBox is cropped to the land
 	let narrow = $state(false);
@@ -43,9 +42,8 @@
 	const pct = (x: number, y: number) => `left:${(x / W) * 100}%;top:${(y / VIEW.h) * 100}%`;
 	const hvWidth = $derived(2 + Math.min(1, Math.abs(hv) / 1200) * 6);
 
-	// each island's generation by fuel as a ring over the island (viewBox coordinates), largest fuel first
-	const RING = { NI: { x: 300, y: 190 }, SI: { x: 133, y: 402 } };
-	const RING_R = 40, RING_C = 2 * Math.PI * RING_R;
+	// each island's generation by fuel as a ring over the island, largest fuel first
+	const RING_C = 2 * Math.PI * RING_R;
 	const ringOf = (r: Region) => ring(now?.mix ?? [], r, RING_R);
 
 	onMount(() => {
@@ -155,7 +153,7 @@
 								<circle class="hv-end" cx={bx} cy={by} r={hvWidth + 2} />
 							{/if}
 						{/if}
-						<circle class="node" cx={bx} cy={by} r="4" /><text class="node-lbl" x={bx - 8} y={by + 18} text-anchor="middle">Benmore</text>
+						<circle class="node" cx={bx} cy={by} r="4" /><text class="node-lbl" x={bx + 9} y={by + 16}>Benmore</text>
 						<circle class="node" cx={hx} cy={hy} r="4" /><text class="node-lbl" x={hx + 8} y={hy - 9}>Haywards</text>
 						{#if now}
 							<!-- each island's generation mix as a ring, its total in the middle -->
