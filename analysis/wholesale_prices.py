@@ -291,6 +291,16 @@ def main():
     P({v: round(avg[k], 1) for k, v in NODES.items()})
     sp = (H - B).loc['2025-10':'2026-09']
     P(f'HAY-BEN Oct25-Sep26: mean {sp.mean():.1f}; HAY>BEN+10 {100 * (sp > 10).mean():.1f}%; BEN>HAY+10 {100 * (sp < -10).mean():.1f}%')
+    # what the HVDC link was doing when Haywards ran $10+ above Benmore (mid-link flow, north positive, site history)
+    hv = []
+    for mo in pd.period_range('2025-10', '2026-09', freq='M'):
+        d = json.load(open(fetch(f'{SITE}/hh/{mo}.json', os.path.join(DATA, 'hist', 'hh', f'{mo}.json'))))
+        hv.append(pd.Series(d['hvdcN'], index=pd.to_datetime(d['t0'] + np.arange(d['N']) * d['step'], unit='ms', utc=True).tz_convert(NZ)))
+    hv = pd.concat(hv)
+    hv = hv[~hv.index.duplicated()].reindex(sp.index)
+    wide = sp > 10
+    P(f'  HVDC when HAY>BEN+10: median {hv[wide].median():.0f} MW north; >=700 MW in {100 * (hv[wide] >= 700).mean():.0f}% '
+      f'(all trading periods {100 * (hv >= 700).mean():.0f}%); >=1000 MW in {100 * (hv[wide] >= 1000).mean():.0f}%')
 
     # ---- where the money is made: every trading period's grid generation (dispatch) paid at its island's reference
     # price (Haywards for the North Island, Benmore for the South), before any hedge contracts
