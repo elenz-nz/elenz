@@ -572,6 +572,7 @@
 	.lbl { margin: 4px 0 -6px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-weight: 600; }
 	.p-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 14px 18px; align-items: start; }
 	.card { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px 16px; display: grid; gap: 10px; min-width: 0; }
+	.card > :global(*) { min-width: 0; }
 	.card h2 { font-size: 0.86rem; font-weight: 600; margin: 0; }
 	.card .sub { margin: 2px 0 0; color: var(--muted); font-size: 0.8rem; }
 	.card .note { margin: 0; color: var(--muted); font-size: 0.76rem; }
