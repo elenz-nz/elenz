@@ -40,14 +40,11 @@
 			const from = document.querySelector('[data-handoff="from"]'), to = document.querySelector('[data-handoff="to"]');
 			if (!from || !to) return;
 			const a = from.getBoundingClientRect(), b = to.getBoundingClientRect(), vh = innerHeight, s = scrollY;
-			// landed once the Tracker chart's middle is a little above the middle of the screen
+			// aim to have landed once the Tracker chart's middle is a little above the middle of the screen
 			const travel = s + (b.top + b.height / 2) - vh * 0.52;
-			// the line is gone into the dot after the first ~160 px of scroll, and grows back over the last ~320 px
-			const sA = Math.min(160, travel * 0.2), sC = travel - Math.min(320, travel * 0.3);
+			// the line is gone into the dot after the first ~160 px of scroll
+			const sA = Math.max(1, Math.min(160, travel * 0.2));
 			const kA = travel <= 0 ? 1 : smooth(s / sA);
-			const kC = travel <= 0 ? 1 : smooth((s - sC) / (travel - sC));
-			root.style.setProperty('--ho-lift', kA.toFixed(4));
-			root.style.setProperty('--ho', kC.toFixed(4));
 			const n = src.tot.length;
 			const P = (i: number) => ({ x: a.left + (i / Math.max(1, n - 1)) * a.width, y: a.top + (src.y(src.tot[i]) / HZ.H) * a.height });
 			// the landing points are the Tracker's own, so the line ends exactly on the outline it hands over to
@@ -68,7 +65,7 @@
 				const onMap = (v: Pt) => { const q = new DOMPoint(v.x, v.y).matrixTransform(ctm); return { x: q.x, y: q.y + s }; };
 				const add = (key: string, v: Pt, hv = false) => {
 					const p = onMap(v), prev = stops[stops.length - 1].at;
-					const at = Math.min(sC - 1, Math.max(prev + 1, p.y - vh * 0.5));
+					const at = Math.max(prev + 1, p.y - vh * 0.5);
 					stops.push({ p, at, hv });
 					mapStops[key] = at;
 				};
@@ -77,6 +74,15 @@
 				add('ben', hvAt(0), true); // reached by following the route from Haywards
 				add('si', RING.SI);
 			}
+			// then the line grows back out of the dot over the last ~320 px. Where the map sits close above the Tracker
+			// (side by side on desktop) the last map stop comes late, so the flight from it to the Tracker keeps at
+			// least 220 px of scroll and the growing at least 200, landing a little higher on the screen than aimed
+			const last = stops[stops.length - 1].at;
+			const sC = Math.max(travel - Math.min(320, travel * 0.3), last + 220);
+			const land = Math.max(travel, sC + 200);
+			const kC = travel <= 0 ? 1 : smooth((s - sC) / (land - sC));
+			root.style.setProperty('--ho-lift', kA.toFixed(4));
+			root.style.setProperty('--ho', kC.toFixed(4));
 			stops.push({ p: page(qEnd), at: sC });
 			// where the dot is (page coordinates) at scroll position v
 			const route = (v: number): Pt => {
