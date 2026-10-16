@@ -5,7 +5,9 @@
 	//   area    { values, tok, opacity }      an area from zero
 	//   bars    { values, tok, opacity }      one bar per point (long ranges)
 	//   line    { values, tok, width, dash }  a line; NaN leaves a gap
-	// shade: [a, b) index ranges shaded behind everything (islands priced apart); marks: labels at the top edge.
+	// shade: [a, b) index ranges shaded behind everything (islands priced apart); marks: labels at the top edge;
+	// note: a label beside one point (the range's high), with a dot when there's no cursor.
+	// onpoint(e, i) fires as the pointer moves (for the page's tooltip), onleave when it leaves.
 	import { firstAtOrAfter } from '#lib/tracker/series.js';
 
 	type Scale = { f: (v: number) => number; lo: number; hi: number; ticks: number[] };
@@ -13,11 +15,12 @@
 
 	let {
 		t, t0, t1, height = 200, y, fmt = (v: number) => String(v), layers = [], shade = [], marks = [], hover = $bindable(-1),
-		xTicks = [], showX = false, label = '', zero = false
+		xTicks = [], showX = false, label = '', zero = false, note = null, onpoint, onleave
 	}: {
 		t: ArrayLike<number>; t0: number; t1: number; height?: number; y: Scale; fmt?: (v: number) => string; layers?: Layer[];
 		shade?: [number, number][]; marks?: { i: number; label: string }[]; hover?: number; xTicks?: { t: number; label: string; minor?: boolean }[];
-		showX?: boolean; label?: string; zero?: boolean;
+		showX?: boolean; label?: string; zero?: boolean; note?: { i: number; v: number; text: string; tok?: string } | null;
+		onpoint?: (e: PointerEvent, i: number) => void; onleave?: () => void;
 	} = $props();
 
 	let W = $state(600);
@@ -63,12 +66,20 @@
 		if (i >= n) i = n - 1;
 		if (i > 0 && Math.abs(t[i - 1] - tv) < Math.abs(t[i] - tv)) i--;
 		if (i >= 0 && i !== hover) hover = i;
+		if (i >= 0) onpoint?.(e, i);
 	}
+	// the note sits beside its point, kept inside the plot
+	const noteX = $derived.by(() => {
+		if (!note || note.i < 0 || note.i >= n) return 0;
+		const x = X(t[note.i]), w = note.text.length * 6.4;
+		const lx = x + 10 + w < x1 ? x + 9 : x - 9 - w;
+		return Math.max(x0 + 4, Math.min(x1 - w, lx));
+	});
 	const hx = $derived(hover >= 0 && hover < n ? X(t[hover]) : null);
 </script>
 
 <div class="tc" bind:clientWidth={W}>
-	<svg width={W} {height} viewBox="0 0 {W} {height}" role="img" aria-label={label} onpointermove={move} onpointerdown={move}>
+	<svg width={W} {height} viewBox="0 0 {W} {height}" role="img" aria-label={label} onpointermove={move} onpointerdown={move} onpointerleave={() => onleave?.()}>
 		{#each shade as [a, b]}
 			<rect class="shade" x={Math.max(x0, X(t[a]) - half(a))} y={yTop} width={Math.max(1, X(t[b - 1]) + half(b - 1) - Math.max(x0, X(t[a]) - half(a)))} height={yBot - yTop}></rect>
 		{/each}
@@ -99,6 +110,10 @@
 			<path class="mark" d="M{X(t[m.i]) - 5} {yTop + 8} L{X(t[m.i]) + 5} {yTop + 8} L{X(t[m.i])} {yTop} Z"></path>
 			<text class="ml" x={X(t[m.i]) + (X(t[m.i]) > W * 0.7 ? -8 : 8)} y={yTop + 10} text-anchor={X(t[m.i]) > W * 0.7 ? 'end' : 'start'}>{m.label}</text>
 		{/each}
+		{#if note && note.i >= 0 && note.i < n && note.v === note.v}
+			<text class="note" x={noteX} y={Math.max(yTop + 10, Math.min(yBot - 4, Y(note.v) + 4))}>{note.text}</text>
+			{#if hx === null}<circle cx={X(t[note.i])} cy={Y(note.v)} r="3.2" style="stroke: var({note.tok ?? '--ink'})" class="dot"></circle>{/if}
+		{/if}
 		{#if hx !== null}
 			<line class="cursor" x1={hx} x2={hx} y1={yTop} y2={yBot}></line>
 			{#each layers as ly}
@@ -131,4 +146,5 @@
 	.xl.minor { opacity: 0.75; }
 	.mark { fill: var(--o1); }
 	.ml { fill: var(--ink); font-weight: 500; }
+	.note { fill: var(--ink-2); }
 </style>

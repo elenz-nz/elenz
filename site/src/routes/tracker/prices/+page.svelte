@@ -43,6 +43,11 @@
 	let heatSeg: any = null;
 	let endT = $state<number | null>(null); // end of the window (ms), or null for the latest data
 	let heatTo = 0;
+	let popped = $state<string | null>(null); // a lower chart enlarged over the page
+	let winH = $state(800);
+	let infoOpen = $state(false), helpOpen = $state(false);
+	let infoBtn = $state<HTMLButtonElement>(), infoBox = $state<HTMLDivElement>(), helpBtn = $state<HTMLButtonElement>();
+	let tipS = $state<{ chart: string; i: number; x: number; y: number } | null>(null); // the tooltip that follows the mouse
 	const FIRST = Date.UTC(2020, 8, 10) - 12 * 36e5; // history starts 10 Sep 2020 (NZ)
 
 	const store = historyStore();
@@ -124,9 +129,9 @@
 		}
 	}
 	function setView(v: any) {
-		const keep = view && view.mode === v.mode && hover >= 0 && hover < view.n - 1;
+		const keep = view && view.mode === v.mode && hover >= 0 && hover < v.n && view.n === v.n;
 		view = v;
-		if (!keep || hover >= v.n) hover = v.n - 1;
+		if (!keep) hover = -1;   // no cursor: the summary shows the whole range, as on the Generation tab
 	}
 
 	/** Live week and 30 days: node prices, spread and HVDC at each point. */
@@ -213,38 +218,106 @@
 		return { f: (v: number) => v, lo: 0, hi: Math.max(hi, ticks[ticks.length - 1]), ticks };
 	});
 
-	// ---------- summary: at the cursor, and over the range ----------
-	const at = $derived(view && hover >= 0 && hover < view.n ? hover : view ? view.n - 1 : -1);
-	function whenLabel(i: number) {
-		if (!view || i < 0) return '';
+	// ---------- summary: at the cursor, or the whole range when there's no cursor (as on the Generation tab) ----------
+	const at = $derived(view && hover >= 0 && hover < view.n ? hover : -1);
+	const TP = (t: number) => { const p = nzParts(t); return Math.floor((p.h * 60 + p.mi) / 30) + 1; };
+	const yearIf = (t: number) => (endT !== null && nzParts(t).y !== nzParts(latestT).y ? ' ' + nzParts(t).y : '');
+	/** A point's name for the tooltip. */
+	function chip(i: number) {
 		const t = view.t[i];
-		if (view.mode === 'time') return effInt === '1d' ? dayLabel(t) : `${clock(t)} ${dayLabel(t)}${endT !== null ? ' ' + nzParts(t).y : ''}`;
-		return effInt === '1mo' ? monthLabel(t) : effInt === '1w' ? `Week of ${dateLabel(t)}` : dateLabel(t);
+		if (view.mode === 'long' || effInt === '1d') return effInt === '1mo' ? monthLabel(t) : effInt === '1w' ? `w/c ${dateLabel(t)}` : `${dayLabel(t)} ${nzParts(t).y}`;
+		return `${dayLabel(t)}${yearIf(t)}, ${clock(t)}`;
+	}
+	/** The summary's heading: [title, subtitle]. */
+	function heading(i: number): [string, string] {
+		if (!view) return ['', ''];
+		const kind = view.mode === 'long' || (view.histEnd && view.t[Math.max(i, 0)] <= view.histEnd) ? 'final prices' : 'dispatch prices';
+		if (i < 0) {
+			const t0 = view.t[0], t1 = view.t[view.n - 1];
+			if (R.days == null) return [`Since ${dateLabel(t0)}`, `to ${dateLabel(t1)} · averages`];
+			if (endT === null) return [`Last ${R.label}`, `to ${clock(t1)} ${dayLabel(t1)} · averages`];
+			return [`${R.label} to ${dateLabel(t1)}`, `${dateLabel(t0)} – ${dateLabel(t1)} · averages`];
+		}
+		const t = view.t[i];
+		if (view.mode === 'long') return [effInt === '1mo' ? monthLabel(t) : effInt === '1w' ? `Week of ${dateLabel(t)}` : `${dayLabel(t)} ${nzParts(t).y}`, `${effInt === '1d' ? 'daily' : effInt === '1w' ? 'weekly' : 'monthly'} figures · final prices`];
+		if (effInt === '1d') return [`${dayLabel(t)} ${nzParts(t).y}`, `daily average · ${kind}`];
+		return [clock(t), `${dayLabel(t)}${yearIf(t)} · TP ${TP(t)} · ${effInt === '5m' ? '5-minute' : 'half-hour average'} · ${kind}`];
 	}
 	const mw = (v: number) => `${Math.round(Math.abs(v)).toLocaleString('en-NZ')} MW ${v >= 0 ? 'north' : 'south'}`;
 	const hours = (h: number) => (h < 1 ? `${Math.round(h * 60)} min` : `${h < 10 ? h.toFixed(1) : Math.round(h)} h`);
+	const wavgOf = (S: any, a: ArrayLike<number>) => { let s = 0, w = 0; for (let i = 0; i < S.n; i++) if (a[i] === a[i]) { s += a[i] * S.h[i]; w += S.h[i]; } return w ? s / w : NaN; };
+	// a series' value at the cursor, or its time-weighted average over the range
+	const valOf = (a: ArrayLike<number> | null) => (!a ? NaN : at >= 0 ? a[at] : wavgOf(view.mode === 'long' ? view.P : view.S, a));
 
 	const cursorRows = $derived.by(() => {
-		if (!view || at < 0) return [];
+		if (!view) return [];
 		if (view.mode === 'time') {
-			const rows: any[] = view.series.filter((s: any) => regionNodes.some((r) => r.k === s.k)).map((s: any) => ({ tok: s.tok, label: NODE[s.k].name, value: money(s.values[at]), dim: off.includes(s.k) }));
-			rows.push({ tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(view.spread[at]) });
-			rows.push({ tok: '--f-hvdc', label: 'HVDC', value: mw(view.hvdc[at]) });
+			const rows: any[] = view.series.filter((s: any) => regionNodes.some((r) => r.k === s.k)).map((s: any) => ({ tok: s.tok, label: NODE[s.k].name, value: money(valOf(s.values)), dim: off.includes(s.k) }));
+			rows.push({ tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(valOf(view.spread)) });
+			rows.push({ tok: '--f-hvdc', label: 'HVDC', value: mw(valOf(view.hvdc)) });
 			return rows;
 		}
 		const P = view.P, own = bandKey === 'BEN' ? 'SI' : 'NI', I = P[own];
+		if (at < 0) return [
+			{ tok: '--p-ni', label: 'Haywards', value: money(valOf(P.NI.price)) },
+			{ tok: '--p-si', label: 'Benmore', value: money(valOf(P.SI.price)) },
+			{ tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(valOf(P.spread)) },
+			{ tok: '--f-hvdc', label: 'HVDC', value: mw(valOf(P.hvdc)) }
+		];
 		return [
-			{ tok: '--p-ni', label: 'Haywards, average', value: money(P.NI.price[at]) },
-			{ tok: '--p-si', label: 'Benmore, average', value: money(P.SI.price[at]) },
+			{ tok: '--p-ni', label: 'Haywards', value: money(P.NI.price[at]) },
+			{ tok: '--p-si', label: 'Benmore', value: money(P.SI.price[at]) },
 			{ label: `${NODE[bandKey].name}, middle 80%`, value: `${money(I.p10[at])} – ${money(I.p90[at])}` },
 			{ label: `${NODE[bandKey].name}, low`, value: money(I.pmin[at]) },
 			{ label: `${NODE[bandKey].name}, high`, value: money(I.pmax[at]) },
 			{ label: 'Half-hours over $500', value: String(I.n500[at]) },
 			{ tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(P.spread[at]) },
-			{ tok: '--f-hvdc', label: 'HVDC, average', value: mw(P.hvdc[at]) }
+			{ tok: '--f-hvdc', label: 'HVDC', value: mw(P.hvdc[at]) }
 		];
 	});
+	// the high point of the range on the price chart, labelled as on the Generation tab
+	const highNote = $derived.by(() => {
+		if (!view) return null;
+		const k = region === 'SI' || (view.mode === 'long' && bandKey === 'BEN') ? 'BEN' : 'HAY';
+		const a = view.mode === 'time' ? priceOf(view.S, k) : view.P[k === 'BEN' ? 'SI' : 'NI'].pmax;
+		if (!a || (view.mode === 'time' && off.includes(k))) return null;
+		let j = 0;
+		for (let i = 1; i < a.length; i++) if (a[i] > a[j]) j = i;
+		return { i: j, v: a[j], text: `High ${money(a[j])} · ${chip(j)}`, tok: NODE[k].tok };
+	});
+	// the tooltip's rows for one chart at one point
+	function tipRows(chart: string, i: number) {
+		if (chart === 'price') {
+			if (view.mode === 'time') return shown.map((s: any) => ({ tok: s.tok, label: NODE[s.k].name, value: money(s.values[i]), unit: '/MWh' }));
+			const I = view.P[bandKey === 'BEN' ? 'SI' : 'NI'], tok = bandKey === 'BEN' ? '--p-si' : '--p-ni';
+			return [
+				{ tok, label: `${NODE[bandKey].name}, average`, value: money(I.price[i]), unit: '/MWh' },
+				{ tok, label: 'Middle 80%', value: `${money(I.p10[i])} – ${money(I.p90[i])}` },
+				{ tok, label: 'Low to high', value: `${money(I.pmin[i])} – ${money(I.pmax[i])}` }
+			];
+		}
+		if (chart === 'spread') return [{ tok: '--o1', label: 'Haywards − Benmore', value: signedMoney((view.mode === 'time' ? view.spread : view.P.spread)[i]), unit: '/MWh' }];
+		if (chart === 'hvdc') { const v = view.hvdc[i]; return [{ tok: '--f-hvdc', label: 'Benmore ⇄ Haywards', value: `${Math.round(Math.abs(v)).toLocaleString('en-NZ')}`, unit: `MW ${v >= 0 ? 'north' : 'south'}` }]; }
+		const I = view.P[bandKey === 'BEN' ? 'SI' : 'NI'];
+		return [{ tok: '--o1', label: 'Over $500', value: String(I.n500[i]), unit: 'half-hours' }, { tok: '--o1', label: 'Over $1,000', value: String(I.n1000[i]), unit: 'half-hours' }];
+	}
+	const point = (chart: string) => (e: PointerEvent, i: number) => {
+		if (e.pointerType === 'touch') { tipS = null; return; }
+		tipS = { chart, i, x: e.clientX, y: e.clientY };
+	};
+	const leave = () => (tipS = null);
+	const tipPos = $derived.by(() => {
+		if (!tipS) return '';
+		const w = 260, h = 110, pad = 8;
+		let x = tipS.x + 16, y = tipS.y + 16;
+		if (typeof window !== 'undefined') {
+			if (x + w > window.innerWidth - pad) x = tipS.x - w - 16;
+			if (y + h > window.innerHeight - pad) y = tipS.y - h - 12;
+		}
+		return `transform: translate(${Math.max(pad, x)}px, ${Math.max(pad, y)}px)`;
+	});
 	const sepNow = $derived(view && view.mode === 'time' && at >= 0 ? view.sep[at] : null);
+	const head = $derived(heading(at));
 
 	// over the whole range: averages, highs and spikes (Haywards and Benmore), and price captured by fuel
 	const rangeStats = $derived.by(() => {
@@ -311,12 +384,27 @@
 
 	function keys(e: KeyboardEvent) {
 		if (!view) return;
-		const step = e.shiftKey ? 10 : 1;
-		if (e.key === 'ArrowLeft') { hover = Math.max(0, at - step); e.preventDefault(); }
-		else if (e.key === 'ArrowRight') { hover = Math.min(view.n - 1, at + step); e.preventDefault(); }
+		const by = e.shiftKey ? 10 : 1, cur = at < 0 ? view.n : at;
+		if (e.key === 'ArrowLeft') { hover = Math.max(0, cur - by); e.preventDefault(); }
+		else if (e.key === 'ArrowRight') { hover = Math.min(view.n - 1, at < 0 ? view.n - 1 : at + by); e.preventDefault(); }
 		else if (e.key === 'Home') { hover = 0; e.preventDefault(); }
-		else if (e.key === 'End' || e.key === 'Escape') { hover = view.n - 1; e.preventDefault(); }
+		else if (e.key === 'End') { hover = view.n - 1; e.preventDefault(); }
+		else if (e.key === 'PageUp' || e.key === 'PageDown') { e.preventDefault(); step(e.key === 'PageUp' ? -1 : 1); }
+		else if (e.key === 'Escape') { hover = -1; tipS = null; }
 	}
+	function closeInfo(e: Event) {
+		if (e instanceof KeyboardEvent) {
+			if (e.key !== 'Escape') return;
+			if (popped) popped = null;
+			if (infoOpen) { infoOpen = false; infoBtn?.focus(); }
+			if (helpOpen) helpOpen = false;
+			return;
+		}
+		if (!infoOpen) return;
+		const t = e.target as Node;
+		if (!infoBox?.contains(t) && !infoBtn?.contains(t)) infoOpen = false;
+	}
+	const popH = $derived(Math.min(560, Math.round(winH * 0.62)));
 	const toggleNode = (k: string) => { off = off.includes(k) ? off.filter((x) => x !== k) : [...off, k]; save(); };
 
 	onMount(() => {
@@ -349,6 +437,8 @@
 	const fmtSpread = (v: number) => (v === 0 ? '$0' : (v > 0 ? '+' : '−') + fmtTick(Math.abs(v)));
 	const fmtMW = (v: number) => (Math.abs(v) >= 1000 ? `${(v / 1000).toLocaleString('en-NZ')}k` : String(v));
 </script>
+
+<svelte:window bind:innerHeight={winH} onclick={closeInfo} onkeydown={closeInfo} />
 
 <svelte:head>
 	<title>Prices · Tracker · ELENZ</title>
@@ -405,20 +495,39 @@
 					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {clock(meta.end)} {dayLabel(meta.end)}</span>
 				{/if}
 			{/if}
+			<button type="button" class="info-btn" bind:this={infoBtn} aria-expanded={infoOpen} aria-controls="p-about" aria-label="About this data" title="About this data" onclick={() => (infoOpen = !infoOpen)}>
+				<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg>
+			</button>
+			<div class="info-pop" id="p-about" role="region" aria-label="About this data" bind:this={infoBox} hidden={!infoOpen}>
+				<p>Prices from the Electricity Authority: its real-time dispatch feed for the live week (dispatch prices, every 5 minutes), and its final prices for history, usually published the next day.</p>
+				<a href="/about#m-price">How the price charts are built</a>
+			</div>
 		</div>
 	</nav>
 
 	<noscript><p class="notice">The charts need JavaScript turned on.</p></noscript>
 
-	<div class="p-layout">
-		<!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions (the chart panel takes arrow keys to move the cursor) -->
-		<section class="charts" tabindex="0" aria-busy={busy} onkeydown={keys}
-			aria-label="Price charts on one time axis. Hover, or use the left and right arrow keys, to read a single point; Escape returns to the latest.">
+	{#snippet popBtn(id: string, name: string)}
+		<button type="button" class="pop-btn" onclick={() => (popped = popped === id ? null : id)} aria-pressed={popped === id}
+			aria-label={popped === id ? `Shrink the ${name} chart` : `Enlarge the ${name} chart`} title={popped === id ? 'Close' : 'Enlarge'}>
+			{#if popped === id}
+				<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+			{:else}
+				<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 2.5h4v4M6.5 13.5h-4v-4M13.5 2.5L9 7M2.5 13.5L7 9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+			{/if}
+		</button>
+	{/snippet}
+
+	<div class="layout">
+		<!-- The chart panels take arrow keys to move the time cursor, so they need to be focusable. -->
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -->
+		<section class="charts" id="charts" tabindex="0" aria-busy={busy} onkeydown={keys}
+			aria-label="Price chart. Hover or use the left and right arrow keys to read values at a point in time, Page Up and Page Down to move by the range; Escape returns to range averages.">
 			{#if view && priceY}
 				<div class="chart">
 					<div class="ch-head">
 						{#if view.mode === 'time'}
-							<h2>Prices</h2><span class="unit">$/MWh at each node</span>
+							<h2>Wholesale price</h2><span class="unit">$/MWh at each node</span>
 						{:else}
 							<h2>Price range</h2><span class="unit">$/MWh, each {effInt === '1d' ? 'day' : effInt === '1w' ? 'week' : 'month'}'s half-hours</span>
 						{/if}
@@ -434,7 +543,7 @@
 						{#if view.mode === 'time'}
 							{#each view.series.filter((s: any) => regionNodes.some((r) => r.k === s.k)) as s (s.k)}
 								<button type="button" class="nk" aria-pressed={!off.includes(s.k)} onclick={() => toggleNode(s.k)} title="{NODE[s.k].node}, {NODE[s.k].place}. Select to show or hide">
-									<i style="--c: var({s.tok})"></i>{NODE[s.k].name}
+									<i style="--c: var({s.tok})"></i>{NODE[s.k].name} <b>{money(valOf(s.values))}</b>
 								</button>
 							{/each}
 							{#if NODES.some((nd) => regionNodes.includes(nd) && !view.series.some((s: any) => s.k === nd.k))}
@@ -449,97 +558,127 @@
 							</div>
 							<span class="lg"><i class="area" style="--c: var({bandKey === 'BEN' ? '--p-si' : '--p-ni'}); opacity: 0.25"></i>Low to high</span>
 							<span class="lg"><i class="area" style="--c: var({bandKey === 'BEN' ? '--p-si' : '--p-ni'}); opacity: 0.55"></i>Middle 80%</span>
-							<span class="lg"><i style="--c: var({bandKey === 'BEN' ? '--p-si' : '--p-ni'})"></i>Average</span>
-							<span class="lg"><i class="dash" style="--c: var({bandKey === 'BEN' ? '--p-ni' : '--p-si'})"></i>{bandKey === 'BEN' ? 'Haywards' : 'Benmore'} average</span>
+							<span class="lg"><i style="--c: var({bandKey === 'BEN' ? '--p-si' : '--p-ni'})"></i>Average <b>{money(valOf(view.P[bandKey === 'BEN' ? 'SI' : 'NI'].price))}</b></span>
+							<span class="lg"><i class="dash" style="--c: var({bandKey === 'BEN' ? '--p-ni' : '--p-si'})"></i>{bandKey === 'BEN' ? 'Haywards' : 'Benmore'} <b>{money(valOf(view.P[bandKey === 'BEN' ? 'NI' : 'SI'].price))}</b></span>
 						{/if}
 					</div>
-					<div class="plot-wrap">
-						<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={250} y={priceY} fmt={fmtTick} layers={priceLayers}
-							shade={view.mode === 'time' ? view.shade : []} marks={capMarks} bind:hover label="Prices at the grid nodes over the range" zero />
+					<div class="plot">
+						<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={250} y={priceY} fmt={fmtTick} layers={priceLayers} note={highNote}
+							shade={view.mode === 'time' ? view.shade : []} marks={capMarks} bind:hover onpoint={point('price')} onleave={leave}
+							label="Prices at the grid nodes over the range" zero />
 						{#if canMove}
-							<button type="button" class="arrow prev" aria-label="Previous {R.label}" title="Previous {R.label}" onclick={() => step(-1)}>
+							<button type="button" class="nav prev" aria-label="Previous {R.label}" title="Previous {R.label}" onclick={() => step(-1)}>
 								<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
 							</button>
-							<button type="button" class="arrow next" aria-label="Next {R.label}" title="Next {R.label}" disabled={atLatest} onclick={() => step(1)}>
+							<button type="button" class="nav next" aria-label="Next {R.label}" title="Next {R.label}" disabled={atLatest} onclick={() => step(1)}>
 								<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
 							</button>
 						{/if}
 					</div>
 				</div>
+			{:else}
+				<p class="empty">{status || 'Loading…'}</p>
+			{/if}
+		</section>
 
-				<div class="chart">
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -->
+		<section class="charts" id="charts-more" tabindex="0" onkeydown={keys} aria-label="Island spread and {view?.mode === 'long' ? 'price spike' : 'HVDC'} charts, on the same time axis as the prices.">
+			{#if view && priceY}
+				<div class="chart" class:popped={popped === 'spread'}>
 					<div class="ch-head">
 						<h2>Island spread</h2><span class="unit">Haywards − Benmore, $/MWh{view.mode === 'long' ? ', average' : ''}</span>
 						<div class="legends">
 							<span class="lg"><i class="area" style="--c: var(--o1)"></i>North Island dearer</span>
-							<span class="lg"><i class="area" style="--c: var(--o2)"></i>South Island dearer</span>
+							<span class="lg"><i class="area" style="--c: var(--o2)"></i>South Island dearer <b>{signedMoney(valOf(view.mode === 'time' ? view.spread : view.P.spread))}</b></span>
 						</div>
+						{@render popBtn('spread', 'island spread')}
 					</div>
-					<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={120} y={spreadY} fmt={fmtSpread} zero
+					<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={popped === 'spread' ? popH : 120} y={spreadY} fmt={fmtSpread} zero showX={popped === 'spread'} {xTicks}
 						layers={view.mode === 'time' ? [{ kind: 'posneg', values: view.spread, pos: '--o1', neg: '--o2' }] : [{ kind: 'bars', values: view.P.spread, tok: '--o1', neg: '--o2', opacity: 0.85 }]}
-						shade={view.mode === 'time' ? view.shade : []} bind:hover label="The price gap between Haywards and Benmore" />
+						shade={view.mode === 'time' ? view.shade : []} bind:hover onpoint={point('spread')} onleave={leave} label="The price gap between Haywards and Benmore" />
 				</div>
 
 				{#if view.mode === 'time'}
-					<div class="chart">
+					<div class="chart" class:popped={popped === 'hvdc'}>
 						<div class="ch-head">
 							<h2>HVDC transfer</h2><span class="unit">MW, northward positive</span>
-							<div class="legends"><span class="lg"><i class="area" style="--c: var(--f-hvdc)"></i>Benmore ⇄ Haywards</span></div>
+							<div class="legends"><span class="lg"><i class="area" style="--c: var(--f-hvdc)"></i>Benmore ⇄ Haywards <b>{mw(valOf(view.hvdc))}</b></span></div>
+							{@render popBtn('hvdc', 'HVDC transfer')}
 						</div>
-						<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={140} y={hvdcY} fmt={fmtMW} zero showX {xTicks}
+						<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={popped === 'hvdc' ? popH : 140} y={hvdcY} fmt={fmtMW} zero showX {xTicks}
 							layers={[{ kind: 'area', values: view.hvdc, tok: '--f-hvdc', opacity: 0.5 }, { kind: 'line', values: view.hvdc, tok: '--f-hvdc', width: 1.3, dot: false }]}
-							shade={view.shade} bind:hover label="HVDC transfer between the islands" />
+							shade={view.shade} bind:hover onpoint={point('hvdc')} onleave={leave} label="HVDC transfer between the islands" />
 					</div>
 				{:else if spikeY}
-					<div class="chart">
+					<div class="chart" class:popped={popped === 'spikes'}>
 						<div class="ch-head">
 							<h2>Price spikes</h2><span class="unit">half-hours at {NODE[bandKey].name}</span>
 							<div class="legends">
 								<span class="lg"><i class="area" style="--c: var(--o1); opacity: 0.45"></i>Over $500</span>
 								<span class="lg"><i class="area" style="--c: var(--o1)"></i>Over $1,000</span>
 							</div>
+							{@render popBtn('spikes', 'price spikes')}
 						</div>
-						<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={140} y={spikeY} fmt={(v) => String(v)} showX {xTicks}
+						<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={popped === 'spikes' ? popH : 140} y={spikeY} fmt={(v) => String(v)} showX {xTicks}
 							layers={[{ kind: 'bars', values: view.P[bandKey === 'BEN' ? 'SI' : 'NI'].n500, tok: '--o1', opacity: 0.45 }, { kind: 'bars', values: view.P[bandKey === 'BEN' ? 'SI' : 'NI'].n1000, tok: '--o1' }]}
-							bind:hover label="Half-hours with prices over $500 and $1,000 in each period" />
+							bind:hover onpoint={point('spikes')} onleave={leave} label="Half-hours with prices over $500 and $1,000 in each period" />
 					</div>
 				{/if}
-			{:else}
-				<p class="empty">{status || 'Loading…'}</p>
 			{/if}
 		</section>
+		{#if popped}<button type="button" class="pop-backdrop" aria-label="Close the enlarged chart" onclick={() => (popped = null)}></button>{/if}
 
-		<aside class="summary p-side" aria-label="Prices at the selected time">
-			<div>
-				<div class="sum-when">{whenLabel(at)}</div>
-				<div class="sum-sub">{view?.mode === 'long' || (view && view.histEnd && view.t[at] <= view.histEnd) ? 'Final prices' : 'Dispatch prices'}</div>
-			</div>
-			<table class="mix">
-				<tbody>
-					{#each cursorRows as r}
-						<tr class:dim={r.dim}><td>{#if r.tok}<i class="sw" style="--c: var({r.tok})"></i>{/if}{r.label}</td><td class="n">{r.value}</td></tr>
-					{/each}
-				</tbody>
-			</table>
-			{#if sepNow !== null}
-				<p class="sep" class:on={sepNow}>{sepNow ? 'Islands priced apart' : 'Islands priced together'}</p>
-			{/if}
-			{#if rangeStats}
-				<p class="lbl">{R.label}</p>
+		<div class="side">
+			<aside class="summary" aria-label="Prices for the selected time">
+				<div class="sum-head">
+					<div>
+						<div class="sum-when">{head[0]}</div>
+						<div class="sum-sub">{head[1]}</div>
+					</div>
+					<button type="button" class="info-btn" bind:this={helpBtn} aria-expanded={helpOpen} aria-controls="p-help" aria-label="How to use the charts" title="How to use the charts" onclick={() => (helpOpen = !helpOpen)}>
+						<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg>
+					</button>
+				</div>
+				<div class="help" id="p-help" role="note" hidden={!helpOpen}>
+					<p>Use the arrows on the price chart, or the date box, to step back through history by the selected range.</p>
+					<p>Select a node to show or hide it. Hover the charts, or focus them and use the arrow keys, to read a single interval; Escape returns to the range.</p>
+				</div>
 				<table class="mix">
+					<thead><tr><th scope="col">{view?.mode === 'time' ? 'Node' : 'Series'}</th><th scope="col" class="n">{at < 0 ? 'Average' : 'Value'}</th></tr></thead>
 					<tbody>
-						{#each rangeStats.rows as r}
-							<tr><td>{r.node} average</td><td class="n">{money(r.avg)}</td></tr>
-							<tr><td>{r.node} high</td><td class="n">{money(r.hi)}</td></tr>
-							<tr><td>Time over $500</td><td class="n">{hours(r.over)}</td></tr>
+						{#each cursorRows as r}
+							<tr class:dim={r.dim}><td>{#if r.tok}<i class="sw" style="--c: var({r.tok})"></i>{/if}{r.label}</td><td class="n">{r.value}</td></tr>
 						{/each}
-						<tr><td>Generation-weighted average</td><td class="n">{money(rangeStats.cap.avg)}</td></tr>
-						{#if rangeStats.sepShare !== null}<tr><td>Islands priced apart</td><td class="n">{Math.round(rangeStats.sepShare * 100)}% of the time</td></tr>{/if}
 					</tbody>
 				</table>
+				{#if sepNow !== null}
+					<p class="sep" class:on={sepNow}>{sepNow ? 'Islands priced apart' : 'Islands priced together'}</p>
+				{/if}
+			</aside>
+			{#if rangeStats}
+				<section class="stats" aria-label="Prices over the range">
+					<dl class="sys">
+						{#each rangeStats.rows as r}
+							<dt>{r.node} average</dt><dd>{money(r.avg)}<small>/MWh</small></dd>
+							<dt>{r.node} high</dt><dd>{money(r.hi)}<small>{view.mode === 'long' ? dateLabel(r.hiT) : chip(firstAtOrAfter(view.t, r.hiT))}</small></dd>
+							<dt>{r.node} over $500</dt><dd>{hours(r.over)}</dd>
+						{/each}
+						<dt>Generation-weighted average</dt><dd>{money(rangeStats.cap.avg)}<small>/MWh</small></dd>
+						{#if rangeStats.sepShare !== null}<dt>Islands priced apart</dt><dd>{Math.round(rangeStats.sepShare * 100)}%<small>of the time</small></dd>{/if}
+					</dl>
+				</section>
 			{/if}
-		</aside>
+		</div>
 	</div>
+
+	{#if tipS && view && tipS.i < view.n}
+		<div class="tip" aria-hidden="true" style={tipPos}>
+			<div class="tip-t">{chip(tipS.i)}</div>
+			{#each tipRows(tipS.chart, tipS.i) as r}
+				<div class="tip-r"><i style="--c: var({r.tok})"></i><span>{r.label}</span><b>{r.value}</b>{#if r.unit}<small>{r.unit}</small>{/if}</div>
+			{/each}
+		</div>
+	{/if}
 
 	<div class="p-row">
 		<section class="card">
@@ -579,14 +718,8 @@
 </div>
 
 <style>
-	.p-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 14px 18px; align-items: start; }
-	.p-side { position: sticky; top: 12px; }
-	.plot-wrap { position: relative; }
-	.arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 30px; height: 44px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 4px; background: color-mix(in srgb, var(--surface) 88%, transparent); color: var(--ink-2); cursor: pointer; opacity: 0.85; }
-	.arrow:hover { color: var(--ink); opacity: 1; }
-	.arrow:disabled { opacity: 0.3; cursor: default; }
-	.arrow.prev { left: 54px; }
-	.arrow.next { right: 12px; }
+	.plot .nav { top: calc(50% - 22px); }
+	.nk b { font-weight: 500; color: var(--ink); font-family: var(--font-data); font-variant-numeric: tabular-nums; }
 	.keys { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 6px 0 4px; }
 	.nk { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 0.8rem; color: var(--ink-2); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px 2px 8px; min-height: 28px; cursor: pointer; }
 	.nk[aria-pressed='false'] { opacity: 0.45; }
@@ -597,7 +730,6 @@
 	.mix tr.dim { opacity: 0.5; }
 	.sep { margin: 0; font-size: 0.8rem; padding: 6px 9px; border-radius: 4px; background: var(--grid); color: var(--ink-2); }
 	.sep.on { background: var(--warn-bg); color: var(--warn-ink); font-weight: 600; }
-	.lbl { margin: 4px 0 -6px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-weight: 600; }
 	.p-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 14px 18px; align-items: start; }
 	.card { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px 16px; display: grid; gap: 10px; min-width: 0; }
 	.card > :global(*) { min-width: 0; }
@@ -609,7 +741,6 @@
 	.notes h3 { font-size: 0.82rem; margin: 0 0 3px; }
 	.notes p { margin: 0; font-size: 0.8rem; color: var(--ink-2); line-height: 1.5; }
 	@media (max-width: 900px) {
-		.p-layout, .p-row { grid-template-columns: minmax(0, 1fr); }
-		.p-side { position: static; }
+		.p-row { grid-template-columns: minmax(0, 1fr); }
 	}
 </style>

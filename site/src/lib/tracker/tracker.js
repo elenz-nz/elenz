@@ -352,7 +352,7 @@ export function mountTracker(D, hooks = {}) {
   let C = {}, PAT = {};
   function readColours() {
     const cs = getComputedStyle(document.documentElement);
-    for (const t of ['--ink', '--ink-2', '--muted', '--line', '--grid', '--surface', '--accent', '--accent-soft', '--co2', '--p-ni', '--p-si', '--f-coal', '--f-gas', '--f-diesel', '--f-geo', '--f-hydro', '--f-wind', '--f-solar', '--f-batt', '--f-hvdc', '--g-fossil', '--g-ren', '--g-fast', '--g-vre', '--g-resid', '--o1', '--o2', '--o3', '--o4', '--o5', '--o6'])
+    for (const t of ['--ink', '--ink-2', '--muted', '--line', '--grid', '--surface', '--accent', '--accent-soft', '--co2', '--p-ni', '--p-si', '--f-coal', '--f-gas', '--f-diesel', '--f-geo', '--f-bio', '--f-waste', '--f-hydro', '--f-wind', '--f-solar', '--f-batt', '--f-hvdc', '--g-fossil', '--g-ren', '--g-fast', '--g-vre', '--g-resid', '--o1', '--o2', '--o3', '--o4', '--o5', '--o6'])
       C[t] = cs.getPropertyValue(t).trim();
     PAT = {};
     for (const f of FUELS) if (f.hatch) PAT[f.k] = hatchOf(C[f.tok]);
