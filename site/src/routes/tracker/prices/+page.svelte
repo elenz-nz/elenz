@@ -660,7 +660,7 @@
 					<dl class="sys">
 						{#each rangeStats.rows as r}
 							<dt>{r.node} average</dt><dd>{money(r.avg)}<small>/MWh</small></dd>
-							<dt>{r.node} high</dt><dd>{money(r.hi)}<small>{view.mode === 'long' ? dateLabel(r.hiT) : chip(firstAtOrAfter(view.t, r.hiT))}</small></dd>
+							<dt>{r.node} high</dt><dd>{money(r.hi)}<small>{R.days === 1 && view.mode === 'time' ? clock(r.hiT) : shortDate(r.hiT)}</small></dd>
 							<dt>{r.node} over $500</dt><dd>{hours(r.over)}</dd>
 						{/each}
 						<dt>Generation-weighted average</dt><dd>{money(rangeStats.cap.avg)}<small>/MWh</small></dd>
