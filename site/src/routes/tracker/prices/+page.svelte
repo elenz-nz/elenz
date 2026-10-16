@@ -179,21 +179,19 @@
 			{ kind: 'line', values: I.price, tok, width: 1.8 }
 		];
 	});
-	// prices above the cap, marked at the top (the highest few, spaced apart)
+	// prices above the cap, marked at the top: every clipped point, highest first (the chart labels as many as fit)
 	const capMarks = $derived.by(() => {
 		if (!view || !priceY || !(priceY as any).capped) return [];
 		const pts: { i: number; v: number; k: string }[] = [];
 		if (view.mode === 'time') for (const s of shown) s.values.forEach((v: number, i: number) => { if (v > CAP) pts.push({ i, v, k: s.k }); });
 		else { const I = view.P[bandKey === 'BEN' ? 'SI' : 'NI']; I.pmax.forEach((v: number, i: number) => { if (v > CAP) pts.push({ i, v, k: bandKey }); }); }
 		pts.sort((a, b) => b.v - a.v);
-		const out: { i: number; label: string }[] = [];
-		const gap = Math.max(1, Math.round(view.n / 8));
-		for (const p of pts) {
-			if (out.length >= 3) break;
-			if (out.some((o) => Math.abs(o.i - p.i) < gap)) continue;
-			out.push({ i: p.i, label: `${NODE[p.k].name} ${money(p.v)}` });
-		}
-		return out;
+		const seen = new Set<number>();   // one label per point in time: the highest node there
+		return pts.map((p) => {
+			const first = !seen.has(p.i);
+			seen.add(p.i);
+			return { i: p.i, label: first ? `${shown.length > 1 || view.mode === 'long' ? NODE[p.k].name + ' ' : ''}${money(p.v)}` : '' };
+		});
 	});
 	const spreadSeries = $derived(view ? (view.mode === 'time' ? view.spread : view.P.spread) : new Float64Array(0));
 	const spreadY = $derived.by(() => {
@@ -283,6 +281,7 @@
 		if (!a || (view.mode === 'time' && off.includes(k))) return null;
 		let j = 0;
 		for (let i = 1; i < a.length; i++) if (a[i] > a[j]) j = i;
+		if (scale === 'capped' && a[j] > CAP) return null;   // clipped: the marks at the top label it
 		return { i: j, v: a[j], text: `High ${money(a[j])} · ${chip(j)}`, tok: NODE[k].tok };
 	});
 	// the tooltip's rows for one chart at one point

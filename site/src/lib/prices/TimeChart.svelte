@@ -68,6 +68,23 @@
 		if (i >= 0 && i !== hover) hover = i;
 		if (i >= 0) onpoint?.(e, i);
 	}
+	// marks: a triangle at every clipped point (one per few pixels), and labels only where they don't overlap;
+	// marks come highest first, so the highest prices get their labels
+	const placed = $derived.by(() => {
+		const tri: number[] = [], labels: { x: number; anchor: string; text: string }[] = [], boxes: [number, number][] = [];
+		for (const m of marks) {
+			if (m.i < 0 || m.i >= n) continue;
+			const x = X(t[m.i]);
+			if (!tri.some((v) => Math.abs(v - x) < 6)) tri.push(x);
+			if (!m.label) continue;
+			const w = m.label.length * 6.4, right = x + 8 + w < x1;
+			const a = right ? x + 8 : x - 8 - w, b = a + w;
+			if (a < x0 || boxes.some(([p, q]) => a < q + 10 && b > p - 10)) continue;
+			boxes.push([a, b]);
+			labels.push({ x: right ? x + 8 : x - 8, anchor: right ? 'start' : 'end', text: m.label });
+		}
+		return { tri, labels, boxes };
+	});
 	// the note sits beside its point, kept inside the plot
 	const noteX = $derived.by(() => {
 		if (!note || note.i < 0 || note.i >= n) return 0;
@@ -106,9 +123,11 @@
 				<path d={linePath(ly.values)} style="fill: none; stroke: var({ly.tok}); stroke-width: {ly.width ?? 1.5}; stroke-linejoin: round; {ly.dash ? `stroke-dasharray: ${ly.dash}` : ''}"></path>
 			{/if}
 		{/each}
-		{#each marks as m}
-			<path class="mark" d="M{X(t[m.i]) - 5} {yTop + 8} L{X(t[m.i]) + 5} {yTop + 8} L{X(t[m.i])} {yTop} Z"></path>
-			<text class="ml" x={X(t[m.i]) + (X(t[m.i]) > W * 0.7 ? -8 : 8)} y={yTop + 10} text-anchor={X(t[m.i]) > W * 0.7 ? 'end' : 'start'}>{m.label}</text>
+		{#each placed.tri as x}
+			<path class="mark" d="M{x - 5} {yTop + 8} L{x + 5} {yTop + 8} L{x} {yTop} Z"></path>
+		{/each}
+		{#each placed.labels as l}
+			<text class="ml" x={l.x} y={yTop + 10} text-anchor={l.anchor}>{l.text}</text>
 		{/each}
 		{#if note && note.i >= 0 && note.i < n && note.v === note.v}
 			<text class="note" x={noteX} y={Math.max(yTop + 10, Math.min(yBot - 4, Y(note.v) + 4))}>{note.text}</text>
