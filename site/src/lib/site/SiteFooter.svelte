@@ -50,8 +50,8 @@
 		</ul>
 	</div>
 	<p class="credits">
-		Data from <a href="https://www.emi.ea.govt.nz" target="_blank" rel="noopener">www.emi.ea.govt.nz</a> provided by the Electricity Authority (New Zealand), CC BY 4.0.
-		Irradiance: Himawari satellite data (JMA/JAXA) via <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>, CC BY 4.0.
+		<span>Data from <a href="https://www.emi.ea.govt.nz" target="_blank" rel="noopener">www.emi.ea.govt.nz</a> provided by the Electricity Authority (New Zealand), CC BY 4.0.</span>
+		<span>Irradiance: Himawari satellite data (JMA/JAXA) via <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>, CC BY 4.0.</span>
 	</p>
 </footer>
 
@@ -64,6 +64,7 @@
 	.links a { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; color: var(--muted); transition: color 0.15s, background 0.15s; }
 	.links a:hover { color: var(--ink); background: var(--grid); }
 	.links a:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-	.credits { margin: 0; max-width: 90ch; line-height: 1.5; }
-	.credits a { color: inherit; }
+	/* one credit per line */
+	.credits { margin: 0; display: grid; gap: 2px; line-height: 1.5; }
+	.credits a { color: inherit; white-space: nowrap; }
 </style>
