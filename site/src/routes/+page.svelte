@@ -1,7 +1,7 @@
 <script lang="ts">
 	// The landing page: the mark, one live figure and the generation mix, then a glimpse of each page.
-	// To add a page, add an entry to PAGES with a preview component in #lib/landing. Tracker comes first: the hero's
-	// horizon line flies down onto its preview as the page scrolls (Handoff).
+	// To add a page, add an entry to PAGES with a preview component in #lib/landing. As the page scrolls, the hero's
+	// horizon line shrinks into its dot, which flies down to the Tracker preview and opens out onto it (Handoff).
 	import { onMount } from 'svelte';
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
 	import Masthead from '#lib/site/Masthead.svelte';
@@ -21,10 +21,10 @@
 	const LIVE_MINUTES = 15;
 
 	const PAGES = [
-		{ href: '/tracker', name: 'Tracker', peek: TrackerPeek,
-			blurb: 'Generation by fuel, plant, owner or scheme, and prices at six grid nodes with the island spread and what each fuel earned, from the last 24 hours back to 1997.' },
 		{ href: '/now', name: 'Now', peek: NowPeek,
 			blurb: 'The system this five minutes: demand, prices at Haywards and Benmore, the HVDC link, emissions, and each island’s generation mix on the map.' },
+		{ href: '/tracker', name: 'Tracker', peek: TrackerPeek,
+			blurb: 'Generation by fuel, plant, owner or scheme, and prices at six grid nodes with the island spread and what each fuel earned, from the last 24 hours back to 1997.' },
 		{ href: '/articles', name: 'Articles', peek: ArticlesPeek,
 			blurb: 'New records, quarterly reviews and closer looks at how the system is running, written from the same data as the tracker.' },
 	];

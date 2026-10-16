@@ -1,7 +1,7 @@
 <script lang="ts">
 	// A glimpse of the Tracker for the landing page: the last 24 hours of generation, stacked by fuel. No y axis: the
 	// top of the chart is a rounded-up maximum, so a label there would read as a figure it isn't. On the landing page
-	// the hero's horizon line flies down onto this stack as you scroll (Handoff.svelte), which fills in beneath it.
+	// the hero's horizon line lands on this stack as you scroll (Handoff.svelte), which fills in beneath it.
 	import { TK, tracker } from './geometry.js';
 
 	let { D }: { D: any; now?: any } = $props();
@@ -65,8 +65,8 @@
 	path { stroke: none; }
 	.grid { stroke: var(--grid); stroke-width: 1; }
 	.axis { stroke: var(--line); stroke-width: 1; }
-	/* --ho is the hand-off's progress (0 at the top of the page, 1 once the line has landed); unset, all shows */
-	.fill { opacity: calc((var(--ho, 1) - 0.45) * 1.9); }
+	/* --ho is the hand-off's landing (0 until the line starts opening out here, 1 once it has landed); unset, all shows */
+	.fill { opacity: var(--ho, 1); }
 	.now { position: absolute; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--accent); pointer-events: none;
 		opacity: calc((var(--ho, 1) - 0.97) * 34); }
 	.now::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--accent); animation: ping 2.2s ease-out infinite; }

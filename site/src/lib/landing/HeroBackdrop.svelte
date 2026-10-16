@@ -1,7 +1,7 @@
 <script lang="ts">
 	// The landing hero's horizon: New Zealand's total generation over the last 24 hours as one outline across the
 	// width of the hero, ending in a pulsing dot at now. Hovering shows the total and time at that point. As the page
-	// scrolls, Handoff.svelte flies this line down onto the Tracker preview (geometry shared in geometry.js).
+	// scrolls, Handoff.svelte shrinks this line into its dot and flies it down to the Tracker preview (geometry shared in geometry.js).
 	import { HZ, horizon } from './geometry.js';
 
 	let { D }: { D: any } = $props();
@@ -65,8 +65,8 @@
 	.lbl { position: absolute; bottom: 4px; font-size: 0.7rem; color: var(--muted); font-family: var(--font-data); pointer-events: none; }
 	.lbl.l { left: 6%; }
 	.lbl.r { right: 0; transform: translateX(50%); }
-	/* while the line is away (Handoff.svelte sets --ho and data-ho on <html>), its fill fades and its own line and dot hide */
-	.area { fill: url(#bd-fill); opacity: calc(1 - var(--ho, 0) * 2.5); }
+	/* while the line is away (Handoff.svelte sets --ho-lift and data-ho on <html>), its fill fades and its own line and dot hide */
+	.area { fill: url(#bd-fill); opacity: calc(1 - var(--ho-lift, 0)); }
 	:global(html[data-ho]) .line, :global(html[data-ho]) .dot { opacity: 0; }
 	.line { fill: none; stroke: var(--accent); stroke-opacity: 0.55; stroke-width: 1.5; stroke-linejoin: round; }
 	.dot { position: absolute; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--accent); pointer-events: none; }
