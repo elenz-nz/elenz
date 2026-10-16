@@ -49,11 +49,11 @@
 </ul>
 
 <h2>From offers to a price</h2>
-<p>Each generator offers its output for every trading period, the half-hour the market is settled in: up to five blocks of megawatts per site, each at a price, which it can change until shortly before the trading period starts. Some large users can also bid to cut their demand when the price is high.</p>
+<p>Each generator offers its output for every trading period, the half-hour the market is settled in: up to five price bands for each station (some large thermal units are offered unit by unit), each a quantity of megawatts at a price. Offers must be in about a day and a half ahead, and can be revised until gate closure, an hour before the trading period starts for most generators; from then on the prices are locked. Some large users can also bid to cut their demand when the price is high.</p>
 
 <p>Every five minutes the system operator's dispatch software stacks those offers from cheapest to most expensive and runs the cheapest combination that meets demand. It does this for the whole grid at once, allowing for the energy lost on the lines, the limits of each line, and the reserve that must be held back in case a station or line trips.</p>
 
-<p>The result is a price at every grid point: what one more megawatt would cost to deliver there. In practice that is roughly the price of the last offer needed to meet demand, adjusted for losses and line limits along the way. The market quotes two reference points, Haywards near Wellington for the North Island and Benmore in the Waitaki valley for the South. Final prices for each trading period are published after checks, usually the next day.</p>
+<p>The result is a price at every grid point: what one more megawatt would cost to deliver there. In practice that is roughly the price of the last offer needed to meet demand, adjusted for losses and line limits along the way. The market quotes two reference points, Haywards near Wellington for the North Island and Benmore in the Waitaki valley for the South. Each trading period's price is the time-weighted average of its five-minute prices. It is published first as an interim price, and becomes final at 2 pm the next business day unless someone claims a pricing error.</p>
 
 <Figure caption="How the wholesale market works" wide>
 	<MarketDiagram />
@@ -75,7 +75,7 @@
 <p>Why would a hydro station, whose fuel falls from the sky, offer at $800? Because water used now can't be used later, so generators price it at what it is expected to be worth when it is needed most. That idea, the water value, runs through everything that follows; <a href={PARTS.water}>Part 3</a> looks at it in detail.</p>
 
 <h2>Who pays whom</h2>
-<p>Once the trading period is over and the meters are read, every generator is paid the final price at its grid point for what it generated, and every retailer and large user is charged the price at its own grid point for what its customers used. The two sides are settled each month.</p>
+<p>Once the trading period is over and the meters are read, every generator is paid the final price at its grid point for what it generated, and every retailer and large user is charged the price at its own grid point for what its customers used. Each calendar month is a billing period: the market's clearing manager works out what every participant owes and is owed, and the money changes hands on the 20th of the following month.</p>
 
 <p>Very few people pay that price directly. Most electricity is also covered by contracts that fix its price in advance: hedges between generators and retailers, futures traded on the ASX, and the gentailers selling their own generation to their own customers. A household pays its retailer a tariff set months ahead. The spot price still matters, because it is what all those contracts are priced against, and what any electricity outside a contract earns or costs.</p>
 
@@ -83,6 +83,8 @@
 <p>The price decides which stations run and when. A high price tells generators to run everything they have and large users to cut back; a low one tells hydro stations to save their water. Over years, the prices people expect are what new power stations are built against. When the price swings from $878/MWh one winter's day to about a dollar on a summer evening, it is telling everyone something about how much electricity there is to go round.</p>
 
 <p>The rest of the series follows that signal: <a href={PARTS.history}>thirty years of prices</a>, the <a href={PARTS.water}>water and gas</a> behind them, the <a href={PARTS.extremes}>most expensive and cheapest months</a>, <a href={PARTS.money}>where the money is made</a>, <a href={PARTS.bill}>how it reaches a power bill</a>, and <a href={PARTS.when}>when and where the price changes</a>.</p>
+
+<p class="a-src">The market's rules are in the Electricity Industry Participation Code: offers and gate closure in <a href="https://www.ea.govt.nz/code-and-compliance/the-code-electricity-industry-participation-code-2010/part-13-trading-arrangements/">Part 13</a> (clauses 13.6 to 13.17), interim and final prices in clauses 13.134A and 13.182A, and settlement in <a href="https://www.ea.govt.nz/code-and-compliance/the-code-electricity-industry-participation-code-2010/part-14-clearing-and-settlement/">Part 14</a> (clause 14.31).</p>
 
 <Note title="Words used in this series">
 	<dl class="gloss">
