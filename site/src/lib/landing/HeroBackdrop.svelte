@@ -64,7 +64,7 @@
 		-webkit-mask-image: linear-gradient(to right, transparent, #000 15%); mask-image: linear-gradient(to right, transparent, #000 15%); }
 	.lbl { position: absolute; bottom: 4px; font-size: 0.7rem; color: var(--muted); font-family: var(--font-data); pointer-events: none; }
 	.lbl.l { left: 6%; }
-	.lbl.r { right: 0; transform: translateX(50%); }
+	.lbl.r { right: 0; }
 	/* while the line is away (Handoff.svelte sets --ho-lift and data-ho on <html>), its fill fades and its own line and dot hide */
 	.area { fill: url(#bd-fill); opacity: calc(1 - var(--ho-lift, 0)); }
 	:global(html[data-ho]) .line, :global(html[data-ho]) .dot { opacity: 0; }

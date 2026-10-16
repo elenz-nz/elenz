@@ -9,8 +9,11 @@ This repository is public: never commit keys, tokens or personal details.
 - `site/`: SvelteKit 3 + Svelte 5, `adapter-static`, every page prerendered. Hosted on Cloudflare Workers as static
   assets (`wrangler.jsonc` at the repo root; build command `cd site && npm ci && npm run build`, deploy command
   `npx wrangler deploy`). Every push to `main` redeploys. Pages: `/` the landing page (`src/routes/+page.svelte`: the
-  mark, live total generation, a rotating second figure, the mix bar and a 24-hour line, then a glimpse of each page;
-  add a page to its `PAGES` list with a preview component in `src/lib/landing/`); `/now` the live page
+  logo (stacked on desktop, compact on phones), live total generation with one rotating second figure, a small live stamp,
+  and the 24-hour horizon line along the bottom of the first screen, then a glimpse of each page; add a page to its
+  `PAGES` list with a preview component in `src/lib/landing/`. As the page scrolls, `Handoff.svelte` shrinks the horizon
+  into its dot, flies it through the Now preview's map (building its rings and HVDC link via `build.svelte.js`) and opens
+  it out onto the Tracker preview; shared chart geometry in `geometry.js`, map positions in `src/lib/home/maplayout.js`); `/now` the live page
   (`src/routes/now/+page.svelte`: live figures, the island map with each island's mix ring, the generation mix now,
   from tracker.json's newest interval via `src/lib/home/now.js`; island outlines in `src/lib/home/nzmap.js`, made by
   `analysis/make_nz_map.py`); `/articles` records, quarterly reviews and analysis (`src/routes/articles/`; one
@@ -30,7 +33,7 @@ This repository is public: never commit keys, tokens or personal details.
   `src/lib/site/view.js`; the tab links carry it, so any view can be linked), and region, range and a chosen interval
   are also remembered in localStorage `elenz-view` (never the date); the rest is kept in `elenz-prices`). The tracker page markup
   is in `src/routes/tracker/+page.svelte` (About page: `src/routes/about/+page.svelte`, a card per chart on how it's built; shared
-  masthead, footer, logo mark and Buy Me a Coffee link in `src/lib/site/`); the canvas chart code is `src/lib/tracker/tracker.js` (vanilla JS, driven by
+  masthead, footer (© line, data credits, link icons: fill in a `href` in its `LINKS` to show a social account), logo mark and Buy Me a Coffee link in `src/lib/site/`); the canvas chart code is `src/lib/tracker/tracker.js` (vanilla JS, driven by
   element ids in the page), styles in `src/lib/tracker/tracker.css` (colour tokens, light/dark). The fuel table
   (colours, renewable flags, fallback emission factors) is `src/lib/tracker/fuels.js`, shared with the home pages;
   every emissions calculation goes through `src/lib/tracker/emissions.js` (the Rankines' quarterly factor, each
