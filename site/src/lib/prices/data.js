@@ -37,11 +37,12 @@ export const separated = (a, b) => { const d = Math.abs(a - b); return d > 10 &&
 export const CAP_FUELS = FUELS.filter((f) => f.k !== 'roof' && f.k !== 'hvdc');
 
 /** Adds rv_<fuel> (MW × $/MWh) and batt_d (battery discharge MW) per point wherever a segment lacks them, for points
- *  [0, upto): exact for 5-minute and half-hourly data; from daily means for daily history built before BUILD 5. */
-export function addRevenue(S, upto = S.n) {
+ *  [0, upto): exact for 5-minute and half-hourly data; from daily means for daily history built before BUILD 5.
+ *  force: recompute every point (half-hourly history merged with the live tail). */
+export function addRevenue(S, upto = S.n, force = false) {
   for (const isl of ['NI', 'SI']) {
     const I = S[isl], p = I.price;
-    const missing = (a) => !a || !a.subarray(0, upto).some((v) => v !== 0);
+    const missing = (a) => force || !a || !a.subarray(0, upto).some((v) => v !== 0);
     if (missing(I.batt_d)) { I.batt_d = I.batt_d || new Float64Array(S.n); for (let i = 0; i < upto; i++) I.batt_d[i] = Math.max(I.batt[i], 0); }
     for (const f of CAP_FUELS) {
       const key = 'rv_' + f.k, g = f.k === 'batt' ? I.batt_d : I[f.k];

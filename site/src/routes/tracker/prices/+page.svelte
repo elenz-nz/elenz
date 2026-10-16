@@ -109,7 +109,7 @@
 				if (!store.has('hh', from, to)) { busy = true; await store.load('hh', from, to); }
 				if (my !== token) return;
 				const m = store.merged('hh', live);
-				setView(timeView(atInterval(windowOf(m, from, to), iv), m.histEnd));
+				setView(timeView(atInterval(addRevenue(windowOf(m, from, to), undefined, true), iv), m.histEnd));
 			} else {
 				if (!store.has('day', 0, 0)) { busy = true; await store.load('day', 0, 0); }
 				if (my !== token) return;
