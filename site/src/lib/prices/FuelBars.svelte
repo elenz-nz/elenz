@@ -36,8 +36,8 @@
 	.rows { position: relative; display: grid; gap: 7px; padding-top: 20px; }
 	.row { display: grid; grid-template-columns: var(--lw) 1fr 58px 46px; align-items: center; column-gap: 0; font-size: 0.84rem; }
 	.nm { color: var(--ink-2); padding-right: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-	.track { height: 16px; position: relative; }
-	.bar { position: absolute; inset: 0 auto 0 0; border-radius: 2px; }
+	.track { display: block; height: 16px; position: relative; }
+	.bar { position: absolute; inset: 0 auto 0 0; height: 100%; border-radius: 2px; }
 	.v, .p { text-align: right; font-family: var(--font-data); font-variant-numeric: tabular-nums; }
 	.p { color: var(--muted); font-size: 0.78rem; }
 	.avg { position: absolute; top: 18px; bottom: 0; width: 0; border-left: 1.5px dashed var(--ink-2); z-index: 1; pointer-events: none; }

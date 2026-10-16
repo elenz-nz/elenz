@@ -42,9 +42,9 @@
 	.hm {
 		--h0: #e6eff0; --h1: #bfdadf; --h2: #86b9c4; --h3: #4793a6; --h4: #16697d; --h5: #d9731f;
 	}
-	:global(:root[data-theme='dark']) .hm { --h0: #1d2b2c; --h1: #1d4650; --h2: #21687a; --h3: #2f8ca2; --h4: #5cb5c8; --h5: #f08a3c; }
+	:global(:root[data-theme='dark']) .hm { --h0: #2c4244; --h1: #23596a; --h2: #2a7a8e; --h3: #3c9cb3; --h4: #7ccbdb; --h5: #f08a3c; }
 	@media (prefers-color-scheme: dark) {
-		:global(:root:not([data-theme='light'])) .hm { --h0: #1d2b2c; --h1: #1d4650; --h2: #21687a; --h3: #2f8ca2; --h4: #5cb5c8; --h5: #f08a3c; }
+		:global(:root:not([data-theme='light'])) .hm { --h0: #2c4244; --h1: #23596a; --h2: #2a7a8e; --h3: #3c9cb3; --h4: #7ccbdb; --h5: #f08a3c; }
 	}
 	.scroll { overflow-x: auto; }
 	.grid { min-width: 440px; display: grid; gap: 1px; }
