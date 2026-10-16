@@ -1,0 +1,95 @@
+"""Smoke test for the ingest code, run on every push (.github/workflows/checks.yml) and locally:
+
+  python3 ingest/tests/smoke.py
+
+Uses one hour of a real daily dispatch file (15 Oct 2026, 6:15-7:10 pm, sample_dispatch.csv.gz) and the matching
+interim final prices for the reference and Prices-page nodes (sample_final.csv). No network, no keys, no store.
+Checks that the live path (state.compact -> merge -> assemble) and the history path (half-hourly state -> final
+prices -> build_month -> daily summary -> combine_days) still run and produce the fields the website reads.
+"""
+import os
+import sys
+import tempfile
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+tmp = tempfile.mkdtemp(prefix='elenz-smoke-')
+os.environ['ELENZ_DATA'] = os.path.join(tmp, 'data')
+os.environ['ELENZ_OUT'] = os.path.join(tmp, 'out')
+sys.path.insert(0, os.path.dirname(HERE))
+
+import json  # noqa: E402
+
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
+
+import build_tracker as bt  # noqa: E402
+import history  # noqa: E402
+import state as st  # noqa: E402
+from common import overrides  # noqa: E402
+
+failures = []
+
+
+def check(cond, msg):
+    print(('ok    ' if cond else 'FAIL  ') + msg)
+    if not cond:
+        failures.append(msg)
+
+
+raw = pd.read_csv(os.path.join(HERE, 'sample_dispatch.csv.gz'), keep_default_na=False)
+
+# ---------- live path ----------
+s = st.merge(None, st.compact(raw, 'file'))
+check(len(s) == 12, f'compact: 12 five-minute intervals ({len(s)})')
+check({'P|NI', 'P|SI', 'L|NI', 'L|SI', 'T'} <= set(s.columns), 'compact: reference prices, island load, Tiwai')
+check(s['P|NI'].between(-100, 20000).all() and s['P|SI'].between(-100, 20000).all(), 'compact: reference prices plausible')
+check('P|WKM' in s and s['P|WKM'].notna().all(), 'compact: Whakamaru price (a generating node, in the daily files)')
+s2 = st.loads(st.dumps(s))
+check(s2.shape == s.shape, 'state: survives the gzip round trip')
+
+full = pd.date_range(s.index.min(), s.index.max(), freq='5min')
+g = s.reindex(full)
+zero = pd.Series(0.0, index=full)
+js = bt.assemble(g, full, {'NI': zero, 'SI': zero}, log=lambda *a: None)
+gen = sum(np.array(js[i][k]) for i in ('NI', 'SI') for k in bt.KEYS if k != 'batt')
+check(js['N'] == len(full) and len(js['NI']['price']) == len(full), 'assemble: series on the time grid')
+check(gen.min() > 2000, f'assemble: NZ generation above 2,000 MW at the evening peak ({gen.min():.0f})')
+check(all(k in js['NI'] for k in bt.KEYS), 'assemble: every fuel key present, including bio and waste')
+names = {p['name']: p['fuel'] for p in js['plants']}
+check(names.get('Kinleith') == 'bio' and names.get('Kawerau Mill CoGen') == 'bio' and names.get('Glenbrook Steel') == 'waste',
+      'assemble: Kinleith is bioenergy, Glenbrook waste heat')
+check('WKM' in js.get('nodes', {}), 'assemble: node prices written')
+json.dumps(js, allow_nan=False)
+check(True, 'assemble: JSON has no NaN')
+
+# ---------- history path ----------
+hh = s.drop(columns='src')
+tp = hh.index.floor('30min')
+h = hh.groupby(tp).mean()
+h.insert(0, 'n', hh.groupby(tp).size())
+h.index.name = 't'
+for c in history.irr_cols():
+    h[c] = np.nan
+with open(os.path.join(HERE, 'sample_final.csv'), 'rb') as f:
+    fin = history.parse_final(f.read(), interim=True)
+check(fin is not None and set(history.final_cols()) <= set(fin.columns), 'parse_final: reference and extra nodes')
+h = h.join(fin, how='left')
+cols = history.final_cols()
+check(h[cols].notna().all().all(), 'parse_final: every half-hour of the sample priced')
+cap = bt.default_capacity()
+hhj, dd = history.build_month(h, '2026-10', cap, log=lambda *a: None)
+json.dumps(hhj, allow_nan=False)
+json.dumps(dd, allow_nan=False)
+check(abs(hhj['NI']['price'][0] - float(fin['F|NI'].iloc[0])) < 0.01, 'build_month: history uses the final price')
+check(set(overrides()['price_nodes']) <= set(hhj.get('nodes', {})), 'build_month: every extra node in the half-hourly file')
+for k in ('p10', 'p90', 'pmin', 'pmax', 'n500', 'n1000', 'rv_hydro', 'rv_geo', 'batt_d'):
+    check(k in dd['NI'] and len(dd['NI'][k]) == len(dd['t']), f'daily: {k}')
+check(dd['NI']['pmin'][0] <= dd['NI']['p10'][0] <= dd['NI']['p90'][0] <= dd['NI']['pmax'][0], 'daily: pmin <= p10 <= p90 <= pmax')
+cap_h = dd['NI']['rv_hydro'][0] / max(dd['NI']['hydro'][0], 1)
+check(dd['NI']['pmin'][0] * 0.9 <= cap_h <= dd['NI']['pmax'][0] * 1.1, f'daily: hydro captured price within the day\'s range ({cap_h:.0f})')
+day = history.combine_days([dd, dd])
+check(day['N'] == 2 * len(dd['t']) and len(day['nodes']['OTA']) == day['N'], 'combine_days: node prices joined')
+check(len(day['NI']['p10']) == day['N'], 'combine_days: price spread joined')
+
+print(f'\n{len(failures)} failed' if failures else '\nall passed')
+sys.exit(1 if failures else 0)

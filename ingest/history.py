@@ -10,9 +10,13 @@ Stored (Cloudflare KV in GitHub Actions, data/store locally), one set per NZ cal
                              G|<point>, D|<point> = satellite global and diffuse irradiance (W/m², Open-Meteo,
                              Himawari) at each rooftop solar point (facilities/rooftop_points.csv),
                              F|NI and F|SI = final prices at Haywards and Benmore (fi = 1 while only interim),
+                             F|OTA, ... = final prices at the other [price_nodes],
                              H|BEN, H|HAY = metered HVDC transfer northward at each end (MW, once published)
   hist/hh/YYYY-MM.json       the month in the tracker.json layout, half-hourly (the website's 30-day view)
-  hist/dd/YYYY-MM.json       daily averages for the month, plus each day's peak demand and peak generation
+  hist/dd/YYYY-MM.json       daily averages for the month, plus each day's peak demand and peak generation, the
+                             spread of each island's half-hourly price (p10, p90, pmin, pmax, n500, n1000 = half-hours
+                             over $500 and $1,000) and each fuel's revenue at its island's price (rv_<fuel>, $/h, so
+                             rv / generation is the price it captured; batt_d = battery discharge only)
 and across all months:
   hist/day.json              every day since 2020 (the 1-year and all-time views)
   hist/index.json            months stored, first and last time (published once the backfill has caught up)
@@ -55,8 +59,8 @@ import pandas as pd
 import hvdc
 import rooftop
 import state as st
-from build_tracker import assemble, enc
-from common import BLOB, FACILITIES, NZ
+from build_tracker import assemble, enc, enc_na
+from common import BLOB, FACILITIES, NZ, overrides
 from store import open_store
 from sync import DISPATCH
 
@@ -64,9 +68,10 @@ warnings.simplefilter("ignore", pd.errors.PerformanceWarning)  # wide monthly fr
 FINAL = 'Datasets/Wholesale/DispatchAndPricing/FinalEnergyPrices'
 HVDC_FLOWS = 'Datasets/Wholesale/Metered_data/HVDC_Flows'
 
-BUILD = 4                    # bump to rebuild every month's JSON after changing how it is built (2: final prices, 3: peak generation,
-                             # 4: satellite rooftop solar model by point, metered HVDC)
-GEN_FUELS = ('geo', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
+BUILD = 5                    # bump to rebuild every month's JSON after changing how it is built (2: final prices, 3: peak generation,
+                             # 4: satellite rooftop solar model by point, metered HVDC; 5: more price nodes, daily price
+                             # spread and revenue by fuel, bioenergy and waste heat)
+GEN_FUELS = ('geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
 WRITE_BUDGET = 280           # KV writes a day (UTC) for this job; the live job needs ~600 of the 1,000
 FIRST_DAY = date(2020, 9, 10)
 IRR_MONTHS_PER_RUN = 20      # months of missing satellite irradiance fetched per run (~100 Open-Meteo calls each)
@@ -178,10 +183,19 @@ def add_hvdc(s, m):
 
 # ---------- final prices ----------
 
+def price_nodes():
+    """Column key -> node: the island reference nodes (NI: HAY2201, SI: BEN2201) and the other [price_nodes]."""
+    O = overrides()
+    return {**O['reference_nodes'], **O.get('price_nodes', {})}
+
+
+def final_cols():
+    return [f'F|{k}' for k in price_nodes()]
+
+
 def parse_final(raw, interim=False):
-    """An EA FinalEnergyPrices CSV -> rows per trading period (UTC start): F|NI, F|SI, fi."""
-    from common import overrides
-    ref = overrides()['reference_nodes']   # NI: HAY2201, SI: BEN2201
+    """An EA FinalEnergyPrices CSV -> rows per trading period (UTC start): F|NI, F|SI, F|<other nodes>, fi."""
+    ref = price_nodes()
     d = pd.read_csv(io.BytesIO(raw), usecols=['TradingDate', 'TradingPeriod', 'PointOfConnection', 'DollarsPerMegawattHour'])
     d = d[d.PointOfConnection.isin(ref.values())]
     if d.empty:
@@ -190,7 +204,7 @@ def parse_final(raw, interim=False):
     midnight = pd.to_datetime(d.TradingDate).dt.tz_localize(NZ).dt.tz_convert('UTC')
     d['t'] = midnight + pd.to_timedelta((d.TradingPeriod - 1) * 30, unit='min')
     out = d.pivot_table(index='t', columns='PointOfConnection', values='DollarsPerMegawattHour', aggfunc='mean')
-    out = out.rename(columns={node: f'F|{isl}' for isl, node in ref.items()})
+    out = out.rename(columns={node: f'F|{isl}' for isl, node in ref.items()}).reindex(columns=final_cols())
     out['fi'] = 1.0 if interim else 0.0
     return out
 
@@ -216,11 +230,15 @@ def final_prices(m, days):
 
 
 def add_final(s, m):
-    """Fill in final prices for trading periods that lack them (or have interim ones). True if anything changed."""
-    for c in ('F|NI', 'F|SI', 'fi'):
+    """Fill in final prices for trading periods that lack them (or have interim ones). True if anything changed.
+
+    Also periods priced before the other nodes were added (none of them stored): their final prices are fetched again."""
+    cols = final_cols()
+    extra = [c for c in cols if c not in ('F|NI', 'F|SI')]
+    for c in cols + ['fi']:
         if c not in s:
             s[c] = np.nan
-    need = s.index[s['F|NI'].isna() | s['F|SI'].isna() | (s['fi'] == 1)]
+    need = s.index[s['F|NI'].isna() | s['F|SI'].isna() | (s['fi'] == 1) | (s[extra].isna().all(axis=1) if extra else False)]
     if not len(need):
         return False
     days = sorted(set(need.tz_convert(NZ).date))
@@ -230,9 +248,10 @@ def add_final(s, m):
     f = f.reindex(need).dropna(subset=['F|NI', 'F|SI'], how='all')
     if f.empty:
         return False
-    before = s.loc[f.index, ['F|NI', 'F|SI', 'fi']].copy()
-    s.loc[f.index, ['F|NI', 'F|SI', 'fi']] = f[['F|NI', 'F|SI', 'fi']].values
-    return not before.equals(s.loc[f.index, ['F|NI', 'F|SI', 'fi']])
+    f = f.reindex(columns=cols + ['fi'])
+    before = s.loc[f.index, cols + ['fi']].copy()
+    s.loc[f.index, cols + ['fi']] = f[cols + ['fi']].values
+    return not before.equals(s.loc[f.index, cols + ['fi']])
 
 
 # ---------- one month: state -> tracker-layout JSON and daily summary ----------
@@ -250,6 +269,9 @@ def build_month(s, month, cap, log):
         for isl in ('NI', 'SI'):
             g[f'P|{isl}'] = g[f'F|{isl}'].combine_first(g[f'P|{isl}'])
         final = g['F|NI'].notna() & (g['fi'] != 1)
+    for k in overrides().get('price_nodes', {}):   # the other nodes: final prices (dispatch only for WKM2201)
+        if f'F|{k}' in g:
+            g[f'P|{k}'] = g[f'F|{k}'].combine_first(g[f'P|{k}']) if f'P|{k}' in g else g[f'F|{k}']
     irr = g.reindex(columns=irr_cols()).interpolate(limit_area='inside', limit=2)
     roof = rooftop.output(irr.set_axis(full + pd.Timedelta(minutes=15)), full + pd.Timedelta(minutes=15), cap)
     roof = {k: pd.Series(v.values, index=full) for k, v in roof.items()}
@@ -275,6 +297,25 @@ def daily(js, month):
            'hvdcN': mean(js['hvdcN'])}
     for isl in ('NI', 'SI'):
         out[isl] = {k: mean(v, 2 if k == 'price' else 0) for k, v in js[isl].items()}
+        # the day's half-hourly price spread, and revenue by fuel at the island price (the Prices page)
+        price = pd.Series(js[isl]['price'], index=day, dtype=float)
+        g = price.groupby(level=0)
+        for k, v in (('p10', g.quantile(0.1)), ('p90', g.quantile(0.9)), ('pmin', g.min()), ('pmax', g.max())):
+            out[isl][k] = enc(v.reindex(days), 2)
+        for k, lim in (('n500', 500), ('n1000', 1000)):
+            out[isl][k] = enc((price > lim).groupby(level=0).sum().reindex(days))
+        p = price.values
+        for f in GEN_FUELS:
+            if f == 'roof' or f not in js[isl]:
+                continue   # embedded solar isn't paid the spot price
+            gen = np.array(js[isl][f], float)
+            if f == 'batt':
+                gen = np.maximum(gen, 0)   # discharge only
+                out[isl]['batt_d'] = mean(gen)
+            out[isl][f'rv_{f}'] = mean(gen * p)
+    if js.get('nodes'):
+        out['nodes'] = {k: enc_na(pd.Series(v, index=day, dtype=float).groupby(level=0).mean().reindex(days))
+                        for k, v in js['nodes'].items()}
     peak = {}
     for k in ('metered', 'underlying', 'gen'):
         if k == 'gen':  # total generation including rooftop solar, as the page sums it (output only, no HVDC)
@@ -301,7 +342,7 @@ def daily(js, month):
 def combine_days(dds):
     """Monthly daily summaries (oldest first) -> one daily series for the whole history."""
     n = sum(len(d['t']) for d in dds)
-    out = {'t': [], 'h': [], 'hvdcN': [], 'NI': {}, 'SI': {}, 'peak': {}, 'plants': []}
+    out = {'t': [], 'h': [], 'hvdcN': [], 'NI': {}, 'SI': {}, 'nodes': {}, 'peak': {}, 'plants': []}
     plants, pos = {}, 0
     for d in dds:
         m = len(d['t'])
@@ -310,6 +351,9 @@ def combine_days(dds):
             for k, v in d[isl].items():
                 out[isl].setdefault(k, [0] * pos)
                 out[isl][k] += v
+        for k, v in d.get('nodes', {}).items():
+            out['nodes'].setdefault(k, [None] * pos)
+            out['nodes'][k] += v
         for r, kv in d['peak'].items():
             for k, v in kv.items():
                 out['peak'].setdefault(r, {}).setdefault(k, [0] * pos)
@@ -329,6 +373,8 @@ def combine_days(dds):
         for isl in ('NI', 'SI'):  # a series missing from a month (no output anywhere) is zero
             for k, v in out[isl].items():
                 v += [0] * (pos - len(v))
+        for v in out['nodes'].values():  # a node price missing from a month is a gap
+            v += [None] * (pos - len(v))
     out['N'] = n
     for q in plants.values():
         entry = {k: q[k] for k in ('name', 'fuel', 'isl', 'poc', 'cap')}

@@ -18,7 +18,7 @@ import rooftop
 import state as st
 
 WINDOW = 7 * 288
-KEYS = ['coal', 'gas', 'diesel', 'geo', 'hydro', 'wind', 'solar', 'batt']
+KEYS = ['coal', 'gas', 'diesel', 'geo', 'bio', 'waste', 'hydro', 'wind', 'solar', 'batt']   # bio: bioenergy; waste: waste heat
 
 
 def register():
@@ -45,6 +45,11 @@ def register():
 
 def enc(s, dp=0):
     return [round(float(v), dp) if dp else int(round(float(v))) for v in s]
+
+
+def enc_na(s, dp=2):
+    """Like enc, but a missing value is written as null (the page leaves a gap) rather than failing."""
+    return [None if v != v else round(float(v), dp) for v in s]
 
 
 def default_capacity():
@@ -151,11 +156,20 @@ def assemble(s, full, roof, log=print):
             out[isl]['roofU'] = roof[isl + 'u'].interpolate(limit_area='inside', limit=6).fillna(0).clip(lower=0)
     out['NI']['hvdc'] = hay
     out['SI']['hvdc'] = -ben
+    # more price nodes (the Prices page): gaps up to 12 points bridged, longer ones left empty (intervals filled from
+    # the daily files, which have no bus rows)
+    nodes = {}
+    for k in O.get('price_nodes', {}):
+        c = s.get(f'P|{k}')
+        if c is not None and c.notna().any():
+            nodes[k] = c.interpolate(limit=12, limit_area='inside')
 
     t0 = int(full[0].timestamp() * 1000)
     js = {'t0': t0, 'step': int(full.freq.nanos // 1_000_000), 'N': len(full), 'hvdcN': enc(hv)}
     for isl in ['NI', 'SI']:
         js[isl] = {k: enc(v, 2 if k == 'price' else 0) for k, v in out[isl].items()}
+    if nodes:
+        js['nodes'] = {k: enc_na(v) for k, v in nodes.items()}
 
     plants = []
     for (pname, f, isl), us in plant_units.items():

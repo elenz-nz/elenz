@@ -6,6 +6,7 @@ Raw dispatch rows (daily files or API) are reduced to what the tracker needs:
   L|NI, L|SI   island grid load MW, excluding battery charging
   T            Tiwai smelter load MW
   P|NI, P|SI   island reference price $/MWh
+  P|OTA, ...   price at the other nodes in [price_nodes] (API only: the daily files have no bus rows)
 plus 'src' ('api', 'file', or 'empty' for intervals with no dispatch case, so they aren't fetched again).
 About 110-140 columns × ~2,300 rows (KEEP_DAYS): roughly 0.3 MB gzipped.
 """
@@ -47,6 +48,11 @@ def compact(d, src):
         ok = (d.isl == isl) & (d.get('IsDeadFlag', 'N') == 'N') & (lf > 0.5)
         derived = (d.DollarsPerMegawattHour[ok] / lf[ok]).groupby(d.t[ok]).median()
         parts.append(direct.combine_first(derived).rename(f'P|{isl}').to_frame())
+    # more price nodes ([price_nodes]): bus rows, in the API but not the daily files (WKM2201 is in both)
+    for k, node in O.get('price_nodes', {}).items():
+        direct = d[d.PointOfConnectionCode == node].groupby('t').DollarsPerMegawattHour.mean()
+        if len(direct):
+            parts.append(direct.rename(f'P|{k}').to_frame())
     s = pd.concat(parts, axis=1)
     unit_cols = [c for c in s.columns if c[:2] in ('U|', 'C|')]
     s[unit_cols] = s[unit_cols].fillna(0.0)  # a unit absent from a published interval was at zero

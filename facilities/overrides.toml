@@ -9,6 +9,14 @@
 "MPE1101 KWK0" = { fuel = "wind",  plant = "Kaiwaikawe Wind Farm" }
 "ISL0661 KPS0" = { fuel = "solar", plant = "Kōwhai Park Solar Farm" }
 "BRB0331 RUS0" = { fuel = "solar", plant = "Ruakākā Solar Farm" }
+# Fuel corrections (Oct 2026). Kinleith is Oji Fibre Solutions' wood-waste cogeneration, not gas (the register says
+# Gas). KAW0112 ONU0 is the Kawerau pulp mill's cogeneration (recovery and bark boilers: black liquor and wood, some
+# geothermal steam), not a geothermal station (the register says Geothermal). Glenbrook runs on waste gas and heat
+# from NZ Steel's ironmaking, not pipeline gas: "waste" (waste heat), zero emissions by convention (UN CDM
+# ACM0004; the ironmaking emissions are counted in industrial processes), not renewable.
+"KIN0112 KIN0" = { fuel = "bio", plant = "Kinleith" }
+"KAW0112 ONU0" = { fuel = "bio", plant = "Kawerau Mill CoGen" }
+"GLN0332 GLN0" = { fuel = "waste", plant = "Glenbrook Steel" }
 
 # Dispatched solar farms on local networks that the distributed generation registry (EMI report GUEHMT) also counts.
 # The tracker shows them as grid solar, so the rooftop solar model removes them: key = plant, nsp = the Root NSP where
@@ -64,6 +72,14 @@ OHG2201 = "NI"
 [reference_nodes]
 NI = "HAY2201"   # Haywards
 SI = "BEN2201"   # Benmore
+
+# More price nodes for the Prices page (north to south). Live: the real-time API's bus rows (the daily dispatch
+# files lack bus nodes, so intervals filled from them have no price here); history: the EA's final prices.
+[price_nodes]
+OTA = "OTA2201"  # Ōtāhuhu (Auckland)
+WKM = "WKM2201"  # Whakamaru
+ISL = "ISL2201"  # Islington (Christchurch)
+INV = "INV2201"  # Invercargill
 
 # Load connection points shown separately.
 [loads]
