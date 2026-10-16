@@ -2,7 +2,7 @@
 	// The Prices tab of the tracker: node prices, the island spread and HVDC on one time axis (the live week and 30
 	// days), or each period's price range, spread and spikes (12 months and all history); then the price each fuel
 	// captured over the range and a heat map of the last 30 days by time of day. Data: #lib/prices/data.js.
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
 	import { fromLayout, historyStore, firstAtOrAfter } from '#lib/tracker/series.js';
 	import Masthead from '#lib/site/Masthead.svelte';
@@ -287,10 +287,11 @@
 		}
 		heatRows = heat(heatSeg, heatKey);
 	}
-	$effect(() => { if (heatSeg) heatRows = heat(heatSeg, heatKey); });
+	$effect(() => { const k = heatKey; untrack(() => { if (heatSeg) heatRows = heat(heatSeg, k); }); });
 
 	// rebuild when the range, interval or data change
-	$effect(() => { void range; void int; void live; build(); });
+	// (build reads and writes the view, so it runs untracked: only these three trigger it)
+	$effect(() => { void range; void int; void live; untrack(() => build()); });
 
 	function keys(e: KeyboardEvent) {
 		if (!view) return;
