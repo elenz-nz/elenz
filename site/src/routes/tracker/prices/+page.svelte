@@ -406,6 +406,7 @@
 
 	onMount(() => {
 		restore();
+		save();   // the address shows the view from the start, so it can be copied as a link
 		let due = 0, stamp = 0;
 		async function load() {
 			const r = await fetch(DATA_URL, { cache: 'no-cache' });
