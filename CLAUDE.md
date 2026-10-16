@@ -25,8 +25,10 @@ This repository is public: never commit keys, tokens or personal details.
   two tabs (`src/lib/site/TrackerTabs.svelte`, under the masthead): Generation at `/tracker` and Prices at `/tracker/prices`
   (`src/routes/tracker/prices/+page.svelte`: six node prices, the island spread and HVDC on one time axis for the live week and
   30 days; each period's price range, spread and half-hours over $500/$1,000 for 12 months and All; price captured by fuel;
-  a 30-day time-of-day heat map. Data shaping in `src/lib/prices/data.js`, SVG charts in `src/lib/prices/`. Region and range
-  are shared with the Generation tab through localStorage `elenz-view`; the rest is kept in `elenz-prices`). The tracker page markup
+  a 30-day time-of-day heat map. Data shaping in `src/lib/prices/data.js`, SVG charts in `src/lib/prices/`. Region, range,
+  interval and date are shared with the Generation tab through the address (`?region=&range=&int=&end=YYYY-MM-DD`,
+  `src/lib/site/view.js`; the tab links carry it, so any view can be linked), and region, range and a chosen interval
+  are also remembered in localStorage `elenz-view` (never the date); the rest is kept in `elenz-prices`). The tracker page markup
   is in `src/routes/tracker/+page.svelte` (About page: `src/routes/about/+page.svelte`, a card per chart on how it's built; shared
   masthead, footer, logo mark and Buy Me a Coffee link in `src/lib/site/`); the canvas chart code is `src/lib/tracker/tracker.js` (vanilla JS, driven by
   element ids in the page), styles in `src/lib/tracker/tracker.css` (colour tokens, light/dark). The fuel table

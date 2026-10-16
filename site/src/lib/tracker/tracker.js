@@ -4,7 +4,8 @@
 import { FUELS } from './fuels.js';
 import { efAt, geoEf } from './emissions.js';
 import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTotal } from './series.js';
-import PLANT_META from './plants.json';  // owner and hydro scheme per plant (ingest/plant_meta.py)
+import PLANT_META from './plants.json';
+import { readView, writeView } from '#lib/site/view.js';  // owner and hydro scheme per plant (ingest/plant_meta.py)
 export { nzOffset, tzName };
 
 // A model: one segment (series.js) plus what the charts read. NIs/SIs are the island series (same objects).
@@ -32,7 +33,6 @@ const INTS = {
   '1w': { label: 'Week', key: KEY.week },
   '1mo': { label: 'Month', key: KEY.month },
 };
-const OLD_RANGE = { 288: '1d', 864: '3d', 2016: '7d' };
 
 export function mountTracker(D, hooks = {}) {
   const models = { live: buildModel(D), hh: null, day: null };
@@ -144,22 +144,23 @@ export function mountTracker(D, hooks = {}) {
     .filter(p => p.fuel === fuel && (r === 'NZ' || p.isl === r));
   const plantByName = name => M.plants.find(p => p.name === name);
 
-  const state = { region: 'NZ', range: '1d', end: null, kind: 'live', int: '5m', view: 'detailed', unit: 'mw', hover: null, hoverBy: null, hidden: new Set(), drill: { ...TOP_LEVEL },
-                  open: new Set(), filter: '' };
-  let saved = null;
+  // intPicked: the viewer chose the interval (shared with the Prices tab); otherwise it's this tab's default for the range
+  const state = { region: 'NZ', range: '1d', end: null, kind: 'live', int: '5m', intPicked: false, view: 'detailed', unit: 'mw', hover: null, hoverBy: null,
+                  hidden: new Set(), drill: { ...TOP_LEVEL }, open: new Set(), filter: '' };
+  // region, range, interval and date: the address first, then this browser's last view (#lib/site/view.js)
+  const init = readView();
+  state.region = init.region;
+  if (init.int && Object.hasOwn(INTS, init.int)) { state.int = init.int; state.intPicked = true; }
+  let saved = null;  // a long range or a past date needs history loaded first (see below)
+  if (RANGES[init.range].model === 'live' && init.end == null) state.range = init.range;
+  else saved = { range: init.range, end: init.end };
   try {
     const s = JSON.parse(localStorage.getItem('elenz-view') || 'null');
-    if (s && ['NZ', 'NI', 'SI'].includes(s.region)) state.region = s.region;
-    const r = OLD_RANGE[s?.range] || s?.range;
-    if (Object.hasOwn(RANGES, r)) saved = r;  // a long range needs history loaded first (see below)
-    if (s && Object.hasOwn(INTS, s.int)) state.int = s.int;
-    else if (s?.agg === 6) state.int = '30m';
     if (s && Object.hasOwn(VIEWS, s.view)) state.view = s.view;
     if (s?.unit === 'pct') state.unit = 'pct';
   } catch (e) {}
-  if (saved && RANGES[saved].model === 'live') { state.range = saved; saved = null; }
-  if (!RANGES[state.range].ints.includes(state.int)) state.int = RANGES[state.range].def || RANGES[state.range].ints[0];
-  const save = () => { try { localStorage.setItem('elenz-view', JSON.stringify({ region: state.region, range: state.range, int: state.int, view: state.view, unit: state.unit })); } catch (e) {} };
+  if (!RANGES[state.range].ints.includes(state.int)) { state.int = RANGES[state.range].def || RANGES[state.range].ints[0]; state.intPicked = false; }
+  const save = () => writeView({ region: state.region, range: state.range, int: state.intPicked ? state.int : null, end: state.end }, { view: state.view, unit: state.unit });
 
   // ---------- time helpers ----------
   const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -877,7 +878,8 @@ export function mountTracker(D, hooks = {}) {
     return end - R.days * DAY >= models.live.t[0] - 6e4 ? 'live' : 'hh';
   }
   let pending = 0;
-  async function setView(r, end = state.end) {
+  // keepInt: keep a chosen interval across a range change; wantInt: the interval to open on (from the address)
+  async function setView(r, end = state.end, keepInt = false, wantInt = null) {
     const R = RANGES[r];
     if (R.fixed || (end != null && end >= endOfToday())) end = null;
     const kind = kindFor(r, end), ticket = ++pending;
@@ -898,9 +900,11 @@ export function mountTracker(D, hooks = {}) {
         if (ticket !== pending) return;  // another view was chosen while this one loaded
       }
     }
+    if (r !== state.range && !keepInt) state.intPicked = false;   // a new range starts on its default interval
     state.range = r; state.end = end; state.kind = kind;
     const ints = intsFor(r, kind);
-    if (!ints.includes(state.int)) state.int = R.def && ints.includes(R.def) ? R.def : ints[0];
+    if (wantInt && ints.includes(wantInt)) { state.int = wantInt; state.intPicked = true; }
+    if (!state.intPicked || !ints.includes(state.int)) { state.int = R.def && ints.includes(R.def) ? R.def : ints[0]; state.intPicked = false; }
     useModel(); rebuild();
   }
   const step = dir => {
@@ -939,7 +943,7 @@ export function mountTracker(D, hooks = {}) {
     state.unit = b.dataset.v; syncControls(); renderCrumbs(); render(); save();
   });
   $('mix-filter').addEventListener('input', e => { state.filter = e.target.value; applyFilter(); });
-  $('seg-int').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || !intsFor(state.range, state.kind).includes(b.dataset.v)) return; state.int = b.dataset.v; rebuild(); });
+  $('seg-int').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || !intsFor(state.range, state.kind).includes(b.dataset.v)) return; state.int = b.dataset.v; state.intPicked = true; rebuild(); });
 
   // ---------- pointer and keyboard: one time cursor across both chart panels, a tooltip that follows the mouse ----------
   const boxes = [$('charts'), $('charts-more')];
@@ -1031,7 +1035,7 @@ export function mountTracker(D, hooks = {}) {
 
   readColours();
   rebuild();
-  if (saved) setView(saved);  // reopen on the viewer's last long range once its history has loaded
+  if (saved) setView(saved.range, saved.end, true, init.int);  // a long range or past date, once its history has loaded
 
   return {
     // new data: keep the viewer's region, range, interval and drill-down; drop the hover point

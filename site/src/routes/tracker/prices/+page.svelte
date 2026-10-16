@@ -7,6 +7,7 @@
 	import { fromLayout, historyStore, firstAtOrAfter, slice, nzOffset } from '#lib/tracker/series.js';
 	import Masthead from '#lib/site/Masthead.svelte';
 	import TrackerTabs from '#lib/site/TrackerTabs.svelte';
+	import { readView, writeView, midnightOf, addDays, ymd, endOfDay } from '#lib/site/view.js';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import TimeChart from '#lib/prices/TimeChart.svelte';
 	import FuelBars from '#lib/prices/FuelBars.svelte';
@@ -51,42 +52,40 @@
 	const FIRST = Date.UTC(2020, 8, 10) - 12 * 36e5; // history starts 10 Sep 2020 (NZ)
 
 	const store = historyStore();
-	const R = $derived(RANGES[range as keyof typeof RANGES]);
+	const R = $derived(RANGES[range as keyof typeof RANGES] as { mode: string; src: string; days: number | null; ints: string[]; label: string; def?: string });
 	const age = $derived(meta ? (now - meta.end) / 60000 : 0);
 	const isLive = $derived(meta !== null && age < LIVE_MINUTES);
 
 	// ---------- settings: region and range shared with the Generation tab; the rest kept for this page ----------
+	// region, range, interval and date are shared with the Generation tab through the address (#lib/site/view.js);
+	// the scale, hidden nodes and node choices are this page's own
+	let intPicked = $state(false);   // the viewer chose the interval; otherwise this page's default for the range
 	function restore() {
+		const v = readView();
+		region = v.region;
+		range = v.range in RANGES ? v.range : '1d';
+		if (v.int) { int = v.int; intPicked = true; }
+		endT = v.end;
 		try {
-			const v = JSON.parse(localStorage.getItem('elenz-view') || 'null');
-			if (v && ['NZ', 'NI', 'SI'].includes(v.region)) region = v.region;
-			if (v && v.range in RANGES) range = v.range;
 			const p = JSON.parse(localStorage.getItem('elenz-prices') || 'null');
 			if (p) {
 				if (SCALES.some((s) => s.k === p.scale)) scale = p.scale;
 				if (Array.isArray(p.off)) off = p.off.filter((k: string) => k in NODE);
 				if (p.band in NODE) bandKey = p.band;
 				if (p.heat in NODE) heatKey = p.heat;
-				if (p.ints && p.ints[range] && (RANGES as any)[range].ints.includes(p.ints[range])) int = p.ints[range];
-				else int = (RANGES as any)[range].def || (RANGES as any)[range].ints[0];
-			} else int = (RANGES as any)[range].def || (RANGES as any)[range].ints[0];
+			}
 		} catch { /* storage blocked: defaults */ }
 	}
-	let ints: Record<string, string> = {};
 	function save() {
-		try {
-			const v = JSON.parse(localStorage.getItem('elenz-view') || 'null') || {};
-			localStorage.setItem('elenz-view', JSON.stringify({ ...v, region, range }));
-			ints[range] = int;
-			localStorage.setItem('elenz-prices', JSON.stringify({ scale, off, band: bandKey, heat: heatKey, ints }));
-		} catch { /* storage blocked */ }
+		writeView({ region, range, int: intPicked && intChoices.includes(int) ? int : null, end: R.days == null ? null : endT });
+		try { localStorage.setItem('elenz-prices', JSON.stringify({ scale, off, band: bandKey, heat: heatKey })); } catch { /* storage blocked */ }
 	}
 	function pickRange(k: string) {
 		range = k;
-		const r = (RANGES as any)[k];
-		int = ints[k] && r.ints.includes(ints[k]) ? ints[k] : r.def || r.ints[0];
+		intPicked = false;   // a new range starts on its default interval, as on the Generation tab
 		save();
 	}
+	const setEnd = (t: number | null) => { endT = t; save(); };
 
 	// ---------- building the view ----------
 	// the points of a segment in (from, to]
@@ -95,7 +94,7 @@
 	// a window ending before the live week reaches back past it: the live ranges then come from half-hourly history
 	const pastLive = $derived(R.src === 'live' && endT !== null && live && endT - (R.days ?? 0) * 864e5 < live.t[0]);
 	const intChoices = $derived(pastLive ? ['30m'] : R.ints);
-	const effInt = $derived(intChoices.includes(int) ? int : intChoices[0]);
+	const effInt = $derived(intPicked && intChoices.includes(int) ? int : R.def && intChoices.includes(R.def) ? R.def : intChoices[0]);
 
 	let token = 0;
 	async function build() {
@@ -360,25 +359,23 @@
 
 	// rebuild when the range, interval or data change
 	// (build reads and writes the view, so it runs untracked: only these three trigger it)
-	$effect(() => { void range; void int; void live; void endT; untrack(() => build()); });
+	$effect(() => { void range; void int; void intPicked; void live; void endT; untrack(() => build()); });
 
 	// ---------- moving through time: the date box and the arrows ----------
 	const canMove = $derived(R.days != null);
-	const atLatest = $derived(endT === null || endT >= latestT);
+	// windows end at a local midnight (the end of the chosen day), stepping by whole days, as on the Generation tab
+	const endOfToday = $derived(live ? addDays(midnightOf(latestT), 1) : 0);
+	const atLatest = $derived(endT === null || endT >= endOfToday);
 	function step(dir: number) {
 		if (!R.days || !live) return;
-		const base = endT ?? latestT;
-		const next = Math.max(FIRST + R.days * 864e5, base + dir * R.days * 864e5);
-		endT = next >= latestT ? null : next;
+		const next = addDays(endT ?? endOfToday, dir * R.days);
+		setEnd(next >= endOfToday ? null : Math.max(next, addDays(FIRST, R.days)));
 	}
-	const isoDay = (t: number) => { const d = new Date(t + nzOffset(t)); return d.toISOString().slice(0, 10); };
-	const dateValue = $derived(live ? isoDay((endT ?? latestT) - 1) : '');
+	const isoDay = ymd;
+	const dateValue = $derived(live ? ymd((endT ?? latestT) - 1) : '');
 	function pickDate(v: string) {
-		if (!v) { endT = null; return; }
-		const [y, m, d] = v.split('-').map(Number);
-		let t = Date.UTC(y, m - 1, d + 1);         // the end of that NZ day: midnight after it
-		t -= nzOffset(t - 12 * 36e5);
-		endT = t >= latestT ? null : Math.max(t, FIRST + (R.days ?? 0) * 864e5);
+		const t = endOfDay(v);
+		setEnd(t === null || t >= endOfToday ? null : Math.max(t, addDays(FIRST, R.days ?? 0)));
 	}
 
 	function keys(e: KeyboardEvent) {
@@ -408,7 +405,6 @@
 
 	onMount(() => {
 		restore();
-		ints[range] = int;
 		let due = 0, stamp = 0;
 		async function load() {
 			const r = await fetch(DATA_URL, { cache: 'no-cache' });
@@ -469,7 +465,7 @@
 			<span id="p-lb-int">Interval</span>
 			<div class="seg" role="group" aria-labelledby="p-lb-int">
 				{#each intChoices as k}
-					<button type="button" aria-pressed={effInt === k} onclick={() => { int = k; save(); }}>{(INT_LABEL as any)[k]}</button>
+					<button type="button" aria-pressed={effInt === k} onclick={() => { int = k; intPicked = true; save(); }}>{(INT_LABEL as any)[k]}</button>
 				{/each}
 			</div>
 		</div>
@@ -479,7 +475,7 @@
 				<div class="datebox">
 					<input type="date" id="p-date" value={dateValue} min="2020-09-10" max={live ? isoDay(latestT) : undefined}
 						title="Shows the selected range ending on this date" onchange={(e) => pickDate((e.currentTarget as HTMLInputElement).value)} />
-					{#if !atLatest}<button type="button" onclick={() => (endT = null)}>Latest</button>{/if}
+					{#if !atLatest}<button type="button" onclick={() => setEnd(null)}>Latest</button>{/if}
 				</div>
 			</div>
 		{/if}
