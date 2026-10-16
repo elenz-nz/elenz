@@ -14,7 +14,7 @@ import pandas as pd
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HH = os.path.join(ROOT, 'data', 'articles', 'hist', 'hh')
-SITE = 'https://elenz.elenz.workers.dev/data/history/hh'
+SITE = 'https://elenz.co.nz/data/history/hh'
 FUELS = ['geo', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar']  # stack order, bottom to top
 
 

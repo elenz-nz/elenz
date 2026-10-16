@@ -16,7 +16,7 @@ in the FY23 Q3 report; the revised figure is used.
   5. Check: modelled Huntly emissions from the dispatch data against Genesis's reported emissions, by quarter.
 
   python3 analysis/emission_factors.py <folder of history hh/YYYY-MM.json files>
-  (download them with: curl -s -o hh/2025-06.json https://elenz.elenz.workers.dev/data/history/hh/2025-06.json)
+  (download them with: curl -s -o hh/2025-06.json https://elenz.co.nz/data/history/hh/2025-06.json)
 """
 import glob, json, os, sys
 from collections import Counter, defaultdict

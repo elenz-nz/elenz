@@ -4,7 +4,7 @@ Winter is 1 June to 31 August. Winter 2026 is compared with the five winters bef
 the article means the highest or lowest of those six winters. All figures are half-hourly.
 
 Inputs (downloaded into data/articles/ if missing):
-  hist/hh/YYYY-MM.json   the site's half-hourly history (https://elenz.elenz.workers.dev/data/history/hh/...)
+  hist/hh/YYYY-MM.json   the site's half-hourly history (https://elenz.co.nz/data/history/hh/...)
   hvdc/YYYYMM.csv        EMI Metered_data/HVDC_Flows, used for every HVDC figure (the site's history for 2022-2026
                          carried the older island-balance estimate while the BUILD 4 rebuild was under way)
 
@@ -24,7 +24,7 @@ import hvdc  # noqa: E402
 
 DATA = os.path.join(ROOT, 'data', 'articles')
 OUT = os.path.join(ROOT, 'site', 'src', 'lib', 'articles', 'data', 'winter-2026.json')
-SITE = 'https://elenz.elenz.workers.dev/data/history'
+SITE = 'https://elenz.co.nz/data/history'
 EMI = 'https://emidatasets.blob.core.windows.net/publicdata/Datasets/Wholesale/Metered_data/HVDC_Flows'
 NZ = 'Pacific/Auckland'
 YEARS = list(range(2021, 2027))
