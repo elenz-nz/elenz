@@ -252,7 +252,7 @@
 	const cursorRows = $derived.by(() => {
 		if (!view) return [];
 		if (view.mode === 'time') {
-			const rows: any[] = view.series.filter((s: any) => regionNodes.some((r) => r.k === s.k)).map((s: any) => ({ tok: s.tok, label: NODE[s.k].name, value: money(valOf(s.values)), dim: off.includes(s.k) }));
+			const rows: any[] = view.series.filter((s: any) => regionNodes.some((r) => r.k === s.k)).map((s: any) => ({ k: s.k, tok: s.tok, label: NODE[s.k].name, value: money(valOf(s.values)) }));
 			rows.push({ tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(valOf(view.spread)) });
 			rows.push({ tok: '--f-hvdc', label: 'HVDC', value: mw(valOf(view.hvdc)) });
 			return rows;
@@ -524,7 +524,7 @@
 		<section class="charts" id="charts" tabindex="0" aria-busy={busy} onkeydown={keys}
 			aria-label="Price chart. Hover or use the left and right arrow keys to read values at a point in time, Page Up and Page Down to move by the range; Escape returns to range averages.">
 			{#if view && priceY}
-				<div class="chart">
+				<div class="chart" class:popped={popped === 'price'}>
 					<div class="ch-head">
 						{#if view.mode === 'time'}
 							<h2>Wholesale price</h2><span class="unit">$/MWh at each node</span>
@@ -532,38 +532,28 @@
 							<h2>Price range</h2><span class="unit">$/MWh, each {effInt === '1d' ? 'day' : effInt === '1w' ? 'week' : 'month'}'s half-hours</span>
 						{/if}
 						<div class="legends">
+							{#if view.mode === 'time'}
+								<span class="lg"><i class="area" style="--c: var(--warn-bg); opacity: 1"></i>Islands priced apart</span>
+							{:else}
+								<span class="lg"><i class="area" style="--c: var({bandKey === 'BEN' ? '--p-si' : '--p-ni'}); opacity: 0.25"></i>Low to high</span>
+								<span class="lg"><i class="area" style="--c: var({bandKey === 'BEN' ? '--p-si' : '--p-ni'}); opacity: 0.55"></i>Middle 80%</span>
+								<span class="lg"><i class="dash" style="--c: var({bandKey === 'BEN' ? '--p-ni' : '--p-si'})"></i>{bandKey === 'BEN' ? 'Haywards' : 'Benmore'}</span>
+								<div class="seg" role="group" aria-label="Node for the price range">
+									{#each ['HAY', 'BEN'] as k}
+										<button type="button" aria-pressed={bandKey === k} onclick={() => { bandKey = k; save(); }}>{NODE[k].name}</button>
+									{/each}
+								</div>
+							{/if}
 							<div class="seg" role="group" aria-label="Price scale">
 								{#each SCALES as s}
 									<button type="button" aria-pressed={scale === s.k} title={s.title} onclick={() => { scale = s.k; save(); }}>{s.label}</button>
 								{/each}
 							</div>
 						</div>
-					</div>
-					<div class="keys">
-						{#if view.mode === 'time'}
-							{#each view.series.filter((s: any) => regionNodes.some((r) => r.k === s.k)) as s (s.k)}
-								<button type="button" class="nk" aria-pressed={!off.includes(s.k)} onclick={() => toggleNode(s.k)} title="{NODE[s.k].node}, {NODE[s.k].place}. Select to show or hide">
-									<i style="--c: var({s.tok})"></i>{NODE[s.k].name} <b>{money(valOf(s.values))}</b>
-								</button>
-							{/each}
-							{#if NODES.some((nd) => regionNodes.includes(nd) && !view.series.some((s: any) => s.k === nd.k))}
-								<span class="kn">Other nodes from the live feed only</span>
-							{/if}
-							<span class="lg"><i class="area" style="--c: var(--warn-bg); opacity: 1"></i>Islands priced apart</span>
-						{:else}
-							<div class="seg" role="group" aria-label="Node for the price range">
-								{#each ['HAY', 'BEN'] as k}
-									<button type="button" aria-pressed={bandKey === k} onclick={() => { bandKey = k; save(); }}>{NODE[k].name}</button>
-								{/each}
-							</div>
-							<span class="lg"><i class="area" style="--c: var({bandKey === 'BEN' ? '--p-si' : '--p-ni'}); opacity: 0.25"></i>Low to high</span>
-							<span class="lg"><i class="area" style="--c: var({bandKey === 'BEN' ? '--p-si' : '--p-ni'}); opacity: 0.55"></i>Middle 80%</span>
-							<span class="lg"><i style="--c: var({bandKey === 'BEN' ? '--p-si' : '--p-ni'})"></i>Average <b>{money(valOf(view.P[bandKey === 'BEN' ? 'SI' : 'NI'].price))}</b></span>
-							<span class="lg"><i class="dash" style="--c: var({bandKey === 'BEN' ? '--p-ni' : '--p-si'})"></i>{bandKey === 'BEN' ? 'Haywards' : 'Benmore'} <b>{money(valOf(view.P[bandKey === 'BEN' ? 'NI' : 'SI'].price))}</b></span>
-						{/if}
+						{@render popBtn('price', 'wholesale price')}
 					</div>
 					<div class="plot">
-						<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={250} y={priceY} fmt={fmtTick} layers={priceLayers} note={highNote}
+						<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={popped === 'price' ? popH : 250} showX={popped === 'price'} {xTicks} y={priceY} fmt={fmtTick} layers={priceLayers} note={highNote}
 							shade={view.mode === 'time' ? view.shade : []} marks={capMarks} bind:hover onpoint={point('price')} onleave={leave}
 							label="Prices at the grid nodes over the range" zero />
 						{#if canMove}
@@ -641,13 +631,23 @@
 				</div>
 				<div class="help" id="p-help" role="note" hidden={!helpOpen}>
 					<p>Use the arrows on the price chart, or the date box, to step back through history by the selected range.</p>
-					<p>Select a node to show or hide it. Hover the charts, or focus them and use the arrow keys, to read a single interval; Escape returns to the range.</p>
+					<p>Select a node's colour square to show or hide its line. Hover the charts, or focus them and use the arrow keys, to read a single interval; Escape returns to the range.</p>
 				</div>
 				<table class="mix">
 					<thead><tr><th scope="col">{view?.mode === 'time' ? 'Node' : 'Series'}</th><th scope="col" class="n">{at < 0 ? 'Average' : 'Value'}</th></tr></thead>
 					<tbody>
 						{#each cursorRows as r}
-							<tr class:dim={r.dim}><td>{#if r.tok}<i class="sw" style="--c: var({r.tok})"></i>{/if}{r.label}</td><td class="n">{r.value}</td></tr>
+							<tr class:off={r.k && off.includes(r.k)}>
+								<td><div class="row-name">
+									{#if r.k}
+										<button type="button" class="sw-btn" aria-pressed={!off.includes(r.k)} aria-label="Show {r.label} in the chart" title="Show or hide {r.label} ({NODE[r.k].node}, {NODE[r.k].place})" onclick={() => toggleNode(r.k)}><span class="sw" style="--c: var({r.tok})"></span></button>
+									{:else}
+										<span class="sw-btn">{#if r.tok}<span class="sw" style="--c: var({r.tok})"></span>{/if}</span>
+									{/if}
+									<span class="nm">{r.label}</span>
+								</div></td>
+								<td class="n">{r.value}</td>
+							</tr>
 						{/each}
 					</tbody>
 				</table>
@@ -719,15 +719,7 @@
 
 <style>
 	.plot .nav { top: calc(50% - 22px); }
-	.nk b { font-weight: 500; color: var(--ink); font-family: var(--font-data); font-variant-numeric: tabular-nums; }
-	.keys { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 6px 0 4px; }
-	.nk { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 0.8rem; color: var(--ink-2); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px 2px 8px; min-height: 28px; cursor: pointer; }
-	.nk[aria-pressed='false'] { opacity: 0.45; }
-	.nk i, .sw { width: 14px; height: 0; border-top: 2px solid var(--c); display: inline-block; }
-	.sw { margin-right: 7px; vertical-align: middle; }
-	.kn { font-size: 0.76rem; color: var(--muted); }
 	.empty { color: var(--muted); font-size: 0.86rem; padding: 18px 10px; margin: 0; }
-	.mix tr.dim { opacity: 0.5; }
 	.sep { margin: 0; font-size: 0.8rem; padding: 6px 9px; border-radius: 4px; background: var(--grid); color: var(--ink-2); }
 	.sep.on { background: var(--warn-bg); color: var(--warn-ink); font-weight: 600; }
 	.p-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 14px 18px; align-items: start; }

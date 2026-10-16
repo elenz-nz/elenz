@@ -186,6 +186,8 @@ table { border-collapse: collapse; width: 100%; }
 .sw-btn { flex: none; display: grid; place-items: center; width: 22px; height: 22px; border: 0; background: none; padding: 0; border-radius: 4px; cursor: pointer; }
 span.sw-btn { cursor: default; }
 .sw-btn:hover { background: var(--grid); }
+button.sw-btn { border: 1px solid var(--line); }   /* a box marks the swatches that show or hide a layer */
+button.sw-btn:hover { border-color: var(--ink-2); }
 .drill, .nm { font: inherit; color: var(--ink); text-align: left; overflow-wrap: anywhere; }
 .drill { border: 0; background: none; padding: 2px 0; cursor: pointer; }
 .drill::after { content: " ›"; color: var(--muted); }

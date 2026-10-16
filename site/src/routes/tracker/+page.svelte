@@ -194,7 +194,7 @@
 		<!-- The chart panel takes arrow keys to move the time cursor, so it needs to be focusable. -->
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 		<section class="charts" id="charts" tabindex="0" aria-label="Generation chart. Hover or use the left and right arrow keys to read values at a point in time, Page Up and Page Down to move by the range; Escape returns to range totals.">
-			<div class="chart gen">
+			<div class="chart gen" class:popped={popped === 'gen'}>
 				<div class="ch-head">
 					<h2 class="crumbs" id="gen-title">Generation</h2><span class="unit" id="gen-unit">MW, stacked by fuel</span>
 					<div class="legends">
@@ -214,6 +214,7 @@
 							<button type="button" data-v="pct" aria-pressed="false">%</button>
 						</div>
 					</div>
+					{@render popBtn('gen', 'generation')}
 				</div>
 				<div class="plot">
 					<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
