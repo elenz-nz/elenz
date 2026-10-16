@@ -3,7 +3,7 @@
 "Embedded solar" on the site (data key `roof`): solar on local networks that isn't dispatched, rooftops and
 ground-mounted arrays up to ~10 MW. Earlier notes below say "rooftop" for the same thing.
 
-Development scripts, not run by the jobs. Results as of 15 Oct 2026; rerun them when the inputs change a lot.
+Development scripts, not run by the jobs. Results as of 15 Oct 2026 (later sections dated); rerun them when the inputs change a lot.
 
 ## Rooftop solar capacity
 
@@ -176,3 +176,30 @@ refining and gas processing, ~1.2 Mt): tracker coal + gas + diesel 4.4 Mt in 199
 year pattern matches (the 2001 and 2005-06 peaks, the 2007 dip, the 2011 low). Rankine coal share before FY21: MBIE
 quarterly generation from coal less Glenbrook's metered output, over the Rankines' metered output; over FY21-FY25 it
 reproduces Genesis's figures to a few points in most quarters (FY23 Q1 24 against 24 GWh of coal, FY24 Q1 201 against 200).
+
+## Price explainer triggers (`price_triggers.py`, 17 Oct 2026)
+
+Planned for /now: a "Why is the price high?" card, always there but folded into one line under the price tiles. It
+is highlighted (outlined, asking to be opened) when prices are unusual and opens by itself only at extremes. Tested
+on every trading period of final prices at Haywards and Benmore, Mar 1997 to Sep 2026 (`price_fetch.py` first).
+"Typical" is the median of the same half-hour of the week over the previous four weeks; "year median" the median
+over the previous 365 days. Each state holds 30 minutes after its condition ends. "Recent" is 2021-Sep 2026.
+
+| State | Rule | Time, all / recent | Episodes a year, recent |
+| --- | --- | --- | --- |
+| Highlighted | max(HAY, BEN) ≥ 1.5× typical and ≥ 1.25× year median; or the islands > $50 and > 25% apart; or a new low (under $5 after 24 h without one, first 2 h only) | 11.2% / 13.4% (8.8-21.8% a year since 2021) | 460 (on 57% of days, median 1 h) |
+| Open by itself | ≥ 3× typical and ≥ 3× year median and ≥ $300; or ≥ $800 at any time | 0.6% / 0.7% | 34 (about 3 a month, on 6.5% of days) |
+
+- **The year-median floor matters.** On the ratio alone, 1.5× typical fires 24.6% of the recent time: spill makes
+  typical tiny, so $20 against $5 counts as 4×. The first draft's opening rule (2× typical and $250) opened 98 times a
+  year recently.
+- **The $300 floor and $800 backstop.** The year median was only $36 at the end of Sep 2026, so 3× it is ~$110: not
+  an extreme. A dry year raises typical with it, so the relative rule alone missed 8 Aug 2024 ($897 against a
+  typical $366); the backstop opens it (42 half-hours). 15 Aug 2024 ($699, typical $433) is only highlighted.
+- **Opened:** 9 Aug 2021 (final peak $2,698), 8 May 2024 ($4,522), 12 Dec 2024 ($4,573, typical $28), 4 Aug 2026 ($3,696).
+- **Lows never open it.** Under $5 is 14.4% of the recent time (25.7% of 2026; nearly always both islands), runs
+  last a median 1.5 h but 7.5 h at the 90th percentile, and the longest was 354 h at $0.01, 22 Dec 2025 to 6 Jan 2026.
+  Highlighting every low would highlight 14% of the time on its own; a new low is ~45 times a year.
+- **Live use:** these are half-hourly final prices. /now has 5-minute dispatch prices, which spike more and can be
+  revised (9 Aug 2021: dispatch peak $356,621, final $2,698), so test the 30-minute average of dispatch prices, and
+  check the live rates after a month.
