@@ -4,8 +4,7 @@
 .a-kind { display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--accent); }
 .a-draft { display: inline-block; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--warn-ink); background: var(--warn-bg); border-radius: 3px; padding: 1px 6px; margin-left: 8px; vertical-align: 1px; }
 
-/* index: the heading in a left column, articles as a grid of cards (title, then a large cover), after
-   openelectricity.org.au/analysis */
+/* index: the heading in a left column, articles as a grid of cards (title, then a large cover) */
 .wrap.fill { min-height: 100svh; grid-template-rows: auto 1fr auto; }   /* footer pinned to the bottom on short pages */
 .a-index { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px 40px; padding-block: 10px 30px; align-content: start; }
 .a-index > header { display: grid; gap: 10px; align-content: start; }

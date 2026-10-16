@@ -42,7 +42,7 @@ export function mountTracker(D, hooks = {}) {
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const FUEL = Object.fromEntries(FUELS.map(f => [f.k, f]));
-  // Source groupings for the generation chart, after Open Electricity's. Each group lists its fuels in stack order.
+  // Source groupings for the generation chart. Each group lists its fuels in stack order.
   // Battery and HVDC are signed (charging, export), so they stay separate layers in every view.
   const REN = { id: 'ren', name: 'Renewables', tok: '--g-ren', f: ['geo', 'bio', 'hydro', 'wind', 'solar', 'roof'] };
   const FOSSIL = f => ({ id: 'fossil', name: f, tok: '--g-fossil', f: ['waste', 'coal', 'gas', 'diesel'] });

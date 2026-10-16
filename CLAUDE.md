@@ -1,6 +1,6 @@
 # Elenz: notes for Claude
 
-Public NZ electricity tracker modelled on openelectricity.org.au. The owner knows the power system well but is new
+Public NZ electricity tracker at https://elenz.co.nz. The owner knows the power system well but is new
 to web development and hosting, so give step-by-step instructions for anything they have to do themselves.
 This repository is public: never commit keys, tokens or personal details.
 
@@ -184,7 +184,8 @@ This repository is public: never commit keys, tokens or personal details.
 
 ## Status and next steps
 
-1. Site live at https://elenz.elenz.workers.dev (Cloudflare Workers; domain elenz.nz to be bought later).
+1. Site live at https://elenz.co.nz (Cloudflare Workers custom domain; https://elenz.elenz.workers.dev stays on until
+   the monitors move).
 2. Live data via GitHub Actions + Workers KV (set up Oct 2026). A paid server running `update.py` in a loop is the
    upgrade path if GitHub's schedule delays become a problem.
 3. History since Aug 1997 on the tracker page: 30 days, 1 year, All (BUILD 6, Oct 2026; was Sep 2020).

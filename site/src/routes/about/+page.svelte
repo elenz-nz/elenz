@@ -103,7 +103,7 @@
 						<li>The two can differ a lot: on 9 Aug 2021 dispatch prices averaged over $16,000/MWh at Haywards, against a final average of $360.</li>
 						<li>The <a href="/tracker/prices">Prices</a> tab adds Ōtāhuhu (OTA2201), Whakamaru (WKM2201), Islington (ISL2201) and Invercargill (INV2201). Live, these come from the real-time feed's bus rows, so where the week was filled in from the daily dispatch files (which have no bus rows) only Haywards, Benmore and Whakamaru have prices.</li>
 						<li>Islands priced apart: Haywards and Benmore more than $10 and 10% apart, usually because the HVDC link or the grid near it is at a limit.</li>
-						<li>Price captured by fuel: each fuel's output times its island's reference price, divided by its output, like Open Electricity's volume-weighted price. Batteries count discharge only; embedded solar isn't paid the spot price, so it's left out.</li>
+						<li>Price captured by fuel: each fuel's output times its island's reference price, divided by its output: the average price that fuel's generation was worth. Batteries count discharge only; embedded solar isn't paid the spot price, so it's left out.</li>
 						<li>Long ranges show each day's spread of half-hourly prices: the middle 80% (10th to 90th percentile), lowest and highest, and half-hours over $500 and $1,000. Weeks and months average the daily percentiles and take the lowest and highest half-hour.</li>
 					</ul>
 				</article>

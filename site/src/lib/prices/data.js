@@ -32,7 +32,7 @@ export function priceOf(S, k) {
 export const separated = (a, b) => { const d = Math.abs(a - b); return d > 10 && d > 0.1 * Math.max(Math.min(a, b), 0); };
 
 // ---------- revenue by fuel (price captured) ----------
-// Each fuel's output × its island's reference price, like Open Electricity's volume-weighted price. Embedded solar
+// Each fuel's output × its island's reference price (a volume-weighted price). Embedded solar
 // isn't paid the spot price; batteries count discharge only.
 export const CAP_FUELS = FUELS.filter((f) => f.k !== 'roof' && f.k !== 'hvdc');
 
