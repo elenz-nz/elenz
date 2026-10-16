@@ -269,27 +269,6 @@
 		return { rows, cap, sepShare: h ? sepH / h : null, spread: wavg(S.NI.price) - wavg(S.SI.price) };
 	});
 
-	const tiles = $derived.by(() => {
-		if (!view || !rangeStats) return [];
-		const st = rangeStats;
-		if (view.mode === 'time') {
-			const i = view.n - 1;
-			const lbl = endT === null ? 'latest' : 'at the end of the range';
-			return [
-				{ label: 'Haywards', value: money(view.S.NI.price[i]), sub: `North Island reference, ${lbl}` },
-				{ label: 'Benmore', value: money(view.S.SI.price[i]), sub: `South Island reference, ${lbl}` },
-				{ label: 'Island spread', value: signedMoney(view.spread[i]), sub: 'Haywards − Benmore' },
-				{ label: 'HVDC', value: `${Math.round(Math.abs(view.hvdc[i])).toLocaleString('en-NZ')} MW`, sub: view.hvdc[i] >= 0 ? 'Flowing north' : 'Flowing south' },
-				...st.rows.map((r: any) => ({ label: `${r.node} average`, value: money(r.avg), sub: `${R.label}, time-weighted` })),
-			];
-		}
-		return [
-			...st.rows.map((r: any) => ({ label: `${r.node} average`, value: money(r.avg), sub: `${R.label}, time-weighted` })),
-			{ label: 'Island spread', value: signedMoney(st.spread), sub: 'Average, Haywards − Benmore' },
-			...st.rows.map((r: any) => ({ label: `${r.node} high`, value: money(r.hi), sub: `Half-hour, ${dateLabel(r.hiT)}` })),
-		];
-	});
-
 	// ---------- the heat map: the last 30 days, half-hourly ----------
 	/** The heat map: the 30 days to the end of the window. */
 	async function loadHeat(to: number) {
@@ -430,14 +409,6 @@
 	</nav>
 
 	<noscript><p class="notice">The charts need JavaScript turned on.</p></noscript>
-
-	{#if tiles.length}
-		<section class="tiles" aria-label="Key figures">
-			{#each tiles as k}
-				<div class="tile"><span class="tl">{k.label}</span><span class="tv">{k.value}</span><span class="ts">{k.sub}</span></div>
-			{/each}
-		</section>
-	{/if}
 
 	<div class="p-layout">
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions (the chart panel takes arrow keys to move the cursor) -->
@@ -608,11 +579,6 @@
 </div>
 
 <style>
-	.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
-	.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 10px 12px; display: grid; gap: 2px; }
-	.tl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-weight: 600; }
-	.tv { font-family: var(--font-data); font-size: 1.3rem; font-weight: 500; font-variant-numeric: tabular-nums; }
-	.ts { font-size: 0.74rem; color: var(--muted); }
 	.p-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 14px 18px; align-items: start; }
 	.p-side { position: sticky; top: 12px; }
 	.plot-wrap { position: relative; }
