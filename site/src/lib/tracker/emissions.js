@@ -75,8 +75,8 @@ const GEO_YEARS = {
 const GEO_YEAR_COLS = [2020, 2022, 2023];
 // stations without published figures yet: estimates (TIMES-NZ assumptions), until the NZGA publishes them
 const GEO_ASSUMED = { tauhara: 32, te_huka_3: 0, topp2: 0,
-  // Kawerau pulp mill cogeneration (KAW0112 ONU0): likely mostly black liquor and wood, so treated as bioenergy
-  // (biogenic CO₂, counted as zero) until it moves to a Bioenergy fuel with Kinleith at the next history rebuild
+  // Kawerau pulp mill cogeneration (KAW0112 ONU0): bioenergy since BUILD 5 (Oct 2026); kept at zero in case a file
+  // built before then still lists it as geothermal
   kawerau_mill: 0 };
 const GEO_DEFAULT = 57;   // fleet average, CY2023: for anything unmatched
 

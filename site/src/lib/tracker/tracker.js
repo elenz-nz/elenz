@@ -43,15 +43,16 @@ export function mountTracker(D, hooks = {}) {
   const FUEL = Object.fromEntries(FUELS.map(f => [f.k, f]));
   // Source groupings for the generation chart, after Open Electricity's. Each group lists its fuels in stack order.
   // Battery and HVDC are signed (charging, export), so they stay separate layers in every view.
-  const REN = { id: 'ren', name: 'Renewables', tok: '--g-ren', f: ['geo', 'hydro', 'wind', 'solar', 'roof'] };
-  const FOSSIL = f => ({ id: 'fossil', name: f, tok: '--g-fossil', f: ['coal', 'gas', 'diesel'] });
+  const REN = { id: 'ren', name: 'Renewables', tok: '--g-ren', f: ['geo', 'bio', 'hydro', 'wind', 'solar', 'roof'] };
+  const FOSSIL = f => ({ id: 'fossil', name: f, tok: '--g-fossil', f: ['waste', 'coal', 'gas', 'diesel'] });
+  const THERMAL = { id: 'fossil', name: 'Thermal', tok: '--g-fossil', f: ['bio', 'waste', 'coal', 'gas', 'diesel'] };
   const VRE = name => ({ id: 'vre', name, tok: '--g-vre', f: ['wind', 'solar', 'roof'] });
   const one = k => ({ id: k, name: FUEL[k].name, tok: FUEL[k].tok, f: [k] });
   const VIEWS = {
     detailed: { groups: null },
-    simple: { groups: [one('geo'), FOSSIL('Thermal'), one('hydro'), one('wind'), { id: 'solar', name: 'Solar', tok: '--f-solar', f: ['solar', 'roof'] }] },
+    simple: { groups: [one('geo'), THERMAL, one('hydro'), one('wind'), { id: 'solar', name: 'Solar', tok: '--f-solar', f: ['solar', 'roof'] }] },
     flex: { groups: [
-      { ...one('geo'), name: 'Inflexible' },        // geothermal runs flat out, around the clock
+      { ...one('geo'), name: 'Inflexible', f: ['geo', 'bio', 'waste'] },   // geothermal runs flat out; cogeneration follows its mill or steelworks
       { ...one('coal'), name: 'Slow flexible' },    // Huntly's Rankine units: hours to start, slow to ramp
       { id: 'fast', name: 'Fast flexible', tok: '--g-fast', f: ['gas', 'diesel', 'hydro'] },
       VRE('Variable'),
@@ -60,15 +61,15 @@ export function mountTracker(D, hooks = {}) {
     // views built from plants rather than fuels (see plantSets below)
     site: { by: 'site' }, scheme: { by: 'scheme' }, owner: { by: 'owner' },
     // inverter-based generation (wind and solar) against the synchronous machines (hydro, geothermal, thermal)
-    vre: { groups: [{ id: 'resid', name: 'Synchronous', tok: '--g-resid', f: ['geo', 'coal', 'gas', 'diesel', 'hydro'] }, VRE('Inverter-based')] },
+    vre: { groups: [{ id: 'resid', name: 'Synchronous', tok: '--g-resid', f: ['geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro'] }, VRE('Inverter-based')] },
   };
   const SIGNED = FUELS.filter(f => f.signed).map(f => f.k);
   // what each grouping shows, in a note under the generation chart
   const NOTES = {
-    simple: 'Simplified groups the fuels into five: geothermal; thermal (Huntly\'s coal/gas Rankine units, gas and diesel); hydro; wind; and solar, grid-scale and estimated embedded solar together.',
-    flex: 'Groups generation by how readily it can follow demand. Inflexible: geothermal, which runs flat out around the clock. Slow flexible: Huntly\'s coal/gas Rankine units, which take hours to start and ramp slowly. Fast flexible: hydro, gas and diesel, which can change output quickly. Variable: wind and solar, which follow the weather. Grouping is by fuel, so gas cogeneration counts as fast flexible.',
-    rf: 'Renewables are geothermal, hydro, wind and solar (grid-scale and estimated embedded solar). Fossils are Huntly\'s coal/gas Rankine units, gas and diesel. Geothermal counts as renewable, although it emits some CO₂ (each station\'s own figure, about 0.05 t/MWh across the fleet now).',
-    vre: 'Inverter-based is wind and solar (grid-scale and estimated embedded solar), connected through power electronics. Synchronous is hydro, geothermal and thermal plant, whose spinning generators add inertia and system strength. Batteries are also inverter-based but are shown separately, because they charge as well as generate.',
+    simple: 'Simplified groups the fuels into five: geothermal; thermal (Huntly\'s coal/gas Rankine units, gas, diesel, bioenergy and waste heat); hydro; wind; and solar, grid-scale and estimated embedded solar together.',
+    flex: 'Groups generation by how readily it can follow demand. Inflexible: geothermal, which runs flat out around the clock, and the industrial cogeneration (bioenergy and waste heat), which follows its mill or steelworks. Slow flexible: Huntly\'s coal/gas Rankine units, which take hours to start and ramp slowly. Fast flexible: hydro, gas and diesel, which can change output quickly. Variable: wind and solar, which follow the weather. Grouping is by fuel, so gas cogeneration counts as fast flexible.',
+    rf: 'Renewables are geothermal, bioenergy, hydro, wind and solar (grid-scale and estimated embedded solar). Fossils are Huntly\'s coal/gas Rankine units, gas, diesel and waste heat (Glenbrook\'s cogeneration on NZ Steel\'s ironmaking gases, counted as zero emissions because the ironmaking is counted elsewhere). Geothermal counts as renewable, although it emits some CO₂ (each station\'s own figure, about 0.05 t/MWh across the fleet now).',
+    vre: 'Inverter-based is wind and solar (grid-scale and estimated embedded solar), connected through power electronics. Synchronous is hydro, geothermal and thermal plant (including bioenergy and waste heat), whose spinning generators add inertia and system strength. Batteries are also inverter-based but are shown separately, because they charge as well as generate.',
     owner: "Owners as of October 2026, from each plant's operator in the EA register (Manawa Energy's stations counted as Contact's). Today's owners are applied to the whole history, so earlier sales and transfers aren't shown.",
   };
   const groupById = id => (VIEWS[state.view].groups || []).find(g => g.id === id) || setById(id);

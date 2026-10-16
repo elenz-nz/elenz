@@ -21,7 +21,12 @@ This repository is public: never commit keys, tokens or personal details.
   their own address still works for review. `article-template` is a draft layout sample. Articles dated after today (NZ time, at build) are scheduled: hidden like drafts until a build on or after their date (`scheduled`/`hidden` in the registry; any push rebuilds). Series: an article with `series: '<key>'` and `part: n` in its meta (keys in `SERIES` in the registry) shows "Part n of N" under its title and `SeriesNav` (all parts, previous/next) at its end, and the index folds the series into one card. The first series, "Inside the wholesale market" (`wholesale-market`, 7 parts, drafts from 16 Oct 2026), shares its data and helpers in `src/lib/articles/series/wholesale.ts`; its figures come from `analysis/wholesale_prices.py` (run `analysis/price_fetch.py` first for 30 years of final prices), which writes `data/wholesale-prices.json` and `data/wholesale-months.json` and prints every figure quoted. Every part's cover is `PriceCover` (each month's Haywards price since 1996), saved as its PNG with `analysis/cover_png.py <slug>`. Article charts are Svelte SVG components in `src/lib/articles/charts/` (Columns (with optional same-axis `marks`), HBars, DotRank, Lines (`xzero`, `xticks` for year and clock axes), TimeStack (`labelEvery`, fixed `ymax`/`pmax` to compare two charts), OfferStack (a supply curve from generator offers), Scatter, Ridgeline (one row per year, each on its own scale), TimeMoney (share of time against share of money by band), SplitBar (one whole in parts), MarketDiagram (the market as a flow); site colour tokens, hover readouts, a data table under each) plus `Stats` for headline figures; an article's chart data is a JSON file in `src/lib/articles/data/`, written by a script in `analysis/` (`winter_2026.py` for the Winter 2026 review, which also prints every figure quoted in the text). Quarterly reviews open with `ReviewCover`
   (the quarter's daily generation by fuel under the title, always dark): `analysis/review_cover.py 2026-06 2026-08 winter-2026`
   writes its data to `src/lib/articles/covers/`; `analysis/cover_png.py winter-2026` saves it as a 1200×630 PNG in
-  `static/articles/` for link previews (set `image` in the article's meta; `SITE_URL` in the registry makes it absolute). The tracker page markup
+  `static/articles/` for link previews (set `image` in the article's meta; `SITE_URL` in the registry makes it absolute). The tracker has
+  two tabs (`src/lib/site/TrackerTabs.svelte`, under the masthead): Generation at `/tracker` and Prices at `/tracker/prices`
+  (`src/routes/tracker/prices/+page.svelte`: six node prices, the island spread and HVDC on one time axis for the live week and
+  30 days; each period's price range, spread and half-hours over $500/$1,000 for 12 months and All; price captured by fuel;
+  a 30-day time-of-day heat map. Data shaping in `src/lib/prices/data.js`, SVG charts in `src/lib/prices/`. Region and range
+  are shared with the Generation tab through localStorage `elenz-view`; the rest is kept in `elenz-prices`). The tracker page markup
   is in `src/routes/tracker/+page.svelte` (About page: `src/routes/about/+page.svelte`, a card per chart on how it's built; shared
   masthead, footer, logo mark and Buy Me a Coffee link in `src/lib/site/`); the canvas chart code is `src/lib/tracker/tracker.js` (vanilla JS, driven by
   element ids in the page), styles in `src/lib/tracker/tracker.css` (colour tokens, light/dark). The fuel table
@@ -31,7 +36,7 @@ This repository is public: never commit keys, tokens or personal details.
   `src/lib/tracker/series.js` loads the history files and merges them with the live week (24 h/3 d/7 d use the
   live 5-minute data; 30 days uses half-hourly history; 1 year and All use daily history).
 - `ingest/`: Python. `update.py` (the scheduled job), `state.py` (compact 7-day state: one row per interval,
-  columns `U|POC UNIT`, `C|...` charging, `L|NI`, `L|SI`, `T`, `P|NI`, `P|SI`, `src`), `build_tracker.py`
+  columns `U|POC UNIT`, `C|...` charging, `L|NI`, `L|SI`, `T`, `P|NI`, `P|SI`, `P|<node>` for `[price_nodes]`, `src`), `build_tracker.py`
   (state → tracker.json; `assemble()` is shared with history), `emi_live.py` (API client), `store.py` (Workers KV
   via the Cloudflare REST API, or `data/store` locally), `sync.py` (EMI blob container + Open-Meteo), `common.py`
   (paths, overrides). `history.py`: history since 10 Sep 2020 from the daily dispatch files (see its docstring for
@@ -63,6 +68,9 @@ This repository is public: never commit keys, tokens or personal details.
   `facilities/plant_register.csv`: the EA register (refresh with `sync.py plants`, review the diff).
 - `ingest/plant_meta.py` writes `site/src/lib/tracker/plants.json` (plant → owner, hydro scheme) from the register and
   those tables. Rerun it and commit the JSON after refreshing the register or editing the tables.
+- `.github/workflows/checks.yml`: on every push, ruff (syntax errors and undefined names only), `ingest/tests/smoke.py`
+  (the live and history paths on a committed one-hour sample of real dispatch data and matching final prices, no network)
+  and the site's `npm run check` and `npm run build`. Cloudflare deploys `main` regardless, so a red cross means look now.
 - `.github/workflows/watchdog.yml`: checks the live site every 15 minutes; opens an issue labelled `stale-data`
   (GitHub emails it to the owner) when live data is over 30 minutes old, history over 5 days behind, or the Worker
   can't start a job, and closes it when the data recovers.
@@ -117,10 +125,15 @@ This repository is public: never commit keys, tokens or personal details.
   11.2 GJ/MWh; coal 91.8, gas 54.1 kg CO₂e/GJ; gas plant 0.46 t/MWh; geothermal per station by year (NZGA). These
   reproduce Genesis's reported Huntly emissions within ±5% in most quarters. The dispatch data's Rankine output
   matches Genesis's reported Rankine output within 1–2% a quarter.
-- Fuel labels in the EA register to correct at the next history rebuild: Kinleith (KIN0112, wood-waste
-  cogeneration) and the Kawerau pulp mill (KAW0112 ONU0, listed as geothermal) → bioenergy; Glenbrook (GLN0332,
-  waste gas from NZ Steel's ironmaking) → waste heat, zero emissions. Until then emissions.js counts the Kawerau
-  mill as zero; Kinleith and Glenbrook count as gas.
+- Fuel labels corrected in `[units]` (BUILD 5, Oct 2026): Kinleith (KIN0112, wood-waste cogeneration) and the Kawerau
+  pulp mill (KAW0112 ONU0, listed as geothermal) are `bio` (Bioenergy, renewable, zero emissions); Glenbrook (GLN0332 GLN0,
+  waste gas from NZ Steel's ironmaking) is `waste` (Waste heat, zero emissions, grouped with fossils).
+- Price nodes: the daily dispatch files carry only connection points with load or generation (~263 rows an interval),
+  so bus nodes (HAY2201, BEN2201, OTA2201, ISL2201, INV2201) are missing; WKM2201 is a generating node and is there.
+  The real-time API's ~568 rows include the bus nodes. Final prices (`FinalEnergyPrices`) have every node (~246).
+  History's `daily()` adds each day's price spread (p10, p90, pmin, pmax, n500, n1000), revenue by fuel at the
+  island price (`rv_<fuel>`, plus `batt_d`, battery discharge) and `nodes` daily means; the Prices page computes
+  revenue for 5-minute and half-hourly data itself (fuel MW × island price).
 - The live API now and then returns rows with fields missing (RunDateTime null, ~3 a day); `emi_live.to_frame`
   skips or patches them instead of failing.
 - Open-Meteo rate-limits some shared addresses (HTTP 429). The history job stores missing irradiance as blank and
@@ -149,9 +162,10 @@ This repository is public: never commit keys, tokens or personal details.
    upgrade path if GitHub's schedule delays become a problem.
 3. History since Sep 2020 on the tracker page: 30 days, 1 year, All (Oct 2026).
    Daily history keeps each day's peak demand and peak generation (total output including embedded solar). BUILD 4
-   (embedded solar model, metered HVDC) rebuilding from 15 Oct 2026 over about four runs (still in progress at
-   11:20 pm 15 Oct: the public `hist/index.json` is from 14 Oct until it finishes).
-4. Pages: landing (`/`), live (`/now`), tracker, About, and Articles (`/articles`, published 15 Oct 2026 with the Winter 2026 review). Stale-data watchdog, Cloudflare Web Analytics and a Buy Me a
+   (embedded solar model, metered HVDC) finished 16 Oct 2026. BUILD 5 (Prices page fields, bioenergy and waste heat)
+   pushed 16 Oct 2026: every month's state gains the other nodes' final prices (one monthly final-prices file each),
+   then the month is rebuilt; expect a couple of runs before `hist/index.json` and `day.json` are republished.
+4. Pages: landing (`/`), live (`/now`), tracker (Generation and Prices tabs), About, and Articles (`/articles`, published 15 Oct 2026 with the Winter 2026 review). Stale-data watchdog, Cloudflare Web Analytics and a Buy Me a
    Coffee link are in place.
 5. Then the brief's build order: plant pages, map, hydro panel and records (planned as short record articles),
    offer stacks and downloads.
@@ -160,5 +174,4 @@ Recurring upkeep: add Genesis's Rankine coal share to `emissions.js` each quarte
 after quarter end; FY27 Q1 due late Oct 2026); add each year's NZGA geothermal figures (NZ Geothermal Workshop,
 November); renew the Worker's `GITHUB_TOKEN` before it expires (~Oct 2027).
 
-Open questions: written confirmation of terms from the EA before launch; the fuel relabelling above (bundle with
-the next history rebuild); farm mounting (tracking or fixed) to confirm.
+Open questions: written confirmation of terms from the EA before launch; farm mounting (tracking or fixed) to confirm.

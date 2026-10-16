@@ -3,6 +3,7 @@
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
 	import { mountTracker } from '#lib/tracker/tracker.js';
 	import Masthead from '#lib/site/Masthead.svelte';
+	import TrackerTabs from '#lib/site/TrackerTabs.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 
 	type Meta = { intervals: number; expected: number; end: number; api_from: number | null; built: number };
@@ -129,6 +130,7 @@
 
 <div class="wrap">
 	<Masthead heading />
+	<TrackerTabs />
 
 	<nav class="toolbar" aria-label="View controls">
 		<div class="ctl">

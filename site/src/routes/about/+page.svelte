@@ -100,6 +100,10 @@
 						<li>Island reference nodes: Haywards (HAY2201) and Benmore (BEN2201).</li>
 						<li>The live week shows dispatch prices. History uses the EA's final prices (<code>FinalEnergyPrices</code>) once published, usually the next day.</li>
 						<li>The two can differ a lot: on 9 Aug 2021 dispatch prices averaged over $16,000/MWh at Haywards, against a final average of $360.</li>
+						<li>The <a href="/tracker/prices">Prices</a> tab adds Ōtāhuhu (OTA2201), Whakamaru (WKM2201), Islington (ISL2201) and Invercargill (INV2201). Live, these come from the real-time feed's bus rows, so where the week was filled in from the daily dispatch files (which have no bus rows) only Haywards, Benmore and Whakamaru have prices.</li>
+						<li>Islands priced apart: Haywards and Benmore more than $10 and 10% apart, usually because the HVDC link or the grid near it is at a limit.</li>
+						<li>Price captured by fuel: each fuel's output times its island's reference price, divided by its output, like Open Electricity's volume-weighted price. Batteries count discharge only; embedded solar isn't paid the spot price, so it's left out.</li>
+						<li>Long ranges show each day's spread of half-hourly prices: the middle 80% (10th to 90th percentile), lowest and highest, and half-hours over $500 and $1,000. Weeks and months average the daily percentiles and take the lowest and highest half-hour.</li>
 					</ul>
 				</article>
 
@@ -134,7 +138,9 @@
 						<li><b>0.65–1.0</b> Huntly Rankines<small>Varies with how much of their fuel was coal. Genesis reports the coal share each quarter (24% in Apr–Jun 2026); the latest is carried forward until the next report</small></li>
 						<li><b>0.80</b> diesel</li>
 						<li><b>0.46</b> gas<small>Average of the gas fleet: Huntly 5 combined cycle about 0.41, peakers and cogeneration about 0.5–0.57</small></li>
-						<li><b>0.02–0.30</b> geothermal<small>Each station's own operational emissions by year (NZ Geothermal Association): from about 0.02 at Wairakei to 0.30 at Ōhaaki, and falling as stations reinject CO₂; about 0.05 across the fleet now. The latest published year carries forward until the next. The Kawerau pulp mill's cogeneration, listed as geothermal, is counted as bioenergy (zero), since it mostly burns black liquor and wood</small></li>
+						<li><b>0.02–0.30</b> geothermal<small>Each station's own operational emissions by year (NZ Geothermal Association): from about 0.02 at Wairakei to 0.30 at Ōhaaki, and falling as stations reinject CO₂; about 0.05 across the fleet now. The latest published year carries forward until the next</small></li>
+						<li><b>0</b> bioenergy<small>Kinleith (wood waste) and the Kawerau pulp mill's cogeneration (black liquor and wood): biogenic CO₂, counted as zero, as in national inventories. The EA register lists them as gas and geothermal</small></li>
+						<li><b>0</b> waste heat<small>Glenbrook's cogeneration runs on waste gas and heat from NZ Steel's ironmaking, not pipeline gas. Its emissions are counted with the ironmaking (industrial processes), so the electricity counts as zero</small></li>
 					</ul>
 					<dl>
 						<dt>How</dt>
@@ -160,9 +166,9 @@
 					<p class="m-src"><span>Source</span>Grouped from the fuel mix</p>
 					<dl>
 						<dt>Renewable vs fossil</dt>
-						<dd><p>Renewables are geothermal, hydro, wind and solar (grid and embedded). Thermal and fossils are coal/gas Rankine, gas and diesel.</p></dd>
+						<dd><p>Renewables are geothermal, bioenergy, hydro, wind and solar (grid and embedded). Fossils are coal/gas Rankine, gas, diesel and waste heat (Glenbrook, on NZ Steel's ironmaking gases).</p></dd>
 						<dt>Flexibility</dt>
-						<dd><p>Inflexible: geothermal. Slow flexible: Huntly's Rankine units. Fast flexible: gas, diesel and hydro. Variable: wind and solar. Grouping is by fuel, so gas cogeneration plant counts as fast flexible.</p></dd>
+						<dd><p>Inflexible: geothermal, and the industrial cogeneration (bioenergy and waste heat). Slow flexible: Huntly's Rankine units. Fast flexible: gas, diesel and hydro. Variable: wind and solar. Grouping is by fuel, so gas cogeneration plant counts as fast flexible.</p></dd>
 						<dt>Inverter-based</dt>
 						<dd><p>Wind and solar, against the synchronous machines (hydro, geothermal and thermal).</p></dd>
 						<dt>By site</dt>

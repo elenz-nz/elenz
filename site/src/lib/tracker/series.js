@@ -32,12 +32,18 @@ export const KEY = {
 };
 
 // roof: embedded solar (rooftops and small ground-mounted arrays, estimated); roofU: its uncertainty (one standard deviation, MW); zero in data built before it existed
-const SERIES = ['geo', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'roofU', 'batt', 'hvdc', 'metered', 'underlying', 'tiwai', 'price'];
+const SERIES = ['geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'roofU', 'batt', 'hvdc', 'metered', 'underlying', 'tiwai', 'price'];
 const F = (a, n) => (a ? Float64Array.from(a) : new Float64Array(n));
+// node prices (the Prices page) can have gaps: null in the files, NaN here
+const FN = (a, n) => (a ? Float64Array.from(a, v => (v == null ? NaN : v)) : new Float64Array(n).fill(NaN));
+// island series: the standard ones (zero where a file lacks them) plus any others the file carries (the daily
+// history's price spread and revenue by fuel, read by the Prices page)
+const islKeys = s => [...new Set([...SERIES, ...Object.keys(s || {})])];
+const mapNodes = (o, fn) => Object.fromEntries(Object.entries(o || {}).map(([k, v]) => [k, fn(v)]));
 const plantKey = p => `${p.name}|${p.fuel}|${p.isl}`;
 
 // total generation per point, including embedded solar (output only: no HVDC, no battery charging), as the page sums it
-const GEN = ['geo', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt'];
+const GEN = ['geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt'];
 export function genTotal(S, region) {
   const n = S.t.length, o = new Float64Array(n);
   for (const k of GEN) {
@@ -52,10 +58,10 @@ export function fromLayout(D) {
   const n = D.N;
   const t = D.t ? Float64Array.from(D.t) : Float64Array.from({ length: n }, (_, i) => D.t0 + i * D.step);
   const h = D.h ? Float64Array.from(D.h) : new Float64Array(n).fill(D.step / 36e5);
-  const isl = s => Object.fromEntries(SERIES.map(k => [k, F(s[k], n)]));
+  const isl = s => Object.fromEntries(islKeys(s).map(k => [k, F(s[k], n)]));
   const peak = D.peak ? Object.fromEntries(Object.entries(D.peak).map(([r, o]) => [r, Object.fromEntries(Object.entries(o).map(([k, v]) => [k, F(v, n)]))])) : null;
   return {
-    n, t, h, NI: isl(D.NI), SI: isl(D.SI), hvdcN: F(D.hvdcN, n), peak,
+    n, t, h, NI: isl(D.NI), SI: isl(D.SI), hvdcN: F(D.hvdcN, n), peak, nodes: mapNodes(D.nodes, v => FN(v, n)),
     plants: D.plants.map(p => ({ ...p, s: F(p.s, n), units: p.units && p.units.map(u => ({ ...u, s: F(u.s, n) })) })),
   };
 }
@@ -65,7 +71,7 @@ export function slice(S, a, b) {
   const cut = x => x.slice(a, b);
   const isl = o => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, cut(v)]));
   return {
-    n: Math.max(0, b - a), t: cut(S.t), h: cut(S.h), NI: isl(S.NI), SI: isl(S.SI), hvdcN: cut(S.hvdcN),
+    n: Math.max(0, b - a), t: cut(S.t), h: cut(S.h), NI: isl(S.NI), SI: isl(S.SI), hvdcN: cut(S.hvdcN), nodes: isl(S.nodes || {}),
     peak: S.peak && Object.fromEntries(Object.entries(S.peak).map(([r, o]) => [r, isl(o)])),
     plants: S.plants.map(p => ({ ...p, s: cut(p.s), units: p.units && p.units.map(u => ({ ...u, s: cut(u.s) })) })),
   };
@@ -83,6 +89,11 @@ export function aggregate(S, key) {
     groups.forEach(([a, b], j) => { let s = 0; for (let i = a; i < b; i++) s += arr[i] * S.h[i]; o[j] = s / h[j]; });
     return o;
   };
+  const avgNaN = arr => {  // node prices: gaps don't count
+    const o = new Float64Array(n);
+    groups.forEach(([a, b], j) => { let s = 0, w = 0; for (let i = a; i < b; i++) if (arr[i] === arr[i]) { s += arr[i] * S.h[i]; w += S.h[i]; } o[j] = w ? s / w : NaN; });
+    return o;
+  };
   const max = arr => { const o = new Float64Array(n); groups.forEach(([a, b], j) => { let m = -Infinity; for (let i = a; i < b; i++) m = Math.max(m, arr[i]); o[j] = m; }); return o; };
   const isl = o => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, avg(v)]));
   let peak;
@@ -94,7 +105,7 @@ export function aggregate(S, key) {
       peak[r] = { metered: max(met), underlying: max(und), gen: max(gen) };
   }
   return {
-    n, t: Float64Array.from(groups, ([a]) => S.t[a]), h, NI: isl(S.NI), SI: isl(S.SI), hvdcN: avg(S.hvdcN), peak,
+    n, t: Float64Array.from(groups, ([a]) => S.t[a]), h, NI: isl(S.NI), SI: isl(S.SI), hvdcN: avg(S.hvdcN), peak, nodes: mapNodes(S.nodes, avgNaN),
     plants: S.plants.map(p => ({ ...p, s: avg(p.s), units: p.units && p.units.map(u => ({ ...u, s: avg(u.s) })) })),
   };
 }
@@ -103,9 +114,11 @@ export function aggregate(S, key) {
 export function concat(segs) {
   segs = segs.filter(s => s.n > 0);
   const n = segs.reduce((a, s) => a + s.n, 0);
-  const join = get => { const o = new Float64Array(n); let pos = 0; for (const s of segs) { const v = get(s); if (v) o.set(v, pos); pos += s.n; } return o; };
-  const isl = side => Object.fromEntries(SERIES.map(k => [k, join(s => s[side][k])]));
-  const out = { n, t: join(s => s.t), h: join(s => s.h), NI: isl('NI'), SI: isl('SI'), hvdcN: join(s => s.hvdcN), peak: null, plants: [] };
+  const join = (get, gap = 0) => { const o = new Float64Array(n).fill(gap); let pos = 0; for (const s of segs) { const v = get(s); if (v) o.set(v, pos); pos += s.n; } return o; };
+  const keys = side => [...new Set(segs.flatMap(s => Object.keys(s[side] || {})).concat(side === 'nodes' ? [] : SERIES))];
+  const isl = side => Object.fromEntries(keys(side).map(k => [k, join(s => s[side][k])]));
+  const nodes = Object.fromEntries(keys('nodes').map(k => [k, join(s => s.nodes && s.nodes[k], NaN)]));
+  const out = { n, t: join(s => s.t), h: join(s => s.h), NI: isl('NI'), SI: isl('SI'), hvdcN: join(s => s.hvdcN), nodes, peak: null, plants: [] };
   if (segs.length && segs.every(s => s.peak)) {
     out.peak = {};
     // a series some segments lack (peak generation in history built before it was added) is dropped
