@@ -33,6 +33,7 @@ from build_tracker import register  # noqa: E402
 
 DATA = os.path.join(ROOT, 'data', 'articles')
 OUT = os.path.join(ROOT, 'site', 'src', 'lib', 'articles', 'data', 'wholesale-prices.json')
+OUT_MONTHS = os.path.join(ROOT, 'site', 'src', 'lib', 'articles', 'data', 'wholesale-months.json')   # Part 4's month charts
 BLOB = 'https://emidatasets.blob.core.windows.net/publicdata'
 SITE = 'https://elenz.elenz.workers.dev/data/history'
 NZ = 'Pacific/Auckland'
@@ -142,7 +143,7 @@ def history(first='2021-01', last='2026-09'):
     for m in pd.period_range(first, last, freq='M'):
         d = json.load(open(fetch(f'{SITE}/hh/{m}.json', os.path.join(DATA, 'hist', 'hh', f'{m}.json'))))
         idx = pd.to_datetime(d['t0'] + np.arange(d['N']) * d['step'], unit='ms', utc=True).tz_convert(NZ)
-        frames.append(pd.DataFrame({f'{i}_{k}': d[i][k] for i in ('NI', 'SI') for k in GEN8 + ['price']}, index=idx))
+        frames.append(pd.DataFrame({f'{i}_{k}': d[i][k] for i in ('NI', 'SI') for k in GEN8 + ['price', 'metered']}, index=idx))
     h = pd.concat(frames)
     return h[~h.index.duplicated()].sort_index()
 
@@ -173,6 +174,8 @@ def main():
     P('Lowest Benmore months:', m.BEN2201.nsmallest(3).round(1).to_dict())
     out['months'] = {'start': str(m.index[0]), 'HAY': [r1(v, 2) for v in m.HAY2201], 'BEN': [r1(v, 2) for v in m.BEN2201]}
     yr = p.groupby(loc.year).HAY2201.mean()
+    yb = p.groupby(loc.year).BEN2201.mean()
+    out['years'] = {'years': list(range(1997, 2027)), 'HAY': [r1(yr[y]) for y in range(1997, 2027)], 'BEN': [r1(yb[y]) for y in range(1997, 2027)]}
     P('Haywards by year:', yr.round(0).astype(int).to_dict())
     P('Haywards average 1997-2017:', round(H.loc['1997':'2017'].mean(), 1), ' 2018-2023:', round(H.loc['2018':'2023'].mean(), 1),
       ' all to Sep 2026:', round(H.mean(), 1))
@@ -358,6 +361,26 @@ def main():
       f'{100 * (g["var"].iloc[-1] / g["var"].iloc[0] - 1):+.0f}%; network share of the bill {g.share.min() * 100:.0f}-{g.share.max() * 100:.0f}%')
     out['bills'] = {'start': str(g.index[0]), 'household': [r1(v, 0) for v in g.var_ex], 'hay': [r1(v, 0) for v in g.hay]}
 
+    # a power bill in parts: the gentailers' latest year per MWh, plus GST at 15% on the whole
+    last = {c.lower(): rr[c.lower()][-1] for c in comp}
+    gst = 0.15 * rr['revenue'][-1]
+    out['bill_parts'] = {'year': rr['years'][-1], **{k: r1(v) for k, v in last.items()}, 'gst': r1(gst), 'total': r1(rr['revenue'][-1] + gst)}
+    P(f'Bill in parts FY{rr["years"][-1]}: ' + ', '.join(f'{k} {v:.1f}' for k, v in last.items()) + f', GST {gst:.1f}, total {rr["revenue"][-1] + gst:.1f}/MWh incl GST')
+
+    # every network region in the latest month: a standard user's bill for the same 600 kWh, so regions compare
+    lm = s.MonthEnd.max()
+    reg = s[s.MonthEnd == lm].copy()
+    reg['bill600'] = reg.FixedDollarPerDayInclGST * lm.day + reg.VariableDollarPerkWhInclGST * 600
+    reg = reg.sort_values('bill600')
+    P(f'Regions {lm.date()}: 600 kWh bill ${reg.bill600.min():.0f} ({reg.NetworkReportingRegion.iloc[0]}) to ${reg.bill600.max():.0f} '
+      f'({reg.NetworkReportingRegion.iloc[-1]}), median ${reg.bill600.median():.0f}; {len(reg)} regions; '
+      f'lines share {100 * reg.share.min():.0f}-{100 * reg.share.max():.0f}%')
+    reg['lines600'] = reg.NetworkMonthlyChargeDollarsInclGST / reg.MonthlyNetworkMeankWh * 600   # the lines charge scaled to 600 kWh
+    P(f'  lines charge scaled to 600 kWh: {reg.lines600.iloc[0]:.0f} (cheapest region) to {reg.lines600.iloc[-1]:.0f} (most expensive); '
+      f'correlation with the 600 kWh bill {reg.bill600.corr(reg.lines600):.2f}')
+    out['regions'] = {'month': str(lm.date()), 'days': int(lm.day),
+                      'rows': [{'name': r.NetworkReportingRegion, 'bill': r1(r.bill600, 0), 'share': r1(100 * r.share, 0)} for r in reg.itertuples()]}
+
     # ---- the two example trading periods
     out['stacks'] = []
     for day_, tp in EXAMPLES:
@@ -389,6 +412,21 @@ def main():
                               'load': round(load), 'price': {'HAY': r1(row.HAY2201, 2), 'BEN': r1(row.BEN2201, 2)},
                               'blocks': [[b[0], b[1], round(b[2], 1)] for b in blocks]})
         P(f'  blocks: {len(blocks)}')
+
+    # ---- Part 4: the most expensive and cheapest months, two-hourly, generation by fuel, demand and the Haywards price
+    two = {}
+    for ym in ['2024-08', '2026-01']:
+        x = hh.loc[ym]
+        g2 = pd.DataFrame({f: x[f'NI_{f}'] + x[f'SI_{f}'] for f in GEN8})
+        g2['demand'] = x.NI_metered + x.SI_metered
+        g2['price'] = p.HAY2201.reindex(x.index)
+        b2 = g2.resample('2h').mean()
+        two[ym] = {'t0': int(b2.index[0].value // 10**6), 'step': 7200000, **{k: [r1(v, 0) for v in b2[k]] for k in GEN8 + ['demand', 'price']}}
+        P(f'{ym}: two-hourly points {len(b2)}; mean demand {g2.demand.mean():.0f} MW; thermal mean {(g2.coal + g2.gas + g2.diesel).mean():.0f} MW; '
+          f'hydro {g2.hydro.mean():.0f}; geo {g2.geo.mean():.0f}; wind {g2.wind.mean():.0f}; Haywards mean {g2.price.mean():.2f}')
+    with open(OUT_MONTHS, 'w') as f:
+        json.dump(two, f, separators=(',', ':'))
+    P('wrote', OUT_MONTHS, os.path.getsize(OUT_MONTHS), 'bytes')
 
     with open(OUT, 'w') as f:
         json.dump(out, f, separators=(',', ':'), ensure_ascii=False)

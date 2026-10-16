@@ -8,8 +8,12 @@
 	type Layer = { name: string; tok: string; values: number[] };
 	type Panel = { name: string; tok: string; values: number[]; unit: string; fmt: (v: number) => string; height?: number };
 	let {
-		t0, step, layers, line, panel = undefined, height = 300, unit = 'MW',
-	}: { t0: number; step: number; layers: Layer[]; line: { name: string; tok: string; values: number[] }; panel?: Panel; height?: number; unit?: string } = $props();
+		t0, step, layers, line, panel = undefined, height = 300, unit = 'MW', labelEvery = 1, ymax = undefined, pmax = undefined,
+	}: { t0: number; step: number; layers: Layer[]; line: { name: string; tok: string; values: number[] }; panel?: Panel; height?: number; unit?: string;
+		labelEvery?: number;   // label every nth day (a month of days needs 3 or more)
+		ymax?: number; pmax?: number;   // fixed tops for the stack and the panel, to put two charts on the same scales
+	} = $props();
+	const half = $derived(Math.round(43200000 / step));   // steps in half a day, to centre each day's label
 
 	let w = $state(680);
 	const m = { l: 46, r: 10, t: 24, b: 8 };
@@ -28,7 +32,7 @@
 		return out;
 	});
 	const top = $derived(Math.max(...line.values, ...cum[cum.length - 1]));
-	const ext = $derived(nice(0, top, 5));
+	const ext = $derived(nice(0, ymax ?? top, 5));
 	const y = $derived(linear(ext[0], ext[1], ph, 0));
 	const yt = $derived(ticks(ext[0], ext[1], 5));
 	const area = (lo: number[] | null, hi: number[]) => {
@@ -38,7 +42,7 @@
 	};
 	const edge = (v: number[]) => v.map((q, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(q).toFixed(1)}`).join('');
 
-	const pext = $derived(panel ? nice(Math.min(0, ...panel.values), Math.max(...panel.values), 3) : [0, 1]);
+	const pext = $derived(panel ? nice(Math.min(0, ...panel.values), pmax ?? Math.max(...panel.values), 3) : [0, 1]);
 	const py = $derived(linear(pext[0], pext[1], qh, 0));
 	const pt = $derived(panel ? ticks(pext[0], pext[1], 3) : []);
 
@@ -90,8 +94,8 @@
 						{#each days as i}<line class="ch-day" x1={x(i)} x2={x(i)} y1="0" y2={qh} />{/each}
 					</g>
 				{/if}
-				{#each days as i}
-					<text class="ch-tick" x={x(Math.min(n - 1, i + 24))} y={ph + (panel ? gap + qh : 0) + 18} text-anchor="middle">{DAY.format(new Date(t0 + i * step))}</text>
+				{#each days.filter((_, j) => j % labelEvery === 0) as i}
+					<text class="ch-tick" x={x(Math.min(n - 1, i + half))} y={ph + (panel ? gap + qh : 0) + 18} text-anchor="middle">{DAY.format(new Date(t0 + i * step))}</text>
 				{/each}
 				{#if hi >= 0}
 					<line class="ch-cross" x1={x(hi)} x2={x(hi)} y1="0" y2={ph + (panel ? gap + qh : 0)} />

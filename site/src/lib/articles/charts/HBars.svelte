@@ -6,16 +6,17 @@
 
 	type Row = { label: string; value: number; tok: string; note?: string };
 	let {
-		rows, fmt = (v: number) => String(v), legend = [], label = 'Row', valueLabel = 'Value', tickFmt = undefined, table = true,
+		rows, fmt = (v: number) => String(v), legend = [], label = 'Row', valueLabel = 'Value', tickFmt = undefined, table = true, labelWidth = undefined,
 	}: {
 		rows: Row[]; fmt?: (v: number) => string; legend?: LegendItem[]; label?: string; valueLabel?: string;
 		tickFmt?: (v: number) => string; table?: boolean;
+		labelWidth?: number;   // room for the row labels on phones (default 104)
 	} = $props();
 
 	let w = $state(680);
 	const rowH = 30, barH = 18;
 	const narrow = $derived(w < 520);
-	const m = $derived({ l: narrow ? 104 : 132, r: 54, t: 6, b: 24 });
+	const m = $derived({ l: narrow ? (labelWidth ?? 104) : Math.max(132, labelWidth ?? 0), r: 54, t: 6, b: 24 });
 	const pw = $derived(Math.max(80, w - m.l - m.r));
 	const ph = $derived(rows.length * rowH);
 	// a little headroom past the longest bar on each side, so its value label fits inside the plot
