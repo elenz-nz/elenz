@@ -88,8 +88,9 @@
 	const setEnd = (t: number | null) => { endT = t; save(); };
 
 	// ---------- building the view ----------
-	// the points of a segment in (from, to]
-	const windowOf = (S: any, from: number, to: number) => slice(S, firstAtOrAfter(S.t, from + 1), firstAtOrAfter(S.t, to + 1));
+	// the points of a segment starting in [from, to): a point is the interval that starts at its time, so a window
+	// ending at midnight leaves out the interval that starts then
+	const windowOf = (S: any, from: number, to: number) => slice(S, firstAtOrAfter(S.t, from), firstAtOrAfter(S.t, to));
 	const latestT = $derived(live ? live.t[live.n - 1] : 0);
 	// a window ending before the live week reaches back past it: the live ranges then come from half-hourly history
 	const pastLive = $derived(R.src === 'live' && endT !== null && live && endT - (R.days ?? 0) * 864e5 < live.t[0]);
@@ -102,7 +103,7 @@
 		const my = ++token;
 		const r = (RANGES as any)[range];
 		const latest = live.t[live.n - 1];
-		const to = r.days == null || endT === null ? latest : Math.min(endT, latest);
+		const to = r.days == null || endT === null ? latest + 1 : Math.min(endT, latest + 1);
 		const from = r.days == null ? 0 : to - r.days * 864e5;
 		const iv = effInt;
 		viewError = '';
