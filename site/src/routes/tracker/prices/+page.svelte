@@ -4,7 +4,7 @@
 	// captured over the range and a heat map of the last 30 days by time of day. Data: #lib/prices/data.js.
 	import { onMount, untrack } from 'svelte';
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
-	import { fromLayout, historyStore, firstAtOrAfter } from '#lib/tracker/series.js';
+	import { fromLayout, historyStore, firstAtOrAfter, slice, nzOffset } from '#lib/tracker/series.js';
 	import Masthead from '#lib/site/Masthead.svelte';
 	import TrackerTabs from '#lib/site/TrackerTabs.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
@@ -12,8 +12,8 @@
 	import FuelBars from '#lib/prices/FuelBars.svelte';
 	import HeatMap from '#lib/prices/HeatMap.svelte';
 	import {
-		NODES, NODE, priceOf, separated, addRevenue, captured, RANGES, INT_LABEL, lastDays, atInterval, completeDaily, periods,
-		heat, priceScale, niceTicks, CAP, money, signedMoney, clock, dayLabel, dateLabel, monthLabel, shortDate, timeTicks
+		NODES, NODE, priceOf, separated, addRevenue, captured, RANGES, INT_LABEL, atInterval, completeDaily, periods,
+		heat, priceScale, niceTicks, CAP, money, signedMoney, clock, dayLabel, dateLabel, monthLabel, shortDate, timeTicks, nzParts
 	} from '#lib/prices/data.js';
 
 	const DATA_URL = '/data/tracker.json';
@@ -41,6 +41,9 @@
 	let viewError = $state('');
 	let heatRows = $state<any[]>([]);
 	let heatSeg: any = null;
+	let endT = $state<number | null>(null); // end of the window (ms), or null for the latest data
+	let heatTo = 0;
+	const FIRST = Date.UTC(2020, 8, 10) - 12 * 36e5; // history starts 10 Sep 2020 (NZ)
 
 	const store = historyStore();
 	const R = $derived(RANGES[range as keyof typeof RANGES]);
@@ -81,27 +84,39 @@
 	}
 
 	// ---------- building the view ----------
+	// the points of a segment in (from, to]
+	const windowOf = (S: any, from: number, to: number) => slice(S, firstAtOrAfter(S.t, from + 1), firstAtOrAfter(S.t, to + 1));
+	const latestT = $derived(live ? live.t[live.n - 1] : 0);
+	// a window ending before the live week reaches back past it: the live ranges then come from half-hourly history
+	const pastLive = $derived(R.src === 'live' && endT !== null && live && endT - (R.days ?? 0) * 864e5 < live.t[0]);
+	const intChoices = $derived(pastLive ? ['30m'] : R.ints);
+	const effInt = $derived(intChoices.includes(int) ? int : intChoices[0]);
+
 	let token = 0;
 	async function build() {
 		if (!live) return;
 		const my = ++token;
 		const r = (RANGES as any)[range];
+		const latest = live.t[live.n - 1];
+		const to = r.days == null || endT === null ? latest : Math.min(endT, latest);
+		const from = r.days == null ? 0 : to - r.days * 864e5;
+		const iv = effInt;
 		viewError = '';
 		try {
-			if (r.src === 'live') {
-				setView(timeView(atInterval(lastDays(live, r.days), int)));
-			} else if (r.src === 'hh') {
-				const to = live.t[live.n - 1], from = to - r.days * 864e5;
+			if (r.src === 'live' && from >= live.t[0] - 1) {
+				setView(timeView(atInterval(windowOf(live, from, to), iv)));
+			} else if (r.src !== 'day') {
 				if (!store.has('hh', from, to)) { busy = true; await store.load('hh', from, to); }
 				if (my !== token) return;
 				const m = store.merged('hh', live);
-				setView(timeView(atInterval(lastDays(m, r.days), int), m.histEnd));
+				setView(timeView(atInterval(windowOf(m, from, to), iv), m.histEnd));
 			} else {
 				if (!store.has('day', 0, 0)) { busy = true; await store.load('day', 0, 0); }
 				if (my !== token) return;
 				const m0 = store.merged('day', live), m = completeDaily(m0, m0.histEnd, live);
-				setView(longView(lastDays(m, r.days), m.histEnd));
+				setView(longView(r.days == null ? m : windowOf(m, from, to), m.histEnd));
 			}
+			if (to !== heatTo) loadHeat(to);
 		} catch (e: any) {
 			if (my === token) viewError = e.missing ? 'History is still being prepared. Please check back later.' : `History couldn't be loaded. ${e.message}`;
 		} finally {
@@ -129,7 +144,7 @@
 
 	/** 12 months and all history: per period (day, week or month). */
 	function longView(S: any, histEnd: number) {
-		const P = periods(S, int);
+		const P = periods(S, effInt);
 		return { mode: 'long', S, P, n: P.n, t: P.t, t0: P.t[0], t1: P.t[P.n - 1], histEnd };
 	}
 
@@ -203,8 +218,8 @@
 	function whenLabel(i: number) {
 		if (!view || i < 0) return '';
 		const t = view.t[i];
-		if (view.mode === 'time') return int === '1d' ? dayLabel(t) : `${clock(t)} ${dayLabel(t)}`;
-		return int === '1mo' ? monthLabel(t) : int === '1w' ? `Week of ${shortDate(t)}` : dateLabel(t);
+		if (view.mode === 'time') return effInt === '1d' ? dayLabel(t) : `${clock(t)} ${dayLabel(t)}${endT !== null ? ' ' + nzParts(t).y : ''}`;
+		return effInt === '1mo' ? monthLabel(t) : effInt === '1w' ? `Week of ${dateLabel(t)}` : dateLabel(t);
 	}
 	const mw = (v: number) => `${Math.round(Math.abs(v)).toLocaleString('en-NZ')} MW ${v >= 0 ? 'north' : 'south'}`;
 	const hours = (h: number) => (h < 1 ? `${Math.round(h * 60)} min` : `${h < 10 ? h.toFixed(1) : Math.round(h)} h`);
@@ -258,8 +273,8 @@
 		if (!view || !rangeStats) return [];
 		const st = rangeStats;
 		if (view.mode === 'time') {
-			const i = view.n - 1, end = R.src === 'live' || !view.histEnd;
-			const lbl = end ? 'latest' : 'at the end of the range';
+			const i = view.n - 1;
+			const lbl = endT === null ? 'latest' : 'at the end of the range';
 			return [
 				{ label: 'Haywards', value: money(view.S.NI.price[i]), sub: `North Island reference, ${lbl}` },
 				{ label: 'Benmore', value: money(view.S.SI.price[i]), sub: `South Island reference, ${lbl}` },
@@ -276,14 +291,17 @@
 	});
 
 	// ---------- the heat map: the last 30 days, half-hourly ----------
-	async function loadHeat() {
+	/** The heat map: the 30 days to the end of the window. */
+	async function loadHeat(to: number) {
 		if (!live) return;
+		heatTo = to;
+		const from = to - 30 * 864e5;
 		try {
-			const to = live.t[live.n - 1], from = to - 30 * 864e5;
 			if (!store.has('hh', from, to)) await store.load('hh', from, to);
-			heatSeg = lastDays(store.merged('hh', live), 30);
+			if (heatTo !== to) return;
+			heatSeg = windowOf(store.merged('hh', live), from, to);
 		} catch {
-			heatSeg = lastDays(live, 30);   // history not ready: the live week only
+			heatSeg = windowOf(live, from, to);   // history not ready: the live week only
 		}
 		heatRows = heat(heatSeg, heatKey);
 	}
@@ -291,7 +309,26 @@
 
 	// rebuild when the range, interval or data change
 	// (build reads and writes the view, so it runs untracked: only these three trigger it)
-	$effect(() => { void range; void int; void live; untrack(() => build()); });
+	$effect(() => { void range; void int; void live; void endT; untrack(() => build()); });
+
+	// ---------- moving through time: the date box and the arrows ----------
+	const canMove = $derived(R.days != null);
+	const atLatest = $derived(endT === null || endT >= latestT);
+	function step(dir: number) {
+		if (!R.days || !live) return;
+		const base = endT ?? latestT;
+		const next = Math.max(FIRST + R.days * 864e5, base + dir * R.days * 864e5);
+		endT = next >= latestT ? null : next;
+	}
+	const isoDay = (t: number) => { const d = new Date(t + nzOffset(t)); return d.toISOString().slice(0, 10); };
+	const dateValue = $derived(live ? isoDay((endT ?? latestT) - 1) : '');
+	function pickDate(v: string) {
+		if (!v) { endT = null; return; }
+		const [y, m, d] = v.split('-').map(Number);
+		let t = Date.UTC(y, m - 1, d + 1);         // the end of that NZ day: midnight after it
+		t -= nzOffset(t - 12 * 36e5);
+		endT = t >= latestT ? null : Math.max(t, FIRST + (R.days ?? 0) * 864e5);
+	}
 
 	function keys(e: KeyboardEvent) {
 		if (!view) return;
@@ -317,7 +354,6 @@
 			meta = D.meta;
 			error = '';
 			live = addRevenue(fromLayout(D));
-			if (!heatSeg) loadHeat();
 		}
 		load().catch((e) => (error = `The data couldn't be loaded. ${e.message} Try reloading the page.`));
 		const check = () => {
@@ -364,15 +400,25 @@
 		<div class="ctl">
 			<span id="p-lb-int">Interval</span>
 			<div class="seg" role="group" aria-labelledby="p-lb-int">
-				{#each R.ints as k}
-					<button type="button" aria-pressed={int === k} onclick={() => { int = k; save(); }}>{(INT_LABEL as any)[k]}</button>
+				{#each intChoices as k}
+					<button type="button" aria-pressed={effInt === k} onclick={() => { int = k; save(); }}>{(INT_LABEL as any)[k]}</button>
 				{/each}
 			</div>
 		</div>
+		{#if canMove}
+			<div class="ctl">
+				<label for="p-date">{R.label} ending</label>
+				<div class="datebox">
+					<input type="date" id="p-date" value={dateValue} min="2020-09-10" max={live ? isoDay(latestT) : undefined}
+						title="Shows the selected range ending on this date" onchange={(e) => pickDate((e.currentTarget as HTMLInputElement).value)} />
+					{#if !atLatest}<button type="button" onclick={() => (endT = null)}>Latest</button>{/if}
+				</div>
+			</div>
+		{/if}
 		<div class="status">
 			<span class="tstatus" role="status">{status}</span>
 			{#if meta}
-				{#if R.src !== 'live'}
+				{#if R.src !== 'live' || endT !== null}
 					<span class="pill hist" title="Final prices from the EA, then the live week">History</span>
 				{:else if isLive}
 					<span class="pill live" title="Dispatch prices from the EMI real-time feed, every 5 minutes">Live · {clock(meta.end)}</span>
@@ -403,7 +449,7 @@
 						{#if view.mode === 'time'}
 							<h2>Prices</h2><span class="unit">$/MWh at each node</span>
 						{:else}
-							<h2>Price range</h2><span class="unit">$/MWh, each {int === '1d' ? 'day' : int === '1w' ? 'week' : 'month'}'s half-hours</span>
+							<h2>Price range</h2><span class="unit">$/MWh, each {effInt === '1d' ? 'day' : effInt === '1w' ? 'week' : 'month'}'s half-hours</span>
 						{/if}
 						<div class="legends">
 							<div class="seg" role="group" aria-label="Price scale">
@@ -436,8 +482,18 @@
 							<span class="lg"><i class="dash" style="--c: var({bandKey === 'BEN' ? '--p-ni' : '--p-si'})"></i>{bandKey === 'BEN' ? 'Haywards' : 'Benmore'} average</span>
 						{/if}
 					</div>
-					<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={250} y={priceY} fmt={fmtTick} layers={priceLayers}
-						shade={view.mode === 'time' ? view.shade : []} marks={capMarks} bind:hover label="Prices at the grid nodes over the range" zero />
+					<div class="plot-wrap">
+						<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={250} y={priceY} fmt={fmtTick} layers={priceLayers}
+							shade={view.mode === 'time' ? view.shade : []} marks={capMarks} bind:hover label="Prices at the grid nodes over the range" zero />
+						{#if canMove}
+							<button type="button" class="arrow prev" aria-label="Previous {R.label}" title="Previous {R.label}" onclick={() => step(-1)}>
+								<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+							</button>
+							<button type="button" class="arrow next" aria-label="Next {R.label}" title="Next {R.label}" disabled={atLatest} onclick={() => step(1)}>
+								<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+							</button>
+						{/if}
+					</div>
 				</div>
 
 				<div class="chart">
@@ -485,7 +541,7 @@
 		<aside class="summary p-side" aria-label="Prices at the selected time">
 			<div>
 				<div class="sum-when">{whenLabel(at)}</div>
-				<div class="sum-sub">{view?.mode === 'long' ? 'Final prices' : view && view.histEnd && view.t[at] <= view.histEnd ? 'Final prices' : 'Dispatch prices'}</div>
+				<div class="sum-sub">{view?.mode === 'long' || (view && view.histEnd && view.t[at] <= view.histEnd) ? 'Final prices' : 'Dispatch prices'}</div>
 			</div>
 			<table class="mix">
 				<tbody>
@@ -529,7 +585,7 @@
 			<div class="card-head">
 				<div>
 					<h2>Price by time of day</h2>
-					<p class="sub">Each half-hour of the last 30 days</p>
+					<p class="sub">Each half-hour of the {endT === null ? 'last 30 days' : `30 days to ${dateLabel(endT - 1)}`}</p>
 				</div>
 				<div class="seg" role="group" aria-label="Node for the heat map">
 					{#each NODES.filter((nd) => nd.ref || (heatSeg && priceOf(heatSeg, nd.k))) as nd}
@@ -542,7 +598,7 @@
 	</div>
 
 	<section class="card notes">
-		<div><h3>Spike-proof scale</h3><p>Linear to about $100 and compressed above, so one spike doesn't flatten everything else. Capped clips at ${CAP} and marks anything higher.</p></div>
+		<div><h3>Scales</h3><p><b>Spike-proof</b> is linear up to about $100 and compressed above it (logarithmic), so one spike doesn't flatten everything else; equal steps up the axis are equal ratios. <b>Capped</b> is linear up to ${CAP} and clips anything higher, marking the highest prices at the top. <b>Linear</b> is a plain scale, where a spike shows at its true size.</p></div>
 		<div><h3>Dispatch or final prices</h3><p>The live week shows dispatch prices from the real-time feed. History uses the Electricity Authority's final prices once published, usually the next day; under scarcity the two can differ a lot.</p></div>
 		<div><h3>Two kinds of average</h3><p>Time-weighted counts every interval the same. Generation-weighted counts each interval by how much was generated, so busy peaks count for more.</p></div>
 		<div><h3>Islands priced apart</h3><p>Shaded where Haywards and Benmore differ by more than $10 and 10%, usually because the HVDC link or the grid near it is at a limit.</p></div>
@@ -559,6 +615,12 @@
 	.ts { font-size: 0.74rem; color: var(--muted); }
 	.p-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 14px 18px; align-items: start; }
 	.p-side { position: sticky; top: 12px; }
+	.plot-wrap { position: relative; }
+	.arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 30px; height: 44px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 4px; background: color-mix(in srgb, var(--surface) 88%, transparent); color: var(--ink-2); cursor: pointer; opacity: 0.85; }
+	.arrow:hover { color: var(--ink); opacity: 1; }
+	.arrow:disabled { opacity: 0.3; cursor: default; }
+	.arrow.prev { left: 54px; }
+	.arrow.next { right: 12px; }
 	.keys { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 6px 0 4px; }
 	.nk { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 0.8rem; color: var(--ink-2); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px 2px 8px; min-height: 28px; cursor: pointer; }
 	.nk[aria-pressed='false'] { opacity: 0.45; }
