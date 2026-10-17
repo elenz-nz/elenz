@@ -39,6 +39,13 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .num, td.n, .v { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
 
 /* Masthead */
+.mast-wrap { display: grid; gap: 12px; min-width: 0; }
+/* PREVIEW NOTE (remove after launch, with the markup in Masthead.svelte) */
+.preview-note { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 6px 12px; border-radius: 6px; background: var(--accent-soft); color: var(--ink-2); font-size: 0.82rem; line-height: 1.4; }
+.preview-note strong { color: var(--accent); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.preview-note a { margin-left: auto; color: var(--accent); font-weight: 600; text-decoration: none; white-space: nowrap; }
+.preview-note a:hover { text-decoration: underline; }
+@media (max-width: 560px) { .preview-note .pn-more { display: none; } }
 .masthead { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
 .brand svg { flex: none; }
