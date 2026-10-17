@@ -81,7 +81,7 @@ export const TOPICS: Topic[] = [
 		title: 'Installed capacity',
 		summary: 'How much each plant could generate, and when that changed, back to 1997: the basis for the Generation tab’s capacity factors and dispatchable headroom.',
 		shownOn: [['Tracker', '/tracker']],
-		updated: '2026-10-17',
+		updated: '2026-10-18',
 	},
 	{
 		slug: 'history',
@@ -156,9 +156,9 @@ export const SOURCES: Source[] = [
 		id: 'offers', name: 'Generator offers', publisher: EA, dataset: 'BidsAndOffers/Offers',
 		url: EMI + 'BidsAndOffers/Offers',
 		what: 'Each generator’s energy offers for every trading period: blocks of MW at a price, revised up to gate closure.',
-		use: 'The likely price setter in the price explainer, from the final offers of the newest published day.',
-		period: 'Daily files', fresh: 'The day after', licence: CCBY,
-		topics: ['price-explainer'],
+		use: 'The likely price setter in the price explainer, from the final offers of the newest published day; offered capacity for the Generation tab’s dispatchable headroom, every half-hour from 2013.',
+		period: 'January 2013 on, daily files', fresh: 'The day after', licence: CCBY,
+		topics: ['price-explainer', 'capacity'],
 	},
 	{
 		id: 'register', name: 'Dispatched generation plant', publisher: EA, dataset: 'Generation/GenerationFleet/Existing/DispatchedGenerationPlant.csv',

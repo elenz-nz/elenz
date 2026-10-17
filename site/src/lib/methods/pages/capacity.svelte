@@ -53,19 +53,23 @@
 </ul>
 
 <h2 id="headroom">Dispatchable headroom</h2>
-<p>The Generation tab’s headroom chart uses the same capacity to show how much plant that can be called on was not generating:</p>
-<p class="formula">Headroom = installed MW − output, for hydro, gas, coal/gas (Huntly’s Rankines), diesel and batteries<small>each fuel on its own, never below zero, then added up; batteries count discharge only</small></p>
-<p>Geothermal, bioenergy and waste heat are left out because they run close to flat out as a rule, and wind and solar because they follow the weather. An island on its own counts only its own plant, not what the HVDC link could bring.</p>
-<p>Thermal plant and batteries sit at the bottom of the chart, read from zero, and hydro on top. <b>Include hydro</b> takes hydro out: at any time much of its capacity is short of water, so the thermal and battery margin on its own is often the better guide.</p>
-<p>The chart follows the range and interval. Where a point covers more data than it shows (days built from half-hours, or weeks and months), the bands are each fuel’s average and a line marks the lowest total within the point. For the 1-year and All ranges the line needs each day’s highest half-hour of dispatchable output, which daily history gains at its next rebuild (late October 2026); until then those ranges show daily averages, which hide the tightest half-hours.</p>
-<p>It is an upper bound, and a rough one. Every unit counts as available, so these all show as spare when they aren’t:</p>
+<p>The Generation tab’s headroom chart shows how much plant that can be called on was not generating, three ways:</p>
+<p class="formula">Headroom = capacity − output, for hydro, gas, coal/gas (Huntly’s Rankines), diesel and batteries<small>for each island and fuel, never below zero, then added up; batteries count discharge only</small></p>
 <ul>
-	<li>plant out for maintenance or faults, and units in storage (one Huntly Rankine unit from 2013 to 2021);</li>
-	<li>units that take hours to start, such as the Rankines, or that need gas contracted ahead;</li>
-	<li>hydro short of water, or held back by river flow and lake level rules, and stations on a chain that can’t all run at once;</li>
-	<li>capacity held as reserve, and output the grid can’t carry.</li>
+	<li><b>Installed:</b> capacity is every unit’s installed MW, from the table below. Every unit counts as available, so this is the most there could have been.</li>
+	<li><b>Offered:</b> capacity is what generators offered for each half-hour in their final energy offers (the EA’s daily offers files, from January 2013). Plant that is off and slow to start isn’t offered, so most days Huntly’s Rankine units drop out, as do units out for maintenance or faults and plant short of fuel. On 16 October 2026 the lowest headroom was about 3,500 MW installed but 1,150 MW offered: Huntly 1, 2, 4 and 5 offered nothing, and Manapōuri offered 620 of its 800 MW.</li>
+	<li><b>Under $1,000:</b> only the part offered under $1,000/MWh. Generators offer water they want to keep, and peaking plant, at high prices, so this is what was there at a price the market usually pays. Whirinaki’s diesel units are usually offered above it.</li>
 </ul>
-<p>So the real margin is always smaller. Read the chart for when supply was tight and how that compares across days, seasons and years, not for how much was truly left. Transpower’s security-of-supply reports and the system operator’s residual generation forecasts take outages and water into account.</p>
+<p>Geothermal, bioenergy and waste heat are left out because they run close to flat out as a rule, and wind and solar because they follow the weather. An island on its own counts only its own plant, not what the HVDC link could bring. Thermal plant and batteries sit at the bottom of the By fuel view and hydro on top; <b>Include hydro</b> takes hydro out.</p>
+<p>The chart follows the range and interval. Where a point covers more data than it shows (days built from half-hours, or weeks and months), each level is its lowest within the point. The offers job (<a href={REPO + 'ingest/offered.py'}><code>ingest/offered.py</code></a>) keeps each day’s lowest offered headroom; for installed capacity on the 1-year and All ranges the lowest needs each day’s highest half-hour of dispatchable output, which daily history gains at its next rebuild (late October 2026). Until then those ranges show installed headroom as daily averages.</p>
+<p>Even offered headroom overstates the margin a little:</p>
+<ul>
+	<li>offers are published the day after, so the newest day has none (shaded);</li>
+	<li>capacity held as reserve on running plant is still counted;</li>
+	<li>a unit offered but needing hours to reach full output, or a river chain that can’t run every station at once, counts in full;</li>
+	<li>output the grid can’t carry, and transmission outages, aren’t considered.</li>
+</ul>
+<p>Offers don’t say why MW wasn’t offered: an outage, maintenance, a unit not committed, or fuel or water kept back all look the same. Transpower’s security-of-supply reports and the system operator’s residual generation figures take outages and reserves into account.</p>
 
 <h2 id="changes">Plants whose capacity changed since 1997</h2>
 <div class="tbl">

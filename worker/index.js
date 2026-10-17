@@ -7,16 +7,18 @@
 //             outside uptime monitor, which still works if the cron below stops).
 //  scheduled: asks GitHub to run the data jobs. Every 5 minutes: the live update (update-data.yml), which waits
 //             for the interval that has just begun (the EMI API publishes each 1-2 minutes after it starts). Every 6 hours:
-//             the history update (history.yml), which adds newly published daily dispatch files. GitHub's own
+//             the history update (history.yml), which adds newly published daily dispatch files, and the offers job
+//             (offers.yml), which adds newly published daily offers files. GitHub's own
 //             schedule is unreliable for new repositories; on-demand runs start within seconds. Every 15 minutes
 //             (at :10, :25, :40, :55) also the watchdog (watchdog.yml), which raises an issue when data goes stale.
 //             Needs the Worker secret GITHUB_TOKEN: a fine-grained token for elenz-nz/elenz with Actions: read and write.
 const WORKFLOWS = 'https://api.github.com/repos/elenz-nz/elenz/actions/workflows';
 const HISTORY_CRON = '40 */6 * * *'; // must match wrangler.jsonc
-// history files the site may request: the index, all days, one half-hourly file per month, and the records
+// history files the site may request: the index, all days, one half-hourly file per month, the records, and the
+// offered capacity (ingest/offered.py: one file per month and all days)
 // /data/health: the same limits as the GitHub watchdog (watchdog.yml)
 const HEALTH = { liveMinutes: 30, historyDays: 5, rebuildDays: 12 };   // history may lag up to rebuildDays during a rebuild
-const HISTORY_FILE = /^\/data\/history\/(index\.json|progress\.json|day\.json|records\.json|hh\/\d{4}-\d{2}\.json)$/;
+const HISTORY_FILE = /^\/data\/history\/(index\.json|progress\.json|day\.json|records\.json|hh\/\d{4}-\d{2}\.json|off\/(?:\d{4}-\d{2}|days)\.json)$/;
 
 export default {
   async fetch(request, env) {
@@ -120,6 +122,11 @@ export default {
       return r.status === 204 ? 'ok' : `GitHub said HTTP ${r.status}: ${(await r.text()).slice(0, 300)}`;
     };
     const result = await dispatch(workflow);
+    // the offers job (offered capacity, ingest/offered.py) runs alongside the history job
+    if (history) {
+      const o = await dispatch('offers.yml');
+      if (o !== 'ok') console.log('offers: ' + o);
+    }
     if (!history && new Date(event.scheduledTime).getUTCMinutes() % 15 === 10) {
       const w = await dispatch('watchdog.yml');
       if (w !== 'ok') console.log('watchdog: ' + w);

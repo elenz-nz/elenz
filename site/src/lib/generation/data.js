@@ -169,39 +169,95 @@ export function mixRows(S, region, from, to, prev, fine) {
 // ---------- dispatchable headroom ----------
 // Plant that can be called on at short notice: hydro, thermal (gas, the Rankines, diesel) and batteries. Geothermal,
 // bioenergy and waste heat run flat out as a rule, and wind and solar follow the weather, so they're left out.
+// Three levels, each less output: installed capacity (capacity.json), what was offered (the final energy offers),
+// and what was offered under $1,000/MWh (ingest/offered.py: hist/off/YYYY-MM.json by half-hour, hist/off/days.json
+// by day). For each island and fuel the level less output, never below zero, then added up.
 export const DISPATCH = DISPATCHABLE;
+export const LEVELS = ['I', 'O', 'C'];
+const HH = 18e5;
 
-/** Installed MW of a fuel in a region at each time in t (sorted), from the capacity steps. */
-export function capSeries(k, region, t) {
-  const out = new Float64Array(t.length);
-  for (const isl of isls(region)) {
-    const s = steps(isl, k);
-    let j = -1;
-    for (let i = 0; i < t.length; i++) {
-      while (j + 1 < s.length && s[j + 1][0] <= t[i]) j++;
-      if (j >= 0) out[i] += s[j][1];
+/** Installed MW of a fuel in one island at each time in t (sorted), from the capacity steps. */
+export function capSeries(k, isl, t) {
+  const out = new Float64Array(t.length), s = steps(isl, k);
+  let j = -1;
+  for (let i = 0; i < t.length; i++) {
+    while (j + 1 < s.length && s[j + 1][0] <= t[i]) j++;
+    if (j >= 0) out[i] = s[j][1];
+  }
+  return out;
+}
+
+/** Output of a fuel in one island at point i (battery: discharge; daily history's batt_d where it has it). */
+const outAt = (S, k, isl, i) => {
+  const I = S[isl];
+  if (k === 'batt' && I.batt_d && I.batt_d[i] > 0) return I.batt_d[i];
+  const a = I[k];
+  return a ? Math.max(0, a[i]) : 0;
+};
+
+/** A fuel's offered MW (k 'o' all, 'c' under $1,000) in one island at each point of S, from the month files (fine
+ *  data: the half-hour each point falls in) or days.json (daily data: the day's mean). NaN where there's none. */
+function offeredSeries(S, off, f, isl, k, daily) {
+  const out = new Float64Array(S.n).fill(NaN);
+  if (!off) return out;
+  if (daily) {
+    const D = off.days, col = D && D[isl] && D[isl][f] && D[isl][f][k];
+    if (!col) return out;
+    for (let i = 0; i < S.n; i++) { const j = off.dayIndex.get(S.t[i]); if (j !== undefined && col[j] != null) out[i] = col[j]; }
+    return out;
+  }
+  for (const M of off.months) {
+    const col = M[isl] && M[isl][f] && M[isl][f][k];
+    if (!col) continue;
+    for (let i = 0; i < S.n; i++) {
+      const j = Math.floor((S.t[i] - M.t0) / HH);
+      if (j >= 0 && j < M.N && col[j] != null) out[i] = col[j];
     }
   }
   return out;
 }
 
-/** Dispatchable headroom at each point of a segment: installed MW less output, by fuel (never below zero) and in
- *  total, over `fuels` (all of DISPATCH, or some of them). low: the lowest total within each point, where the data has
- *  it: the point's own figure for half-hours and shorter; for days, daily history's peak dispatchable output (peak.disp,
- *  once the history carries it, and only for all of DISPATCH), otherwise NaN. */
-export function headroom(S, region, daily, fuels = DISPATCH) {
-  const by = /** @type {Record<string, Float64Array>} */ ({}), tot = new Float64Array(S.n), cap = new Float64Array(S.n);
-  for (const k of fuels) {
-    const c = capSeries(k, region, S.t), a = (by[k] = new Float64Array(S.n));
-    for (let i = 0; i < S.n; i++) { a[i] = Math.max(0, c[i] - mwAt(S, k, region, i)); tot[i] += a[i]; cap[i] += c[i]; }
+/** Each level's headroom at each point of a segment: by fuel and in total, over `fuels` (all of DISPATCH or some),
+ *  and low, the lowest total within each point where the data has it: the point's own total for half-hours and
+ *  shorter; for days, daily history's peak dispatchable output (installed) or days.json's lows (offered).
+ *  off: { months: [hist/off month files] } for fine data, { days, dayIndex } for daily data, or null. */
+export function headroom(S, region, daily, fuels = DISPATCH, off = null) {
+  const out = /** @type {Record<string, {by: Record<string, Float64Array>, tot: Float64Array, low: Float64Array, any: boolean}>} */ ({});
+  const all = fuels.length === DISPATCH.length, noHydro = !fuels.includes('hydro');
+  for (const L of LEVELS) {
+    const by = /** @type {Record<string, Float64Array>} */ ({}), tot = new Float64Array(S.n);
+    let any = false;
+    for (const k of fuels) {
+      const a = (by[k] = new Float64Array(S.n));
+      for (const isl of isls(region)) {
+        const base = L === 'I' ? capSeries(k, isl, S.t) : offeredSeries(S, off, k, isl, L === 'O' ? 'o' : 'c', daily);
+        for (let i = 0; i < S.n; i++) a[i] += Math.max(0, base[i] - outAt(S, k, isl, i));   // NaN stays NaN
+      }
+      for (let i = 0; i < S.n; i++) tot[i] += a[i];
+    }
+    for (let i = 0; i < S.n; i++) if (tot[i] === tot[i]) { any = true; break; }
+    let low = tot;
+    if (daily) {
+      low = new Float64Array(S.n).fill(NaN);
+      if (L === 'I') {
+        const pk = S.peak && S.peak[region] && S.peak[region][all ? 'disp' : 'dispx'];
+        if (pk && (all || noHydro)) {
+          const cap = new Float64Array(S.n);
+          for (const k of fuels) for (const isl of isls(region)) { const c = capSeries(k, isl, S.t); for (let i = 0; i < S.n; i++) cap[i] += c[i]; }
+          for (let i = 0; i < S.n; i++) if (pk[i] === pk[i] && pk[i] > 0) low[i] = Math.max(0, cap[i] - pk[i]);
+        }
+      } else if (off && off.days && (all || noHydro)) {
+        const col = off.days[`low${L}${all ? '' : 'x'}`]?.[region];
+        if (col) for (let i = 0; i < S.n; i++) { const j = off.dayIndex.get(S.t[i]); if (j !== undefined && col[j] != null) low[i] = col[j]; }
+      }
+    }
+    out[L] = { by, tot, low, any };
   }
-  const pk = fuels.length === DISPATCH.length && S.peak && S.peak[region] && S.peak[region].disp;
-  const low = daily ? Float64Array.from({ length: S.n }, (_, i) => (pk && pk[i] === pk[i] && pk[i] > 0 ? Math.max(0, cap[i] - pk[i]) : NaN)) : tot;
-  return { by, tot, cap, low };
+  return out;
 }
 
-/** Headroom over the chart's points: each fuel's average and the lowest total in each (the points of `to` are
- *  buckets of the points of `S`, as atInterval makes them). */
+/** One level's headroom over the chart's points: each fuel's average and the lowest total in each (the points of
+ *  `to` are buckets of the points of `S`, as atInterval makes them). A point with no data for the level is NaN. */
 export function headroomAt(H, S, to) {
   const keys = Object.keys(H.by);
   const n = to.n, by = /** @type {Record<string, Float64Array>} */ ({}), low = new Float64Array(n).fill(NaN), tot = new Float64Array(n);
@@ -212,6 +268,7 @@ export function headroomAt(H, S, to) {
     while (i < S.n && S.t[i] < to.t[j]) i++;
     let w = 0; const acc = Object.fromEntries(keys.map((k) => [k, 0]));
     for (; i < S.n && S.t[i] < end; i++) {
+      if (!(H.tot[i] === H.tot[i])) continue;
       for (const k of keys) acc[k] += H.by[k][i] * S.h[i];
       w += S.h[i];
       if (H.low[i] === H.low[i] && !(low[j] <= H.low[i])) low[j] = H.low[i];
@@ -220,4 +277,31 @@ export function headroomAt(H, S, to) {
     else tot[j] = NaN;
   }
   return { by, tot, low };
+}
+
+/** Offered capacity files, fetched once each: month files (hist/off/YYYY-MM.json) and all days (hist/off/days.json).
+ *  A file not there yet (the first backfill) comes back null. */
+const offCache = new Map();
+function getOff(name) {
+  if (!offCache.has(name)) {
+    offCache.set(name, fetch(`/data/history/off/${name}.json`).then((r) => (r.ok ? r.json() : null)).catch(() => {
+      offCache.delete(name);   // try again next time
+      return null;
+    }));
+  }
+  return offCache.get(name);
+}
+/** What headroom() needs for [from, to): the month files for fine data, days.json (with an index by day) for daily. */
+export async function loadOffered(daily, from, to) {
+  if (daily) {
+    const days = await getOff('days');
+    return days ? { days, dayIndex: new Map(days.t.map((/** @type {number} */ t, /** @type {number} */ j) => [t, j])) } : null;
+  }
+  const names = [];
+  for (let t = from; t < to + 864e5; t += 864e5 * 27) {
+    const d = new Date(t + nzOffset(t)), m = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+    if (!names.includes(m)) names.push(m);
+  }
+  const months = (await Promise.all(names.map(getOff))).filter(Boolean);
+  return months.length ? { months } : null;
 }

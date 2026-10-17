@@ -197,5 +197,39 @@ check(d3['v'] == p2['v'] and d3.get('since') == 3 and any(x['k'] == 'demand_max'
       'records: confirmed when the metered month arrives (new, and listed as settled)')
 check(not rc.same(R2, R3) and rc.same(R3, {**R3, 'built': 0}), 'records: republished only when something changed')
 
+# offered capacity (offered.py): final energy offers summed by plant, the cheap part under $1,000, headroom lows
+import io as _io  # noqa: E402
+import time as _time  # noqa: E402
+from datetime import date as _date  # noqa: E402
+
+import offered as of  # noqa: E402
+hdr = ('TradingDate,TradingPeriod,ParticipantCode,PointOfConnection,Unit,ProductType,ProductClass,ReserveType,'
+       'ProductDescription,UTCSubmissionDate,UTCSubmissionTime,SubmissionOrder,IsLatestYesNo,Tranche,'
+       'MaximumRampUpMegawattsPerHour,MaximumRampDownMegawattsPerHour,PartiallyLoadedSpinningReservePercent,'
+       'MaximumOutputMegawatts,ForecastOfGenerationPotentialMegawatts,Megawatts,DollarsPerMegawattHour')
+rows = [('MAN2201', 'MAN0', 'Energy', 'Injection', 'Y', 300, 10), ('MAN2201', 'MAN0', 'Energy', 'Injection', 'Y', 200, 2000),
+        ('MAN2201', 'MAN0', 'Energy', 'Injection', 'N', 999, 1), ('HLY2201', 'HLY5', 'Energy', 'Injection', 'Y', 100, 500),
+        ('HLY2201', 'HLY5', 'Reserve', 'Injection', 'Y', 50, 1), ('XXX0001', 'ZZZ0', 'Energy', 'Injection', 'Y', 40, 1)]
+csv_text = hdr + '\n' + '\n'.join(f'2026-10-16,{tp},P,{poc},{u},{pt},{pc},,x,2026-10-15,00:00:00.000,1,{y},1,,,,,,{mw},{pr}'
+                                     for tp in (1, 2) for poc, u, pt, pc, y, mw, pr in rows)
+table = of.units()
+unk = {}
+red = of.reduce_day(_io.StringIO(csv_text), table, unk)
+man = next(k for k in red if k.startswith('Manap'))
+check(red[man][0][0] == 500 and red[man][1][0] == 300, f'offered: Manapōuri TP1 offered 500, under $1,000 300 ({red[man][0][0]}, {red[man][1][0]})')
+check(red['Huntly 5'][0][1] == 100 and red['Huntly 5'][1][1] == 100, 'offered: Huntly 5 TP2 100 MW, all under $1,000; reserve and old offers ignored')
+check('XXX0001 ZZZ0' in unk, 'offered: a unit the register lacks is skipped and reported')
+of.fetch_day = lambda d, t, u: of.reduce_day(_io.StringIO(csv_text), t, u)
+off, offp, added = of.build_month(_date(2026, 10, 1), None, None, table, [_date(2026, 10, 16)], lambda *a: None, _time.time() + 60)
+i0 = of.day_index(_date(2026, 10, 16), off['t0'])
+check(added == 1 and off['SI']['hydro']['o'][i0] == 500 and off['NI']['gas']['c'][i0 + 1] == 100 and off['SI']['hydro']['o'][i0 + 2] == 0
+      and off['SI']['hydro']['o'][i0 - 1] is None, 'offered: month grid filled for the day (zero where nothing offered, null before)')
+hh_fake = {'t0': off['t0'], 'N': off['N'], 'NI': {f: [0] * off['N'] for f in of.DISPATCH}, 'SI': {f: [0] * off['N'] for f in of.DISPATCH}}
+hh_fake['SI']['hydro'] = [450] * off['N']
+sm = of.summarise(off, hh_fake)
+j = sm['t'].index(int(pd.Timestamp('2026-10-16', tz='Pacific/Auckland').timestamp() * 1000))
+check(sm['lowO']['NZ'][j] == 0 and sm['lowC']['SI'][j] == 0 and sm['lowOx']['NI'][j] == 0 and sm['lowO']['SI'][j - 1] is None,
+      'offered: daily lowest headroom (offered less output, never below zero; no offers, no figure)')
+
 print(f'\n{len(failures)} failed' if failures else '\nall passed')
 sys.exit(1 if failures else 0)

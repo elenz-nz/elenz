@@ -60,11 +60,14 @@ Plan, on the branch:
 
 The Generation tab's headroom chart draws a line for the lowest headroom in each day, week or month. For the 1-year and
 All ranges that needs each day's highest half-hour of dispatchable output (hydro, gas, coal/gas, diesel, battery
-discharge), which `daily()` in `ingest/history.py` now writes as `peak.disp` (on the branch). It isn't in the fingerprint,
+discharge), which `daily()` in `ingest/history.py` now writes as `peak.disp`, and the same without hydro as
+`peak.dispx` (on the branch). It isn't in the fingerprint,
 so it rides on this rebuild. After it:
-- Check `/data/history/day.json` has `peak.NZ.disp`, and the 1Y headroom chart shows "Lowest in each day".
-- On `/methods/capacity#headroom`, replace the sentence about the next rebuild with: daily history keeps each day's
-  highest half-hour of dispatchable output, so the lowest line reaches back to 1997.
+- Check `/data/history/day.json` has `peak.NZ.disp` and `peak.NZ.dispx`, and the 1Y headroom chart's installed level is each day's
+  lowest (the "Daily averages where history doesn't yet keep each day's lowest" note goes).
+- Run the Offers workflow by hand with "resummarise" ticked, so each month's lowest offered headroom uses the rebuilt output.
+- On `/methods/capacity#headroom`, replace the sentences about the next rebuild with: daily history keeps each day's
+  highest half-hour of dispatchable output, so installed headroom's lowest reaches back to 1997.
 
 ## Not fixable from EMI data
 
