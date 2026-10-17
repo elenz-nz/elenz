@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { afterNavigate, goto } from '$app/navigation';
 	import Coffee from '#lib/site/Coffee.svelte';
 
 	// How each chart was built used to be on this page; links to its old sections go to the new pages
@@ -12,7 +12,22 @@
 	onMount(() => {
 		const to = MOVED[location.hash.slice(1)];
 		if (to) goto(to, { replaceState: true });
+		const onHash = () => flashIf();
+		addEventListener('hashchange', onHash);
+		return () => removeEventListener('hashchange', onHash);
 	});
+
+	// arriving at #contact (the sidebar's Contact, from any page): the section lights up and fades, since it sits at
+	// the foot of the page and often can't scroll to the top
+	let flash = $state(false);
+	let timer: ReturnType<typeof setTimeout> | undefined;
+	function flashIf() {
+		if (location.hash !== '#contact') return;
+		flash = false;
+		clearTimeout(timer);
+		requestAnimationFrame(() => { flash = true; timer = setTimeout(() => (flash = false), 2600); });
+	}
+	afterNavigate(flashIf);
 
 	type Part = { name: string; href: string; lede: string; items: string[] };
 	const PAGES: Part[] = [
@@ -93,8 +108,10 @@
 		<p>Elenz is free and has no ads. If you find it useful, a coffee helps keep it running and improving.</p>
 		<div><Coffee label="Buy Elenz a coffee" /></div>
 
-		<h2 id="contact">Contact</h2>
-		<p>Questions, corrections and ideas: <a href="mailto:hello@elenz.co.nz">hello@elenz.co.nz</a>.</p>
+		<section class="ab-contact" class:flash id="contact" aria-labelledby="contact-h">
+			<h2 id="contact-h">Contact</h2>
+			<p>Questions, corrections and ideas: <a href="mailto:hello@elenz.co.nz">hello@elenz.co.nz</a>.</p>
+		</section>
 	</div>
 </main>
 
@@ -107,4 +124,15 @@
 	.ab-page h3 a:hover { color: var(--accent); text-decoration: underline; }
 	.ab-page p { color: var(--muted); font-size: 0.88rem; }
 	.ab-page li { font-size: 0.88rem; line-height: 1.5; }
+	/* Contact: a section like the others (rule above, heading), able to light up when the sidebar's Contact is used */
+	.ab-contact { margin: 18px -16px 0; padding: 18px 16px 14px; border-top: 1px solid var(--line); border-radius: 0 0 8px 8px; display: grid; gap: 12px; scroll-margin-top: 16px; }
+	.ab-contact h2 { margin: 0; font-size: 1.18rem; font-weight: 700; letter-spacing: -0.005em; }
+	.ab-contact.flash { animation: ab-flash 2.6s ease-out; }
+	@keyframes ab-flash {
+		0%, 35% { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent); }
+		100% { background: transparent; box-shadow: inset 0 0 0 2px transparent; }
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.ab-contact.flash { animation: none; background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent); }
+	}
 </style>

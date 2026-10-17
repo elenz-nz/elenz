@@ -11,6 +11,8 @@
 	let { children }: LayoutProps = $props();
 	const path = $derived(page.url.pathname.replace(/\/$/, ''));
 	const cur = (href: string) => (path === href ? 'page' : undefined);
+	// on About, the sidebar's Contact is the current item while the address ends in #contact
+	const atContact = $derived(page.url.hash === '#contact');
 </script>
 
 <div class="wrap">
@@ -20,8 +22,8 @@
 			<div>
 				<p>Elenz</p>
 				<ul>
-					<li><a href="/about" aria-current={cur('/about')}>About</a></li>
-					<li><a href="/about#contact">Contact</a></li>
+					<li><a href="/about" aria-current={cur('/about') && !atContact ? 'page' : undefined}>About</a></li>
+					<li><a href="/about#contact" aria-current={cur('/about') && atContact ? 'location' : undefined}>Contact</a></li>
 				</ul>
 			</div>
 			<div>
