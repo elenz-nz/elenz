@@ -321,7 +321,7 @@
 				{/if}
 			{:else if roomView === 'levels' && tight.I}
 				<span>Lowest</span>
-				{#each [...levelsShown].reverse() as L, i}{#if tight[L]}<span class="was">{i ? ' · ' : ' '}{LEVEL_SHORT[L]}</span> <b>{mw(tight[L].v)}</b>{#if L === markL}<span class="was"> ({tight[L].avgDay ? 'daily average, ' : ''}{whenOf(tight[L])})</span>{/if}{/if}{/each}
+				{#each [...levelsShown].reverse() as L, i}{#if tight[L]}<span class="was">{i ? ' · ' : ' '}{LEVEL_SHORT[L]}</span> <b>{mw(tight[L].v)}</b>{#if L === markL}{' '}<span class="was">({tight[L].avgDay ? 'daily average, ' : ''}{whenOf(tight[L])})</span>{/if}{/if}{/each}
 			{:else if roomView === 'fuel' && tight[roomBasis]}
 				<span>{tight[roomBasis].avgDay ? 'Lowest day (average)' : 'Lowest'}</span> <b>{mw(tight[roomBasis].v)}</b> <span class="was">{whenOf(tight[roomBasis])}</span>
 			{/if}
