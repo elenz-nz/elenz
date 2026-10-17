@@ -4,12 +4,11 @@ Public NZ electricity tracker at https://elenz.co.nz. The owner knows the power 
 to web development and hosting, so give step-by-step instructions for anything they have to do themselves.
 This repository is public: never commit keys, tokens or personal details.
 
-## Preview note (remove after launch)
+## Beta note (remove when the site is announced)
 
-Until the public launch on 2 Nov 2026 every page shows a thin "Preview" line above the masthead
-(`site/src/lib/site/Masthead.svelte`, `.preview-note` and `.mast-wrap` in `site/src/lib/tracker/tracker.css`). It hides
-itself from 2 Nov NZDT, but once the site is announced delete the markup, the `PREVIEW_UNTIL` block and the styles
-(keeping `.mast-wrap` is harmless), and this section.
+Until the site is announced every page shows a thin "Beta" line above the masthead (`site/src/lib/site/Masthead.svelte`,
+`.beta-note` in `site/src/lib/tracker/tracker.css`). It has no end date: the owner decides when to announce. Then
+delete the markup, the styles (keeping `.mast-wrap` is harmless) and this section.
 
 ## Layout
 

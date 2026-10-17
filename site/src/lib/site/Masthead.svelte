@@ -20,13 +20,6 @@
 		mq.addEventListener('change', follow);
 		return () => mq.removeEventListener('change', follow);
 	});
-	// PREVIEW NOTE (remove after launch): a thin line above the masthead until the public launch on 2 Nov 2026.
-	// It hides itself from midnight NZDT on 2 Nov (1 Nov 11:00 UTC), but delete this block, the {#if preview} markup
-	// below and `.preview-note` in tracker.css once the site is announced (see CLAUDE.md, "Preview note").
-	const PREVIEW_UNTIL = Date.parse('2026-11-01T11:00:00Z');
-	let preview = $state(Date.now() < PREVIEW_UNTIL);   // decided at build (prerender), checked again in the browser
-	onMount(() => { if (Date.now() >= PREVIEW_UNTIL) preview = false; });
-
 	function toggleTheme() {
 		dark = !dark;
 		document.documentElement.dataset.theme = dark ? 'dark' : 'light';
@@ -35,9 +28,8 @@
 </script>
 
 <div class="mast-wrap">
-{#if preview}
-	<p class="preview-note"><strong>Preview</strong><span>Elenz launches on 2 November.<span class="pn-more"> Until then, expect a few rough edges.</span></span><a href="mailto:hello@elenz.co.nz?subject=Elenz%20preview%20feedback">Send feedback</a></p>
-{/if}
+<!-- BETA NOTE: remove when the site is announced, with `.beta-note` in tracker.css (see CLAUDE.md, "Beta note") -->
+<p class="beta-note"><strong>Beta</strong><span>Elenz is still being tested<span class="bn-more">, so some figures and pages may change</span>.</span><a href="mailto:hello@elenz.co.nz?subject=Elenz%20feedback">Send feedback</a></p>
 <header class="masthead" class:bare={!brand}>
 	{#if brand}
 	<div class="brand">
