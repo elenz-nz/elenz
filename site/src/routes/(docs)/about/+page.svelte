@@ -17,7 +17,7 @@
 		return () => removeEventListener('hashchange', onHash);
 	});
 
-	// arriving at #contact (the sidebar's Contact, from any page): the section lights up and fades, since it sits at
+	// arriving at #contact (the sidebar's Contact, from any page): after 0.5 s the section lights up and fades, since it sits at
 	// the foot of the page and often can't scroll to the top
 	let flash = $state(false);
 	let timer: ReturnType<typeof setTimeout> | undefined;
@@ -25,7 +25,8 @@
 		if (location.hash !== '#contact') return;
 		flash = false;
 		clearTimeout(timer);
-		requestAnimationFrame(() => { flash = true; timer = setTimeout(() => (flash = false), 2600); });
+		// half a second's pause after landing, so the change catches the eye
+		timer = setTimeout(() => { flash = true; timer = setTimeout(() => (flash = false), 2600); }, 500);
 	}
 	afterNavigate(flashIf);
 
