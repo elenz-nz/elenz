@@ -99,9 +99,9 @@
 </main>
 
 <style>
-	/* the pages, two to a row beside the contents; one on phones */
-	.ab-pages { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 10px; align-items: start; }
-	.ab-page { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; display: grid; gap: 8px; align-content: start; }
+	/* the pages in two columns, each card straight under the one above (no ragged rows); one column on phones */
+	.ab-pages { columns: 2 280px; column-gap: 14px; }
+	.ab-page { break-inside: avoid; margin: 0 0 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; display: grid; gap: 8px; align-content: start; }
 	.ab-page h3 { margin: 0; font-size: 1rem; }
 	.ab-page h3 a { color: var(--ink); text-decoration: none; }
 	.ab-page h3 a:hover { color: var(--accent); text-decoration: underline; }
