@@ -582,8 +582,14 @@ export function mountTracker(D, hooks = {}) {
     const r = state.region, aNI = r === 'SI' ? 0.35 : 1, aSI = r === 'NI' ? 0.35 : 1;
     line(ctx, X, Y, V.pSI, alpha(C['--p-si'], aSI));
     line(ctx, X, Y, V.pNI, alpha(C['--p-ni'], aNI));
-    const prim = r === 'SI' ? V.pSI : V.pNI; let jm = 0; for (let j = 1; j < V.n; j++) if (prim[j] > prim[jm]) jm = j;
-    if (V.n) extreme(ctx, F, jm, prim[jm], `High ${money(prim[jm])}`, r === 'SI' ? C['--p-si'] : C['--p-ni']);
+    // the high of the line in front: the region's island, or for NZ the higher of the two (named, as both are drawn)
+    let jm = 0, si = r === 'SI';
+    for (let j = 0; j < V.n; j++) {
+      if (r !== 'SI' && V.pNI[j] > (si ? V.pSI : V.pNI)[jm]) { jm = j; si = false; }
+      if (r !== 'NI' && V.pSI[j] > (si ? V.pSI : V.pNI)[jm]) { jm = j; si = true; }
+    }
+    const hi = (si ? V.pSI : V.pNI)[jm], who = r === 'NZ' ? (si ? ' · Benmore' : ' · Haywards') : '';
+    if (V.n) extreme(ctx, F, jm, hi, `High ${money(hi)}${who}`, si ? C['--p-si'] : C['--p-ni']);
     cursor(ctx, F);
     if (state.hover != null) { const j = state.hover; dot(ctx, X(j), Y(V.pSI[j]), alpha(C['--p-si'], aSI)); dot(ctx, X(j), Y(V.pNI[j]), alpha(C['--p-ni'], aNI)); }
   }

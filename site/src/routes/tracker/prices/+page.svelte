@@ -278,16 +278,19 @@
 			{ tok: '--f-hvdc', label: 'HVDC', value: mw(P.hvdc[at]) }
 		];
 	});
-	// the high point of the range on the price chart, labelled as on the Generation tab
+	// the high point of the range on the price chart: the highest of the lines drawn (live week and 30 days: the nodes
+	// switched on, named when there's more than one, as the clipped marks are; 12 months and All: the island's band)
 	const highNote = $derived.by(() => {
 		if (!view) return null;
-		const k = region === 'SI' || (view.mode === 'long' && bandKey === 'BEN') ? 'BEN' : 'HAY';
-		const a = view.mode === 'time' ? priceOf(view.S, k) : view.P[k === 'BEN' ? 'SI' : 'NI'].pmax;
-		if (!a || (view.mode === 'time' && off.includes(k))) return null;
-		let j = 0;
-		for (let i = 1; i < a.length; i++) if (a[i] > a[j]) j = i;
-		if (scale === 'capped' && a[j] > CAP) return null;   // clipped: the marks at the top label it
-		return { i: j, v: a[j], text: `High ${money(a[j])}`, tok: NODE[k].tok };
+		let best: { i: number; v: number; k: string } | null = null;
+		const scan = (a: ArrayLike<number>, k: string) => { for (let i = 0; i < a.length; i++) if (a[i] === a[i] && (!best || a[i] > best.v)) best = { i, v: a[i], k }; };
+		if (view.mode === 'time') for (const s of shown) scan(s.values, s.k);
+		else scan(view.P[bandKey === 'BEN' ? 'SI' : 'NI'].pmax, bandKey);
+		const h = best as { i: number; v: number; k: string } | null;
+		if (!h) return null;
+		if (scale === 'capped' && h.v > CAP) return null;   // clipped: the marks at the top label it
+		const named = view.mode === 'time' && shown.length > 1;
+		return { i: h.i, v: h.v, text: `High ${money(h.v)}${named ? ' · ' + NODE[h.k].name : ''}`, tok: NODE[h.k].tok };
 	});
 	// the tooltip's rows for one chart at one point
 	function tipRows(chart: string, i: number) {
