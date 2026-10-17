@@ -133,7 +133,28 @@
 
 <div class="wrap">
 	<Masthead heading />
-	<TrackerTabs />
+	<TrackerTabs>
+		<div class="status">
+			<span class="tstatus" role="status">{status}</span>
+			{#if meta}
+				{#if view && (view.kind !== 'live' || view.past) && !view.loading && !view.error}
+					<span class="pill hist" title="History from the EA's daily dispatch files">History</span>
+				{:else if live}
+					<span class="pill live" title="Data to {when(meta.end)}. Updated from the EMI real-time dispatch feed every 5 minutes">Live · {clockOnly(meta.end)}</span>
+				{:else}
+					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {clockOnly(meta.end)}<span class="pday">{when(meta.end).slice(clockOnly(meta.end).length)}</span></span>
+				{/if}
+			{/if}
+			<button type="button" class="info-btn" bind:this={infoBtn} aria-expanded={infoOpen} aria-controls="about-data" aria-label="About this data" title="About this data" onclick={() => (infoOpen = !infoOpen)}>
+				<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg>
+			</button>
+			<div class="info-pop" id="about-data" role="region" aria-label="About this data" bind:this={infoBox} hidden={!infoOpen}>
+				<p class="asof" id="asof"></p>
+				<p>{notice || 'Loading the latest data…'}</p>
+				<a href="/methods">How each chart is built</a>
+			</div>
+		</div>
+	</TrackerTabs>
 
 	<nav class="toolbar" aria-label="View controls" use:barHeight>
 		<div class="ctl">
@@ -169,26 +190,6 @@
 				<input type="date" id="in-date" title="Shows the selected range ending on this date" />
 				<button type="button" class="step" id="tb-next" aria-label="Next 24 hours"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 				<button type="button" id="btn-latest" hidden>Latest</button>
-			</div>
-		</div>
-		<div class="status">
-			<span class="tstatus" role="status">{status}</span>
-			{#if meta}
-				{#if view && (view.kind !== 'live' || view.past) && !view.loading && !view.error}
-					<span class="pill hist" title="History from the EA's daily dispatch files">History</span>
-				{:else if live}
-					<span class="pill live" title="Data to {when(meta.end)}. Updated from the EMI real-time dispatch feed every 5 minutes">Live · {clockOnly(meta.end)}</span>
-				{:else}
-					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {when(meta.end)}</span>
-				{/if}
-			{/if}
-			<button type="button" class="info-btn" bind:this={infoBtn} aria-expanded={infoOpen} aria-controls="about-data" aria-label="About this data" title="About this data" onclick={() => (infoOpen = !infoOpen)}>
-				<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg>
-			</button>
-			<div class="info-pop" id="about-data" role="region" aria-label="About this data" bind:this={infoBox} hidden={!infoOpen}>
-				<p class="asof" id="asof"></p>
-				<p>{notice || 'Loading the latest data…'}</p>
-				<a href="/methods">How each chart is built</a>
 			</div>
 		</div>
 	</nav>

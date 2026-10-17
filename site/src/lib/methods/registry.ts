@@ -79,7 +79,7 @@ export const TOPICS: Topic[] = [
 	{
 		slug: 'capacity',
 		title: 'Installed capacity',
-		summary: 'How much each plant could generate, and when that changed, back to 1997: the basis for the capacity factors in the Generation tab’s mix table.',
+		summary: 'How much each plant could generate, and when that changed, back to 1997: the basis for the Generation tab’s capacity factors and dispatchable headroom.',
 		shownOn: [['Tracker', '/tracker']],
 		updated: '2026-10-17',
 	},
@@ -124,7 +124,7 @@ export const SOURCES: Source[] = [
 		id: 'capacity', name: 'Plant capacity histories', publisher: 'Elenz', dataset: 'facilities/plant_capacity.csv',
 		url: 'https://github.com/elenz-nz/elenz/blob/main/facilities/plant_capacity.csv',
 		what: 'Every plant the tracker shows, with its installed MW and the dates each figure applies: the EA plant register, corrected where it misses upgrades, closures or staged commissioning. Each row names its source.',
-		use: 'Capacity factors in the Generation tab’s mix table.',
+		use: 'Capacity factors in the Generation tab’s mix table, and its dispatchable headroom chart.',
 		period: 'August 1997 on', fresh: 'Updated by hand as plants change', licence: 'Compiled from the sources each row names',
 		topics: ['capacity'],
 	},

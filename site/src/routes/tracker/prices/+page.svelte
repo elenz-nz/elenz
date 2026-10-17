@@ -15,7 +15,7 @@
 	import Context from '#lib/site/Context.svelte';
 	import PopButton from '#lib/site/PopButton.svelte';
 	import { barHeight } from '#lib/site/sticky.js';
-	import { rangeName, span } from '#lib/site/context.js';
+	import { rangeName, span, LOCKED } from '#lib/site/context.js';
 	import {
 		NODES, NODE, priceOf, separated, addRevenue, captured, RANGES, INT_LABEL, atInterval, completeDaily, periods,
 		heat, priceScale, niceTicks, CAP, money, signedMoney, clock, dayLabel, dateLabel, monthLabel, shortDate, timeTicks, nzParts
@@ -334,9 +334,6 @@
 	// over the whole range: averages, highs and spikes (Haywards and Benmore), and price captured by fuel
 	// what the cards under the charts cover, said on each (the controls are far above)
 	const win = $derived(view && view.S.n ? { from: view.S.t[0], to: view.S.t[view.S.n - 1] + view.S.h[view.S.n - 1] * 36e5 } : null);
-	const priceKind = $derived(!view || !win ? '' : view.mode === 'long' ? 'final prices'
-		: view.histEnd == null ? 'dispatch prices' : view.histEnd >= win.to - 18e5 ? 'final prices' : 'final prices, then dispatch');
-	const regionText = $derived(region === 'NZ' ? 'both islands' : region === 'NI' ? 'North Island (Haywards)' : 'South Island (Benmore)');
 	const rangeStats = $derived.by(() => {
 		if (!view) return null;
 		const S = view.S, wavg = (a: ArrayLike<number>) => { let s = 0, w = 0; for (let i = 0; i < S.n; i++) if (a[i] === a[i]) { s += a[i] * S.h[i]; w += S.h[i]; } return w ? s / w : NaN; };
@@ -463,7 +460,27 @@
 
 <div class="wrap">
 	<Masthead heading />
-	<TrackerTabs />
+	<TrackerTabs>
+		<div class="status">
+			<span class="tstatus" role="status">{status}</span>
+			{#if meta}
+				{#if R.src !== 'live' || endT !== null}
+					<span class="pill hist" title="Final prices from the EA, then the live week">History</span>
+				{:else if isLive}
+					<span class="pill live" title="Dispatch prices from the EMI real-time feed, every 5 minutes">Live · {clock(meta.end)}</span>
+				{:else}
+					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {clock(meta.end)}<span class="pday"> {dayLabel(meta.end)}</span></span>
+				{/if}
+			{/if}
+			<button type="button" class="info-btn" bind:this={infoBtn} aria-expanded={infoOpen} aria-controls="p-about" aria-label="About this data" title="About this data" onclick={() => (infoOpen = !infoOpen)}>
+				<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg>
+			</button>
+			<div class="info-pop" id="p-about" role="region" aria-label="About this data" bind:this={infoBox} hidden={!infoOpen}>
+				<p>Prices from the Electricity Authority: its real-time dispatch feed for the live week (dispatch prices, every 5 minutes), and its final prices for history, usually published the next day.</p>
+				<a href="/methods/prices">How the price charts are built</a>
+			</div>
+		</div>
+	</TrackerTabs>
 
 	<nav class="toolbar" aria-label="View controls" use:barHeight>
 		<div class="ctl">
@@ -502,25 +519,6 @@
 				</div>
 			</div>
 		{/if}
-		<div class="status">
-			<span class="tstatus" role="status">{status}</span>
-			{#if meta}
-				{#if R.src !== 'live' || endT !== null}
-					<span class="pill hist" title="Final prices from the EA, then the live week">History</span>
-				{:else if isLive}
-					<span class="pill live" title="Dispatch prices from the EMI real-time feed, every 5 minutes">Live · {clock(meta.end)}</span>
-				{:else}
-					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {clock(meta.end)} {dayLabel(meta.end)}</span>
-				{/if}
-			{/if}
-			<button type="button" class="info-btn" bind:this={infoBtn} aria-expanded={infoOpen} aria-controls="p-about" aria-label="About this data" title="About this data" onclick={() => (infoOpen = !infoOpen)}>
-				<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg>
-			</button>
-			<div class="info-pop" id="p-about" role="region" aria-label="About this data" bind:this={infoBox} hidden={!infoOpen}>
-				<p>Prices from the Electricity Authority: its real-time dispatch feed for the live week (dispatch prices, every 5 minutes), and its final prices for history, usually published the next day.</p>
-				<a href="/methods/prices">How the price charts are built</a>
-			</div>
-		</div>
 	</nav>
 
 	<noscript><p class="notice">The charts need JavaScript turned on.</p></noscript>
@@ -703,7 +701,7 @@
 			<div class="card-head">
 				<div>
 					<h2>Price captured by fuel</h2>
-					<Context range={rangeName(R.label, endT, R.days)} items={[win ? span(win.from, win.to) : '', regionText, priceKind]} />
+					<Context range={rangeName(R.label, endT, R.days)} items={[win ? span(win.from, win.to) : '']} />
 				</div>
 				<PopButton inline open={popped === 'cap'} name="price captured by fuel chart" onclick={() => (popped = popped === 'cap' ? null : 'cap')} />
 			</div>
@@ -719,7 +717,7 @@
 			<div class="card-head">
 				<div>
 					<h2>Price by time of day</h2>
-					<Context range={endT === null ? 'Last 30 days' : rangeName('30 days', endT, 30)} items={[heatSpan, NODE[heatKey]?.name, 'each half-hour']} />
+					<Context range={endT === null ? 'Last 30 days' : rangeName('30 days', endT, 30)} locked={LOCKED} items={[heatSpan, NODE[heatKey]?.name, 'each half-hour']} />
 				</div>
 				<div class="tools">
 				<div class="seg" role="group" aria-label="Node for the heat map">

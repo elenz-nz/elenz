@@ -31,3 +31,6 @@ export function span(from, to) {
 
 /** What one point stands for, for the context line. */
 export const RES = { '5m': '5-minute', '30m': 'half-hourly', '1d': 'daily', '1w': 'weekly', '1mo': 'monthly', '1yr': 'yearly' };
+
+/** Why a 30-day heat map's chip has a padlock: it doesn't follow the range buttons. */
+export const LOCKED = 'Always the 30 days to the end of the range, whatever range is picked';

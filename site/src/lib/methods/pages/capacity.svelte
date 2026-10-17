@@ -52,6 +52,21 @@
 	<li>Each island’s capacity is the sum of its plants; New Zealand’s is both islands.</li>
 </ul>
 
+<h2 id="headroom">Dispatchable headroom</h2>
+<p>The Generation tab’s headroom chart uses the same capacity to show how much plant that can be called on was not generating:</p>
+<p class="formula">Headroom = installed MW − output, for hydro, gas, coal/gas (Huntly’s Rankines), diesel and batteries<small>each fuel on its own, never below zero, then added up; batteries count discharge only</small></p>
+<p>Geothermal, bioenergy and waste heat are left out because they run close to flat out as a rule, and wind and solar because they follow the weather. An island on its own counts only its own plant, not what the HVDC link could bring.</p>
+<p>Thermal plant and batteries sit at the bottom of the chart, read from zero, and hydro on top. <b>Include hydro</b> takes hydro out: at any time much of its capacity is short of water, so the thermal and battery margin on its own is often the better guide.</p>
+<p>The chart follows the range and interval. Where a point covers more data than it shows (days built from half-hours, or weeks and months), the bands are each fuel’s average and a line marks the lowest total within the point. For the 1-year and All ranges the line needs each day’s highest half-hour of dispatchable output, which daily history gains at its next rebuild (late October 2026); until then those ranges show daily averages, which hide the tightest half-hours.</p>
+<p>It is an upper bound, and a rough one. Every unit counts as available, so these all show as spare when they aren’t:</p>
+<ul>
+	<li>plant out for maintenance or faults, and units in storage (one Huntly Rankine unit from 2013 to 2021);</li>
+	<li>units that take hours to start, such as the Rankines, or that need gas contracted ahead;</li>
+	<li>hydro short of water, or held back by river flow and lake level rules, and stations on a chain that can’t all run at once;</li>
+	<li>capacity held as reserve, and output the grid can’t carry.</li>
+</ul>
+<p>So the real margin is always smaller. Read the chart for when supply was tight and how that compares across days, seasons and years, not for how much was truly left. Transpower’s security-of-supply reports and the system operator’s residual generation forecasts take outages and water into account.</p>
+
 <h2 id="changes">Plants whose capacity changed since 1997</h2>
 <div class="tbl">
 	<table>

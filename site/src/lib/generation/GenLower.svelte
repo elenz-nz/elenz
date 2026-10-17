@@ -1,6 +1,6 @@
 <script lang="ts">
 	// The Generation tab under the charts: a share of generation over the range against the same dates a year
-	// earlier; the mix by fuel with capacity factors; and the last 30 days by time of day. Each card says what it
+	// earlier; dispatchable headroom; the mix by fuel with capacity factors; and the last 30 days by time of day. Each card says what it
 	// covers (#lib/site/Context.svelte), since the page's controls are far above. The tracker passes its view through
 	// its `view` hook (src/lib/tracker/tracker.js): the window, the model it was drawn from and its history store.
 	// Data shaping in ./data.js.
@@ -8,24 +8,25 @@
 	import TimeChart from '#lib/prices/TimeChart.svelte';
 	import { timeTicks, niceTicks } from '#lib/prices/data.js';
 	import Context from '#lib/site/Context.svelte';
-	import { rangeName, span, RES as RES_, REGION_NAME as REGION_ } from '#lib/site/context.js';
+	import { rangeName, span, RES as RES_, LOCKED } from '#lib/site/context.js';
 	import { nzOffset } from '#lib/tracker/series.js';
 	import PopButton from '#lib/site/PopButton.svelte';
 	import GenHeat from './GenHeat.svelte';
 	import MixTable from './MixTable.svelte';
-	import { METRICS, METRIC, YEAR, shares, atInterval, windowOf, alignYearAgo, shareOver, heatRows, mixRows } from './data.js';
+	import { METRICS, METRIC, YEAR, shares, atInterval, windowOf, alignYearAgo, shareOver, heatRows, mixRows, headroom, headroomAt } from './data.js';
+	import { FUELS } from '#lib/tracker/fuels.js';
 
 	type View = { region: string; range: string; label: string; days: number | null; int: string; kind: string; end: number | null; from: number; to: number; M: any; live: any; history: any };
 	let { v }: { v: View | null } = $props();
 
-	const RES: Record<string, string> = RES_, REGION_NAME: Record<string, string> = REGION_;
+	const RES: Record<string, string> = RES_;
 	const FIRST = Date.UTC(1997, 6, 31, 12);   // history starts 1 Aug 1997 (NZ)
 	const DAY = 864e5;
 	let metric = $state('ren'), heatMetric = $state('ren'), compare = $state(true);
 	let near = $state(false);   // on screen or nearly: only then load the extra history (a year earlier, 30 days)
 	let box = $state<HTMLElement>();
 	let hover = $state(-1);
-	let popped = $state<string | null>(null);   // a card enlarged over the page: 'share', 'mix' or 'heat'
+	let popped = $state<string | null>(null);   // a card enlarged over the page: 'share', 'room', 'mix' or 'heat'
 	const pop = (id: string) => (popped = popped === id ? null : id);
 	let prev = $state.raw<any>(null), prevFor = '';   // the window a year earlier
 	let heatSeg = $state.raw<any>(null), heatFor = '';
@@ -37,13 +38,14 @@
 			if (s && METRIC[s.metric]) metric = s.metric;
 			if (s && METRIC[s.heat]) heatMetric = s.heat;
 			if (s && s.compare === false) compare = false;
+			if (s && s.hydro === false) withHydro = false;
 		} catch { /* storage blocked: defaults */ }
 		const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { near = true; io.disconnect(); } }, { rootMargin: '600px 0px' });
 		if (box) io.observe(box);
 		return () => io.disconnect();
 	});
 	function save() {
-		try { localStorage.setItem('elenz-gen-lower', JSON.stringify({ metric, heat: heatMetric, compare })); } catch { /* storage blocked */ }
+		try { localStorage.setItem('elenz-gen-lower', JSON.stringify({ metric, heat: heatMetric, compare, hydro: withHydro })); } catch { /* storage blocked */ }
 	}
 
 	// ---------- the window and a year before it ----------
@@ -122,6 +124,59 @@
 	const pc = (x: number) => (x === x ? `${x.toFixed(1)}%` : '–');
 	const pts = (a: number, b: number) => { if (!(a === a && b === b)) return ''; const d = a - b; return `${Math.abs(d) < 0.05 ? '±0.0' : (d > 0 ? '+' : '−') + Math.abs(d).toFixed(1)} pts`; };
 
+	// ---------- dispatchable headroom ----------
+	// installed hydro, thermal and battery MW less their output, at the chart's interval: each fuel's average, and
+	// (where the points are longer than the data) the lowest total within each point
+	const FUEL: Record<string, any> = Object.fromEntries(FUELS.map((f) => [f.k, f]));
+	const ROOM_NAME: Record<string, string> = { hydro: 'Hydro', gas: 'Gas', coal: 'Coal/gas', diesel: 'Diesel', batt: 'Battery' };
+	// thermal and batteries at the bottom, read from zero; hydro on top, since much of it is short of water at any time
+	let withHydro = $state(true);
+	const ROOM_ORDER = ['gas', 'coal', 'diesel', 'batt', 'hydro'];
+	const roomFuels = $derived(ROOM_ORDER.filter((k) => withHydro || k !== 'hydro'));
+	const roomRaw = $derived(cur && v ? headroom(cur, v.region, v.kind === 'day', roomFuels) : null);
+	const room = $derived<{ by: Record<string, Float64Array>; tot: Float64Array; low: Float64Array } | null>(roomRaw && cur && curI ? headroomAt(roomRaw, cur, curI) : null);
+	// the lowest line: when a chart point spans several data points, or daily history carries each day's lowest
+	const hasLow = $derived(!!room && !!curI && !!cur && (v?.kind === 'day' ? room.low.some((x: number) => x === x) : curI.n < cur.n));
+	const roomLayers = $derived.by(() => {
+		if (!room || !curI) return [];
+		const out: any[] = [];
+		let lo = new Float64Array(curI.n);
+		for (const k of roomFuels) {
+			const hi = lo.map((x: number, i: number) => x + (room.by[k][i] === room.by[k][i] ? room.by[k][i] : 0));
+			out.push({ kind: 'band', lo, hi, tok: FUEL[k].tok, opacity: 0.8 });
+			lo = hi;
+		}
+		if (hasLow) out.push({ kind: 'line', values: room.low, tok: '--ink', width: 1.3 });
+		return out;
+	});
+	const roomScale = $derived.by(() => {
+		let hi = 0;
+		if (room) for (let i = 0; i < room.tot.length; i++) if (room.tot[i] > hi) hi = room.tot[i];
+		const ticks = niceTicks(0, Math.max(hi * 1.05, 100), 4);
+		return { f: (x: number) => x, lo: 0, hi: Math.max(hi, ticks[ticks.length - 1] ?? hi), ticks };
+	});
+	// the tightest point: the lowest total in the data (each day's lowest where daily history has it)
+	const tight = $derived.by(() => {
+		if (!roomRaw || !cur || !curI) return null;
+		const a = v?.kind === 'day' && !roomRaw.low.some((x: number) => x === x) ? roomRaw.tot : roomRaw.low;
+		let j = -1;
+		for (let i = 0; i < a.length; i++) if (a[i] === a[i] && (j < 0 || a[i] < a[j])) j = i;
+		if (j < 0) return null;
+		const t = cur.t[j], ci = Math.max(0, Math.min(curI.n - 1, (() => { let k = 0; while (k + 1 < curI.n && curI.t[k + 1] <= t) k++; return k; })()));
+		return { v: a[j], t, ci, avgDay: v?.kind === 'day' && a === roomRaw.tot };
+	});
+	const roomAvg = $derived.by(() => {
+		if (!roomRaw || !cur) return NaN;
+		let a = 0, w = 0;
+		for (let i = 0; i < cur.n; i++) { a += roomRaw.tot[i] * cur.h[i]; w += cur.h[i]; }
+		return w ? a / w : NaN;
+	});
+	const mw = (x: number) => (x === x ? `${Math.round(x).toLocaleString('en-NZ')} MW` : '–');
+	const dayName = (t: number) => { const d = new Date(t + nzOffset(t)); return `${WD[d.getUTCDay()]} ${d.getUTCDate()} ${MON[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
+	const tightWhen = $derived(!tight ? '' : v?.kind === 'day' ? dayName(tight.t) : (() => { const d = new Date(tight.t + nzOffset(tight.t)), h = d.getUTCHours(); return `${h % 12 || 12}:${String(d.getUTCMinutes()).padStart(2, '0')} ${h < 12 ? 'am' : 'pm'} ${WD[d.getUTCDay()]} ${d.getUTCDate()} ${MON[d.getUTCMonth()]}`; })());
+	const lowWord = $derived(v ? ({ '30m': 'half-hour', '1d': 'day', '1w': 'week', '1mo': 'month', '1yr': 'year' } as Record<string, string>)[v.int] ?? 'point' : 'point');
+	let roomHover = $state(-1);
+
 	// ---------- the heat map: always the 30 days to the end of the range ----------
 	$effect(() => {
 		const w = v, ok = near;
@@ -153,7 +208,6 @@
 	// ---------- what each card covers ----------
 	const rangeChip = $derived(v ? rangeName(v.label, v.end, v.days) : '');
 	const dates = $derived(v ? span(v.from, v.to) : '');
-	const where = $derived(v ? REGION_NAME[v.region] : '');
 	const heatChip = $derived(v ? (v.end == null ? 'Last 30 days' : rangeName('30 days', v.end, 30)) : '');
 </script>
 
@@ -164,7 +218,7 @@
 		<div class="card-head">
 			<div>
 				<h2>{metric === 'ren' ? 'Renewable share' : `${m.title} share`}</h2>
-				<Context range={rangeChip} items={[dates, where, v ? `${RES[v.int]}, % of generation` : '', m.note]} />
+				<Context range={rangeChip} items={[dates, v ? `${RES[v.int]}, % of generation` : '', m.note]} />
 			</div>
 			<div class="tools">
 				<div class="seg" role="group" aria-label="Series for the share chart">
@@ -199,12 +253,49 @@
 		</p>
 	</section>
 
+	<section class="card" class:popped={popped === 'room'} aria-label="Dispatchable headroom over the range">
+		<div class="card-head">
+			<div>
+				<h2>Dispatchable headroom</h2>
+				<Context range={rangeChip} items={[dates, v ? `${RES[v.int]}, MW not generating` : '']} />
+			</div>
+			<div class="tools">
+				<button type="button" class="tog box" aria-pressed={withHydro} onclick={() => { withHydro = !withHydro; save(); }}><i aria-hidden="true"></i>Include hydro</button>
+				<PopButton inline open={popped === 'room'} name="headroom chart" onclick={() => pop('room')} />
+			</div>
+		</div>
+		<p class="readout" aria-live="polite">
+			{#if roomHover >= 0 && room && curI && roomHover < curI.n}
+				<span>{pointName(curI.t[roomHover])}</span> <b>{mw(room.tot[roomHover])}</b>{#if hasLow && room.low[roomHover] === room.low[roomHover]}<span class="was"> · lowest <b>{mw(room.low[roomHover])}</b></span>{/if}
+				<span class="parts">{#each roomFuels as k}{#if room.by[k][roomHover] >= 0.5}<span><i style="background: var({FUEL[k].tok})"></i>{ROOM_NAME[k]} {Math.round(room.by[k][roomHover]).toLocaleString('en-NZ')}</span>{/if}{/each}</span>
+			{:else if tight}
+				<span>{tight.avgDay ? 'Lowest day (average)' : 'Lowest'}</span> <b>{mw(tight.v)}</b> <span class="was">{tightWhen} · average <b>{mw(roomAvg)}</b></span>
+			{/if}
+		</p>
+		{#if curI && curI.n > 1 && room}
+			<TimeChart t={curI.t} t0={curI.t[0]} t1={curI.t[curI.n - 1]} height={popped === 'room' ? Math.round(Math.min(560, Math.max(260, (typeof window === 'undefined' ? 800 : window.innerHeight) * 0.55))) : 210} y={roomScale} fmt={(x: number) => x.toLocaleString('en-NZ')} layers={roomLayers} {xTicks} showX bind:hover={roomHover}
+				note={tight && !tight.avgDay ? { i: tight.ci, v: hasLow ? room.low[tight.ci] : room.tot[tight.ci], text: `Lowest ${mw(tight.v)}`, tok: '--ink' } : null}
+				label="Dispatchable capacity not generating, by fuel{hasLow ? `, with a line for the lowest in each ${lowWord}` : ''}" onleave={() => (roomHover = -1)} />
+			<div class="legend">
+				{#each roomFuels as k}<span><i style="background: var({FUEL[k].tok})"></i>{ROOM_NAME[k]}</span>{/each}
+				{#if hasLow}<span><i class="ln"></i>Lowest in each {lowWord}</span>{/if}
+			</div>
+		{:else}
+			<p class="empty">Loading…</p>
+		{/if}
+		<p class="note">
+			Installed {withHydro ? 'hydro, ' : ''}gas, coal/gas, diesel and battery capacity less what it generated{v && v.kind === 'day' && !hasLow ? ` (daily averages: the tightest half-hours were lower${withHydro ? '' : '; each day’s lowest needs hydro included'})` : ''}.
+			Every unit counts as available, so plant out for maintenance or mothballed, slow-starting units, hydro short of water or held by river flows, and reserves all show as spare: the real margin is smaller. It shows when things got tight, not how tight.
+			{v && v.region !== 'NZ' ? 'One island only: the HVDC link isn’t counted. ' : ''}<a href="/methods/capacity#headroom">How it's worked out</a>
+		</p>
+	</section>
+
 	<div class="row2">
 		<section class="card" class:popped={popped === 'mix'} aria-label="Generation by fuel over the range">
 			<div class="card-head">
 				<div>
 					<h2>Mix by fuel</h2>
-					<Context range={rangeChip} items={[dates, where, canCompare && prev ? `against ${prevYear ? 'the ' : ''}${prevPhrase}` : '']} />
+					<Context range={rangeChip} items={[dates, canCompare && prev ? `against ${prevYear ? 'the ' : ''}${prevPhrase}` : '']} />
 				</div>
 				<PopButton inline open={popped === 'mix'} name="mix table" onclick={() => pop('mix')} />
 			</div>
@@ -223,7 +314,7 @@
 			<div class="card-head">
 				<div>
 					<h2>{heatMetric === 'ren' ? 'Renewable share' : hm.title} by time of day</h2>
-					<Context range={heatChip} items={[heatTo ? span(heatTo - 30 * DAY, heatTo) : '', where, heatMetric === 'ren' ? 'each half-hour, % of generation' : 'each half-hour, MW']} />
+					<Context range={heatChip} locked={LOCKED} items={[heatTo ? span(heatTo - 30 * DAY, heatTo) : '', heatMetric === 'ren' ? 'each half-hour, % of generation' : 'each half-hour, MW']} />
 				</div>
 				<div class="tools">
 					<div class="seg" role="group" aria-label="Series for the heat map">
@@ -255,10 +346,17 @@
 	.tog i { width: 20px; height: 0; border-top: 2px dashed var(--muted); display: inline-block; }
 	.tog[aria-pressed='false'] { opacity: 0.6; }
 	.tog[aria-pressed='false'] i { border-top-style: dotted; }
+	.tog.box i { width: 10px; height: 10px; border: 1.5px solid var(--f-hydro); border-radius: 2px; background: var(--f-hydro); }
+	.tog.box[aria-pressed='false'] i { background: none; }
 	.readout { margin: 0; font-size: 0.8rem; color: var(--ink-2); min-height: 1.3em; }
 	.readout b { font-family: var(--font-data); font-weight: 500; color: var(--ink); }
 	.readout .delta { font-family: var(--font-data); color: var(--muted); }
 	.note { margin: 0; color: var(--muted); font-size: 0.76rem; }
+	.legend, .parts { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.76rem; color: var(--ink-2); }
+	.parts { display: inline-flex; margin-left: 10px; font-family: var(--font-data); }
+	.legend span, .parts span { display: inline-flex; align-items: center; gap: 5px; }
+	.legend i, .parts i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; opacity: 0.85; }
+	.legend i.ln { height: 0; border-top: 1.5px solid var(--ink); border-radius: 0; width: 16px; }
 	.note a { color: inherit; }
 	.empty { color: var(--muted); font-size: 0.86rem; padding: 18px 10px; margin: 0; }
 	.row2 { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 14px 18px; align-items: start; }

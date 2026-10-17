@@ -53,12 +53,14 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 8px; border-radius: 999px; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; background: var(--accent-soft); color: var(--accent); }
 .pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid currentColor; }
 .status { margin-left: auto; display: flex; align-items: center; gap: 8px; position: relative; }
+.status .pill { white-space: nowrap; }
+.tstatus { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ctl + .ctl { padding-left: 16px; border-left: 1px solid var(--line); margin-left: -1px; }
 
 /* About this data: an info button with a small panel beneath it */
 .info-btn { display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 50%; background: none; color: var(--muted); cursor: pointer; padding: 0; }
 .info-btn:hover, .info-btn[aria-expanded="true"] { color: var(--ink); background: var(--grid); }
-.info-pop { position: absolute; right: 0; top: calc(100% + 8px); z-index: 20; width: min(440px, calc(100vw - 32px)); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.12); display: grid; gap: 8px; }
+.info-pop { position: absolute; right: 0; top: calc(100% + 8px); z-index: 24; width: min(440px, calc(100vw - 32px)); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.12); display: grid; gap: 8px; }
 .info-pop[hidden] { display: none; }
 .info-pop p { margin: 0; color: var(--ink-2); font-size: 0.84rem; }
 .info-pop a { font-size: 0.82rem; }
@@ -101,12 +103,10 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 .datebox button.step[hidden] { display: none; }
 
 /* The control bar stays at the top of the window as the page scrolls, so every chart below can be moved through
-   from where it is (wide screens only: on phones it wraps to several lines). --tb-h is its height
-   (#lib/site/sticky.js), so the sticky summary panel sits below it. Its background runs the full window width. */
-@media (min-width: 760px) {
-  .toolbar { position: sticky; top: 0; z-index: 20; background: var(--bg); box-shadow: 0 0 0 100vmax var(--bg); clip-path: inset(0 -100vmax); }
-  .side { top: calc(var(--tb-h, 46px) + 12px); max-height: calc(100vh - var(--tb-h, 46px) - 24px); }
-}
+   from where it is. --tb-h is its height (#lib/site/sticky.js), so the sticky summary panel sits below it. Its
+   background runs the full window width. On phones it is packed into two short rows (see the 560px block). */
+.toolbar { position: sticky; top: 0; z-index: 20; background: var(--bg); box-shadow: 0 0 0 100vmax var(--bg); clip-path: inset(0 -100vmax); }
+.side { top: calc(var(--tb-h, 46px) + 12px); max-height: calc(100vh - var(--tb-h, 46px) - 24px); }
 
 /* Main layout */
 .layout { display: grid; grid-template-columns: minmax(0, 1fr) 316px; grid-template-rows: auto 1fr; grid-template-areas: "gen side" "more side"; gap: 14px 18px; align-items: start; }
@@ -259,7 +259,13 @@ a { color: var(--accent); }
   .nav { width: 26px; height: 38px; }
   .seg button { padding: 2px 7px; }
   .ctl + .ctl { padding-left: 0; border-left: 0; }
-  #seg-range { flex-wrap: wrap; }
+  /* the sticky bar in two short rows: region and range, then interval and date; the control names are kept for
+     screen readers only (the buttons and the date say what they are) */
+  .toolbar { gap: 6px 10px; padding-block: 6px; }
+  .toolbar .ctl > span, .toolbar .ctl > label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .toolbar .seg button { padding: 2px 6px; }
+  .toolbar select.pick { font-size: 0.9rem; }
+  .pill .pday { display: none; }   /* the delayed pill keeps its time and drops the day, to fit beside the tabs */
 
 }
 /* phones: the five page links no longer fit beside the brand, so they take a row of their own under it */
@@ -270,6 +276,8 @@ a { color: var(--accent); }
 }
 @media (max-width: 400px) {
   .pages a { padding-inline: 5px; }
+  .status .pill { letter-spacing: 0.01em; padding-inline: 7px 8px; font-size: 0.7rem; }
+  .toolbar .seg button { padding: 2px 5px; }
 }
 .pill.live { background: var(--live-bg); color: var(--live-ink); }
 .pill.live::before { background: currentColor; }

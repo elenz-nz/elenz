@@ -44,9 +44,11 @@ const plantKey = p => `${p.name}|${p.fuel}|${p.isl}`;
 
 // total generation per point, including embedded solar (output only: no HVDC, no battery charging), as the page sums it
 const GEN = ['geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt'];
-export function genTotal(S, region) {
+// dispatchable plant (the Generation tab's headroom chart; history's peak.disp is the same sum, ingest/history.py)
+export const DISPATCHABLE = ['hydro', 'gas', 'coal', 'diesel', 'batt'];
+export function genTotal(S, region, fuels = GEN) {
   const n = S.t.length, o = new Float64Array(n);
-  for (const k of GEN) {
+  for (const k of fuels) {
     const a = region === 'SI' ? null : S.NI[k], b = region === 'NI' ? null : S.SI[k];
     for (let i = 0; i < n; i++) o[i] += Math.max(0, (a ? a[i] : 0) + (b ? b[i] : 0));
   }
@@ -101,8 +103,8 @@ export function aggregate(S, key) {
   else {
     const nz = k => S.NI[k].map((v, i) => v + S.SI[k][i]);
     peak = {};
-    for (const [r, met, und, gen] of [['NZ', nz('metered'), nz('underlying'), genTotal(S, 'NZ')], ['NI', S.NI.metered, S.NI.underlying, genTotal(S, 'NI')], ['SI', S.SI.metered, S.SI.underlying, genTotal(S, 'SI')]])
-      peak[r] = { metered: max(met), underlying: max(und), gen: max(gen) };
+    for (const [r, met, und] of [['NZ', nz('metered'), nz('underlying')], ['NI', S.NI.metered, S.NI.underlying], ['SI', S.SI.metered, S.SI.underlying]])
+      peak[r] = { metered: max(met), underlying: max(und), gen: max(genTotal(S, r)), disp: max(genTotal(S, r, DISPATCHABLE)) };
   }
   return {
     n, t: Float64Array.from(groups, ([a]) => S.t[a]), h, NI: isl(S.NI), SI: isl(S.SI), hvdcN: avg(S.hvdcN), peak, nodes: mapNodes(S.nodes, avgNaN),

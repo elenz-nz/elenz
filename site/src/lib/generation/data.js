@@ -4,7 +4,7 @@
 // Capacity: capacity.json, written by ingest/capacity.py from facilities/plant_capacity.csv.
 
 import { FUELS } from '#lib/tracker/fuels.js';
-import { KEY, aggregate, slice, firstAtOrAfter, nzOffset } from '#lib/tracker/series.js';
+import { KEY, aggregate, slice, firstAtOrAfter, nzOffset, DISPATCHABLE } from '#lib/tracker/series.js';
 import CAPACITY from '#lib/tracker/capacity.json';
 
 const DAY = 864e5;
@@ -164,4 +164,60 @@ export function mixRows(S, region, from, to, prev, fine) {
     rows, tot, totPrev: prev ? totPrev : NaN, avg: tot / hours, peak: fine ? peakTot : NaN,
     ren, renShare: tot > 0 ? ren / tot : NaN, renSharePrev: prev && totPrev > 0 ? renPrev / totPrev : NaN,
   };
+}
+
+// ---------- dispatchable headroom ----------
+// Plant that can be called on at short notice: hydro, thermal (gas, the Rankines, diesel) and batteries. Geothermal,
+// bioenergy and waste heat run flat out as a rule, and wind and solar follow the weather, so they're left out.
+export const DISPATCH = DISPATCHABLE;
+
+/** Installed MW of a fuel in a region at each time in t (sorted), from the capacity steps. */
+export function capSeries(k, region, t) {
+  const out = new Float64Array(t.length);
+  for (const isl of isls(region)) {
+    const s = steps(isl, k);
+    let j = -1;
+    for (let i = 0; i < t.length; i++) {
+      while (j + 1 < s.length && s[j + 1][0] <= t[i]) j++;
+      if (j >= 0) out[i] += s[j][1];
+    }
+  }
+  return out;
+}
+
+/** Dispatchable headroom at each point of a segment: installed MW less output, by fuel (never below zero) and in
+ *  total, over `fuels` (all of DISPATCH, or some of them). low: the lowest total within each point, where the data has
+ *  it: the point's own figure for half-hours and shorter; for days, daily history's peak dispatchable output (peak.disp,
+ *  once the history carries it, and only for all of DISPATCH), otherwise NaN. */
+export function headroom(S, region, daily, fuels = DISPATCH) {
+  const by = /** @type {Record<string, Float64Array>} */ ({}), tot = new Float64Array(S.n), cap = new Float64Array(S.n);
+  for (const k of fuels) {
+    const c = capSeries(k, region, S.t), a = (by[k] = new Float64Array(S.n));
+    for (let i = 0; i < S.n; i++) { a[i] = Math.max(0, c[i] - mwAt(S, k, region, i)); tot[i] += a[i]; cap[i] += c[i]; }
+  }
+  const pk = fuels.length === DISPATCH.length && S.peak && S.peak[region] && S.peak[region].disp;
+  const low = daily ? Float64Array.from({ length: S.n }, (_, i) => (pk && pk[i] === pk[i] && pk[i] > 0 ? Math.max(0, cap[i] - pk[i]) : NaN)) : tot;
+  return { by, tot, cap, low };
+}
+
+/** Headroom over the chart's points: each fuel's average and the lowest total in each (the points of `to` are
+ *  buckets of the points of `S`, as atInterval makes them). */
+export function headroomAt(H, S, to) {
+  const keys = Object.keys(H.by);
+  const n = to.n, by = /** @type {Record<string, Float64Array>} */ ({}), low = new Float64Array(n).fill(NaN), tot = new Float64Array(n);
+  for (const k of keys) by[k] = new Float64Array(n).fill(NaN);
+  let i = 0;
+  for (let j = 0; j < n; j++) {
+    const end = j + 1 < n ? to.t[j + 1] : Infinity;
+    while (i < S.n && S.t[i] < to.t[j]) i++;
+    let w = 0; const acc = Object.fromEntries(keys.map((k) => [k, 0]));
+    for (; i < S.n && S.t[i] < end; i++) {
+      for (const k of keys) acc[k] += H.by[k][i] * S.h[i];
+      w += S.h[i];
+      if (H.low[i] === H.low[i] && !(low[j] <= H.low[i])) low[j] = H.low[i];
+    }
+    if (w > 0) for (const k of keys) { by[k][j] = acc[k] / w; tot[j] += by[k][j]; }
+    else tot[j] = NaN;
+  }
+  return { by, tot, low };
 }
