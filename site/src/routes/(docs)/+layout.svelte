@@ -1,5 +1,6 @@
 <script lang="ts">
-	// Data and methods: masthead, the contents (overview, sources, one page per series) beside the page, footer.
+	// About and Data and methods share this frame: masthead, the contents (About, the methods overview, every source,
+	// one page per series) beside the page, footer. A route group, so the addresses stay /about and /methods/...
 	import { page } from '$app/state';
 	import Masthead from '#lib/site/Masthead.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
@@ -17,6 +18,10 @@
 	<div class="mt">
 		<nav class="mt-nav" aria-label="Data and methods">
 			<div>
+				<p>Elenz</p>
+				<ul><li><a href="/about" aria-current={cur('/about')}>About</a></li></ul>
+			</div>
+			<div>
 				<p>Data and methods</p>
 				<ul>
 					<li><a href="/methods" aria-current={cur('/methods')}>Overview</a></li>
@@ -30,10 +35,6 @@
 						<li><a href="/methods/{t.slug}" aria-current={cur(`/methods/${t.slug}`)}>{t.title}{#if t.estimate}<span class="est-dot" title="Includes estimates"></span>{/if}</a></li>
 					{/each}
 				</ul>
-			</div>
-			<div>
-				<p>Elenz</p>
-				<ul><li><a href="/about">About</a></li></ul>
 			</div>
 		</nav>
 		{@render children()}
