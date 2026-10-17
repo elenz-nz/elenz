@@ -6,6 +6,8 @@
 	import { summarise, ring } from '#lib/home/now.js';
 	import { explainNow } from '#lib/now/explain.js';
 	import PriceExplainer from '#lib/now/PriceExplainer.svelte';
+	import RecordLine from '#lib/records/RecordLine.svelte';
+	import { loadRecords, freshLive } from '#lib/records/records.js';
 	import PLANT_META from '#lib/tracker/plants.json';
 	import { VIEW, NI as NI_PATH, SI as SI_PATH, PTS } from '#lib/home/nzmap.js';
 	import { RING, RING_R, HV_PATH, HV_MID } from '#lib/home/maplayout.js';
@@ -23,6 +25,11 @@
 	let ex = $state<ReturnType<typeof explainNow>>(null);
 	let error = $state('');
 	let clock = $state(Date.now());
+	// records the live data has just beaten (#lib/records/records.js): provisional until the metered data confirms them
+	let records: any = null;
+	let lastD: any = null;
+	let recNew = $state<ReturnType<typeof freshLive>>([]);
+	const checkRecords = () => { try { recNew = records && lastD ? freshLive(records, lastD) : []; } catch { recNew = []; } };
 
 	const PARTS = new Intl.DateTimeFormat('en-NZ', {
 		timeZone: 'Pacific/Auckland', weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true
@@ -67,9 +74,12 @@
 			stamp = D.meta.end;
 			now = summarise(D) as Now;
 			try { ex = explainNow(D, PLANT_META); } catch (e) { console.warn('price explainer left out:', e); ex = null; }   // never let it break the page
+			lastD = D;
+			checkRecords();
 			error = '';
 		}
 		load().catch((e) => (error = `The data couldn't be loaded. ${e.message} Try reloading the page.`));
+		loadRecords().then((r) => { records = r; checkRecords(); });
 		// tick every minute (clock and labels); fetch only once the next interval is due, while on screen
 		const check = () => {
 			clock = Date.now();
@@ -145,6 +155,7 @@
 		</section>
 
 		{#if ex}<PriceExplainer x={ex} />{/if}
+		{#if recNew.length}<RecordLine items={recNew} />{/if}
 
 		<div class="grid">
 			<section class="panel map-panel" aria-label="The two islands">

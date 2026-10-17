@@ -1,0 +1,100 @@
+<script lang="ts">
+	// How a record grew: a step line from the first data to today, one step each time it was broken, the current
+	// record marked, and a provisional one (dashed) beyond it. Hover or tap shows the record at that date.
+	import { yearOf } from './records.js';
+
+	let { steps, first, end, tok = '--ink', label, fmt, prov = null, dashed = false }:
+		{ steps: [number, number][]; first: number; end: number; tok?: string; label: string; fmt: (v: number) => string;
+		  prov?: { t: number; v: number } | null; dashed?: boolean } = $props();
+
+	// drawn at the width it is shown, so labels stay readable on phones
+	let cw = $state(1000);
+	const W = $derived(Math.max(320, Math.min(1000, cw)));
+	const H = $derived(W < 600 ? 220 : 300);
+	const L = 64, Rm = 18, T = 16, B = 30;
+	const pts = $derived(prov ? [...steps, [prov.t, prov.v] as [number, number]] : steps);
+	const t1 = $derived(Math.max(end, pts[pts.length - 1][0]));
+
+	// a round axis that holds every step (from zero for most records: the growth is the point)
+	function niceStep(span: number) {
+		const raw = span / 4, p = 10 ** Math.floor(Math.log10(raw || 1)), m = raw / p;
+		return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * p;
+	}
+	const ax = $derived.by(() => {
+		const vs = pts.map((s) => s[1]);
+		let lo = Math.min(...vs), hi = Math.max(...vs);
+		if (lo >= 0 && lo < 0.5 * hi) lo = 0;   // from zero unless the record moved over a narrow range
+		if (hi === lo) hi = lo + 1;
+		const st = niceStep(hi - lo);
+		lo = Math.floor(lo / st) * st; hi = Math.ceil(hi / st) * st;
+		const ticks = [];
+		for (let v = lo; v <= hi + st / 2; v += st) ticks.push(v);
+		return { lo, hi, ticks };
+	});
+	const x = (t: number) => L + ((t - first) / (t1 - first)) * (W - L - Rm);
+	const y = (v: number) => T + (1 - (v - ax.lo) / (ax.hi - ax.lo)) * (H - T - B);
+	const path = $derived.by(() => {
+		let d = `M${x(steps[0][0]).toFixed(1)} ${y(steps[0][1]).toFixed(1)}`;
+		for (const [t, v] of steps.slice(1)) d += ` H${x(t).toFixed(1)} V${y(v).toFixed(1)}`;
+		return d + (prov ? ` H${x(prov.t).toFixed(1)}` : ` H${x(t1).toFixed(1)}`);
+	});
+	const years = $derived.by(() => {
+		const a = +yearOf(first), b = +yearOf(t1), every = (b - a) / (W / 90) > 5 ? 10 : b - a > 20 ? 5 : b - a > 8 ? 2 : 1;
+		const out = [];
+		for (let yr = Math.ceil(a / every) * every; yr <= b; yr += every) out.push({ yr, t: Date.UTC(yr, 0, 1) - 13 * 36e5 });
+		return out.filter((q) => q.t >= first);
+	});
+	const last = $derived(steps[steps.length - 1]);
+
+	let hover = $state<number | null>(null);
+	function move(e: PointerEvent) {
+		const svg = e.currentTarget as SVGSVGElement;
+		const r = svg.getBoundingClientRect();
+		const t = first + (((e.clientX - r.left) / r.width) * W - L) / (W - L - Rm) * (t1 - first);
+		let i = 0;
+		while (i + 1 < pts.length && pts[i + 1][0] <= t) i++;
+		hover = t < pts[0][0] ? null : i;
+	}
+</script>
+
+<figure class="prog" bind:clientWidth={cw}>
+	<svg viewBox="0 0 {W} {H}" role="img" aria-label={label} onpointermove={move} onpointerleave={() => (hover = null)}>
+		{#each ax.ticks as v}
+			<line x1={L} x2={W - Rm} y1={y(v)} y2={y(v)} class="grid" />
+			<text x={L - 8} y={y(v) + 4} text-anchor="end" class="lab">{fmt(v)}</text>
+		{/each}
+		{#each years as q}
+			<text x={x(q.t)} y={H - 8} text-anchor="middle" class="lab">{q.yr}</text>
+		{/each}
+		<path d={path} fill="none" style="stroke:var({tok})" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray={dashed ? '6 3' : undefined} />
+		{#if prov}
+			<path d="M{x(prov.t)} {y(last[1])} V{y(prov.v)} H{x(t1)}" fill="none" style="stroke:var({tok})" stroke-width="2" stroke-dasharray="4 4" />
+			<circle cx={x(prov.t)} cy={y(prov.v)} r="5" class="hole" style="stroke:var({tok})" />
+		{/if}
+		<circle cx={x(last[0])} cy={y(last[1])} r="5" style="fill:var({tok})" />
+		{#if hover !== null}
+			{@const p = pts[hover]}
+			<line x1={x(p[0])} x2={x(p[0])} y1={T} y2={H - B} class="cursor" />
+			<circle cx={x(p[0])} cy={y(p[1])} r="4" style="fill:var({tok})" />
+		{/if}
+	</svg>
+	<figcaption class="readout" aria-live="polite">
+		{#if hover !== null}
+			{@const p = pts[hover]}
+			<b>{fmt(p[1])}</b> {prov && hover === pts.length - 1 ? 'provisional,' : 'from'} {new Date(p[0]).toLocaleDateString('en-NZ', { timeZone: 'Pacific/Auckland', day: 'numeric', month: 'short', year: 'numeric' })}
+		{:else}
+			{steps.length - 1 === 0 ? 'Not broken since the data began' : `Broken ${steps.length - 1} times since ${yearOf(first)}`}{prov ? '; dashed: provisional' : ''}. Hover for the record at any date.
+		{/if}
+	</figcaption>
+</figure>
+
+<style>
+	.prog { margin: 0; display: grid; gap: 4px; }
+	svg { width: 100%; height: auto; display: block; touch-action: pan-y; }
+	.grid { stroke: var(--grid); stroke-width: 1; }
+	.lab { fill: var(--muted); font-family: var(--font-data); font-size: 12px; }
+	.cursor { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 3 3; }
+	.hole { fill: var(--surface); stroke-width: 2.4; }
+	.readout { color: var(--muted); font-size: 0.8rem; min-height: 1.4em; }
+	.readout b { color: var(--ink); font-family: var(--font-data); }
+</style>

@@ -30,6 +30,8 @@ and across all months:
   hist/explain.json, hist/offers.json   the /now price explainer's usual values and the newest day of generator
                              offers (explain.py; written only when history moves on or a new offers day appears, within
                              the write allowance); the live job reads both
+  hist/rec/months.json.gz, hist/records.json   the Records pages: a summary of every month and the records drawn from
+                             them (records.py; published while the history is complete, only when something changed)
 
 HVDC is metered (EMI HVDC_Flows) wherever published, about two weeks after each month, and estimated from the
 island balances before that (hvdc.py).
@@ -66,6 +68,7 @@ import pandas as pd
 import explain
 import hvdc
 import metered as mt
+import records
 import rooftop
 import state as st
 from build_tracker import assemble, enc, enc_na
@@ -541,6 +544,7 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
     done = set(index.get('done', [])) - left   # complete months: nothing left to fetch or rebuild
     done_before = set(done)
     changed_dd = {}
+    rec_fresh = {}   # records.py summaries of the months rebuilt this run
     stopped = ''
     repairs = 0
     icols = irr_cols()
@@ -640,12 +644,17 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
             put_json(store, f'hist/hh/{month}.json', hh)
             put_json(store, f'hist/dd/{month}.json', dd)
             changed_dd[month] = dd
+            rec_fresh[month] = records.summarise(hh)
             stored.add(month)
             left.discard(month)
             caps_before[month] = hh['meta']['roof_mw']
 
     # the /now price explainer's usual values (when history has moved on) and the newest day of offers (once a day)
     explain.update(store, log)
+    # records (records.py): month summaries kept up to date; hist/records.json published while the history is
+    # complete, as day.json is. Three writes stay free for the closing day, index and progress files.
+    records.update(store, rec_fresh, sorted(stored), publish=not stopped and not left, log=log,
+                   room=lambda n: store.room(n + 3))
 
     months = sorted(stored)
     # 'at': when this run saved it; the Worker's health check and the watchdog treat a stale index as expected while a

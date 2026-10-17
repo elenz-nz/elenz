@@ -10,6 +10,7 @@
 	import NowPeek from '#lib/landing/NowPeek.svelte';
 	import TrackerPeek from '#lib/landing/TrackerPeek.svelte';
 	import ArticlesPeek from '#lib/landing/ArticlesPeek.svelte';
+	import RecordsPeek from '#lib/landing/RecordsPeek.svelte';
 	import HeroBackdrop from '#lib/landing/HeroBackdrop.svelte';
 	import Handoff from '#lib/landing/Handoff.svelte';
 	import { Tween } from 'svelte/motion';
@@ -29,6 +30,8 @@
 			blurb: 'The system this five minutes: demand, prices at Haywards and Benmore, the HVDC link, emissions, and each island’s generation mix on the map.' },
 		{ href: '/tracker', name: 'Tracker', peek: TrackerPeek,
 			blurb: 'Generation by fuel, plant, owner or scheme, and prices at six grid nodes with the island spread and what each fuel earned, from the last 24 hours back to 1997.' },
+		{ href: '/records', name: 'Records', peek: RecordsPeek,
+			blurb: 'The highest and lowest half-hours since 1997, for New Zealand and each island: peak demand, renewable share, wind and solar, prices and the HVDC link, and how each record grew.' },
 		{ href: '/articles', name: 'Articles', peek: ArticlesPeek,
 			window: latest ? { href: `/articles/${latest.slug}`, label: `Read ${latest.title}` } : undefined,
 			blurb: 'New records, quarterly reviews and closer looks at how the system is running, written from the same data as the tracker.' },

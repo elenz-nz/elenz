@@ -165,5 +165,37 @@ check((E['setter']['NI'] or {}).get('plant') == pl['name'], f'explain: price set
 json.dumps(E, allow_nan=False)
 check(ex.live(js, None) is None, 'explain: no block without usual values')
 
+# records (records.py): month summaries, official and provisional records, runs, settling a provisional record
+import copy  # noqa: E402
+import records as rc  # noqa: E402
+
+m_off = copy.deepcopy(hhj)
+m_off['meta'].update({'source': 'metered', 'final_prices': 1.0, 'hvdc_metered': 1.0})
+s_off = rc.summarise(m_off)
+nzd = np.array(m_off['NI']['metered']) + np.array(m_off['SI']['metered'])
+R = rc.build([s_off], None, lambda m: m_off, now_ms=1)
+dm = R['records']['demand_max']['NZ']
+check(dm['v'] == int(nzd[~rc.clock_days(m_off)].max()) and dm['steps'][-1] == [dm['t'], dm['v']], 'records: peak demand from the month (progression ends at the record)')
+check('ctx' in dm and len(dm['ctx']['day']['v']) >= 1 and dm['ctx']['demand'] == dm['v'], 'records: context for the record half-hour')
+check(R['runs']['low_price_run'].get('NZ') is not None or (np.maximum(np.array(m_off['NI']['price']), m_off['SI']['price']) >= rc.LOW_PRICE).all(),
+      'records: runs joined')
+json.dumps(R, allow_nan=False)
+# a later month on dispatch data with higher demand: a provisional record, then confirmed once its metering is in
+m_new = copy.deepcopy(m_off)
+m_new['t0'] = m_off['t0'] + m_off['N'] * m_off['step']
+m_new['meta'].update({'month': '2026-11', 'source': 'dispatch'})
+for isl in ('NI', 'SI'):
+    m_new[isl]['metered'] = [v + 500 for v in m_new[isl]['metered']]
+s_new = rc.summarise(m_new)
+R2 = rc.build([s_off, s_new], R, lambda m: m_new if m == '2026-11' else m_off, now_ms=2)
+p2 = R2['records']['demand_max']['NZ'].get('prov')
+check(p2 is not None and p2['v'] > dm['v'] and R2['records']['demand_max']['NZ']['v'] == dm['v'], 'records: dispatch month sets a provisional record only')
+m_new['meta']['source'] = 'metered'
+R3 = rc.build([s_off, rc.summarise(m_new)], R2, lambda m: m_new if m == '2026-11' else m_off, now_ms=3)
+d3 = R3['records']['demand_max']['NZ']
+check(d3['v'] == p2['v'] and d3.get('since') == 3 and any(x['k'] == 'demand_max' and x['r'] == 'NZ' and x['ok'] for x in R3['resolved']),
+      'records: confirmed when the metered month arrives (new, and listed as settled)')
+check(not rc.same(R2, R3) and rc.same(R3, {**R3, 'built': 0}), 'records: republished only when something changed')
+
 print(f'\n{len(failures)} failed' if failures else '\nall passed')
 sys.exit(1 if failures else 0)

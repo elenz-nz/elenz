@@ -11,6 +11,7 @@ transfer and emissions, every 5 minutes and back to 1997. Built on free Electric
 | `/now` | Live figures (demand, renewable share, island prices, HVDC, emissions, embedded solar) and a map of each island's mix |
 | `/tracker` | Linked charts on one time axis: generation by fuel (drill down to plant), prices, demand, HVDC, emissions intensity, renewable share. 24 hours to All (since Aug 1997), NZ or either island |
 | `/tracker/prices` | Six node prices, the island spread and HVDC; daily price ranges, price captured by fuel, a time-of-day heat map |
+| `/records` | The highest and lowest half-hours, months and runs since 1997 for NZ and each island, each with its own page (how it grew, the day it fell); provisional records from the live week |
 | `/articles` | Quarterly reviews, records and analysis |
 | `/about` | How each chart is built: sources, estimates and their uncertainty |
 

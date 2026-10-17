@@ -90,6 +90,13 @@ export const TOPICS: Topic[] = [
 		shownOn: [['Tracker', '/tracker'], ['Prices', '/tracker/prices']],
 		updated: '2026-10-17',
 	},
+	{
+		slug: 'records',
+		title: 'Records',
+		summary: 'The highest and lowest half-hours, months and runs since 1997: which data they rest on, when a record is official or provisional, and what is left out.',
+		shownOn: [['Records', '/records'], ['Now', '/now']],
+		updated: '2026-10-17',
+	},
 ];
 
 export type Source = {
@@ -127,7 +134,7 @@ export const SOURCES: Source[] = [
 		what: 'Every 5-minute dispatch case: MW for each generating unit and load at every connection point, and the price at every node, including the island reference nodes.',
 		use: 'The live week: generation by unit, island load, prices, the Tiwai smelter (TWI2201). Also the inputs to the HVDC estimate and the price explainer.',
 		period: 'The last month or so', fresh: 'Usually 1–2 minutes after each interval starts', licence: CCBY,
-		topics: ['generation', 'demand', 'prices', 'hvdc', 'price-explainer', 'history'],
+		topics: ['generation', 'demand', 'prices', 'hvdc', 'price-explainer', 'history', 'records'],
 	},
 	{
 		id: 'dispatch', name: 'Dispatch prices and volumes', publisher: EA, dataset: 'DispatchAndPricing/NodalPricesAndVolumes',
@@ -135,7 +142,7 @@ export const SOURCES: Source[] = [
 		what: 'The same dispatch cases as the real-time feed, one file a day, for connection points with load or generation (no bus nodes).',
 		use: 'Fills gaps in the live week; history for the weeks since the latest metered month; plants the metering doesn’t have (batteries, new solar farms).',
 		period: 'From 10 Sep 2020', fresh: '1–4 days late', licence: CCBY,
-		topics: ['generation', 'demand', 'prices', 'history'],
+		topics: ['generation', 'demand', 'prices', 'history', 'records'],
 	},
 	{
 		id: 'final', name: 'Final energy prices', publisher: EA, dataset: 'DispatchAndPricing/FinalEnergyPrices',
@@ -143,7 +150,7 @@ export const SOURCES: Source[] = [
 		what: 'The price the market settles at, for every node and half-hour trading period. Marked interim (_I) for the last day or two and while under review.',
 		use: 'Every price in the history. The usual prices the explainer compares with.',
 		period: 'From 1996 (the site uses August 1997 on)', fresh: 'Usually the next day', licence: CCBY,
-		topics: ['prices', 'price-explainer', 'history'],
+		topics: ['prices', 'price-explainer', 'history', 'records'],
 	},
 	{
 		id: 'offers', name: 'Generator offers', publisher: EA, dataset: 'BidsAndOffers/Offers',
@@ -184,7 +191,7 @@ export const SOURCES: Source[] = [
 		what: 'Half-hourly energy from each station, by connection point and generator code: grid-connected stations from August 1997, stations on local networks from January 2009.',
 		use: 'Generation by plant and fuel for every month it has been published.',
 		period: 'From Aug 1997', fresh: 'About 5–6 weeks after each month', licence: CCBY,
-		topics: ['generation', 'demand', 'history', 'capacity'],
+		topics: ['generation', 'demand', 'history', 'capacity', 'records'],
 	},
 	{
 		id: 'embedded', name: 'Embedded generation', publisher: EA, dataset: 'Metered_data/Embedded_generation',
@@ -192,7 +199,7 @@ export const SOURCES: Source[] = [
 		what: 'Half-hourly energy injected at connection points on local networks.',
 		use: 'Stations on local networks before 2009, and their gross output where Generation_MD records it net of local load.',
 		period: 'From Oct 1998 (most points from Apr 1999)', fresh: 'About 2 weeks after each month', licence: CCBY,
-		topics: ['generation', 'history', 'capacity'],
+		topics: ['generation', 'history', 'capacity', 'records'],
 	},
 	{
 		id: 'gridexport', name: 'Grid exports', publisher: EA, dataset: 'Metered_data/Grid_export',
@@ -200,7 +207,7 @@ export const SOURCES: Source[] = [
 		what: 'Half-hourly energy leaving the grid at every connection point.',
 		use: 'Demand in history.',
 		period: 'From Oct 1996', fresh: 'About 2 weeks after each month', licence: CCBY,
-		topics: ['demand', 'history'],
+		topics: ['demand', 'history', 'records'],
 	},
 	{
 		id: 'gridimport', name: 'Grid imports', publisher: EA, dataset: 'Metered_data/Grid_import',
@@ -208,7 +215,7 @@ export const SOURCES: Source[] = [
 		what: 'Half-hourly energy entering the grid at every connection point (until about 2003, only from local networks).',
 		use: 'Demand in history.',
 		period: 'From Oct 2000', fresh: 'About 2 weeks after each month', licence: CCBY,
-		topics: ['demand', 'history'],
+		topics: ['demand', 'history', 'records'],
 	},
 	{
 		id: 'tiwai', name: 'Grid exports to Tiwai', publisher: EA, dataset: 'Metered_data/Grid_export_to_Tiwai',
@@ -216,7 +223,7 @@ export const SOURCES: Source[] = [
 		what: 'Half-hourly energy supplied to the Tiwai Point aluminium smelter.',
 		use: 'The smelter’s load in history.',
 		period: 'From Oct 1996', fresh: 'About 2 weeks after each month', licence: CCBY,
-		topics: ['demand', 'history'],
+		topics: ['demand', 'history', 'records'],
 	},
 	{
 		id: 'hvdcflows', name: 'HVDC flows', publisher: EA, dataset: 'Metered_data/HVDC_Flows',
@@ -224,7 +231,7 @@ export const SOURCES: Source[] = [
 		what: 'Half-hourly energy at the Benmore and Haywards ends of the HVDC link (three file layouts over the years).',
 		use: 'HVDC transfer in history; the fit behind the live estimate.',
 		period: 'From Oct 1996', fresh: 'About 2 weeks after each month', licence: CCBY,
-		topics: ['hvdc', 'history'],
+		topics: ['hvdc', 'history', 'records'],
 	},
 	{
 		id: 'reconciliation', name: 'Reconciled injection and offtake', publisher: EA, dataset: 'Volumes/Reconciliation',

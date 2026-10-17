@@ -40,6 +40,22 @@ the By site view.
 The register calls them "Ōtāhuhu A" and "Ōtāhuhu B"; `metered_plants.csv` has "Otahuhu A" and "Otahuhu B". Use the
 register's names in `metered_plants.csv` and `plant_capacity.csv`, so plant pages find one plant.
 
+## 5. Clock-change days in the older metered files (added 17 Oct 2026)
+
+`metered.read_emi` maps trading period k to (k-1) half-hours after local midnight, counting straight through a clock
+change (46 periods on the day the clocks go forward, 50 when they go back). The current Generation_MD files do that,
+but the older ones number those days by the clock with 48 periods: `200503_Generation_MD.csv` has nothing in TP49-50 on
+20 Mar 2005 (Grid_export has all 50), and 5 Oct 1997 has generation missing at 3:00-3:30 am. `202604` and `201504` are
+fine. So on each clock-change day in those years two half-hours have no generation (demand there goes negative) and the
+rest of the day after the change is an hour out. Found by the records (17 Oct 2026); `records.py` leaves those days out.
+Plan, on the branch:
+- Find the last year with 48-period clock-change days (check one Generation_MD file a year, and Embedded_generation).
+- `read_emi`: for a file whose clock-change day has 48 periods, map period k by the clock (period 5-6 don't exist going
+  forward; going back, the repeated hour is one pair of periods, so split or drop it and note which).
+- The stored states hold the parsed times, so the affected months must refetch their metered data (drop their metered
+  columns, or make `complete()` false for them), then rebuild. Check: generation on those days' nights, and demand never
+  negative.
+
 ## Not fixable from EMI data
 
 - Highbank before Oct 2001: no meter in `Generation_MD` or `Embedded_generation`, and reconciliation starts in 2005.

@@ -13,10 +13,10 @@
 //             Needs the Worker secret GITHUB_TOKEN: a fine-grained token for elenz-nz/elenz with Actions: read and write.
 const WORKFLOWS = 'https://api.github.com/repos/elenz-nz/elenz/actions/workflows';
 const HISTORY_CRON = '40 */6 * * *'; // must match wrangler.jsonc
-// history files the site may request: the index, all days, and one half-hourly file per month
+// history files the site may request: the index, all days, one half-hourly file per month, and the records
 // /data/health: the same limits as the GitHub watchdog (watchdog.yml)
 const HEALTH = { liveMinutes: 30, historyDays: 5, rebuildDays: 12 };   // history may lag up to rebuildDays during a rebuild
-const HISTORY_FILE =/^\/data\/history\/(index\.json|progress\.json|day\.json|hh\/\d{4}-\d{2}\.json)$/;
+const HISTORY_FILE = /^\/data\/history\/(index\.json|progress\.json|day\.json|records\.json|hh\/\d{4}-\d{2}\.json)$/;
 
 export default {
   async fetch(request, env) {
