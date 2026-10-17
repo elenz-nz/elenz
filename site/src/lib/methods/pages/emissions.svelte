@@ -116,7 +116,7 @@
 			{#each Object.entries(GAS_PLANT as Record<string, number>) as [name, ef] (name)}
 				<tr><td>{name}</td><td class="n">{f2(ef)}</td><td>{GAS_NOTES[name] ?? ''}</td></tr>
 			{/each}
-			<tr><td>Taranaki Combined Cycle</td><td class="n">{f2(STRATFORD_TCC)}</td><td>Part of Stratford until it closed in mid-2022</td></tr>
+			<tr><td>Taranaki Combined Cycle</td><td class="n">{f2(STRATFORD_TCC)}</td><td>Part of Stratford until it closed in March 2026</td></tr>
 		</tbody>
 	</table>
 </div>

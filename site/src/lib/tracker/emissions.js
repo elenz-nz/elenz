@@ -155,7 +155,7 @@ export const GAS_PLANT = {
   'Southdown': 0.45,       // combined cycle, to 2016
   'Te Awamutu': 0.45,      // dairy factory cogeneration, to 2007
 };
-const TCC_END = Date.UTC(2022, 5, 1);   // Taranaki Combined Cycle (in 'Stratford' with the peakers) closed mid-2022
+const TCC_END = Date.UTC(2026, 2, 31, 11);   // Taranaki Combined Cycle (in 'Stratford' with the peakers) closed in Mar 2026 (Contact's FY26 results; derated 2022-23)
 export const STRATFORD_TCC = 0.40;
 
 /** Gas factor (t CO₂e/MWh) for a plant at time t: a closed plant's own, otherwise the fleet average. */

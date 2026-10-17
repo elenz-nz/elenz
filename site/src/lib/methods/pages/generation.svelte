@@ -47,7 +47,7 @@
 <p>The metered history only sees some stations as a whole, so they are one plant everywhere on the site, with their register plants as units where the dispatch data has them:</p>
 <ul>
 	<li><b>Huntly Rankines</b>: Huntly units 1–4.</li>
-	<li><b>Stratford</b>: Taranaki Combined Cycle (closed 2022) and Stratford peakers 1 and 2.</li>
+	<li><b>Stratford</b>: Taranaki Combined Cycle (closed March 2026) and Stratford peakers 1 and 2.</li>
 	<li><b>Waikaremoana</b>: Tuai, Piripaua and Kaitawa.</li>
 	<li><b>Te Mihi</b>: Te Mihi 1 and 2.</li>
 	<li><b>Southdown</b>: Southdown and Southdown 5.</li>
