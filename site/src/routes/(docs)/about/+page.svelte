@@ -43,6 +43,14 @@
 			],
 		},
 		{
+			name: 'Tracker', href: '/tracker',
+			lede: 'Two tabs, Generation and Prices, with the same controls.',
+			items: [
+				'New Zealand or either island; any range from the last 24 hours to the whole history; and intervals from 5 minutes to a year.',
+				'A view’s address keeps its region, range, interval and date, so any view can be linked to.',
+			],
+		},
+		{
 			name: 'Tracker: Generation', href: '/tracker',
 			lede: 'Linked charts on one time axis, with one hover line driving a summary table.',
 			items: [
@@ -51,6 +59,10 @@
 				'Demand at the grid, and with embedded solar added back; the Tiwai Point smelter on its own.',
 				'HVDC transfer, emissions intensity and renewable share.',
 				'Energy, averages and peaks over the range in the summary table.',
+				'Share of generation over the range against the same dates a year earlier: renewables, wind, solar, inverter-based, hydro, gas or coal/gas.',
+				'Dispatchable headroom: hydro, gas, coal/gas, diesel and battery capacity not being used.',
+				'Mix by fuel: energy, change on last year, average and peak output, and capacity factor.',
+				'A heat map of the 30 days to the range’s end by time of day, for any of the same shares.',
 			],
 		},
 		{
@@ -65,8 +77,17 @@
 			],
 		},
 		{
+			name: 'Records', href: '/records',
+			lede: 'The highest and lowest half-hours, months and runs since 1997, for New Zealand and each island.',
+			items: [
+				'All-time records, with new ones flagged, and provisional records from the newest dispatch data until the metered month confirms them.',
+				'Milestones, and the best on record for each month of the year.',
+				'A page for each record: how it grew over the years, the day it fell, and an image to share.',
+			],
+		},
+		{
 			name: 'Articles', href: '/articles',
-			lede: 'Records, quarterly reviews and analysis built on the same data.',
+			lede: 'Quarterly reviews and analysis built on the same data.',
 			items: ['Each article lists the data behind its figures.'],
 		},
 	];
@@ -82,14 +103,13 @@
 		<p class="mt-kicker">Elenz</p>
 		<h1 id="mt-h">About Elenz</h1>
 		<p class="mt-lede">Elenz shows how New Zealand’s electricity system is running: what is generating, by fuel and by plant; the wholesale price in each island; demand; the flow on the HVDC link between the islands; and how much greenhouse gas the mix emits. The live view updates every five minutes from the Electricity Authority’s market data, and the history goes back to August 1997.</p>
-		<p class="mt-meta">Free, no ads, and not connected with the Electricity Authority.</p>
+		<p class="mt-meta">Free, no ads, and not affiliated with any organisation.</p>
 	</header>
 
 	<div class="mt-body">
-		<h2 id="pages">What’s on the site</h2>
-		<p>Both tracker tabs share the same controls: New Zealand or either island; any range from the last 24 hours to the whole history; and intervals from 5 minutes to a year. A view’s address keeps its region, range, interval and date, so any view can be linked to. Every page has light and dark modes and a layout for phones.</p>
+		<h2 id="pages">Site pages</h2>
 		<div class="ab-pages">
-			{#each PAGES as p (p.href)}
+			{#each PAGES as p (p.name)}
 				<article class="ab-page">
 					<h3><a href={p.href}>{p.name}</a></h3>
 					<p>{p.lede}</p>
@@ -126,7 +146,10 @@
 	.ab-page p { color: var(--muted); font-size: 0.88rem; }
 	.ab-page li { font-size: 0.88rem; line-height: 1.5; }
 	/* Contact: a section like the others (rule above, heading), able to light up when the sidebar's Contact is used */
-	.ab-contact { margin: 18px -16px 0; padding: 18px 16px 14px; border-top: 1px solid var(--line); border-radius: 0 0 8px 8px; display: grid; gap: 12px; scroll-margin-top: 16px; }
+	.ab-contact { position: relative; margin: 18px -16px 0; padding: 18px 16px 14px; border-radius: 8px; display: grid; gap: 12px; scroll-margin-top: 16px; }
+	/* the rule above lines up with the other sections' rules, inside the highlight's padding */
+	.ab-contact::before { content: ''; position: absolute; top: 0; left: 16px; right: 16px; border-top: 1px solid var(--line); }
+	.ab-contact.flash::before { border-color: transparent; }
 	.ab-contact h2 { margin: 0; font-size: 1.18rem; font-weight: 700; letter-spacing: -0.005em; }
 	.ab-contact.flash { animation: ab-flash 2.6s ease-out; }
 	@keyframes ab-flash {
