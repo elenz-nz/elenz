@@ -1,6 +1,6 @@
 <script lang="ts">
 	// One series' method: header and "Data used" from the registry, then the page's own body (#lib/methods/pages).
-	import { TOPICS, body, longDate, sourceHref, sourcesFor, topic } from '#lib/methods/registry.js';
+	import { TOPICS, body, longDate, reportHref, sourceHref, sourcesFor, topic } from '#lib/methods/registry.js';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -45,6 +45,8 @@
 	<div class="mt-body">
 		{#if Body}<Body />{/if}
 	</div>
+
+	<p class="mt-report">Spotted a problem with this page, or know a better source? <a href={reportHref(t.title, `/methods/${t.slug}`)}>Email us about it</a></p>
 
 	<nav class="mt-pn" aria-label="More methods">
 		{#if prev}<a class="prev" href="/methods/{prev.slug}"><small>Previous</small>{prev.title}</a>{/if}

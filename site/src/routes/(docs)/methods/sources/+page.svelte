@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Every dataset Elenz uses, from the registry (#lib/methods/registry.ts), with links to the pages that use it.
-	import { SOURCES, TOPICS } from '#lib/methods/registry.js';
+	import { SOURCES, TOPICS, reportHref } from '#lib/methods/registry.js';
 
 	const title = (slug: string) => TOPICS.find((t) => t.slug === slug)?.title ?? slug;
 	const groups: [string, string[]][] = [
@@ -52,4 +52,6 @@
 		<p>Only data that may be republished is used. Live hydro lake storage and planned outages aren’t on the site yet, because there is no source for them that can be republished freely.</p>
 		<p>Articles cite their own sources at the end of each article.</p>
 	</div>
+
+	<p class="mt-report">Spotted a problem with a source, or know a better one? <a href={reportHref('Every data source', '/methods/sources')}>Email us about it</a></p>
 </main>

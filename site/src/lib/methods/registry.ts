@@ -311,3 +311,8 @@ export const longDate = (d: string) => {
 
 // the source code these pages describe, on GitHub
 export const REPO = 'https://github.com/elenz-nz/elenz/blob/main/';
+
+// "Spotted a problem with this page?": an email with the page already named, so reviewers' corrections are easy to sort
+export const reportHref = (title: string, path: string) =>
+	'mailto:hello@elenz.co.nz?subject=' + encodeURIComponent(`Elenz methods: ${title}`) +
+	'&body=' + encodeURIComponent(`Page: https://elenz.co.nz${path}\n\n`);

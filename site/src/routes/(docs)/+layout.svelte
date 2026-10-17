@@ -19,7 +19,10 @@
 		<nav class="mt-nav" aria-label="Data and methods">
 			<div>
 				<p>Elenz</p>
-				<ul><li><a href="/about" aria-current={cur('/about')}>About</a></li></ul>
+				<ul>
+					<li><a href="/about" aria-current={cur('/about')}>About</a></li>
+					<li><a href="/about#contact">Contact</a></li>
+				</ul>
 			</div>
 			<div>
 				<p>Data and methods</p>
