@@ -13,6 +13,8 @@
 	import FuelBars from '#lib/prices/FuelBars.svelte';
 	import HeatMap from '#lib/prices/HeatMap.svelte';
 	import Context from '#lib/site/Context.svelte';
+	import PopButton from '#lib/site/PopButton.svelte';
+	import { barHeight } from '#lib/site/sticky.js';
 	import { rangeName, span } from '#lib/site/context.js';
 	import {
 		NODES, NODE, priceOf, separated, addRevenue, captured, RANGES, INT_LABEL, atInterval, completeDaily, periods,
@@ -463,7 +465,7 @@
 	<Masthead heading />
 	<TrackerTabs />
 
-	<nav class="toolbar" aria-label="View controls">
+	<nav class="toolbar" aria-label="View controls" use:barHeight>
 		<div class="ctl">
 			<label for="p-region" class="vh">Region</label>
 			<select class="pick" id="p-region" bind:value={region} onchange={save}>
@@ -492,8 +494,10 @@
 			<div class="ctl">
 				<label for="p-date">{R.label} ending</label>
 				<div class="datebox">
+					<button type="button" class="step" aria-label="Previous {R.label}" title="Previous {R.label}" disabled={!live || (endT ?? endOfToday) - (R.days ?? 0) * 864e5 <= FIRST} onclick={() => step(-1)}><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 					<input type="date" id="p-date" value={dateValue} min="1997-08-01" max={live ? isoDay(latestT) : undefined}
 						title="Shows the selected range ending on this date" onchange={(e) => pickDate((e.currentTarget as HTMLInputElement).value)} />
+					<button type="button" class="step" aria-label="Next {R.label}" title={atLatest ? 'Showing the latest data' : `Next ${R.label}`} disabled={atLatest} onclick={() => step(1)}><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 					{#if !atLatest}<button type="button" onclick={() => setEnd(null)}>Latest</button>{/if}
 				</div>
 			</div>
@@ -695,10 +699,13 @@
 	{/if}
 
 	<div class="p-row">
-		<section class="card">
-			<div>
-				<h2>Price captured by fuel</h2>
-				<Context range={rangeName(R.label, endT, R.days)} items={[win ? span(win.from, win.to) : '', regionText, priceKind]} />
+		<section class="card" class:popped={popped === 'cap'}>
+			<div class="card-head">
+				<div>
+					<h2>Price captured by fuel</h2>
+					<Context range={rangeName(R.label, endT, R.days)} items={[win ? span(win.from, win.to) : '', regionText, priceKind]} />
+				</div>
+				<PopButton inline open={popped === 'cap'} name="price captured by fuel chart" onclick={() => (popped = popped === 'cap' ? null : 'cap')} />
 			</div>
 			<p class="sub">What each fuel earned over the range: its output × its island's price, divided by its output.</p>
 			{#if rangeStats && rangeStats.cap.rows.length}
@@ -708,16 +715,19 @@
 				<p class="empty">{status || 'Loading…'}</p>
 			{/if}
 		</section>
-		<section class="card">
+		<section class="card" class:popped={popped === 'heat'} style={popped === 'heat' ? '--rh: 15px' : ''}>
 			<div class="card-head">
 				<div>
 					<h2>Price by time of day</h2>
 					<Context range={endT === null ? 'Last 30 days' : rangeName('30 days', endT, 30)} items={[heatSpan, NODE[heatKey]?.name, 'each half-hour']} />
 				</div>
+				<div class="tools">
 				<div class="seg" role="group" aria-label="Node for the heat map">
 					{#each NODES.filter((nd) => nd.ref || (heatSeg && priceOf(heatSeg, nd.k))) as nd}
 						<button type="button" aria-pressed={heatKey === nd.k} onclick={() => { heatKey = nd.k; save(); }}>{nd.name}</button>
 					{/each}
+				</div>
+				<PopButton inline open={popped === 'heat'} name="price by time of day chart" onclick={() => (popped = popped === 'heat' ? null : 'heat')} />
 				</div>
 			</div>
 			{#if heatRows.length}<HeatMap rows={heatRows} />{:else}<p class="empty">Loading…</p>{/if}
@@ -750,6 +760,7 @@
 	.card .sub { margin: 2px 0 0; color: var(--muted); font-size: 0.8rem; }
 	.card .note { margin: 0; color: var(--muted); font-size: 0.76rem; }
 	.card-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 12px; align-items: flex-start; }
+	.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 	.notes { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px 22px; }
 	.notes h3 { font-size: 0.82rem; margin: 0 0 3px; }
 	.notes p { margin: 0; font-size: 0.8rem; color: var(--ink-2); line-height: 1.5; }

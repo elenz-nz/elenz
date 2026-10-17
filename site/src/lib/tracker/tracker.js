@@ -853,13 +853,16 @@ export function mountTracker(D, hooks = {}) {
     inp.value = R.fixed ? '' : ymd(end - 1);
     inp.min = ymd(firstDay()); inp.max = ymd(models.live.END);
     $('btn-latest').hidden = state.end == null;
-    // the arrows on the chart step by the range
-    const prev = $('nav-prev'), next = $('nav-next');
-    prev.hidden = next.hidden = !!R.fixed;
-    prev.disabled = !R.fixed && end - R.days * DAY <= firstDay();
-    next.disabled = state.end == null;
-    prev.setAttribute('aria-label', `Previous ${R.label}`); next.setAttribute('aria-label', `Next ${R.label}`);
-    prev.title = `Previous ${R.label}`; next.title = state.end == null ? 'Showing the latest data' : `Next ${R.label}`;
+    // the arrows on the chart and beside the date step by the range
+    for (const [p, n] of [['nav-prev', 'nav-next'], ['tb-prev', 'tb-next']]) {
+      const prev = $(p), next = $(n);
+      if (!prev || !next) continue;
+      prev.hidden = next.hidden = !!R.fixed;
+      prev.disabled = !R.fixed && end - R.days * DAY <= firstDay();
+      next.disabled = state.end == null;
+      prev.setAttribute('aria-label', `Previous ${R.label}`); next.setAttribute('aria-label', `Next ${R.label}`);
+      prev.title = `Previous ${R.label}`; next.title = state.end == null ? 'Showing the latest data' : `Next ${R.label}`;
+    }
     $('sel-region').value = state.region;
     for (const [id, val] of [['seg-range', state.range], ['seg-int', state.int]])
       for (const b of $(id).querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v === val));
@@ -951,8 +954,8 @@ export function mountTracker(D, hooks = {}) {
     setView(state.range, addDays(day, 1));
   });
   $('btn-latest').addEventListener('click', () => setView(state.range, null));
-  $('nav-prev').addEventListener('click', () => step(-1));
-  $('nav-next').addEventListener('click', () => step(1));
+  for (const id of ['nav-prev', 'tb-prev']) $(id)?.addEventListener('click', () => step(-1));
+  for (const id of ['nav-next', 'tb-next']) $(id)?.addEventListener('click', () => step(1));
   $('sel-view').addEventListener('change', e => {
     if (!Object.hasOwn(VIEWS, e.target.value)) return;
     state.view = e.target.value; state.drill = { ...TOP_LEVEL }; state.hidden.clear(); state.filter = ''; state.open.clear(); rebuild();

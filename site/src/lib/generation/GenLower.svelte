@@ -10,6 +10,7 @@
 	import Context from '#lib/site/Context.svelte';
 	import { rangeName, span, RES as RES_, REGION_NAME as REGION_ } from '#lib/site/context.js';
 	import { nzOffset } from '#lib/tracker/series.js';
+	import PopButton from '#lib/site/PopButton.svelte';
 	import GenHeat from './GenHeat.svelte';
 	import MixTable from './MixTable.svelte';
 	import { METRICS, METRIC, YEAR, shares, atInterval, windowOf, alignYearAgo, shareOver, heatRows, mixRows } from './data.js';
@@ -24,6 +25,8 @@
 	let near = $state(false);   // on screen or nearly: only then load the extra history (a year earlier, 30 days)
 	let box = $state<HTMLElement>();
 	let hover = $state(-1);
+	let popped = $state<string | null>(null);   // a card enlarged over the page: 'share', 'mix' or 'heat'
+	const pop = (id: string) => (popped = popped === id ? null : id);
 	let prev = $state.raw<any>(null), prevFor = '';   // the window a year earlier
 	let heatSeg = $state.raw<any>(null), heatFor = '';
 	let heatTo = $state(0);
@@ -154,8 +157,10 @@
 	const heatChip = $derived(v ? (v.end == null ? 'Last 30 days' : rangeName('30 days', v.end, 30)) : '');
 </script>
 
+<svelte:window onkeydown={(e) => { if (popped && e.key === 'Escape') popped = null; }} />
+
 <div class="lower" bind:this={box}>
-	<section class="card" aria-label="{m.title} share of generation over the range">
+	<section class="card" class:popped={popped === 'share'} aria-label="{m.title} share of generation over the range">
 		<div class="card-head">
 			<div>
 				<h2>{metric === 'ren' ? 'Renewable share' : `${m.title} share`}</h2>
@@ -168,6 +173,7 @@
 				{#if canCompare}
 					<button type="button" class="tog" aria-pressed={compare} onclick={() => { compare = !compare; save(); }}><i aria-hidden="true"></i>{prevYear ? `Same dates in ${prevYear}` : 'The year before'}</button>
 				{/if}
+				<PopButton inline open={popped === 'share'} name="share chart" onclick={() => pop('share')} />
 			</div>
 		</div>
 		<p class="readout" aria-live="polite">
@@ -181,7 +187,7 @@
 		</p>
 		{#if curI && curI.n > 1}
 			<div bind:clientWidth={chartW}>
-			<TimeChart t={curI.t} t0={curI.t[0]} t1={curI.t[curI.n - 1]} height={210} y={yScale} fmt={(x: number) => `${x}%`} {layers} {xTicks} showX bind:hover
+			<TimeChart t={curI.t} t0={curI.t[0]} t1={curI.t[curI.n - 1]} height={popped === 'share' ? Math.round(Math.min(560, Math.max(260, (typeof window === 'undefined' ? 800 : window.innerHeight) * 0.55))) : 210} y={yScale} fmt={(x: number) => `${x}%`} {layers} {xTicks} showX bind:hover
 				label="{m.title} share of generation{ghost ? ', with the same dates a year earlier as a dashed line' : ''}" onleave={() => (hover = -1)} />
 			</div>
 		{:else}
@@ -194,10 +200,13 @@
 	</section>
 
 	<div class="row2">
-		<section class="card" aria-label="Generation by fuel over the range">
-			<div>
-				<h2>Mix by fuel</h2>
-				<Context range={rangeChip} items={[dates, where, canCompare && prev ? `against ${prevYear ? 'the ' : ''}${prevPhrase}` : '']} />
+		<section class="card" class:popped={popped === 'mix'} aria-label="Generation by fuel over the range">
+			<div class="card-head">
+				<div>
+					<h2>Mix by fuel</h2>
+					<Context range={rangeChip} items={[dates, where, canCompare && prev ? `against ${prevYear ? 'the ' : ''}${prevPhrase}` : '']} />
+				</div>
+				<PopButton inline open={popped === 'mix'} name="mix table" onclick={() => pop('mix')} />
 			</div>
 			{#if mix}
 				<MixTable {mix} prevLabel={canCompare && prev ? (prevYear ?? 'year before') : null} />
@@ -210,14 +219,17 @@
 			</p>
 		</section>
 
-		<section class="card" aria-label="{hm.title} by time of day over 30 days">
+		<section class="card" class:popped={popped === 'heat'} style={popped === 'heat' ? '--rh: 15px' : ''} aria-label="{hm.title} by time of day over 30 days">
 			<div class="card-head">
 				<div>
 					<h2>{heatMetric === 'ren' ? 'Renewable share' : hm.title} by time of day</h2>
 					<Context range={heatChip} items={[heatTo ? span(heatTo - 30 * DAY, heatTo) : '', where, heatMetric === 'ren' ? 'each half-hour, % of generation' : 'each half-hour, MW']} />
 				</div>
-				<div class="seg" role="group" aria-label="Series for the heat map">
-					{#each METRICS as x}<button type="button" aria-pressed={heatMetric === x.k} onclick={() => { heatMetric = x.k; save(); }}>{x.label}</button>{/each}
+				<div class="tools">
+					<div class="seg" role="group" aria-label="Series for the heat map">
+						{#each METRICS as x}<button type="button" aria-pressed={heatMetric === x.k} onclick={() => { heatMetric = x.k; save(); }}>{x.label}</button>{/each}
+					</div>
+					<PopButton inline open={popped === 'heat'} name="time of day chart" onclick={() => pop('heat')} />
 				</div>
 			</div>
 			{#if rows.length}
@@ -229,6 +241,7 @@
 		</section>
 	</div>
 </div>
+{#if popped}<button type="button" class="pop-backdrop" aria-label="Close the enlarged card" onclick={() => (popped = null)}></button>{/if}
 
 <style>
 	.lower { display: grid; gap: 14px; margin-top: 14px; }

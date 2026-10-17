@@ -63,10 +63,10 @@
 	}
 	.scroll { overflow-x: auto; }
 	.grid { min-width: 440px; display: grid; gap: 1px; }
-	.r { display: flex; align-items: center; gap: 8px; height: 10px; }
+	.r { display: flex; align-items: center; gap: 8px; height: var(--rh, 10px); }  /* --rh: row height, taller when enlarged */
 	.r.ax { height: 16px; margin-top: 3px; }
 	.d { width: 46px; flex: none; text-align: right; font: 400 10px var(--font-data); color: var(--muted); white-space: nowrap; }
-	.cells { flex: 1; display: grid; grid-template-columns: repeat(48, minmax(0, 1fr)); gap: 1px; height: 10px; }
+	.cells { flex: 1; display: grid; grid-template-columns: repeat(48, minmax(0, 1fr)); gap: 1px; height: var(--rh, 10px); }
 	.c { display: block; height: 100%; background: var(--grid); }
 	.hrs { flex: 1; display: flex; justify-content: space-between; font: 400 10px var(--font-data); color: var(--muted); }
 	.b0 { background: var(--h0); } .b1 { background: var(--h1); } .b2 { background: var(--h2); }

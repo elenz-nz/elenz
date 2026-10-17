@@ -6,6 +6,7 @@
 	import TrackerTabs from '#lib/site/TrackerTabs.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import GenLower from '#lib/generation/GenLower.svelte';
+	import { barHeight } from '#lib/site/sticky.js';
 
 	type Meta = { intervals: number; expected: number; end: number; api_from: number | null; built: number };
 
@@ -134,7 +135,7 @@
 	<Masthead heading />
 	<TrackerTabs />
 
-	<nav class="toolbar" aria-label="View controls">
+	<nav class="toolbar" aria-label="View controls" use:barHeight>
 		<div class="ctl">
 			<label for="sel-region" class="vh">Region</label>
 			<select class="pick" id="sel-region">
@@ -164,7 +165,9 @@
 		<div class="ctl">
 			<label for="in-date" id="lb-date">24 hours ending</label>
 			<div class="datebox">
+				<button type="button" class="step" id="tb-prev" aria-label="Previous 24 hours"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 				<input type="date" id="in-date" title="Shows the selected range ending on this date" />
+				<button type="button" class="step" id="tb-next" aria-label="Next 24 hours"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 				<button type="button" id="btn-latest" hidden>Latest</button>
 			</div>
 		</div>

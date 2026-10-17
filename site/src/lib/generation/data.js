@@ -15,6 +15,7 @@ export const METRICS = [
   { k: 'ren', label: 'Renewables', title: 'Renewable share', tok: '--g-ren', parts: FUELS.filter((f) => f.ren).map((f) => f.k) },
   { k: 'wind', label: 'Wind', title: 'Wind', tok: '--f-wind', parts: ['wind'] },
   { k: 'sun', label: 'Solar', title: 'Solar', tok: '--f-solar', parts: ['solar', 'roof'], note: 'grid and embedded' },
+  { k: 'ibr', label: 'Inverter-based', title: 'Inverter-based', tok: '--g-vre', parts: ['wind', 'solar', 'roof'], note: 'wind and solar, grid and embedded' },
   { k: 'hydro', label: 'Hydro', title: 'Hydro', tok: '--f-hydro', parts: ['hydro'] },
   { k: 'gas', label: 'Gas', title: 'Gas', tok: '--f-gas', parts: ['gas'] },
   { k: 'coal', label: 'Coal/gas', title: 'Coal/gas Rankine', tok: '--f-coal', parts: ['coal'] },
