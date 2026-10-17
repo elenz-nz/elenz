@@ -17,8 +17,8 @@ Stored (Cloudflare KV in GitHub Actions, data/store locally), one set per NZ cal
                              F|OTA, ... = final prices at the other [price_nodes],
                              H|BEN, H|HAY = metered HVDC transfer northward at each end (MW, once published)
   hist/hh/YYYY-MM.json       the month in the tracker.json layout, half-hourly (the website's 30-day view)
-  hist/dd/YYYY-MM.json       daily averages for the month, plus each day's peak demand and peak generation, the
-                             spread of each island's half-hourly price (p10, p90, pmin, pmax, n500, n1000 = half-hours
+  hist/dd/YYYY-MM.json       daily averages for the month, plus each day's peak demand, peak generation and peak
+                             dispatchable output (peak.disp: hydro, thermal, battery discharge), the spread of each island's half-hourly price (p10, p90, pmin, pmax, n500, n1000 = half-hours
                              over $500 and $1,000) and each fuel's revenue at its island's price (rv_<fuel>, $/h, so
                              rv / generation is the price it captured; batt_d = battery discharge only)
 and across all months:
@@ -87,6 +87,7 @@ BUILD = 6                    # bump to rebuild every month's JSON after changing
                              # spread and revenue by fuel, bioenergy and waste heat; 6: metered history back to Aug 1997,
                              # metered generation wherever published, plant groups)
 GEN_FUELS = ('geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
+DISPATCHABLE = ('hydro', 'gas', 'coal', 'diesel', 'batt')   # as DISPATCHABLE in site/src/lib/tracker/series.js
 WRITE_BUDGET = 280           # KV writes a day (UTC) for this job; the live job needs ~600 of the 1,000
 FIRST_DAY = date(2020, 9, 10)  # first daily dispatch file
 FIRST_MONTH = mt.FIRST_MONTH   # first month of metered history (Generation_MD): Aug 1997
@@ -363,12 +364,15 @@ def daily(js, month):
         out['nodes'] = {k: enc_na(pd.Series(v, index=day, dtype=float).groupby(level=0).mean().reindex(days))
                         for k, v in js['nodes'].items()}
     peak = {}
-    for k in ('metered', 'underlying', 'gen'):
-        if k == 'gen':  # total generation including rooftop solar, as the page sums it (output only, no HVDC)
-            fu = lambda isl: {f: np.array(js[isl].get(f, np.zeros(js['N'])), float) for f in GEN_FUELS}
+    for k in ('metered', 'underlying', 'gen', 'disp'):
+        if k in ('gen', 'disp'):
+            # gen: total generation including rooftop solar, as the page sums it (output only, no HVDC);
+            # disp: dispatchable output (hydro, thermal, battery discharge), for the Generation tab's headroom chart
+            fuels = GEN_FUELS if k == 'gen' else DISPATCHABLE
+            fu = lambda isl: {f: np.array(js[isl].get(f, np.zeros(js['N'])), float) for f in fuels}
             a, b = fu('NI'), fu('SI')
             ni, si = (sum(np.maximum(v, 0) for v in x.values()) for x in (a, b))
-            nz = sum(np.maximum(a[f] + b[f], 0) for f in GEN_FUELS)
+            nz = sum(np.maximum(a[f] + b[f], 0) for f in fuels)
         else:
             ni, si = np.array(js['NI'][k], float), np.array(js['SI'][k], float)
             nz = ni + si
