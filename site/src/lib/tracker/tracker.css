@@ -131,6 +131,7 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 /* Tooltip that follows the mouse */
 .chart-note { margin: 2px 0 4px; color: var(--muted); font-size: 0.76rem; }
 .chart-note[hidden] { display: none; }
+.chart-note a { color: inherit; }
 .tip { position: fixed; left: 0; top: 0; z-index: 30; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 7px 10px; box-shadow: 0 6px 18px rgb(0 0 0 / 0.14); font-size: 0.8rem; display: grid; gap: 3px; min-width: 170px; max-width: 320px; }
 .tip[hidden] { display: none; }
 .tip-t { font-weight: 600; color: var(--ink); margin-bottom: 1px; }

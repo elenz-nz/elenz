@@ -66,12 +66,13 @@ export function mountTracker(D, hooks = {}) {
   };
   const SIGNED = FUELS.filter(f => f.signed).map(f => f.k);
   // what each grouping shows, in a note under the generation chart
+  // one line under the generation chart for the groupings that need it; the full definitions are on /methods/groupings
   const NOTES = {
-    simple: 'Simplified groups the fuels into five: geothermal; thermal (Huntly\'s coal/gas Rankine units, gas, diesel, bioenergy and waste heat); hydro; wind; and solar, grid-scale and estimated embedded solar together.',
-    flex: 'Groups generation by how readily it can follow demand. Inflexible: geothermal, which runs flat out around the clock, and the industrial cogeneration (bioenergy and waste heat), which follows its mill or steelworks. Slow flexible: Huntly\'s coal/gas Rankine units, which take hours to start and ramp slowly. Fast flexible: hydro, gas and diesel, which can change output quickly. Variable: wind and solar, which follow the weather. Grouping is by fuel, so gas cogeneration counts as fast flexible.',
-    rf: 'Renewables are geothermal, bioenergy, hydro, wind and solar (grid-scale and estimated embedded solar). Fossils are Huntly\'s coal/gas Rankine units, gas, diesel and waste heat (Glenbrook\'s cogeneration on NZ Steel\'s ironmaking gases, counted as zero emissions because the ironmaking is counted elsewhere). Geothermal counts as renewable, although it emits some CO₂ (each station\'s own figure, about 0.05 t/MWh across the fleet now).',
-    vre: 'Inverter-based is wind and solar (grid-scale and estimated embedded solar), connected through power electronics. Synchronous is hydro, geothermal and thermal plant (including bioenergy and waste heat), whose spinning generators add inertia and system strength. Batteries are also inverter-based but are shown separately, because they charge as well as generate.',
-    owner: "Owners as of October 2026, from each plant's operator in the EA register (Manawa Energy's stations counted as Contact's). Today's owners are applied to the whole history, so earlier sales and transfers aren't shown.",
+    simple: 'Five groups: geothermal, thermal, hydro, wind, and solar (grid-scale and embedded together).',
+    flex: 'Grouped by how readily each fuel can follow demand: inflexible, slow, fast and variable.',
+    rf: 'Renewables against fossil fuels. Geothermal counts as renewable, although it emits some CO₂.',
+    vre: 'Wind and solar, connected through inverters, against spinning hydro, geothermal and thermal plant.',
+    owner: "Today's owners, applied to the whole history.",
   };
   const groupById = id => (VIEWS[state.view].groups || []).find(g => g.id === id) || setById(id);
 
@@ -666,7 +667,8 @@ export function mountTracker(D, hooks = {}) {
     $('gen-unit').textContent = pctMode() ? unitTxt.replace(/^MW/, '% of all generation') : unitTxt;
     const note = $('gen-note'), txt = NOTES[state.view] || '';
     note.hidden = !txt;
-    note.textContent = txt;
+    note.textContent = txt ? txt + ' ' : '';
+    if (txt) { const a = document.createElement('a'); a.href = '/methods/groupings#groupings'; a.textContent = 'How the groups are made'; note.append(a); }
     const up = lv !== 'top' ? parts[parts.length - 2] : null;
     $('sum-level').hidden = !up;
     if (up) {

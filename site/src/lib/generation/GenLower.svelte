@@ -286,7 +286,7 @@
 		{/if}
 		<p class="note">
 			{#if canCompare}Dashed: the same dates a year earlier (365 days before){v && v.int === '5m' ? ', half-hourly' : ''}.{:else if v && v.days == null}No comparison on the full history.{:else}The year before is outside the history.{/if}
-			Shares count generation only: battery charging and the HVDC link aren't generation.
+			<a href="/methods/groupings#renewable">How shares are worked out</a>
 		</p>
 	</section>
 
@@ -344,11 +344,8 @@
 			<p class="empty">Loading…</p>
 		{/if}
 		<p class="note">
-			Hydro, gas, coal/gas, diesel and battery capacity less what it generated{withHydro ? '' : ' (hydro left out)'}, three ways: <b>installed</b> counts every unit as available;
-			<b>offered</b> counts what generators offered for each half-hour, so plant that is off and slow to start, out for maintenance or short of fuel drops out;
-			<b>under $1,000</b> counts only what was offered under $1,000/MWh.
-			{v && v.region !== 'NZ' ? 'One island only: the HVDC link isn’t counted. ' : ''}{avgOnly ? 'Daily averages where history doesn’t yet keep each day’s lowest. ' : ''}{!hasOffers ? 'Offers start in 2013, a day after each day; none are loaded for these dates yet. ' : 'Offers are published the day after, from 2013. '}Reserve held on running plant isn’t taken out, so the real margin is a little smaller again.
-			<a href="/methods/capacity#headroom">How it's worked out</a>
+			Dispatchable capacity not generating{withHydro ? '' : ', hydro left out'}: installed, offered, and offered under $1,000/MWh.
+			{v && v.region !== 'NZ' ? 'One island only: the HVDC link isn’t counted. ' : ''}{avgOnly ? 'Daily averages where history doesn’t yet keep each day’s lowest. ' : ''}{!hasOffers ? 'No offers loaded for these dates yet. ' : ''}<a href="/methods/capacity#headroom">How it's worked out</a>
 		</p>
 	</section>
 
@@ -368,7 +365,7 @@
 			{/if}
 			<p class="note">
 				Energy over the range{v && v.kind === 'day' ? ' (peaks need half-hourly data, so long ranges leave them out)' : ''}{canCompare && prev ? '; “vs” is the change in energy on the same dates a year earlier' : ''}.
-				Capacity factor is average output over installed capacity on each day, from <a href="/methods/capacity">each plant's capacity history</a> (embedded solar: the distributed generation registry). Batteries count discharge only.
+				<a href="/methods/capacity#use">How capacity factors are worked out</a>
 			</p>
 		</section>
 
@@ -424,7 +421,6 @@
 	.legend i.lv-O { background: color-mix(in srgb, var(--accent) 20%, transparent); border-top: 1.5px dashed var(--accent); }
 	.legend i.lv-C { background: color-mix(in srgb, var(--accent) 42%, transparent); border-top: 2px solid var(--accent); }
 	.legend i.gap { background: var(--warn-bg); }
-	.note b { font-weight: 600; color: var(--ink-2); }
 	.note a { color: inherit; }
 	.empty { color: var(--muted); font-size: 0.86rem; padding: 18px 10px; margin: 0; }
 	.row2 { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 14px 18px; align-items: start; }

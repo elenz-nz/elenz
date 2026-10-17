@@ -714,7 +714,7 @@
 			<p class="sub">What each fuel earned over the range: its output × its island's price, divided by its output.</p>
 			{#if rangeStats && rangeStats.cap.rows.length}
 				<FuelBars rows={rangeStats.cap.rows} avg={rangeStats.cap.avg} />
-				<p class="note">Percent is against the generation-weighted average of all fuels. Batteries count discharge only; embedded solar isn't paid the spot price, so it's left out.</p>
+				<p class="note">Percent is against the average of all fuels. <a href="/methods/prices#derived">How it's worked out</a></p>
 			{:else}
 				<p class="empty">{status || 'Loading…'}</p>
 			{/if}
@@ -738,16 +738,7 @@
 		</section>
 	</div>
 
-	<section class="card notes">
-		<div><h3>Scales</h3><ul>
-			<li><b>Spike-proof:</b> linear up to about $100, compressed above it, so one spike doesn't flatten everything else.</li>
-			<li><b>Capped:</b> linear up to ${CAP}; anything higher is clipped and marked at the top.</li>
-			<li><b>Linear:</b> a plain scale, showing spikes at their true size.</li>
-		</ul></div>
-		<div><h3>Dispatch or final prices</h3><p>The live week shows dispatch prices from the real-time feed. History uses the Electricity Authority's final prices once published, usually the next day; under scarcity the two can differ a lot.</p></div>
-		<div><h3>Two kinds of average</h3><p>Time-weighted counts every interval the same. Generation-weighted counts each interval by how much was generated, so busy peaks count for more.</p></div>
-		<div><h3>Islands priced apart</h3><p>Shaded where Haywards and Benmore differ by more than $10 and 10%, usually because the HVDC link or the grid near it is at a limit.</p></div>
-	</section>
+	<p class="more">How these charts are made: <a href="/methods/prices#scales">price scales</a> · <a href="/methods/prices#dispatch">dispatch and final prices</a> · <a href="/methods/prices#derived">averages, spread and shading</a></p>
 
 	<SiteFooter />
 </div>
@@ -765,10 +756,8 @@
 	.card .note { margin: 0; color: var(--muted); font-size: 0.76rem; }
 	.card-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 12px; align-items: flex-start; }
 	.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-	.notes { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px 22px; }
-	.notes h3 { font-size: 0.82rem; margin: 0 0 3px; }
-	.notes p { margin: 0; font-size: 0.8rem; color: var(--ink-2); line-height: 1.5; }
-	.notes ul { margin: 0; padding-left: 1.1em; font-size: 0.8rem; color: var(--ink-2); line-height: 1.5; display: grid; gap: 2px; }
+	.more { margin: 2px 2px 0; color: var(--muted); font-size: 0.8rem; }
+	.more a, .card .note a { color: inherit; }
 	@media (max-width: 900px) {
 		.p-row { grid-template-columns: minmax(0, 1fr); }
 	}
