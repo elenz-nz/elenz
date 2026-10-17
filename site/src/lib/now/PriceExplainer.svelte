@@ -4,11 +4,12 @@
 	// Highlighted: the line is outlined and asks to be opened. Open (extremes only): the card opens by itself; a viewer
 	// can fold it, and it stays folded until the explainer's state changes.
 	import { money, clock, duration } from './explain.js';
+	import ExplainChart from './ExplainChart.svelte';
 
 	type Row = { k: string; tok: string; title: string; sub: string; now: number; usual: number; effect: number; split?: boolean };
 	type Band = { t0: number; t1: number; med: number; p25: number; p75: number; hl: number; open: number };
 	type X = {
-		t: number; tier: string; variant: string; newLow: boolean; lowStart: number | null;
+		t: number; tier: string; variant: string; newLow: boolean; nearZero: boolean; lowStart: number | null;
 		since: number | null; hay: number; ben: number; hi: number; typical: number | null; ratio: number | null;
 		headline: string; line: string; verdict: string; rows: Row[]; link: Row; offersDay: string | null; setterIsl: string;
 		setter: { plant: string; fuel: string; mw: number; cap: number | null; price: number; owner?: string; scheme?: string } | null;
@@ -31,43 +32,20 @@
 	const DAY = (d: string | null) => d ? new Date(d + 'T12:00:00+13:00').toLocaleDateString('en-NZ', { day: 'numeric', month: 'short', timeZone: 'Pacific/Auckland' }) : '';
 
 	const tag = $derived(x.tier === 'open' ? 'High price' : x.variant === 'split' ? 'Islands split' : x.variant === 'high' ? 'Prices up'
-		: x.variant === 'low' ? (x.newLow ? 'New low' : 'Near zero') : 'Price');
+		: x.variant === 'low' ? (x.newLow ? 'New low' : x.nearZero ? 'Near zero' : 'Low') : 'Price');
 	const button = $derived(open ? 'Hide' : x.tier === 'quiet' ? 'Why this price?' : x.headline);
 	const sub = $derived(
-		x.variant === 'low' ? (x.lowStart ? `Near zero since ${clock(x.lowStart)}.` : '')
+		x.variant === 'low' ? (x.lowStart ? `${x.nearZero ? 'Near zero' : 'Low'} since ${clock(x.lowStart)}.` : '')
 		: x.since && x.tier !== 'quiet' ? `${x.variant === 'split' ? 'Split' : 'High'} for ${duration(x.t - x.since + 300000)}.` : ''
 	);
 
-	// the 24-hour chart
-	const VW = 420, VH = 230, L = 58, R = 8, T = 12, B = 30;
-	const c = $derived(x.chart);
-	const t0 = $derived(c.t[0]), t1 = $derived(c.t[c.t.length - 1]);
-	const ymax = $derived.by(() => {
-		let m = 0;
-		for (const v of c.hay) if (v > m) m = v;
-		for (const v of c.ben) if (v > m) m = v;
-		for (const b of c.band) m = Math.max(m, b.p75, b.hl);
-		const raw = Math.max(10, m * 1.08);
-		const p = Math.pow(10, Math.floor(Math.log10(raw)));
-		return Math.ceil(raw / (p / 2)) * (p / 2);
-	});
-	const X = (v: number) => L + ((v - t0) / (t1 - t0 || 1)) * (VW - L - R);
-	const Y = (v: number) => T + (1 - Math.max(0, Math.min(v, ymax)) / ymax) * (VH - T - B);
-	const line = (vals: number[]) => vals.map((v, i) => `${i ? 'L' : 'M'}${X(c.t[i]).toFixed(1)},${Y(v).toFixed(1)}`).join('');
-	const steps = (k: 'hl' | 'open') => c.band.filter((b) => b[k] <= ymax).map((b) => `M${X(b.t0).toFixed(1)},${Y(b[k]).toFixed(1)}H${X(b.t1).toFixed(1)}`).join('');
-	const yTicks = $derived([0, ymax / 2, ymax]);
-	const xTicks = $derived.by(() => {
-		const out: { t: number; label: string }[] = [];
-		const six = 6 * 3600000;
-		// every six hours on the NZ clock (midnight, 6 am, noon, 6 pm), clear of "now"
-		const hr = 3600000;
-		for (let tt = Math.ceil(t0 / hr) * hr; tt < t1 - 2 * hr; tt += hr) {
-			const h = Number(new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', hour: 'numeric', hourCycle: 'h23' }).format(new Date(tt)));
-			if (h % 6 === 0) { out.push({ t: tt, label: h === 0 ? 'midnight' : h === 12 ? 'noon' : clock(tt).replace(':00', '') }); tt += six - hr; }
-		}
-		return out;
-	});
-	const ariaChart = $derived(`Haywards and Benmore prices over the last 24 hours, with the usual range for each half-hour. Now: Haywards ${money(x.hay)}, Benmore ${money(x.ben)} per MWh (30-minute averages)${x.typical != null ? `; usually about ${money(x.typical)}` : ''}.`);
+	// the 24-hour chart (ExplainChart.svelte) pops out larger in a modal dialog: Esc, the close button or a click
+	// outside it closes it
+	let big: HTMLDialogElement | undefined = $state();
+	let bigOpen = $state(false);
+	let narrow = $state(false);
+	const popOut = () => { narrow = innerWidth < 700; bigOpen = true; big?.showModal(); };
+	const shut = () => big?.close();
 	const bar = (r: Row) => { const s = Math.max(r.now, r.usual, 1) * 1.15; return { fill: (r.now / s) * 100, tick: (r.usual / s) * 100 }; };
 </script>
 
@@ -100,47 +78,33 @@
 								<span class="sw" style="--c:var({r.tok})" aria-hidden="true"></span>
 								<span class="pe-what"><b>{r.title}</b><small>{r.sub}</small></span>
 								<span class="pe-bar" aria-hidden="true"><span class="fill" style="--c:var({r.tok});width:{b.fill}%"></span><span class="tick" style="left:{b.tick}%"></span></span>
-								<span class="pe-eff e{r.effect}">{r.split ? 'Split' : r.effect > 0 ? 'Pushing up' : r.effect < 0 ? 'Pushing down' : 'Normal'}</span>
 							</li>
 						{/each}
 					</ul>
-					<p class="pe-key"><span class="tick-key" aria-hidden="true"></span>usual for this half-hour of the week (last four weeks) · Not in the explanation yet: lake storage, reserves, outages</p>
 				</div>
 
 				<aside class="pe-side">
 					<div>
-						<h3>Prices, last 24 hours</h3>
-						<svg viewBox="0 0 {VW} {VH}" role="img" aria-label={ariaChart}>
-							{#each yTicks as v}
-								<line class="grid" x1={L} x2={VW - R} y1={Y(v)} y2={Y(v)} />
-								<text class="ax" x={L - 6} y={Y(v) + 5} text-anchor="end">{money(v).replace(/\.00$/, '')}</text>
-							{/each}
-							{#each c.band as b}
-								<rect class="band" x={X(b.t0)} width={Math.max(0.5, X(b.t1) - X(b.t0))} y={Y(b.p75)} height={Math.max(0.5, Y(b.p25) - Y(b.p75))} />
-							{/each}
-							<path class="thr hl" d={steps('hl')} />
-							<path class="thr op" d={steps('open')} />
-							<path class="p-ben" d={line(c.ben)} />
-							<path class="p-hay" d={line(c.hay)} />
-							{#each xTicks as tk}
-								<text class="ax" x={X(tk.t)} y={VH - 8} text-anchor="middle">{tk.label}</text>
-							{/each}
-							<text class="ax" x={VW - R} y={VH - 8} text-anchor="end">now</text>
-						</svg>
-						<p class="legend">
-							<span><i class="k-hay"></i>Haywards</span><span><i class="k-ben"></i>Benmore</span><span><i class="k-band"></i>usual range</span>
-							<span><i class="k-hl"></i>highlighted above</span>{#if c.band.some((b) => b.open <= ymax)}<span><i class="k-op"></i>opens by itself above</span>{/if}
-						</p>
+						<div class="ch-head">
+							<h3>Prices, last 24 hours</h3>
+							<button type="button" class="pop" onclick={popOut} aria-haspopup="dialog">
+								<svg width="13" height="13" viewBox="0 0 14 14" aria-hidden="true"><path d="M8 2h4v4M12 2L7 7M6 3H3v8h8V8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+								Enlarge
+							</button>
+						</div>
+						<ExplainChart c={x.chart} />
 					</div>
 
 					<div class="pe-setter">
-						<p class="ps-head"><span>Likely price setter{x.variant === 'split' ? `, ${x.setterIsl === 'NI' ? 'North' : 'South'} Island` : ''}</span><span class="est">Estimate</span></p>
+						<p class="ps-head"><span>Possible price setter{x.variant === 'split' ? `, ${x.setterIsl === 'NI' ? 'North' : 'South'} Island` : ''}</span><span class="est">Estimate</span></p>
 						{#if x.setter}
 							<p class="ps-name"><span class="sw" style="--c:var({TOK[x.setter.fuel] ?? '--muted'})" aria-hidden="true"></span><b>{x.setter.plant}</b>
 								<small>{FUEL[x.setter.fuel] ?? x.setter.fuel}{x.setter.scheme ? `, ${x.setter.scheme} scheme` : ''}{x.setter.owner ? `, ${x.setter.owner}` : ''}</small></p>
 							<p class="ps-why">Running {fmt(x.setter.mw)} MW, part way up an offer block at {money(x.setter.price)}/MWh in the latest offers published ({DAY(x.offersDay)}, same half-hour).</p>
-						{:else if x.hi < 5}
+						{:else if x.nearZero}
 							<p class="ps-why">Near zero, many plants are offering at this price, so no single one sets it.</p>
+						{:else if x.hi < 5}
+							<p class="ps-why">At prices this low, many plants offer at similar prices, so no single one stands out.</p>
 						{:else}
 							<p class="ps-why">No plant in the latest offers {x.offersDay ? `(${DAY(x.offersDay)})` : ''} clearly matches this price.</p>
 						{/if}
@@ -148,11 +112,25 @@
 				</aside>
 			</div>
 			<p class="pe-foot">
-				<span>Built from the 5-minute dispatch feed, compared with the last four weeks of history. Offers are published the day after, so the price setter is a best guess.</span>
+				<span class="pe-key"><span class="tick-key" aria-hidden="true"></span>usual for this half-hour of the week (wind: its four-week median)</span>
 				<a href="/methods/price-explainer">How this works</a>
 			</p>
 		</div>
 	{/if}
+
+	<dialog bind:this={big} class="big" aria-labelledby="pe-big-h" onclose={() => (bigOpen = false)}
+		onclick={(e) => { if (e.target === big) shut(); }}>
+		<div class="big-in">
+			<div class="big-head">
+				<h2 id="pe-big-h">Prices, last 24 hours</h2>
+				<button type="button" class="close" onclick={shut} aria-label="Close the larger chart">
+					<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+				</button>
+			</div>
+			{#if bigOpen}<ExplainChart c={x.chart} size={narrow ? 'tall' : 'large'} />{/if}
+			<p class="big-foot">Dispatch prices, every 5 minutes. <a href="/tracker/prices?range=7d">See the week on the Prices tab →</a></p>
+		</div>
+	</dialog>
 </section>
 
 <style>
@@ -192,7 +170,7 @@
 	.pe-main { flex: 999 1 520px; min-width: 0; padding: 16px 18px; display: grid; gap: 12px; align-content: start; }
 	.pe-verdict { margin: 0; font-size: 1rem; line-height: 1.5; max-width: 66ch; }
 	.pe-rows { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--grid); }
-	.pe-rows li { display: grid; grid-template-columns: 12px minmax(0, 1fr) 110px 98px; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--grid); }
+	.pe-rows li { display: grid; grid-template-columns: 12px minmax(0, 1fr) 140px; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--grid); }
 	.sw { width: 10px; height: 10px; border-radius: 3px; background: var(--c); display: inline-block; }
 	.pe-what { display: grid; gap: 2px; min-width: 0; }
 	.pe-what b { font-weight: 600; font-size: 0.92rem; }
@@ -200,31 +178,28 @@
 	.pe-bar { position: relative; height: 7px; border-radius: 4px; background: var(--grid); }
 	.pe-bar .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--c); }
 	.pe-bar .tick { position: absolute; top: -4px; width: 2px; height: 15px; background: var(--ink); transform: translateX(-1px); }
-	.pe-eff { justify-self: end; font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; white-space: nowrap; background: var(--grid); color: var(--ink-2); }
-	.pe-eff.e1 { background: var(--warn-bg); color: var(--warn-ink); }
-	.pe-eff.e-1 { background: var(--accent-soft); color: var(--accent); }
-	.pe-key { margin: 0; font-size: 0.76rem; color: var(--muted); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+	.pe-key { display: inline-flex; align-items: center; gap: 6px; }
 	.tick-key { width: 2px; height: 12px; background: var(--ink); display: inline-block; }
 
 	.pe-side { flex: 1 1 340px; min-width: 0; padding: 16px 18px; background: color-mix(in srgb, var(--bg) 45%, var(--surface)); border-left: 1px solid var(--grid); display: grid; gap: 14px; align-content: start; }
 	.pe-side h3 { margin: 0 0 6px; font-size: 0.86rem; }
-	.pe-side svg { width: 100%; height: auto; display: block; }
-	.grid { stroke: var(--grid); stroke-width: 1; }
-	.ax { fill: var(--muted); font-size: 15px; font-family: var(--font-data); }
-	.band { fill: var(--f-hydro); opacity: 0.16; }
-	.thr { fill: none; stroke-width: 1.3; }
-	.thr.hl { stroke: var(--ink-2); stroke-dasharray: 2 3; }
-	.thr.op { stroke: var(--warn-ink); stroke-dasharray: 5 4; }
-	.p-hay { fill: none; stroke: var(--p-ni); stroke-width: 1.8; stroke-linejoin: round; }
-	.p-ben { fill: none; stroke: var(--p-si); stroke-width: 1.5; stroke-dasharray: 5 3; stroke-linejoin: round; }
-	.legend { margin: 6px 0 0; display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.74rem; color: var(--muted); }
-	.legend span { display: inline-flex; align-items: center; gap: 5px; }
-	.legend i { display: inline-block; width: 14px; height: 0; border-top: 2px solid; }
-	.k-hay { border-color: var(--p-ni) !important; }
-	.k-ben { border-color: var(--p-si) !important; border-top-style: dashed !important; }
-	.k-band { height: 9px !important; border: 0 !important; background: var(--f-hydro); opacity: 0.3; }
-	.k-hl { border-color: var(--ink-2) !important; border-top-style: dotted !important; }
-	.k-op { border-color: var(--warn-ink) !important; border-top-style: dashed !important; }
+	.ch-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+	.ch-head h3 { margin: 0; }
+	.pop { font: inherit; font-size: 0.8rem; font-weight: 600; color: var(--accent); background: transparent; border: 1px solid var(--line);
+		border-radius: 4px; min-height: 36px; padding: 0 10px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+	.pop:hover { background: var(--accent-soft); }
+	.pop:focus-visible, .close:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+	.big { width: min(1040px, calc(100vw - 32px)); max-width: none; border: 1px solid var(--line); border-radius: 6px; padding: 0;
+		background: var(--surface); color: var(--ink); box-shadow: 0 18px 50px rgb(0 0 0 / 0.25); }
+	.big::backdrop { background: rgb(10 18 18 / 0.5); }
+	.big-in { padding: 14px 18px 16px; display: grid; gap: 6px; }
+	.big-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+	.big-head h2 { margin: 0; font-size: 1.1rem; }
+	.close { width: 44px; height: 44px; border: 0; border-radius: 4px; background: transparent; color: var(--ink-2); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+	.close:hover { background: var(--grid); }
+	.big-foot { margin: 6px 0 0; font-size: 0.8rem; color: var(--muted); }
+	.big-foot a { color: var(--accent); font-weight: 600; }
 
 	.pe-setter { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; display: grid; gap: 6px; }
 	.ps-head { margin: 0; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
@@ -234,15 +209,16 @@
 	.ps-name small { color: var(--muted); font-size: 0.82rem; }
 	.ps-why { margin: 0; font-size: 0.84rem; color: var(--ink-2); line-height: 1.45; }
 
-	.pe-foot { margin: 0; padding: 10px 18px; border-top: 1px solid var(--grid); display: flex; justify-content: space-between; gap: 6px 14px; flex-wrap: wrap;
+	.pe-foot { margin: 0; padding: 10px 18px; border-top: 1px solid var(--grid); display: flex; justify-content: space-between; align-items: center; gap: 6px 14px; flex-wrap: wrap;
 		font-size: 0.78rem; color: var(--muted); }
 	.pe-foot a { color: var(--accent); font-weight: 600; }
 
 	@media (max-width: 640px) {
 		.pe-line { padding: 6px 8px 8px 12px; }
 		.pe-btn { width: 100%; justify-content: center; }
-		.pe-rows li { grid-template-columns: 12px minmax(0, 1fr) auto; }
-		.pe-bar { grid-column: 2 / 4; grid-row: 2; }
+		.pe-rows li { grid-template-columns: 12px minmax(0, 1fr); }
+		.pe-bar { grid-column: 2; grid-row: 2; }
+		.big-in { padding: 10px 12px 12px; }
 		.pe-side { border-left: 0; border-top: 1px solid var(--grid); }
 		.pe-head, .pe-main, .pe-side { padding-inline: 14px; }
 	}

@@ -58,7 +58,7 @@ export const TOPICS: Topic[] = [
 	{
 		slug: 'price-explainer',
 		title: 'Price explainer',
-		summary: 'The “Why is the price high?” panel on the Now page: what counts as usual, when it is highlighted or opens by itself, and how the likely price setter is found.',
+		summary: 'The “Why is the price high?” panel on the Now page: what counts as usual, when it is highlighted or opens by itself, and how a possible price setter is found.',
 		shownOn: [['Now', '/now']],
 		updated: '2026-10-17',
 	},
@@ -156,7 +156,7 @@ export const SOURCES: Source[] = [
 		id: 'offers', name: 'Generator offers', publisher: EA, dataset: 'BidsAndOffers/Offers',
 		url: EMI + 'BidsAndOffers/Offers',
 		what: 'Each generator’s energy offers for every trading period: blocks of MW at a price, revised up to gate closure.',
-		use: 'The likely price setter in the price explainer, from the final offers of the newest published day; offered capacity for the Generation tab’s dispatchable headroom, every half-hour from 2013.',
+		use: 'The possible price setter in the price explainer, from the final offers of the newest published day; offered capacity for the Generation tab’s dispatchable headroom, every half-hour from 2013.',
 		period: 'January 2013 on, daily files', fresh: 'The day after', licence: CCBY,
 		topics: ['price-explainer', 'capacity'],
 	},

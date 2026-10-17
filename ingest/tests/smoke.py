@@ -164,6 +164,9 @@ check(E is not None and len(E['typ']['med']) >= 52 and set(E['now']) >= {'NZ', '
 check((E['setter']['NI'] or {}).get('plant') == pl['name'], f'explain: price setter found part way up a tranche ({pl["name"]})')
 json.dumps(E, allow_nan=False)
 check(ex.live(js, None) is None, 'explain: no block without usual values')
+wnd = (E.get('wind') or {}).get('NZ') or {}
+check(base.get('v') == ex.VERSION and len(base['wind']['NZ']['s']) > 0 and wnd.get('side') in ('low', 'high') and wnd.get('med') is not None,
+      'explain: wind against its four-week median, with recent half-hours')
 
 # records (records.py): month summaries, official and provisional records, runs, settling a provisional record
 import copy  # noqa: E402

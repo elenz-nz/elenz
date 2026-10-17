@@ -65,7 +65,7 @@ This repository is public: never commit keys, tokens or personal details.
   day of EMI `BidsAndOffers/Offers`, ~290 MB, reduced to each plant's offer stack per trading period, final offers only;
   ~2 minutes) when a newer day is published, both within `WRITE_BUDGET`. The live job reads both (two KV reads) and adds
   `explain` to tracker.json (usual values for the last 26 hours and this half-hour, factor values now, running peakers in
-  `PEAKERS`, and the likely price setter: a plant part way up a tranche priced within 25% of its island's price). If
+  `PEAKERS`, wind against its four-week median and how long since it was this low or high, and a possible price setter: a plant part way up a tranche priced within 25% of its island's price). If
   either file is missing the block is left out and /now shows no explainer.
   `records.py`: the Records pages' data. Each month rebuilt is summarised (every half-hour that beat everything
   earlier in the month, the month's figures, the runs at its ends and the longest inside) into `hist/rec/months.json.gz`

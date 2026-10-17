@@ -5,6 +5,8 @@ History job (update(), every run, a few KV writes a day):
                       25th and 75th percentile of max(Haywards, Benmore) and the median of each factor below, over the
                       last DAYS days of half-hourly history; plus `level`, the median of max(HAY, BEN) over the last
                       365 days. The page's rules compare the live price with both (analysis/price_triggers.py).
+                      Wind follows the weather, not the clock, so it also gets `wind`: each region's median over the
+                      whole four weeks and its half-hourly averages (for "lowest in N days"). `v` = VERSION.
   hist/offers.json    the newest day of generator energy offers (EMI BidsAndOffers/Offers, published the day after,
                       ~290 MB): each plant's offer stack per trading period, cumulative MW against $/MWh, final
                       offers only (IsLatestYesNo = Y). Fetched once a day, when a newer file appears.
@@ -15,8 +17,10 @@ Live job (live(), every 5 minutes, no extra writes): tracker.json gains `explain
              triggers and its 24-hour chart)
   usual/now  {NZ|NI|SI: {wind, solar, hydro, thermal, peakers, demand}, hvdc, gap}: each factor's usual value for
              this half-hour of the week, and its value in the newest interval
+  wind       {NZ|NI|SI: {now, med, side, days, at_least}}: wind (30-minute average) against its four-week median, and
+             how long before the current calm (or windy) spell it was last this low (or high) (wind_since)
   peakers    running peaking plants, [{name, mw}]
-  setter     {NI|SI: {plant, fuel, mw, cap, price}}: the likely price setter, an estimate: a plant running part
+  setter     {NI|SI: {plant, fuel, mw, cap, price}}: the possible price setter, an estimate: a plant running part
              way up an offer tranche (in the latest offers, same trading period) priced near its island's price now
 
 Factors: wind; solar = grid solar + embedded solar; hydro; thermal = coal + gas + diesel (Huntly's Rankines burn
@@ -87,6 +91,9 @@ def _r(x, dp=0):
     return [None if v != v else (round(float(v), dp) if dp else int(round(float(v)))) for v in x]
 
 
+VERSION = 2   # bump when hist/explain.json gains fields, so the history job rewrites it on its next run
+
+
 def baseline(frames, now=None):
     """Half-hourly history frames (factors()) -> the hist/explain.json dict."""
     d = pd.concat(frames).sort_index()
@@ -98,13 +105,19 @@ def baseline(frames, now=None):
     full = lambda s: s.reindex(range(SLOTS))   # noqa: E731
     med = g.median()
     out = {
-        'built': int(time.time() * 1000), 'end': int(end.timestamp() * 1000) + 1800000, 'days': DAYS,
+        'v': VERSION, 'built': int(time.time() * 1000), 'end': int(end.timestamp() * 1000) + 1800000, 'days': DAYS,
         'level': round(level, 2), 'peakers': sorted(PEAKERS),
         'hi': {'med': _r(full(med.hi), 2), 'p25': _r(full(g.hi.quantile(0.25)), 2), 'p75': _r(full(g.hi.quantile(0.75)), 2)},
         'gap': _r(full(med.gap), 2), 'hvdc': _r(full(med.hvdc)),
     }
     for r in REGIONS:
         out[r] = {f: _r(full(med[f'{r}_{f}'])) for f in FACTORS}
+    # wind follows the weather, not the clock: its "usual" is the median over the whole four weeks, and the live job
+    # says how long since it was last this low (or high), from these half-hours and the live week
+    grid = pd.date_range(w.index.min().floor('30min'), end, freq='30min')
+    out['wind'] = {'t0': int(grid[0].timestamp() * 1000), 'step': 1800000,
+                   **{r: {'med': _r([w[f'{r}_wind'].median()])[0],
+                          's': _r(w[f'{r}_wind'].resample('30min').mean().reindex(grid))} for r in REGIONS}}
     return out
 
 
@@ -124,8 +137,8 @@ def build_baseline(store, log=print):
         return None
     b = baseline(frames)
     old = store.get('hist/explain.json')
-    if old and json.loads(old).get('end') == b['end']:
-        return None   # history hasn't moved on: keep the stored file (saves a KV write)
+    if old and (o := json.loads(old)).get('end') == b['end'] and o.get('v') == VERSION:
+        return None   # history hasn't moved on (and the layout hasn't changed): keep the stored file (saves a KV write)
     log(f'explain: usual values from {DAYS} days of history to {pd.Timestamp(b["end"], unit="ms", tz="UTC").tz_convert(NZ):%d %b %H:%M}, '
         f'year median ${b["level"]:.2f}/MWh')
     return b
@@ -223,7 +236,7 @@ def trading_period(t):
 
 
 def setter(js, d, offers, isl):
-    """The likely price setter in island `isl` for the newest interval, or None."""
+    """The possible price setter in island `isl` for the newest interval, or None."""
     price = float(d[{'NI': 'hay', 'SI': 'ben'}[isl]].iloc[-1])
     if not offers or not price == price or price < 5:   # near zero there is no single marginal plant to name
         return None
@@ -248,6 +261,35 @@ def setter(js, d, offers, isl):
     return best[1] if best else None
 
 
+def wind_since(base, d, r):
+    """Region r's wind now (30-minute average) against its four-week median and the recent past: {now, med, side, days,
+    at_least}. side: 'low' below the median, 'high' above. The current spell is the run of half-hours on that side of
+    the median up to now; days: how long before this spell wind was last as low (or as high) as now, over the stored
+    four weeks and the live week, if at least a day (else None); at_least: never in that window (days = its length)."""
+    W = base['wind']
+    hist = pd.Series(W[r]['s'], index=pd.to_datetime(W['t0'] + np.arange(len(W[r]['s'])) * W['step'], unit='ms', utc=True), dtype=float)
+    livew = d[f'{r}_wind'].resample('30min').mean()
+    s = pd.concat([hist[hist.index < livew.index[0]], livew]).dropna()
+    nw, med = float(d[f'{r}_wind'].iloc[-6:].mean()), W[r]['med']
+    before = s[s.index < d.index[-1].floor('30min')]   # half-hours before the current one
+    if before.empty or med is None:
+        return None
+    low = nw < med
+    v = before.to_numpy()
+    same = v < med if low else v > med
+    k = len(v)
+    while k > 0 and same[k - 1]:   # back to the start of this spell
+        k -= 1
+    hit = np.flatnonzero((v[:k] <= nw) if low else (v[:k] >= nw))
+    t_end = d.index[-1]
+    if len(hit) == 0:
+        days, at_least = (t_end - before.index[0]).total_seconds() / 86400, True
+    else:
+        days, at_least = (t_end - before.index[hit[-1]]).total_seconds() / 86400, False
+    return {'now': int(round(nw)), 'med': med, 'side': 'low' if low else 'high',
+            'days': round(days, 1) if days >= 1 else None, 'at_least': at_least and days >= 1}
+
+
 def live(js, base, offers=None):
     """tracker.json's `explain` block from the live data, hist/explain.json and hist/offers.json (dicts)."""
     if not base:
@@ -270,6 +312,8 @@ def live(js, base, offers=None):
                            if p['name'] in PEAKERS and (p['s'][-1] or 0) >= 5), key=lambda x: -x['mw']),
         'setter': {isl: setter(js, d, offers, isl) for isl in ('NI', 'SI')},
     }
+    if 'wind' in base:
+        block['wind'] = {r: wind_since(base, d, r) for r in REGIONS}
     block['usual'].update({'hvdc': base['hvdc'][k], 'gap': base['gap'][k]})
     block['now'].update({'hvdc': _r([d.hvdc.iloc[-1]])[0], 'gap': _r([d.gap.iloc[-1]], 2)[0]})
     return block

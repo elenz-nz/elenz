@@ -15,6 +15,8 @@ export const RULES = {
   hlRatio: 1.5, hlLevel: 1.25,                // highlighted: ≥ 1.5× typical and ≥ 1.25× the year median
   splitGap: 50, splitRel: 0.25,               // or the islands more than $50 and 25% apart
   low: 5, lowQuietH: 24, lowShowH: 2,         // or a new low: under $5 after 24 h without one, for its first 2 h
+  nearZero: 0.2,                              // a low under this is "near zero"; otherwise just "low"
+  windDays: 2,                                // wind: say "lower than it has been for N days" from this many days
   openRatio: 3, openLevel: 3, openFloor: 300, // opens itself: ≥ 3× typical, ≥ 3× the year median and ≥ $300
   openAny: 800,                               // or ≥ $800 at any time
   avgMin: 30, holdMin: 30,
@@ -23,9 +25,10 @@ export const RULES = {
 // Each factor: which way it pushes the price when above usual (sign); the MW difference below which it isn't worth
 // mentioning (floor; also the smallest "usual" a percentage is taken of); the share of usual it must differ by (rel);
 // and its weight when ranking. Hydro weighs less: it is dispatched to balance everything else, so it follows the
-// others more than it leads.
+// others more than it leads. Wind follows the weather, not the clock, so it is compared with its median over the last
+// four weeks (not this half-hour's), and described by how long it has been since it was this low or high.
 export const FACTORS = [
-  { k: 'wind', name: 'Wind', tok: '--f-wind', sign: -1, floor: 100 },
+  { k: 'wind', name: 'Wind', tok: '--f-wind', sign: -1, floor: 100, rel: 0.3 },
   { k: 'solar', name: 'Solar', tok: '--f-solar', sign: -1, floor: 100 },
   { k: 'hydro', name: 'Hydro', tok: '--f-hydro', sign: -1, floor: 250, weight: 0.5 },
   { k: 'thermal', name: 'Gas and coal', tok: '--f-gas', sign: 1, floor: 80 },
@@ -79,12 +82,31 @@ export function compare(f, now, usual) {
 function phrase(f, now, usual, c, long = false) {
   if (!c.effect) return null;
   const name = f.name.toLowerCase();
+  if (f.k === 'wind') return `wind is ${c.dev < 0 ? 'below' : 'above'} usual`;
   if (f.k === 'peakers') return now >= 10 && usual < 10 ? 'peaking plants are running' : c.dev > 0 ? `peaking plants are running ${fmt(now)} MW` : 'peaking plants are off';
   const r = usual > 0 ? now / usual : Infinity;
   if (c.dev < 0) return r <= 0.66 ? `${name} is ${fraction(r)} usual` : `${name} is ${Math.round(-c.rel * 100)}% below usual`;
   // from a small usual, a percentage misleads: say the MW
   if (usual < f.floor) return `${name} is up to ${fmt(now)} MW` + (long ? ` from a usual ${fmt(usual)} MW` : '');
   return r >= 1.8 ? `${name} is ${r.toFixed(1)}× usual` : `${name} is ${Math.round(c.rel * 100)}% above usual`;
+}
+
+/** Days as words: '5 days', '2 weeks'. */
+const span = (d) => (d >= 14 ? `${Math.round(d / 7)} weeks` : `${Math.round(d)} days`);
+
+/** Wind's row: { title, phrase } against its four-week median and how long since it was last this low or high
+ * (W: the explain block's wind for the region, from ingest/explain.py wind_since). */
+function windWords(W, c, where) {
+  const side = W.side === 'low' ? 'lower' : 'higher';
+  if (W.days != null && W.days >= RULES.windDays) {
+    const p = `wind is ${side} than it has been for ${W.at_least ? 'at least ' : ''}${span(W.days)}`;
+    return { title: cap(where + p), phrase: where + p };
+  }
+  if (c.effect) {
+    const p = `wind is ${c.dev < 0 ? 'below' : 'above'} its four-week median`;
+    return { title: cap(where + p), phrase: where + p };
+  }
+  return { title: `${where}${where ? 'wind' : 'Wind'} close to its four-week median`, phrase: null };
 }
 
 const avg = (a, j, n) => {
@@ -94,7 +116,7 @@ const avg = (a, j, n) => {
 };
 
 /** The explainer for the newest interval of tracker.json, or null if the file has no `explain` block yet.
- * plantMeta: plants.json (plant -> owner, scheme), for naming the likely price setter. */
+ * plantMeta: plants.json (plant -> owner, scheme), for naming the possible price setter. */
 export function explainNow(D, plantMeta = {}) {
   const E = D.explain;
   if (!E || !E.typ) return null;
@@ -149,6 +171,7 @@ export function explainNow(D, plantMeta = {}) {
   const variant = isOpen ? (isSplit && now.gap > 0.5 * Math.max(now.lo, 1) ? 'split' : 'high')
     : isSplit ? 'split' : isHigh ? 'high' : now.low ? 'low' : 'usual';
   const ratio = now.ty ? now.hi / now.ty : null;
+  const nearZero = now.hi < R.nearZero;   // both islands under $0.20
   const label = slotLabel(t);
   const northDear = now.h >= now.b;
 
@@ -157,9 +180,18 @@ export function explainNow(D, plantMeta = {}) {
   const regionOf = (k) => (variant === 'split' ? (k === 'hydro' ? 'SI' : dear) : 'NZ');
   const peakers = E.peakers || [];
   const rows = FACTORS.map((f) => {
-    const r = regionOf(f.k), nw = E.now[r]?.[f.k], us = E.usual[r]?.[f.k];
-    const c = compare(f, nw, us);
+    const r = regionOf(f.k);
     const where = r === 'NZ' ? '' : r === 'NI' ? 'North Island ' : 'South Island ';
+    const W = f.k === 'wind' ? E.wind?.[r] : null;
+    if (W) {
+      // wind: against its four-week median (30-minute average now), not this half-hour's usual
+      const c = compare(f, W.now, W.med);
+      const w = windWords(W, c, where), bare = windWords(W, c, '');
+      return { ...f, region: r, now: W.now, usual: W.med, ...c, title: w.title, sub: `${fmt(W.now)} MW now · four-week median ${fmt(W.med)} MW`,
+        phrase: w.phrase, bare: bare.phrase, where };
+    }
+    const nw = E.now[r]?.[f.k], us = E.usual[r]?.[f.k];
+    const c = compare(f, nw, us);
     const ph = phrase(f, nw ?? 0, us ?? 0, c), phLong = phrase(f, nw ?? 0, us ?? 0, c, true);
     const title = ph ? cap(where + ph) : `${where}${where ? f.name.toLowerCase() : f.name} close to usual`;
     const named = f.k === 'peakers' && peakers.length ? peakers.slice(0, 3).map((p) => `${p.name} ${fmt(p.mw)}`).join(', ') + ' MW · ' : '';
@@ -198,9 +230,11 @@ export function explainNow(D, plantMeta = {}) {
     verdict = (joined ? joined + ' ' : "None of the factors shown here is far from usual, so the cause may be one this page can't see yet: an outage, a grid constraint, reserves, or how generators have offered. ")
       + 'The price is set by the most expensive offer needed to meet demand in each 5 minutes.';
   } else if (variant === 'low') {
+    const word = nearZero ? 'near zero' : 'low';
     headline = 'Why is the price so low?';
-    line = newLow ? `Prices near zero since ${clock(lowStart)}.` : `Prices near zero for ${duration(t - lowStart)}.`;
-    verdict = (joined ? joined + ' ' : '') + 'When more low-cost generation is on offer than the country needs, mostly hydro water that would otherwise be spilled, and wind and solar that cost nothing to run, the price falls towards zero.';
+    line = (newLow ? `Prices ${word} since ${clock(lowStart)}` : `Prices ${word} for ${duration(t - lowStart)}`)
+      + (nearZero ? '.' : `: ${money(now.hi)}/MWh over the last 30 minutes.`);
+    verdict = (joined ? joined + ' ' : '') + 'When more low-cost generation is on offer than the country needs, mostly hydro water that would otherwise be spilled, and wind and solar that cost nothing to run, the price falls to a few dollars or less.';
   } else {
     // not unusual enough to flag, but say which way it leans: below usual, about usual, or above (under the floor)
     const lean = !now.ty ? 'about usual' : now.hi < 0.67 * now.ty && now.ty - now.hi >= 10 ? 'below usual'
@@ -210,7 +244,7 @@ export function explainNow(D, plantMeta = {}) {
     verdict = (joined || 'Nothing shown here is far from normal.') + ' The price is set by the most expensive offer needed to meet demand in each 5 minutes.';
   }
 
-  // the likely price setter: the dearer island's (or Haywards'), an estimate from the latest offers
+  // the possible price setter: the dearer island's (or Haywards'), an estimate from the latest offers
   const sIsl = variant === 'split' ? dear : 'NI';
   const s = E.setter?.[sIsl] || (variant !== 'split' ? E.setter?.SI : null);
   const meta = s ? plantMeta[s.plant] || {} : {};
@@ -235,7 +269,7 @@ export function explainNow(D, plantMeta = {}) {
   const hold = band.length ? band[band.length - 1] : null;
 
   return {
-    t, tier, variant, label, newLow, lowStart, since: since(variant === 'split' ? ['split', 'open'] : ['high', 'open']),
+    t, tier, variant, label, newLow, lowStart, nearZero, since: since(variant === 'split' ? ['split', 'open'] : ['high', 'open']),
     hay: now.h, ben: now.b, hi: now.hi, lo: now.lo, gap: now.gap, typical: now.ty, ratio, level: E.level,
     thresholds: hold ? { highlight: hold.hl, open: hold.open } : null,
     headline, line, verdict, rows, link, setter, offersDay: E.offers_day, setterIsl: sIsl,
