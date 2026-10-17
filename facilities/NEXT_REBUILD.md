@@ -45,16 +45,6 @@ the By site view.
 The register calls them "Ōtāhuhu A" and "Ōtāhuhu B"; `metered_plants.csv` has "Otahuhu A" and "Otahuhu B". Use the
 register's names in `metered_plants.csv` and `plant_capacity.csv`, so plant pages find one plant.
 
-## 6. Each day's peak dispatchable output (added 17 Oct 2026)
-
-The Generation tab's headroom chart draws a line for the lowest headroom in each day, week or month. For the 1-year and
-All ranges that needs each day's highest half-hour of dispatchable output (hydro, gas, coal/gas, diesel, battery
-discharge), which `daily()` in `ingest/history.py` now writes as `peak.disp` (on the branch). It isn't in the fingerprint,
-so it rides on this rebuild. After it:
-- Check `/data/history/day.json` has `peak.NZ.disp`, and the 1Y headroom chart shows "Lowest in each day".
-- On `/methods/capacity#headroom`, replace the sentence about the next rebuild with: daily history keeps each day's
-  highest half-hour of dispatchable output, so the lowest line reaches back to 1997.
-
 ## Not fixable from EMI data
 
 - Highbank before Oct 2001: no meter in `Generation_MD` or `Embedded_generation`, and reconciliation starts in 2005.
