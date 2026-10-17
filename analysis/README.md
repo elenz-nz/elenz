@@ -205,3 +205,51 @@ over the previous 365 days. Each state holds 30 minutes after its condition ends
 - **Live use:** these are half-hourly final prices. /now has 5-minute dispatch prices, which spike more and can be
   revised (9 Aug 2021: dispatch peak $356,621, final $2,698), so test the 30-minute average of dispatch prices, and
   check the live rates after a month.
+
+## Installed capacity (`capacity_check.py`, 17 Oct 2026)
+
+`facilities/plant_capacity.csv` gives every plant the tracker shows its installed MW with dates (start and end
+inclusive), for the capacity factors in the Generation tab's mix table; `ingest/capacity.py` turns it into
+`site/src/lib/tracker/capacity.json` and checks it on every push. Built by comparing each plant's yearly peak
+half-hour (99.5th percentile) in the metered history with the register's capacity, then researching every plant where
+they disagreed.
+
+**The register alone isn't enough.** `plant_capacity()` (the most a plant had installed at once) gives today's figure
+for the whole history and counts some stations twice: Benmore 1,080 (units on two connections 2009-12), Matahina 160,
+Whareroa 272 (68 MW repeated on four unit rows), West Wind 160 (two 80 MW rows for a 142.6 MW farm). It lacks Te
+Awamutu, Edgecumbe, the old Stratford gas turbines (4 × 50 MW to 2001) and Kawerau TG1/TG2, has Ōtāhuhu A and B only
+under macron names the history doesn't use, and has no end date for TCC (closed Mar 2026) or Te Rapa (2023).
+
+**Corrections** (each row of the CSV names its source; `override` rows are these):
+- Hydro: Manapōuri 585 MW until the second tailrace (May 2002, output steps up then), 700 to end 2007 while units
+  were refurbished, then 800 (854 installed, consent limit 800). Clyde 432 → 464 from Nov 2015, when output first goes
+  past 432 (Wikipedia dates the consent change to 2005; the output says otherwise). Arapuni 188.7 → 196.7 (four units
+  uprated in 2001). Whakamaru 100 → 124 one unit a year 2017-20, dates from the output steps. Karāpiro 96 → 112.5
+  (Sep 2025). Benmore 540 → 552 (May 2024) → 570, Ōhau C 212 → 220 and Ōhau B → 220 (30 Jul 2026). Takapō A 30 from
+  2016 (output above 25 from then; register 25).
+- Geothermal: Wairakei 167 → 181 (binary plant, Jun 2005) → 136 (May 2014, ~45 MW of steam to Te Mihi). Ōhaaki ~65
+  (built as 104; steamfield decline, undated) → 43.7 from 2013. Mokai 55 → 95 (May 2005) → 112 (Jun 2007). Ngāwhā 10
+  → 25 (Aug 2008, OEC3) → 57 (Dec 2020, OEC4; the register has only OEC4). Ngā Tamariki 86 → 132 (unit 5, Jan 2026).
+  Rotokawa 29 → 35 (2003). Te Mihi 166 from its first output (Nov 2013; register 181).
+- Thermal: Stratford 200 (old turbines) → 577 (TCC from Mar 1998 alongside them) → 377 (2002) → 589 (peakers, May
+  2011) → 572 → 542 (TCC derated, register) → 212 (TCC closed Mar 2026). New Plymouth 600 to Dec 2007, 100 May-Dec
+  2008. Ōtāhuhu A 180 to Apr 2004 (its last output); Ōtāhuhu B 385 → 404 (2005), to Sep 2015. Southdown 130 → 180
+  (Mar 2007). Glenbrook 112, Junction Road 100 (register 130). Huntly Rankines 1,000 → 750 on the register's date for
+  unit 3 (Jan 2014; Wikipedia says Jun 2015).
+- Wind: Te Rere Hau 5 → 32.5 → 48.5 (2008-11), Turitea 118.8 → 221.4 (Apr 2023), Harapaki 88 → 176 (May 2024),
+  West Wind 71.3 per connection.
+
+**Counted from the first metered output.** For plants older than their first month in the history (embedded stations
+before Apr 1999, Highbank before Mar 2002, Mill Creek before Sep 2015, Kawerau Mill before 2020 ...), capacity starts
+with the data, so a gap doesn't pull a capacity factor down.
+
+**Check** (`python3 analysis/capacity_check.py`): plant-years where the peak runs more than 8% over capacity or the
+capacity factor tops 98%. What's left is explained: Trustpower's double-reading meters to Jul 2005 (the build halves
+them, the script doesn't); shared embedded meters the script counts for both plants (WRK0331, TWH0331, TWC2201,
+KOE1101); West Wind's connections each carrying more than half the farm at times; Mahinerangi (a 70/30 split of a
+shared meter); Waitaki at ~104 MW in 2025-26 against the register's 95 (left as the register); a few hours of output
+before a plant's start (Huntly 5 testing in 2006, Ōtāhuhu B Nov 1998, traces at Whirinaki 1997-2000 with no known plant).
+
+**Uncertain:** New Plymouth's units were run down before Dec 2007 (output ~300-400 MW 2002-07; dates not found);
+Ōtāhuhu A's two Olympus units (MW not found); Ōhaaki's derating date; Kawerau Mill (register 53, output peaks ~40,
+Wikipedia 37); the Stratford peakers (register 2 × 106, Wikipedia 200).

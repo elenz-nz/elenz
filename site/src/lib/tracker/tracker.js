@@ -928,7 +928,18 @@ export function mountTracker(D, hooks = {}) {
     if (d.plant) { const p = plantByName(d.plant); if (!p || (state.region !== 'NZ' && p.isl !== state.region)) d.plant = null; }
     if (d.fuel && !plantsFor(d.fuel).length) { d.fuel = null; d.plant = null; }
     if (d.group && !(setById(d.group)?.plants.length || groupById(d.group)?.f?.some(k => present[state.region].includes(k)))) { d.group = null; d.plant = null; }
-    relayer(); state.hover = null; syncControls(); buildSummary(); render(); save(); report();
+    relayer(); state.hover = null; syncControls(); buildSummary(); render(); save(); report(); share();
+  }
+  // the page's lower section (src/lib/generation/GenLower.svelte) works from the same window: told on every rebuild
+  let lastShared = '';
+  function share() {
+    if (!hooks.view || !V || !V.n) return;
+    const R = RANGES[state.range], from = V.t[0], to = V.t[V.n - 1] + V.hrs[V.n - 1] * 36e5;
+    const key = [state.region, state.range, state.int, state.kind, state.end, from, to, M.END].join('|');
+    if (key === lastShared) return;   // grouping, drill-down and hidden layers don't change it
+    lastShared = key;
+    hooks.view({ region: state.region, range: state.range, label: R.label, days: R.days ?? null, int: state.int, kind: state.kind,
+                 end: state.end, from, to, M, live: models.live, history });
   }
 
   $('sel-region').addEventListener('change', e => { if (!['NZ', 'NI', 'SI'].includes(e.target.value)) return; state.region = e.target.value; state.hidden.clear(); rebuild(); });

@@ -30,7 +30,7 @@ This repository is public: never commit keys, tokens or personal details.
   two tabs (`src/lib/site/TrackerTabs.svelte`, under the masthead): Generation at `/tracker` and Prices at `/tracker/prices`
   (`src/routes/tracker/prices/+page.svelte`: six node prices, the island spread and HVDC on one time axis for the live week and
   30 days; each period's price range, spread and half-hours over $500/$1,000 for 12 months and All; price captured by fuel;
-  a 30-day time-of-day heat map. Data shaping in `src/lib/prices/data.js`, SVG charts in `src/lib/prices/`. Region, range,
+  a 30-day time-of-day heat map. Data shaping in `src/lib/prices/data.js`, SVG charts in `src/lib/prices/`. Under the Generation tab's charts, `src/lib/generation/GenLower.svelte`: a share of generation over the range with the same dates a year earlier (365 days; not on All), the mix by fuel with capacity factors (from `capacity.json`; peaks only for half-hourly or finer data; batteries count discharge, daily history's `batt_d`), and the 30 days to the range's end by time of day; data shaping in `src/lib/generation/data.js`. The tracker hands it its window through the `view` hook of `mountTracker` (model, live week, history store), and it loads the year-earlier and 30-day history only when scrolled near. Cards say what they cover with `src/lib/site/Context.svelte` (range chip, dates, region, resolution; `src/lib/site/context.js`), as do the Prices tab's lower cards. Region, range,
   interval and date are shared with the Generation tab through the address (`?region=&range=&int=&end=YYYY-MM-DD`,
   `src/lib/site/view.js`; the tab links carry it, so any view can be linked), and region, range and a chosen interval
   are also remembered in localStorage `elenz-view` (never the date); the rest is kept in `elenz-prices`). The tracker page markup
@@ -89,6 +89,16 @@ This repository is public: never commit keys, tokens or personal details.
   distributed-generation registry also counts), plus `[owners]`, `[plant_owners]` and `[hydro_schemes]` for the
   site's By owner / By hydro scheme views; `facilities/connection_points.csv`: POC → island;
   `facilities/plant_register.csv`: the EA register (refresh with `sync.py plants`, review the diff).
+- `facilities/plant_capacity.csv`: installed MW of every plant the tracker shows, with the dates each figure applies
+  (start/end inclusive, blank = open; `basis` register / override / pending; source and note per row; evidence in
+  `analysis/capacity_check.py` and the "Installed capacity" section of `analysis/README.md`). Capacity counts from the
+  first month the history has a plant's output. Not in the rebuild fingerprint. `ingest/capacity.py` writes
+  `site/src/lib/tracker/capacity.json` (each fuel's MW by island as steps, embedded solar by month from
+  `rooftop_capacity.json`, rows per plant) and, with `--check` (run in checks.yml), fails if a plant has no row, rows
+  overlap, or the JSON is stale: after editing the CSV, run `python3 ingest/capacity.py` and commit both. A new plant
+  that isn't generating yet gets a `pending` row with no dates.
+- `facilities/NEXT_REBUILD.md`: changes waiting for the next full history rebuild (they touch fingerprinted files).
+  Bundle them into one rebuild; never start one while another is running.
 - `ingest/plant_meta.py` writes `site/src/lib/tracker/plants.json` (plant → owner, hydro scheme) from the register and
   those tables. Rerun it and commit the JSON after refreshing the register or editing the tables.
 - `.github/workflows/checks.yml`: on every push, ruff (syntax errors and undefined names only), `ingest/tests/smoke.py`

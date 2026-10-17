@@ -77,6 +77,13 @@ export const TOPICS: Topic[] = [
 		updated: '2026-10-17',
 	},
 	{
+		slug: 'capacity',
+		title: 'Installed capacity',
+		summary: 'How much each plant could generate, and when that changed, back to 1997: the basis for the capacity factors in the Generation tab’s mix table.',
+		shownOn: [['Tracker', '/tracker']],
+		updated: '2026-10-17',
+	},
+	{
 		slug: 'history',
 		title: 'History since 1997',
 		summary: 'How the record back to August 1997 is put together from metered data, the daily dispatch files and the live feed, where the sources hand over, and the known gaps.',
@@ -106,6 +113,14 @@ const CCBY = 'CC BY 4.0';
 
 export const SOURCES: Source[] = [
 	// ---------- market data ----------
+	{
+		id: 'capacity', name: 'Plant capacity histories', publisher: 'Elenz', dataset: 'facilities/plant_capacity.csv',
+		url: 'https://github.com/elenz-nz/elenz/blob/main/facilities/plant_capacity.csv',
+		what: 'Every plant the tracker shows, with its installed MW and the dates each figure applies: the EA plant register, corrected where it misses upgrades, closures or staged commissioning. Each row names its source.',
+		use: 'Capacity factors in the Generation tab’s mix table.',
+		period: 'August 1997 on', fresh: 'Updated by hand as plants change', licence: 'Compiled from the sources each row names',
+		topics: ['capacity'],
+	},
 	{
 		id: 'rtd', name: 'Real-time dispatch', publisher: EA, dataset: 'EMI API: real-time-dispatch',
 		url: 'https://emi.developer.azure-api.net/',
@@ -144,7 +159,7 @@ export const SOURCES: Source[] = [
 		what: 'Every dispatched unit: plant name, connection point, unit code, fuel, technology, operator and nameplate MW, with dated rows as units are added, moved or retired.',
 		use: 'Maps each unit in the dispatch data to its plant, fuel, island and owner; plant capacities.',
 		period: 'Current and past units', fresh: 'About twice a year', licence: CCBY,
-		topics: ['generation', 'groupings'],
+		topics: ['generation', 'groupings', 'capacity'],
 	},
 	{
 		id: 'nsp', name: 'Network supply points', publisher: EA, dataset: 'MappingsAndGeospatial/NetworkSupplyPointsTable',
@@ -169,7 +184,7 @@ export const SOURCES: Source[] = [
 		what: 'Half-hourly energy from each station, by connection point and generator code: grid-connected stations from August 1997, stations on local networks from January 2009.',
 		use: 'Generation by plant and fuel for every month it has been published.',
 		period: 'From Aug 1997', fresh: 'About 5–6 weeks after each month', licence: CCBY,
-		topics: ['generation', 'demand', 'history'],
+		topics: ['generation', 'demand', 'history', 'capacity'],
 	},
 	{
 		id: 'embedded', name: 'Embedded generation', publisher: EA, dataset: 'Metered_data/Embedded_generation',
@@ -177,7 +192,7 @@ export const SOURCES: Source[] = [
 		what: 'Half-hourly energy injected at connection points on local networks.',
 		use: 'Stations on local networks before 2009, and their gross output where Generation_MD records it net of local load.',
 		period: 'From Oct 1998 (most points from Apr 1999)', fresh: 'About 2 weeks after each month', licence: CCBY,
-		topics: ['generation', 'history'],
+		topics: ['generation', 'history', 'capacity'],
 	},
 	{
 		id: 'gridexport', name: 'Grid exports', publisher: EA, dataset: 'Metered_data/Grid_export',
@@ -225,7 +240,7 @@ export const SOURCES: Source[] = [
 		what: 'Installed solar on local networks each month, from the registry, by grid exit point (Root NSP), for systems up to 10 kW and over 10 kW.',
 		use: 'Embedded solar capacity at each grid exit point.',
 		period: 'From Aug 2013', fresh: 'Monthly', licence: CCBY,
-		topics: ['embedded-solar', 'history'],
+		topics: ['embedded-solar', 'history', 'capacity'],
 	},
 	// ---------- weather ----------
 	{

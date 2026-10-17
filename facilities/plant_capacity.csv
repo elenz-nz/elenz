@@ -1,0 +1,149 @@
+plant,fuel,island,start,end,mw,basis,source,note
+Aniwhenua,hydro,NI,1999-04-01,,25.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 1999-04, the first month the history has its output"
+Arapuni,hydro,NI,,2001-12-31,188.7,override,https://en.wikipedia.org/wiki/Arapuni_Power_Station,196.7 MW less the 2001 uprate
+Arapuni,hydro,NI,2002-01-01,,196.7,override,https://en.wikipedia.org/wiki/Arapuni_Power_Station; https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand,four units uprated 24.7 -> 26.7 MW in 2001; register 191 (two buses)
+Aratiatia,hydro,NI,,,78.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Aviemore,hydro,SI,,,220.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Benmore,hydro,SI,,2024-04-30,540,override,https://www.meridianenergy.co.nz/news-and-events/increase-to-maximum-station-capacity-at-benmore-power-station; EA plant register (DispatchedGenerationPlant.csv),"register double-counts 2009-12, when units sat on two connections"
+Benmore,hydro,SI,2024-05-01,2026-07-29,552,override,https://www.meridianenergy.co.nz/news-and-events/increase-to-maximum-station-capacity-at-benmore-power-station,"maximum capacity reassessed 540 -> 552 MW (announced 19 Mar 2024, available from May)"
+Benmore,hydro,SI,2026-07-30,,570,override,https://www.energyglobal.com/other-renewables/31072026/meridian-energy-increases-generation-capacity-at-waitaki-hydropower-stations/,maximum operating capacity 552 -> 570 MW from 30 Jul 2026
+Branch River (Arnold),hydro,SI,,,12.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Clandeboye Solar Farm,solar,SI,2026-06-10,,24.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Clyde,hydro,SI,,2015-10-31,432,override,"https://en.wikipedia.org/wiki/Clyde_Dam; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",consent limit; output first exceeds 432 MW in Nov 2015 (Wikipedia dates the consent change to 2005: check)
+Clyde,hydro,SI,2015-11-01,,464,override,"https://en.wikipedia.org/wiki/Clyde_Dam; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",4 x 116 MW installed; register still 432
+Cobb,hydro,SI,,,32.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Coleridge,hydro,SI,,,40.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Dannevirke Solar Farm,solar,NI,2026-04-29,,23.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Deep Stream (Waipori A),hydro,SI,1999-04-01,,26.0,register,EA plant register (DispatchedGenerationPlant.csv),"metered output from 1999-04, before the register commissioning date 2008-01"
+Edgecumbe,gas,NI,1999-01-01,2008-03-31,10,override,https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand,"Fonterra cogeneration (1996); history shows it to Mar 2008; counted from 1999-01, the first month the history has its output"
+Fonterra Dairy - Whareroa,gas,NI,1998-09-01,,68,override,https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand; EA plant register (DispatchedGenerationPlant.csv),"register repeats 68 MW on each of four unit rows; counted from 1998-09, the first month the history has its output"
+Glenbrook Steel,waste,NI,1998-01-01,,112,override,https://en.wikipedia.org/wiki/Glenbrook_Power_Station,"two plants (1987, 1997), 112 MW in all; register 68; counted from 1998-01, the first month the history has its output"
+Glenbrook-Ohurua Battery,batt,NI,2025-12-04,,100.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Harapaki,wind,NI,2023-11-01,2024-04-30,88,override,"Elenz: step in metered output (Generation_MD, monthly peak half-hour)",commissioned in stages; half assumed until May 2024
+Harapaki,wind,NI,2024-05-01,,176,override,EA plant register (DispatchedGenerationPlant.csv); https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand,
+Highbank,hydro,SI,2002-03-01,,28.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 2002-03, the first month the history has its output"
+Huntly 5,gas,NI,2007-02-01,,403.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 2007-02, the first month the history has its output (in service from 2007-01)"
+Huntly 6,gas,NI,2004-05-01,,50.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 2004-05, the first month the history has its output (in service from 2004-01)"
+Huntly Battery,batt,NI,2026-07-01,,100.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Huntly Rankines,coal,NI,,2014-01-23,1000,register,EA plant register (DispatchedGenerationPlant.csv); https://en.wikipedia.org/wiki/Huntly_Power_Station,4 x 250 MW
+Huntly Rankines,coal,NI,2014-01-24,,750,register,EA plant register (DispatchedGenerationPlant.csv); https://en.wikipedia.org/wiki/Huntly_Power_Station,unit 3 decommissioned (register date; Wikipedia: retired Jun 2015). One unit in storage 2013-21 still counted
+Junction Road,gas,NI,2020-02-01,,100,override,"https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand; Elenz: step in metered output (Generation_MD, monthly peak half-hour)","register 130 (100 MW installed; output peaks 99); counted from 2020-02, the first month the history has its output (in service from 2020-01)"
+Kaimai,hydro,NI,1999-04-01,,42.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 1999-04, the first month the history has its output"
+Kaiwaikawe Wind Farm,wind,NI,2026-06-01,,74,override,https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand,first power mid-2026: set the start to its first dispatch output
+Kaiwera Downs (Stage 2),wind,SI,2026-03-31,,155.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Kaiwera Downs Wind Farm,wind,SI,2023-08-01,,43.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Kapuni,gas,NI,1998-03-01,,25.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 1998-03, the first month the history has its output (in service from 1998-01)"
+Karāpiro,hydro,NI,,2025-09-24,96,override,https://www.mercury.co.nz/investors/news/2025-september---karapiro-final-milestone,units out in turn 2024-25 during the upgrade
+Karāpiro,hydro,NI,2025-09-25,,112.5,override,https://www.mercury.co.nz/investors/news/2025-september---karapiro-final-milestone; EA plant register (DispatchedGenerationPlant.csv),upgrade 96 -> 112.5 MW completed Sep 2025
+Kawerau,geo,NI,2008-06-01,,109.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 2008-06, the first month the history has its output (in service from 2008-01)"
+Kawerau (TOPP1),geo,NI,1999-01-01,2008-03-31,6,override,"https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand; Elenz: step in metered output (Generation_MD, monthly peak half-hour)","probably Kawerau TG1 and TG2 (6 MW, 1989/1993), not TOPP1 (26 MW, 2012): rename?; counted from 1999-01, the first month the history has its output"
+Kawerau (TOPP2),geo,NI,2025-12-01,,49.0,register,EA plant register (DispatchedGenerationPlant.csv),"metered output from 2025-12, before the register commissioning date 2025-12"
+Kawerau (Te Ahi O Maui),geo,NI,2018-10-01,,27.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 2018-10, the first month the history has its output (in service from 2018-01)"
+Kawerau Mill CoGen,bio,NI,2020-01-01,,53,register,EA plant register (DispatchedGenerationPlant.csv),"Norske Skog / Carter Holt Harvey CoGen in the register; metered peak ~40; Wikipedia 37; counted from 2020-01, the first month the history has its output"
+Kinleith,bio,NI,1997-08-01,,40.0,register,EA plant register (DispatchedGenerationPlant.csv),"metered output from 1997-08, before the register commissioning date 1998-01"
+Kohirā Solar Farm,solar,NI,2023-10-25,,24.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Kōwhai Park Solar Farm,solar,SI,2026-07-01,,160,override,"https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",168 MWp; ~160 MW AC from the distributed generation registry (Jul 2026 step); commissioning since mid-2026: set the start to its first dispatch output
+Kūmara,hydro,SI,1999-04-01,,10.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 1999-04, the first month the history has its output"
+Lauriston Solar Farm,solar,SI,2025-02-01,,47.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Mahinerangi (Waipori B),wind,SI,2011-06-01,,36.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 2011-06, the first month the history has its output (in service from 2011-01)"
+Manapōuri,hydro,SI,,2002-04-30,585,override,https://en.wikipedia.org/wiki/Manap%C5%8Duri_Power_Station,tailrace friction held output to 585 MW for ~30 years
+Manapōuri,hydro,SI,2002-05-01,2007-12-31,700,override,"https://en.wikipedia.org/wiki/Manap%C5%8Duri_Power_Station; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",second tailrace (2002); units refurbished 2002-07; output steps up May 2002
+Manapōuri,hydro,SI,2008-01-01,,800,override,https://en.wikipedia.org/wiki/Manap%C5%8Duri_Power_Station; EA plant register (DispatchedGenerationPlant.csv),all 7 units refurbished by end 2007 (854 MW installed); consent limits output to 800 MW; register 802
+Mangahao,hydro,NI,,,42.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Maraetai,hydro,NI,,,360.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Matahina,hydro,NI,1998-09-01,,80,override,EA plant register (DispatchedGenerationPlant.csv); https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand,"register double-counts 2012-14 (two connections); counted from 1998-09, the first month the history has its output"
+McKee,gas,NI,2012-09-01,,100.0,register,EA plant register (DispatchedGenerationPlant.csv),"metered output from 2012-09, before the register commissioning date 2013-01"
+Mill Creek,wind,NI,2015-09-01,,60.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 2015-09, the first month the history has its output (in service from 2014-01)"
+Mokai,geo,NI,1999-10-01,2005-04-30,55,override,"https://en.wikipedia.org/wiki/Mokai_Power_Station; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+Mokai,geo,NI,2005-05-01,2007-05-31,95,override,"https://en.wikipedia.org/wiki/Mokai_Power_Station; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",+40 MW in 2005
+Mokai,geo,NI,2007-06-01,,112,override,https://en.wikipedia.org/wiki/Mokai_Power_Station; EA plant register (DispatchedGenerationPlant.csv),increased to ~110-113 MW in 2007
+New Plymouth,gas,NI,,2007-12-31,600,override,https://en.wikipedia.org/wiki/New_Plymouth_Power_Station; https://www.nbr.co.nz/contact-sells-mothballed-new-plymouth-power-station-for-24m/,5 x 120 MW; mothballed Dec 2007 (units were run down earlier: dates not found)
+New Plymouth,gas,NI,2008-05-01,2008-12-31,100,override,https://en.wikipedia.org/wiki/New_Plymouth_Power_Station,"unit 3 recommissioned at 100 MW, May-Dec 2008"
+Nga Awa Pūrua,geo,NI,2010-01-01,,144.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Ngā Tamariki,geo,NI,2013-03-01,2026-01-20,86,override,https://www.thinkgeoenergy.com/nga-tamariki-unit-5-geothermal-power-plant-in-new-zealand-starts-grid-supply/,"register 87; counted from 2013-03, the first month the history has its output"
+Ngā Tamariki,geo,NI,2026-01-21,,132,override,https://www.thinkgeoenergy.com/nga-tamariki-unit-5-geothermal-power-plant-in-new-zealand-starts-grid-supply/,"unit 5 (46 MW) supplying the grid from Jan 2026, commissioning to Mar 2026"
+Ngāwhā,geo,NI,1999-04-01,2008-07-31,10,override,"https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand; Elenz: step in metered output (Generation_MD, monthly peak half-hour)","OEC1-2 (1998); counted from 1999-04, the first month the history has its output"
+Ngāwhā,geo,NI,2008-08-01,2020-11-30,25,override,"https://www.thinkgeoenergy.com/top-energy-kicks-off-commercial-operation-of-32-mw-ngawha-3-geothermal-power-plant/; Elenz: step in metered output (Generation_MD, monthly peak half-hour)","OEC3: output steps to 25 MW in Aug 2008 (""two existing stations 25 MW"")"
+Ngāwhā,geo,NI,2020-12-01,,57,override,https://www.thinkgeoenergy.com/top-energy-kicks-off-commercial-operation-of-32-mw-ngawha-3-geothermal-power-plant/; https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand,OEC4 (32 MW) live Dec 2020; register has only OEC4 (31.5)
+Omeheu Solar Farm,solar,NI,2026-05-01,,28.7,register,EA plant register (DispatchedGenerationPlant.csv),"metered output from 2026-05, before the register commissioning date 2026-05"
+Otahuhu A,gas,NI,,2004-04-30,180,override,https://en.wikipedia.org/wiki/Otahuhu_Power_Station; EA plant register (DispatchedGenerationPlant.csv),"4 x 45 MW (+2 Olympus twin-packs, MW not found); reserve plant, last output Apr 2004; register Ōtāhuhu A 180 to 2014 (reactive support only)"
+Otahuhu B,gas,NI,1999-03-01,2004-12-31,385,override,"https://en.wikipedia.org/wiki/Otahuhu_Power_Station; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",full output from Mar 1999 (commissioned Jan 2000)
+Otahuhu B,gas,NI,2005-01-01,2015-09-30,404,override,https://en.wikipedia.org/wiki/Otahuhu_Power_Station,raised to ~404 MW in 2005; ceased generation end Sep 2015; register Ōtāhuhu B 400
+Paerau Gorge,hydro,SI,1999-04-01,,12.5,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 1999-04, the first month the history has its output"
+Papareireiā,solar,NI,2025-02-01,,17.6,register,EA plant register (DispatchedGenerationPlant.csv),"metered output from 2025-02, before the register commissioning date 2025-11"
+Poihipi,geo,NI,,,55.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Pukenui Solar Farm,solar,NI,2025-05-23,,20.8,register,EA plant register (DispatchedGenerationPlant.csv),
+Pāmu Rā ki Whitianga Solar Farm,solar,NI,2025-11-18,,23.8,register,EA plant register (DispatchedGenerationPlant.csv),
+Pātea,hydro,NI,,,34.5,register,EA plant register (DispatchedGenerationPlant.csv),
+Rangipo,hydro,NI,,,120.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Rangitaiki Solar Farm,solar,NI,2024-03-01,,24.0,register,EA plant register (DispatchedGenerationPlant.csv),"metered output from 2024-03, before the register commissioning date 2024-03"
+Roaring Meg,hydro,SI,,,12.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Rotohiko,batt,NI,2023-11-23,,35.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Rotokawa,geo,NI,1999-04-01,2002-12-31,29,override,"Elenz: step in metered output (Generation_MD, monthly peak half-hour); https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand","metered output (halved: Trustpower meters read double to Jul 2005); counted from 1999-04, the first month the history has its output"
+Rotokawa,geo,NI,2003-01-01,,35,override,"Elenz: step in metered output (Generation_MD, monthly peak half-hour); EA plant register (DispatchedGenerationPlant.csv)",extension 2003; register 36
+Roxburgh,hydro,SI,,,328.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Ruakākā Energy Park,batt,NI,2024-10-15,,100.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Southdown,gas,NI,,2007-02-28,130,register,"EA plant register (DispatchedGenerationPlant.csv); Elenz: step in metered output (Generation_MD, monthly peak half-hour)",combined cycle (1996)
+Southdown,gas,NI,2007-03-01,2016-01-19,180,register,"EA plant register (DispatchedGenerationPlant.csv); Elenz: step in metered output (Generation_MD, monthly peak half-hour)","+ Southdown 5 (50 MW), output from Mar 2007; last output Dec 2015"
+Southdown Battery,batt,NI,2017-01-01,2022-05-23,1.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Stratford,gas,NI,,1998-02-28,200,override,https://en.wikipedia.org/wiki/Stratford_Power_Station,"old Stratford gas turbines, 4 x 50 MW (1976-2001)"
+Stratford,gas,NI,1998-03-01,2001-12-31,577,override,"https://en.wikipedia.org/wiki/Stratford_Power_Station; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",TCC (377) from Mar 1998 alongside the old turbines until 2001
+Stratford,gas,NI,2002-01-01,2011-05-30,377,override,https://en.wikipedia.org/wiki/Stratford_Power_Station,TCC
+Stratford,gas,NI,2011-05-31,2022-05-30,589,override,https://en.wikipedia.org/wiki/Stratford_Power_Station; EA plant register (DispatchedGenerationPlant.csv),TCC 377 + peakers 2 x 106 (register; Wikipedia 200)
+Stratford,gas,NI,2022-05-31,2023-10-30,572,override,EA plant register (DispatchedGenerationPlant.csv),TCC derated to 360
+Stratford,gas,NI,2023-10-31,2026-03-31,542,override,EA plant register (DispatchedGenerationPlant.csv); https://www.investing.com/news/company-news/contact-energy-fy26-slides-renewable-pivot-drives-31-ebitdaf-gain-93CH-4847780,TCC derated to 330
+Stratford,gas,NI,2026-04-01,,212,override,https://www.investing.com/news/company-news/contact-energy-fy26-slides-renewable-pivot-drives-31-ebitdaf-gain-93CH-4847780; EA plant register (DispatchedGenerationPlant.csv),TCC closed Mar 2026 (last output Dec 2025); peakers only
+Taiohi Solar Farm,solar,NI,2025-09-15,,22.4,register,EA plant register (DispatchedGenerationPlant.csv),
+Takapō A,hydro,SI,,2015-12-31,25,register,EA plant register (DispatchedGenerationPlant.csv),
+Takapō A,hydro,SI,2016-01-01,,30,override,"https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",output above 25 MW from 2016; Wikipedia 30 MW; register 25: check
+Takapō B,hydro,SI,,,160.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Tararua Wind Farm 3,wind,NI,2007-02-01,,93.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 2007-02, the first month the history has its output (in service from 2007-01)"
+Tararua stage I,wind,NI,1999-12-01,,36.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 1999-12, the first month the history has its output (in service from 1999-01)"
+Tararua stage II,wind,NI,2004-04-01,,37.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 2004-04, the first month the history has its output (in service from 2004-01)"
+Tauhara,geo,NI,2023-10-05,,174.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Tauhei Solar Farm,solar,NI,2026-05-01,,147.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Te Awamutu,gas,NI,,2007-05-31,54,override,https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand,dairy factory gas turbine (1995-2007)
+Te Herenga o Te Rā Solar Farm,solar,NI,2024-11-22,,33.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Te Huka,geo,NI,2009-01-01,,30.0,register,EA plant register (DispatchedGenerationPlant.csv),"metered output from 2009-01, before the register commissioning date 2010-01"
+Te Huka 3,geo,NI,2024-09-24,,51.4,register,EA plant register (DispatchedGenerationPlant.csv),
+Te Mihi,geo,NI,2013-11-01,,166,override,https://en.wikipedia.org/wiki/Te_Mihi_Power_Station; https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand,output from Nov 2013 (commissioned May 2014); register 181
+Te Puna Mauri ō Omaru at Ruawai,solar,NI,2024-12-05,,16.8,register,EA plant register (DispatchedGenerationPlant.csv),
+Te Rapa,gas,NI,1999-05-01,2023-06-30,48,register,EA plant register (DispatchedGenerationPlant.csv); https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand,"closed 2023 (register has no end date; Wikipedia 44 MW); counted from 1999-05, the first month the history has its output"
+Te Rere Hau,wind,NI,2008-11-01,2009-06-30,5,override,"https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand; Elenz: step in metered output (Generation_MD, monthly peak half-hour)","built in stages 2006, 2009, 2011 (97 x 0.5 MW)"
+Te Rere Hau,wind,NI,2009-07-01,2011-04-30,32.5,override,"https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+Te Rere Hau,wind,NI,2011-05-01,,48.5,override,https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand; EA plant register (DispatchedGenerationPlant.csv),
+Te Uku,wind,NI,2010-11-01,,64.4,register,EA plant register (DispatchedGenerationPlant.csv),"metered output from 2010-11, before the register commissioning date 2011-01"
+Te Āpiti,wind,NI,2004-07-01,,90.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 2004-07, the first month the history has its output (in service from 2004-01)"
+Teviot,hydro,SI,1999-06-01,,22.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 1999-06, the first month the history has its output"
+Tokaanu,hydro,NI,,,242.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Turitea Wind Farm,wind,NI,2021-08-01,2023-03-31,118.8,override,"https://en.wikipedia.org/wiki/Turitea_Wind_Farm; Elenz: step in metered output (Generation_MD, monthly peak half-hour)","northern stage, 33 x 3.6 MW"
+Turitea Wind Farm,wind,NI,2023-04-01,,221.4,override,"https://en.wikipedia.org/wiki/Turitea_Wind_Farm; Elenz: step in metered output (Generation_MD, monthly peak half-hour)","+ southern stage, 27 x 3.8 MW (opened May 2023)"
+Twin Rivers Solar Farm,solar,NI,2025-09-17,,24.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Waikaremoana,hydro,NI,,,140.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Waipipi,wind,NI,2020-01-01,,133.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Waipori (2A/3/4),hydro,SI,,,74.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Waipāpa,hydro,NI,,,54.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Wairakei,geo,NI,,2005-05-31,167,override,"https://en.wikipedia.org/wiki/Wairakei_Power_Station; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",A and B stations before the binary plant
+Wairakei,geo,NI,2005-06-01,2014-04-30,181,override,https://en.wikipedia.org/wiki/Wairakei_Power_Station,14 MW binary plant added 2005
+Wairakei,geo,NI,2014-05-01,,136,override,"https://en.wikipedia.org/wiki/Te_Mihi_Power_Station; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",about 45 MW of steam moved to Te Mihi (May 2014); register 152
+Waitaki,hydro,SI,,,95.0,register,EA plant register (DispatchedGenerationPlant.csv),
+West Wind 1,wind,NI,2009-04-01,,71.3,override,"https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand; Elenz: step in metered output (Generation_MD, monthly peak half-hour)","West Wind is 142.6 MW on two connections (register 80 + 80); counted from 2009-04, the first month the history has its output (in service from 2009-03)"
+West Wind 2,wind,NI,2009-03-01,,71.3,override,"https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+Whakamaru,hydro,NI,,2017-04-30,100,override,https://en.wikipedia.org/wiki/Whakamaru_Power_Station,
+Whakamaru,hydro,NI,2017-05-01,2018-02-28,106,override,"https://en.wikipedia.org/wiki/Whakamaru_Power_Station; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",units refurbished one a year 2017-20; dates from metered output
+Whakamaru,hydro,NI,2018-03-01,2019-05-31,112,override,"https://en.wikipedia.org/wiki/Whakamaru_Power_Station; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+Whakamaru,hydro,NI,2019-06-01,2020-02-29,118,override,"https://en.wikipedia.org/wiki/Whakamaru_Power_Station; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+Whakamaru,hydro,NI,2020-03-01,,124,override,https://en.wikipedia.org/wiki/Whakamaru_Power_Station; EA plant register (DispatchedGenerationPlant.csv),
+Wheao and Flaxy,hydro,NI,,,24.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Whirinaki,diesel,NI,2004-04-01,,156,register,"EA plant register (DispatchedGenerationPlant.csv); Elenz: step in metered output (Generation_MD, monthly peak half-hour)",output from Apr 2004; a few hours at WHI2201 in 1997-2000 have no known plant
+White Hill,wind,SI,2007-06-01,,58.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 2007-06, the first month the history has its output (in service from 2007-01)"
+Ātiamuri,hydro,NI,,,77.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Ōhaaki,geo,NI,,2012-12-31,65,override,"https://en.wikipedia.org/wiki/Ohaaki_Power_Station; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",built as 104 MW (1989); steamfield decline limits it to ~65 MW (date not given)
+Ōhaaki,geo,NI,2013-01-01,,43.7,override,"https://contact.co.nz/about-us/our-story/our-generation-and-power-sites/geothermal/ohaaki; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",current maximum per Contact; output steps down in 2013
+Ōhakuri,hydro,NI,,,109.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Ōhau A,hydro,SI,,,264.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Ōhau B,hydro,SI,,2026-07-29,212,register,EA plant register (DispatchedGenerationPlant.csv),Meridian gives 216 MW before the 2026 change
+Ōhau B,hydro,SI,2026-07-30,,220,override,https://www.energyglobal.com/other-renewables/31072026/meridian-energy-increases-generation-capacity-at-waitaki-hydropower-stations/,
+Ōhau C,hydro,SI,,2026-07-29,212,register,EA plant register (DispatchedGenerationPlant.csv),
+Ōhau C,hydro,SI,2026-07-30,,220,override,https://www.energyglobal.com/other-renewables/31072026/meridian-energy-increases-generation-capacity-at-waitaki-hydropower-stations/,
+Ruakākā Solar Farm,solar,NI,,,120,pending,https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand,"under construction (fixed mounting); not generating yet: give it a start date, basis override, once it appears in the dispatch data"

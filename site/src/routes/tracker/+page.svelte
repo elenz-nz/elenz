@@ -5,6 +5,7 @@
 	import Masthead from '#lib/site/Masthead.svelte';
 	import TrackerTabs from '#lib/site/TrackerTabs.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
+	import GenLower from '#lib/generation/GenLower.svelte';
 
 	type Meta = { intervals: number; expected: number; end: number; api_from: number | null; built: number };
 
@@ -16,6 +17,7 @@
 	let meta = $state<Meta | null>(null);
 	let error = $state('');
 	let view = $state<View | null>(null);
+	let lower = $state.raw<any>(null);   // the window the charts show, for the section under them (GenLower)
 	let now = $state(Date.now());
 	let infoOpen = $state(false);
 	let infoBtn = $state<HTMLButtonElement>();
@@ -92,7 +94,7 @@
 			meta = D.meta;
 			error = '';
 			if (tracker) tracker.update(D);
-			else tracker = mountTracker(D, { status: (v: View) => (view = v) });
+			else tracker = mountTracker(D, { status: (v: View) => (view = v), view: (v: any) => (lower = v) });
 		}
 		load().catch((e) => (error = `The data couldn't be loaded. ${e.message} Try reloading the page.`));
 		// tick every minute (clock and labels); fetch only once the next interval is due, while on screen
@@ -299,6 +301,8 @@
 			</section>
 		</div>
 	</div>
+
+	<GenLower v={lower} />
 
 	<!-- follows the mouse over the charts; the summary panel carries the same values for keyboard and screen readers -->
 	<div class="tip" id="tip" aria-hidden="true" hidden></div>

@@ -12,6 +12,8 @@
 	import TimeChart from '#lib/prices/TimeChart.svelte';
 	import FuelBars from '#lib/prices/FuelBars.svelte';
 	import HeatMap from '#lib/prices/HeatMap.svelte';
+	import Context from '#lib/site/Context.svelte';
+	import { rangeName, span } from '#lib/site/context.js';
 	import {
 		NODES, NODE, priceOf, separated, addRevenue, captured, RANGES, INT_LABEL, atInterval, completeDaily, periods,
 		heat, priceScale, niceTicks, CAP, money, signedMoney, clock, dayLabel, dateLabel, monthLabel, shortDate, timeTicks, nzParts
@@ -42,6 +44,7 @@
 	let viewError = $state('');
 	let heatRows = $state<any[]>([]);
 	let heatSeg: any = null;
+	let heatSpan = $state('');   // the dates the heat map covers, for its context line
 	let endT = $state<number | null>(null); // end of the window (ms), or null for the latest data
 	let heatTo = 0;
 	let popped = $state<string | null>(null); // a lower chart enlarged over the page
@@ -327,6 +330,11 @@
 	const head = $derived(heading(at));
 
 	// over the whole range: averages, highs and spikes (Haywards and Benmore), and price captured by fuel
+	// what the cards under the charts cover, said on each (the controls are far above)
+	const win = $derived(view && view.S.n ? { from: view.S.t[0], to: view.S.t[view.S.n - 1] + view.S.h[view.S.n - 1] * 36e5 } : null);
+	const priceKind = $derived(!view || !win ? '' : view.mode === 'long' ? 'final prices'
+		: view.histEnd == null ? 'dispatch prices' : view.histEnd >= win.to - 18e5 ? 'final prices' : 'final prices, then dispatch');
+	const regionText = $derived(region === 'NZ' ? 'both islands' : region === 'NI' ? 'North Island (Haywards)' : 'South Island (Benmore)');
 	const rangeStats = $derived.by(() => {
 		if (!view) return null;
 		const S = view.S, wavg = (a: ArrayLike<number>) => { let s = 0, w = 0; for (let i = 0; i < S.n; i++) if (a[i] === a[i]) { s += a[i] * S.h[i]; w += S.h[i]; } return w ? s / w : NaN; };
@@ -363,6 +371,7 @@
 			heatSeg = windowOf(live, from, to);   // history not ready: the live week only
 		}
 		heatRows = heat(heatSeg, heatKey);
+		heatSpan = heatSeg && heatSeg.n ? span(heatSeg.t[0], heatSeg.t[heatSeg.n - 1] + heatSeg.h[heatSeg.n - 1] * 36e5) : '';
 	}
 	$effect(() => { const k = heatKey; untrack(() => { if (heatSeg) heatRows = heat(heatSeg, k); }); });
 
@@ -687,8 +696,11 @@
 
 	<div class="p-row">
 		<section class="card">
-			<h2>Price captured by fuel</h2>
-			<p class="sub">What each fuel earned over the {R.label.toLowerCase()}: its output × its island's price, divided by its output. {region === 'NZ' ? 'Both islands' : region === 'NI' ? 'North Island (Haywards)' : 'South Island (Benmore)'}.</p>
+			<div>
+				<h2>Price captured by fuel</h2>
+				<Context range={rangeName(R.label, endT, R.days)} items={[win ? span(win.from, win.to) : '', regionText, priceKind]} />
+			</div>
+			<p class="sub">What each fuel earned over the range: its output × its island's price, divided by its output.</p>
 			{#if rangeStats && rangeStats.cap.rows.length}
 				<FuelBars rows={rangeStats.cap.rows} avg={rangeStats.cap.avg} />
 				<p class="note">Percent is against the generation-weighted average of all fuels. Batteries count discharge only; embedded solar isn't paid the spot price, so it's left out.</p>
@@ -700,7 +712,7 @@
 			<div class="card-head">
 				<div>
 					<h2>Price by time of day</h2>
-					<p class="sub">Each half-hour of the {endT === null ? 'last 30 days' : `30 days to ${dateLabel(endT - 1)}`}</p>
+					<Context range={endT === null ? 'Last 30 days' : rangeName('30 days', endT, 30)} items={[heatSpan, NODE[heatKey]?.name, 'each half-hour']} />
 				</div>
 				<div class="seg" role="group" aria-label="Node for the heat map">
 					{#each NODES.filter((nd) => nd.ref || (heatSeg && priceOf(heatSeg, nd.k))) as nd}

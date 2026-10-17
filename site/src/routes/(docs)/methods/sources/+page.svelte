@@ -8,6 +8,7 @@
 		['Metered data', ['genmd', 'embedded', 'gridexport', 'gridimport', 'tiwai', 'hvdcflows', 'reconciliation', 'guehmt']],
 		['Weather', ['satellite', 'era5', 'forecast']],
 		['Emission factors and national figures', ['genesis', 'mbie', 'mfe', 'nzga', 'inventory']],
+		['Compiled by Elenz', ['capacity']],
 	];
 	const byId = Object.fromEntries(SOURCES.map((s) => [s.id, s]));
 </script>

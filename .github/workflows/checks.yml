@@ -28,6 +28,8 @@ jobs:
         run: ruff check ingest analysis --select E9,F63,F7,F82 --output-format github
       - name: Smoke test (live and history paths on a sample)
         run: python ingest/tests/smoke.py
+      - name: Installed capacity (every plant has a row; the site's copy is up to date)
+        run: python ingest/capacity.py --check
 
   site:
     runs-on: ubuntu-latest

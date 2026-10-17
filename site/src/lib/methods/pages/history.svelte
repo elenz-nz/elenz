@@ -56,6 +56,8 @@
 	<li><b>1–9 September 2020</b>: no Huntly. <code>Generation_MD</code> has no rows for the Rankines or unit 5 that month, and the dispatch files start on 10 September.</li>
 	<li><b>Matahina from October 2021</b>: no metered rows; the dispatch figures stand in.</li>
 	<li><b>Before April 1999</b>: <code>Embedded_generation</code> doesn’t yet have Rotokawa, Ngāwhā, Kaimai and Tararua, about 1–2% of generation in 1997–99. Geothermal in 1998–2000 is up to 15% below MBIE’s for that reason.</li>
+	<li><b>Highbank before October 2001</b>: no metered rows for it at all; it appears in <code>Embedded_generation</code> from then (25 MW).</li>
+	<li><b>Mill Creek, April 2014 to August 2015</b>: its first 17 months aren’t in <code>Embedded_generation</code> or <code>Generation_MD</code> (60 MW of wind, about 330 GWh). They are in the EA’s reconciliation data, and are due to be added at the next full rebuild.</li>
 	<li><b>Grid imports before 2003</b>: incomplete (see <a href="/methods/demand#history">demand</a>), so the stations’ own metered generation stands in.</li>
 	<li><b>Owners</b>: today’s owners apply to the whole history.</li>
 	<li><b>Geothermal emissions before 2020</b> use 2020’s station factors, which probably understate them.</li>
