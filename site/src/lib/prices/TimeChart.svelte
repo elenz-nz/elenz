@@ -93,6 +93,19 @@
 		return Math.max(x0 + 4, Math.min(x1 - w, lx));
 	});
 	const hx = $derived(hover >= 0 && hover < n ? X(t[hover]) : null);
+	// time labels that fit: all of them when there's room; otherwise every k-th main label (no minor ones), so they
+	// don't run into each other on a narrow screen
+	const ticks = $derived.by(() => {
+		const main = xTicks.filter((x) => !x.minor);
+		if (!main.length) return xTicks;
+		const fits = (list: typeof xTicks) => list.every((x, i) => !i || X(x.t) - X(list[i - 1].t) >= (x.label.length + list[i - 1].label.length) * 3.3 + 12);
+		if (fits(xTicks)) return xTicks;
+		for (let k = 1; k <= main.length; k++) {
+			const keep = main.filter((_, i) => i % k === 0);
+			if (fits(keep)) return keep;
+		}
+		return main.slice(0, 1);
+	});
 </script>
 
 <div class="tc" bind:clientWidth={W}>
@@ -142,7 +155,7 @@
 			{/each}
 		{/if}
 		{#if showX}
-			{#each xTicks as tk}
+			{#each ticks as tk}
 				{#if X(tk.t) >= x0 - 1 && X(tk.t) <= x1 + 1}
 					<line class="xt" x1={X(tk.t)} x2={X(tk.t)} y1={yBot} y2={yBot + 4}></line>
 					<text class="xl" class:minor={tk.minor} x={X(tk.t)} y={height - 5} text-anchor="middle">{tk.label}</text>

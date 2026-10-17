@@ -91,13 +91,8 @@
 		...(ghost ? [{ kind: 'line', values: ghost, tok: '--muted', width: 1.2, dash: '4 3' }] : []),
 		{ kind: 'line', values: curPct, tok: m.tok, width: 1.7 },
 	]);
-	// thinned so labels stay ~80 px apart on a narrow screen
-	let chartW = $state(800);
-	const xTicks = $derived.by(() => {
-		const all = curI && curI.n ? timeTicks(curI.t[0], curI.t[curI.n - 1]) : [];
-		const keep = all.filter((x: any) => !x.minor), every = Math.max(1, Math.ceil((keep.length * 80) / Math.max(chartW - 60, 100)));
-		return every === 1 ? all : keep.filter((_: any, i: number) => i % every === 0);
-	});
+	// TimeChart drops labels that would overlap on a narrow screen
+	const xTicks = $derived(curI && curI.n ? timeTicks(curI.t[0], curI.t[curI.n - 1]) : []);
 	const avgNow = $derived(cur && v ? shareOver(cur, v.region, metric) : NaN);
 	const avgPrev = $derived(prev && v ? shareOver(prev, v.region, metric) : NaN);
 	const prevYear = $derived.by(() => {
@@ -240,10 +235,8 @@
 			{/if}
 		</p>
 		{#if curI && curI.n > 1}
-			<div bind:clientWidth={chartW}>
 			<TimeChart t={curI.t} t0={curI.t[0]} t1={curI.t[curI.n - 1]} height={popped === 'share' ? Math.round(Math.min(560, Math.max(260, (typeof window === 'undefined' ? 800 : window.innerHeight) * 0.55))) : 210} y={yScale} fmt={(x: number) => `${x}%`} {layers} {xTicks} showX bind:hover
 				label="{m.title} share of generation{ghost ? ', with the same dates a year earlier as a dashed line' : ''}" onleave={() => (hover = -1)} />
-			</div>
 		{:else}
 			<p class="empty">Loading…</p>
 		{/if}

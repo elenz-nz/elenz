@@ -569,7 +569,7 @@
 						{@render popBtn('price', 'wholesale price')}
 					</div>
 					<div class="plot">
-						<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={popped === 'price' ? popH : 250} showX={popped === 'price'} {xTicks} y={priceY} fmt={fmtTick} layers={priceLayers} note={highNote}
+						<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={popped === 'price' ? popH : 266} showX {xTicks} y={priceY} fmt={fmtTick} layers={priceLayers} note={highNote}
 							shade={view.mode === 'time' ? view.shade : []} marks={capMarks} bind:hover onpoint={point('price')} onleave={leave}
 							label="Prices at the grid nodes over the range" zero />
 						{#if canMove}
