@@ -7,7 +7,7 @@
 </script>
 
 <h2 id="what">What it does</h2>
-<p>Under the price tiles on the <a href="/now">Now</a> page, one line says whether the price is usual for the time of week, for example “$138 is about usual for a Saturday at 10:30 am”. Opened, it lists what is different from usual (wind, solar, hydro, gas and coal, peaking plants, demand, the HVDC link and the gap between the islands), each against its usual value, a 24-hour price chart against the usual range (which can be enlarged), and a possible price setter. It has three states:</p>
+<p>Under the price tiles on the <a href="/now">Now</a> page, one line says how the price compares with recent prices at this time, for example “$38/MWh is about what prices have been recently around this time on weekends”. Opened, it lists what is different from usual (wind, solar, hydro, gas and coal, peaking plants, demand, the HVDC link and the gap between the islands), each against its usual value, a 24-hour price chart against the usual range (which can be enlarged), and a possible price setter. It has three states:</p>
 <dl>
 	<dt>Quiet</dt>
 	<dd>Just the line and a “Why this price?” button.</dd>
@@ -18,8 +18,8 @@
 </dl>
 
 <h2 id="usual">What counts as usual</h2>
-<p>The history job keeps, for each of the week’s 336 half-hours (Monday 12:00 am = the first), the median and the 25th and 75th percentiles of the higher of the Haywards and Benmore prices, and the median of each factor, over the last 28 days of half-hourly history. It also keeps the median price over the past year, the <i>year median</i>, as a floor: when spilling hydro makes the usual price tiny, $20 against a usual $5 would otherwise count as four times usual.</p>
-<p class="formula">Typical = median of max(Haywards, Benmore) at the same half-hour of the week, last four weeks</p>
+<p>The history job keeps, for each of the week’s 336 half-hours (Monday 12:00 am = the first), the median and the 25th and 75th percentiles of the higher of the Haywards and Benmore prices, and the median of each factor, over the last 28 days of half-hourly history. For the price, each half-hour pools every half-hour on the same kind of day (weekday or weekend) within an hour of that time of day: 40 prices for a weekend half-hour, 100 for a weekday one. The same half-hour of the week alone gives only four prices, and two spill nights at a few cents among them made an ordinary $72 look six times usual (Saturday 11:30 pm, 17 October 2026: the four Saturdays were $0.02, $3.00, $20.76 and $66.55; pooled, the usual was $28). The panel doesn’t quote a multiple of usual for the same reason: it says prices are higher, or far above, what they have been recently around this time. It also keeps the median price over the past year, the <i>year median</i>, as a floor: when spilling hydro makes the usual price tiny, $20 against a usual $5 would otherwise count as four times usual.</p>
+<p class="formula">Typical = median of max(Haywards, Benmore) on the same kind of day (weekday or weekend), within an hour of this time of day, last four weeks</p>
 <p>Wind is the exception. It follows the weather, not the clock, so its usual value is its median over the whole four weeks, not at this half-hour. The panel then says how long it has been since wind was this low (or this high) before the current calm or windy spell, for example “Wind is lower than it has been for 5 days”, once that is at least {R.windDays} days; otherwise it says whether wind is above or below its four-week median. Wind now is its {R.avgMin}-minute average here.</p>
 
 <h2 id="rules">When it is highlighted or opens</h2>
@@ -47,8 +47,8 @@
 <h3 id="tested">How often, tested on 30 years</h3>
 <p>The rules were tested on every half-hour of the EA’s final prices at Haywards and Benmore from March 1997 to September 2026:</p>
 <ul>
-	<li><b>Highlighted</b> 11% of the time over the whole period, 13% since 2021 (9–22% a year): about 460 episodes a year, on 57% of days, a median of an hour each.</li>
-	<li><b>Open</b> 0.6–0.7% of the time: about 34 times a year since 2021, on 6.5% of days. It would have opened on 9 August 2021, 8 May 2024, 12 December 2024 and 4 August 2026, and through August 2024’s dry-year prices (by the {usd(R.openAny)} rule).</li>
+	<li><b>Highlighted</b> 11% of the time over the whole period, 12.5% since 2021 (8–19% a year): about 400 episodes a year, on 54% of days, a median of 1½ hours each.</li>
+	<li><b>Open</b> 0.6–0.7% of the time: about 33 times a year since 2021, on 6.2% of days. It would have opened on 9 August 2021, 8 May 2024, 12 December 2024 and 4 August 2026, and through August 2024’s dry-year prices (by the {usd(R.openAny)} rule).</li>
 	<li><b>Lows</b> never open it: prices were under $5 for 14% of the time since 2021 and 26% of 2026, and the longest run was 354 hours at $0.01, from 22 December 2025 to 6 January 2026.</li>
 </ul>
 <p>Live, the rules run on dispatch prices, which spike more than final prices; the rates are to be checked against these after a month.</p>

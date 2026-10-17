@@ -2,8 +2,9 @@
 
 History job (update(), every run, a few KV writes a day):
   hist/explain.json   "usual" for each half-hour of the week (NZ clock, Monday 0:00 = slot 0, 336 slots): the median,
-                      25th and 75th percentile of max(Haywards, Benmore) and the median of each factor below, over the
-                      last DAYS days of half-hourly history; plus `level`, the median of max(HAY, BEN) over the last
+                      25th and 75th percentile of max(Haywards, Benmore), pooled over the same kind of day (weekday or
+                      weekend) within POOL half-hours of the time of day (as analysis/price_triggers.py tests it), and
+                      the median of each factor below at that half-hour, over the last DAYS days of half-hourly history; plus `level`, the median of max(HAY, BEN) over the last
                       365 days. The page's rules compare the live price with both (analysis/price_triggers.py).
                       Wind follows the weather, not the clock, so it also gets `wind`: each region's median over the
                       whole four weeks and its half-hourly averages (for "lowest in N days"). `v` = VERSION.
@@ -91,7 +92,8 @@ def _r(x, dp=0):
     return [None if v != v else (round(float(v), dp) if dp else int(round(float(v)))) for v in x]
 
 
-VERSION = 2   # bump when hist/explain.json gains fields, so the history job rewrites it on its next run
+VERSION = 3   # bump when hist/explain.json changes, so the history job rewrites it on its next run
+POOL = 2      # the price's usual pools half-hours within this many trading periods either side (an hour)
 
 
 def baseline(frames, now=None):
@@ -104,10 +106,19 @@ def baseline(frames, now=None):
     g = w.groupby(slot(w.index))
     full = lambda s: s.reindex(range(SLOTS))   # noqa: E731
     med = g.median()
+    # the price's usual: pooled over the same kind of day (weekday or weekend) within an hour of the time of day, so 40
+    # to 100 prices rather than the same half-hour's four (two spill nights in four made $72 look "6x usual")
+    ws = slot(w.index)
+    kind, tod, v = ws // 48 >= 5, ws % 48, w.hi.to_numpy()
+    pq = np.full((SLOTS, 3), np.nan)
+    for k in range(SLOTS):
+        near = (kind == (k // 48 >= 5)) & (np.abs((tod - k % 48 + 24) % 48 - 24) <= POOL)
+        if near.sum() >= 20:
+            pq[k] = np.percentile(v[near], [50, 25, 75])
     out = {
         'v': VERSION, 'built': int(time.time() * 1000), 'end': int(end.timestamp() * 1000) + 1800000, 'days': DAYS,
         'level': round(level, 2), 'peakers': sorted(PEAKERS),
-        'hi': {'med': _r(full(med.hi), 2), 'p25': _r(full(g.hi.quantile(0.25)), 2), 'p75': _r(full(g.hi.quantile(0.75)), 2)},
+        'hi': {'med': _r(pq[:, 0], 2), 'p25': _r(pq[:, 1], 2), 'p75': _r(pq[:, 2], 2)},
         'gap': _r(full(med.gap), 2), 'hvdc': _r(full(med.hvdc)),
     }
     for r in REGIONS:

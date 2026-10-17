@@ -8,8 +8,9 @@
 // analysis/README.md, "Price explainer triggers"). Live they test the 30-minute average of the 5-minute dispatch
 // prices, and each state holds for 30 minutes after its condition ends.
 //
-// "Typical" is the median of max(Haywards, Benmore) for the same half-hour of the week over the last four weeks of
-// history; `level` the median over the last year (a floor, so a $20 price over a $5 typical doesn't count as 4×).
+// "Typical" is the median of max(Haywards, Benmore) over the last four weeks of history, on the same kind of day
+// (weekday or weekend) within an hour of the time of day; `level` the median over the last year (a floor, so a $20
+// price over a $5 typical doesn't count as 4×).
 
 export const RULES = {
   hlRatio: 1.5, hlLevel: 1.25,                // highlighted: ≥ 1.5× typical and ≥ 1.25× the year median
@@ -45,6 +46,12 @@ const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
 const PARTS = new Intl.DateTimeFormat('en-NZ', { timeZone: NZT, weekday: 'long', hour: 'numeric', minute: '2-digit', hour12: true });
 /** 'Saturday at 8:30 am' for the half-hour containing t. */
+const WDAY = new Intl.DateTimeFormat('en-NZ', { timeZone: NZT, weekday: 'short' });
+/** 'around this time on weekends' (or weekdays): what the price's usual is pooled over (ingest/explain.py POOL). */
+export function whenLabel(t) {
+  const d = WDAY.format(new Date(t));
+  return `around this time on ${d === 'Sat' || d === 'Sun' ? 'weekends' : 'weekdays'}`;
+}
 export function slotLabel(t) {
   const p = Object.fromEntries(PARTS.formatToParts(new Date(Math.floor(t / HALF) * HALF)).map((x) => [x.type, x.value]));
   return `${p.weekday} at ${p.hour}${p.minute === '00' ? '' : ':' + p.minute} ${String(p.dayPeriod).toLowerCase()}`;
@@ -172,7 +179,7 @@ export function explainNow(D, plantMeta = {}) {
     : isSplit ? 'split' : isHigh ? 'high' : now.low ? 'low' : 'usual';
   const ratio = now.ty ? now.hi / now.ty : null;
   const nearZero = now.hi < R.nearZero;   // both islands under $0.20
-  const label = slotLabel(t);
+  const label = slotLabel(t), when = whenLabel(t);
   const northDear = now.h >= now.b;
 
   // factors: New Zealand, or for a split the dearer island's (hydro from the South Island, where most of it is)
@@ -226,7 +233,10 @@ export function explainNow(D, plantMeta = {}) {
     verdict = `Prices split like this when the HVDC link, or the grid near it, can't carry any more power from the ${loIsl} Island, so each island is priced on its own. ${joined}`.trim();
   } else if (variant === 'high') {
     headline = tier === 'open' ? 'Why is the price high?' : 'Why is the price up?';
-    line = `Prices are up: ${money(now.hi)}/MWh over the last 30 minutes${ratio ? `, about ${ratio.toFixed(1)}× usual for a ${label}` : ''}.`;
+    // no "n× usual": the usual is a median of recent prices, and a multiple of it reads as more exact than it is
+    line = tier === 'open'
+      ? `Prices are high: ${money(now.hi)}/MWh over the last 30 minutes, far above what they have been recently ${when}.`
+      : `Prices are up: ${money(now.hi)}/MWh over the last 30 minutes, higher than they have been recently ${when}.`;
     verdict = (joined ? joined + ' ' : "None of the factors shown here is far from usual, so the cause may be one this page can't see yet: an outage, a grid constraint, reserves, or how generators have offered. ")
       + 'The price is set by the most expensive offer needed to meet demand in each 5 minutes.';
   } else if (variant === 'low') {
@@ -237,10 +247,10 @@ export function explainNow(D, plantMeta = {}) {
     verdict = (joined ? joined + ' ' : '') + 'When more low-cost generation is on offer than the country needs, mostly hydro water that would otherwise be spilled, and wind and solar that cost nothing to run, the price falls to a few dollars or less.';
   } else {
     // not unusual enough to flag, but say which way it leans: below usual, about usual, or above (under the floor)
-    const lean = !now.ty ? 'about usual' : now.hi < 0.67 * now.ty && now.ty - now.hi >= 10 ? 'below usual'
-      : now.hi > 1.3 * now.ty && now.hi - now.ty >= 10 ? 'a little above usual' : 'about usual';
+    const lean = !now.ty ? 'about' : now.hi < 0.67 * now.ty && now.ty - now.hi >= 10 ? 'below'
+      : now.hi > 1.3 * now.ty && now.hi - now.ty >= 10 ? 'a little above' : 'about';
     headline = 'Why this price?';
-    line = `${money(now.hi)}/MWh is ${lean} for a ${label}` + (lean === 'about usual' || !now.ty ? '.' : ` (usually ${money(now.ty)}).`);
+    line = `${money(now.hi)}/MWh is ${lean} what prices have been recently ${when}` + (lean === 'about' || !now.ty ? '.' : ` (usually about ${money(now.ty)}).`);
     verdict = (joined || 'Nothing shown here is far from normal.') + ' The price is set by the most expensive offer needed to meet demand in each 5 minutes.';
   }
 

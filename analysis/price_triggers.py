@@ -6,8 +6,7 @@ three states:
   highlighted  the line is outlined and asks to be opened: prices are up, the islands have split, or a new low
   open         the card opens by itself: extremes only. Lows never open it.
 
-The rules (RULES below) compare max(Haywards, Benmore) with "typical", the median price of the same half-hour of the
-week over the previous four weeks, and with "level", the median price over the previous 365 days (a floor, so a
+The rules (RULES below) compare max(Haywards, Benmore) with "typical" (typical() below) and with "level", the median price over the previous 365 days (a floor, so a
 $20 price over a $5 typical during spill doesn't count as "3×", and so the rules work in 1997 and 2026 dollars).
 Every state holds for 30 minutes after its condition ends (gaps of one trading period are bridged).
 
@@ -41,6 +40,41 @@ RULES = {
     # open by itself: at least 3× typical, 3× the past year's median and $300; or $800 at any time
     'open_ratio': 3, 'open_level': 3, 'open_floor': 300, 'open_any': 800,
 }
+POOL = 2   # typical pools the half-hours within this many trading periods either side (an hour)
+
+
+def typical(loc, hi, pool=POOL):
+    """Typical price for every trading period: median (and 25th, 75th percentiles) of hi over the previous four whole
+    weeks, on the same kind of day (weekend: Saturday and Sunday) and within `pool` half-hours of the same time of day
+    (wrapping round midnight): 40 prices for a weekend half-hour, 100 for a weekday one.
+
+    pool=None: the same half-hour of the week only, four prices (the first version, until 18 Oct 2026). Two spill
+    nights at a few cents in four made an ordinary $72 look "6× usual" (Saturday 11:30 pm, 17 Oct 2026: the four
+    Saturdays were $0.02, $3.00, $20.76 and $66.55, median $11.88; pooled, $40.86)."""
+    week = (loc.normalize() - pd.to_timedelta(loc.dayofweek, unit='D')).asi8
+    tod = np.asarray(loc.hour * 2 + (loc.minute >= 30), dtype=int)
+    if pool is None:
+        key, nk = np.asarray(loc.dayofweek, dtype=int) * 48 + tod, 336
+        M = np.eye(nk, dtype=bool)
+    else:
+        key, nk = np.asarray(loc.dayofweek >= 5, dtype=int) * 48 + tod, 96
+        near = np.abs((np.arange(48)[:, None] - np.arange(48)[None, :] + 24) % 48 - 24) <= pool
+        M = np.zeros((nk, nk), dtype=bool)
+        M[:48, :48] = M[48:, 48:] = near
+    hi = np.asarray(hi, dtype=float)
+    weeks = np.unique(week)
+    out = np.full((len(hi), 3), np.nan)
+    for i in range(3, len(weeks)):
+        prev = (week >= weeks[max(0, i - 4)]) & (week < weeks[i])
+        pk, pv = key[prev], hi[prev]
+        rows = np.flatnonzero(week == weeks[i])
+        stats = np.full((nk, 3), np.nan)
+        for k in np.unique(key[rows]):
+            v = pv[M[k][pk]]
+            if len(v) >= (3 if pool is None else 20):
+                stats[k] = np.percentile(v, [50, 25, 75])
+        out[rows] = stats[key[rows]]
+    return out
 
 
 def load():
@@ -60,12 +94,9 @@ def load():
     loc = d.index.tz_convert(NZ)
     d['hi'] = d[['hay', 'ben']].max(axis=1)
     d['lo'] = d[['hay', 'ben']].min(axis=1)
-    # typical: median of the same half-hour of the week (local clock) over the previous four weeks, this week excluded
-    week = loc.normalize() - pd.to_timedelta(loc.dayofweek, unit='D')
-    slot = loc.dayofweek * 48 + loc.hour * 2 + (loc.minute >= 30)
-    piv = d.hi.groupby([week, slot]).mean().unstack()
-    typ = piv.shift(1).rolling(4, min_periods=3).median().stack()
-    d['typ'] = typ.reindex(pd.MultiIndex.from_arrays([week, slot])).to_numpy()
+    # typical: pooled (typical()); and the first version, the same half-hour of the week only, for comparison
+    d['typ'] = typical(loc, d.hi)[:, 0]
+    d['typ_slot'] = typical(loc, d.hi, None)[:, 0]
     # level: median over the previous 365 days (needs 60 days of data)
     d['level'] = d.hi.rolling('365D', min_periods=48 * 60).median().shift(1)
     d = d.dropna(subset=['typ', 'level'])
@@ -147,7 +178,12 @@ def main():
     ], all_years, recent)
 
     print('\nWhy the floors (alternatives, same measures):')
+    rs = d.hi / d.typ_slot.clip(lower=1)
     table(d, [
+        ('First typical (same half-hour of the week only): highlighted', hold(((rs >= RULES['hl_ratio']) & (d.hi >= RULES['hl_level'] * d.level))
+                                                                              | ((d.gap > RULES['split_gap']) & (d.gap_rel > RULES['split_rel'])))),
+        ('First typical: opens', hold(((rs >= RULES['open_ratio']) & (d.hi >= RULES['open_level'] * d.level) & (d.hi >= RULES['open_floor']))
+                                      | (d.hi >= RULES['open_any']))),
         ('Ratio alone: ≥1.5× typical', hold(d.r >= 1.5)),
         ('Ratio alone: ≥2× typical', hold(d.r >= 2)),
         ('First draft: ≥2× typical and ≥ $250 (opens)', hold((d.r >= 2) & (d.hi >= 250))),

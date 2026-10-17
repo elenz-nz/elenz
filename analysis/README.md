@@ -182,13 +182,14 @@ reproduces Genesis's figures to a few points in most quarters (FY23 Q1 24 agains
 Planned for /now: a "Why is the price high?" card, always there but folded into one line under the price tiles. It
 is highlighted (outlined, asking to be opened) when prices are unusual and opens by itself only at extremes. Tested
 on every trading period of final prices at Haywards and Benmore, Mar 1997 to Sep 2026 (`price_fetch.py` first).
-"Typical" is the median of the same half-hour of the week over the previous four weeks; "year median" the median
+"Typical" is the median over the previous four weeks of every half-hour on the same kind of day (weekday or weekend)
+within an hour of the same time of day (since 18 Oct 2026; before, the same half-hour of the week alone, see below); "year median" the median
 over the previous 365 days. Each state holds 30 minutes after its condition ends. "Recent" is 2021-Sep 2026.
 
 | State | Rule | Time, all / recent | Episodes a year, recent |
 | --- | --- | --- | --- |
-| Highlighted | max(HAY, BEN) ≥ 1.5× typical and ≥ 1.25× year median; or the islands > $50 and > 25% apart; or a new low (under $5 after 24 h without one, first 2 h only) | 11.2% / 13.4% (8.8-21.8% a year since 2021) | 460 (on 57% of days, median 1 h) |
-| Open by itself | ≥ 3× typical and ≥ 3× year median and ≥ $300; or ≥ $800 at any time | 0.6% / 0.7% | 34 (about 3 a month, on 6.5% of days) |
+| Highlighted | max(HAY, BEN) ≥ 1.5× typical and ≥ 1.25× year median; or the islands > $50 and > 25% apart; or a new low (under $5 after 24 h without one, first 2 h only) | 10.9% / 12.5% (8.0-19.3% a year since 2021) | 397 (on 54% of days, median 1.5 h) |
+| Open by itself | ≥ 3× typical and ≥ 3× year median and ≥ $300; or ≥ $800 at any time | 0.6% / 0.7% | 33 (about 3 a month, on 6.2% of days) |
 
 - **The year-median floor matters.** On the ratio alone, 1.5× typical fires 24.6% of the recent time: spill makes
   typical tiny, so $20 against $5 counts as 4×. The first draft's opening rule (2× typical and $250) opened 98 times a
@@ -200,6 +201,12 @@ over the previous 365 days. Each state holds 30 minutes after its condition ends
 - **Lows never open it.** Under $5 is 14.4% of the recent time (25.7% of 2026; nearly always both islands), runs
   last a median 1.5 h but 7.5 h at the 90th percentile, and the longest was 354 h at $0.01, 22 Dec 2025 to 6 Jan 2026.
   Highlighting every low would highlight 14% of the time on its own; a new low is ~45 times a year.
+- **Typical pooled** (18 Oct 2026). The same half-hour of the week alone is four prices, and in spill season two of
+  them can be a few cents: on 17 Oct 2026 the last four Saturdays at 11:30 pm were $0.02, $3.00, $20.76 and $66.55
+  (median $11.88), so $72 read as "6.1× usual". Pooling the same kind of day within an hour (40-100 prices) gave $28
+  ($40.86 for 10 pm-midnight). Over 30 years it changes little: highlighted 13.6% → 12.5% since 2021, opening 34 → 33
+  times a year, every event above still caught, episodes a little longer (less flicker). The panel no longer quotes a
+  multiple of usual.
 - **Built** (17 Oct 2026): `ingest/explain.py` (usual values, offers, the live block) and `site/src/lib/now/explain.js`
   (these rules, on the 30-minute average of dispatch prices, and the wording).
 - **Live use:** these are half-hourly final prices. /now has 5-minute dispatch prices, which spike more and can be

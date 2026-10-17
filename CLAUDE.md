@@ -60,8 +60,8 @@ This repository is public: never commit keys, tokens or personal details.
   islands for the many retired or local connection points in the metered files (from EMI's NetworkSupplyPointsTable).
   The build warns about any Generation_MD code not in the table.
   `explain.py`: the /now price explainer's data. The history job (`update()`, after the months) writes
-  `hist/explain.json` (each factor's and the price's usual value for each half-hour of the week over the last 28 days of
-  `hist/hh`, and the past year's median price) when history has moved on, and `hist/offers.json` (gzipped: the newest
+  `hist/explain.json` (each factor's usual value for each half-hour of the week over the last 28 days of `hist/hh`, the
+  price's pooled over the same kind of day within an hour (`POOL`), and the past year's median price) when history has moved on, and `hist/offers.json` (gzipped: the newest
   day of EMI `BidsAndOffers/Offers`, ~290 MB, reduced to each plant's offer stack per trading period, final offers only;
   ~2 minutes) when a newer day is published, both within `WRITE_BUDGET`. The live job reads both (two KV reads) and adds
   `explain` to tracker.json (usual values for the last 26 hours and this half-hour, factor values now, running peakers in
