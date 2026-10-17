@@ -120,6 +120,9 @@
 "Kawerau Mill CoGen":{
 "owner":"Other generators"
 },
+"Kawerau TG1/TG2":{
+"owner":"Other generators"
+},
 "Kinleith":{
 "owner":"Contact"
 },
@@ -341,6 +344,9 @@
 "owner":"Meridian",
 "scheme":"Waitaki",
 "river":5
+},
+"West Wind":{
+"owner":"Meridian"
 },
 "West Wind 1":{
 "owner":"Meridian"

@@ -34,8 +34,8 @@
 	const geoRows = Object.entries(GEO_YEARS as Record<string, number[]>);
 	const assumed = Object.entries(GEO_ASSUMED as Record<string, number>).filter(([k]) => k in GEO_NAMES);
 	const GAS_NOTES: Record<string, string> = {
-		'Otahuhu B': 'Combined cycle, 1999–2015', 'New Plymouth': 'Steam, gas and some oil, to 2008',
-		'Otahuhu A': 'Open-cycle turbines', 'Southdown': 'Combined cycle, to 2016', 'Te Awamutu': 'Dairy factory cogeneration, to 2007',
+		'Ōtāhuhu B': 'Combined cycle, 1999–2015', 'New Plymouth': 'Steam, gas and some oil, to 2008',
+		'Ōtāhuhu A': 'Open-cycle turbines', 'Southdown': 'Combined cycle, to 2016', 'Te Awamutu': 'Dairy factory cogeneration, to 2007',
 	};
 </script>
 
