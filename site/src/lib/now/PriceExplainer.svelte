@@ -149,7 +149,7 @@
 			</div>
 			<p class="pe-foot">
 				<span>Built from the 5-minute dispatch feed, compared with the last four weeks of history. Offers are published the day after, so the price setter is a best guess.</span>
-				<a href="/about#m-explain">How this works</a>
+				<a href="/methods/price-explainer">How this works</a>
 			</p>
 		</div>
 	{/if}

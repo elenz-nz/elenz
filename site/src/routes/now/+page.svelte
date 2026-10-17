@@ -125,7 +125,7 @@
 					<span title="North Island reference price, Haywards"><b class="isl">HAY</b>{now ? money(now.regions.NI.price ?? 0) : '–'}<small>/MWh</small></span>
 					<span title="South Island reference price, Benmore"><b class="isl">BEN</b>{now ? money(now.regions.SI.price ?? 0) : '–'}<small>/MWh</small></span>
 				</span>
-				<span class="k-sub"><a class="k-link" href="/about#m-price">Spot market, every 5 minutes</a></span>
+				<span class="k-sub"><a class="k-link" href="/methods/prices">Spot market, every 5 minutes</a></span>
 			</div>
 			<div class="kpi">
 				<span class="k-lbl">HVDC</span>
@@ -135,7 +135,7 @@
 			<div class="kpi">
 				<span class="k-lbl">Emissions intensity</span>
 				<span class="k-val">{nz ? fmt(nz.co2) : '–'}<small>g CO₂e/kWh</small></span>
-				<span class="k-sub"><a class="k-link" href="/about#m-co2">CO₂ per kWh generated</a></span>
+				<span class="k-sub"><a class="k-link" href="/methods/emissions">CO₂ per kWh generated</a></span>
 			</div>
 			<div class="kpi">
 				<span class="k-lbl">Embedded solar <span class="tag">est.</span></span>

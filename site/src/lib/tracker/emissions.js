@@ -9,8 +9,8 @@
 // cogeneration ~0.5–0.57). Applied to the dispatch data, these reproduce Genesis's reported Huntly emissions to
 // within ±5% in most quarters (−0.4% overall).
 
-const RANKINE_HEAT_RATE = 11.2;     // GJ per MWh
-const COAL = 91.8, GAS = 54.1;      // kg CO₂e per GJ
+export const RANKINE_HEAT_RATE = 11.2;     // GJ per MWh
+export const COAL = 91.8, GAS = 54.1;      // kg CO₂e per GJ
 
 // Share of Huntly Rankine fuel that was coal, by Genesis financial quarter (FY ends 30 June: FY21 Q1 = Jul–Sep 2020).
 // From FY21: Genesis performance reports. Add each new quarter as Genesis reports it (about 3 weeks after it ends).
@@ -19,7 +19,7 @@ const COAL = 91.8, GAS = 54.1;      // kg CO₂e per GJ
 // metered output (MBIE counts Glenbrook's cogeneration, on gases from NZ Steel's coal-fed ironmaking, as coal), over the
 // Rankines' metered output (Generation_MD). Over FY21-FY25 this reproduces Genesis's own figures to within a few
 // points in most quarters. Quarters with under 100 GWh of Rankine output keep the quarter before's share.
-const RANKINE_COAL_SHARE_MBIE = [
+export const RANKINE_COAL_SHARE_MBIE = [
   ['FY98 Q1', 0.48], ['FY98 Q2', 0.57], ['FY98 Q3', 0.49], ['FY98 Q4', 0.56],
   ['FY99 Q1', 0.72], ['FY99 Q2', 0.72], ['FY99 Q3', 0.25], ['FY99 Q4', 0.37],
   ['FY00 Q1', 0.37], ['FY00 Q2', 0.32], ['FY00 Q3', 0.31], ['FY00 Q4', 0.27],
@@ -44,7 +44,7 @@ const RANKINE_COAL_SHARE_MBIE = [
   ['FY19 Q1', 0.87], ['FY19 Q2', 0.84], ['FY19 Q3', 0.94], ['FY19 Q4', 0.81],
   ['FY20 Q1', 0.95], ['FY20 Q2', 0.93], ['FY20 Q3', 0.79], ['FY20 Q4', 0.59],
 ];
-const RANKINE_COAL_SHARE_GENESIS = [
+export const RANKINE_COAL_SHARE_GENESIS = [
   ['FY21 Q1', 0.95], ['FY21 Q2', 0.90], ['FY21 Q3', 0.99], ['FY21 Q4', 0.96],
   ['FY22 Q1', 0.87], ['FY22 Q2', 0.29], ['FY22 Q3', 0.86], ['FY22 Q4', 0.93],
   ['FY23 Q1', 0.15], ['FY23 Q2', 0.13], ['FY23 Q3', 0.43], ['FY23 Q4', 0.11],
@@ -88,7 +88,7 @@ export function rankineQuarter(t) {
 // 2024 (as used by TIMES-NZ). Each year uses the newest figures published for it or before it; years before 2020
 // use 2020's. Stations reinject more CO₂ each year (Ngāwhā, Te Huka, Ngā Tamariki), so add new years as published
 // (each November, at the NZ Geothermal Workshop).
-const GEO_YEARS = {
+export const GEO_YEARS = {
   //               2020  2022  2023
   wairakei:      [  18,   19,   21],
   te_mihi:       [  38,   37,   34],
@@ -103,13 +103,13 @@ const GEO_YEARS = {
   te_ahi_o_maui: [  49,   60,   61],
   ngawha_oec4:   [ 313,  313,   95],   // commissioned 2021; until 2023 the field's pre-reinjection figure (2020, OEC1–3)
 };
-const GEO_YEAR_COLS = [2020, 2022, 2023];
+export const GEO_YEAR_COLS = [2020, 2022, 2023];
 // stations without published figures yet: estimates (TIMES-NZ assumptions), until the NZGA publishes them
-const GEO_ASSUMED = { tauhara: 32, te_huka_3: 0, topp2: 0,
+export const GEO_ASSUMED = { tauhara: 32, te_huka_3: 0, topp2: 0,
   // Kawerau pulp mill cogeneration (KAW0112 ONU0): bioenergy since BUILD 5 (Oct 2026); kept at zero in case a file
   // built before then still lists it as geothermal
   kawerau_mill: 0 };
-const GEO_DEFAULT = 57;   // fleet average, CY2023: for anything unmatched
+export const GEO_DEFAULT = 57;   // fleet average, CY2023: for anything unmatched
 
 // dispatch plant name → station (confirmed by the owner, 15 Oct 2026): 'Wairakei' is the whole site (A, B and binary);
 // 'Ngāwhā B' (OEC4) is the only dispatched Ngāwhā plant (Ngāwhā A, ~20 MW, isn't); TOPP1 and GDL aren't dispatched;
@@ -147,8 +147,8 @@ export function geoEf(name, t) {
 // also has plants that have closed, much more or less efficient than that; they get factors from their typical heat
 // rates at 54.1 kg CO₂e/GJ (estimates, not reported figures): combined cycle ~7.4 GJ/MWh, conventional steam and
 // open-cycle turbines ~11-11.5.
-const GAS_FLEET = 0.46;
-const GAS_PLANT = {
+export const GAS_FLEET = 0.46;
+export const GAS_PLANT = {
   'Otahuhu B': 0.40,       // combined cycle, 1999-2015
   'New Plymouth': 0.60,    // steam, gas and some oil, to 2008
   'Otahuhu A': 0.62,       // open-cycle turbines
@@ -156,7 +156,7 @@ const GAS_PLANT = {
   'Te Awamutu': 0.45,      // dairy factory cogeneration, to 2007
 };
 const TCC_END = Date.UTC(2022, 5, 1);   // Taranaki Combined Cycle (in 'Stratford' with the peakers) closed mid-2022
-const STRATFORD_TCC = 0.40;
+export const STRATFORD_TCC = 0.40;
 
 /** Gas factor (t CO₂e/MWh) for a plant at time t: a closed plant's own, otherwise the fleet average. */
 export function gasEf(name, t) {

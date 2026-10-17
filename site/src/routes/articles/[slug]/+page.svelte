@@ -48,7 +48,7 @@
 		{#if S}<SeriesNav name={S.name} dek={S.dek} parts={S.parts} current={a.slug} prev={S.prev} next={S.next} />{/if}
 
 		<footer class="a-foot">
-			<p>Figures are from the Electricity Authority's market data as shown on the <a href="/tracker">tracker</a>; <a href="/about#sources">About</a> explains how each series is built and which are estimates.</p>
+			<p>Figures are from the Electricity Authority's market data as shown on the <a href="/tracker">tracker</a>; <a href="/methods">Data and methods</a> explains how each series is built and which are estimates.</p>
 		</footer>
 	</main>
 

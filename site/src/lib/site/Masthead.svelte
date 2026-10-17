@@ -42,7 +42,7 @@
 			<a href="/now" aria-current={page.url.pathname.startsWith('/now') ? 'page' : undefined}>Now</a>
 			<a href="/tracker" aria-current={page.url.pathname.startsWith('/tracker') ? 'page' : undefined}>Tracker</a>
 			{#if ARTICLES_PUBLIC}<a href="/articles" aria-current={page.url.pathname.startsWith('/articles') ? 'page' : undefined}>Articles</a>{/if}
-			<a href="/about" aria-current={page.url.pathname.startsWith('/about') ? 'page' : undefined}>About</a>
+			<a href="/about" aria-current={page.url.pathname.startsWith('/about') || page.url.pathname.startsWith('/methods') ? 'page' : undefined}>About</a>
 		</nav>
 		<button type="button" class="info-btn theme-btn" onclick={toggleTheme} aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'} title={dark ? 'Light mode' : 'Dark mode'}>
 			{#if dark}

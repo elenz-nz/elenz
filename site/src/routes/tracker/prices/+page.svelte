@@ -505,7 +505,7 @@
 			</button>
 			<div class="info-pop" id="p-about" role="region" aria-label="About this data" bind:this={infoBox} hidden={!infoOpen}>
 				<p>Prices from the Electricity Authority: its real-time dispatch feed for the live week (dispatch prices, every 5 minutes), and its final prices for history, usually published the next day.</p>
-				<a href="/about#m-price">How the price charts are built</a>
+				<a href="/methods/prices">How the price charts are built</a>
 			</div>
 		</div>
 	</nav>
