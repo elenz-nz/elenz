@@ -473,6 +473,27 @@ export function mountTracker(D, hooks = {}) {
     ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
     ctx.lineWidth = 2; ctx.strokeStyle = C['--surface']; ctx.stroke();
   }
+  // a label in the panel colour's halo, so it reads over lines and fills (as on the Prices tab)
+  function haloText(ctx, text, x, y) {
+    ctx.save(); ctx.lineJoin = 'round'; ctx.lineWidth = 3; ctx.strokeStyle = C['--surface']; ctx.strokeText(text, x, y);
+    ctx.fillStyle = C['--ink-2']; ctx.fillText(text, x, y); ctx.restore();
+  }
+  // a range's high or low: a dot on the point and a short label ("High $412") with no time, since the cursor's
+  // tooltip or time chip gives that. The high's label sits beside the point; the low's above it (a stack's trough
+  // has empty space above it, filled area below). Kept inside the plot.
+  function extreme(ctx, F, j, v, text, colour, low = false) {
+    if (j < 0 || v !== v) return;
+    const x = F.X(j), y = F.Y(v);
+    ctx.font = FONT; const tw = ctx.measureText(text).width;
+    ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+    let lx, ly;
+    if (low) { lx = x - tw / 2; ly = y - 12; }
+    else { lx = x + 10 + tw < F.x1 ? x + 9 : x - 9 - tw; ly = y; }
+    lx = Math.max(F.x0 + 4, Math.min(F.x1 - tw, lx));
+    ly = Math.max(F.top + 6, Math.min(F.bottom - 6, ly));
+    haloText(ctx, text, lx, ly);
+    dot(ctx, x, y, colour);
+  }
   function roundRect(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
 
   // ---------- charts ----------
@@ -528,6 +549,14 @@ export function mountTracker(D, hooks = {}) {
       ctx.font = FONT; ctx.fillStyle = C['--ink-2']; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
       ctx.fillText(`Nameplate ${fmt(cap)} MW`, F.x1, y - 3);
     }
+    if (n > 1 && !full) {
+      let jh = 0, jl = 0; for (let j = 1; j < n; j++) { if (pos[j] > pos[jh]) jh = j; if (pos[j] < pos[jl]) jl = j; }
+      const val = v => pct ? (v < 10 ? v.toFixed(1) : Math.round(v)) + '%' : `${fmt(v)} MW`;
+      if (pos[jh] > 0.5) {
+        extreme(ctx, F, jh, pos[jh], `High ${val(pos[jh])}`, C['--ink']);
+        if (pos[jl] < pos[jh] * 0.98) extreme(ctx, F, jl, pos[jl], `Low ${val(pos[jl])}`, C['--ink'], true);
+      }
+    }
     GEN = { F, tops };
     cursor(ctx, F);
     if (state.hover != null && state.hoverBy !== 'mouse') {  // the mouse tooltip shows the time itself
@@ -554,14 +583,7 @@ export function mountTracker(D, hooks = {}) {
     line(ctx, X, Y, V.pSI, alpha(C['--p-si'], aSI));
     line(ctx, X, Y, V.pNI, alpha(C['--p-ni'], aNI));
     const prim = r === 'SI' ? V.pSI : V.pNI; let jm = 0; for (let j = 1; j < V.n; j++) if (prim[j] > prim[jm]) jm = j;
-    const lbl = `High ${money(prim[jm])} · ${chip(jm)}`;
-    ctx.font = FONT; const tw = ctx.measureText(lbl).width, x = X(jm), y = Y(prim[jm]);
-    ctx.fillStyle = C['--ink-2']; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
-    // beside the high point, kept inside the plot (clear of the axis labels on narrow screens)
-    let lx = x + 10 + tw < F.x1 ? x + 9 : x - 9 - tw;
-    lx = Math.max(F.x0 + 4, Math.min(F.x1 - tw, lx));
-    ctx.fillText(lbl, lx, Math.max(F.top + 6, y));
-    if (state.hover == null) dot(ctx, x, y, r === 'SI' ? C['--p-si'] : C['--p-ni']);
+    if (V.n) extreme(ctx, F, jm, prim[jm], `High ${money(prim[jm])}`, r === 'SI' ? C['--p-si'] : C['--p-ni']);
     cursor(ctx, F);
     if (state.hover != null) { const j = state.hover; dot(ctx, X(j), Y(V.pSI[j]), alpha(C['--p-si'], aSI)); dot(ctx, X(j), Y(V.pNI[j]), alpha(C['--p-ni'], aNI)); }
   }

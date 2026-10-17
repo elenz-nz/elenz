@@ -41,6 +41,7 @@
 	let bandKey = $state('HAY');
 	let heatKey = $state('HAY');
 	let hover = $state(-1);
+	let hoverBy = $state<'mouse' | 'touch' | 'key' | null>(null); // touch and keys get the time chip, the mouse its tooltip
 	let view = $state<any>(null); // what the charts draw (see build below)
 	let busy = $state(false);
 	let viewError = $state('');
@@ -286,7 +287,7 @@
 		let j = 0;
 		for (let i = 1; i < a.length; i++) if (a[i] > a[j]) j = i;
 		if (scale === 'capped' && a[j] > CAP) return null;   // clipped: the marks at the top label it
-		return { i: j, v: a[j], text: `High ${money(a[j])} · ${chip(j)}`, tok: NODE[k].tok };
+		return { i: j, v: a[j], text: `High ${money(a[j])}`, tok: NODE[k].tok };
 	});
 	// the tooltip's rows for one chart at one point
 	function tipRows(chart: string, i: number) {
@@ -309,6 +310,7 @@
 	let leaveTimer: ReturnType<typeof setTimeout> | undefined;
 	const point = (chart: string) => (e: PointerEvent, i: number) => {
 		clearTimeout(leaveTimer);
+		hoverBy = e.pointerType === 'touch' ? 'touch' : 'mouse';
 		if (e.pointerType === 'touch') { tipS = null; return; }
 		tipS = { chart, i, x: e.clientX, y: e.clientY };
 	};
@@ -398,6 +400,7 @@
 	function keys(e: KeyboardEvent) {
 		if (!view) return;
 		const by = e.shiftKey ? 10 : 1, cur = at < 0 ? view.n : at;
+		hoverBy = 'key';
 		if (e.key === 'ArrowLeft') { hover = Math.max(0, cur - by); e.preventDefault(); }
 		else if (e.key === 'ArrowRight') { hover = Math.min(view.n - 1, at < 0 ? view.n - 1 : at + by); e.preventDefault(); }
 		else if (e.key === 'Home') { hover = 0; e.preventDefault(); }
@@ -569,7 +572,7 @@
 						{@render popBtn('price', 'wholesale price')}
 					</div>
 					<div class="plot">
-						<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={popped === 'price' ? popH : 266} showX {xTicks} y={priceY} fmt={fmtTick} layers={priceLayers} note={highNote}
+						<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={popped === 'price' ? popH : 266} showX {xTicks} y={priceY} fmt={fmtTick} layers={priceLayers} note={highNote} stamp={at >= 0 && hoverBy !== 'mouse' ? chip(at) : null}
 							shade={view.mode === 'time' ? view.shade : []} marks={capMarks} bind:hover onpoint={point('price')} onleave={leave}
 							label="Prices at the grid nodes over the range" zero />
 						{#if canMove}

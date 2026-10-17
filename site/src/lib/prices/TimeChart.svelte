@@ -6,7 +6,8 @@
 	//   bars    { values, tok, opacity }      one bar per point (long ranges)
 	//   line    { values, tok, width, dash }  a line; NaN leaves a gap
 	// shade: [a, b) index ranges shaded behind everything (islands priced apart); marks: labels at the top edge;
-	// note: a label beside one point (the range's high), with a dot when there's no cursor.
+	// note: a label beside one point (the range's high) with a dot on it; stamp: the cursor's time in a chip at the top
+	// (touch and keys, where there's no tooltip), as on the Generation tab.
 	// onpoint(e, i) fires as the pointer moves (for the page's tooltip), onleave when it leaves.
 	import { firstAtOrAfter } from '#lib/tracker/series.js';
 
@@ -15,11 +16,11 @@
 
 	let {
 		t, t0, t1, height = 200, y, fmt = (v: number) => String(v), layers = [], shade = [], marks = [], hover = $bindable(-1),
-		xTicks = [], showX = false, label = '', zero = false, note = null, onpoint, onleave
+		xTicks = [], showX = false, label = '', zero = false, note = null, stamp = null, onpoint, onleave
 	}: {
 		t: ArrayLike<number>; t0: number; t1: number; height?: number; y: Scale; fmt?: (v: number) => string; layers?: Layer[];
 		shade?: [number, number][]; marks?: { i: number; label: string }[]; hover?: number; xTicks?: { t: number; label: string; minor?: boolean }[];
-		showX?: boolean; label?: string; zero?: boolean; note?: { i: number; v: number; text: string; tok?: string } | null;
+		showX?: boolean; label?: string; zero?: boolean; note?: { i: number; v: number; text: string; tok?: string } | null; stamp?: string | null;
 		onpoint?: (e: PointerEvent, i: number) => void; onleave?: (e: PointerEvent) => void;
 	} = $props();
 
@@ -144,15 +145,20 @@
 		{/each}
 		{#if note && note.i >= 0 && note.i < n && note.v === note.v}
 			<text class="note" x={noteX} y={Math.max(yTop + 10, Math.min(yBot - 4, Y(note.v) + 4))}>{note.text}</text>
-			{#if hx === null}<circle cx={X(t[note.i])} cy={Y(note.v)} r="3.2" style="stroke: var({note.tok ?? '--ink'})" class="dot"></circle>{/if}
+			<circle cx={X(t[note.i])} cy={Y(note.v)} r="4" style="fill: var({note.tok ?? '--ink'})" class="dot"></circle>
 		{/if}
 		{#if hx !== null}
-			<line class="cursor" x1={hx} x2={hx} y1={yTop} y2={yBot}></line>
+			<line class="cursor" x1={Math.round(hx) + 0.5} x2={Math.round(hx) + 0.5} y1={yTop} y2={yBot}></line>
 			{#each layers as ly}
 				{#if ly.kind === 'line' && ly.dot !== false && ly.values && ly.values[hover] === ly.values[hover]}
-					<circle cx={hx} cy={Y(ly.values[hover])} r="3.2" style="stroke: var({ly.tok})" class="dot"></circle>
+					<circle cx={hx} cy={Y(ly.values[hover])} r="4" style="fill: var({ly.tok})" class="dot"></circle>
 				{/if}
 			{/each}
+		{/if}
+		{#if stamp && hx !== null}
+			{@const sw = stamp.length * 6.6 + 12}
+			{@const sx = Math.max(x0, Math.min(x1 - sw, hx - sw / 2))}
+			<g class="stamp"><rect x={sx} y={yTop} width={sw} height="18" rx="4"></rect><text x={sx + 6} y={yTop + 13}>{stamp}</text></g>
 		{/if}
 		{#if showX}
 			{#each ticks as tk}
@@ -172,8 +178,11 @@
 	.grid { stroke: var(--grid); }
 	.zero { stroke: var(--ink-2); stroke-width: 1; }
 	.shade { fill: var(--warn-bg); }
-	.cursor { stroke: var(--ink); stroke-dasharray: 3 3; }
-	.dot { fill: var(--surface); stroke-width: 2; }
+	/* cursor, dots and time chip match the Generation tab's canvas charts */
+	.cursor { stroke: var(--ink-2); stroke-width: 1; }
+	.dot { stroke: var(--surface); stroke-width: 2; }
+	.stamp rect { fill: var(--ink); }
+	.stamp text { fill: var(--surface); font-size: 11px; font-weight: 600; }
 	.xt { stroke: var(--line); }
 	.xl.minor { opacity: 0.75; }
 	.mark { fill: var(--o1); }
