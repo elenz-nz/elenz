@@ -53,7 +53,9 @@ Mangahao,hydro,NI,,,42.0,register,EA plant register (DispatchedGenerationPlant.c
 Maraetai,hydro,NI,,,360.0,register,EA plant register (DispatchedGenerationPlant.csv),
 Matahina,hydro,NI,1998-09-01,,80,override,EA plant register (DispatchedGenerationPlant.csv); https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand,"register double-counts 2012-14 (two connections); counted from 1998-09, the first month the history has its output"
 McKee,gas,NI,2012-09-01,,100.0,register,EA plant register (DispatchedGenerationPlant.csv),"metered output from 2012-09, before the register commissioning date 2013-01"
-Mill Creek,wind,NI,2015-09-01,,60.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 2015-09, the first month the history has its output (in service from 2014-01)"
+Mill Creek,wind,NI,2014-05-01,2014-06-30,10,override,EA reconciled injection (Volumes/Reconciliation); EA plant register (DispatchedGenerationPlant.csv),commissioning: peaks 4.5 MW (May 2014) and 9 MW (Jun)
+Mill Creek,wind,NI,2014-07-01,2014-08-31,40,override,EA reconciled injection (Volumes/Reconciliation); EA plant register (DispatchedGenerationPlant.csv),commissioning: peaks 30 MW (Jul 2014) and 40 MW (Aug)
+Mill Creek,wind,NI,2014-09-01,,60.0,override,EA reconciled injection (Volumes/Reconciliation); EA plant register (DispatchedGenerationPlant.csv),26 x 2.3 MW (59.8 MW); full output from Sep 2014; the history has it from May 2014 (reconciliation data until Aug 2015)
 Mokai,geo,NI,1999-10-01,2005-04-30,55,override,"https://en.wikipedia.org/wiki/Mokai_Power_Station; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
 Mokai,geo,NI,2005-05-01,2007-05-31,95,override,"https://en.wikipedia.org/wiki/Mokai_Power_Station; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",+40 MW in 2005
 Mokai,geo,NI,2007-06-01,,112,override,https://en.wikipedia.org/wiki/Mokai_Power_Station; EA plant register (DispatchedGenerationPlant.csv),increased to ~110-113 MW in 2007

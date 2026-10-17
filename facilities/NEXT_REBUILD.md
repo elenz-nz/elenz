@@ -5,20 +5,25 @@ These changes touch files in the history's rebuild fingerprint (`mapping_hash()`
 them starts a rebuild of every month (~4 days at the KV write budget). Bundle them and push them together, and never
 while a rebuild is still running (check `/data/history/progress.json`: `rebuild_left` empty).
 
-They are prepared on the branch `next-rebuild`; merge it when the current rebuild has finished, then tick them off here.
+All four are ready on the branch `next-rebuild` (17 Oct 2026). To run them: once the current rebuild has finished,
+merge the branch into `main` (on GitHub: open a pull request from `next-rebuild` and merge it), which starts the
+rebuild by itself. When it has finished, delete this file's done items, the old-name entries at the end of
+`[plant_owners]` in `overrides.toml`, and `GAS_ALIAS` in `site/src/lib/tracker/emissions.js`.
 
-## 1. Mill Creek, Apr 2014 to Aug 2015 (added 17 Oct 2026)
+## 1. Mill Creek, May 2014 to Aug 2015 (added 17 Oct 2026)
 
 Mill Creek (Meridian, 60 MW wind at Wilton, WIL0331) is missing from the history for its first 17 months: it isn't in
 `Generation_MD` (which has it from Jan 2020) or `Embedded_generation` (from Sep 2015). The EA's reconciliation data has
 it: `Volumes/Reconciliation/YYYY/ReconciledInjectionAndOfftake_YYYYMM_*.csv.gz` (from 2005, ~20 MB a month) shows
-Meridian's injection at WIL0331 on network CKHK (Aug 2014: 10.1 GWh, peak 40 MW half-hour). Plan, on the branch:
-- `metered.py`: a third kind of `metered_plants.csv` row, code `R:<participant>`, read from the reconciliation file
-  (injection at that POC by that participant, latest revision of the month) into `Q|POC PARTICIPANT` columns, only
-  for months a row is active; `complete()` refetches a month that should have them and doesn't.
-- `metered_plants.csv`: `WIL0331,R:MERI,Mill Creek,wind,NI,2014-03,2015-08,...`
-- Then `plant_capacity.csv`: Mill Creek's start back to its first output, and its note.
-- Check: the months' totals against Meridian's reported Mill Creek output, and no double count in Sep 2015.
+Meridian's injection at WIL0331 on network CKHK: commissioning output from May 2014 (peaks 4.5, 9, 30, 40 MW in
+May-Aug), full output from Sep 2014; in Sep 2015 it matches the embedded meter to 0.1% (23.36 vs 23.35 GWh). Done on
+the branch:
+- `metered.py`: a third kind of `metered_plants.csv` row, code `R:<trader>`, read from the month's latest
+  reconciliation file into `Q|POC TRADER` columns, only for months such a row is active; `complete()` refetches a
+  month that should have them and doesn't (marker `mq`). Tested on Aug 2014 (10.11 GWh) and Sep 2015 (no double count).
+- `metered_plants.csv`: `WIL0331,R:MERI,Mill Creek,wind,NI,2014-05,2015-08`.
+- `plant_capacity.csv`: Mill Creek from May 2014, 10 then 40 MW while commissioning, 60 MW from Sep 2014.
+- After the rebuild: check May 2014 - Aug 2015 on the 1-year view, and that demand at Wilton didn't step.
 
 ## 2. Kawerau TG1/TG2 (added 17 Oct 2026)
 

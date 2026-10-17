@@ -143,7 +143,7 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   (~5-6 weeks behind), the daily dispatch files (from 10 Sep 2020) for the weeks since and to fill what the metering
   lacks; bump its `BUILD` number to rebuild every month after changing how months are built.
   `facilities/metered_plants.csv` maps each Generation_MD generator code (and, `*`, each listed embedded meter's
-  residual over Generation_MD) to a plant, fuel and island, with date ranges and shares; `metered_islands.csv` gives
+  residual over Generation_MD; `R:<trader>`, that trader's injection at the point from the monthly reconciliation file, only where neither file has the plant: Mill Creek May 2014-Aug 2015) to a plant, fuel and island, with date ranges and shares; `metered_islands.csv` gives
   islands for the many retired or local connection points in the metered files (from EMI's NetworkSupplyPointsTable).
   The build warns about any Generation_MD code not in the table.
   `explain.py`: the /now price explainer's data. The history job (`update()`, after the months) writes

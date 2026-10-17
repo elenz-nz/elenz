@@ -8,7 +8,7 @@ fill in plants the metering lacks. Each run fetches anything published that isn'
 time budget and the day's KV write allowance, so the first run starts a backfill that later runs finish.
 
 Stored (Cloudflare KV in GitHub Actions, data/store locally), one set per NZ calendar month:
-  hist/state/YYYY-MM.csv.gz  half-hourly compact state: the metered columns (metered.py: M|, E|, X|, I|, J|, MT, mg,
+  hist/state/YYYY-MM.csv.gz  half-hourly compact state: the metered columns (metered.py: M|, E|, X|, I|, J|, Q|, MT, mg, mq,
                              me) where published, and from Sep 2020 unit MW, island load, Tiwai, reference prices (state.py
                              columns averaged over each trading period), n = 5-minute intervals present (0-6),
                              G|<point>, D|<point> = satellite global and diffuse irradiance (W/m², Open-Meteo,
@@ -456,14 +456,14 @@ def dispatch_days(s):
     return set(s.index[s['n'].fillna(0) > 0].tz_convert(NZ).date)
 
 
-METERED_COLS = ('M|', 'E|', 'X|', 'I|', 'J|')
+METERED_COLS = ('M|', 'E|', 'X|', 'I|', 'J|', 'Q|')
 
 
 def merge_metered(s, mf):
     """A month's state with its metered columns replaced by a newly fetched set (rows the dispatch data lacks are added)."""
     if s is None:
         return mf.sort_index()
-    old = [c for c in s.columns if c[:2] in METERED_COLS or c in ('MT', 'mg', 'me')]
+    old = [c for c in s.columns if c[:2] in METERED_COLS or c in ('MT', 'mg', 'me', 'mq')]
     return s.drop(columns=old).join(mf, how='outer').sort_index()
 
 

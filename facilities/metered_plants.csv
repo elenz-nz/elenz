@@ -133,6 +133,7 @@ WDV1101,te_apiti,Te Āpiti,wind,,,,,,,
 WHI2201,whirinaki,Whirinaki,diesel,,,,,,,
 WHU1101,tauhei_solar_farm,Tauhei Solar Farm,solar,,,,,,,
 WIL0331,mill_creek,Mill Creek,wind,,,,,,,
+WIL0331,R:MERI,Mill Creek,wind,NI,2014-05,2015-08,,,,"Meridian's reconciled injection at WIL0331 (Volumes/Reconciliation): Mill Creek's first months, before the embedded meter starts (Sep 2015, when the two agree to 0.1%)"
 WIL0331,*,Mill Creek,wind,,,,,,,
 WKM2201,mokai,Mokai,geo,,,,,,,
 WKM2201,whakamaru,Whakamaru,hydro,,,,,,,
