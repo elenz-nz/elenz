@@ -14,6 +14,10 @@ Sources (EMI, CC BY 4.0), one file per month:
   Metered_data/Grid_export             half-hourly kWh leaving the grid at every connection point (Oct 1996 on)
   Metered_data/Grid_import             half-hourly kWh entering the grid at every connection point (Oct 2000 on)
   Metered_data/Grid_export_to_Tiwai    the smelter (Oct 1996 on)
+  Volumes/Reconciliation               monthly injection and offtake by connection point, network and trader (2005 on,
+                                       ~20 MB gzipped): read only for months a metered_plants.csv row with code
+                                       R:<trader> is active (Mill Creek's first months, Apr 2014 - Aug 2015, are in
+                                       neither file above)
 
 State columns for a month (half-hourly, trading period start, UTC), alongside the dispatch columns (state.py):
   M|POC code   Generation_MD MW by connection point and generator code (mapped to plants later, so fixes to
@@ -22,6 +26,8 @@ State columns for a month (half-hourly, trading period start, UTC), alongside th
   X|NI, X|SI   Grid_export MW by island; I|NI, I|SI Grid_import MW by island (blank before Oct 2000)
   J|NI, J|SI   Generation_MD MW at connection points Grid_import doesn't cover (see demand())
   MT           Tiwai MW
+  Q|POC TRADER reconciled injection MW, for the R:<trader> rows of metered_plants.csv; mq 1 once the month's
+               reconciliation file has been read
   mg           1 where Generation_MD covers the trading period
 
 Generation per plant (generation()): each Generation_MD code goes to its plant (metered_plants.csv); where an
@@ -38,8 +44,10 @@ Generation_MD stands in for every connection point it lacks. Over Sep 2020 - Sep
 data's island load within 1-2%.
 """
 import csv
+import gzip
 import io
 import os
+import re
 from datetime import date
 
 import numpy as np
@@ -49,6 +57,7 @@ from common import BLOB, FACILITIES, NZ, connection_islands, island_of
 
 GMD = 'Datasets/Wholesale/Generation/Generation_MD'
 MD = 'Datasets/Wholesale/Metered_data'
+RECON = 'Datasets/Wholesale/Volumes/Reconciliation'
 FIRST_MONTH = date(1997, 8, 1)          # Generation_MD's first month
 GRID_IMPORT_FROM = date(2000, 10, 1)    # Grid_import's first month
 EMBEDDED_FROM = date(1998, 10, 1)       # Embedded_generation's first month
@@ -76,7 +85,7 @@ def read_emi(raw):
 
 def table():
     """facilities/metered_plants.csv rows: poc, code (Generation_MD generator code, '*' = the embedded meter at the
-    POC), plant ('-' = ignore), fuel, isl, from/to (YYYY-MM, inclusive), share (of the code's output; default 1)."""
+    POC, 'R:<trader>' = that trader's reconciled injection at the POC), plant ('-' = ignore), fuel, isl, from/to (YYYY-MM, inclusive), share (of the code's output; default 1)."""
     with open(os.path.join(FACILITIES, 'metered_plants.csv'), encoding='utf-8') as f:
         rows = list(csv.DictReader(f))
     for r in rows:
@@ -108,6 +117,36 @@ def embedded_pocs():
     return sorted({r['poc'] for r in table() if r['code'] == '*'})
 
 
+def recon_rows(month):
+    """metered_plants.csv rows read from the reconciliation data that are active in month 'YYYY-MM'."""
+    return [r for r in table() if r['code'].startswith('R:') and _active(r, month)]
+
+
+def fetch_recon(get, m, rows, log=print):
+    """Reconciled injection (MW) at the rows' connection points by their traders, for month m: the month's latest
+    revision of ReconciledInjectionAndOfftake. None if it isn't published."""
+    tag = f'{m:%Y%m}'
+    listing = get(f'{BLOB}?restype=container&comp=list&prefix={RECON}/{m.year}/ReconciledInjectionAndOfftake_{tag}_')
+    names = sorted(re.findall(r'<Name>([^<]+)</Name>', listing.decode())) if listing else []
+    if not names:
+        log(f'  {tag}: no reconciliation file')
+        return None
+    raw = get(f'{BLOB}/{names[-1]}')
+    if raw is None:
+        return None
+    d = pd.read_csv(io.BytesIO(gzip.decompress(raw)), usecols=['PointOfConnection', 'Participant', 'TradingDate',
+                                                                'TradingPeriod', 'FlowDirection', 'KilowattHours'])
+    want = {(r['poc'], r['code'][2:]) for r in rows}
+    pairs = np.array([(p, t) in want for p, t in zip(d.PointOfConnection, d.Participant)], dtype=bool)
+    d = d[(d.FlowDirection == 'Injection').to_numpy() & pairs]
+    if d.empty:
+        return pd.DataFrame({'mq': []})
+    day = pd.to_datetime(d.TradingDate.astype(str).str[:10], format='%Y-%m-%d')
+    d = d.assign(t=day.dt.tz_localize(NZ).dt.tz_convert('UTC') + pd.to_timedelta((d.TradingPeriod - 1) * 30, unit='min'),
+                 key='Q|' + d.PointOfConnection + ' ' + d.Participant, mw=d.KilowattHours / 500.0)
+    return d.pivot_table(index='t', columns='key', values='mw', aggfunc='sum')
+
+
 def fetch_month(get, m, log=print):
     """Metered columns for month m (a date, first of the month), or None if Generation_MD isn't published yet."""
     tag = f'{m:%Y%m}'
@@ -130,6 +169,14 @@ def fetch_month(get, m, log=print):
         e = e[(e.flow_direction == 'I') & e.poc.isin(embedded_pocs())]
         if len(e):
             out.append(e.pivot_table(index='t', columns='poc', values='mw', aggfunc='sum').add_prefix('E|'))
+
+    rr = recon_rows(f'{m:%Y-%m}')
+    if rr:
+        q = fetch_recon(get, m, rr, log)
+        if q is not None:
+            out.append(covered.rename('mq').to_frame())
+            if len(q.columns):
+                out.append(q)
 
     unknown = set()
     import_pocs = set()
@@ -164,7 +211,7 @@ def fetch_month(get, m, log=print):
     start = pd.Timestamp(m, tz=NZ).tz_convert('UTC')
     end = pd.Timestamp(date(m.year + (m.month == 12), m.month % 12 + 1, 1), tz=NZ).tz_convert('UTC')
     s = s[(s.index >= start) & (s.index < end)]
-    gen_cols = [c for c in s.columns if c[:2] in ('M|', 'E|')]
+    gen_cols = [c for c in s.columns if c[:2] in ('M|', 'E|', 'Q|')]
     s[gen_cols] = s[gen_cols].fillna(0.0)
     return s
 
@@ -179,6 +226,8 @@ def complete(s, m):
     if m >= GRID_IMPORT_FROM and ('I|NI' not in s or s['I|NI'].isna().all()):
         return False
     if m >= EMBEDDED_FROM and ('me' not in s or not (s['me'] == 1).any()):
+        return False
+    if recon_rows(f'{m:%Y-%m}') and ('mq' not in s or not (s['mq'] == 1).any()):
         return False
     return True
 
@@ -214,6 +263,11 @@ def generation(s, month, log=print):
         gmd_at[poc] = gmd_at.get(poc, 0) + series
         for r in rs:
             add(r, series)
+    # reconciled injection by trader (R:<trader> rows), for plants in neither file above
+    for c in [c for c in s.columns if c.startswith('Q|')]:
+        poc, trader = c[2:].split(' ', 1)
+        for r in by_code.get((poc, 'R:' + trader), []):
+            add(r, s[c].fillna(0))
     # embedded meters: each listed one's reading over Generation_MD at its connection point, by plant; a plant whose
     # embedded reading for the month peaks above 1.4 times its max_mw is halved (Trustpower's embedded meters reported
     # double values until Jul 2005: Kaimai, Rotokawa, Tararua ... peaking at twice their capacity)
