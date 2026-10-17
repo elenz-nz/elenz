@@ -43,8 +43,8 @@ HWA1102,whareroa,Fonterra Dairy - Whareroa,gas,,,,,,,
 HWB0331,Waipori,Deep Stream (Waipori A),hydro,,,,,,,
 JRD1101,junctionroad,Junction Road,gas,,,,,,,
 KAW0111,kawerau,Kawerau (Te Ahi O Maui),geo,,,,,,,
-KAW0111,kawerau_geo,Kawerau (TOPP1),geo,,,,,8,,binary plant on the Kawerau field (not dispatched)
-KAW0111,*,Kawerau (TOPP1),geo,,,2017-12,,,,
+KAW0111,kawerau_geo,Kawerau TG1/TG2,geo,,,,,6,,binary plants on the Kawerau field (1989 and 1993; not dispatched)
+KAW0111,*,Kawerau TG1/TG2,geo,,,2017-12,,,,
 KAW0111,*,Kawerau (Te Ahi O Maui),geo,,2018-01,,,,,
 KAW0112,norskeskog,Kawerau Mill CoGen,bio,,,,,,,pulp mill cogeneration (see overrides.toml)
 KAW1101,kawerau_new,Kawerau,geo,,,,,,,
@@ -97,9 +97,9 @@ OHG1101,patea_unit_2,-,,,,,,,,
 OHG1101,patea_unit_3,-,,,,,,,,
 OHK2201,ohakuri,Ōhakuri,hydro,,,,,,,
 OKI2201,ohaaki,Ōhaaki,geo,,,,,,,
-OTA1101,otahuhu_a,Otahuhu A,gas,,,,,100,,
-OTA2221,otahuhu_a,Otahuhu A,gas,,,,,,,
-OTA2202,otahuhu_b,Otahuhu B,gas,,,,,404,,combined cycle (closed 2015)
+OTA1101,otahuhu_a,Ōtāhuhu A,gas,,,,,100,,
+OTA2221,otahuhu_a,Ōtāhuhu A,gas,,,,,,,
+OTA2202,otahuhu_b,Ōtāhuhu B,gas,,,,,404,,combined cycle (closed 2015)
 PPI2201,poihipi,Poihipi,geo,,,,,,,
 ROT1101,wheao_flaxy,Wheao and Flaxy,hydro,,,,,,,
 ROX1101,roxburgh,Roxburgh,hydro,,,,,,,
@@ -150,8 +150,8 @@ WRK0331,*,Te Huka,geo,,2009-01,,,,,
 WRK2201,wairakei,Wairakei,geo,,,,,,,
 WTK0111,waitaki,Waitaki,hydro,,,,,,,
 WVY1101,waipipi,Waipipi,wind,,,,,,,
-WWD1102,west_wind,West Wind 1,wind,,,,,,,
-WWD1103,west_wind,West Wind 2,wind,,,,,,,
+WWD1102,west_wind,West Wind,wind,,,,,,,
+WWD1103,west_wind,West Wind,wind,,,,,,,
 RKA0111,*,Rotokawa,geo,NI,,,,,35,old embedded code (to Mar 2008); flat output; Rotokawa moves to WRK0331 in 2008
 NGA0331,*,Ngāwhā,geo,NI,,,,,12,old embedded code (to Mar 2008); Ngāwhā moves to KOE0331
 KMI0331,*,Kaimai,hydro,NI,,,,,42,old embedded code (to Mar 2008); Kaimai moves to TGA0331

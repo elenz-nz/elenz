@@ -149,19 +149,22 @@ export function geoEf(name, t) {
 // open-cycle turbines ~11-11.5.
 export const GAS_FLEET = 0.46;
 export const GAS_PLANT = {
-  'Otahuhu B': 0.40,       // combined cycle, 1999-2015
+  'Ōtāhuhu B': 0.40,       // combined cycle, 1999-2015
   'New Plymouth': 0.60,    // steam, gas and some oil, to 2008
-  'Otahuhu A': 0.62,       // open-cycle turbines
+  'Ōtāhuhu A': 0.62,       // open-cycle turbines
   'Southdown': 0.45,       // combined cycle, to 2016
   'Te Awamutu': 0.45,      // dairy factory cogeneration, to 2007
 };
 const TCC_END = Date.UTC(2026, 2, 31, 11);   // Taranaki Combined Cycle (in 'Stratford' with the peakers) closed in Mar 2026 (Contact's FY26 results; derated 2022-23)
 export const STRATFORD_TCC = 0.40;
 
+// history built before Oct 2026 spells them without macrons
+const GAS_ALIAS = { 'Otahuhu A': 'Ōtāhuhu A', 'Otahuhu B': 'Ōtāhuhu B' };
+
 /** Gas factor (t CO₂e/MWh) for a plant at time t: a closed plant's own, otherwise the fleet average. */
 export function gasEf(name, t) {
   if (name === 'Stratford' && t < TCC_END) return STRATFORD_TCC;
-  return GAS_PLANT[name] ?? GAS_FLEET;
+  return GAS_PLANT[GAS_ALIAS[name] ?? name] ?? GAS_FLEET;
 }
 
 /** A plant's own factor for fuels that vary by plant (geothermal, gas), or null for the others. */

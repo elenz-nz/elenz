@@ -31,7 +31,7 @@
 	<dt>Embedded solar</dt>
 	<dd>The same model with each month’s installed capacity: none before the registry starts in August 2013, ERA5 reanalysis sunshine for 2013–15, the satellite from 2016. See <a href="/methods/embedded-solar">embedded solar</a>.</dd>
 </dl>
-<p>Plants that have closed are included: New Plymouth, Otahuhu A and B, Southdown, Te Awamutu, and Taranaki Combined Cycle (within Stratford).</p>
+<p>Plants that have closed are included: New Plymouth, Ōtāhuhu A and B, Southdown, Te Awamutu, and Taranaki Combined Cycle (within Stratford).</p>
 
 <h2 id="seam">Where the sources hand over</h2>
 <p>Over September 2020 to September 2026, where both exist, dispatch and metered figures agree closely (half-hourly national correlation 0.999 every month), but dispatch totals run 1–2% above metered ones every year: wind 3–4%, hydro 1–2%, geothermal, gas and coal within 2%. That is most likely because dispatch measures output at the generator and metering at the grid connection. The site uses each as published rather than scaling one to the other, so where the history switches from metered to dispatch data, about six weeks back, totals can step up slightly.</p>
