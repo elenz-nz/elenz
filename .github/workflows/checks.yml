@@ -1,5 +1,5 @@
 # Checks on every push and pull request: the ingest code (syntax and undefined names, then a smoke test on a
-# committed one-hour sample of real dispatch data) and the website (type check and build).
+# committed one-hour sample of real dispatch data) and the website (type check, tests and build).
 #
 # Cloudflare deploys main on its own as soon as it's pushed, so these don't block a deploy: a red cross here means
 # check the change straight away (the live job runs new ingest code within 5 minutes).
@@ -46,4 +46,6 @@ jobs:
           cache-dependency-path: site/package-lock.json
       - run: npm ci
       - run: npm run check
+      - name: Tests (the tracker's address and share links)
+        run: npm test
       - run: npm run build

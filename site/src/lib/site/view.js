@@ -1,77 +1,81 @@
-// The tracker's shared view: region, range, interval and end date, kept in the address
-// (e.g. /tracker/prices?region=NI&range=7d&int=30m&end=2024-08-14), so the Generation and Prices tabs show the same
-// window and any view can be linked or bookmarked. The tab links carry the address across (TrackerTabs.svelte).
+// The tracker's view in the address, so any view can be linked or bookmarked: region, range, interval and end date
+// are shared by the Generation and Prices tabs, and each tab adds its own settings (grouping, drill-down, chart
+// options) and the selected point. What each key means, and the parsing, is in #lib/site/viewurl.js.
 //
-// Region, range and the interval are also remembered in localStorage ('elenz-view') for a plain visit; the date never
-// is, so coming back later opens on the latest data. The interval is only shared once the viewer has picked one: until
-// then each tab uses its own default for the range (Generation's 1-year view defaults to weeks, Prices to days).
-// The address is replaced, not pushed, so Back leaves the page rather than stepping through every setting.
+// Opening a page: an address with a query is a link, and opens exactly what it says (anything it leaves out is the
+// default). A plain visit opens on what this browser last used: region, range and a chosen interval in localStorage
+// ('elenz-view', shared), each tab's own settings in its own key; never the date or the drill-down, so coming back
+// later opens on the latest data at the top level.
+//
+// Writing: the address is replaced as settings change, so Back leaves the page rather than stepping through every
+// setting; a drill-down step pushes a new entry (push), so Back steps back out of it. Each tab's last address is also
+// kept for this browser tab (sessionStorage), so switching tabs and back restores the drill-down (TrackerTabs.svelte).
 
-import { replaceState } from '$app/navigation';
-import { KEY, nzOffset } from '#lib/tracker/series.js';
+import { replaceState, pushState } from '$app/navigation';
+import { readQuery, writeQuery, sharedOnly, REGIONS, RANGES, INTS, OLD_RANGE } from './viewurl.js';
 
-const REGIONS = ['NZ', 'NI', 'SI'];
-const RANGES = ['1d', '3d', '7d', '30d', '1y', 'all'];
-const INTS = ['5m', '30m', '1d', '1w', '1mo', '1yr'];
-const OLD_RANGE = { 288: '1d', 864: '3d', 2016: '7d' };
-const DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
+export { midnightOf, addDays, ymd, endOfDay, slug, describe, shareUrl, shareLinks, SITE_URL } from './viewurl.js';
 
-// ---------- NZ days ----------
-const DAY = 864e5;
-/** Local midnight at or before t. */
-export const midnightOf = (t) => { const k = KEY.day(t) * DAY; return k - nzOffset(k - nzOffset(k)); };
-/** Whole days later or earlier (a day is 23-25 hours at the clock changes). */
-export const addDays = (m, k) => midnightOf(m + k * DAY + 3 * 36e5);
-/** 'YYYY-MM-DD' of the NZ day containing t. */
-export function ymd(t) {
-  const d = new Date(t + nzOffset(t));
-  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
-}
-/** The end of a window that shows up to and including the NZ day 'YYYY-MM-DD': the midnight after it. */
-export function endOfDay(s) {
-  const m = DATE.exec(s || '');
-  if (!m) return null;
-  return addDays(midnightOf(Date.UTC(+m[1], +m[2] - 1, +m[3], 12) - 12 * 36e5), 1);
-}
+const TAB_KEY = 'elenz-tab:';
 
-// ---------- reading and writing ----------
-/** The view to open with: the address first, then what this browser remembers. end is a time (ms) or null. */
+/** The view to open with. Returns the shared settings (end and t as times, or null), `link` (true when the address
+ *  has a query: the page then takes its own settings from `q` only) and `q`, everything the address holds. */
 export function readView() {
-  const v = { region: 'NZ', range: '1d', int: null, end: null };
-  let stored = null;
-  try { stored = JSON.parse(localStorage.getItem('elenz-view') || 'null'); } catch { /* storage blocked */ }
-  if (stored) {
-    if (REGIONS.includes(stored.region)) v.region = stored.region;
-    const r = OLD_RANGE[stored.range] || stored.range;
-    if (RANGES.includes(r)) v.range = r;
-    if (stored.intPicked && INTS.includes(stored.int)) v.int = stored.int;
+  /** @type {{ region: string, range: string, int: string | null, end: number | null, t: number | null, link: boolean, q: Record<string, any> }} */
+  const v = { region: 'NZ', range: '1d', int: null, end: null, t: null, link: false, q: {} };
+  const search = typeof location === 'undefined' ? '' : location.search;
+  if (search.length > 1) {
+    const q = readQuery(search);
+    Object.assign(v, { link: true, q });
+    if (q.region) v.region = q.region;
+    if (q.range) v.range = q.range;
+    if (q.int) v.int = q.int;
+    if (q.end != null) v.end = q.end;
+    if (q.t != null) v.t = q.t;
+    return v;
   }
-  const q = typeof location === 'undefined' ? null : new URLSearchParams(location.search);
-  if (q) {
-    if (REGIONS.includes(q.get('region'))) v.region = q.get('region');
-    if (RANGES.includes(q.get('range'))) { v.range = q.get('range'); v.int = null; }
-    if (INTS.includes(q.get('int'))) v.int = q.get('int');
-    v.end = endOfDay(q.get('end'));
-  }
+  try {
+    const stored = JSON.parse(localStorage.getItem('elenz-view') || 'null');
+    if (stored) {
+      if (REGIONS.includes(stored.region)) v.region = stored.region;
+      const r = OLD_RANGE[stored.range] || stored.range;
+      if (RANGES.includes(r)) v.range = r;
+      if (stored.intPicked && INTS.includes(stored.int)) v.int = stored.int;
+    }
+  } catch { /* storage blocked */ }
   return v;
 }
 
-/** Records the view: the address always, and region, range and interval in this browser. extra: other fields the
- *  Generation tab keeps in 'elenz-view' (grouping, MW or %). int: null while the tab is on its own default. */
-export function writeView({ region, range, int, end }, extra = {}) {
+/** Records the view: the address always, and region, range and interval in this browser.
+ *  query: this tab's own settings for the address (see viewurl.js); store: other fields the Generation tab keeps in
+ *  'elenz-view' (grouping, MW or %); push: a new history entry (a drill-down step) rather than replacing this one.
+ *  int: null while the tab is on its own default. */
+export function writeView({ region, range, int, end }, { query = {}, store = {}, push = false } = {}) {
   try {
     const old = JSON.parse(localStorage.getItem('elenz-view') || 'null') || {};
-    const keep = { ...old, ...extra, region, range };
+    const keep = { ...old, ...store, region, range };
     if (int) { keep.int = int; keep.intPicked = true; } else { delete keep.intPicked; }
     localStorage.setItem('elenz-view', JSON.stringify(keep));
   } catch { /* storage blocked: the address still has it */ }
   if (typeof location === 'undefined') return;
-  const q = new URLSearchParams();
-  if (region !== 'NZ') q.set('region', region);
-  if (range !== '1d') q.set('range', range);
-  if (int) q.set('int', int);
-  if (end != null) q.set('end', ymd(end - 1));
-  const url = location.pathname + (q.size ? '?' + q : '') + location.hash;
+  const qs = writeQuery({ region, range, int, end, ...query });
+  const url = location.pathname + (qs ? '?' + qs : '') + location.hash;
+  try { sessionStorage.setItem(TAB_KEY + location.pathname.replace(/\/$/, ''), qs); } catch { /* storage blocked */ }
   if (url === location.pathname + location.search + location.hash) return;
-  try { replaceState(url, {}); } catch { history.replaceState(history.state, '', url); }   // before the router starts
+  const go = push ? pushState : replaceState;
+  // before the router has started (the first moments after loading) SvelteKit refuses: use the browser's own
+  Promise.resolve().then(() => go(url, {})).catch(() => history[push ? 'pushState' : 'replaceState'](history.state, '', url));
+}
+
+/** The address for another tab: this page's shared settings with that tab's own from its last visit in this browser
+ *  tab (its drill-down, grouping or chart options). */
+export function tabHref(path) {
+  const shared = sharedOnly(readQuery(location.search));
+  let own = {};
+  try {
+    const last = readQuery(sessionStorage.getItem(TAB_KEY + path) || '');
+    own = Object.fromEntries(Object.entries(last).filter(([k]) => !['region', 'range', 'int', 'end', 't'].includes(k)));
+  } catch { /* storage blocked */ }
+  const qs = writeQuery({ ...shared, ...own });
+  return path + (qs ? '?' + qs : '');
 }

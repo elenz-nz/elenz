@@ -4,8 +4,9 @@
 import { FUELS } from './fuels.js';
 import { efAt, plantEf, BY_PLANT } from './emissions.js';
 import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTotal } from './series.js';
-import PLANT_META from './plants.json';
-import { readView, writeView } from '#lib/site/view.js';  // owner and hydro scheme per plant (ingest/plant_meta.py)
+import PLANT_META from './plants.json';  // owner and hydro scheme per plant (ingest/plant_meta.py)
+import { readView, writeView, slug, describe, shareLinks } from '#lib/site/view.js';
+import { readQuery } from '#lib/site/viewurl.js';
 export { nzOffset, tzName };
 
 // A model: one segment (series.js) plus what the charts read. NIs/SIs are the island series (same objects).
@@ -149,20 +150,40 @@ export function mountTracker(D, hooks = {}) {
   // intPicked: the viewer chose the interval (shared with the Prices tab); otherwise it's this tab's default for the range
   const state = { region: 'NZ', range: '1d', end: null, kind: 'live', int: '5m', intPicked: false, view: 'detailed', unit: 'mw', hover: null, hoverBy: null,
                   hidden: new Set(), drill: { ...TOP_LEVEL }, open: new Set(), filter: '' };
-  // region, range, interval and date: the address first, then this browser's last view (#lib/site/view.js)
-  const init = readView();
+  // the view to open with: a link's address, or this browser's last view on a plain visit (#lib/site/view.js)
+  const init = readView(), q = init.q;
   state.region = init.region;
   if (init.int && Object.hasOwn(INTS, init.int)) { state.int = init.int; state.intPicked = true; }
   let saved = null;  // a long range or a past date needs history loaded first (see below)
   if (RANGES[init.range].model === 'live' && init.end == null) state.range = init.range;
   else saved = { range: init.range, end: init.end };
-  try {
+  if (init.link) {
+    if (q.by && Object.hasOwn(VIEWS, q.by)) state.view = q.by;
+    if (q.unit === 'pct') state.unit = 'pct';
+  } else try {
     const s = JSON.parse(localStorage.getItem('elenz-view') || 'null');
     if (s && Object.hasOwn(VIEWS, s.view)) state.view = s.view;
     if (s?.unit === 'pct') state.unit = 'pct';
   } catch (e) {}
   if (!RANGES[state.range].ints.includes(state.int)) { state.int = RANGES[state.range].def || RANGES[state.range].ints[0]; state.intPicked = false; }
-  const save = () => writeView({ region: state.region, range: state.range, int: state.intPicked ? state.int : null, end: state.end }, { view: state.view, unit: state.unit });
+  // a link's drill-down and point wait for the window they belong to: a long range or past date loads its history
+  // first (a retired plant is only in the history), so they're applied by the rebuild after that (waiting: until then)
+  let linked = init.link && (q.group || q.fuel || q.plant || init.t != null) ? { group: q.group, fuel: q.fuel, plant: q.plant, t: init.t } : null;
+  let waiting = !!saved;
+  // the drill-down in the address: plants and plant sets (scheme, owner, other plants of a fuel) by slug
+  const groupKey = id => id == null ? null : /^[sox]:/.test(id) ? slug(id.slice(2)) : id;
+  const ownQuery = () => {
+    const d = state.drill, l = linked;
+    return { by: state.view, unit: state.unit, ...(l ? { group: l.group, fuel: l.fuel, plant: l.plant }
+      : { group: groupKey(d.group), fuel: d.fuel, plant: d.plant ? slug(d.plant) : null }) };
+  };
+  const shared = () => ({ region: state.region, range: state.range, int: state.intPicked ? state.int : null, end: state.end });
+  // push: a drill-down step, so Back steps out of it. The browser tab's title says what the view shows.
+  const save = (push = false) => {
+    writeView(shared(), { store: { view: state.view, unit: state.unit }, query: ownQuery(), push });
+    const d = state.drill;
+    document.title = describe('generation', { ...shared(), ...ownQuery() }, { plant: d.plant, group: d.group ? groupById(d.group)?.name : null }) + ' · ELENZ';
+  };
 
   // ---------- time helpers ----------
   const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -356,7 +377,23 @@ export function mountTracker(D, hooks = {}) {
   const busLabel = k => { const poc = k.split(' ')[0]; const kv = parseInt(poc.slice(3, 6), 10); return `${kv} kV · ${poc}`; };
   const level = () => state.drill.plant ? 'unit' : state.drill.fuel ? 'plant' : state.drill.group ? 'fuel' : 'top';
   function drillTo(d) {
-    state.drill = d; state.hidden.clear(); state.filter = ''; relayer(); buildSummary(); render();
+    linked = null; state.drill = d; state.hidden.clear(); state.filter = ''; relayer(); buildSummary(); render(); save(true);
+  }
+  // a link's drill-down, once its window is built (rebuild); anything that no longer exists is dropped there
+  function fromLink(l) {
+    const d = { ...TOP_LEVEL };
+    if (l.group) {
+      const g = (VIEWS[state.view].groups || []).find(x => x.id === l.group) || (V.sets || (V.sets = plantSets())).find(x => slug(x.id.slice(2)) === l.group);
+      if (g) d.group = g.id;
+    }
+    if (l.fuel && FUEL[l.fuel]) d.fuel = l.fuel;
+    if (l.plant) { const p = M.plants.find(x => slug(x.name) === l.plant); if (p) d.plant = p.name; }
+    return d;
+  }
+  // the point containing time t, or null
+  function pointAt(t) {
+    for (let j = V.n - 1; j >= 0; j--) if (V.t[j] <= t) return t < V.t[j] + V.hrs[j] * 36e5 ? j : null;
+    return null;
   }
 
   // ---------- colours ----------
@@ -861,7 +898,9 @@ export function mountTracker(D, hooks = {}) {
   // ---------- orchestration ----------
   let raf = 0;
   function drawAll() { drawGen(); drawPrice(); drawDemand(); drawHvdc(); drawCo2(); drawRen(); }
-  function render() { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { drawAll(); updateSummary(); }); }
+  // lastT: the last point the cursor was on (the mouse leaves the charts to reach the Share button), for "Mark this time"
+  let lastT = null;
+  function render() { if (state.hover != null && V) lastT = V.t[state.hover]; cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { drawAll(); updateSummary(); }); }
   const intsFor = (r, kind) => RANGES[r].model === 'live' && kind !== 'live' ? RANGES[r].past : RANGES[r].ints;
   // local midnight at or before t; whole days later or earlier (a day is 23-25 hours at the clock changes)
   const midnightOf = t => { const k = KEY.day(t) * DAY; return k - nzOffset(k - nzOffset(k)); };
@@ -920,9 +959,11 @@ export function mountTracker(D, hooks = {}) {
     return end - R.days * DAY >= models.live.t[0] - 6e4 ? 'live' : 'hh';
   }
   let pending = 0;
-  // keepInt: keep a chosen interval across a range change; wantInt: the interval to open on (from the address)
-  async function setView(r, end = state.end, keepInt = false, wantInt = null) {
+  // keepInt: keep a chosen interval across a range change; wantInt: the interval to open on (from the address);
+  // opening: the view a link or this browser's last visit opens on, after which a link's drill-down applies
+  async function setView(r, end = state.end, keepInt = false, wantInt = null, opening = false) {
     const R = RANGES[r];
+    if (!opening) waiting = false;   // the viewer moved on before the linked view loaded: its drill-down applies now
     if (R.fixed || (end != null && end >= endOfToday())) end = null;
     const kind = kindFor(r, end), ticket = ++pending;
     if (kind !== 'live') {
@@ -947,6 +988,7 @@ export function mountTracker(D, hooks = {}) {
     const ints = intsFor(r, kind);
     if (wantInt && ints.includes(wantInt)) { state.int = wantInt; state.intPicked = true; }
     if (!state.intPicked || !ints.includes(state.int)) { state.int = R.def && ints.includes(R.def) ? R.def : ints[0]; state.intPicked = false; }
+    if (opening) waiting = false;
     useModel(); rebuild();
   }
   const step = dir => {
@@ -956,13 +998,35 @@ export function mountTracker(D, hooks = {}) {
     else if (state.end != null) setView(state.range, addDays(state.end, R.days));
   };
   function rebuild() {
-    const d = state.drill;
     V = buildView();  // first: the drill-down checks below look at this view's plant sets
+    const link = linked && !waiting ? linked : null;
+    if (link) state.drill = fromLink(link);
+    const d = state.drill;
     if (d.plant) { const p = plantByName(d.plant); if (!p || (state.region !== 'NZ' && p.isl !== state.region)) d.plant = null; }
     if (d.fuel && !plantsFor(d.fuel).length) { d.fuel = null; d.plant = null; }
     if (d.group && !(setById(d.group)?.plants.length || groupById(d.group)?.f?.some(k => present[state.region].includes(k)))) { d.group = null; d.plant = null; }
-    relayer(); state.hover = null; syncControls(); buildSummary(); render(); save(); report(); share();
+    relayer(); state.hover = null; lastT = null;
+    if (link) {
+      linked = null;
+      const j = link.t != null ? pointAt(link.t) : null;
+      if (j != null) { state.hover = j; state.hoverBy = 'key'; }   // the summary opens on the linked point
+    }
+    syncControls(); buildSummary(); render(); save(); report(); share();
   }
+  // Back and Forward between drill-down steps (save(true)): the entry's address says the view
+  function onPop() {
+    if (location.pathname.replace(/\/$/, '') !== '/tracker') return;   // leaving the page
+    const a = readQuery(location.search);
+    state.region = a.region || 'NZ';
+    state.view = a.by && Object.hasOwn(VIEWS, a.by) ? a.by : 'detailed';
+    state.unit = a.unit === 'pct' ? 'pct' : 'mw';
+    state.hidden.clear(); state.filter = ''; state.open.clear();
+    linked = { group: a.group, fuel: a.fuel, plant: a.plant, t: null }; waiting = false;
+    const range = a.range || '1d', end = a.end ?? null;
+    if (range !== state.range || end !== state.end || (a.int && a.int !== state.int)) setView(range, end, !!a.int, a.int || null);
+    else rebuild();
+  }
+  window.addEventListener('popstate', onPop);
   // the page's lower section (src/lib/generation/GenLower.svelte) works from the same window: told on every rebuild
   let lastShared = '';
   function share() {
@@ -988,7 +1052,7 @@ export function mountTracker(D, hooks = {}) {
   for (const id of ['nav-next', 'tb-next']) $(id)?.addEventListener('click', () => step(1));
   $('sel-view').addEventListener('change', e => {
     if (!Object.hasOwn(VIEWS, e.target.value)) return;
-    state.view = e.target.value; state.drill = { ...TOP_LEVEL }; state.hidden.clear(); state.filter = ''; state.open.clear(); rebuild();
+    state.view = e.target.value; state.drill = { ...TOP_LEVEL }; linked = null; state.hidden.clear(); state.filter = ''; state.open.clear(); rebuild();
   });
   $('seg-unit').addEventListener('click', e => {
     const b = e.target.closest('button');
@@ -1088,7 +1152,7 @@ export function mountTracker(D, hooks = {}) {
 
   readColours();
   rebuild();
-  if (saved) setView(saved.range, saved.end, true, init.int);  // a long range or past date, once its history has loaded
+  if (saved) setView(saved.range, saved.end, true, init.int, true);  // a long range or past date, once its history has loaded
 
   return {
     // new data: keep the viewer's region, range, interval and drill-down; drop the hover point
@@ -1103,6 +1167,15 @@ export function mountTracker(D, hooks = {}) {
         if (state.kind === kind) { M = null; useModel(); rebuild(); }
       }).catch(() => {});
     },
-    destroy() { window.removeEventListener('scroll', hideTip); mo.disconnect(); ro.disconnect(); if (mq) mq.removeEventListener('change', retheme); cancelAnimationFrame(raf); },
+    // the links the Share button offers (#lib/site/ShareLink.svelte): this view, live or fixed to its dates, and the
+    // last point the cursor was on
+    links() {
+      const R = RANGES[state.range], j = lastT != null && V ? pointAt(lastT) : null;
+      return shareLinks('/tracker', { ...shared(), ...ownQuery() }, {
+        point: j != null ? lastT : null, pointLabel: j != null ? (isLong() ? heading(j)[0] : chip(j)) : null, tDay: isLong(),
+        days: R.fixed ? null : R.days, latestEnd: endOfToday(),
+      });
+    },
+    destroy() { window.removeEventListener('popstate', onPop); window.removeEventListener('scroll', hideTip); mo.disconnect(); ro.disconnect(); if (mq) mq.removeEventListener('change', retheme); cancelAnimationFrame(raf); },
   };
 }

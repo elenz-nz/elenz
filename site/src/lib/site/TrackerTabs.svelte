@@ -1,11 +1,13 @@
 <script lang="ts">
 	// The tracker's views, as tabs under the masthead: Generation (/tracker) and Prices (/tracker/prices).
 	// Add a view here; the masthead's Tracker link covers every page under /tracker.
-	// The links carry the current address's query (region, range, interval, date: #lib/site/view.js), so switching tabs
-	// keeps the same window. It's added as the link is used, since the pages update the address as views change.
+	// The links carry the current address's shared settings (region, range, interval, date: #lib/site/view.js), so
+	// switching tabs keeps the same window, plus the other tab's own settings from its last visit (its drill-down,
+	// grouping or chart options). Worked out as the link is used, since the pages update the address as views change.
 	// children: the page's status (Live / History / Delayed pill and the About this data button), at the line's right.
 	import { page } from '$app/state';
 	import type { Snippet } from 'svelte';
+	import { tabHref } from '#lib/site/view.js';
 
 	let { children }: { children?: Snippet } = $props();
 
@@ -14,7 +16,7 @@
 		{ href: '/tracker/prices', name: 'Prices' }
 	];
 	const current = (href: string) => page.url.pathname.replace(/\/$/, '') === href;
-	const carry = (e: Event, href: string) => { (e.currentTarget as HTMLAnchorElement).href = href + location.search; };
+	const carry = (e: Event, href: string) => { (e.currentTarget as HTMLAnchorElement).href = tabHref(href); };
 </script>
 
 <div class="tabline">

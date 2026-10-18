@@ -12,6 +12,12 @@
 //             schedule is unreliable for new repositories; on-demand runs start within seconds. Every 15 minutes
 //             (at :10, :25, :40, :55) also the watchdog (watchdog.yml), which raises an issue when data goes stale.
 //             Needs the Worker secret GITHUB_TOKEN: a fine-grained token for elenz-nz/elenz with Actions: read and write.
+//  previews: the tracker's pages (/tracker, /tracker/prices) pass through the Worker too ("run_worker_first" in
+//             wrangler.jsonc), which adds link-preview tags (og:title, og:description, og:url) and a title saying what
+//             a linked view shows, e.g. "Wind generation · North Island · 7 days to 18 Oct 2026", from its address
+//             (site/src/lib/site/viewurl.js, shared with the pages). The pages are prerendered, so they can't do it.
+import { readQuery, writeQuery, describe, SITE_URL } from '../site/src/lib/site/viewurl.js';
+
 const WORKFLOWS = 'https://api.github.com/repos/elenz-nz/elenz/actions/workflows';
 const HISTORY_CRON = '40 */6 * * *'; // must match wrangler.jsonc
 // history files the site may request: the index, all days, one half-hourly file per month, the records, and the
@@ -19,6 +25,33 @@ const HISTORY_CRON = '40 */6 * * *'; // must match wrangler.jsonc
 // /data/health: the same limits as the GitHub watchdog (watchdog.yml)
 const HEALTH = { liveMinutes: 30, historyDays: 5, rebuildDays: 12 };   // history may lag up to rebuildDays during a rebuild
 const HISTORY_FILE = /^\/data\/history\/(index\.json|progress\.json|day\.json|records\.json|hh\/\d{4}-\d{2}\.json|off\/(?:\d{4}-\d{2}|days)\.json)$/;
+
+// ---------- link previews for the tracker's pages ----------
+// each page's tab, and its own title (for a plain address, which keeps it)
+const PREVIEW_TABS = { '/tracker': ['generation', 'Tracker · ELENZ'], '/tracker/prices': ['prices', 'Prices · Tracker · ELENZ'] };
+const escAttr = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+function withPreview(res, [tab, pageTitle], url) {
+  if (!res.ok || !(res.headers.get('content-type') || '').includes('text/html')) return res;
+  // a plain address keeps the page's own title; a linked view gets one saying what it shows. The preview's address
+  // is the view's tidy form (unknown keys dropped).
+  const q = readQuery(url.search), qs = writeQuery(q, { tDay: !/T\d/.test(url.searchParams.get('t') || '') });
+  const title = url.search.length > 1 ? `${describe(tab, q)} · ELENZ` : null;
+  return new HTMLRewriter()
+    .on('title', { element(el) { if (title) el.setInnerContent(title); } })
+    .on('meta[name="description"]', {
+      element(el) {
+        const og = (k, v) => `<meta property="${k}" content="${escAttr(v)}">`;
+        el.after([
+          og('og:type', 'website'), og('og:site_name', 'ELENZ'),
+          og('og:title', title || pageTitle),
+          og('og:description', el.getAttribute('content') || ''),
+          og('og:url', SITE_URL + url.pathname + (qs ? '?' + qs : '')),
+          '<meta name="twitter:card" content="summary">',
+        ].join(''), { html: true });
+      },
+    })
+    .transform(res);
+}
 
 export default {
   async fetch(request, env) {
@@ -100,6 +133,8 @@ export default {
         },
       });
     }
+    const tab = PREVIEW_TABS[url.pathname];
+    if (tab && request.method === 'GET') return withPreview(await env.ASSETS.fetch(request), tab, url);
     return env.ASSETS.fetch(request);
   },
 

@@ -6,6 +6,7 @@
 	import TrackerTabs from '#lib/site/TrackerTabs.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import GenLower from '#lib/generation/GenLower.svelte';
+	import ShareLink from '#lib/site/ShareLink.svelte';
 	import { barHeight } from '#lib/site/sticky.js';
 
 	type Meta = { intervals: number; expected: number; end: number; api_from: number | null; built: number };
@@ -25,6 +26,7 @@
 	let infoBox = $state<HTMLDivElement>();
 	let helpOpen = $state(false);
 	let helpBtn = $state<HTMLButtonElement>();
+	let tracker: ReturnType<typeof mountTracker> | undefined;   // the charts (#lib/tracker/tracker.js), once the data has loaded
 
 	const PARTS = new Intl.DateTimeFormat('en-NZ', {
 		timeZone: 'Pacific/Auckland', weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true
@@ -82,7 +84,6 @@
 	}
 
 	onMount(() => {
-		let tracker: ReturnType<typeof mountTracker> | undefined;
 		let due = 0; // when to fetch again (#lib/site/poll)
 		let stamp = 0;
 		async function load() {
@@ -145,6 +146,7 @@
 					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {clockOnly(meta.end)}<span class="pday">{when(meta.end).slice(clockOnly(meta.end).length)}</span></span>
 				{/if}
 			{/if}
+			<ShareLink links={() => tracker?.links() ?? null} />
 			<button type="button" class="info-btn" bind:this={infoBtn} aria-expanded={infoOpen} aria-controls="about-data" aria-label="About this data" title="About this data" onclick={() => (infoOpen = !infoOpen)}>
 				<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg>
 			</button>

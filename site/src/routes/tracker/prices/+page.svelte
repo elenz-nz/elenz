@@ -7,7 +7,8 @@
 	import { fromLayout, historyStore, firstAtOrAfter, slice, nzOffset } from '#lib/tracker/series.js';
 	import Masthead from '#lib/site/Masthead.svelte';
 	import TrackerTabs from '#lib/site/TrackerTabs.svelte';
-	import { readView, writeView, midnightOf, addDays, ymd, endOfDay } from '#lib/site/view.js';
+	import { readView, writeView, midnightOf, addDays, ymd, endOfDay, describe, shareLinks } from '#lib/site/view.js';
+	import ShareLink from '#lib/site/ShareLink.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import TimeChart from '#lib/prices/TimeChart.svelte';
 	import FuelBars from '#lib/prices/FuelBars.svelte';
@@ -63,28 +64,43 @@
 
 	// ---------- settings: region and range shared with the Generation tab; the rest kept for this page ----------
 	// region, range, interval and date are shared with the Generation tab through the address (#lib/site/view.js);
-	// the scale, hidden nodes and node choices are this page's own
+	// the scale, hidden nodes and price-range island are this page's own, also in the address. A link opens exactly
+	// what its address says; a plain visit opens on this browser's last settings ('elenz-prices'). The heat map's node
+	// is only remembered in this browser.
 	let intPicked = $state(false);   // the viewer chose the interval; otherwise this page's default for the range
+	let linkedT: number | null = null;   // a link's point: the summary opens on it once the view is built
+	let lastT = $state<number | null>(null);   // the last point the cursor was on, for the Share button
 	function restore() {
 		const v = readView();
 		region = v.region;
 		range = v.range in RANGES ? v.range : '1d';
 		if (v.int) { int = v.int; intPicked = true; }
 		endT = v.end;
-		try {
-			const p = JSON.parse(localStorage.getItem('elenz-prices') || 'null');
-			if (p) {
-				if (SCALES.some((s) => s.k === p.scale)) scale = p.scale;
-				if (Array.isArray(p.off)) off = p.off.filter((k: string) => k in NODE);
-				if (p.band in NODE) bandKey = p.band;
-				if (p.heat in NODE) heatKey = p.heat;
-			}
-		} catch { /* storage blocked: defaults */ }
+		linkedT = v.t;
+		let p: any = null;
+		try { p = JSON.parse(localStorage.getItem('elenz-prices') || 'null'); } catch { /* storage blocked: defaults */ }
+		if (v.link) p = { scale: v.q.scale, off: v.q.hide, band: v.q.band, heat: p?.heat };
+		if (p) {
+			if (SCALES.some((s) => s.k === p.scale)) scale = p.scale;
+			if (Array.isArray(p.off)) off = p.off.filter((k: string) => k in NODE);
+			if (p.band in NODE) bandKey = p.band;
+			if (p.heat in NODE) heatKey = p.heat;
+		}
 	}
+	const sharedNow = () => ({ region, range, int: intPicked && intChoices.includes(int) ? int : null, end: R.days == null ? null : endT });
+	const ownNow = () => ({ scale, hide: off, band: bandKey });
 	function save() {
-		writeView({ region, range, int: intPicked && intChoices.includes(int) ? int : null, end: R.days == null ? null : endT });
+		writeView(sharedNow(), { query: ownNow() });
+		document.title = `${describe('prices', sharedNow())} · ELENZ`;
 		try { localStorage.setItem('elenz-prices', JSON.stringify({ scale, off, band: bandKey, heat: heatKey })); } catch { /* storage blocked */ }
 	}
+	// the links the Share button offers: this view, live or fixed to its dates, and the last point the cursor was on
+	function links() {
+		const tDay = !['5m', '30m'].includes(effInt);
+		const label = lastT == null ? null : !tDay ? `${clock(lastT)} ${dayLabel(lastT)}` : effInt === '1mo' ? monthLabel(lastT) : effInt === '1w' ? `Week of ${dateLabel(lastT)}` : dateLabel(lastT);
+		return shareLinks('/tracker/prices', { ...sharedNow(), ...ownNow() }, { point: lastT, pointLabel: label, tDay, days: R.days, latestEnd: endOfToday });
+	}
+	$effect(() => { if (view && at >= 0) lastT = view.t[at]; });
 	function pickRange(k: string) {
 		range = k;
 		intPicked = false;   // a new range starts on its default interval, as on the Generation tab
@@ -136,7 +152,14 @@
 	function setView(v: any) {
 		const keep = view && view.mode === v.mode && hover >= 0 && hover < v.n && view.n === v.n;
 		view = v;
-		if (!keep) hover = -1;   // no cursor: the summary shows the whole range, as on the Generation tab
+		if (!keep) { hover = -1; lastT = null; }   // no cursor: the summary shows the whole range, as on the Generation tab
+		if (linkedT != null) {
+			// a link's point: the period that contains it
+			let j = -1;
+			for (let i = v.n - 1; i >= 0; i--) if (v.t[i] <= linkedT) { j = i; break; }
+			if (j >= 0 && (j < v.n - 1 || linkedT - v.t[j] < 32 * 864e5)) { hover = j; hoverBy = 'key'; }
+			linkedT = null;
+		}
 	}
 
 	/** Live week and 30 days: node prices, spread and HVDC at each point. */
@@ -478,6 +501,7 @@
 					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {clock(meta.end)}<span class="pday"> {dayLabel(meta.end)}</span></span>
 				{/if}
 			{/if}
+			<ShareLink {links} />
 			<button type="button" class="info-btn" bind:this={infoBtn} aria-expanded={infoOpen} aria-controls="p-about" aria-label="About this data" title="About this data" onclick={() => (infoOpen = !infoOpen)}>
 				<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg>
 			</button>
