@@ -206,7 +206,7 @@ function offeredSeries(S, off, f, isl, k, daily) {
     for (let i = 0; i < S.n; i++) { const j = off.dayIndex.get(S.t[i]); if (j !== undefined && col[j] != null) out[i] = col[j]; }
     return out;
   }
-  for (const M of off.months) {
+  for (const M of off.months || []) {   // daily-shaped data (no months) has nothing at this resolution
     const col = M[isl] && M[isl][f] && M[isl][f][k];
     if (!col) continue;
     for (let i = 0; i < S.n; i++) {

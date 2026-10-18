@@ -136,7 +136,10 @@
 	// thermal and batteries at the bottom of the fuel stack, read from zero; hydro on top
 	const ROOM_ORDER = ['gas', 'coal', 'diesel', 'batt', 'hydro'];
 	const roomFuels = $derived(ROOM_ORDER.filter((k) => withHydro || k !== 'hydro'));
-	let offData = $state.raw<any>(null), offFor = '';
+	// offered data comes in two shapes (days.json for daily views, month files otherwise) and arrives after the view
+	// changes, so it's tagged with the shape it was loaded for and used only while the view still wants that shape
+	// (switching 1Y/All to a shorter range otherwise handed daily data to the half-hourly code, which threw)
+	let offLoaded = $state.raw<{ daily: boolean; data: any } | null>(null), offFor = '';
 	$effect(() => {
 		const w = v, ok = near;
 		untrack(() => {
@@ -144,9 +147,10 @@
 			const daily = w.kind === 'day', key = `${daily}|${daily ? '' : `${w.from}|${w.to}`}`;
 			if (key === offFor) return;
 			offFor = key;
-			loadOffered(daily, w.from, w.to).then((d) => { if (offFor === key) offData = d; });
+			loadOffered(daily, w.from, w.to).then((d) => { if (offFor === key) offLoaded = { daily, data: d }; });
 		});
 	});
+	const offData = $derived(v && offLoaded && offLoaded.daily === (v.kind === 'day') ? offLoaded.data : null);
 	type Level = { by: Record<string, Float64Array>; tot: Float64Array; low: Float64Array; any?: boolean };
 	const roomRaw = $derived<Record<string, Level> | null>(cur && v ? headroom(cur, v.region, v.kind === 'day', roomFuels, offData) : null);
 	const roomAt = $derived<Record<string, Level> | null>(roomRaw && cur && curI ? Object.fromEntries(LEVELS.map((L: string) => [L, headroomAt(roomRaw[L], cur, curI)])) : null);
