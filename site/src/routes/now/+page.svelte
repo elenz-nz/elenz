@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Preview from '#lib/site/Preview.svelte';
 	import { onMount } from 'svelte';
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
 	import Masthead from '#lib/site/Masthead.svelte';
@@ -94,6 +95,7 @@
 <svelte:head>
 	<title>ELENZ · New Zealand's electricity, right now</title>
 	<meta name="description" content="New Zealand's electricity right now: demand, prices, the generation mix, renewable share, emissions and the HVDC link, live from the Electricity Authority's market data." />
+	<Preview title="New Zealand's electricity, right now · ELENZ" description="New Zealand's electricity right now: demand, prices, the generation mix, renewable share, emissions and the HVDC link, live from the Electricity Authority's market data." path="/now" />
 </svelte:head>
 
 <div class="wrap">

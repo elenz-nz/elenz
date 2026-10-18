@@ -2,6 +2,7 @@
 	// Records: the highest and lowest half-hours, months and runs since 1997 (ingest/records.py writes the data;
 	// names, wording and the live check are in #lib/records/records.js). Each record has its own page,
 	// /records/<id>?region=NI.
+	import Preview from '#lib/site/Preview.svelte';
 	import { onMount } from 'svelte';
 	import { replaceState } from '$app/navigation';
 	import Masthead from '#lib/site/Masthead.svelte';
@@ -78,6 +79,7 @@
 <svelte:head>
 	<title>Records · ELENZ</title>
 	<meta name="description" content="New Zealand's electricity records since 1997: peak demand, renewable share, wind and solar, prices and the HVDC link, for New Zealand and each island, from the Electricity Authority's metered data." />
+	<Preview title="New Zealand's electricity records since 1997 · ELENZ" description="New Zealand's electricity records since 1997: peak demand, renewable share, wind and solar, prices and the HVDC link, for New Zealand and each island, from the Electricity Authority's metered data." path="/records" />
 </svelte:head>
 
 <div class="wrap">

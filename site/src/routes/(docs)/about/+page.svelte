@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Preview from '#lib/site/Preview.svelte';
 	import { onMount } from 'svelte';
 	import { afterNavigate, goto } from '$app/navigation';
 	import Coffee from '#lib/site/Coffee.svelte';
@@ -96,6 +97,7 @@
 <svelte:head>
 	<title>About · ELENZ</title>
 	<meta name="description" content="What Elenz is, what each page shows, and how to support it." />
+	<Preview title="About ELENZ" description="What Elenz is, what each page shows, and how to support it." path="/about" />
 </svelte:head>
 
 <main class="mt-page" aria-labelledby="mt-h">

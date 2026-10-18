@@ -1,11 +1,13 @@
 <script lang="ts">
 	// Data and methods: the overview. How the data flows, the conventions every chart shares, and a card per series.
+	import Preview from '#lib/site/Preview.svelte';
 	import { REPO, SOURCES, TOPICS } from '#lib/methods/registry.js';
 </script>
 
 <svelte:head>
 	<title>Data and methods · ELENZ</title>
 	<meta name="description" content="Where every figure on Elenz comes from, how it is calculated and checked, and what it can't tell you." />
+	<Preview title="Data and methods · ELENZ" description="Where every figure on Elenz comes from, how it is calculated and checked, and what it can't tell you." path="/methods" />
 </svelte:head>
 
 <main class="mt-page" aria-labelledby="mt-h">

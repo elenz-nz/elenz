@@ -1,5 +1,6 @@
 <script lang="ts">
 	// One series' method: header and "Data used" from the registry, then the page's own body (#lib/methods/pages).
+	import Preview from '#lib/site/Preview.svelte';
 	import { TOPICS, body, longDate, reportHref, sourceHref, sourcesFor, topic } from '#lib/methods/registry.js';
 	import type { PageProps } from './$types';
 
@@ -15,6 +16,7 @@
 <svelte:head>
 	<title>{t.title} · Data and methods · ELENZ</title>
 	<meta name="description" content={t.summary} />
+	<Preview title="{t.title} · Data and methods · ELENZ" description={t.summary} path="/methods/{data.slug}" />
 </svelte:head>
 
 <main class="mt-page" aria-labelledby="mt-h">

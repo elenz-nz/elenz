@@ -2,6 +2,7 @@
 	// The landing page: the mark, one live figure and the generation mix, then a glimpse of each page.
 	// To add a page, add an entry to PAGES with a preview component in #lib/landing. As the page scrolls, the hero's
 	// horizon line shrinks into its dot, which flies down to the Tracker preview and opens out onto it (Handoff).
+	import Preview from '#lib/site/Preview.svelte';
 	import { onMount } from 'svelte';
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
 	import Masthead from '#lib/site/Masthead.svelte';
@@ -113,6 +114,7 @@
 <svelte:head>
 	<title>ELENZ · New Zealand's electricity</title>
 	<meta name="description" content="New Zealand's electricity, live: the generation mix and renewable share now, and a tracker of generation, prices, demand and the HVDC link back to 1997." />
+	<Preview title="ELENZ · New Zealand's electricity, live" description="New Zealand's electricity, live: the generation mix and renewable share now, and a tracker of generation, prices, demand and the HVDC link back to 1997." path="/" />
 </svelte:head>
 
 <div class="wrap">

@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+# the page the link-preview image is drawn from (analysis/site_card_png.py)
+Disallow: /og/card

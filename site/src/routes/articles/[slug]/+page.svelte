@@ -2,8 +2,9 @@
 	// One article: header, the article's own body (from #lib/articles/posts), then sources and a link back.
 	import Masthead from '#lib/site/Masthead.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
-	import { longDate, noindex, SITE_URL, seriesOf, scheduled } from '#lib/articles/registry.js';
+	import { longDate, noindex, seriesOf, scheduled } from '#lib/articles/registry.js';
 	import SeriesNav from '#lib/articles/SeriesNav.svelte';
+	import Preview from '#lib/site/Preview.svelte';
 	import '#lib/articles/articles.css';
 	import type { PageProps } from './$types';
 
@@ -16,16 +17,8 @@
 <svelte:head>
 	<title>{a.title} · ELENZ</title>
 	<meta name="description" content={a.dek} />
-	<meta property="og:title" content={a.title} />
-	<meta property="og:description" content={a.dek} />
-	<meta property="og:type" content="article" />
-	<meta property="og:url" content="{SITE_URL}/articles/{a.slug}" />
-	{#if a.image}
-		<meta property="og:image" content="{SITE_URL}{a.image}" />
-		<meta property="og:image:width" content="1200" />
-		<meta property="og:image:height" content="630" />
-		<meta name="twitter:card" content="summary_large_image" />
-	{/if}
+	<!-- the article's cover, or the site's card for one without -->
+	<Preview title={a.title} description={a.dek} path="/articles/{a.slug}" type="article" image={a.image || undefined} alt={a.image ? `Cover of “${a.title}”` : undefined} />
 	{#if noindex(a)}<meta name="robots" content="noindex" />{/if}
 </svelte:head>
 

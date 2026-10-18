@@ -2,6 +2,7 @@
 	// The Prices tab of the tracker: node prices, the island spread and HVDC on one time axis (the live week and 30
 	// days), or each period's price range, spread and spikes (12 months and all history); then the price each fuel
 	// captured over the range and a heat map of the last 30 days by time of day. Data: #lib/prices/data.js.
+	import Preview from '#lib/site/Preview.svelte';
 	import { onMount, untrack } from 'svelte';
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
 	import { fromLayout, historyStore, firstAtOrAfter, slice, nzOffset } from '#lib/tracker/series.js';
@@ -496,6 +497,7 @@
 <svelte:head>
 	<title>Prices · Tracker · ELENZ</title>
 	<meta name="description" content="New Zealand wholesale electricity prices at six grid nodes, every 5 minutes: the gap between the islands, HVDC transfer, the price each fuel earned, and price ranges and spikes back to 1997." />
+	<Preview title="Wholesale electricity prices · ELENZ Tracker" description="New Zealand wholesale electricity prices at six grid nodes, every 5 minutes: the gap between the islands, HVDC transfer, the price each fuel earned, and price ranges and spikes back to 1997." path="/tracker/prices" />
 </svelte:head>
 
 <div class="wrap">

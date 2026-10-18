@@ -1,5 +1,6 @@
 <script lang="ts">
 	// The articles index: records, quarterly reviews and analysis. Hidden while ARTICLES_PUBLIC is false (see #lib/articles/registry.ts).
+	import Preview from '#lib/site/Preview.svelte';
 	import Masthead from '#lib/site/Masthead.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import { ARTICLES_PUBLIC, entries, hidden, longDate, noindex, scheduled } from '#lib/articles/registry.js';
@@ -9,6 +10,7 @@
 <svelte:head>
 	<title>Articles · ELENZ</title>
 	<meta name="description" content="Records, quarterly reviews and analysis of New Zealand's electricity system, from Electricity Authority data." />
+	<Preview title="Articles · ELENZ" description="Records, quarterly reviews and analysis of New Zealand's electricity system, from Electricity Authority data." path="/articles" />
 	{#if noindex()}<meta name="robots" content="noindex" />{/if}
 </svelte:head>
 

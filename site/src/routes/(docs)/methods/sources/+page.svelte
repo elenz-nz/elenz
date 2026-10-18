@@ -1,5 +1,6 @@
 <script lang="ts">
 	// Every dataset Elenz uses, from the registry (#lib/methods/registry.ts), with links to the pages that use it.
+	import Preview from '#lib/site/Preview.svelte';
 	import { SOURCES, TOPICS, reportHref } from '#lib/methods/registry.js';
 
 	const title = (slug: string) => TOPICS.find((t) => t.slug === slug)?.title ?? slug;
@@ -16,6 +17,7 @@
 <svelte:head>
 	<title>Every data source · Data and methods · ELENZ</title>
 	<meta name="description" content="Every dataset Elenz uses: what it contains, what it is used for, how far back it goes, how soon it is published and its licence." />
+	<Preview title="Every data source · ELENZ" description="Every dataset Elenz uses: what it contains, what it is used for, how far back it goes, how soon it is published and its licence." path="/methods/sources" />
 </svelte:head>
 
 <main class="mt-page" aria-labelledby="mt-h">

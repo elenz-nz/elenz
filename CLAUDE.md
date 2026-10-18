@@ -55,7 +55,7 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   it opens the share sheet. A click on any chart pins the time line there (accent line, "Pinned · Release" under the
   summary's heading; another click on it, Release or Escape lets go); drilling down is from the summary list only (the
   generation chart no longer drills on click). Touch keeps its point without pinning, so it can still scrub. The browser tab's title says what the view shows (`describe`), and the
-  Worker adds the same title and og: tags to `/tracker` and `/tracker/prices` for link previews. The tracker page markup
+  Worker puts the same title into the page title, og:title and og:url of `/tracker` and `/tracker/prices` for a linked view. The tracker page markup
   is in `src/routes/tracker/+page.svelte` (About and Data and methods share one layout with a contents sidebar, the route group `src/routes/(docs)/`; About page: `src/routes/(docs)/about/+page.svelte`, short: what each page shows, where the data comes from in brief, support, contact; links to its old `#m-*` sections forward to the method pages. Data and methods: `/methods` overview, `/methods/sources` every dataset, `/methods/<slug>` one page per series (generation, embedded-solar, demand, hvdc, prices, price-explainer, emissions, groupings, history); topics and datasets in `src/lib/methods/registry.ts` (each page's header and "Data used" box come from it, so a dataset is described once), bodies in `src/lib/methods/pages/<slug>.svelte`, styles in `methods.css`. The emissions and price explainer pages import their factors and rules from `emissions.js` and `explain.js`, so they stay in step; the other pages are prose: when a method changes, update its page and its `updated` date; shared
   masthead, footer (© line, data credits, link icons: fill in a `href` in its `LINKS` to show a social account), logo mark and Buy Me a Coffee link in `src/lib/site/`); the canvas chart code is `src/lib/tracker/tracker.js` (vanilla JS, driven by
   element ids in the page), styles in `src/lib/tracker/tracker.css` (colour tokens, light/dark). The fuel table
@@ -64,6 +64,12 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   geothermal station's own factor by year; evidence in `analysis/emission_factors.py` and `analysis/README.md`).
   `src/lib/tracker/series.js` loads the history files and merges them with the live week (24 h/3 d/7 d use the
   live 5-minute data; 30 days uses half-hourly history; 1 year and All use daily history).
+- Link previews: every public page puts `src/lib/site/Preview.svelte` in its `<svelte:head>` (og:title, og:description,
+  og:url, og:image, the large-image card). Articles use their cover PNG; every other page the site's card,
+  `static/og/elenz.png`: `src/lib/site/SiteCard.svelte` (the mark and name over a week of generation, cover style)
+  drawn at `/og/card` (noindex, disallowed in robots.txt) and saved by `analysis/site_card_png.py` (redo it now and
+  then; it isn't dated). `npm run check:previews` (`scripts/check-previews.js`, after the build, in checks.yml) fails
+  if a public page (not noindex) lacks any tag or its image. A new page needs a `<Preview>`.
 - `ingest/`: Python. `update.py` (the scheduled job), `state.py` (compact 7-day state: one row per interval,
   columns `U|POC UNIT`, `C|...` charging, `L|NI`, `L|SI`, `T`, `P|NI`, `P|SI`, `P|<node>` for `[price_nodes]`, `src`), `build_tracker.py`
   (state → tracker.json; `assemble()` is shared with history), `emi_live.py` (API client), `store.py` (Workers KV
@@ -114,8 +120,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   run backfills ~2,200 daily files (resumes next run if it hits its time budget). KV writes: ~3 per changed month,
   ~225 for a full backfill or rebuild, on top of the live job's ~600/day, so avoid more than one full rebuild a day.
 - `worker/index.js`: serves static assets, `/data/tracker.json` from KV (binding `DATA`), falling back to the
-  bundled snapshot, and `/data/history/{index,day,hh/YYYY-MM}.json` from KV keys `hist/*`; adds link-preview tags
-  (og:title from the view's address, og:description, og:url) to the tracker's two pages, which `run_worker_first` in
+  bundled snapshot, and `/data/history/{index,day,hh/YYYY-MM}.json` from KV keys `hist/*`; rewrites the title,
+  og:title and og:url of the tracker's two pages for a linked view (from its address), which `run_worker_first` in
   `wrangler.jsonc` routes through it (`withPreview`, HTMLRewriter); its `scheduled` handler
   dispatches the GitHub jobs (live every 5 minutes, history every 6 hours, watchdog every 15 minutes) (Worker secret `GITHUB_TOKEN`: fine-grained,
   elenz only, Actions read/write; it expires, so renew it yearly). KV free plan: 1,000 writes/day (the job uses ~600), 100,000 reads/day.
@@ -143,7 +149,7 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   those tables. Rerun it and commit the JSON after refreshing the register or editing the tables.
 - `.github/workflows/checks.yml`: on every push, ruff (syntax errors and undefined names only), `ingest/tests/smoke.py`
   (the live and history paths on a committed one-hour sample of real dispatch data and matching final prices, no network)
-  and the site's `npm run check`, `npm test` (`site/tests/`: the tracker's address) and `npm run build`. Cloudflare deploys `main` regardless, so a red cross means look now.
+  and the site's `npm run check`, `npm test` (`site/tests/`: the tracker's address), `npm run build` and `npm run check:previews`. Cloudflare deploys `main` regardless, so a red cross means look now.
 - `.github/workflows/watchdog.yml`: checks the live site every 15 minutes; opens an issue labelled `stale-data`
   (GitHub emails it to the owner) when live data is over 30 minutes old, history over 5 days behind, or the Worker
   can't start a job, and closes it when the data recovers.

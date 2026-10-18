@@ -49,3 +49,5 @@ jobs:
       - name: Tests (the tracker's address and share links)
         run: npm test
       - run: npm run build
+      - name: Link previews (every public page has og:title, og:description, og:url and an image)
+        run: npm run check:previews
