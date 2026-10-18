@@ -20,12 +20,7 @@ export type Kind = 'Record' | 'Quarterly review' | 'Analysis' | 'Guide';
 // Series: articles published as numbered parts. An article joins one with `series: '<key>'` and `part: <n>` in its
 // meta; each part then shows "Part n of N", the list of parts and previous/next links, and the index shows the series
 // as one card.
-export const SERIES: { [key: string]: { name: string; dek: string } } = {
-	'wholesale-market': {
-		name: 'Inside the wholesale market',
-		dek: "How New Zealand's electricity is bought and sold, what sets the price, and how it reaches your bill.",
-	},
-};
+export const SERIES: { [key: string]: { name: string; dek: string } } = {};
 
 export type Meta = {
 	title: string;
