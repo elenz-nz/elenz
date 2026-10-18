@@ -8,10 +8,13 @@
 	let { c, size = 'small' }: { c: { t: number[]; hay: number[]; ben: number[]; band: Band[] }; size?: 'small' | 'large' | 'tall' } = $props();
 	const large = $derived(size === 'large');
 
-	// viewBox size; text is drawn in viewBox units, so the narrow charts' text is larger to stay legible when shrunk
-	const VW = $derived(large ? 960 : 420), VH = $derived(large ? 420 : size === 'tall' ? 420 : 230);
-	const FS = $derived(large ? 13 : 15);
-	const L = $derived(large ? 60 : 58), R = 10, T = 12, B = $derived(large ? 28 : 30);
+	// drawn at its measured width and a fixed height, one viewBox unit per pixel, so the text stays the same size and
+	// only the plot stretches (a fixed viewBox scaled the text with the width: huge when the side column wrapped under
+	// the reasons at middling window widths)
+	let W = $state(0);
+	const VW = $derived(Math.max(240, W || 420)), VH = $derived(large ? 420 : size === 'tall' ? 360 : 220);
+	const FS = $derived(large ? 12.5 : 11.5);
+	const L = 48, R = 8, T = 10, B = 24;
 	const NT = $derived(size === 'small' ? 2 : 4);   // steps up the price axis
 	const t0 = $derived(c.t[0]), t1 = $derived(c.t[c.t.length - 1]);
 	const ymax = $derived.by(() => {
@@ -32,9 +35,9 @@
 	const yTicks = $derived(Array.from({ length: NT + 1 }, (_, i) => (ymax * i) / NT));
 	const HOUR = new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', hour: 'numeric', hourCycle: 'h23' });
 	const xTicks = $derived.by(() => {
-		// every six hours on the NZ clock (every three on the large chart), clear of "now"
+		// every six hours on the NZ clock (every three once the chart is 640 px wide), clear of "now"
 		const out: { t: number; label: string }[] = [];
-		const hr = 3600000, every = large ? 3 : 6;
+		const hr = 3600000, every = VW >= 640 ? 3 : 6;
 		for (let tt = Math.ceil(t0 / hr) * hr; tt < t1 - 2 * hr; tt += hr) {
 			const h = Number(HOUR.format(new Date(tt)));
 			if (h % every === 0) { out.push({ t: tt, label: h === 0 ? 'midnight' : h === 12 ? 'noon' : clock(tt).replace(':00', '') }); tt += (every - 1) * hr; }
@@ -66,7 +69,8 @@
 	<span><i class="k-ben"></i>Benmore {ria(c.ben[at])}</span>
 	{#if bandAt}<span><i class="k-band"></i>usual {money(bandAt.p25)}–{money(bandAt.p75)}</span>{/if}
 </p>
-<svg bind:this={svgEl} viewBox="0 0 {VW} {VH}" style="--fs:{FS}px" role="img" onpointermove={move} onpointerleave={() => (hi = -1)}
+<div class="plot" bind:clientWidth={W}>
+<svg bind:this={svgEl} viewBox="0 0 {VW} {VH}" width={VW} height={VH} style="--fs:{FS}px" role="img" onpointermove={move} onpointerleave={() => (hi = -1)}
 	aria-label="Haywards and Benmore prices over the last 24 hours, with the usual range for each half-hour of the week.">
 	{#each yTicks as v}
 		<line class="grid" x1={L} x2={VW - R} y1={Y(v)} y2={Y(v)} />
@@ -81,20 +85,22 @@
 	<path class="p-hay" d={line(c.hay)} />
 	{#if hi >= 0}
 		<line class="cur" x1={X(c.t[hi])} x2={X(c.t[hi])} y1={T} y2={VH - B} />
-		<circle class="dot-hay" cx={X(c.t[hi])} cy={Y(c.hay[hi])} r={large ? 4 : 5} />
+		<circle class="dot-hay" cx={X(c.t[hi])} cy={Y(c.hay[hi])} r="4" />
 	{/if}
 	{#each xTicks as tk}
 		<text class="ax" x={X(tk.t)} y={VH - 8} text-anchor="middle">{tk.label}</text>
 	{/each}
 	<text class="ax" x={VW - R} y={VH - 8} text-anchor="end">now</text>
 </svg>
+</div>
 <p class="legend">
 	<span><i class="k-hay"></i>Haywards</span><span><i class="k-ben"></i>Benmore</span><span><i class="k-band"></i>usual range</span>
 	<span><i class="k-hl"></i>highlighted above</span>{#if show}<span><i class="k-op"></i>opens by itself above</span>{/if}
 </p>
 
 <style>
-	svg { width: 100%; height: auto; display: block; touch-action: pan-y; }
+	.plot { width: 100%; min-width: 0; }
+	svg { display: block; max-width: 100%; touch-action: pan-y; }
 	.grid { stroke: var(--grid); stroke-width: 1; }
 	.ax { fill: var(--muted); font-size: var(--fs); font-family: var(--font-data); }
 	.band { fill: var(--f-hydro); opacity: 0.16; }
