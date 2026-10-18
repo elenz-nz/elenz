@@ -1,0 +1,107 @@
+// The /now page's "Every generator right now" table: one row per plant from tracker.json's newest interval.
+// MW is dispatch (the market's 5-minute target for the plant), capacity is the installed MW that applies today
+// (capacity.json, from facilities/plant_capacity.csv; the plant's register nameplate if it has no row), owner from
+// plants.json. Stations shown whole (Huntly Rankines ...) and plants on two buses (Arapuni, Roxburgh) carry `units`.
+// The table's settings live in /now's address (fuel, island, owner, sort, q, on), so a view can be linked.
+import { FUELS } from '#lib/tracker/fuels.js';
+import CAPACITY from '#lib/tracker/capacity.json';
+import PLANT_META from '#lib/tracker/plants.json';
+import { slug } from '#lib/site/viewurl.js';
+
+const FUEL = Object.fromEntries(FUELS.map((f) => [f.k, f]));
+const META = /** @type {Record<string, { owner?: string }>} */ (PLANT_META);
+const CAP_ROWS = new Map(CAPACITY.plants.map((p) => [p.name, p.rows]));
+const TODAY = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Pacific/Auckland' }).format(new Date());
+
+/** Installed MW today: the capacity.json row covering today, else the register nameplate tracker.json gives. */
+function capacityNow(name, fallback, today) {
+  const rows = CAP_ROWS.get(name);
+  const row = rows?.find(([a, b]) => (a == null || a <= today) && (b == null || today <= b));
+  return row ? row[2] : (fallback || null);
+}
+
+/** @typedef {{ name: string, mw: number, cap: number | null }} Unit */
+/** @typedef {{ name: string, key: string, fuel: string, fuelName: string, tok: string, isl: string, owner: string,
+ *   mw: number, cap: number | null, pct: number | null, charging: boolean, href: string, units: Unit[], part: string }} Row */
+/** @typedef {{ fuel: string, island: string, owner: string, by: string, asc: boolean, text: string, on: boolean }} Settings */
+
+/** Rows for every plant in tracker.json at its newest interval.
+ * @param {any} D
+ * @returns {Row[]} */
+export function generatorRows(D) {
+  const j = D.N - 1, today = TODAY();
+  return (D.plants || []).map((p) => {
+    const mw = p.s?.[j] ?? 0;
+    const cap = capacityNow(p.name, p.cap, today);
+    const f = FUEL[p.fuel] || { name: p.fuel, tok: '--muted' };
+    return {
+      name: p.name, key: slug(p.name), fuel: p.fuel, fuelName: f.name, tok: f.tok, isl: p.isl,
+      owner: META[p.name]?.owner || 'Other generators',
+      mw, cap, pct: cap ? (mw / cap) * 100 : null,
+      charging: p.fuel === 'batt' && mw < -0.5,
+      href: `/tracker?fuel=${p.fuel}&plant=${slug(p.name)}`,
+      units: (p.units || []).map((u) => ({ name: u.label || u.name, mw: u.s?.[j] ?? 0, cap: u.cap || null })),
+      // a station shown whole lists its register plants (they carry a label); a plant on two buses, its connections
+      part: (p.units || []).some((u) => u.label) ? 'units' : 'connections',
+    };
+  });
+}
+
+export const SORTS = { mw: 'MW', pct: '% of capacity', name: 'Plant' };
+
+/** The table's settings from /now's address; unknown values fall back to the defaults.
+ * @param {string} search
+ * @param {Row[]} rows
+ * @returns {Settings} */
+export function readSettings(search, rows) {
+  const q = new URLSearchParams(search || '');
+  const get = (/** @type {string} */ k) => q.get(k) || '';
+  const fuels = new Set(rows.map((r) => r.fuel)), owners = new Set(rows.map((r) => slug(r.owner)));
+  const sort = get('sort');
+  const [by, dir] = sort.split('-');
+  return {
+    fuel: fuels.has(get('fuel')) ? get('fuel') : '',
+    island: ['NI', 'SI'].includes(get('island').toUpperCase()) ? get('island').toUpperCase() : '',
+    owner: owners.has(get('owner')) ? get('owner') : '',
+    by: by in SORTS ? by : 'mw',
+    asc: dir === 'asc' ? true : dir === 'desc' ? false : by === 'name',
+    text: get('q').slice(0, 40),
+    on: q.get('on') === '1',
+  };
+}
+
+/** The settings as /now's query ('' when all are defaults).
+ * @param {Settings} s */
+export function writeSettings(s) {
+  const q = new URLSearchParams();
+  if (s.fuel) q.set('fuel', s.fuel);
+  if (s.island) q.set('island', s.island);
+  if (s.owner) q.set('owner', s.owner);
+  const natural = s.by === 'name';
+  if (s.by !== 'mw' || s.asc !== natural) q.set('sort', s.asc === natural ? s.by : `${s.by}-${s.asc ? 'asc' : 'desc'}`);
+  if (s.text.trim()) q.set('q', s.text.trim());
+  if (s.on) q.set('on', '1');
+  const out = q.toString();
+  return out ? `?${out}` : '';
+}
+
+const norm = (x) => String(x).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+/** Rows after the filters, in the chosen order.
+ * @param {Row[]} rows
+ * @param {Settings} s
+ * @returns {Row[]} */
+export function pick(rows, s) {
+  const text = norm(s.text.trim());
+  const out = rows.filter((r) => (!s.fuel || r.fuel === s.fuel) && (!s.island || r.isl === s.island) &&
+    (!s.owner || slug(r.owner) === s.owner) && (!text || norm(r.name).includes(text)) && (!s.on || Math.abs(r.mw) >= 0.5));
+  const val = (r) => (s.by === 'name' ? norm(r.name) : s.by === 'pct' ? r.pct : r.mw);
+  return out.sort((a, b) => {
+    const x = val(a), y = val(b);
+    if (x == null && y == null) return 0;
+    if (x == null) return 1;   // plants with no capacity go last either way
+    if (y == null) return -1;
+    const c = x < y ? -1 : x > y ? 1 : 0;
+    return (s.asc ? c : -c) || norm(a.name).localeCompare(norm(b.name));
+  });
+}

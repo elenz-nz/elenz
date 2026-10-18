@@ -8,6 +8,7 @@
 	import { explainNow } from '#lib/now/explain.js';
 	import PriceExplainer from '#lib/now/PriceExplainer.svelte';
 	import RecordLine from '#lib/records/RecordLine.svelte';
+	import Generators from '#lib/now/Generators.svelte';
 	import { loadRecords, freshLive } from '#lib/records/records.js';
 	import PLANT_META from '#lib/tracker/plants.json';
 	import { VIEW, NI as NI_PATH, SI as SI_PATH, PTS } from '#lib/home/nzmap.js';
@@ -29,6 +30,7 @@
 	// records the live data has just beaten (#lib/records/records.js): provisional until the metered data confirms them
 	let records: any = null;
 	let lastD: any = null;
+	let liveD = $state.raw<any>(null);   // the newest tracker.json, for the generator table
 	let recNew = $state<ReturnType<typeof freshLive>>([]);
 	const checkRecords = () => { try { recNew = records && lastD ? freshLive(records, lastD) : []; } catch { recNew = []; } };
 
@@ -76,6 +78,7 @@
 			now = summarise(D) as Now;
 			try { ex = explainNow(D, PLANT_META); } catch (e) { console.warn('price explainer left out:', e); ex = null; }   // never let it break the page
 			lastD = D;
+			liveD = D;
 			checkRecords();
 			error = '';
 		}
@@ -247,6 +250,8 @@
 				{/if}
 			</section>
 		</div>
+
+		{#if liveD && now}<Generators D={liveD} when={clockOnly(now.t)} />{/if}
 	</main>
 
 	<SiteFooter />

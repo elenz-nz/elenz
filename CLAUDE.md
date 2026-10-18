@@ -66,6 +66,12 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   geothermal station's own factor by year; evidence in `analysis/emission_factors.py` and `analysis/README.md`).
   `src/lib/tracker/series.js` loads the history files and merges them with the live week (24 h/3 d/7 d use the
   live 5-minute data; 30 days uses half-hourly history; 1 year and All use daily history).
+- "Every generator right now" on /now (`src/lib/now/Generators.svelte`, rows and settings in `src/lib/now/generators.js`):
+  each plant in tracker.json's `plants` at the newest interval, MW against the installed capacity that applies today
+  (`capacity.json`, else the register nameplate), fuel, island and owner (`plants.json`); stations shown whole and
+  two-bus plants expand into their `units`. Sort, filters and search live in /now's address (`fuel`, `island`, `owner`
+  as a slug, `sort` = mw | pct | name with `-asc`/`-desc`, `q`, `on=1` generating only); 20 rows until "Show all".
+  Each plant links to `/tracker?fuel=<fuel>&plant=<slug>`. Later the index of plant pages (/plants).
 - Footer extras (`src/lib/site/SiteFooter.svelte`): "Report a problem" (`ReportLink.svelte`: an email to hello@elenz.co.nz
   with the page title and full address, so the view, filled in when clicked) and a link to `/privacy`
   (`src/routes/(docs)/privacy/+page.svelte`, in the About/methods sidebar). The privacy page describes what the code

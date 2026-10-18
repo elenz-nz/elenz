@@ -41,6 +41,7 @@
 				'A map of the two islands, each island’s generation mix as a ring, and the flow on the HVDC link.',
 				'The generation mix right now, by fuel.',
 				'“Why is the price high?”: whether the price is usual for the time of week, and what is different when it isn’t.',
+				'Every generator right now: each plant’s output against its installed capacity, by fuel, island and owner, with a link to its history.',
 			],
 		},
 		{
