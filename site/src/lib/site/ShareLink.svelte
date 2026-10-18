@@ -53,8 +53,9 @@
 
 <svelte:window onclick={outside} onkeydown={outside} />
 
-<button type="button" class="info-btn share-btn" bind:this={btn} aria-expanded={open} aria-controls="share-pop" aria-label="Share this view" title="Share this view" onclick={toggle}>
+<button type="button" class="share-btn" bind:this={btn} aria-expanded={open} aria-controls="share-pop" aria-label="Share this view" title="Share this view" onclick={toggle}>
 	<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M8.5 11.5a3.2 3.2 0 0 0 4.6 0l2.6-2.6a3.2 3.2 0 0 0-4.6-4.6l-1 1M11.5 8.5a3.2 3.2 0 0 0-4.6 0l-2.6 2.6a3.2 3.2 0 0 0 4.6 4.6l1-1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+	<span class="sh-word">Share</span>
 </button>
 <div class="info-pop share-pop" id="share-pop" role="region" aria-label="Share this view" bind:this={pop} hidden={!open}>
 	{#if L}
@@ -74,6 +75,8 @@
 			</div>
 			{#if L.pointLabel}
 				<label class="sh-mark"><input type="checkbox" bind:checked={mark} /> Mark {L.pointLabel}</label>
+			{:else}
+				<p class="sh-tip">To mark a time, click the chart there to pin it, then share.</p>
 			{/if}
 		{/if}
 		{#if manual}
@@ -83,6 +86,14 @@
 </div>
 
 <style>
+	/* the link icon, with the word beside it where there's room */
+	.share-btn { display: inline-flex; align-items: center; gap: 5px; height: 30px; min-width: 30px; justify-content: center; padding: 0 9px 0 7px; border: 1px solid var(--line); border-radius: 999px; background: none; color: var(--ink-2); font: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+	.share-btn:hover, .share-btn[aria-expanded='true'] { color: var(--ink); background: var(--grid); border-color: var(--ink-2); }
+	@media (max-width: 720px) {
+		.share-btn { padding: 0; border-color: transparent; border-radius: 50%; }
+		.sh-word { display: none; }
+	}
+	.sh-tip { font-size: 0.78rem !important; color: var(--muted) !important; margin: -4px 0 0 !important; }
 	.share-pop { width: min(360px, calc(100vw - 32px)); gap: 10px; }
 	.sh-row { display: flex; align-items: center; gap: 12px; }
 	.sh-txt { display: grid; gap: 1px; min-width: 0; flex: 1; }

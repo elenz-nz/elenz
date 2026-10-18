@@ -284,6 +284,7 @@
 					<div>
 						<div class="sum-when" id="sum-when"></div>
 						<div class="sum-sub" id="sum-sub"></div>
+						<div class="sum-pin" id="sum-pin" hidden>Pinned <button type="button" id="sum-unpin">Release</button></div>
 					</div>
 					<button type="button" class="info-btn" bind:this={helpBtn} aria-expanded={helpOpen} aria-controls="sum-help" aria-label="How to use the charts" title="How to use the charts" onclick={() => (helpOpen = !helpOpen)}>
 						<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg>
@@ -291,8 +292,8 @@
 				</div>
 				<div class="help" id="sum-help" role="note" hidden={!helpOpen}>
 					<p>Use the arrows on the generation chart, or the date box, to step back through history by the selected range.</p>
-					<p>Select a name, or click a band in the chart, to break it down by fuel and plant. Select a colour square to hide that layer.</p>
-					<p>Hover the charts, or focus them and use the arrow keys, to read a single interval.</p>
+					<p>Select a name in the list to break it down by fuel and plant. Select a colour square to hide that layer.</p>
+					<p>Hover the charts, or focus them and use the arrow keys, to read a single interval. Click a chart to pin the time line there (click it again, or press Escape, to release it); Share can then mark that time.</p>
 				</div>
 				<div class="sum-level" id="sum-level" hidden><span id="sum-level-txt"></span><button type="button" class="back" id="sum-back">‹ Back</button></div>
 				<input type="search" class="mix-filter" id="mix-filter" aria-label="Filter the list" placeholder="Filter" hidden />

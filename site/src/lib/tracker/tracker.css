@@ -300,3 +300,10 @@ a { color: var(--accent); }
 /* Cards under the charts (Generation and Prices tabs) enlarge over the page like the charts do */
 .card.popped { position: fixed; z-index: 26; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(1180px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; border-radius: 6px; box-shadow: 0 18px 50px rgb(0 0 0 / 0.28); }
 .pop-btn.inline { position: static; flex: none; }
+
+/* a pinned time line (a click on a chart): said under the summary's heading, with a button to release it */
+.sum-pin { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); }
+.sum-pin[hidden] { display: none; }
+.sum-pin button { font: inherit; font-size: 0.74rem; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--ink-2); background: none; border: 1px solid var(--line); border-radius: 3px; padding: 1px 7px; cursor: pointer; }
+.sum-pin button:hover { color: var(--ink); border-color: var(--ink-2); }
+#charts canvas, #charts-more canvas { cursor: crosshair; }

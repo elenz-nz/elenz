@@ -504,8 +504,8 @@ export function mountTracker(D, hooks = {}) {
   }
   function cursor(ctx, F) {
     if (state.hover == null) return;
-    const x = Math.round(F.X(state.hover)) + 0.5;
-    ctx.strokeStyle = C['--ink-2']; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, F.top); ctx.lineTo(x, F.bottom); ctx.stroke();
+    const x = Math.round(F.X(state.hover)) + 0.5, pin = state.hoverBy === 'pin';
+    ctx.strokeStyle = pin ? C['--accent'] : C['--ink-2']; ctx.lineWidth = pin ? 1.5 : 1; ctx.beginPath(); ctx.moveTo(x, F.top); ctx.lineTo(x, F.bottom); ctx.stroke();
   }
   function dot(ctx, x, y, color) {
     ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
@@ -898,9 +898,7 @@ export function mountTracker(D, hooks = {}) {
   // ---------- orchestration ----------
   let raf = 0;
   function drawAll() { drawGen(); drawPrice(); drawDemand(); drawHvdc(); drawCo2(); drawRen(); }
-  // lastT: the last point the cursor was on (the mouse leaves the charts to reach the Share button), for "Mark this time"
-  let lastT = null;
-  function render() { if (state.hover != null && V) lastT = V.t[state.hover]; cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { drawAll(); updateSummary(); }); }
+  function render() { $('sum-pin').hidden = state.hoverBy !== 'pin' || state.hover == null; cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { drawAll(); updateSummary(); }); }
   const intsFor = (r, kind) => RANGES[r].model === 'live' && kind !== 'live' ? RANGES[r].past : RANGES[r].ints;
   // local midnight at or before t; whole days later or earlier (a day is 23-25 hours at the clock changes)
   const midnightOf = t => { const k = KEY.day(t) * DAY; return k - nzOffset(k - nzOffset(k)); };
@@ -1005,11 +1003,11 @@ export function mountTracker(D, hooks = {}) {
     if (d.plant) { const p = plantByName(d.plant); if (!p || (state.region !== 'NZ' && p.isl !== state.region)) d.plant = null; }
     if (d.fuel && !plantsFor(d.fuel).length) { d.fuel = null; d.plant = null; }
     if (d.group && !(setById(d.group)?.plants.length || groupById(d.group)?.f?.some(k => present[state.region].includes(k)))) { d.group = null; d.plant = null; }
-    relayer(); state.hover = null; lastT = null;
+    relayer(); state.hover = null;
     if (link) {
       linked = null;
       const j = link.t != null ? pointAt(link.t) : null;
-      if (j != null) { state.hover = j; state.hoverBy = 'key'; }   // the summary opens on the linked point
+      if (j != null) { state.hover = j; state.hoverBy = 'pin'; }   // the summary opens on the linked point, pinned
     }
     syncControls(); buildSummary(); render(); save(); report(); share();
   }
@@ -1111,21 +1109,36 @@ export function mountTracker(D, hooks = {}) {
   const hideTip = () => { tip.hidden = true; };
   for (const box of boxes) for (const cv of box.querySelectorAll('canvas')) {
     cv.addEventListener('pointermove', e => {
+      if (state.hoverBy === 'pin') return;   // pinned: the line stays put until a click, Release or Escape
       const j = indexAt(cv, e.clientX), by = e.pointerType === 'touch' ? 'touch' : 'mouse';
       if (j !== state.hover || by !== state.hoverBy) { state.hover = j; state.hoverBy = by; render(); }
       if (by === 'mouse') showTip(cv, j, e);
-      if (cv.id === 'cv-gen' && by === 'mouse') { const l = layerAt(e.clientX, e.clientY); cv.style.cursor = l && l.drill ? 'pointer' : ''; }
     });
     cv.addEventListener('pointerleave', hideTip);
-    cv.addEventListener('pointerdown', e => { state.hover = indexAt(cv, e.clientX); state.hoverBy = e.pointerType === 'touch' ? 'touch' : 'mouse'; render(); });
+    cv.addEventListener('pointerdown', e => {
+      downBy = e.pointerType;
+      if (state.hoverBy === 'pin' || e.pointerType !== 'touch') return;   // a touch keeps its point; a click pins (below)
+      state.hover = indexAt(cv, e.clientX); state.hoverBy = 'touch'; render();
+    });
+    // a click pins the time line there; a click on the pinned point (or next to it) releases it. Drilling down is from
+    // the list beside the charts.
+    cv.addEventListener('click', e => {
+      if (downBy === 'touch') return;
+      const j = indexAt(cv, e.clientX);
+      hideTip();
+      if (state.hoverBy === 'pin' && state.hover != null && Math.abs(j - state.hover) <= 1) { state.hoverBy = 'mouse'; showTip(cv, j, e); }
+      else { state.hover = j; state.hoverBy = 'pin'; }
+      render();
+    });
   }
-  $('cv-gen').addEventListener('click', e => { if (e.pointerType === 'touch') return; const l = layerAt(e.clientX, e.clientY); if (l && l.drill) { hideTip(); drillTo(l.drill); } });
+  let downBy = '';
+  $('sum-unpin').addEventListener('click', () => { state.hover = null; state.hoverBy = null; render(); });
   for (const box of boxes) {
-    box.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') { state.hover = null; hideTip(); render(); } });
+    box.addEventListener('pointerleave', e => { hideTip(); if (e.pointerType === 'mouse' && state.hoverBy !== 'pin') { state.hover = null; render(); } });
     box.addEventListener('keydown', e => {
       if (e.target !== box) return;
       const by = e.shiftKey ? { '5m': 12, '30m': 2, '1d': 7, '1w': 4, '1mo': 12, '1yr': 5 }[state.int] : 1;
-      state.hoverBy = 'key';
+      if (state.hoverBy !== 'pin') state.hoverBy = 'key';   // the arrows move a pinned line and keep it pinned
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         e.preventDefault();
         const cur = state.hover == null ? V.n - 1 : state.hover;
@@ -1133,7 +1146,7 @@ export function mountTracker(D, hooks = {}) {
       } else if (e.key === 'PageUp' || e.key === 'PageDown') { e.preventDefault(); step(e.key === 'PageUp' ? -1 : 1); }
       else if (e.key === 'Home') { e.preventDefault(); state.hover = 0; render(); }
       else if (e.key === 'End') { e.preventDefault(); state.hover = V.n - 1; render(); }
-      else if (e.key === 'Escape') { state.hover = null; render(); }
+      else if (e.key === 'Escape') { state.hover = null; state.hoverBy = null; render(); }
     });
   }
   window.addEventListener('scroll', hideTip, { passive: true });
@@ -1168,11 +1181,12 @@ export function mountTracker(D, hooks = {}) {
       }).catch(() => {});
     },
     // the links the Share button offers (#lib/site/ShareLink.svelte): this view, live or fixed to its dates, and the
-    // last point the cursor was on
+    // pinned point
     links() {
-      const R = RANGES[state.range], j = lastT != null && V ? pointAt(lastT) : null;
+      // the pinned point, or one chosen with the arrow keys or a touch (not wherever the mouse last passed)
+      const R = RANGES[state.range], j = state.hover != null && state.hoverBy !== 'mouse' && V ? state.hover : null;
       return shareLinks('/tracker', { ...shared(), ...ownQuery() }, {
-        point: j != null ? lastT : null, pointLabel: j != null ? (isLong() ? heading(j)[0] : chip(j)) : null, tDay: isLong(),
+        point: j != null ? V.t[j] : null, pointLabel: j != null ? (isLong() ? heading(j)[0] : chip(j)) : null, tDay: isLong(),
         days: R.fixed ? null : R.days, latestEnd: endOfToday(),
       });
     },

@@ -42,7 +42,8 @@
 	let bandKey = $state('HAY');
 	let heatKey = $state('HAY');
 	let hover = $state(-1);
-	let hoverBy = $state<'mouse' | 'touch' | 'key' | null>(null); // touch and keys get the time chip, the mouse its tooltip
+	let hoverBy = $state<'mouse' | 'touch' | 'key' | 'pin' | null>(null); // touch, keys and a pin get the time chip, the mouse its tooltip
+	let pinned = $state(false);   // a click on a chart pins the time line there until another click, Release or Escape
 	let view = $state<any>(null); // what the charts draw (see build below)
 	let busy = $state(false);
 	let viewError = $state('');
@@ -69,7 +70,6 @@
 	// is only remembered in this browser.
 	let intPicked = $state(false);   // the viewer chose the interval; otherwise this page's default for the range
 	let linkedT: number | null = null;   // a link's point: the summary opens on it once the view is built
-	let lastT = $state<number | null>(null);   // the last point the cursor was on, for the Share button
 	function restore() {
 		const v = readView();
 		region = v.region;
@@ -94,13 +94,15 @@
 		document.title = `${describe('prices', sharedNow())} · ELENZ`;
 		try { localStorage.setItem('elenz-prices', JSON.stringify({ scale, off, band: bandKey, heat: heatKey })); } catch { /* storage blocked */ }
 	}
-	// the links the Share button offers: this view, live or fixed to its dates, and the last point the cursor was on
+	// the links the Share button offers: this view, live or fixed to its dates, and the pinned point (or one chosen with
+	// the arrow keys or a touch)
 	function links() {
+		const lastT = view && at >= 0 && hoverBy !== 'mouse' ? view.t[at] : null;
 		const tDay = !['5m', '30m'].includes(effInt);
 		const label = lastT == null ? null : !tDay ? `${clock(lastT)} ${dayLabel(lastT)}` : effInt === '1mo' ? monthLabel(lastT) : effInt === '1w' ? `Week of ${dateLabel(lastT)}` : dateLabel(lastT);
 		return shareLinks('/tracker/prices', { ...sharedNow(), ...ownNow() }, { point: lastT, pointLabel: label, tDay, days: R.days, latestEnd: endOfToday });
 	}
-	$effect(() => { if (view && at >= 0) lastT = view.t[at]; });
+
 	function pickRange(k: string) {
 		range = k;
 		intPicked = false;   // a new range starts on its default interval, as on the Generation tab
@@ -152,12 +154,12 @@
 	function setView(v: any) {
 		const keep = view && view.mode === v.mode && hover >= 0 && hover < v.n && view.n === v.n;
 		view = v;
-		if (!keep) { hover = -1; lastT = null; }   // no cursor: the summary shows the whole range, as on the Generation tab
+		if (!keep) { hover = -1; pinned = false; }   // no cursor: the summary shows the whole range, as on the Generation tab
 		if (linkedT != null) {
 			// a link's point: the period that contains it
 			let j = -1;
 			for (let i = v.n - 1; i >= 0; i--) if (v.t[i] <= linkedT) { j = i; break; }
-			if (j >= 0 && (j < v.n - 1 || linkedT - v.t[j] < 32 * 864e5)) { hover = j; hoverBy = 'key'; }
+			if (j >= 0 && (j < v.n - 1 || linkedT - v.t[j] < 32 * 864e5)) { hover = j; hoverBy = 'pin'; pinned = true; }
 			linkedT = null;
 		}
 	}
@@ -335,6 +337,7 @@
 	// doesn't flicker); a touch keeps its point, since there's no hover to follow
 	let leaveTimer: ReturnType<typeof setTimeout> | undefined;
 	const point = (chart: string) => (e: PointerEvent, i: number) => {
+		if (pinned) return;
 		clearTimeout(leaveTimer);
 		hoverBy = e.pointerType === 'touch' ? 'touch' : 'mouse';
 		if (e.pointerType === 'touch') { tipS = null; return; }
@@ -342,10 +345,18 @@
 	};
 	const leave = (e?: PointerEvent) => {
 		tipS = null;
-		if (e && e.pointerType === 'touch') return;
+		if (pinned || (e && e.pointerType === 'touch')) return;
 		clearTimeout(leaveTimer);
 		leaveTimer = setTimeout(() => (hover = -1), 150);
 	};
+	// a click pins the time line; a click on the pinned point (or next to it) releases it
+	function pin(i: number) {
+		clearTimeout(leaveTimer);
+		tipS = null;
+		if (pinned && Math.abs(i - hover) <= 1) { pinned = false; hoverBy = 'mouse'; return; }
+		hover = i; pinned = true; hoverBy = 'pin';
+	}
+	function unpin() { pinned = false; hover = -1; }
 	const tipPos = $derived.by(() => {
 		if (!tipS) return '';
 		const w = 260, h = 110, pad = 8;
@@ -432,7 +443,7 @@
 		else if (e.key === 'Home') { hover = 0; e.preventDefault(); }
 		else if (e.key === 'End') { hover = view.n - 1; e.preventDefault(); }
 		else if (e.key === 'PageUp' || e.key === 'PageDown') { e.preventDefault(); step(e.key === 'PageUp' ? -1 : 1); }
-		else if (e.key === 'Escape') { hover = -1; tipS = null; }
+		else if (e.key === 'Escape') { hover = -1; tipS = null; pinned = false; }
 	}
 	function closeInfo(e: Event) {
 		if (e instanceof KeyboardEvent) {
@@ -600,7 +611,7 @@
 					</div>
 					<div class="plot">
 						<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={popped === 'price' ? popH : 266} showX {xTicks} y={priceY} fmt={fmtTick} layers={priceLayers} note={highNote} stamp={at >= 0 && hoverBy !== 'mouse' ? chip(at) : null}
-							shade={view.mode === 'time' ? view.shade : []} marks={capMarks} bind:hover onpoint={point('price')} onleave={leave}
+							shade={view.mode === 'time' ? view.shade : []} marks={capMarks} bind:hover onpoint={point('price')} onleave={leave} onpin={pin} {pinned}
 							label="Prices at the grid nodes over the range" zero />
 						{#if canMove}
 							<button type="button" class="nav prev" aria-label="Previous {R.label}" title="Previous {R.label}" onclick={() => step(-1)}>
@@ -631,7 +642,7 @@
 					</div>
 					<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={popped === 'spread' ? popH : 120} y={spreadY} fmt={fmtSpread} zero showX={popped === 'spread'} {xTicks}
 						layers={view.mode === 'time' ? [{ kind: 'posneg', values: view.spread, pos: '--o1', neg: '--o2' }] : [{ kind: 'bars', values: view.P.spread, tok: '--o1', neg: '--o2', opacity: 0.85 }]}
-						shade={view.mode === 'time' ? view.shade : []} bind:hover onpoint={point('spread')} onleave={leave} label="The price gap between Haywards and Benmore" />
+						shade={view.mode === 'time' ? view.shade : []} bind:hover onpoint={point('spread')} onleave={leave} onpin={pin} {pinned} label="The price gap between Haywards and Benmore" />
 				</div>
 
 				{#if view.mode === 'time'}
@@ -643,7 +654,7 @@
 						</div>
 						<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={popped === 'hvdc' ? popH : 140} y={hvdcY} fmt={fmtMW} zero showX {xTicks}
 							layers={[{ kind: 'area', values: view.hvdc, tok: '--f-hvdc', opacity: 0.5 }, { kind: 'line', values: view.hvdc, tok: '--f-hvdc', width: 1.3, dot: false }]}
-							shade={view.shade} bind:hover onpoint={point('hvdc')} onleave={leave} label="HVDC transfer between the islands" />
+							shade={view.shade} bind:hover onpoint={point('hvdc')} onleave={leave} onpin={pin} {pinned} label="HVDC transfer between the islands" />
 					</div>
 				{:else if spikeY}
 					<div class="chart" class:popped={popped === 'spikes'}>
@@ -657,7 +668,7 @@
 						</div>
 						<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={popped === 'spikes' ? popH : 140} y={spikeY} fmt={(v) => String(v)} showX {xTicks}
 							layers={[{ kind: 'bars', values: view.P[bandKey === 'BEN' ? 'SI' : 'NI'].n500, tok: '--o1', opacity: 0.45 }, { kind: 'bars', values: view.P[bandKey === 'BEN' ? 'SI' : 'NI'].n1000, tok: '--o1' }]}
-							bind:hover onpoint={point('spikes')} onleave={leave} label="Half-hours with prices over $500 and $1,000 in each period" />
+							bind:hover onpoint={point('spikes')} onleave={leave} onpin={pin} {pinned} label="Half-hours with prices over $500 and $1,000 in each period" />
 					</div>
 				{/if}
 			{/if}
@@ -670,6 +681,7 @@
 					<div>
 						<div class="sum-when">{head[0]}</div>
 						<div class="sum-sub">{head[1]}</div>
+						{#if pinned && at >= 0}<div class="sum-pin">Pinned <button type="button" onclick={unpin}>Release</button></div>{/if}
 					</div>
 					<button type="button" class="info-btn" bind:this={helpBtn} aria-expanded={helpOpen} aria-controls="p-help" aria-label="How to use the charts" title="How to use the charts" onclick={() => (helpOpen = !helpOpen)}>
 						<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg>
@@ -677,7 +689,7 @@
 				</div>
 				<div class="help" id="p-help" role="note" hidden={!helpOpen}>
 					<p>Use the arrows on the price chart, or the date box, to step back through history by the selected range.</p>
-					<p>Select a node's colour square to show or hide its line. Hover the charts, or focus them and use the arrow keys, to read a single interval; Escape returns to the range.</p>
+					<p>Select a node's colour square to show or hide its line. Hover the charts, or focus them and use the arrow keys, to read a single interval. Click a chart to pin the time line there (click it again, or press Escape, to release it); Share can then mark that time.</p>
 				</div>
 				<table class="mix">
 					<thead><tr><th scope="col">{view?.mode === 'time' ? 'Node' : 'Series'}</th><th scope="col" class="n">{at < 0 ? 'Average' : 'Value'}</th></tr></thead>

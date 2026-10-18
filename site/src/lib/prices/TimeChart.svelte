@@ -8,7 +8,8 @@
 	// shade: [a, b) index ranges shaded behind everything (islands priced apart); marks: labels at the top edge;
 	// note: a label beside one point (the range's high) with a dot on it; stamp: the cursor's time in a chip at the top
 	// (touch and keys, where there's no tooltip), as on the Generation tab.
-	// onpoint(e, i) fires as the pointer moves (for the page's tooltip), onleave when it leaves.
+	// onpoint(e, i) fires as the pointer moves (for the page's tooltip), onleave when it leaves. onpin(i): a click (not a
+	// touch) at point i, to pin the time line there; while pinned the line ignores the pointer.
 	import { firstAtOrAfter } from '#lib/tracker/series.js';
 
 	type Scale = { f: (v: number) => number; lo: number; hi: number; ticks: number[] };
@@ -16,12 +17,12 @@
 
 	let {
 		t, t0, t1, height = 200, y, fmt = (v: number) => String(v), layers = [], shade = [], marks = [], hover = $bindable(-1),
-		xTicks = [], showX = false, label = '', zero = false, note = null, stamp = null, onpoint, onleave
+		xTicks = [], showX = false, label = '', zero = false, note = null, stamp = null, pinned = false, onpoint, onleave, onpin
 	}: {
 		t: ArrayLike<number>; t0: number; t1: number; height?: number; y: Scale; fmt?: (v: number) => string; layers?: Layer[];
 		shade?: [number, number][]; marks?: { i: number; label: string }[]; hover?: number; xTicks?: { t: number; label: string; minor?: boolean }[];
 		showX?: boolean; label?: string; zero?: boolean; note?: { i: number; v: number; text: string; tok?: string } | null; stamp?: string | null;
-		onpoint?: (e: PointerEvent, i: number) => void; onleave?: (e: PointerEvent) => void;
+		onpoint?: (e: PointerEvent, i: number) => void; onleave?: (e: PointerEvent) => void; pinned?: boolean; onpin?: (i: number) => void;
 	} = $props();
 
 	let W = $state(600);
@@ -59,15 +60,27 @@
 		return d + 'Z';
 	}
 
-	function move(e: PointerEvent) {
+	function indexAt(e: MouseEvent) {
 		const r = (e.currentTarget as SVGSVGElement).getBoundingClientRect();
 		const px = ((e.clientX - r.left) / r.width) * W;
 		const tv = t0 + ((px - L) / (W - L - R)) * (t1 - t0);
 		let i = firstAtOrAfter(t as Float64Array, tv);
 		if (i >= n) i = n - 1;
 		if (i > 0 && Math.abs(t[i - 1] - tv) < Math.abs(t[i] - tv)) i--;
+		return i;
+	}
+	let downBy = '';   // how the last press came: a touch keeps its point without pinning (it scrubs instead)
+	function move(e: PointerEvent) {
+		if (e.type === 'pointerdown') downBy = e.pointerType;
+		if (pinned) return;
+		const i = indexAt(e);
 		if (i >= 0 && i !== hover) hover = i;
 		if (i >= 0) onpoint?.(e, i);
+	}
+	function click(e: MouseEvent) {
+		if (downBy === 'touch' || !onpin) return;
+		const i = indexAt(e);
+		if (i >= 0) onpin(i);
 	}
 	// marks: a triangle at every clipped point (one per few pixels), and labels only where they don't overlap;
 	// marks come highest first, so the highest prices get their labels
@@ -110,7 +123,9 @@
 </script>
 
 <div class="tc" bind:clientWidth={W}>
-	<svg width={W} {height} viewBox="0 0 {W} {height}" role="img" aria-label={label} onpointermove={move} onpointerdown={move} onpointerleave={(e) => onleave?.(e)}>
+	<!-- a click pins the time line; the keyboard moves it with the arrow keys on the page's focusable chart panel -->
+	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
+	<svg width={W} {height} viewBox="0 0 {W} {height}" role="img" aria-label={label} onpointermove={move} onpointerdown={move} onpointerleave={(e) => onleave?.(e)} onclick={click} class:pinnable={!!onpin}>
 		{#each shade as [a, b]}
 			<rect class="shade" x={Math.max(x0, X(t[a]) - half(a))} y={yTop} width={Math.max(1, X(t[b - 1]) + half(b - 1) - Math.max(x0, X(t[a]) - half(a)))} height={yBot - yTop}></rect>
 		{/each}
@@ -148,7 +163,7 @@
 			<circle cx={X(t[note.i])} cy={Y(note.v)} r="4" style="fill: var({note.tok ?? '--ink'})" class="dot"></circle>
 		{/if}
 		{#if hx !== null}
-			<line class="cursor" x1={Math.round(hx) + 0.5} x2={Math.round(hx) + 0.5} y1={yTop} y2={yBot}></line>
+			<line class="cursor" class:pinned x1={Math.round(hx) + 0.5} x2={Math.round(hx) + 0.5} y1={yTop} y2={yBot}></line>
 			{#each layers as ly}
 				{#if ly.kind === 'line' && ly.dot !== false && ly.values && ly.values[hover] === ly.values[hover]}
 					<circle cx={hx} cy={Y(ly.values[hover])} r="4" style="fill: var({ly.tok})" class="dot"></circle>
@@ -180,6 +195,8 @@
 	.shade { fill: var(--warn-bg); }
 	/* cursor, dots and time chip match the Generation tab's canvas charts */
 	.cursor { stroke: var(--ink-2); stroke-width: 1; }
+	.cursor.pinned { stroke: var(--accent); stroke-width: 1.5; }
+	svg.pinnable { cursor: crosshair; }
 	.dot { stroke: var(--surface); stroke-width: 2; }
 	.stamp rect { fill: var(--ink); }
 	.stamp text { fill: var(--surface); font-size: 11px; font-weight: 600; }
