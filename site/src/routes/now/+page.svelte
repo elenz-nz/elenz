@@ -79,7 +79,7 @@
 			checkRecords();
 			error = '';
 		}
-		load().catch((e) => (error = `The data couldn't be loaded. ${e.message} Try reloading the page.`));
+		load().catch((e) => { console.warn('data load failed:', e); error = "Elenz can't reach its data right now. It will try again every minute."; });   // check() below retries every minute
 		loadRecords().then((r) => { records = r; checkRecords(); });
 		// tick every minute (clock and labels); fetch only once the next interval is due, while on screen
 		const check = () => {

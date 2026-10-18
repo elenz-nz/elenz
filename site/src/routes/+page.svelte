@@ -94,7 +94,7 @@
 			stampSeen = true;
 			error = '';
 		}
-		load().catch((e) => (error = `The live data couldn't be loaded. ${e.message}`));
+		load().catch((e) => { console.warn('data load failed:', e); error = "Elenz can't reach its data right now. It will try again every minute."; });   // retried every minute
 		const check = () => {
 			clock = Date.now();
 			if (document.visibilityState === 'visible' && Date.now() >= due) load().catch(() => {});

@@ -110,7 +110,7 @@
 			if (tracker) tracker.update(D);
 			else tracker = mountTracker(D, { status: (v: View) => (view = v), view: (v: any) => (lower = v) });
 		}
-		load().catch((e) => (error = `The data couldn't be loaded. ${e.message} Try reloading the page.`));
+		load().catch((e) => { console.warn('data load failed:', e); error = "Elenz can't reach its data right now. It will try again every minute."; });   // check() below retries every minute
 		// tick every minute (clock and labels); fetch only once the next interval is due, while on screen
 		const check = () => {
 			now = Date.now();
