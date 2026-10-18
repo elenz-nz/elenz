@@ -434,13 +434,32 @@ export function mountTracker(D, hooks = {}) {
   const PADL = 50, PADR = 12;
   const FONT = '11px "IBM Plex Mono", ui-monospace, Menlo, monospace';
   let exportScale = 0;   // while drawing a download: at least twice the screen's pixels, so the image is sharp
+  // Each chart is drawn once per view into an off-screen copy, its base (fills, lines, axes, labels, highs and lows).
+  // Moving the time line only copies the base back and draws the line, dots and time chip over it (paint), so
+  // scrubbing a long range on a phone doesn't redraw thousands of points per frame. Each draw function leaves its
+  // frame (F) and an `over(ctx, j)` for paint. render() redraws the bases; hover() only repaints.
+  const BASE = {};   // canvas id -> { off, dpr, F, over }
   function setup(cv) {
     const dpr = Math.max(exportScale, window.devicePixelRatio || 1), w = cv.clientWidth, h = cv.clientHeight;
     const W = Math.round(w * dpr), H = Math.round(h * dpr);
     if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
-    const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+    const base = BASE[cv.id] || (BASE[cv.id] = { off: document.createElement('canvas') });
+    if (base.off.width !== W || base.off.height !== H) { base.off.width = W; base.off.height = H; }
+    const ctx = base.off.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+    base.dpr = dpr; base.F = null; base.over = null;
     // an enlarged chart (the page's popout) draws its own time axis
-    return { ctx, w, h, dpr, popped: !!cv.closest('.popped') };
+    return { ctx, w, h, dpr, base, popped: !!cv.closest('.popped') };
+  }
+  // the chart on screen: its base, then the time line and whatever the chart marks at the hovered point
+  function paint(id) {
+    const cv = $(id), b = BASE[id];
+    if (!b || !b.F) return;
+    const ctx = cv.getContext('2d');
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height); ctx.drawImage(b.off, 0, 0);
+    if (state.hover == null || state.hover >= V.n) return;
+    ctx.setTransform(b.dpr, 0, 0, b.dpr, 0, 0);
+    cursor(ctx, b.F);
+    if (b.over) b.over(ctx, state.hover);
   }
   // an enlarged chart has room for about three times as many gridlines
   const ticksFor = (id, n) => ($(id).closest('.popped') ? n * 3 : n);
@@ -598,14 +617,15 @@ export function mountTracker(D, hooks = {}) {
       }
     }
     GEN = { F, tops };
-    cursor(ctx, F);
-    if (state.hover != null && state.hoverBy !== 'mouse') {  // the mouse tooltip shows the time itself
-      const lbl = chip(state.hover);
+    c.base.F = F;
+    c.base.over = (ctx, j) => {
+      if (state.hoverBy === 'mouse') return;   // the mouse tooltip shows the time itself
+      const lbl = chip(j);
       ctx.font = '600 11px "IBM Plex Mono", ui-monospace, monospace'; const tw = ctx.measureText(lbl).width;
-      let x = F.X(state.hover) - tw / 2 - 6; x = Math.max(F.x0, Math.min(F.x1 - tw - 12, x));
+      let x = F.X(j) - tw / 2 - 6; x = Math.max(F.x0, Math.min(F.x1 - tw - 12, x));
       ctx.fillStyle = C['--ink']; roundRect(ctx, x, F.top, tw + 12, 18, 4); ctx.fill();
       ctx.fillStyle = C['--surface']; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(lbl, x + 6, F.top + 9.5);
-    }
+    };
   }
   function layerAt(clientX, clientY) {
     if (!GEN) return null;
@@ -630,8 +650,7 @@ export function mountTracker(D, hooks = {}) {
     }
     const hi = (si ? V.pSI : V.pNI)[jm], who = r === 'NZ' ? (si ? ' · Benmore' : ' · Haywards') : '';
     if (V.n) extreme(ctx, F, jm, hi, `High ${money(hi)}${who}`, si ? C['--p-si'] : C['--p-ni']);
-    cursor(ctx, F);
-    if (state.hover != null) { const j = state.hover; dot(ctx, X(j), Y(V.pSI[j]), alpha(C['--p-si'], aSI)); dot(ctx, X(j), Y(V.pNI[j]), alpha(C['--p-ni'], aNI)); }
+    c.base.F = F; c.base.over = (ctx, j) => { dot(ctx, X(j), Y(V.pSI[j]), alpha(C['--p-si'], aSI)); dot(ctx, X(j), Y(V.pNI[j]), alpha(C['--p-ni'], aNI)); };
   }
   function drawDemand() {
     const c = setup($('cv-demand')), { ctx } = c;
@@ -643,8 +662,7 @@ export function mountTracker(D, hooks = {}) {
     if (V.roofU.some(u => u > 0.5)) band(ctx, X, Y, V.underlying.map((v, j) => v - V.roofU[j]), V.underlying.map((v, j) => v + V.roofU[j]), alpha(C['--ink-2'], 0.22));
     line(ctx, X, Y, V.underlying, C['--ink-2'], 1.5, [4, 3]);
     line(ctx, X, Y, V.metered, C['--ink']);
-    cursor(ctx, F);
-    if (state.hover != null) { const j = state.hover; dot(ctx, X(j), Y(V.underlying[j]), C['--ink-2']); dot(ctx, X(j), Y(V.metered[j]), C['--ink']); }
+    c.base.F = F; c.base.over = (ctx, j) => { dot(ctx, X(j), Y(V.underlying[j]), C['--ink-2']); dot(ctx, X(j), Y(V.metered[j]), C['--ink']); };
   }
   function drawHvdc() {
     const c = setup($('cv-hvdc')), { ctx } = c;
@@ -656,8 +674,7 @@ export function mountTracker(D, hooks = {}) {
     ctx.font = FONT; ctx.fillStyle = C['--muted']; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
     ctx.fillText('↑ north', F.x0 + 4, F.top);
     if (dom.lo < 0) { ctx.textBaseline = 'bottom'; ctx.fillText('↓ south', F.x0 + 4, F.bottom); }
-    cursor(ctx, F);
-    if (state.hover != null) dot(ctx, X(state.hover), Y(V.hvdc[state.hover]), C['--f-hvdc']);
+    c.base.F = F; c.base.over = (ctx, j) => dot(ctx, X(j), Y(V.hvdc[j]), C['--f-hvdc']);
   }
   function drawCo2() {
     const c = setup($('cv-co2')), { ctx } = c;
@@ -666,8 +683,7 @@ export function mountTracker(D, hooks = {}) {
     const F = frame(c, dom, v => fmt(v)), { X, Y } = F;
     area(ctx, X, Y, V.co2, 0, alpha(C['--co2'], 0.28));
     line(ctx, X, Y, V.co2, C['--co2'], 1.5);
-    cursor(ctx, F);
-    if (state.hover != null) dot(ctx, X(state.hover), Y(V.co2[state.hover]), C['--co2']);
+    c.base.F = F; c.base.over = (ctx, j) => dot(ctx, X(j), Y(V.co2[j]), C['--co2']);
   }
   function drawRen() {
     const c = setup($('cv-ren')), { ctx } = c;
@@ -679,8 +695,7 @@ export function mountTracker(D, hooks = {}) {
     const F = frame(c, dom, v => v + '%', { axis: true }), { X, Y } = F;
     area(ctx, X, Y, V.ren, lo, alpha(C['--accent'], 0.14));
     line(ctx, X, Y, V.ren, C['--accent']);
-    cursor(ctx, F);
-    if (state.hover != null) dot(ctx, X(state.hover), Y(V.ren[state.hover]), C['--accent']);
+    c.base.F = F; c.base.over = (ctx, j) => dot(ctx, X(j), Y(V.ren[j]), C['--accent']);
   }
 
   // ---------- summary ----------
@@ -728,7 +743,7 @@ export function mountTracker(D, hooks = {}) {
     for (const id of ids) off ? state.hidden.add(id) : state.hidden.delete(id);
     for (const l of V.layers) if (ids.includes(l.id)) { l.row.classList.toggle('off', off); l.row.querySelector('.sw-btn')?.setAttribute('aria-pressed', String(!off)); }
     if (tr) { tr.classList.toggle('off', off); tr.querySelector('.sw-btn').setAttribute('aria-pressed', String(!off)); }
-    drawGen();
+    render();
   }
   function applyFilter() {
     const q = norm(state.filter.trim());
@@ -742,6 +757,8 @@ export function mountTracker(D, hooks = {}) {
       x.row.setAttribute('aria-expanded', String(!!q || state.open.has(x.id)));
     }
   }
+  // a row's quantity, share and bar cells, kept so a hover doesn't search the table for them
+  const cellsOf = tr => ({ q: tr.querySelector('[data-q]'), s: tr.querySelector('[data-s]'), b: tr.querySelector('[data-b]') });
   function buildSummary() {
     renderCrumbs();
     const body = $('mix-body'); body.innerHTML = '';
@@ -764,7 +781,7 @@ export function mountTracker(D, hooks = {}) {
           tr.innerHTML = `<td><div class="row-name"><button type="button" class="sw-btn" aria-pressed="${!ids.every(id => state.hidden.has(id))}" aria-label="Show ${esc(x.name)} in the chart"><span class="sw${x.hatch ? ' hatch' : ''}"></span></button><button type="button" class="sec-btn" aria-label="${esc(x.name)}: show or hide its ${x.members.length} rows">${esc(x.name)} <span class="cnt">${x.members.length}</span></button></div></td><td class="n" data-q></td><td class="n"><div class="share"><span data-s></span><span class="bar" data-b></span></div></td>`;
           tr.querySelector('.sw-btn').addEventListener('click', () => toggleHidden(ids, tr));
           tr.querySelector('.sec-btn').addEventListener('click', () => { state.open.has(x.id) ? state.open.delete(x.id) : state.open.add(x.id); applyFilter(); });
-          x.row = tr;
+          x.row = tr; x.cells = cellsOf(tr);
           body.appendChild(tr);
         }
       } else if (!l.section) cur = null;
@@ -779,7 +796,7 @@ export function mountTracker(D, hooks = {}) {
         if (x && x.row) { const all = x.members.every(m => state.hidden.has(m.id)); x.row.classList.toggle('off', all); x.row.querySelector('.sw-btn').setAttribute('aria-pressed', String(!all)); }
       });
       if (l.drill) tr.querySelector('.drill').addEventListener('click', () => drillTo(l.drill));
-      l.row = tr;
+      l.row = tr; l.cells = cellsOf(tr);
       body.appendChild(tr);
     }
     const f = $('mix-filter');
@@ -837,9 +854,9 @@ export function mountTracker(D, hooks = {}) {
       for (const x of V.sections) if (x.row) E.set(x, x.members.reduce((a, m) => a + E.get(m), 0));
       for (const l of [...layers, ...V.sections.filter(x => x.row)]) {
         const e = E.get(l);
-        l.row.querySelector('[data-q]').textContent = en(e);
-        l.row.querySelector('[data-s]').textContent = l.signed ? signedTxt(l, e, true) : tot > 0 ? (e / tot * 100).toFixed(1) + '%' : '—';
-        l.row.querySelector('[data-b]').style.transform = `scaleX(${l.signed || tot <= 0 ? 0 : Math.max(0, e / tot)})`;
+        l.cells.q.textContent = en(e);
+        l.cells.s.textContent = l.signed ? signedTxt(l, e, true) : tot > 0 ? (e / tot * 100).toFixed(1) + '%' : '—';
+        l.cells.b.style.transform = `scaleX(${l.signed || tot <= 0 ? 0 : Math.max(0, e / tot)})`;
       }
       $('tot-q').textContent = en(tot); $('tot-s').textContent = layers.some(l => l.signed) && !topIsAll() ? 'net' : '100%';
       let pn = 0, ps = 0, pk = 0, pkg = 0, ti = 0, hv = 0, em = 0, gw = 0, re = 0, hs = 0;
@@ -871,9 +888,9 @@ export function mountTracker(D, hooks = {}) {
     if (topIsAll()) tot = V.gen[j]; else for (const l of layers) tot += l.signed ? l.s[j] : Math.max(0, l.s[j]);
     for (const l of [...layers, ...V.sections.filter(x => x.row)]) {
       const v = l.members ? l.members.reduce((a, m) => a + m.s[j], 0) : l.s[j];
-      l.row.querySelector('[data-q]').textContent = fmt(v);
-      l.row.querySelector('[data-s]').textContent = l.signed ? signedTxt(l, v, false) : tot > 0.5 ? (v / tot * 100).toFixed(1) + '%' : '—';
-      l.row.querySelector('[data-b]').style.transform = `scaleX(${l.signed || tot <= 0.5 ? 0 : Math.max(0, v / tot)})`;
+      l.cells.q.textContent = fmt(v);
+      l.cells.s.textContent = l.signed ? signedTxt(l, v, false) : tot > 0.5 ? (v / tot * 100).toFixed(1) + '%' : '—';
+      l.cells.b.style.transform = `scaleX(${l.signed || tot <= 0.5 ? 0 : Math.max(0, v / tot)})`;
     }
     $('tot-q').textContent = fmt(tot); $('tot-s').textContent = layers.some(l => l.signed) && !topIsAll() ? '' : '100%';
     setSys([
@@ -898,9 +915,19 @@ export function mountTracker(D, hooks = {}) {
   }
 
   // ---------- orchestration ----------
-  let raf = 0;
+  const CHARTS = ['cv-gen', 'cv-price', 'cv-demand', 'cv-hvdc', 'cv-co2', 'cv-ren'];
+  let raf = 0, stale = true;
   function drawAll() { drawGen(); drawPrice(); drawDemand(); drawHvdc(); drawCo2(); drawRen(); }
-  function render() { $('sum-pin').hidden = state.hoverBy !== 'pin' || state.hover == null; cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { drawAll(); updateSummary(); }); }
+  const paintAll = () => { for (const id of CHARTS) paint(id); };
+  function schedule() {
+    $('sum-pin').hidden = state.hoverBy !== 'pin' || state.hover == null;
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => { if (stale) { drawAll(); stale = false; } paintAll(); updateSummary(); });
+  }
+  // render: the view, its layers, units, colours or size changed, so the charts are drawn again
+  function render() { stale = true; schedule(); }
+  // hover: only the time line moved (pointer, touch, keys, pin); the charts are repainted from their bases
+  function hover() { schedule(); }
   const intsFor = (r, kind) => RANGES[r].model === 'live' && kind !== 'live' ? RANGES[r].past : RANGES[r].ints;
   // local midnight at or before t; whole days later or earlier (a day is 23-25 hours at the clock changes)
   const midnightOf = t => { const k = KEY.day(t) * DAY; return k - nzOffset(k - nzOffset(k)); };
@@ -1113,14 +1140,14 @@ export function mountTracker(D, hooks = {}) {
     cv.addEventListener('pointermove', e => {
       if (state.hoverBy === 'pin') return;   // pinned: the line stays put until a click, Release or Escape
       const j = indexAt(cv, e.clientX), by = e.pointerType === 'touch' ? 'touch' : 'mouse';
-      if (j !== state.hover || by !== state.hoverBy) { state.hover = j; state.hoverBy = by; render(); }
+      if (j !== state.hover || by !== state.hoverBy) { state.hover = j; state.hoverBy = by; hover(); }
       if (by === 'mouse') showTip(cv, j, e);
     });
     cv.addEventListener('pointerleave', hideTip);
     cv.addEventListener('pointerdown', e => {
       downBy = e.pointerType;
       if (state.hoverBy === 'pin' || e.pointerType !== 'touch') return;   // a touch keeps its point; a click pins (below)
-      state.hover = indexAt(cv, e.clientX); state.hoverBy = 'touch'; render();
+      state.hover = indexAt(cv, e.clientX); state.hoverBy = 'touch'; hover();
     });
     // a click pins the time line there; a click on the pinned point (or next to it) releases it. Drilling down is from
     // the list beside the charts.
@@ -1130,13 +1157,13 @@ export function mountTracker(D, hooks = {}) {
       hideTip();
       if (state.hoverBy === 'pin' && state.hover != null && Math.abs(j - state.hover) <= 1) { state.hoverBy = 'mouse'; showTip(cv, j, e); }
       else { state.hover = j; state.hoverBy = 'pin'; }
-      render();
+      hover();
     });
   }
   let downBy = '';
-  $('sum-unpin').addEventListener('click', () => { state.hover = null; state.hoverBy = null; render(); });
+  $('sum-unpin').addEventListener('click', () => { state.hover = null; state.hoverBy = null; hover(); });
   for (const box of boxes) {
-    box.addEventListener('pointerleave', e => { hideTip(); if (e.pointerType === 'mouse' && state.hoverBy !== 'pin') { state.hover = null; render(); } });
+    box.addEventListener('pointerleave', e => { hideTip(); if (e.pointerType === 'mouse' && state.hoverBy !== 'pin') { state.hover = null; hover(); } });
     box.addEventListener('keydown', e => {
       if (e.target !== box) return;
       const by = e.shiftKey ? { '5m': 12, '30m': 2, '1d': 7, '1w': 4, '1mo': 12, '1yr': 5 }[state.int] : 1;
@@ -1144,11 +1171,11 @@ export function mountTracker(D, hooks = {}) {
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         e.preventDefault();
         const cur = state.hover == null ? V.n - 1 : state.hover;
-        state.hover = Math.max(0, Math.min(V.n - 1, cur + (e.key === 'ArrowLeft' ? -by : by))); render();
+        state.hover = Math.max(0, Math.min(V.n - 1, cur + (e.key === 'ArrowLeft' ? -by : by))); hover();
       } else if (e.key === 'PageUp' || e.key === 'PageDown') { e.preventDefault(); step(e.key === 'PageUp' ? -1 : 1); }
-      else if (e.key === 'Home') { e.preventDefault(); state.hover = 0; render(); }
-      else if (e.key === 'End') { e.preventDefault(); state.hover = V.n - 1; render(); }
-      else if (e.key === 'Escape') { state.hover = null; state.hoverBy = null; render(); }
+      else if (e.key === 'Home') { e.preventDefault(); state.hover = 0; hover(); }
+      else if (e.key === 'End') { e.preventDefault(); state.hover = V.n - 1; hover(); }
+      else if (e.key === 'Escape') { state.hover = null; state.hoverBy = null; hover(); }
     });
   }
   window.addEventListener('scroll', hideTip, { passive: true });
@@ -1163,6 +1190,7 @@ export function mountTracker(D, hooks = {}) {
   mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   const ro = new ResizeObserver(() => render());
   for (const box of boxes) ro.observe(box);
+  for (const id of CHARTS) ro.observe($(id));   // an enlarged chart changes height without its panel changing width
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => render());
 
   // ---------- for the downloads ----------
@@ -1204,7 +1232,7 @@ export function mountTracker(D, hooks = {}) {
     async image(which) {
       const L = this.links(), views = { ...shared(), ...ownQuery() };
       const ids = which === 'gen' ? ['cv-gen'] : ['cv-gen', 'cv-price', 'cv-demand', 'cv-hvdc', 'cv-co2', 'cv-ren'];
-      exportScale = 2; drawAll();   // redraw at double resolution, copy, then back to the screen's own
+      exportScale = 2; drawAll(); paintAll();   // redraw at double resolution, copy, then back to the screen's own
       try {
         const panels = ids.map(id => {
           const cv = $(id), card = cv.closest('.chart'), src = document.createElement('canvas');
