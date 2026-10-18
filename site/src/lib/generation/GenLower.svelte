@@ -257,7 +257,7 @@
 		<div class="card-head">
 			<div>
 				<h2>{metric === 'ren' ? 'Renewable share' : `${m.title} share`}</h2>
-				<Context range={rangeChip} items={[dates, v ? `${RES[v.int]}, % of generation` : '', m.note]} />
+				<Context range={rangeChip} items={[dates, v ? `${RES[v.int]}, % of generation` : '']} />
 			</div>
 			<div class="tools">
 				<div class="seg" role="group" aria-label="Series for the share chart">
@@ -286,6 +286,7 @@
 		{/if}
 		<p class="note">
 			{#if canCompare}Dashed: the same dates a year earlier (365 days before){v && v.int === '5m' ? ', half-hourly' : ''}.{:else if v && v.days == null}No comparison on the full history.{:else}The year before is outside the history.{/if}
+			{#if m.note}{m.title}: {m.note}.{/if}
 			<a href="/methods/groupings#renewable">How shares are worked out</a>
 		</p>
 	</section>
