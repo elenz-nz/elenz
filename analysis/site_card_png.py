@@ -1,5 +1,5 @@
 """Save the site's link-preview image (site/src/lib/site/SiteCard.svelte, drawn at /og/card from the live week) as
-site/static/og/elenz.png, 1200 x 630, dark. Every page without its own image uses it (site/src/lib/site/Preview.svelte).
+site/static/og/elenz.png, 2400 x 1260 (twice the usual size, so LinkedIn and others scale down from more detail), dark. Every page without its own image uses it (site/src/lib/site/Preview.svelte).
 
 Needs the built site served locally with live data at /data/tracker.json, Pillow, and Playwright with Chromium
 (pip install pillow playwright; playwright install chromium):
@@ -22,13 +22,13 @@ def main(base='http://localhost:4173'):
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with sync_playwright() as p:
         b = p.chromium.launch()
-        pg = b.new_page(viewport={'width': 1200, 'height': 630}, color_scheme='dark')
+        pg = b.new_page(viewport={'width': 1200, 'height': 630}, device_scale_factor=2, color_scheme='dark')
         pg.goto(f'{base}/og/card')
         pg.wait_for_selector('figure.site-card svg path')
         pg.wait_for_timeout(1500)  # web fonts
         pg.locator('figure.site-card svg').screenshot(path=OUT)
         b.close()
-    Image.open(OUT).convert('RGB').resize((1200, 630), Image.LANCZOS).save(OUT, optimize=True)
+    Image.open(OUT).convert('RGB').resize((2400, 1260), Image.LANCZOS).save(OUT, optimize=True)
     print(OUT, os.path.getsize(OUT) // 1024, 'KB')
 
 

@@ -66,7 +66,7 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   live 5-minute data; 30 days uses half-hourly history; 1 year and All use daily history).
 - Link previews: every public page puts `src/lib/site/Preview.svelte` in its `<svelte:head>` (og:title, og:description,
   og:url, og:image, the large-image card). Articles use their cover PNG; every other page the site's card,
-  `static/og/elenz.png`: `src/lib/site/SiteCard.svelte` (the mark and name over a week of generation, cover style)
+  `static/og/elenz.png` (2400 x 1260; each page asks for it as `?p=<page>`, since LinkedIn served some pages a thumbnail of one shared address): `src/lib/site/SiteCard.svelte` (the mark and name over a week of generation, cover style)
   drawn at `/og/card` (noindex, disallowed in robots.txt) and saved by `analysis/site_card_png.py` (redo it now and
   then; it isn't dated). `npm run check:previews` (`scripts/check-previews.js`, after the build, in checks.yml) fails
   if a public page (not noindex) lacks any tag or its image. A new page needs a `<Preview>`.

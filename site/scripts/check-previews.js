@@ -19,7 +19,7 @@ for (const file of pages(BUILD).sort()) {
   for (const k of ['og:title', 'og:description', 'og:url', 'og:image', 'twitter:card']) if (!meta(html, k)) problems.push(`no ${k}`);
   const img = meta(html, 'og:image');
   if (img && !img.startsWith(SITE + '/')) problems.push(`og:image isn't on ${SITE}: ${img}`);
-  else if (img && !existsSync(join(BUILD, img.slice(SITE.length)))) problems.push(`og:image file missing: ${img.slice(SITE.length)}`);
+  else if (img && !existsSync(join(BUILD, img.slice(SITE.length).split('?')[0]))) problems.push(`og:image file missing: ${img.slice(SITE.length)}`);
   const url = meta(html, 'og:url');
   if (url && url !== SITE + page.replace(/\/$/, '') && !(page === '/' && url === SITE + '/')) problems.push(`og:url is ${url}`);
   if (problems.length) { bad++; console.log(`${page}: ${problems.join('; ')}`); }
