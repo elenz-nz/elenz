@@ -8,6 +8,7 @@
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import GenLower from '#lib/generation/GenLower.svelte';
 	import ShareLink from '#lib/site/ShareLink.svelte';
+	import DownloadMenu from '#lib/site/DownloadMenu.svelte';
 	import { barHeight } from '#lib/site/sticky.js';
 
 	type Meta = { intervals: number; expected: number; end: number; api_from: number | null; built: number };
@@ -64,6 +65,16 @@
 			: "Dispatch data from the Electricity Authority's real-time dispatch feed, updated every 5 minutes.";
 	});
 
+	// the Download button's choices (#lib/site/DownloadMenu.svelte); tracker.js makes the files
+	const downloads = () => {
+		const t = tracker;
+		if (!t) return [];
+		return [
+			{ label: 'Generation chart', sub: 'Image with title, dates, sources and credit', kind: 'PNG' as const, run: () => t.image('gen') },
+			{ label: 'All six charts', sub: 'Generation, price, demand, HVDC, emissions and renewables', kind: 'PNG' as const, run: () => t.image('all') },
+			{ label: 'Data for this view', sub: 'Every source shown, prices, demand, HVDC and emissions', kind: 'CSV' as const, run: () => t.csv() },
+		];
+	};
 	const status = $derived(error || (view?.loading ? 'Loading history…' : view?.error) || (meta ? '' : 'Loading the latest data…'));
 
 	// one of the smaller charts enlarged over the page (Esc, the button again or a click outside closes it)
@@ -148,6 +159,7 @@
 					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {clockOnly(meta.end)}<span class="pday">{when(meta.end).slice(clockOnly(meta.end).length)}</span></span>
 				{/if}
 			{/if}
+			<DownloadMenu items={downloads} />
 			<ShareLink links={() => tracker?.links() ?? null} />
 			<button type="button" class="info-btn" bind:this={infoBtn} aria-expanded={infoOpen} aria-controls="about-data" aria-label="About this data" title="About this data" onclick={() => (infoOpen = !infoOpen)}>
 				<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg>

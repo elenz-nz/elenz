@@ -10,6 +10,8 @@
 	import TrackerTabs from '#lib/site/TrackerTabs.svelte';
 	import { readView, writeView, midnightOf, addDays, ymd, endOfDay, describe, shareLinks } from '#lib/site/view.js';
 	import ShareLink from '#lib/site/ShareLink.svelte';
+	import DownloadMenu from '#lib/site/DownloadMenu.svelte';
+	import { composeImage, svgImage, legendOf, csvText, nzTime, utcTime, fileName, CREDIT, LICENCE } from '#lib/site/download.js';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import TimeChart from '#lib/prices/TimeChart.svelte';
 	import FuelBars from '#lib/prices/FuelBars.svelte';
@@ -88,6 +90,61 @@
 			if (p.heat in NODE) heatKey = p.heat;
 		}
 	}
+	// ---------- downloads (#lib/site/DownloadMenu.svelte, #lib/site/download.js) ----------
+	const EACH: Record<string, string> = { '5m': '5-minute', '30m': 'half-hourly', '1d': 'daily', '1w': 'weekly', '1mo': 'monthly' };
+	// "6:05 pm Sat 17 Oct 2026 to 6:00 pm Sun 18 Oct 2026 · 5-minute averages"
+	function spanText() {
+		const S = view.S, a = S.t[0], b = S.t[S.n - 1] + S.h[S.n - 1] * 36e5, long = view.mode === 'long';
+		const at = (t: number) => (long ? dateLabel(t) : `${clock(t)} ${dayLabel(t)} ${nzParts(t).y}`);
+		return `${at(a)} to ${at(long ? b - 1 : b)} · ${EACH[effInt] ?? ''} ${long ? 'periods' : 'averages'}`;
+	}
+	// the address a download names: the live view while it's live, otherwise its dates (and a pinned point)
+	function viewLink() {
+		const L = links();
+		return (L.live && L.point == null ? L.live : (L.fixed(L.point != null) || { url: L.live }).url) ?? "";
+	}
+	const fileWords = () => describe('prices', { ...sharedNow(), end: endT ?? endOfToday });
+	async function image(which: 'price' | 'all') {
+		if (!view) throw new Error('The charts are still loading.');
+		const cards = [...document.querySelectorAll<HTMLElement>('#charts .chart, #charts-more .chart')].filter((c) => c.querySelector('.tc svg'));
+		const tokColour = (tok: string) => getComputedStyle(document.documentElement).getPropertyValue(tok).trim();
+		const panels = [];
+		for (const card of which === 'price' ? cards.slice(0, 1) : cards) {
+			const { img, w, h } = await svgImage(card.querySelector('.tc svg') as SVGSVGElement);
+			// the price chart's nodes are listed in the summary table on screen, so name them here
+			const nodes = card === cards[0] && view.mode === 'time' ? shown.map((x: any) => ({ name: `${x.name} (${x.node})`, colour: tokColour(x.tok), kind: 'line' })) : [];
+			panels.push({ heading: card.querySelector('h2')?.textContent ?? '', unit: card.querySelector('.unit')?.textContent ?? '', legend: [...nodes, ...legendOf(card)], img, w, h });
+		}
+		const blob = await composeImage({ title: describe('prices', sharedNow()), sub: spanText(), panels, credit: [CREDIT, 'Dispatch prices for the live week, final prices for history.'], link: viewLink() });
+		return { blob, name: fileName(fileWords(), 'png') };
+	}
+	function csv() {
+		if (!view) throw new Error('The charts are still loading.');
+		const r2 = (v: number) => Math.round(v * 100) / 100, r1 = (v: number) => Math.round(v * 10) / 10;
+		let header: string[], rows: any[][];
+		if (view.mode === 'time') {
+			header = ['start_nz', 'start_utc', ...shown.map((x: any) => `${x.name} ${x.node} ($/MWh)`), 'Island spread, Haywards - Benmore ($/MWh)', 'HVDC transfer, northward (MW)'];
+			rows = Array.from({ length: view.n }, (_, i) => [nzTime(view.t[i]), utcTime(view.t[i]), ...shown.map((x: any) => r2(x.values[i])), r2(view.spread[i]), r1(view.hvdc[i])]);
+		} else {
+			// each period's percentiles are its days' percentiles averaged (as the chart's middle 80% band)
+			const pc = (n: string) => (effInt === '1d' ? `${n} percentile` : `${n} percentile (daily, averaged)`);
+			const P = view.P, cols: [string, string][] = [['price', 'average'], ['p10', pc('10th')], ['p90', pc('90th')], ['pmin', 'lowest'], ['pmax', 'highest'], ['n500', 'half-hours over $500'], ['n1000', 'half-hours over $1,000']];
+			const isl = [['NI', 'Haywards'], ['SI', 'Benmore']];
+			header = ['period_start_nz', ...isl.flatMap(([, n]) => cols.map(([k, c]) => `${n} ${c}${k.startsWith('n') ? '' : ' ($/MWh)'}`)), 'Island spread, average ($/MWh)', 'HVDC transfer, average northward (MW)'];
+			rows = Array.from({ length: P.n }, (_, j) => [nzTime(P.t[j]).slice(0, 10), ...isl.flatMap(([k]) => cols.map(([c]) => (c.startsWith('n') ? P[k][c][j] : r2(P[k][c][j])))), r2(P.spread[j]), r1(P.hvdc[j])]);
+		}
+		const text = csvText([
+			`ELENZ: ${describe('prices', sharedNow())}`,
+			`${spanText()}. Times are the start of each ${view.mode === 'long' ? 'period' : 'interval'}. Dispatch prices for the live week, final prices for history.`,
+			CREDIT, LICENCE, 'How the prices are shown: https://elenz.co.nz/methods/prices', `This view: ${viewLink()}`,
+		], header, rows);
+		return { blob: new Blob([text], { type: 'text/csv;charset=utf-8' }), name: fileName(fileWords(), 'csv') };
+	}
+	const downloads = () => [
+		{ label: view?.mode === 'long' ? 'Price range chart' : 'Price chart', sub: 'Image with title, dates, nodes and credit', kind: 'PNG' as const, run: () => image('price') },
+		{ label: 'All charts', sub: view?.mode === 'long' ? 'Price range, island spread and price spikes' : 'Prices, island spread and HVDC', kind: 'PNG' as const, run: () => image('all') },
+		{ label: 'Data for this view', sub: view?.mode === 'long' ? 'Each period’s prices, spread, spikes and HVDC' : 'Node prices, island spread and HVDC', kind: 'CSV' as const, run: () => csv() },
+	];
 	const sharedNow = () => ({ region, range, int: intPicked && intChoices.includes(int) ? int : null, end: R.days == null ? null : endT });
 	const ownNow = () => ({ scale, hide: off, band: bandKey });
 	function save() {
@@ -514,6 +571,7 @@
 					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {clock(meta.end)}<span class="pday"> {dayLabel(meta.end)}</span></span>
 				{/if}
 			{/if}
+			<DownloadMenu items={downloads} />
 			<ShareLink {links} />
 			<button type="button" class="info-btn" bind:this={infoBtn} aria-expanded={infoOpen} aria-controls="p-about" aria-label="About this data" title="About this data" onclick={() => (infoOpen = !infoOpen)}>
 				<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg>

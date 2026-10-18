@@ -7,6 +7,7 @@ import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTot
 import PLANT_META from './plants.json';  // owner and hydro scheme per plant (ingest/plant_meta.py)
 import { readView, writeView, slug, describe, shareLinks } from '#lib/site/view.js';
 import { readQuery } from '#lib/site/viewurl.js';
+import { composeImage, legendOf, csvText, nzTime, utcTime, fileName, CREDIT, CREDIT_SOLAR, LICENCE } from '#lib/site/download.js';
 export { nzOffset, tzName };
 
 // A model: one segment (series.js) plus what the charts read. NIs/SIs are the island series (same objects).
@@ -432,8 +433,9 @@ export function mountTracker(D, hooks = {}) {
   // ---------- chart frame ----------
   const PADL = 50, PADR = 12;
   const FONT = '11px "IBM Plex Mono", ui-monospace, Menlo, monospace';
+  let exportScale = 0;   // while drawing a download: at least twice the screen's pixels, so the image is sharp
   function setup(cv) {
-    const dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+    const dpr = Math.max(exportScale, window.devicePixelRatio || 1), w = cv.clientWidth, h = cv.clientHeight;
     const W = Math.round(w * dpr), H = Math.round(h * dpr);
     if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
     const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
@@ -1163,6 +1165,23 @@ export function mountTracker(D, hooks = {}) {
   for (const box of boxes) ro.observe(box);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => render());
 
+  // ---------- for the downloads ----------
+  const names = () => ({ plant: state.drill.plant, group: state.drill.group ? groupById(state.drill.group)?.name : null });
+  // the dates a view covers, for a file name ("... 24 hours to 18 Oct 2026" rather than "last 24 hours")
+  const fixedView = L => { const m = /[?&]end=(\d{4}-\d\d-\d\d)/.exec((L.fixed(false) || {}).url || ''); return { ...shared(), ...ownQuery(), end: m ? addDays(midnightOf(Date.parse(m[1] + 'T12:00:00Z') - 12 * 36e5), 1) : state.end }; };
+  // "6:05 pm Sat 17 Oct 2026 to 6:00 pm Sun 18 Oct 2026 NZDT · 5-minute averages"
+  function spanText() {
+    const a = V.t[0], b = V.t[V.n - 1] + V.hrs[V.n - 1] * 36e5, long = isLong();
+    const at = t => { const p = lp(t); return long ? `${p.dom} ${MON[p.mon]} ${p.y}` : `${clock(p)} ${dayLbl(p)} ${p.y}`; };
+    const each = { '5m': '5-minute', '30m': 'half-hourly', '1d': 'daily', '1w': 'weekly', '1mo': 'monthly', '1yr': 'yearly' }[state.int];
+    return `${at(a)} to ${at(long ? b - 1 : b)}${long ? '' : ' ' + tzName(b)} · ${each} averages`;
+  }
+  // the generation chart's sources as a legend: the layers shown, in stack order from the top
+  // the address a download names: the live view while it's live, otherwise its dates (and a pinned point)
+  const viewLink = L => (L.live && L.point == null ? L.live : (L.fixed(L.point != null) || { url: L.live }).url);
+  const genLegend = () => V.layers.filter(l => !state.hidden.has(l.id) && !(pctMode() && l.id === 'hvdc')).slice().reverse()
+    .map(l => ({ name: l.name, colour: colourOf(l), kind: 'fill', hatch: !!l.hatch }));
+
   readColours();
   rebuild();
   if (saved) setView(saved.range, saved.end, true, init.int, true);  // a long range or past date, once its history has loaded
@@ -1179,6 +1198,54 @@ export function mountTracker(D, hooks = {}) {
         models[kind] = merge(kind);
         if (state.kind === kind) { M = null; useModel(); rebuild(); }
       }).catch(() => {});
+    },
+    // ---------- downloads (#lib/site/DownloadMenu.svelte, #lib/site/download.js) ----------
+    // which: 'gen' (the generation chart) or 'all' (all six charts). Resolves to { blob, name }.
+    async image(which) {
+      const L = this.links(), views = { ...shared(), ...ownQuery() };
+      const ids = which === 'gen' ? ['cv-gen'] : ['cv-gen', 'cv-price', 'cv-demand', 'cv-hvdc', 'cv-co2', 'cv-ren'];
+      exportScale = 2; drawAll();   // redraw at double resolution, copy, then back to the screen's own
+      try {
+        const panels = ids.map(id => {
+          const cv = $(id), card = cv.closest('.chart'), src = document.createElement('canvas');
+          src.width = cv.width; src.height = cv.height; src.getContext('2d').drawImage(cv, 0, 0);
+          const gen = id === 'cv-gen';
+          return {
+            heading: gen ? $('gen-title').textContent.replace(/›/g, ' › ').replace(/\s+/g, ' ').trim() : card.querySelector('h2').textContent,
+            unit: (gen ? $('gen-unit') : card.querySelector('.unit')).textContent,
+            legend: gen ? (which === 'gen' ? [] : genLegend()) : legendOf(card),
+            img: src, w: cv.clientWidth, h: cv.clientHeight,
+          };
+        });
+        const blob = await composeImage({
+          title: describe('generation', views, names()), sub: spanText(), legend: which === 'gen' ? genLegend() : [], panels,
+          credit: [CREDIT, CREDIT_SOLAR], link: viewLink(L),
+        });
+        return { blob, name: fileName(describe('generation', fixedView(L)), 'png') };
+      } finally { exportScale = 0; render(); }
+    },
+    // the view's data: every source shown, then prices, demand, HVDC, emissions and renewable share, one row per point
+    csv() {
+      const L = this.links(), layers = V.layers.filter(l => !state.hidden.has(l.id)), u = isLong() ? 'MW average' : 'MW';
+      const f1 = v => Math.round(v * 10) / 10, f2 = v => Math.round(v * 100) / 100;
+      const header = ['start_nz', 'start_utc', ...layers.map(l => `${l.name} (${u})`), `${totalLabel()} (${u})`,
+        'Price, North Island, Haywards ($/MWh)', 'Price, South Island, Benmore ($/MWh)', `Demand, metered (${u})`, `Demand with embedded solar (${u})`,
+        `HVDC transfer, northward (${u})`, 'Emissions intensity (g CO2e/kWh)', 'Renewable share (%)'];
+      const rows = [];
+      for (let j = 0; j < V.n; j++) {
+        let tot = 0;
+        if (topIsAll()) tot = V.gen[j]; else for (const l of layers) tot += l.signed ? l.s[j] : Math.max(0, l.s[j]);
+        rows.push([nzTime(V.t[j]), utcTime(V.t[j]), ...layers.map(l => f1(l.s[j])), f1(tot), f2(V.pNI[j]), f2(V.pSI[j]),
+          f1(V.metered[j]), f1(V.underlying[j]), f1(V.hvdc[j]), f1(V.co2[j]), f1(V.ren[j])]);
+      }
+      const text = csvText([
+        `ELENZ: ${describe('generation', { ...shared(), ...ownQuery() }, names())}`,
+        `${spanText()}. Times are the start of each interval.`,
+        CREDIT + ' ' + CREDIT_SOLAR, LICENCE,
+        'How each series is made: https://elenz.co.nz/methods',
+        `This view: ${viewLink(L)}`,
+      ], header, rows);
+      return { blob: new Blob([text], { type: 'text/csv;charset=utf-8' }), name: fileName(describe('generation', fixedView(L)), 'csv') };
     },
     // the links the Share button offers (#lib/site/ShareLink.svelte): this view, live or fixed to its dates, and the
     // pinned point

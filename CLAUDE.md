@@ -64,6 +64,13 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   geothermal station's own factor by year; evidence in `analysis/emission_factors.py` and `analysis/README.md`).
   `src/lib/tracker/series.js` loads the history files and merges them with the live week (24 h/3 d/7 d use the
   live 5-minute data; 30 days uses half-hourly history; 1 year and All use daily history).
+- Downloads: the Download button on both tracker tabs (`src/lib/site/DownloadMenu.svelte`, beside Share) gives the
+  chart as a PNG (the view's title and dates over the charts, each with its heading and legend, the credit line and the
+  view's link at the foot, drawn at twice the screen's resolution in the current light/dark colours) or the view's data
+  as a CSV ('#' header lines: what it is, dates, source, licence CC BY 4.0, the view's link; then one row per point,
+  NZ and UTC times). Shared pieces in `src/lib/site/download.js` (`composeImage`, `svgImage` for the Prices tab's SVG
+  charts, `legendOf`, `csvText`); the Generation tab's files are made in tracker.js (`image('gen' | 'all')`, `csv()`),
+  the Prices tab's in its page. The link is the live view while live, otherwise its dates and any pinned point.
 - Link previews: every public page puts `src/lib/site/Preview.svelte` in its `<svelte:head>` (og:title, og:description,
   og:url, og:image, the large-image card). Articles use their cover PNG; every other page the site's card,
   `static/og/elenz.png` (2400 x 1260; each page asks for it as `?p=<page>`, since LinkedIn served some pages a thumbnail of one shared address): `src/lib/site/SiteCard.svelte` (the mark and name over a week of generation, cover style)
