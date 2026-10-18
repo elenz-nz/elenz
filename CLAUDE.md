@@ -66,6 +66,16 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   geothermal station's own factor by year; evidence in `analysis/emission_factors.py` and `analysis/README.md`).
   `src/lib/tracker/series.js` loads the history files and merges them with the live week (24 h/3 d/7 d use the
   live 5-minute data; 30 days uses half-hourly history; 1 year and All use daily history).
+- Footer extras (`src/lib/site/SiteFooter.svelte`): "Report a problem" (`ReportLink.svelte`: an email to hello@elenz.co.nz
+  with the page title and full address, so the view, filled in when clicked) and a link to `/privacy`
+  (`src/routes/(docs)/privacy/+page.svelte`, in the About/methods sidebar). The privacy page describes what the code
+  does (Cloudflare Web Analytics, the browser storage keys, fonts, the email setup): update it and its date if any of
+  that changes. Method pages also have their own report line (`reportHref` in the methods registry).
+- Fonts: Schibsted Grotesk (text) and IBM Plex Mono (figures) are bundled from the `@fontsource/*` packages, imported in
+  `src/routes/+layout.svelte`; the site makes no requests to Google.
+- `/sitemap.xml` (`src/routes/sitemap.xml/+server.ts`, prerendered from the same registries as the pages; listed in
+  `static/robots.txt`, submitted in Google Search Console) and a canonical address on every page (root layout).
+  A new kind of public page needs adding to the sitemap's list.
 - Downloads: the Download button on both tracker tabs (`src/lib/site/DownloadMenu.svelte`, beside Share) gives the
   chart as a PNG (the view's title and dates over the charts, each with its heading and legend, the credit line and the
   view's link at the foot, drawn at twice the screen's resolution in the current light/dark colours) or the view's data

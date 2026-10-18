@@ -4,6 +4,7 @@
 	// Social accounts: fill in a href to show one; entries with no href stay hidden until the account exists.
 	import Mark from './Mark.svelte';
 	import Coffee from './Coffee.svelte';
+	import ReportLink from './ReportLink.svelte';
 
 	const YEAR = new Date().getFullYear();
 	type Link = { k: string; name: string; href: string };
@@ -52,6 +53,7 @@
 	<p class="credits">
 		<span>Data from <a href="https://www.emi.ea.govt.nz" target="_blank" rel="noopener">www.emi.ea.govt.nz</a> provided by the Electricity Authority (New Zealand), CC BY 4.0.</span>
 		<span>Irradiance: Himawari satellite data (JMA/JAXA) via <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>, CC BY 4.0.</span>
+		<span class="more">Spotted something wrong? <ReportLink /> · <a href="/privacy">Privacy</a></span>
 	</p>
 </footer>
 
@@ -72,4 +74,5 @@
 	/* one credit per line */
 	.credits { margin: 0; display: grid; gap: 2px; line-height: 1.5; }
 	.credits a { color: inherit; white-space: nowrap; }
+	.credits .more { margin-top: 4px; }
 </style>

@@ -22,6 +22,7 @@ const urls = (): Url[] => [
 		? [{ path: '/articles' }, ...articles.filter((a) => !hidden(a)).map((a) => ({ path: `/articles/${a.slug}`, lastmod: a.date }))]
 		: []),
 	{ path: '/about' },
+	{ path: '/privacy' },
 	{ path: '/methods' },
 	{ path: '/methods/sources' },
 	...TOPICS.map((t) => ({ path: `/methods/${t.slug}`, lastmod: t.updated }))

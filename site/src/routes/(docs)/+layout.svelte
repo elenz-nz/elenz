@@ -24,6 +24,7 @@
 				<ul>
 					<li><a href="/about" aria-current={cur('/about') && !atContact ? 'page' : undefined}>About</a></li>
 					<li><a href="/about#contact" aria-current={cur('/about') && atContact ? 'location' : undefined}>Contact</a></li>
+					<li><a href="/privacy" aria-current={cur('/privacy')}>Privacy</a></li>
 				</ul>
 			</div>
 			<div>
