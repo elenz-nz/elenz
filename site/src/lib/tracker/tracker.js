@@ -602,13 +602,8 @@ export function mountTracker(D, hooks = {}) {
       tops.push({ l, p0, p1: Float64Array.from(pos), n0, n1: Float64Array.from(neg) });
     }
     let mx = 0, mn = 0; for (let j = 0; j < n; j++) { mx = Math.max(mx, pos[j]); mn = Math.min(mn, neg[j]); }
-    const cap = pct ? null : capacityOf();
-    // nameplate: a flat MW line, or in the energy view what the plant would make running flat out for each point
-    // (a whole period's hours, so the line doesn't jog at the clock changes or drop for the period in progress)
-    const fullHrs = j => { const p = lp(V.t[j]); return { '1d': 24, '1w': 168, '1mo': new Date(Date.UTC(p.y, p.mon + 1, 0)).getUTCDate() * 24,
-                                                         '1yr': p.y % 4 ? 8760 : 8784 }[state.int] || V.hrs[j]; };
-    const capAt = j => energy ? cap * fullHrs(j) / eu().div : cap;
-    if (cap) for (let j = 0; j < n; j++) mx = Math.max(mx, capAt(j) * 1.04);
+    const cap = pct || energy ? null : capacityOf();   // nameplate is a MW line, so only on MW views
+    if (cap) mx = Math.max(mx, cap * 1.04);
     if (pct) mx = Math.min(mx, 100);  // rounding can push a full stack a hair over 100
     const full = pct && topIsAll();  // the whole mix: a fixed 0–100% axis
     const dom = full ? { lo: 0, hi: 100, ticks: [0, 25, 50, 75, 100] } : nice(0, Math.max(mx, pct ? 0.1 : 1), 5);
@@ -632,13 +627,11 @@ export function mountTracker(D, hooks = {}) {
     }
     if (dom.lo < 0) { ctx.strokeStyle = C['--ink-2']; ctx.lineWidth = 1; const y = Math.round(Y(0)) + 0.5; ctx.beginPath(); ctx.moveTo(F.x0, y); ctx.lineTo(F.x1, y); ctx.stroke(); }
     if (cap) {
-      ctx.save(); ctx.setLineDash([5, 4]); ctx.strokeStyle = C['--ink-2']; ctx.lineWidth = 1.25; ctx.beginPath();
-      if (energy) for (let j = 0; j < n; j++) { const y = Y(capAt(j)); j ? ctx.lineTo(X(j), y) : ctx.moveTo(F.x0, y); }
-      else { const y = Math.round(Y(cap)) + 0.5; ctx.moveTo(F.x0, y); ctx.lineTo(F.x1, y); }
-      ctx.stroke(); ctx.restore();
-      let top = Infinity; for (let j = 0; j < n; j++) top = Math.min(top, Y(capAt(j)));
+      const y = Math.round(Y(cap)) + 0.5;
+      ctx.save(); ctx.setLineDash([5, 4]); ctx.strokeStyle = C['--ink-2']; ctx.lineWidth = 1.25;
+      ctx.beginPath(); ctx.moveTo(F.x0, y); ctx.lineTo(F.x1, y); ctx.stroke(); ctx.restore();
       ctx.font = FONT; ctx.fillStyle = C['--ink-2']; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
-      ctx.fillText(energy ? `At nameplate ${fmt(cap)} MW` : `Nameplate ${fmt(cap)} MW`, F.x1, Math.round(top) - 3);
+      ctx.fillText(`Nameplate ${fmt(cap)} MW`, F.x1, y - 3);
     }
     if (n > 2 && !full) {
       // a period still in progress (or the history's first, part year) isn't a fair high or low in energy
