@@ -108,6 +108,10 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 .datebox button.step:hover:not(:disabled) { color: var(--ink); }
 .datebox button.step:disabled { opacity: 0.35; cursor: default; background: var(--surface); }
 .datebox button.step[hidden] { display: none; }
+/* Latest: shown only on a past window, so it stands out as the way back to the live data */
+.datebox button.latest { display: inline-flex; align-items: center; gap: 5px; background: var(--accent); border-color: var(--accent); color: var(--surface); font-weight: 600; padding: 3px 11px 3px 9px; box-shadow: 0 1px 3px color-mix(in srgb, var(--accent) 40%, transparent); }
+.datebox button.latest:hover { background: color-mix(in srgb, var(--accent) 85%, var(--ink)); border-color: color-mix(in srgb, var(--accent) 85%, var(--ink)); }
+.datebox button.latest[hidden] { display: none; }
 
 /* The control bar stays at the top of the window as the page scrolls, so every chart below can be moved through
    from where it is. --tb-h is its height (#lib/site/sticky.js), so the sticky summary panel sits below it. Its

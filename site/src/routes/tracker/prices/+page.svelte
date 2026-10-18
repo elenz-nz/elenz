@@ -556,7 +556,7 @@
 					<input type="date" id="p-date" value={dateValue} min="1997-08-01" max={live ? isoDay(latestT) : undefined}
 						title="Shows the selected range ending on this date" onchange={(e) => pickDate((e.currentTarget as HTMLInputElement).value)} />
 					<button type="button" class="step" aria-label="Next {R.label}" title={atLatest ? 'Showing the latest data' : `Next ${R.label}`} disabled={atLatest} onclick={() => step(1)}><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
-					{#if !atLatest}<button type="button" onclick={() => setEnd(null)}>Latest</button>{/if}
+					{#if !atLatest}<button type="button" class="latest" title="Back to the latest data" onclick={() => setEnd(null)}><svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 3 5 5-5 5M12 3v10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>Latest</button>{/if}
 				</div>
 			</div>
 		{/if}
