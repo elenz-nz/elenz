@@ -61,6 +61,7 @@
 	<li>An island’s total is that island’s own generation; power arriving over the HVDC link isn’t counted.</li>
 	<li>Peak generation is the highest 5-minute total in the range (half-hourly in the 30-day view; on longer ranges, each day’s highest half-hour).</li>
 	<li>With no point in time selected, the summary table shows each source’s energy over the range: MW × hours, summed, in GWh (TWh once the total passes 10,000 GWh).</li>
+	<li>Where each point is a day, week, month or year, the generation chart and the summary at a point show energy (the average MW × the point’s hours) in MWh, GWh or TWh to suit the size, rather than an average MW, which reads low for anything that varies through the day. These views start at the first whole period in the range; the period still in progress shows its energy so far and isn’t counted as a high or low. A single plant’s nameplate line becomes what it would generate running flat out for the whole period.</li>
 	<li>A plant’s capacity is the sum of its units’ nameplate MW in the register. For plants seen only in the metered history, it is the most nameplate the register ever had installed at once.</li>
 </ul>
 

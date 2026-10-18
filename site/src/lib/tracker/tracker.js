@@ -207,11 +207,13 @@ export function mountTracker(D, hooks = {}) {
   }
   function heading(j) {
     const p = lp(V.t[j]), last = j === V.n - 1 && V.partial;
+    // in the energy view generation is the period's total, so the heading names the period rather than an average
+    const per = (word, avg, avgSoFar) => energyMode() ? (last ? `the ${word} so far` : `the whole ${word}`) : (last ? avgSoFar : avg);
     const h = {
-      '1d': [`${DOW[p.dow]} ${p.dom} ${MON[p.mon]} ${p.y}`, last ? 'daily average so far' : 'daily average'],
-      '1w': [`Week of ${p.dom} ${MON[p.mon]} ${p.y}`, last ? 'average for the week so far' : 'weekly average'],
-      '1mo': [`${MONTH[p.mon]} ${p.y}`, last ? 'average for the month so far' : 'monthly average'],
-      '1yr': [`${p.y}`, last ? 'average for the year so far' : 'yearly average'],
+      '1d': [`${DOW[p.dow]} ${p.dom} ${MON[p.mon]} ${p.y}`, per('day', 'daily average', 'daily average so far')],
+      '1w': [`Week of ${p.dom} ${MON[p.mon]} ${p.y}`, per('week', 'weekly average', 'average for the week so far')],
+      '1mo': [`${MONTH[p.mon]} ${p.y}`, per('month', 'monthly average', 'average for the month so far')],
+      '1yr': [`${p.y}`, per('year', 'yearly average', 'average for the year so far')],
     }[state.int];
     return h || [clock(p), `${dayLbl(p)} · TP ${tp(p)} · ${state.int === '5m' ? '5-minute' : 'half-hour average'}`];
   }
@@ -257,6 +259,9 @@ export function mountTracker(D, hooks = {}) {
       start = firstAtOrAfter(M.t, state.end - R.days * DAY - (daily ? 2 * 36e5 : 0));
     } else if (state.kind === 'live') start = Math.max(0, M.N - R.n);
     else if (R.days) start = firstAtOrAfter(M.t, M.END - R.days * DAY + (daily ? 36e5 : 0));
+    // grouped views start at the first whole day, week or month in the window rather than with a sliver of one
+    // (a partial first day's energy, or its average, misleads)
+    if (key && start > 0) { let i = start; while (i < stop && key(M.t[i]) === key(M.t[i - 1])) i++; if (i < stop) start = i; }
     if (!key) for (let i = start; i < stop; i++) groups.push([i, i + 1]);
     else for (let a = start, i = start + 1; i <= stop; i++) if (i === stop || key(M.t[i]) !== key(M.t[a])) { groups.push([a, i]); a = i; }
     const n = groups.length;
@@ -274,6 +279,8 @@ export function mountTracker(D, hooks = {}) {
     v.pkGen = pk ? (pk.gen ? max(pk.gen) : null) : max(genTotal(M, state.region));
     // the last day, week or month is incomplete when it runs up to the newest data
     v.partial = state.end == null && isLong() && n > 0 && key(M.END + 3e5) === key(v.t[n - 1]);
+    // the first point is partial when the data starts part way through its period (the history's first year, 1997)
+    v.partialFirst = isLong() && n > 0 && start < stop && key(M.t[start] - M.h[start] * 36e5) === key(M.t[start]);
     v.pNI = avg(M.NIs.price); v.pSI = avg(M.SIs.price); v.hvdc = avg(M.hvdcN);
     v.marks = marks(v);
     // geothermal and gas: each plant's own factor (geothermal stations by year, closed gas plants), weighted by its
@@ -372,7 +379,7 @@ export function mountTracker(D, hooks = {}) {
       }
       for (const k of SIGNED) if (present[r].includes(k)) L.push(fuelLayer(k, null));
     }
-    V.layers = L;
+    V.layers = L; V.eu = null;
   }
   // "ROX2201 ROX0" -> "220 kV · ROX2201": the POC code carries the bus voltage
   const busLabel = k => { const poc = k.split(' ')[0]; const kv = parseInt(poc.slice(3, 6), 10); return `${kv} kV · ${poc}`; };
@@ -567,23 +574,46 @@ export function mountTracker(D, hooks = {}) {
   // below the top level the axis fits the drilled layers (wind as a share of all generation, not of wind).
   const pctMode = () => state.unit === 'pct';
   const pctOf = (v, j) => V.gen[j] > 0.5 ? Math.max(0, v) / V.gen[j] * 100 : 0;
+  // Energy view: where each point is a day or longer, the generation chart, its tooltip and the summary at a point show
+  // energy (average MW × the point's hours) rather than average MW, which reads oddly low for anything that varies
+  // through the day (a solar farm's daily average is a fraction of its peak). The unit suits the size: MWh for a plant
+  // by the day, GWh for the country by the day or month, TWh by the year. Partial days, weeks and months show the energy
+  // so far.
+  const energyMode = () => isLong() && !pctMode();
+  function eu() {
+    if (!V.eu) {
+      let mx = 0;
+      for (let j = 0; j < V.n; j++) { let s = 0; for (const l of V.layers) s += Math.max(0, l.s[j]); mx = Math.max(mx, s * V.hrs[j]); }
+      V.eu = mx >= 1e7 ? { div: 1e6, unit: 'TWh' } : mx >= 1e4 ? { div: 1e3, unit: 'GWh' } : { div: 1, unit: 'MWh' };
+    }
+    return V.eu;
+  }
+  const en = (v, j) => v * V.hrs[j] / eu().div;                       // a point's average MW as energy in the view's unit
+  const enFmt = v => { const a = Math.abs(v); return a >= 100 || a === 0 ? fmt(v) : v.toFixed(a >= 10 ? 1 : 2); };
+  const genVal = (v, j) => energyMode() ? enFmt(en(v, j)) : fmt(v);  // a generation figure at point j, as the chart shows it
+  const genUnit = () => energyMode() ? eu().unit : 'MW';
   function drawGen() {
-    const c = setup($('cv-gen')), { ctx } = c, n = V.n, pct = pctMode();
+    const c = setup($('cv-gen')), { ctx } = c, n = V.n, pct = pctMode(), energy = energyMode();
     const layers = V.layers.filter(l => !state.hidden.has(l.id) && !(pct && l.id === 'hvdc'));
     const pos = new Float64Array(n), neg = new Float64Array(n), tops = [];
     for (const l of layers) {
-      const a = pct ? Float64Array.from(l.s, pctOf) : l.s, p0 = Float64Array.from(pos), n0 = Float64Array.from(neg);
+      const a = pct ? Float64Array.from(l.s, pctOf) : energy ? Float64Array.from(l.s, en) : l.s, p0 = Float64Array.from(pos), n0 = Float64Array.from(neg);
       for (let j = 0; j < n; j++) { const v = a[j]; if (v > 0) pos[j] += v; else neg[j] += v; }
       tops.push({ l, p0, p1: Float64Array.from(pos), n0, n1: Float64Array.from(neg) });
     }
     let mx = 0, mn = 0; for (let j = 0; j < n; j++) { mx = Math.max(mx, pos[j]); mn = Math.min(mn, neg[j]); }
     const cap = pct ? null : capacityOf();
-    if (cap) mx = Math.max(mx, cap * 1.04);
+    // nameplate: a flat MW line, or in the energy view what the plant would make running flat out for each point
+    // (a whole period's hours, so the line doesn't jog at the clock changes or drop for the period in progress)
+    const fullHrs = j => { const p = lp(V.t[j]); return { '1d': 24, '1w': 168, '1mo': new Date(Date.UTC(p.y, p.mon + 1, 0)).getUTCDate() * 24,
+                                                         '1yr': p.y % 4 ? 8760 : 8784 }[state.int] || V.hrs[j]; };
+    const capAt = j => energy ? cap * fullHrs(j) / eu().div : cap;
+    if (cap) for (let j = 0; j < n; j++) mx = Math.max(mx, capAt(j) * 1.04);
     if (pct) mx = Math.min(mx, 100);  // rounding can push a full stack a hair over 100
     const full = pct && topIsAll();  // the whole mix: a fixed 0–100% axis
     const dom = full ? { lo: 0, hi: 100, ticks: [0, 25, 50, 75, 100] } : nice(0, Math.max(mx, pct ? 0.1 : 1), 5);
     if (mn < 0) dom.lo = mn * 1.2;
-    const F = frame(c, dom, pct ? v => (Number.isInteger(v) ? v : v.toFixed(1)) + '%' : v => fmt(v), { axis: true });
+    const F = frame(c, dom, pct ? v => (Number.isInteger(v) ? v : v.toFixed(1)) + '%' : energy ? v => (Math.abs(v - Math.round(v)) < 1e-9 ? fmt(v) : String(+v.toFixed(2))) : v => fmt(v), { axis: true });
     const { X, Y } = F;
     for (const L of tops) {
       let fill = L.l.hatch ? ctx.createPattern(L.l.shade != null ? hatchOf(colourOf(L.l)) : PAT[L.l.hatch], 'repeat') : colourOf(L.l);
@@ -602,16 +632,20 @@ export function mountTracker(D, hooks = {}) {
     }
     if (dom.lo < 0) { ctx.strokeStyle = C['--ink-2']; ctx.lineWidth = 1; const y = Math.round(Y(0)) + 0.5; ctx.beginPath(); ctx.moveTo(F.x0, y); ctx.lineTo(F.x1, y); ctx.stroke(); }
     if (cap) {
-      const y = Math.round(Y(cap)) + 0.5;
-      ctx.save(); ctx.setLineDash([5, 4]); ctx.strokeStyle = C['--ink-2']; ctx.lineWidth = 1.25;
-      ctx.beginPath(); ctx.moveTo(F.x0, y); ctx.lineTo(F.x1, y); ctx.stroke(); ctx.restore();
+      ctx.save(); ctx.setLineDash([5, 4]); ctx.strokeStyle = C['--ink-2']; ctx.lineWidth = 1.25; ctx.beginPath();
+      if (energy) for (let j = 0; j < n; j++) { const y = Y(capAt(j)); j ? ctx.lineTo(X(j), y) : ctx.moveTo(F.x0, y); }
+      else { const y = Math.round(Y(cap)) + 0.5; ctx.moveTo(F.x0, y); ctx.lineTo(F.x1, y); }
+      ctx.stroke(); ctx.restore();
+      let top = Infinity; for (let j = 0; j < n; j++) top = Math.min(top, Y(capAt(j)));
       ctx.font = FONT; ctx.fillStyle = C['--ink-2']; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
-      ctx.fillText(`Nameplate ${fmt(cap)} MW`, F.x1, y - 3);
+      ctx.fillText(energy ? `At nameplate ${fmt(cap)} MW` : `Nameplate ${fmt(cap)} MW`, F.x1, Math.round(top) - 3);
     }
-    if (n > 1 && !full) {
-      let jh = 0, jl = 0; for (let j = 1; j < n; j++) { if (pos[j] > pos[jh]) jh = j; if (pos[j] < pos[jl]) jl = j; }
-      const val = v => pct ? (v < 10 ? v.toFixed(1) : Math.round(v)) + '%' : `${fmt(v)} MW`;
-      if (pos[jh] > 0.5) {
+    if (n > 2 && !full) {
+      // a period still in progress (or the history's first, part year) isn't a fair high or low in energy
+      const a = energy && V.partialFirst ? 1 : 0, b = energy && V.partial ? n - 1 : n;
+      let jh = a, jl = a; for (let j = a + 1; j < b; j++) { if (pos[j] > pos[jh]) jh = j; if (pos[j] < pos[jl]) jl = j; }
+      const val = v => pct ? (v < 10 ? v.toFixed(1) : Math.round(v)) + '%' : energy ? `${enFmt(v)} ${eu().unit}` : `${fmt(v)} MW`;
+      if (pos[jh] > (energy ? 0 : 0.5)) {
         extreme(ctx, F, jh, pos[jh], `High ${val(pos[jh])}`, C['--ink']);
         if (pos[jl] < pos[jh] * 0.98) extreme(ctx, F, jl, pos[jl], `Low ${val(pos[jl])}`, C['--ink'], true);
       }
@@ -718,7 +752,8 @@ export function mountTracker(D, hooks = {}) {
       fuel: setById(d.group) ? 'MW, stacked by plant' : 'MW, stacked by fuel', plant: d.fuel === 'roof' ? 'MW, estimated, by island' : 'MW, stacked by plant',
       unit: V.layers.length > 1 ? 'MW, by grid connection' : 'MW',
     }[lv];
-    $('gen-unit').textContent = pctMode() ? unitTxt.replace(/^MW/, '% of all generation') : unitTxt;
+    const per = { '1d': 'a day', '1w': 'a week', '1mo': 'a month', '1yr': 'a year' }[state.int];
+    $('gen-unit').textContent = pctMode() ? unitTxt.replace(/^MW/, '% of all generation') : energyMode() ? unitTxt.replace(/^MW/, `${eu().unit} ${per}`) : unitTxt;
     const note = $('gen-note'), txt = NOTES[state.view] || '';
     note.hidden = !txt;
     note.textContent = txt ? txt + ' ' : '';
@@ -883,16 +918,16 @@ export function mountTracker(D, hooks = {}) {
     const [when, sub] = heading(j), long = isLong();
     $('sum-when').textContent = when;
     $('sum-sub').textContent = sub;
-    $('col-q').textContent = long ? 'MW avg' : 'MW';
+    $('col-q').textContent = genUnit();
     let tot = 0;
     if (topIsAll()) tot = V.gen[j]; else for (const l of layers) tot += l.signed ? l.s[j] : Math.max(0, l.s[j]);
     for (const l of [...layers, ...V.sections.filter(x => x.row)]) {
       const v = l.members ? l.members.reduce((a, m) => a + m.s[j], 0) : l.s[j];
-      l.cells.q.textContent = fmt(v);
+      l.cells.q.textContent = genVal(v, j);
       l.cells.s.textContent = l.signed ? signedTxt(l, v, false) : tot > 0.5 ? (v / tot * 100).toFixed(1) + '%' : '—';
       l.cells.b.style.transform = `scaleX(${l.signed || tot <= 0.5 ? 0 : Math.max(0, v / tot)})`;
     }
-    $('tot-q').textContent = fmt(tot); $('tot-s').textContent = layers.some(l => l.signed) && !topIsAll() ? '' : '100%';
+    $('tot-q').textContent = genVal(tot, j); $('tot-s').textContent = layers.some(l => l.signed) && !topIsAll() ? '' : '100%';
     setSys([
       ...plantRows(false, j),
       ['Price, North Island', money(V.pNI[j]), '/MWh'],
@@ -907,7 +942,7 @@ export function mountTracker(D, hooks = {}) {
       ['Emissions intensity', fmt(V.co2[j]), 'g/kWh'],
       ['Renewable share', V.ren[j].toFixed(1) + '%', ''],
     ]);
-    $('v-gen').textContent = fmt(tot) + ' MW';
+    $('v-gen').textContent = `${genVal(tot, j)} ${genUnit()}`;
     $('v-pni').textContent = money(V.pNI[j]); $('v-psi').textContent = money(V.pSI[j]);
     $('v-met').textContent = fmt(V.metered[j]); $('v-und').textContent = fmt(V.underlying[j]);
     $('v-hv').textContent = `${hvTxt(V.hvdc[j])} ${V.hvdc[j] > 0.5 ? 'north' : V.hvdc[j] < -0.5 ? 'south' : ''}`;
@@ -1106,12 +1141,14 @@ export function mountTracker(D, hooks = {}) {
         const l = layerAt(e.clientX, e.clientY), lv = level();
         let tot = 0;
         if (topIsAll()) tot = V.gen[j]; else for (const x of V.layers) tot += x.signed ? x.s[j] : Math.max(0, x.s[j]);
-        if (!l) return head + row(C['--ink'], totalLabel(), fmt(tot), mw);
+        const gu = genUnit();
+        if (!l) return head + row(C['--ink'], totalLabel(), genVal(tot, j), gu);
         const v = l.s[j];
         const uj = l.id === 'roof' ? V.roofU[j] : l.u ? l.u[j] : 0, pm = uj > 0.5 ? ` ± ${fmt(uj)}` : '';
         if (pctMode() && !l.signed) return head + row(colourOf(l), l.name, pctOf(v, j).toFixed(1) + '%', `of all generation · ${fmt(v)} ${mw}${pm}`, !!l.hatch);
-        const extra = l.signed ? `${mw} · ${signedTxt(l, v, false)}` : `${mw}${pm}${tot > 0.5 ? ` · ${(v / tot * 100).toFixed(1)}%` : ''}`;
-        return head + row(colourOf(l), l.name, fmt(v), extra, !!l.hatch);
+        const pmE = energyMode() && uj > 0.5 ? ` ± ${genVal(uj, j)}` : pm;
+        const extra = l.signed ? `${gu} · ${signedTxt(l, v, false)}` : `${gu}${pmE}${tot > 0.5 ? ` · ${(v / tot * 100).toFixed(1)}%` : ''}`;
+        return head + row(colourOf(l), l.name, genVal(v, j), extra, !!l.hatch);
       }
       case 'cv-price':
         return head + row(C['--p-ni'], 'North Island · Haywards', money(V.pNI[j]), '/MWh') + row(C['--p-si'], 'South Island · Benmore', money(V.pSI[j]), '/MWh');
