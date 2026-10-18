@@ -87,6 +87,27 @@ function legendRows(ctx, items, x0, y, max, draw) {
   return rows * 18;
 }
 
+// The Elenz logo (the mark from Mark.svelte and the ELENZ wordmark), right-aligned at x, its top at y. Returns its width.
+const MARK = [[3, 17, 10, '--f-geo'], [3, 9, 7, '--f-hydro'], [9.5, 17, 10, '--f-geo'], [9.5, 5, 11, '--f-hydro'],
+  [16, 17, 10, '--f-geo'], [16, 8, 8, '--f-hydro'], [16, 4, 3, '--f-wind'], [22.5, 17, 10, '--f-geo'], [22.5, 11, 5, '--f-hydro'], [22.5, 6, 4, '--f-solar']];
+function logo(ctx, x, y, draw) {
+  const size = 28, k = size / 30, gap = 7;
+  ctx.font = `800 17px ${UI}`;
+  if ('letterSpacing' in ctx) ctx.letterSpacing = '1.4px';
+  const ww = ctx.measureText('ELENZ').width, w = size + gap + ww;
+  if (draw) {
+    const x0 = x - w;
+    for (const [rx, ry, rh, tok] of MARK) {
+      ctx.fillStyle = css(tok); ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(x0 + rx * k, y + ry * k, 5 * k, rh * k, k); else ctx.rect(x0 + rx * k, y + ry * k, 5 * k, rh * k);
+      ctx.fill();
+    }
+    ctx.fillStyle = css('--ink'); ctx.textBaseline = 'alphabetic'; ctx.fillText('ELENZ', x0 + size + gap, y + size * 0.72);
+  }
+  if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+  return w;
+}
+
 /** The download image. panels: [{ heading, unit, legend, img, w, h }] (img: a canvas, image or bitmap drawn at w x h
  *  CSS pixels); legend: items drawn under the title (the generation chart's sources); credit: lines at the foot;
  *  link: the view's address. Drawn at scale (2: sharp on any screen). Resolves to a PNG blob. */
@@ -97,10 +118,10 @@ export async function composeImage({ title, sub, legend = [], panels, credit = [
   // heights first, then draw
   const layout = (ctx, draw) => {
     let y = PAD;
-    const text = (t, font, colour, lh) => { ctx.font = font; for (const l of wrap(ctx, t, inner)) { y += lh; if (draw) { ctx.fillStyle = colour; ctx.fillText(l, PAD, y - lh * 0.25); } } };
-    // the name at the top right, the title beside it
-    if (draw) { ctx.font = `800 13px ${UI}`; ctx.fillStyle = css('--accent'); ctx.textAlign = 'right'; ctx.fillText('ELENZ', W - PAD, PAD + 14); ctx.textAlign = 'left'; }
-    text(title, `700 21px ${UI}`, css('--ink'), 28);
+    const text = (t, font, colour, lh, max = inner) => { ctx.font = font; for (const l of wrap(ctx, t, max)) { y += lh; if (draw) { ctx.fillStyle = colour; ctx.fillText(l, PAD, y - lh * 0.25); } } };
+    // the logo at the top right; the title wraps short of it
+    const logoW = logo(ctx, W - PAD, PAD + 2, draw);
+    text(title, `700 21px ${UI}`, css('--ink'), 28, inner - logoW - 24);
     if (sub) text(sub, `400 13px ${UI}`, css('--ink-2'), 19);
     if (legend.length) { y += 10; y += legendRows(ctx, legend, PAD, y + 12, inner, draw); }
     for (const p of panels) {
