@@ -319,3 +319,23 @@ a { color: var(--accent); }
   .pill-btn { padding: 0; border-color: transparent; border-radius: 50%; }
   .pill-word { display: none; }
 }
+
+/* phones: the tabs line (two tabs, the Live pill, Download, Share and About this data) must fit the screen's width,
+   or the browser widens the whole page. Tighter tabs and buttons; the Live pill keeps its dot and time and drops the
+   word (its colour and title still say live); on the narrowest screens, smaller still. */
+@media (max-width: 560px) {
+  .tabline { gap: 4px; }
+  .tabline .tabs a { padding-inline: 7px; }
+  .tabline .tabs a:first-child { padding-left: 2px; }
+  .tabline .status { gap: 1px; }
+  .tabline .pill-btn, .tabline .info-btn { width: 28px; min-width: 28px; height: 28px; }
+}
+@media (max-width: 420px) {
+  .pill .pword { display: none; }
+  .status .pill { padding-inline: 6px 7px; gap: 5px; }
+}
+@media (max-width: 350px) {
+  .tabline { gap: 0; }
+  .tabline .tabs a { padding-inline: 5px; font-size: 0.86rem; }
+  .tabline .pill-btn, .tabline .info-btn { width: 26px; min-width: 26px; }
+}

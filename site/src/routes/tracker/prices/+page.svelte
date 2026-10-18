@@ -566,7 +566,7 @@
 				{#if R.src !== 'live' || endT !== null}
 					<span class="pill hist" title="Final prices from the EA, then the live week">History</span>
 				{:else if isLive}
-					<span class="pill live" title="Dispatch prices from the EMI real-time feed, every 5 minutes">Live · {clock(meta.end)}</span>
+					<span class="pill live" title="Dispatch prices from the EMI real-time feed, every 5 minutes"><span class="pword">Live · </span>{clock(meta.end)}</span>
 				{:else}
 					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {clock(meta.end)}<span class="pday"> {dayLabel(meta.end)}</span></span>
 				{/if}

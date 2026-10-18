@@ -154,7 +154,7 @@
 				{#if view && (view.kind !== 'live' || view.past) && !view.loading && !view.error}
 					<span class="pill hist" title="History from the EA's daily dispatch files">History</span>
 				{:else if live}
-					<span class="pill live" title="Data to {when(meta.end)}. Updated from the EMI real-time dispatch feed every 5 minutes">Live · {clockOnly(meta.end)}</span>
+					<span class="pill live" title="Data to {when(meta.end)}. Updated from the EMI real-time dispatch feed every 5 minutes"><span class="pword">Live · </span>{clockOnly(meta.end)}</span>
 				{:else}
 					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {clockOnly(meta.end)}<span class="pday">{when(meta.end).slice(clockOnly(meta.end).length)}</span></span>
 				{/if}
