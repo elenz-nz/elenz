@@ -4,6 +4,7 @@
 		dek: 'For two decades the wholesale price mostly sat between $30 and $80/MWh, broken by dry years. Since 2018 it has run about twice as high, and in the last two years it set both its highest and its lowest month.',
 		date: '2026-10-16',
 		kind: 'Analysis',
+		draft: true,
 		series: 'wholesale-market',
 		part: 2,
 		image: '/articles/thirty-years-of-wholesale-prices.png',

@@ -4,6 +4,7 @@
 		dek: "Every five minutes, New Zealand's generators compete to supply the grid, and the last offer needed sets the price for everyone. Here is how that works, who is involved, and why most people never pay that price directly.",
 		date: '2026-10-16',
 		kind: 'Guide',
+		draft: true,
 		series: 'wholesale-market',
 		part: 1,
 		image: '/articles/how-the-wholesale-market-works.png',
