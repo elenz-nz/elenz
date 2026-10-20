@@ -128,9 +128,8 @@
 		<button type="button" class="g-more" onclick={() => (all = true)}>Show all {shown.length} plants</button>
 	{/if}
 	<p class="g-note">
-		MW is dispatch, the market's 5-minute target for each plant, against its installed capacity. On rivers dispatched as one block,
-		the Waikato above all, the owner can split the total between stations differently. Batteries show negative while charging.
-		Embedded solar isn't listed. Tap a plant for its history in the tracker.
+		MW is each plant's 5-minute dispatch target, against its installed capacity. Batteries show negative while charging.
+		Embedded solar isn't listed. Tap a plant for its history.
 	</p>
 </section>
 

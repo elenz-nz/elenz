@@ -192,6 +192,14 @@ canvas { display: block; width: 100%; }
 .help { display: grid; gap: 6px; background: var(--bg); border: 1px solid var(--grid); border-radius: 4px; padding: 10px 12px; }
 .help[hidden] { display: none; }
 .help p { margin: 0; color: var(--ink-2); font-size: 0.8rem; }
+.help dl { margin: 0; display: grid; gap: 2px; }
+.help dt { font-size: 0.78rem; font-weight: 600; color: var(--ink); margin-top: 6px; }
+.help dt:first-child { margin-top: 0; }
+.help dd { margin: 0; color: var(--ink-2); font-size: 0.8rem; line-height: 1.45; }
+.help a { color: var(--accent); }
+/* the summary's Controls button: labelled, so it reads as the place to find what the charts can do */
+.ctl-btn { display: inline-flex; align-items: center; gap: 6px; flex: none; margin: -2px 0 0; font: inherit; font-size: 0.76rem; font-weight: 500; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px 3px 8px; min-height: 28px; cursor: pointer; }
+.ctl-btn:hover, .ctl-btn[aria-expanded="true"] { color: var(--ink); border-color: var(--ink-2); }
 .sum-when { font-size: 1.12rem; font-weight: 700; letter-spacing: -0.01em; }
 .sum-sub { color: var(--muted); font-size: 0.8rem; }
 table { border-collapse: collapse; width: 100%; }
@@ -228,6 +236,12 @@ tr.off .sw { background: transparent; box-shadow: inset 0 0 0 1.5px var(--c); }
 .mix-filter { font: inherit; font-size: 0.82rem; width: 100%; padding: 5px 9px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); color: var(--ink); }
 .mix-filter:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .mix-filter[hidden] { display: none; }
+.mix-tools { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin: 4px 0 -2px; font-size: 0.74rem; color: var(--muted); }
+.mix-tools[hidden] { display: none; }
+.mix-tools span { margin-right: 2px; }
+.mix-tools button { font: inherit; font-size: 0.74rem; color: var(--accent); background: none; border: 1px solid transparent; border-radius: 3px; padding: 1px 6px; cursor: pointer; }
+.mix-tools button:hover:not(:disabled) { border-color: var(--line); }
+.mix-tools button:disabled { color: var(--muted); opacity: 0.6; cursor: default; }
 .mix tr.sec td { background: color-mix(in srgb, var(--grid) 55%, transparent); }
 .sec-btn { font: inherit; font-weight: 600; color: var(--ink); border: 0; background: none; padding: 2px 0; cursor: pointer; text-align: left; display: inline-flex; align-items: baseline; gap: 6px; }
 .sec-btn::before { content: "›"; display: inline-block; color: var(--muted); transition: transform 0.15s; }

@@ -231,7 +231,7 @@
 							<option value="rf">Renewable vs fossil</option>
 							<option value="vre">Inverter-based vs synchronous</option>
 						</select>
-						<div class="seg" role="group" aria-label="Show generation in MW or as a share of total generation" id="seg-unit">
+						<div class="seg" role="group" aria-label="Show generation as an amount (MW, or energy on long ranges) or as a share of total generation" id="seg-unit">
 							<button type="button" data-v="mw" aria-pressed="true">MW</button>
 							<button type="button" data-v="pct" aria-pressed="false">%</button>
 						</div>
@@ -300,17 +300,30 @@
 						<div class="sum-sub" id="sum-sub"></div>
 						<div class="sum-pin" id="sum-pin" hidden>Pinned <button type="button" id="sum-unpin">Release</button></div>
 					</div>
-					<button type="button" class="info-btn" bind:this={helpBtn} aria-expanded={helpOpen} aria-controls="sum-help" aria-label="How to use the charts" title="How to use the charts" onclick={() => (helpOpen = !helpOpen)}>
-						<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg>
+					<button type="button" class="ctl-btn" bind:this={helpBtn} aria-expanded={helpOpen} aria-controls="sum-help" title="Everything the charts and this list can do" onclick={() => (helpOpen = !helpOpen)}>
+						<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h7M12 4h2M2 12h3M8 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /><circle cx="10.5" cy="4" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /><circle cx="6.5" cy="12" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>Controls
 					</button>
 				</div>
 				<div class="help" id="sum-help" role="note" hidden={!helpOpen}>
-					<p>Use the arrows on the generation chart, or the date box, to step back through history by the selected range.</p>
-					<p>Select a name in the list to break it down by fuel and plant. Select a colour square to hide that layer.</p>
-					<p>Hover the charts, or focus them and use the arrow keys, to read a single interval. Click a chart to pin the time line there (click it again, or press Escape, to release it); Share can then mark that time.</p>
+					<dl>
+						<dt>Read a time</dt>
+						<dd>Hover a chart, or touch and slide on a phone. With a chart focused, ← → move one point (Shift: further), Home and End jump to the ends.</dd>
+						<dt>Pin it</dt>
+						<dd>Click a chart to hold the time line there; click it again, Release or Escape to let go. Share can then mark that time.</dd>
+						<dt>Move through history</dt>
+						<dd>Range, interval and region are in the bar at the top. The ‹ › arrows beside the date, on the generation chart, or Page Up and Page Down step back and forward by the range; the date box jumps to a day; Latest comes back.</dd>
+						<dt>Break it down</dt>
+						<dd>Select a name in this list to go from a fuel to its plants and their grid connections. ‹ Back above the list, or the browser’s Back, steps out. The menu above the generation chart groups it other ways (owner, site, flexibility…), and MW/% switches to shares.</dd>
+						<dt>Hide and show</dt>
+						<dd>Select a colour square to hide that layer. Double-click it, Shift+click it or press and hold it to show only that one (again to show everything); All and None above the list do the rest. In long lists, type in Filter, and select a fuel heading to fold its plants.</dd>
+						<dt>Enlarge, share, download</dt>
+						<dd>The corner button on each chart enlarges it. Share copies a link to this view, live or for the dates shown; Download gives the charts as a picture or the data as a spreadsheet file. The address always holds the whole view, so it can be bookmarked.</dd>
+					</dl>
+					<p><a href="/methods">How the figures are worked out</a></p>
 				</div>
 				<div class="sum-level" id="sum-level" hidden><span id="sum-level-txt"></span><button type="button" class="back" id="sum-back">‹ Back</button></div>
 				<input type="search" class="mix-filter" id="mix-filter" aria-label="Filter the list" placeholder="Filter" hidden />
+				<div class="mix-tools" id="mix-tools" role="group" aria-label="Show in the chart" hidden><span>Show</span><button type="button" id="mix-all">All</button><button type="button" id="mix-none">None</button></div>
 				<table class="mix">
 					<thead><tr><th scope="col" id="col-name">Source</th><th scope="col" class="n" id="col-q">GWh</th><th scope="col" class="n">Share</th></tr></thead>
 					<tbody id="mix-body"></tbody>

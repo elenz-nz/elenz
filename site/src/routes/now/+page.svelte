@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
 	import Masthead from '#lib/site/Masthead.svelte';
+	import KeepAwake from '#lib/now/KeepAwake.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import { summarise, ring } from '#lib/home/now.js';
 	import { explainNow } from '#lib/now/explain.js';
@@ -120,6 +121,7 @@
 				{:else}
 					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {when(now.end)}</span>
 				{/if}
+				<KeepAwake />
 			</div>
 		</section>
 

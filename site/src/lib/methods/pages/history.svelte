@@ -5,7 +5,7 @@
 <h2 id="layers">Three sources, by age</h2>
 <p>Each stretch of time uses the best data published for it. Going back from now:</p>
 <ol>
-	<li><b>The last seven days</b>: the real-time dispatch feed, every 5 minutes, with gaps filled from the daily dispatch files.</li>
+	<li><b>The last seven days</b>: the real-time dispatch feed, every 5 minutes (missed intervals are asked for again; ones with no case are interpolated).</li>
 	<li><b>Back to the latest metered month</b> (about five to six weeks): the EA’s daily dispatch files, the same dispatch cases, arriving 1–4 days late.</li>
 	<li><b>Every month the EA has published metering for, back to August 1997</b>: metered data, what each station actually delivered to the grid, as the market settles it.</li>
 </ol>

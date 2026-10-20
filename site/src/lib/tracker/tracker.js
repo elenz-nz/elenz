@@ -571,7 +571,8 @@ export function mountTracker(D, hooks = {}) {
     ctx.font = FONT; const tw = ctx.measureText(text).width;
     ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
     let lx, ly;
-    if (low) { lx = x - tw / 2; ly = y - 12; }
+    if (low === 'below') { lx = x - tw / 2; ly = y + 12; }   // under a trough below zero
+    else if (low) { lx = x - tw / 2; ly = y - 12; }
     else { lx = x + 10 + tw < F.x1 ? x + 9 : x - 9 - tw; ly = y; }
     lx = Math.max(F.x0 + 4, Math.min(F.x1 - tw, lx));
     ly = Math.max(F.top + 6, Math.min(F.bottom - 6, ly));
@@ -648,6 +649,19 @@ export function mountTracker(D, hooks = {}) {
         ctx.beginPath(); for (let j = 0; j < n; j++) { const x = X(j), y = Y(t[j]); j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.stroke();
       }
     }
+    // a period that isn't whole (the one still under way, or the history's first, part year) holds less energy than
+    // the rest, so its drop at the end is washed out and labelled rather than read as a fall
+    if (energy && n > 1) {
+      const wash = (xa, xb, text, right) => {
+        ctx.save(); ctx.globalAlpha = 0.6; ctx.fillStyle = C['--surface'];
+        ctx.fillRect(xa, F.top, xb - xa, F.bottom - F.top); ctx.restore();
+        ctx.font = FONT; ctx.textBaseline = 'top'; ctx.textAlign = right ? 'right' : 'left';
+        haloText(ctx, text, right ? F.x1 - 2 : F.x0 + 2, F.top + 22);
+      };
+      const day = t => { const p = lp(t); return `${p.dom} ${MON[p.mon]}`; };
+      if (V.partial) wash(X(n - 2), F.x1, `Partial: to ${day(M.END)}`, true);
+      if (V.partialFirst) { const p = lp(V.t[0]); wash(F.x0, X(1), `Partial: from ${p.dom} ${MON[p.mon]} ${p.y}`, false); }
+    }
     if (dom.lo < 0) { ctx.strokeStyle = C['--ink-2']; ctx.lineWidth = 1; const y = Math.round(Y(0)) + 0.5; ctx.beginPath(); ctx.moveTo(F.x0, y); ctx.lineTo(F.x1, y); ctx.stroke(); }
     if (cap) {
       const y = Math.round(Y(cap)) + 0.5;
@@ -659,16 +673,25 @@ export function mountTracker(D, hooks = {}) {
     if (n > 2 && !full) {
       // a period still in progress (or the history's first, part year) isn't a fair high or low in energy
       const a = energy && V.partialFirst ? 1 : 0, b = energy && V.partial ? n - 1 : n;
-      // generation only: HVDC flowing into an island is drawn on the stack but isn't the island's generation
-      const hv = tops.find(T => T.l.id === 'hvdc'), g = hv ? pos.map((v, j) => v - (hv.p1[j] - hv.p0[j])) : pos;
+      // generation only: HVDC flowing into an island is drawn on the stack but isn't the island's generation.
+      // Batteries alone (drilled into battery): net output, so the low is the most charging
+      const hv = tops.find(T => T.l.id === 'hvdc');
+      const net = tops.length > 0 && tops.every(T => T.l.signed && T.l.id !== 'hvdc');
+      const g = net ? pos.map((v, j) => v + neg[j]) : hv ? pos.map((v, j) => v - (hv.p1[j] - hv.p0[j])) : pos;
       let jh = a, jl = a; for (let j = a + 1; j < b; j++) { if (g[j] > g[jh]) jh = j; if (g[j] < g[jl]) jl = j; }
       const val = v => pct ? (v < 10 ? v.toFixed(1) : Math.round(v)) + '%' : energy ? `${enFmt(v)} ${eu().unit}` : `${fmt(v)} MW`;
-      // the dot sits on the stack's top at that point; the label gives the generation figure
-      if (g[jh] > (energy ? 0 : 0.5)) {
+      // the dot sits on the stack's edge at that point (its bottom when charging); the label gives the figure
+      if (net) {
+        if (g[jh] > 0.5) extreme(ctx, F, jh, pos[jh], `High ${val(g[jh])}`, C['--ink']);
+        if (g[jl] < -0.5) extreme(ctx, F, jl, neg[jl], `Low ${val(-g[jl])} charging`, C['--ink'], 'below');
+      } else if (g[jh] > (energy ? 0 : 0.5)) {
         extreme(ctx, F, jh, pos[jh], `High ${val(g[jh])}`, C['--ink']);
         if (g[jl] < g[jh] * 0.98) extreme(ctx, F, jl, pos[jl], `Low ${val(g[jl])}`, C['--ink'], true);
       }
     }
+    // the amount button says what it shows: MW for 5-minute and half-hourly points, energy (MWh, GWh, TWh) for days and longer
+    const amt = $('seg-unit').querySelector('[data-v="mw"]');
+    if (amt) { const u = isLong() ? eu().unit : 'MW'; if (amt.textContent !== u) amt.textContent = u; }
     GEN = { F, tops };
     c.base.F = F;
     c.base.over = (ctx, j) => {
@@ -799,6 +822,43 @@ export function mountTracker(D, hooks = {}) {
     if (tr) { tr.classList.toggle('off', off); tr.querySelector('.sw-btn').setAttribute('aria-pressed', String(!off)); }
     render();
   }
+  // every row's and heading's on/off look from state.hidden (after All, None or Only this)
+  function syncHidden() {
+    for (const l of V.layers) if (l.row) { const off = state.hidden.has(l.id); l.row.classList.toggle('off', off); l.row.querySelector('button.sw-btn')?.setAttribute('aria-pressed', String(!off)); }
+    for (const x of V.sections) if (x.row) { const all = x.members.every(m => state.hidden.has(m.id)); x.row.classList.toggle('off', all); x.row.querySelector('.sw-btn').setAttribute('aria-pressed', String(!all)); }
+    syncMixTools();
+    render();
+  }
+  // Only this: hide every other layer; on the layers already shown alone, show everything again
+  function onlyThis(ids) {
+    const alone = V.layers.every(l => ids.includes(l.id) ? !state.hidden.has(l.id) : state.hidden.has(l.id));
+    state.hidden.clear();
+    if (!alone) for (const l of V.layers) if (!ids.includes(l.id)) state.hidden.add(l.id);
+    syncHidden();
+  }
+  function syncMixTools() {
+    const box = $('mix-tools');
+    if (!box) return;
+    box.hidden = V.layers.length <= 1;
+    $('mix-all').disabled = !V.layers.some(l => state.hidden.has(l.id));
+    $('mix-none').disabled = V.layers.every(l => state.hidden.has(l.id));
+  }
+  // a colour square: click hides or shows; double-click, Shift+click or a long press shows only that row (or section)
+  function squareButton(btn, ids, toggle) {
+    let held = null, longPressed = false;
+    btn.title = 'Hide or show · double-click or press and hold: show only this';
+    btn.addEventListener('click', e => {
+      if (longPressed) { longPressed = false; return; }
+      if (e.shiftKey) onlyThis(ids); else toggle();
+    });
+    btn.addEventListener('dblclick', e => { e.preventDefault(); onlyThis(ids); });
+    btn.addEventListener('pointerdown', e => {
+      if (e.pointerType === 'mouse') return;
+      clearTimeout(held); held = setTimeout(() => { longPressed = true; onlyThis(ids); navigator.vibrate?.(15); }, 500);
+    });
+    for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) btn.addEventListener(ev, () => clearTimeout(held));
+    btn.addEventListener('contextmenu', e => { if (longPressed) e.preventDefault(); });
+  }
   function applyFilter() {
     const q = norm(state.filter.trim());
     for (const l of V.layers) {
@@ -833,7 +893,7 @@ export function mountTracker(D, hooks = {}) {
           const ids = x.members.map(m => m.id);
           if (ids.every(id => state.hidden.has(id))) tr.classList.add('off');
           tr.innerHTML = `<td><div class="row-name"><button type="button" class="sw-btn" aria-pressed="${!ids.every(id => state.hidden.has(id))}" aria-label="Show ${esc(x.name)} in the chart"><span class="sw${x.hatch ? ' hatch' : ''}"></span></button><button type="button" class="sec-btn" aria-label="${esc(x.name)}: show or hide its ${x.members.length} rows">${esc(x.name)} <span class="cnt">${x.members.length}</span></button></div></td><td class="n" data-q></td><td class="n"><div class="share"><span data-s></span><span class="bar" data-b></span></div></td>`;
-          tr.querySelector('.sw-btn').addEventListener('click', () => toggleHidden(ids, tr));
+          squareButton(tr.querySelector('.sw-btn'), ids, () => { toggleHidden(ids, tr); syncMixTools(); });
           tr.querySelector('.sec-btn').addEventListener('click', () => { state.open.has(x.id) ? state.open.delete(x.id) : state.open.add(x.id); applyFilter(); });
           x.row = tr; x.cells = cellsOf(tr);
           body.appendChild(tr);
@@ -844,10 +904,11 @@ export function mountTracker(D, hooks = {}) {
       if (cur && cur.row) tr.classList.add('in-sec');
       const nameHtml = `${esc(l.name)}${l.tag ? ` <span class="tag">${l.tag}</span>` : ''}`;
       tr.innerHTML = `<td><div class="row-name">${canHide ? `<button type="button" class="sw-btn" aria-pressed="${!state.hidden.has(l.id)}" aria-label="Show ${esc(l.name)} in the chart"><span class="sw${l.hatch ? ' hatch' : ''}"></span></button>` : `<span class="sw-btn"><span class="sw"></span></span>`}${l.drill ? `<button type="button" class="drill">${nameHtml}</button>` : `<span class="nm">${nameHtml}</span>`}</div></td><td class="n" data-q></td><td class="n"><div class="share"><span data-s></span><span class="bar" data-b></span></div></td>`;
-      if (canHide) tr.querySelector('.sw-btn').addEventListener('click', () => {
+      if (canHide) squareButton(tr.querySelector('.sw-btn'), [l.id], () => {
         toggleHidden([l.id]);
         const x = V.sections.find(sec => sec.members.includes(l));
         if (x && x.row) { const all = x.members.every(m => state.hidden.has(m.id)); x.row.classList.toggle('off', all); x.row.querySelector('.sw-btn').setAttribute('aria-pressed', String(!all)); }
+        syncMixTools();
       });
       if (l.drill) tr.querySelector('.drill').addEventListener('click', () => drillTo(l.drill));
       l.row = tr; l.cells = cellsOf(tr);
@@ -858,6 +919,7 @@ export function mountTracker(D, hooks = {}) {
     f.value = state.filter;
     f.placeholder = `Filter ${V.layers.length} ${VIEWS[state.view].by === 'site' && level() === 'top' ? 'sites' : 'rows'}`;
     applyFilter();
+    syncMixTools();
   }
   const setSys = rows => { $('sys').innerHTML = rows.filter(Boolean).map(([k, v, s]) => `<dt>${k}</dt><dd>${v}${s ? `<small>${s}</small>` : ''}</dd>`).join(''); };
   const hvTxt = v => Math.abs(v) < 1 ? '0' : `${fmt(Math.abs(v))}`;
@@ -1141,6 +1203,8 @@ export function mountTracker(D, hooks = {}) {
     state.unit = b.dataset.v; syncControls(); renderCrumbs(); render(); save();
   });
   $('mix-filter').addEventListener('input', e => { state.filter = e.target.value; applyFilter(); });
+  $('mix-all').addEventListener('click', () => { state.hidden.clear(); syncHidden(); });
+  $('mix-none').addEventListener('click', () => { for (const l of V.layers) state.hidden.add(l.id); syncHidden(); });
   $('seg-int').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || !intsFor(state.range, state.kind).includes(b.dataset.v)) return; state.int = b.dataset.v; state.intPicked = true; rebuild(); });
 
   // ---------- pointer and keyboard: one time cursor across both chart panels, a tooltip that follows the mouse ----------

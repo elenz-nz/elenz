@@ -22,7 +22,7 @@
 		<p>Three kinds of data, from the newest to the most accurate, are joined into one series on one time axis:</p>
 		<ul class="mt-flow">
 			<li><b>Live</b><strong>The last 7 days</strong><span>The EA’s real-time dispatch feed, every 5 minutes, a minute or two after each interval. Updated by a job that runs every 5 minutes.</span></li>
-			<li><b>Recent</b><strong>The last 5–6 weeks</strong><span>The EA’s daily dispatch files: the same dispatch cases, 1–4 days late. They fill gaps in the live feed.</span></li>
+			<li><b>Recent</b><strong>The last 5–6 weeks</strong><span>The EA’s daily dispatch files: the same dispatch cases, 1–4 days late, for the history behind the live week.</span></li>
 			<li><b>History</b><strong>Back to August 1997</strong><span>Metered data: what each station delivered and each grid point took, half-hourly, as the market settles it. Final prices throughout.</span></li>
 		</ul>
 		<p>The history job runs every six hours and picks up each month’s metering as the EA publishes it. <a href="/methods/history">History since 1997</a> explains where the sources hand over.</p>
@@ -46,7 +46,7 @@
 			<dt>Estimates</dt>
 			<dd>Embedded solar and the live HVDC transfer are modelled, not measured. They are hatched on the charts, marked “est.” in the readouts, and embedded solar has an uncertainty band.</dd>
 			<dt>Gaps</dt>
-			<dd>About 7–8% of 5-minute intervals have no dispatch case in either the feed or the daily files. They are filled by a straight line between the intervals either side, as are the rare cases that arrive incomplete, and the summary table marks them “interpolated”. Longer gaps in a few series (some price nodes, irradiance) are left empty or shown as zero; the method pages say which.</dd>
+			<dd>About 5–8% of 5-minute intervals have no dispatch case in either the feed or the daily files. They are filled by a straight line between the intervals either side, as are the rare cases that arrive incomplete, and the summary table marks them “interpolated”. Longer gaps in a few series (some price nodes, irradiance) are left empty or shown as zero; the method pages say which.</dd>
 			<dt>Live, Delayed, History</dt>
 			<dd>“Live” means the newest interval is under 15 minutes old; “Delayed” that it is older; “History” that the view is past the live week. The page checks for new data once the next interval is due.</dd>
 			<dt>Longer intervals</dt>
