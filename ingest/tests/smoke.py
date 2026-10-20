@@ -46,6 +46,15 @@ check(s['P|NI'].between(-100, 20000).all() and s['P|SI'].between(-100, 20000).al
 check('P|WKM' in s and s['P|WKM'].notna().all(), 'compact: Whakamaru price (a generating node, in the daily files)')
 s2 = st.loads(st.dumps(s))
 check(s2.shape == s.shape, 'state: survives the gzip round trip')
+check(not len(st.suspect(s)), 'partial: no complete interval flagged')
+# an incomplete case (19 Oct 2026, 13:00 NZDT): most rows missing from one interval
+t6 = sorted(raw.IntervalDateTime.unique())[6]
+cut = raw[(raw.IntervalDateTime != t6) | (np.arange(len(raw)) % 4 == 0)]
+sp = st.mark_partial(st.merge(None, st.compact(cut, 'file')), log=lambda *a: None)
+check(list(sp.index[sp.src == 'partial']) == [s.index[6]], 'partial: the incomplete interval, and only it, marked')
+sp = st.mark_partial(st.merge(sp, s.iloc[[6]]), log=lambda *a: None)
+check(not (sp.src == 'partial').any(), 'partial: put back once the whole case arrives')
+check(bt.runs(np.array([0, 1, 1, 0, 1], bool)) == [[1, 2], [4, 1]], 'partial: filled intervals listed as runs')
 
 full = pd.date_range(s.index.min(), s.index.max(), freq='5min')
 g = s.reindex(full)
@@ -63,7 +72,7 @@ json.dumps(js, allow_nan=False)
 check(True, 'assemble: JSON has no NaN')
 
 # ---------- history path ----------
-hh = s.drop(columns='src')
+hh = s.drop(columns=['src', 'R'])
 tp = hh.index.floor('30min')
 h = hh.groupby(tp).mean()
 h.insert(0, 'n', hh.groupby(tp).size())

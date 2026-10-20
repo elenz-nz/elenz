@@ -46,7 +46,7 @@
 			<dt>Estimates</dt>
 			<dd>Embedded solar and the live HVDC transfer are modelled, not measured. They are hatched on the charts, marked “est.” in the readouts, and embedded solar has an uncertainty band.</dd>
 			<dt>Gaps</dt>
-			<dd>About 7–8% of 5-minute intervals have no dispatch case in either the feed or the daily files. They are filled by a straight line between the intervals either side. Longer gaps in a few series (some price nodes, irradiance) are left empty or shown as zero; the method pages say which.</dd>
+			<dd>About 7–8% of 5-minute intervals have no dispatch case in either the feed or the daily files. They are filled by a straight line between the intervals either side, as are the rare cases that arrive incomplete, and the summary table marks them “interpolated”. Longer gaps in a few series (some price nodes, irradiance) are left empty or shown as zero; the method pages say which.</dd>
 			<dt>Live, Delayed, History</dt>
 			<dd>“Live” means the newest interval is under 15 minutes old; “Delayed” that it is older; “History” that the view is past the live week. The page checks for new data once the next interval is due.</dd>
 			<dt>Longer intervals</dt>

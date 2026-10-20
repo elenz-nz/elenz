@@ -96,7 +96,11 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   then; it isn't dated). `npm run check:previews` (`scripts/check-previews.js`, after the build, in checks.yml) fails
   if a public page (not noindex) lacks any tag or its image. A new page needs a `<Preview>`.
 - `ingest/`: Python. `update.py` (the scheduled job), `state.py` (compact 7-day state: one row per interval,
-  columns `U|POC UNIT`, `C|...` charging, `L|NI`, `L|SI`, `T`, `P|NI`, `P|SI`, `P|<node>` for `[price_nodes]`, `src`), `build_tracker.py`
+  columns `U|POC UNIT`, `C|...` charging, `L|NI`, `L|SI`, `T`, `P|NI`, `P|SI`, `P|<node>` for `[price_nodes]`, `R` rows received, `src`: api, file, empty (no case) or partial (a case that arrived
+  incomplete, `state.mark_partial`: an island's load less Tiwai or national generation under 75% of its neighbours', or
+  under 85% of the usual rows; left out and interpolated, fetched again for 6 hours; first seen 19 Oct 2026, 13:00 NZDT).
+  tracker.json's `meta.filled` lists the interpolated intervals as [first, length] runs; the summary heading says
+  "interpolated"), `build_tracker.py`
   (state → tracker.json; `assemble()` is shared with history), `emi_live.py` (API client), `store.py` (Workers KV
   via the Cloudflare REST API, or `data/store` locally), `sync.py` (EMI blob container + Open-Meteo), `common.py`
   (paths, overrides). `history.py`: history since 1 Aug 1997 (see its docstring for the KV keys `hist/*`): metered data
@@ -205,6 +209,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   Older data must come from the EMI files, so every interval must be stored as it arrives.
 - Limits: 60 calls/min, 60 MB/hour. Send `Accept-Encoding: gzip` (168 KB → 11 KB per interval).
 - About 8% of 5-minute intervals have no dispatch case in either source. They are interpolated and the page says so.
+- Tiwai is shown as ordinary demand (owner's call, 21 Oct 2026): no separate summary row or record. The data still
+  carries `tiwai` (T, MT), unused by the site, in case it's wanted again.
 - Daily files arrive 1–4 days late. Island reference prices: HAY2201 and BEN2201 rows exist in the API; the
   daily files lack them, but nodal price ÷ location factor gives the identical figure.
 - Battery charging is load on separate units (RUK99, GLB99, RHO99, HLY91); net it against the battery unit.

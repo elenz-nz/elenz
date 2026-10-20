@@ -26,7 +26,7 @@
 	<dd>Trustpower’s embedded meters (Kaimai, Rotokawa, Tararua, Highbank, Paerau, Waipori, Teviot) read double until July 2005: a month whose peak is more than 1.4 times the plant’s nameplate is halved.</dd>
 	<dt>Gaps filled from dispatch</dt>
 	<dd>Where the metering lacks a plant, its dispatch figures are used: batteries (always, as dispatch nets their charging), solar farms not in the metering yet, and any plant whose metered energy is under half its dispatch energy in a month.</dd>
-	<dt>Demand, Tiwai, HVDC</dt>
+	<dt>Demand and HVDC</dt>
 	<dd>From the metered grid flows; see <a href="/methods/demand#history">demand</a> and <a href="/methods/hvdc#metered">HVDC</a>.</dd>
 	<dt>Embedded solar</dt>
 	<dd>The same model with each month’s installed capacity: none before the registry starts in August 2013, ERA5 reanalysis sunshine for 2013–15, the satellite from 2016. See <a href="/methods/embedded-solar">embedded solar</a>.</dd>

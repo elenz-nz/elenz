@@ -57,7 +57,6 @@ MONTH_LIMIT = 12 * 60      # seconds update() may spend reading months it has no
 # (src/lib/records/records.js).
 HALF_HOURS = {
     'demand_max': ('max', 'gen', REGIONS, 0),
-    'demand_xt_max': ('max', 'gen', ('NZ', 'SI'), 0),      # without the Tiwai Point smelter (in the South Island)
     'demand_min': ('min', 'gen', REGIONS, 0),
     'ren_max': ('max', 'gen', REGIONS, 1),
     'ren_min': ('min', 'gen', REGIONS, 1),
@@ -120,9 +119,8 @@ def series(js):
         share = np.where(gen > 0, 100 * ren / np.where(gen > 0, gen, 1), np.nan)
         dem = a('NI', 'metered') + a('SI', 'metered') if r == 'NZ' else a(r, 'metered')
         price = np.maximum(nip, sip) if r == 'NZ' else (nip if r == 'NI' else sip)
-        tiwai = a('SI', 'tiwai') if r in ('NZ', 'SI') else 0
         S = {
-            'demand_max': dem, 'demand_xt_max': dem - tiwai, 'demand_min': dem,
+            'demand_max': dem, 'demand_min': dem,
             'ren_max': share, 'ren_min': share, 'fossil_min': sum(F[f] for f in FOSSIL),
             'wind_max': F['wind'], 'solar_max': F['solar'], 'roof_max': F['roof'],
             'price_max': price, 'gap_max': np.abs(nip - sip), 'hvdc_n_max': hv, 'hvdc_s_max': -hv,

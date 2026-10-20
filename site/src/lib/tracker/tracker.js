@@ -3,6 +3,7 @@
 
 import { FUELS } from './fuels.js';
 import { efAt, plantEf, BY_PLANT } from './emissions.js';
+import { onDateSettled } from '../site/datefield.js';
 import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTotal } from './series.js';
 import PLANT_META from './plants.json';  // owner and hydro scheme per plant (ingest/plant_meta.py)
 import { readView, writeView, slug, describe, shareLinks } from '#lib/site/view.js';
@@ -14,7 +15,13 @@ export { nzOffset, tzName };
 function toModel(S, END) {
   return { ...S, N: S.n, END: END ?? S.t[S.n - 1], NIs: S.NI, SIs: S.SI };
 }
-export const buildModel = D => toModel(fromLayout(D));
+// the live week's intervals with no complete dispatch case, interpolated (tracker.json meta.filled: [first, length] runs)
+function filledTimes(D) {
+  const out = new Set();
+  for (const [a, n] of D.meta?.filled || []) for (let i = a; i < a + n; i++) out.add(D.t0 + i * D.step);
+  return out;
+}
+export const buildModel = D => ({ ...toModel(fromLayout(D)), filled: filledTimes(D) });
 
 // Ranges: the live week at 5 minutes, then history. Each lists its intervals; the first is the default.
 // A range can end at the latest data or on a chosen date (state.end); the arrows step by the range's length.
@@ -205,6 +212,17 @@ export function mountTracker(D, hooks = {}) {
     return { '1d': `${DOW[p.dow]} ${p.dom} ${MON[p.mon]} ${p.y}`, '1w': `w/c ${p.dom} ${MON[p.mon]} ${p.y}`, '1mo': `${MON[p.mon]} ${p.y}`, '1yr': `${p.y}` }[state.int]
       || `${DOW[p.dow]} ${p.dom} ${MON[p.mon]}${state.end != null && p.y !== lp(models.live.END).y ? ' ' + p.y : ''}, ${clock(p)}`;
   }
+  // the live week's interpolated intervals, named in the summary heading: " · interpolated" for a 5-minute point,
+  // " · 2 of 6 intervals interpolated" for a half-hour of the live week (history's half-hours average what was published)
+  function filledNote(t) {
+    const F = models.live.filled;
+    if (!F || !F.size) return '';
+    if (state.int === '5m') return F.has(t) ? ' · interpolated' : '';
+    if (state.kind !== 'live' && !(t >= models.live.t[0])) return '';
+    let k = 0;
+    for (let i = 0; i < 6; i++) if (F.has(t + i * 3e5)) k++;
+    return k === 6 ? ' · interpolated' : k ? ` · ${k} of 6 intervals interpolated` : '';
+  }
   function heading(j) {
     const p = lp(V.t[j]), last = j === V.n - 1 && V.partial;
     // in the energy view generation is the period's total, so the heading names the period rather than an average
@@ -215,7 +233,7 @@ export function mountTracker(D, hooks = {}) {
       '1mo': [`${MONTH[p.mon]} ${p.y}`, per('month', 'monthly average', 'average for the month so far')],
       '1yr': [`${p.y}`, per('year', 'yearly average', 'average for the year so far')],
     }[state.int];
-    return h || [clock(p), `${dayLbl(p)} · TP ${tp(p)} · ${state.int === '5m' ? '5-minute' : 'half-hour average'}`];
+    return h || [clock(p), `${dayLbl(p)} · TP ${tp(p)} · ${state.int === '5m' ? '5-minute' : 'half-hour average'}${filledNote(V.t[j])}`];
   }
 
   // ---------- time axis: ticks, labels and the vertical lines at day, week, month or year boundaries ----------
@@ -606,8 +624,13 @@ export function mountTracker(D, hooks = {}) {
     if (cap) mx = Math.max(mx, cap * 1.04);
     if (pct) mx = Math.min(mx, 100);  // rounding can push a full stack a hair over 100
     const full = pct && topIsAll();  // the whole mix: a fixed 0–100% axis
-    const dom = full ? { lo: 0, hi: 100, ticks: [0, 25, 50, 75, 100] } : nice(0, Math.max(mx, pct ? 0.1 : 1), 5);
-    if (mn < 0) dom.lo = mn * 1.2;
+    let dom = full ? { lo: 0, hi: 100, ticks: [0, 25, 50, 75, 100] } : nice(0, Math.max(mx, pct ? 0.1 : 1), 5);
+    if (mn < 0) {
+      // below zero (battery charging, HVDC leaving the island): gridlines and labels on both sides when the negative
+      // part is big enough to read, otherwise just room for it
+      const both = nice(mn, Math.max(mx, pct ? 0.1 : 1), 5), step = both.ticks[1] - both.ticks[0];
+      if (-mn >= 0.6 * step) dom = both; else dom.lo = mn * 1.2;
+    }
     const F = frame(c, dom, pct ? v => (Number.isInteger(v) ? v : v.toFixed(1)) + '%' : energy ? v => (Math.abs(v - Math.round(v)) < 1e-9 ? fmt(v) : String(+v.toFixed(2))) : v => fmt(v), { axis: true });
     const { X, Y } = F;
     for (const L of tops) {
@@ -636,11 +659,14 @@ export function mountTracker(D, hooks = {}) {
     if (n > 2 && !full) {
       // a period still in progress (or the history's first, part year) isn't a fair high or low in energy
       const a = energy && V.partialFirst ? 1 : 0, b = energy && V.partial ? n - 1 : n;
-      let jh = a, jl = a; for (let j = a + 1; j < b; j++) { if (pos[j] > pos[jh]) jh = j; if (pos[j] < pos[jl]) jl = j; }
+      // generation only: HVDC flowing into an island is drawn on the stack but isn't the island's generation
+      const hv = tops.find(T => T.l.id === 'hvdc'), g = hv ? pos.map((v, j) => v - (hv.p1[j] - hv.p0[j])) : pos;
+      let jh = a, jl = a; for (let j = a + 1; j < b; j++) { if (g[j] > g[jh]) jh = j; if (g[j] < g[jl]) jl = j; }
       const val = v => pct ? (v < 10 ? v.toFixed(1) : Math.round(v)) + '%' : energy ? `${enFmt(v)} ${eu().unit}` : `${fmt(v)} MW`;
-      if (pos[jh] > (energy ? 0 : 0.5)) {
-        extreme(ctx, F, jh, pos[jh], `High ${val(pos[jh])}`, C['--ink']);
-        if (pos[jl] < pos[jh] * 0.98) extreme(ctx, F, jl, pos[jl], `Low ${val(pos[jl])}`, C['--ink'], true);
+      // the dot sits on the stack's top at that point; the label gives the generation figure
+      if (g[jh] > (energy ? 0 : 0.5)) {
+        extreme(ctx, F, jh, pos[jh], `High ${val(g[jh])}`, C['--ink']);
+        if (g[jl] < g[jh] * 0.98) extreme(ctx, F, jl, pos[jl], `Low ${val(g[jl])}`, C['--ink'], true);
       }
     }
     GEN = { F, tops };
@@ -859,7 +885,6 @@ export function mountTracker(D, hooks = {}) {
 
   function updateSummary() {
     const j = state.hover, r = state.region, layers = V.layers;
-    const showT = r !== 'NI';
     $('tot-lbl').textContent = totalLabel();
     if (j == null) {
       const R = RANGES[state.range], p0 = lp(V.t[0] ?? M.END);
@@ -887,9 +912,9 @@ export function mountTracker(D, hooks = {}) {
         l.cells.b.style.transform = `scaleX(${l.signed || tot <= 0 ? 0 : Math.max(0, e / tot)})`;
       }
       $('tot-q').textContent = en(tot); $('tot-s').textContent = layers.some(l => l.signed) && !topIsAll() ? 'net' : '100%';
-      let pn = 0, ps = 0, pk = 0, pkg = 0, ti = 0, hv = 0, em = 0, gw = 0, re = 0, hs = 0;
+      let pn = 0, ps = 0, pk = 0, pkg = 0, hv = 0, em = 0, gw = 0, re = 0, hs = 0;
       for (let i = 0; i < V.n; i++) {
-        const w = V.hrs[i]; hs += w; pn += V.pNI[i] * w; ps += V.pSI[i] * w; ti += V.tiwai[i] * w; hv += V.hvdc[i] * w;
+        const w = V.hrs[i]; hs += w; pn += V.pNI[i] * w; ps += V.pSI[i] * w; hv += V.hvdc[i] * w;
         pk = Math.max(pk, V.pkMet[i]); if (V.pkGen) pkg = Math.max(pkg, V.pkGen[i]);
         em += V.co2[i] * V.gen[i] * w; re += V.ren[i] * V.gen[i] * w; gw += V.gen[i] * w;
       }
@@ -899,7 +924,6 @@ export function mountTracker(D, hooks = {}) {
         ['Price, South Island', money(ps / hs), 'avg'],
         ['Peak demand, metered', fmt(pk), 'MW'],
         V.pkGen && ['Peak generation', fmt(pkg), 'MW'],
-        showT && ['Tiwai smelter', fmt(ti / hs), 'MW avg'],
         Math.abs(hv) >= 1e6 ? ['HVDC, net transfer', (Math.abs(hv) / 1e6).toFixed(2), hv >= 0 ? 'TWh north' : 'TWh south']
           : ['HVDC, net transfer', (Math.abs(hv) / 1000).toFixed(1), hv >= 0 ? 'GWh north' : 'GWh south'],
         ['Emissions intensity', fmt(em / gw), 'g/kWh'],
@@ -930,12 +954,14 @@ export function mountTracker(D, hooks = {}) {
       ['Embedded solar (est.)', fmt(V.fuels.roof[j]), (long ? 'MW avg' : 'MW') + (V.roofU[j] > 0.5 ? ` ± ${fmt(V.roofU[j])}` : '')],
       long && ['Peak demand, metered', fmt(V.pkMet[j]), 'MW'],
       long && V.pkGen && ['Peak generation', fmt(V.pkGen[j]), 'MW'],
-      showT && ['Tiwai smelter', fmt(V.tiwai[j]), long ? 'MW avg' : 'MW'],
       ['HVDC', hvTxt(V.hvdc[j]), hvDir(V.hvdc[j])],
       ['Emissions intensity', fmt(V.co2[j]), 'g/kWh'],
       ['Renewable share', V.ren[j].toFixed(1) + '%', ''],
     ]);
-    $('v-gen').textContent = `${genVal(tot, j)} ${genUnit()}`;
+    // the figure above the chart is what the chart shows: hidden layers and HVDC left out (the summary keeps the whole)
+    let shown = tot;
+    if (state.hidden.size || !topIsAll()) { shown = 0; for (const l of layers) if (!state.hidden.has(l.id) && l.id !== 'hvdc') shown += l.signed && !topIsAll() ? l.s[j] : Math.max(0, l.s[j]); }
+    $('v-gen').textContent = `${genVal(shown, j)} ${genUnit()}`;
     $('v-pni').textContent = money(V.pNI[j]); $('v-psi').textContent = money(V.pSI[j]);
     $('v-met').textContent = fmt(V.metered[j]); $('v-und').textContent = fmt(V.underlying[j]);
     $('v-hv').textContent = `${hvTxt(V.hvdc[j])} ${V.hvdc[j] > 0.5 ? 'north' : V.hvdc[j] < -0.5 ? 'south' : ''}`;
@@ -1096,8 +1122,8 @@ export function mountTracker(D, hooks = {}) {
 
   $('sel-region').addEventListener('change', e => { if (!['NZ', 'NI', 'SI'].includes(e.target.value)) return; state.region = e.target.value; state.hidden.clear(); rebuild(); });
   $('seg-range').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || !Object.hasOwn(RANGES, b.dataset.v)) return; setView(b.dataset.v); });
-  $('in-date').addEventListener('change', e => {
-    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(e.target.value);
+  onDateSettled($('in-date'), v => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
     if (!m) return;
     const day = midnightOf(Date.UTC(+m[1], +m[2] - 1, +m[3], 12) - 12 * 36e5);  // that date's local midnight
     setView(state.range, addDays(day, 1));

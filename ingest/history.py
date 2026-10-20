@@ -121,7 +121,7 @@ def fetch_day(d):
     raw = get(f'{BLOB}/{DISPATCH}/{d.year}/{d:%Y%m%d}_DispatchNodalPricesAndVolumes.csv')
     if raw is None:
         return None
-    s = st.compact(pd.read_csv(io.BytesIO(raw), keep_default_na=False), 'file').drop(columns='src')
+    s = st.compact(pd.read_csv(io.BytesIO(raw), keep_default_na=False), 'file').drop(columns=['src', 'R'], errors='ignore')
     tp = s.index.floor('30min')
     out = s.groupby(tp).mean()
     out.insert(0, 'n', s.groupby(tp).size())

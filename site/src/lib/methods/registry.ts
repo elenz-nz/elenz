@@ -23,7 +23,7 @@ export const TOPICS: Topic[] = [
 		title: 'Generation',
 		summary: 'What each plant and fuel is generating: the dispatch data for the live week, metered output for history, each unit mapped to its plant and fuel.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
-		updated: '2026-10-18',
+		updated: '2026-10-21',
 	},
 	{
 		slug: 'embedded-solar',
@@ -36,9 +36,9 @@ export const TOPICS: Topic[] = [
 	{
 		slug: 'demand',
 		title: 'Demand',
-		summary: 'Electricity taken from the grid in each island, with embedded solar added back for underlying demand, and the Tiwai Point smelter on its own.',
+		summary: 'Electricity taken from the grid in each island, and with embedded solar added back for underlying demand.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
-		updated: '2026-10-17',
+		updated: '2026-10-21',
 	},
 	{
 		slug: 'hvdc',
@@ -132,7 +132,7 @@ export const SOURCES: Source[] = [
 		id: 'rtd', name: 'Real-time dispatch', publisher: EA, dataset: 'EMI API: real-time-dispatch',
 		url: 'https://emi.developer.azure-api.net/',
 		what: 'Every 5-minute dispatch case: MW for each generating unit and load at every connection point, and the price at every node, including the island reference nodes.',
-		use: 'The live week: generation by unit, island load, prices, the Tiwai smelter (TWI2201). Also the inputs to the HVDC estimate and the price explainer.',
+		use: 'The live week: generation by unit, island load, prices. Also the inputs to the HVDC estimate and the price explainer.',
 		period: 'The last month or so', fresh: 'Usually 1–2 minutes after each interval starts', licence: CCBY,
 		topics: ['generation', 'demand', 'prices', 'hvdc', 'price-explainer', 'history', 'records'],
 	},
@@ -221,9 +221,9 @@ export const SOURCES: Source[] = [
 		id: 'tiwai', name: 'Grid exports to Tiwai', publisher: EA, dataset: 'Metered_data/Grid_export_to_Tiwai',
 		url: EMI + 'Metered_data/Grid_export_to_Tiwai',
 		what: 'Half-hourly energy supplied to the Tiwai Point aluminium smelter.',
-		use: 'The smelter’s load in history.',
+		use: 'Read with the metered history but not shown on its own: the smelter is part of demand like any other consumer.',
 		period: 'From Oct 1996', fresh: 'About 2 weeks after each month', licence: CCBY,
-		topics: ['demand', 'history', 'records'],
+		topics: ['history'],
 	},
 	{
 		id: 'hvdcflows', name: 'HVDC flows', publisher: EA, dataset: 'Metered_data/HVDC_Flows',

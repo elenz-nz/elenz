@@ -85,9 +85,24 @@ def default_capacity():
         return json.load(f)
 
 
+def runs(mask):
+    """[[first index, length], ...] of the True stretches in mask: the intervals the page shows as interpolated."""
+    out, i, n = [], 0, len(mask)
+    while i < n:
+        if mask[i]:
+            j = i
+            while j < n and mask[j]:
+                j += 1
+            out.append([i, j - i])
+            i = j
+        else:
+            i += 1
+    return out
+
+
 def build(state, irr, cap=None, log=print):
     """irr: (satellite, forecast fallback) irradiance DataFrames (rooftop.irr_loads); cap: rooftop capacity by point."""
-    real = state[state.src != 'empty']
+    real = state[~state.src.isin(['empty', 'partial'])]   # incomplete cases are interpolated like missing ones
     last = real.index.max()
     full = pd.date_range(last - pd.Timedelta(minutes=5 * (WINDOW - 1)), last, freq='5min')
     s = real[real.index >= full[0]].reindex(full)  # missing intervals become NaN rows, interpolated below
@@ -99,6 +114,7 @@ def build(state, irr, cap=None, log=print):
     t0 = js['t0']
     sat_end = sat.dropna(how='all').index.max() if sat is not None and not sat.empty else None
     js['meta'] = {'intervals': int(s.src.notna().sum()), 'expected': len(full), 'end': t0 + (len(full) - 1) * 300000,
+                  'filled': runs(s.src.isna().to_numpy()),
                   'api_from': int(api_t.min().timestamp() * 1000) if len(api_t) else None,
                   'sat_end': int(sat_end.timestamp() * 1000) if sat_end is not None else None,
                   'built': int(pd.Timestamp.now(tz='UTC').timestamp() * 1000)}

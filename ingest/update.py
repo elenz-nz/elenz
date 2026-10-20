@@ -4,7 +4,8 @@ Each run:
   1. loads the state (and irradiance) from the store (Cloudflare KV, or data/store locally)
   2. fetches the newest intervals (waiting up to WAIT seconds for the one that has just begun, when the API is
      keeping up), re-reads the two before the newest in case they were re-run, then fills older gaps in the
-     7-day window, newest first, up to a per-run budget (so the first runs fill the week over ~30-40 minutes)
+     7-day window, newest first, up to a per-run budget (so the first runs fill the week over ~30-40 minutes), and
+     fetches again any interval from the last few hours whose case arrived incomplete (state.mark_partial)
   3. refreshes irradiance if it is more than half an hour old (Himawari satellite for the embedded solar points,
      ~45 minutes behind; the forecast service only if the satellite feed is down)
   4. builds tracker.json and saves it and the state back to the store
@@ -37,6 +38,7 @@ IRRADIANCE_MAX_AGE = 1800     # one store write per refresh: 48 a day
 # Self-expiring: those intervals leave the 7-day window by 24 Oct 2026, and this then does nothing.
 NODES_SINCE = pd.Timestamp('2026-10-16 00:20', tz='UTC')
 NODE_BACKFILL = 120
+REFETCH_PARTIAL = pd.Timedelta(hours=6)   # incomplete cases (state.mark_partial) are fetched again for this long
 
 
 def fetch_interval(t_utc):
@@ -108,7 +110,8 @@ def main(log=print):
     raw = store.get('state.csv.gz')
     s = st.loads(raw) if raw else None
     log('state:', 'none yet' if s is None else f'{len(s)} intervals to {s.index.max()}')
-    before = None if s is None else (len(s), s.index[s.src != 'empty'].max())
+    sig = lambda s: (len(s), s.index[s.src != 'empty'].max(), int((s.src == 'partial').sum()))
+    before = None if s is None else sig(st.mark_partial(s, lambda *a: None))
 
     latest = emi_live.to_frame(emi_live.fetch())
     if len(latest):
@@ -153,11 +156,18 @@ def main(log=print):
         if refill:
             log(f'fetching {len(refill)} older intervals again for the extra price nodes ({len(old) - len(refill)} left)')
             todo += refill
+    # incomplete cases from the last few hours: the API may have the whole case by now
+    s = st.mark_partial(s, log)
+    again = [t for t in s.index[(s.src == 'partial') & (s.index > t_latest - REFETCH_PARTIAL)] if t not in todo]
+    if again:
+        log(f'fetching {len(again)} incomplete intervals again')
+        todo += again
     for part in fetch_many(todo):
         s = st.merge(s, part)
+    s = st.mark_partial(s, log)
     log(f'latest {t_latest}, fetched {len(todo)} intervals, {max(0, len(missing) - BUDGET)} older gaps left for later runs')
 
-    if before == (len(s), s.index[s.src != 'empty'].max()):
+    if before == sig(s):
         # nothing new (e.g. two triggers fired close together): skip the writes to stay inside KV's free daily limit
         log(f'no new intervals since the last run (latest {t_latest}); nothing saved')
         return

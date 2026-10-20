@@ -18,8 +18,6 @@ const ALL = ['NZ', 'NI', 'SI'];
 
 export const DEFS = [
   { id: 'demand_max', kind: 'hh', fam: 'gen', group: 'Demand', name: 'Peak demand', sub: 'Highest half-hour of grid demand', unit: 'MW', tok: '--ink', regions: ALL },
-  { id: 'demand_xt_max', kind: 'hh', fam: 'gen', group: 'Demand', name: 'Peak demand without Tiwai', sub: 'The aluminium smelter’s load taken out', unit: 'MW', tok: '--ink', regions: ['NZ', 'SI'],
-    na: { NI: 'Same as peak demand: Tiwai is in the South Island' } },
   { id: 'demand_min', kind: 'hh', fam: 'gen', group: 'Demand', name: 'Lowest demand', sub: 'Lowest half-hour of grid demand', unit: 'MW', tok: '--ink', regions: ALL },
   { id: 'ren_max', kind: 'hh', fam: 'gen', group: 'Renewables', name: 'Highest renewable share', sub: 'Half-hour', unit: '%', dp: 1, tok: '--g-ren', regions: ALL },
   { id: 'ren_month_max', kind: 'month', fam: 'gen', group: 'Renewables', name: 'Highest renewable share', sub: 'Calendar month', unit: '%', dp: 1, tok: '--g-ren', regions: ALL },
@@ -183,10 +181,9 @@ function halfHours(D) {
       for (const f of FOSSIL) fos[j] += F[f][j];
     }
     const dem = r === 'NZ' ? a('NI', 'metered').map((x, j) => x + a('SI', 'metered')[j]) : a(r, 'metered');
-    const tiw = r === 'NI' ? z : a('SI', 'tiwai');
     const G = avg(gen), Rn = avg(ren);
     const S = {
-      demand_max: avg(dem), demand_min: avg(dem), demand_xt_max: avg(dem.map((x, j) => x - tiw[j])),
+      demand_max: avg(dem), demand_min: avg(dem),
       ren_max: G.map((g, i) => (g > 0 ? (100 * Rn[i]) / g : NaN)), fossil_min: avg(fos),
       wind_max: avg(F.wind), solar_max: avg(F.solar), roof_max: avg(F.roof),
     };

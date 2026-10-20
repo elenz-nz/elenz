@@ -119,7 +119,6 @@
 		}
 	}
 	const pc = (x: number) => (x === x ? `${x.toFixed(1)}%` : '–');
-	const pts = (a: number, b: number) => { if (!(a === a && b === b)) return ''; const d = a - b; return `${Math.abs(d) < 0.05 ? '±0.0' : (d > 0 ? '+' : '−') + Math.abs(d).toFixed(1)} pts`; };
 
 	// ---------- dispatchable headroom ----------
 	// hydro, thermal and battery capacity not generating, at three levels: installed, offered, and offered under
@@ -279,7 +278,7 @@
 				{#if ghost && ghost[hover] === ghost[hover]}<span class="was">· {prevYear ?? 'a year before'}: <b>{pc(ghost[hover])}</b></span>{/if}
 			{:else}
 				<span>Average</span> <b>{pc(avgNow)}</b>
-				{#if compare && avgPrev === avgPrev}<span class="was">· {prevPhrase} <b>{pc(avgPrev)}</b></span> <span class="delta">{pts(avgNow, avgPrev)}</span>{/if}
+				{#if compare && avgPrev === avgPrev}<span class="was">· {prevPhrase} <b>{pc(avgPrev)}</b></span>{/if}
 			{/if}
 		</p>
 		{#if curI && curI.n > 1}
@@ -306,11 +305,10 @@
 					<button type="button" aria-pressed={roomView === 'levels'} onclick={() => { roomView = 'levels'; save(); }}>Levels</button>
 					<button type="button" aria-pressed={roomView === 'fuel'} onclick={() => { roomView = 'fuel'; save(); }}>By fuel</button>
 				</div>
-				{#if roomView === 'fuel'}
-					<div class="seg" role="group" aria-label="Level to show by fuel">
-						{#each levelsShown as L}<button type="button" aria-pressed={roomBasis === L} onclick={() => { roomBasis = L as any; save(); }}>{L === 'C' ? 'Under $1,000' : LEVEL_NAME[L]}</button>{/each}
-					</div>
-				{/if}
+				<!-- always in the layout (hidden in the Levels view), so switching views doesn't move the other controls -->
+				<div class="seg" class:held={roomView !== 'fuel'} role="group" aria-label="Level to show by fuel" aria-hidden={roomView !== 'fuel'} inert={roomView !== 'fuel'}>
+					{#each levelsShown as L}<button type="button" aria-pressed={roomBasis === L} onclick={() => { roomBasis = L as any; save(); }}>{L === 'C' ? 'Under $1,000' : LEVEL_NAME[L]}</button>{/each}
+				</div>
 				<button type="button" class="tog box" aria-pressed={withHydro} onclick={() => { withHydro = !withHydro; save(); }}><i aria-hidden="true"></i>Include hydro</button>
 				<PopButton inline open={popped === 'room'} name="headroom chart" onclick={() => pop('room')} />
 			</div>
@@ -406,6 +404,7 @@
 	.card-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: flex-start; }
 	.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 	.lower :global(.seg) { flex-wrap: wrap; }
+	.held { visibility: hidden; }
 	.tog { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 0.78rem; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2px 10px; min-height: 30px; cursor: pointer; }
 	.tog i { width: 20px; height: 0; border-top: 2px dashed var(--muted); display: inline-block; }
 	.tog[aria-pressed='false'] { opacity: 0.6; }
@@ -414,7 +413,6 @@
 	.tog.box[aria-pressed='false'] i { background: none; }
 	.readout { margin: 0; font-size: 0.8rem; color: var(--ink-2); min-height: 1.3em; }
 	.readout b { font-family: var(--font-data); font-weight: 500; color: var(--ink); }
-	.readout .delta { font-family: var(--font-data); color: var(--muted); }
 	.note { margin: 0; color: var(--muted); font-size: 0.76rem; }
 	.legend, .parts { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.76rem; color: var(--ink-2); }
 	.parts { display: inline-flex; margin-left: 10px; font-family: var(--font-data); }
