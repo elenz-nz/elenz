@@ -5,7 +5,8 @@ These changes touch files in the history's rebuild fingerprint (`mapping_hash()`
 them starts a rebuild of every month (~4 days at the KV write budget). Bundle them and push them together, and never
 while a rebuild is still running (check `/data/history/progress.json`: `rebuild_left` empty).
 
-All four are ready on the branch `next-rebuild` (17 Oct 2026). To run them: once the current rebuild has finished,
+Items 1-4 and 6 are ready on the branch `next-rebuild` (17 Oct 2026); item 5 is still only a plan, so it would need
+a rebuild of its own unless it is done on the branch first. To run them: once the current rebuild has finished,
 merge the branch into `main` (on GitHub: open a pull request from `next-rebuild` and merge it), which starts the
 rebuild by itself. When it has finished, delete this file's done items, the old-name entries at the end of
 `[plant_owners]` in `overrides.toml`, and `GAS_ALIAS` in `site/src/lib/tracker/emissions.js`.
