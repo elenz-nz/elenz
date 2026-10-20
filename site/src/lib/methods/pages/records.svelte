@@ -47,7 +47,7 @@
 
 <h2 id="limits">What is left out, and known limits</h2>
 <ul>
-	<li><b>Days the clocks change.</b> Some of the EA’s older metered generation files (1997 to at least 2005) number those days’ half-hours by the clock, 48 of them, where the history counts straight through the change (46 or 50). Generation there is missing for two half-hours and an hour out after the change, so those days are left out of the generation and demand records, and runs carry on over them rather than break. Prices and HVDC are unaffected.</li>
+	<li><b>Days the clocks change.</b> The EA’s metered generation files before 2009 number those days’ half-hours by the clock and leave out one hour (the last hour of the day when the clocks go forward, one of the two 2–3 am hours when they go back). The history puts each half-hour at its right time and fills the missing hour from the half-hour next to it, so those days count like any other, but the filled hour is an estimate.</li>
 	<li><b>Embedded solar is modelled</b> (<a href="/methods/embedded-solar">Embedded solar</a>), so its records are estimates, and it counts towards the renewable share as it does everywhere on the site.</li>
 	<li><b>Coverage.</b> The history has gaps (a few stations missing for some months; see <a href="/methods/history">History since 1997</a>). Totals before 2009 leave out embedded stations the tracker doesn’t show later.</li>
 	<li><b>The South Island</b> has no fossil plant, so its renewable share is always 100%; those records are shown as a note, not a date.</li>

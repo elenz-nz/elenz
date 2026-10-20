@@ -163,8 +163,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   (missing months are read back from `hist/hh`; bump its `VERSION` to remake all); `hist/records.json` (each record by
   region, its progression, context for its half-hour, the best for each month of the year, provisional records from
   dispatch months and which ones were settled) is published while the history is complete, only when it changes. Official
-  means metered generation (meta.source), final prices, metered HVDC. Clock-change days are left out of generation and
-  demand records (older Generation_MD files number those days by the clock; see NEXT_REBUILD.md).
+  means metered generation (meta.source), final prices, metered HVDC. Clock-change days count like any other
+  once BUILD 7 has run (before it, Generation_MD's clock-numbered days before 2009 were left out).
   Try it on downloaded months: `python3 ingest/records.py <folder of YYYY-MM.json> [out.json]`.
   `offered.py` (its own workflow, `offers.yml`, started by the Worker with the history job every 6 hours): final
   generator energy offers from the EA's daily offers files (from 1 Jan 2013, published the day after; ~230 GB in all,
@@ -318,6 +318,10 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   DCP1/DCP2 poles, then BEN/HAY connection points; the 3501 rows repeat totals); `hvdc.parse_metered` reads all.
   Generation_MD gaps: Huntly's Rankines and unit 5 are missing for Sep 2020 (dispatch fills from 10 Sep), Matahina
   from Oct 2021 (dispatch fills).
+- Clock-change days: Generation_MD numbers them by the clock until Sep 2008 and leaves out an hour (forward: TP5-6
+  empty, data to TP46 only; back: 48 periods, the repeated hour once). From Apr 2009, and in every other metered file
+  throughout, periods run straight through the change (46 or 50). `metered.straighten()` renumbers those days and
+  fills the hour from its neighbour (BUILD 7).
 - Rankine coal share before FY21 (emissions.js): MBIE quarterly generation from coal less Glenbrook's metered output
   (MBIE counts Glenbrook as coal), over the Rankines' metered output; reproduces Genesis's FY21-25 figures closely.
 

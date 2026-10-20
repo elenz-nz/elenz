@@ -85,7 +85,7 @@ FUEL_OF = {'wind_max': 'wind', 'solar_max': 'solar'}       # records whose conte
 # calendar year. A period's figure is its average over the half-hours it has (MW, %, $/MWh), so periods of different
 # lengths compare fairly (a February isn't the lowest month just for being short); the renewable share is renewable
 # energy over all generation. Only whole periods count: none before the data starts or after it ends, and a day needs
-# 90% of its half-hours (clock-change days are left out of generation and demand days, as for half-hours). A period
+# 90% of its half-hours. A period
 # is official when every day in it is; a newer one beyond the record is provisional.
 PERIODS = ('day', 'week', 'month', 'year')
 DAY_SUMS = ('dem', 'gen', 'ren', 'fossil', 'wind', 'solar', 'roof', 'price', 'gap', 'hvdc')
@@ -106,23 +106,10 @@ def _arr(x, n):
     return np.array([np.nan if v is None else v for v in x], float) if x is not None else np.zeros(n)
 
 
-def clock_days(js):
-    """True for each half-hour on a day the clocks change. Some of the EA's older metered files (1997 to at least 2005)
-    number those days' half-hours by the clock, 48 of them, where the history counts straight through the change (46
-    or 50), so generation there is missing for two half-hours and an hour out after the change (facilities/
-    NEXT_REBUILD.md). Generation and demand records leave those days out."""
-    n = js['N']
-    t = pd.to_datetime(js['t0'] + np.arange(n) * js['step'], unit='ms', utc=True).tz_convert(NZ)
-    day = t.normalize()
-    nxt = (day.tz_localize(None) + pd.Timedelta(days=1)).tz_localize(NZ)
-    return np.asarray((nxt - day) != pd.Timedelta(days=1))
-
-
 def series(js):
     """A month in the tracker layout -> {record id: {region: array}} for the half-hour records and runs, plus 'gen' and
     'ren' energy sums by region for the month records."""
     n = js['N']
-    clk = clock_days(js)
     a = lambda isl, k: _arr(js[isl].get(k), n)   # noqa: E731
     fu = {isl: {f: a(isl, f) for f in GEN} for isl in ('NI', 'SI')}
     fu['NZ'] = {f: fu['NI'][f] + fu['SI'][f] for f in GEN}
@@ -148,15 +135,11 @@ def series(js):
             regions = HALF_HOURS[k][2] if k in HALF_HOURS else RUNS[k][1]
             if r not in regions:
                 continue
-            if (HALF_HOURS[k][1] if k in HALF_HOURS else RUNS[k][0]) == 'gen' and clk.any():
-                # clock-change days: no half-hour record; a run is carried over them, not broken
-                v = np.where(clk, True, v) if v.dtype == bool else np.where(clk, np.nan, v)
             out[k][r] = v
         out['gen'][r], out['renE'][r], out['windE'][r] = gen, ren, F['wind']
-        # per-day sums for the period records: half-hour values with clock-change days already blanked for
-        # generation and demand (the energy sums for the renewable share are blanked here)
+        # per-day sums for the period records
         out.setdefault('sums', {})[r] = {
-            'dem': out['demand_max'][r], 'gen': np.where(clk, np.nan, gen), 'ren': np.where(clk, np.nan, ren),
+            'dem': out['demand_max'][r], 'gen': gen, 'ren': ren,
             'fossil': out['fossil_min'][r], 'wind': out['wind_max'][r], 'solar': out['solar_max'][r], 'roof': out['roof_max'][r],
             'price': price, 'gap': np.abs(nip - sip) if r == 'NZ' else None, 'hvdc': hv if r == 'NZ' else None,
         }
@@ -447,7 +430,7 @@ def period_figures(sums, now_ms=None):
                             if sc is None or sc[1] < DAY_MIN_SHARE * nh:
                                 if p == 'day' or SUM_FAM[key] != 'gen':
                                     good = False
-                                continue   # a clock-change or short day inside a longer period: the rest stands
+                                continue   # a short day inside a longer period: the rest stands
                             a += sc[0]; c += sc[1]
                             ok = ok and okd[SUM_FAM[key]]
                         if c == 0:

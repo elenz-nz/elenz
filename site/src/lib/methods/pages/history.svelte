@@ -57,7 +57,8 @@
 	<li><b>Matahina from October 2021</b>: no metered rows; the dispatch figures stand in.</li>
 	<li><b>Before April 1999</b>: <code>Embedded_generation</code> doesn’t yet have Rotokawa, Ngāwhā, Kaimai and Tararua, about 1–2% of generation in 1997–99. Geothermal in 1998–2000 is up to 15% below MBIE’s for that reason.</li>
 	<li><b>Highbank before October 2001</b>: no metered rows for it at all; it appears in <code>Embedded_generation</code> from then (25 MW).</li>
-	<li><b>Mill Creek, April 2014 to August 2015</b>: its first 17 months aren’t in <code>Embedded_generation</code> or <code>Generation_MD</code> (60 MW of wind, about 330 GWh). They are in the EA’s reconciliation data, and are due to be added at the next full rebuild.</li>
+	<li><b>Mill Creek, May 2014 to August 2015</b>: its first 16 months (60 MW of wind, commissioning from May 2014) aren’t in <code>Embedded_generation</code> or <code>Generation_MD</code>; they come from the EA’s reconciliation data, Meridian’s injection at Wilton.</li>
+	<li><b>Days the clocks change, before 2009</b>: <code>Generation_MD</code> numbers those days’ half-hours by the clock and leaves out one hour (the day’s last hour when the clocks go forward, one of the two 2–3 am hours when they go back). Each half-hour is put at its right time and the missing hour is filled from the half-hour next to it.</li>
 	<li><b>Grid imports before 2003</b>: incomplete (see <a href="/methods/demand#history">demand</a>), so the stations’ own metered generation stands in.</li>
 	<li><b>Owners</b>: today’s owners apply to the whole history.</li>
 	<li><b>Geothermal emissions before 2020</b> use 2020’s station factors, which probably understate them.</li>

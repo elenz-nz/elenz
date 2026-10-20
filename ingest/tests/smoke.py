@@ -147,6 +147,26 @@ check(o97 is not None and len(o97) == 48 and mt.complete(o97, date(1997, 8, 1)),
 g97 = mt.generation(o97, '1997-08', log=lambda *a: None)
 t97 = sum(sum(v.values()) for v in g97.values())
 check(3000 < float(t97.mean()) < 6000, f'metered 1997: generation plausible ({float(t97.mean()):.0f} MW)')
+
+
+def _clock_csv(day, n, missing=()):
+    """A one-row Generation_MD day with TP k = k (blank for missing and beyond n), dd/mm/yyyy dates as before 2009."""
+    vals = ['' if k in missing or k > n else str(k * 500) for k in range(1, 51)]
+    return (f'POC_Code,Gen_Code,Trading_date,{",".join(f"TP{k}" for k in range(1, 51))}\n'
+            f'ABC0111,abc,{day:%d/%m/%Y},{",".join(vals)}\n').encode()
+
+
+fw = mt.read_emi(_clock_csv(date(2005, 10, 2), 46, missing=(5, 6))).set_index('t').mw   # clocks forward, by the clock
+fw_mw = fw.tolist()
+check(len(fw) == 46 and fw_mw[:4] == [1, 2, 3, 4] and fw_mw[4] == 7 and fw_mw[43] == 46 and fw_mw[44:] == [46, 46],
+      'metered: clocks-forward day numbered by the clock renumbered straight (last hour from TP46)')
+bk = mt.read_emi(_clock_csv(date(2005, 3, 20), 48)).set_index('t').mw.tolist()          # clocks back, 48 periods
+check(len(bk) == 50 and bk[:6] == [1, 2, 3, 4, 5, 6] and bk[6:8] == [5, 6] and bk[49] == 48,
+      'metered: clocks-back day numbered by the clock renumbered straight (repeated hour from TP5-6)')
+st50 = mt.read_emi(_clock_csv(date(2026, 4, 5), 50)).set_index('t').mw.tolist()         # already straight: unchanged
+check(st50 == [float(k) for k in range(1, 51)], 'metered: a straight-numbered clock-change day left as it is')
+check(mt.clock_month(date(2005, 3, 1)) and not mt.clock_month(date(2005, 4, 1)) and not mt.clock_month(date(2009, 4, 1)),
+      'metered: months with a clock-numbered change day are refetched')
 h97 = hvdc.parse_metered(met_get('x/199708_HVDC_flows.csv'))
 h26 = hvdc.parse_metered(met_get('x/202609_HVDC_flows.csv'))
 check(len(h97) == 48 and h97['H|BEN'].abs().max() > 50, 'hvdc: 1997 layout (HVDC_BN/BS/HN/HS) parsed')
@@ -191,7 +211,7 @@ s_off = rc.summarise(m_off)
 nzd = np.array(m_off['NI']['metered']) + np.array(m_off['SI']['metered'])
 R = rc.build([s_off], None, lambda m: m_off, now_ms=1)
 dm = R['records']['demand_max']['NZ']
-check(dm['v'] == int(nzd[~rc.clock_days(m_off)].max()) and dm['steps'][-1] == [dm['t'], dm['v']], 'records: peak demand from the month (progression ends at the record)')
+check(dm['v'] == int(np.nanmax(nzd)) and dm['steps'][-1] == [dm['t'], dm['v']], 'records: peak demand from the month (progression ends at the record)')
 check('ctx' in dm and len(dm['ctx']['day']['v']) >= 1 and dm['ctx']['demand'] == dm['v'], 'records: context for the record half-hour')
 check(R['runs']['low_price_run'].get('NZ') is not None or (np.maximum(np.array(m_off['NI']['price']), m_off['SI']['price']) >= rc.LOW_PRICE).all(),
       'records: runs joined')

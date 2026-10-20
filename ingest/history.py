@@ -8,7 +8,7 @@ fill in plants the metering lacks. Each run fetches anything published that isn'
 time budget and the day's KV write allowance, so the first run starts a backfill that later runs finish.
 
 Stored (Cloudflare KV in GitHub Actions, data/store locally), one set per NZ calendar month:
-  hist/state/YYYY-MM.csv.gz  half-hourly compact state: the metered columns (metered.py: M|, E|, X|, I|, J|, Q|, MT, mg, mq,
+  hist/state/YYYY-MM.csv.gz  half-hourly compact state: the metered columns (metered.py: M|, E|, X|, I|, J|, Q|, MT, mg, mq, mc,
                              me) where published, and from Sep 2020 unit MW, island load, Tiwai, reference prices (state.py
                              columns averaged over each trading period), n = 5-minute intervals present (0-6),
                              G|<point>, D|<point> = satellite global and diffuse irradiance (W/m², Open-Meteo,
@@ -82,10 +82,11 @@ warnings.simplefilter("ignore", pd.errors.PerformanceWarning)  # wide monthly fr
 FINAL = 'Datasets/Wholesale/DispatchAndPricing/FinalEnergyPrices'
 HVDC_FLOWS = 'Datasets/Wholesale/Metered_data/HVDC_Flows'
 
-BUILD = 6                    # bump to rebuild every month's JSON after changing how it is built (2: final prices, 3: peak generation,
+BUILD = 7                    # bump to rebuild every month's JSON after changing how it is built (2: final prices, 3: peak generation,
                              # 4: satellite rooftop solar model by point, metered HVDC; 5: more price nodes, daily price
                              # spread and revenue by fuel, bioenergy and waste heat; 6: metered history back to Aug 1997,
-                             # metered generation wherever published, plant groups)
+                             # metered generation wherever published, plant groups; 7: Generation_MD's clock-numbered
+                             # change days before 2009 renumbered (metered.straighten()), Mill Creek 2014-15, peak.disp)
 GEN_FUELS = ('geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
 DISPATCHABLE = ('hydro', 'gas', 'coal', 'diesel', 'batt')   # as DISPATCHABLE in site/src/lib/tracker/series.js
 WRITE_BUDGET = 280           # KV writes a day (UTC) for this job; the live job needs ~600 of the 1,000
@@ -468,7 +469,7 @@ def merge_metered(s, mf):
     """A month's state with its metered columns replaced by a newly fetched set (rows the dispatch data lacks are added)."""
     if s is None:
         return mf.sort_index()
-    old = [c for c in s.columns if c[:2] in METERED_COLS or c in ('MT', 'mg', 'me', 'mq')]
+    old = [c for c in s.columns if c[:2] in METERED_COLS or c in ('MT', 'mg', 'me', 'mq', 'mc')]
     return s.drop(columns=old).join(mf, how='outer').sort_index()
 
 

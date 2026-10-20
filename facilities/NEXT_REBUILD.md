@@ -5,8 +5,8 @@ These changes touch files in the history's rebuild fingerprint (`mapping_hash()`
 them starts a rebuild of every month (~4 days at the KV write budget). Bundle them and push them together, and never
 while a rebuild is still running (check `/data/history/progress.json`: `rebuild_left` empty).
 
-Items 1-4 and 6 are ready on the branch `next-rebuild` (17 Oct 2026); item 5 is still only a plan, so it would need
-a rebuild of its own unless it is done on the branch first. To run them: once the current rebuild has finished,
+All six are ready on the branch `next-rebuild` (items 1-4 and 6 on 17 Oct 2026, item 5 on 21 Oct 2026; `BUILD` 7).
+Cam is holding it (21 Oct 2026) to add more while testing: add further rebuild changes to this branch. To run them: once the current rebuild has finished,
 merge the branch into `main` (on GitHub: open a pull request from `next-rebuild` and merge it), which starts the
 rebuild by itself. When it has finished, delete this file's done items, the old-name entries at the end of
 `[plant_owners]` in `overrides.toml`, and `GAS_ALIAS` in `site/src/lib/tracker/emissions.js`.
@@ -49,18 +49,25 @@ register's names in `metered_plants.csv` and `plant_capacity.csv`, so plant page
 ## 5. Clock-change days in the older metered files (added 17 Oct 2026)
 
 `metered.read_emi` maps trading period k to (k-1) half-hours after local midnight, counting straight through a clock
-change (46 periods on the day the clocks go forward, 50 when they go back). The current Generation_MD files do that,
-but the older ones number those days by the clock with 48 periods: `200503_Generation_MD.csv` has nothing in TP49-50 on
-20 Mar 2005 (Grid_export has all 50), and 5 Oct 1997 has generation missing at 3:00-3:30 am. `202604` and `201504` are
-fine. So on each clock-change day in those years two half-hours have no generation (demand there goes negative) and the
-rest of the day after the change is an hour out. Found by the records (17 Oct 2026); `records.py` leaves those days out.
-Plan, on the branch:
-- Find the last year with 48-period clock-change days (check one Generation_MD file a year, and Embedded_generation).
-- `read_emi`: for a file whose clock-change day has 48 periods, map period k by the clock (period 5-6 don't exist going
-  forward; going back, the repeated hour is one pair of periods, so split or drop it and note which).
-- The stored states hold the parsed times, so the affected months must refetch their metered data (drop their metered
-  columns, or make `complete()` false for them), then rebuild. Check: generation on those days' nights, and demand never
-  negative.
+change (46 periods on the day the clocks go forward, 50 when they go back). Generation_MD did that only from 2009: every
+change day from Oct 1997 to Sep 2008 is numbered by the clock, and those files also leave out an hour (checked for every
+change day 1997-2026; Embedded_generation, Grid_export, Grid_import and Tiwai count straight throughout):
+- clocks forward: TP1-4, TP5-6 empty, TP7-46 = 03:00-23:00, nothing for 23:00-24:00;
+- clocks back: 48 periods, the repeated 02:00-03:00 only once (TP5-6, which fit its second occurrence).
+Matching each day against Grid_export confirms the two-period shift after the change (1997, 1998, 2005, 2008). So on
+those days two half-hours had no generation (demand there went negative) and the rest of the day was an hour out.
+Done on the branch:
+- `metered.straighten()` (called by `read_emi`) renumbers such a day straight and fills the missing hour from its
+  neighbour (forward: the day's last hour repeats TP46; back: the first 02:00-03:00 repeats TP5-6). Only days that are
+  clock-numbered are touched (TP5-6 empty going forward, nothing past TP48 going back).
+- `complete()` is false for the 23 months with such a day (`clock_month()`) until they're read again (marker `mc`), so
+  the rebuild refetches their metered data (~23 extra KV writes). `BUILD` 7.
+- `records.py` no longer leaves clock-change days out (`VERSION` 2); the records and history method pages say how the
+  hour is filled. Smoke tests for both directions.
+- Checked on real months (Oct 1997, Mar 2005, Sep 2007, Apr 2008): every change day has 46 or 50 half-hours and demand
+  stays in its normal range.
+- After the rebuild: on the 30-day view, look at a change day (e.g. 20 Mar 2005, 30 Sep 2007): no gap at night and the
+  evening peak at the usual time.
 
 ## 6. Each day's peak dispatchable output (added 17 Oct 2026)
 

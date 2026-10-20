@@ -44,7 +44,7 @@
 
 <h2 id="rules">How capacity is counted</h2>
 <ul>
-	<li><b>From when the history has the plant.</b> Capacity counts from the first month the history has a plant’s output, even if the plant is older, so a gap in the data doesn’t drag its capacity factor down. This affects the embedded stations before April 1999 (the metered files start then), Highbank before March 2002, Kawerau Mill before 2020 and Mill Creek before September 2015.</li>
+	<li><b>From when the history has the plant.</b> Capacity counts from the first month the history has a plant’s output, even if the plant is older, so a gap in the data doesn’t drag its capacity factor down. This affects the embedded stations before April 1999 (the metered files start then), Highbank before March 2002 and Kawerau Mill before 2020.</li>
 	<li><b>Consent limits:</b> where a plant is installed bigger than it is allowed to run, the limit counts. Manapōuri has 854 MW installed but may run at 800 MW.</li>
 	<li><b>Stored units count:</b> a unit that is mothballed but not retired still counts. One of Huntly’s Rankine units was in storage from 2013 to 2021, so their capacity factor over those years is lower than for the units running.</li>
 	<li><b>Embedded solar</b> uses the distributed generation registry’s installed capacity by month, less the dispatched solar farms (see <a href="/methods/embedded-solar">embedded solar</a>), with the latest month carried on.</li>

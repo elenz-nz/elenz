@@ -29,6 +29,7 @@ State columns for a month (half-hourly, trading period start, UTC), alongside th
   Q|POC TRADER reconciled injection MW, for the R:<trader> rows of metered_plants.csv; mq 1 once the month's
                reconciliation file has been read
   mg           1 where Generation_MD covers the trading period
+  mc           1 once a month with a clock-numbered change day (before 2009) has been read with straighten()
 
 Generation per plant (generation()): each Generation_MD code goes to its plant (metered_plants.csv); where an
 embedded meter is listed for a connection point and reads more than Generation_MD there (a net meter, or a plant
@@ -61,7 +62,59 @@ RECON = 'Datasets/Wholesale/Volumes/Reconciliation'
 FIRST_MONTH = date(1997, 8, 1)          # Generation_MD's first month
 GRID_IMPORT_FROM = date(2000, 10, 1)    # Grid_import's first month
 EMBEDDED_FROM = date(1998, 10, 1)       # Embedded_generation's first month
+GMD_STRAIGHT_FROM = date(2009, 1, 1)    # Generation_MD counts clock-change days straight from 2009 (straighten())
 STEP = pd.Timedelta(minutes=30)
+
+
+def clock_change_days(days):
+    """{date: +1 (clocks forward: 46 trading periods) or -1 (back: 50)} for the NZ clock-change days among days."""
+    out = {}
+    for x in pd.unique(days):
+        x = pd.Timestamp(x).normalize()
+        a = x.tz_localize(NZ).utcoffset()
+        b = (x + pd.Timedelta(days=1)).tz_localize(NZ).utcoffset()
+        if a != b:
+            out[x] = 1 if b > a else -1
+    return out
+
+
+def straighten(d, tps):
+    """Renumber clock-change days that a file numbers by the clock. The current files count trading periods straight
+    through a change (46 periods on the day the clocks go forward, 50 when they go back), but Generation_MD until
+    2008 numbers those days by the clock (every other metered file counts straight throughout: checked for each change
+    day Oct 1997 - Sep 2026). On those days it has
+      clocks forward: TP1-4 (00:00-02:00), TP5-6 empty (02:00-03:00 never happens), TP7-46 = 03:00-23:00, and nothing
+                      for 23:00-24:00 (it stops at TP46): TP7-46 become straight periods 5-44, and 45-46 repeat TP46
+      clocks back:    48 periods, with the repeated hour 02:00-03:00 only once (TP5-6): TP5-48 become straight periods
+                      7-50, and the hour's first occurrence (straight 5-6) repeats TP5-6
+    so the generation there is right in time, and the missing hour is filled from its neighbour rather than left at
+    nothing (which made demand negative). d's trading_date must be parsed already; returns (d, tps)."""
+    days = clock_change_days(d.trading_date)
+    if not days:
+        return d, tps
+    for k in range(1, 51):
+        if f'tp{k}' not in d:
+            d[f'tp{k}'] = np.nan
+    tps = [f'tp{k}' for k in range(1, 51)]
+    for day, way in days.items():
+        rows = (d.trading_date == day).to_numpy()
+        if not rows.any():
+            continue
+        x = d.loc[rows, tps].to_numpy(dtype=float)
+        has = ~np.isnan(x).all(axis=0)              # has[k-1]: some row has TPk
+        new = np.full_like(x, np.nan)
+        if way == 1 and not has[4] and not has[5] and has[6] and not has[46:].any():
+            new[:, :4] = x[:, :4]
+            new[:, 4:44] = x[:, 6:46]
+            new[:, 44] = new[:, 45] = x[:, 45]
+        elif way == -1 and not has[48:].any() and has[47]:
+            new[:, :4] = x[:, :4]
+            new[:, 4:6] = x[:, 4:6]
+            new[:, 6:50] = x[:, 4:48]
+        else:
+            continue
+        d.loc[rows, tps] = new
+    return d, tps
 
 
 def read_emi(raw):
@@ -73,10 +126,12 @@ def read_emi(raw):
     ids = [c for c in d.columns if c not in tps]
     for c in tps:
         d[c] = pd.to_numeric(d[c], errors='coerce')
+    s = d.trading_date.astype(str)
+    d['trading_date'] = pd.to_datetime(s, format='%d/%m/%Y') if s.iloc[0][2:3] == '/' else pd.to_datetime(s.str[:10], format='%Y-%m-%d')
+    d, tps = straighten(d, tps)
     m = d.melt(id_vars=ids, value_vars=tps, var_name='tp', value_name='kwh').dropna(subset=['kwh'])
     m['tp'] = m.tp.str[2:].astype(int)
-    s = m.trading_date.astype(str)
-    day = pd.to_datetime(s, format='%d/%m/%Y') if s.iloc[0][2:3] == '/' else pd.to_datetime(s.str[:10], format='%Y-%m-%d')
+    day = m.trading_date
     # trading period k starts (k-1) half-hours after local midnight, counting straight through a clock change
     m['t'] = day.dt.tz_localize(NZ).dt.tz_convert('UTC') + pd.to_timedelta((m.tp - 1) * 30, unit='min')
     m['mw'] = m.kwh / 500.0
@@ -158,6 +213,8 @@ def fetch_month(get, m, log=print):
     out = [g.pivot_table(index='t', columns='key', values='mw', aggfunc='sum')]
     covered = g.groupby('t').size().rename('mg') * 0 + 1
     out.append(covered.to_frame())
+    if clock_month(m):
+        out.append(covered.rename('mc').to_frame())   # read with straighten(): states from before it are refetched
 
     isl_tab = islands()
     isl = lambda poc: island_of(poc, isl_tab)
@@ -229,7 +286,18 @@ def complete(s, m):
         return False
     if recon_rows(f'{m:%Y-%m}') and ('mq' not in s or not (s['mq'] == 1).any()):
         return False
+    if clock_month(m) and ('mc' not in s or not (s['mc'] == 1).any()):
+        return False
     return True
+
+
+def clock_month(m):
+    """True for a month whose Generation_MD numbers a clock-change day by the clock (before 2009), so its metered data
+    must have been read with straighten()."""
+    if m >= GMD_STRAIGHT_FROM:
+        return False
+    nxt = date(m.year + (m.month == 12), m.month % 12 + 1, 1)
+    return bool(clock_change_days(pd.date_range(m, nxt, inclusive='left')))
 
 
 def generation(s, month, log=print):

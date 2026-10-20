@@ -262,6 +262,10 @@
 				</section>
 			</div>
 
+<<<<<<< HEAD
+=======
+			<p class="foot">Official records use the EA’s metered data and final prices, which arrive 5–6 weeks after each month (final prices a day or two). Newer records come from dispatch data and stay provisional until the metered month confirms them. Embedded solar is modelled. <a href="/methods/records">How records work</a></p>
+>>>>>>> 26147f0 (Next rebuild: Generation_MD's clock-numbered change days before 2009 renumbered (BUILD 7))
 		{/if}
 	</main>
 
