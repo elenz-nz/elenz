@@ -2,6 +2,7 @@
 	// "Every generator right now" on /now: each plant's output at the newest interval, its share of installed capacity,
 	// fuel, island and owner. Sortable and filterable, with the settings in /now's address so a view can be linked;
 	// each plant links to its history in the tracker. Rows and settings: #lib/now/generators.js.
+	import InfoTip from '#lib/site/InfoTip.svelte';
 	import { onMount } from 'svelte';
 	import { replaceState } from '$app/navigation';
 	import { generatorRows, readSettings, writeSettings, pick } from './generators.js';
@@ -53,6 +54,7 @@
 	<div class="p-head">
 		<h2 id="gens-h">Every generator right now</h2>
 		<span class="unit">{when} · {running} of {rows.length} generating</span>
+		<span class="p-info"><InfoTip label="About this list">MW is each plant's 5-minute dispatch target, against its installed capacity. Batteries show negative while charging. Embedded solar isn't listed. Tap a plant for its history.</InfoTip></span>
 	</div>
 
 	<div class="g-ctl">
@@ -127,10 +129,6 @@
 	{#if !all && !filtered && shown.length > SHOW}
 		<button type="button" class="g-more" onclick={() => (all = true)}>Show all {shown.length} plants</button>
 	{/if}
-	<p class="g-note">
-		MW is each plant's 5-minute dispatch target, against its installed capacity. Batteries show negative while charging.
-		Embedded solar isn't listed. Tap a plant for its history.
-	</p>
 </section>
 
 <style>
@@ -138,6 +136,7 @@
 	.gens { display: grid; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px; min-width: 0; }
 	.p-head { display: flex; align-items: baseline; gap: 4px 10px; flex-wrap: wrap; }
 	.p-head h2 { margin: 0; font-size: 1rem; }
+	.p-info { margin-left: auto; align-self: center; }
 	.unit { color: var(--muted); font-size: 0.8rem; font-family: var(--font-data); }
 	.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 	.g-ctl { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -174,7 +173,6 @@
 	.pbar span { display: block; height: 100%; background: var(--c); }
 	.none { color: var(--muted); padding: 14px 0; }
 	.gtab tfoot th, .gtab tfoot td { padding-top: 8px; border: 0; font-weight: 700; color: var(--ink) !important; text-transform: none !important; letter-spacing: 0 !important; font-size: 0.86rem !important; }
-	.g-note { color: var(--muted); font-size: 0.76rem; margin: 0; max-width: 90ch; }
 	/* phones: plant, MW and share of capacity; fuel stays as the dot, island and owner as filters */
 	@media (max-width: 640px) {
 		.c-fuel, .c-isl, .c-own { display: none; }

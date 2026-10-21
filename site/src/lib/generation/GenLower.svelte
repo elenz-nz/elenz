@@ -11,6 +11,7 @@
 	import { rangeName, span, RES as RES_ } from '#lib/site/context.js';
 	import { nzOffset } from '#lib/tracker/series.js';
 	import PopButton from '#lib/site/PopButton.svelte';
+	import InfoTip from '#lib/site/InfoTip.svelte';
 	import GenHeat from './GenHeat.svelte';
 	import MixTable from './MixTable.svelte';
 	import { METRICS, METRIC, YEAR, LEVELS, shares, atInterval, windowOf, alignYearAgo, shareOver, heatRows, heatMonthRows, capacityAt, mixRows, headroom, headroomAt, loadOffered } from './data.js';
@@ -269,6 +270,9 @@
 				{#if canCompare}
 					<button type="button" class="tog" aria-pressed={compare} onclick={() => { compare = !compare; save(); }}><i aria-hidden="true"></i>{prevYear ? `Same dates in ${prevYear}` : 'The year before'}</button>
 				{/if}
+				<InfoTip>{#if canCompare}Dashed: the same dates a year earlier (365 days before){v && v.int === '5m' ? ', half-hourly' : ''}.{:else if v && v.days == null}No comparison on the full history.{:else}The year before is outside the history.{/if}
+			{#if m.note}{m.title}: {m.note}.{/if}
+			<a href="/methods/groupings#renewable">How shares are worked out</a></InfoTip>
 				<PopButton inline open={popped === 'share'} name="share chart" onclick={() => pop('share')} />
 			</div>
 		</div>
@@ -287,11 +291,6 @@
 		{:else}
 			<p class="empty">Loading…</p>
 		{/if}
-		<p class="note">
-			{#if canCompare}Dashed: the same dates a year earlier (365 days before){v && v.int === '5m' ? ', half-hourly' : ''}.{:else if v && v.days == null}No comparison on the full history.{:else}The year before is outside the history.{/if}
-			{#if m.note}{m.title}: {m.note}.{/if}
-			<a href="/methods/groupings#renewable">How shares are worked out</a>
-		</p>
 	</section>
 
 	<section class="card" class:popped={popped === 'room'} aria-label="Dispatchable headroom over the range">
@@ -310,6 +309,8 @@
 					{#each levelsShown as L}<button type="button" aria-pressed={roomBasis === L} onclick={() => { roomBasis = L as any; save(); }}>{L === 'C' ? 'Under $1,000' : LEVEL_NAME[L]}</button>{/each}
 				</div>
 				<button type="button" class="tog box" aria-pressed={withHydro} onclick={() => { withHydro = !withHydro; save(); }}><i aria-hidden="true"></i>Include hydro</button>
+				<InfoTip>Dispatchable capacity not generating{withHydro ? '' : ', hydro left out'}: installed, offered, and offered under $1,000/MWh.
+			{v && v.region !== 'NZ' ? 'One island only: the HVDC link isn’t counted. ' : ''}{avgOnly ? 'Daily averages where history doesn’t yet keep each day’s lowest. ' : ''}{!hasOffers ? 'No offers loaded for these dates yet. ' : ''}<a href="/methods/capacity#headroom">How it's worked out</a></InfoTip>
 				<PopButton inline open={popped === 'room'} name="headroom chart" onclick={() => pop('room')} />
 			</div>
 		</div>
@@ -346,10 +347,6 @@
 		{:else}
 			<p class="empty">Loading…</p>
 		{/if}
-		<p class="note">
-			Dispatchable capacity not generating{withHydro ? '' : ', hydro left out'}: installed, offered, and offered under $1,000/MWh.
-			{v && v.region !== 'NZ' ? 'One island only: the HVDC link isn’t counted. ' : ''}{avgOnly ? 'Daily averages where history doesn’t yet keep each day’s lowest. ' : ''}{!hasOffers ? 'No offers loaded for these dates yet. ' : ''}<a href="/methods/capacity#headroom">How it's worked out</a>
-		</p>
 	</section>
 
 	<div class="row2">
@@ -359,6 +356,8 @@
 					<h2>Mix by fuel</h2>
 					<Context range={rangeChip} items={[dates, canCompare && prev ? `against ${prevYear ? 'the ' : ''}${prevPhrase}` : '']} />
 				</div>
+				<InfoTip>Energy over the range{v && v.kind === 'day' ? ' (peaks need half-hourly data, so long ranges leave them out)' : ''}{canCompare && prev ? '; “vs” is the change in energy on the same dates a year earlier' : ''}.
+				<a href="/methods/capacity#use">How capacity factors are worked out</a></InfoTip>
 				<PopButton inline open={popped === 'mix'} name="mix table" onclick={() => pop('mix')} />
 			</div>
 			{#if mix}
@@ -366,10 +365,6 @@
 			{:else}
 				<p class="empty">Loading…</p>
 			{/if}
-			<p class="note">
-				Energy over the range{v && v.kind === 'day' ? ' (peaks need half-hourly data, so long ranges leave them out)' : ''}{canCompare && prev ? '; “vs” is the change in energy on the same dates a year earlier' : ''}.
-				<a href="/methods/capacity#use">How capacity factors are worked out</a>
-			</p>
 		</section>
 
 		<section class="card" class:popped={popped === 'heat'} style={popped === 'heat' ? '--rh: 15px' : ''} aria-label="{hm.title} by time of day over the range">
@@ -386,6 +381,8 @@
 					{#if heatMetric !== 'ren'}
 						<button type="button" class="tog box scale" aria-pressed={heatScaled} title={heatScaled ? 'Colours fitted to the rows shown' : 'Colours on a fixed scale (installed capacity now), so different years compare'} onclick={() => { heatScaled = !heatScaled; save(); }}><i aria-hidden="true"></i>Scale to this view</button>
 					{/if}
+					<InfoTip>{heatByMonth ? 'One row per ' + (v?.int === '1yr' ? 'year' : 'month') + ': the average of each half-hour.' : rows.length > 40 ? 'One row per day; scroll for earlier days.' : 'One row per day.'}
+				{heatMetric === 'ren' ? 'Brown marks the half-hours that leaned on thermal plant, usually still evenings at the peak.' : heatScaled ? 'Colours fitted to what’s shown: darker means more.' : `Colours on a fixed scale set by today’s installed ${hm.title.toLowerCase()} capacity${heatCap ? ` (${Math.round(heatCap).toLocaleString('en-NZ')} MW)` : ''}, so earlier years look paler where less was built.`}</InfoTip>
 					<PopButton inline open={popped === 'heat'} name="time of day chart" onclick={() => pop('heat')} />
 				</div>
 			</div>
@@ -394,10 +391,6 @@
 			{:else}
 				<p class="empty">Loading…</p>
 			{/if}
-			<p class="note">
-				{heatByMonth ? 'One row per ' + (v?.int === '1yr' ? 'year' : 'month') + ': the average of each half-hour.' : rows.length > 40 ? 'One row per day; scroll for earlier days.' : 'One row per day.'}
-				{heatMetric === 'ren' ? 'Brown marks the half-hours that leaned on thermal plant, usually still evenings at the peak.' : heatScaled ? 'Colours fitted to what’s shown: darker means more.' : `Colours on a fixed scale set by today’s installed ${hm.title.toLowerCase()} capacity${heatCap ? ` (${Math.round(heatCap).toLocaleString('en-NZ')} MW)` : ''}, so earlier years look paler where less was built.`}
-			</p>
 		</section>
 	</div>
 </div>
@@ -432,7 +425,6 @@
 	.legend i.lv-O { background: color-mix(in srgb, var(--accent) 20%, transparent); border-top: 1.5px dashed var(--accent); }
 	.legend i.lv-C { background: color-mix(in srgb, var(--accent) 42%, transparent); border-top: 2px solid var(--accent); }
 	.legend i.gap { background: var(--warn-bg); }
-	.note a { color: inherit; }
 	.empty { color: var(--muted); font-size: 0.86rem; padding: 18px 10px; margin: 0; }
 	.row2 { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 14px 18px; align-items: start; }
 	@media (max-width: 900px) { .row2 { grid-template-columns: minmax(0, 1fr); } }

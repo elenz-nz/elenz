@@ -1,4 +1,5 @@
 <script lang="ts">
+	import InfoTip from '#lib/site/InfoTip.svelte';
 	import Preview from '#lib/site/Preview.svelte';
 	import { onMount } from 'svelte';
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
@@ -228,7 +229,7 @@
 			</section>
 
 			<section class="panel mix-panel" aria-labelledby="mix-h">
-				<div class="p-head"><h2 id="mix-h">Generation now</h2><span class="unit">{nz ? `${fmt(nz.gen)} MW` : ''}</span></div>
+				<div class="p-head"><h2 id="mix-h">Generation now</h2><span class="unit">{nz ? `${fmt(nz.gen)} MW` : ''}</span><span class="p-info"><InfoTip label="About this table">Generation is dispatch, the market's 5-minute targets for each plant; embedded solar is estimated. <a href="/methods/generation">How generation is built</a></InfoTip></span></div>
 				{#if now && nz}
 					<div class="stack" aria-hidden="true">
 						{#each now.mix as f}<span class:hatch={f.hatch} style="--c:var({f.tok});width:{(f.mw / nz.gen) * 100}%" title="{f.name} {fmt(f.mw)} MW"></span>{/each}
@@ -246,7 +247,6 @@
 						</tbody>
 						<tfoot><tr><th scope="row">Total</th><td class="n">{fmt(nz.gen)}</td><td class="n">100%</td></tr></tfoot>
 					</table>
-					<p class="mix-note">Generation is dispatch, the market's 5-minute targets; embedded solar is estimated.</p>
 					<a class="cta" href="/tracker">See the last 24 hours in the tracker →</a>
 				{:else}
 					<p class="mix-note">{error || 'Loading…'}</p>
@@ -295,6 +295,7 @@
 	.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px; min-width: 0; }
 	.p-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
 	.p-head h2 { margin: 0; font-size: 1rem; }
+	.p-info { margin-left: auto; align-self: center; }
 	.unit { color: var(--muted); font-size: 0.8rem; font-family: var(--font-data); }
 
 	.map { position: relative; width: 100%; max-width: 680px; margin-inline: auto; }

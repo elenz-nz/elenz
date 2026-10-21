@@ -11,6 +11,9 @@
 	// and ends on the other wherever they are. Progress goes on <html>: --ho-lift (stage 1, the hero's fill fades),
 	// --ho (stage 3, the Tracker's stack fills in; 1 once landed) and data-ho while the line is away. Nothing happens
 	// for prefers-reduced-motion.
+	// Eased between scroll positions: where the browser scrolls in jumps (Windows with smooth scrolling off: a mouse
+	// wheel moves the page ~100 px a notch at once), the progress values and the dot glide to their new places over
+	// about a fifth of a second rather than jumping with the page (EASE).
 	import { onMount } from 'svelte';
 	import { HZ, TK, horizon, tracker } from './geometry.js';
 	import { build } from './build.svelte.js';
@@ -31,12 +34,21 @@
 	const smooth = (v: number) => (v <= 0 ? 0 : v >= 1 ? 1 : v * v * (3 - 2 * v));
 	const lerp = (p: Pt, q: Pt, k: number) => ({ x: p.x + (q.x - p.x) * k, y: p.y + (q.y - p.y) * k });
 
+	const EASE = 70;   // ms: the time constant of the easing (63% of the way in 70 ms, ~95% in 200 ms)
+
 	onMount(() => {
 		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 		const root = document.documentElement;
 		let raf = 0;
-		function frame() {
+		// what's shown: eased towards the values the scroll position gives (cur), null until the first frame
+		let shown: { kA: number; kC: number; ni: number; link: number; si: number; dx: number; dy: number } | null = null;
+		let lastT = 0, settling = false;
+		function frame(now = performance.now()) {
 			raf = 0;
+			const dt = lastT ? Math.min(100, now - lastT) : 16;   // after a pause (settled), count the first frame as one frame
+			lastT = now;
+			const f = shown ? 1 - Math.exp(-dt / EASE) : 1;
+			const ease = (a: number, b: number) => { const v = a + (b - a) * f; return Math.abs(b - v) < 0.0015 ? b : v; };
 			const from = document.querySelector('[data-handoff="from"]'), to = document.querySelector('[data-handoff="to"]');
 			if (!from || !to) return;
 			const a = from.getBoundingClientRect(), b = to.getBoundingClientRect(), vh = innerHeight, s = scrollY;
@@ -80,9 +92,7 @@
 			const last = stops[stops.length - 1].at;
 			const sC = Math.max(travel - Math.min(320, travel * 0.3), last + 220);
 			const land = Math.max(travel, sC + 200);
-			const kC = travel <= 0 ? 1 : smooth((s - sC) / (land - sC));
-			root.style.setProperty('--ho-lift', kA.toFixed(4));
-			root.style.setProperty('--ho', kC.toFixed(4));
+			const kC0 = travel <= 0 ? 1 : smooth((s - sC) / (land - sC));
 			stops.push({ p: page(qEnd), at: sC });
 			// where the dot is (page coordinates) at scroll position v
 			const route = (v: number): Pt => {
@@ -94,14 +104,35 @@
 			};
 
 			// the Now preview builds as the dot passes
+			let tNi = 1, tLink = 1, tSi = 1;
 			if (ctm) {
 				const { ni, hay, ben, si } = mapStops;
 				const clamp = (v: number) => (v <= 0 ? 0 : v >= 1 ? 1 : v);
-				build.ni = smooth((s - (ni - 280)) / 280);
-				build.link = clamp((s - hay) / (ben - hay || 1));
+				tNi = smooth((s - (ni - 280)) / 280);
+				tLink = clamp((s - hay) / (ben - hay || 1));
 				const siFrom = ben - 0.3 * (ben - hay);
-				build.si = smooth((s - siFrom) / (si + 100 - siFrom));
+				tSi = smooth((s - siFrom) / (si + 100 - siFrom));
 			}
+			// the dot's place on screen for this scroll position (stage 2)
+			const screen = (p: Pt) => ({ x: p.x, y: p.y - s });
+			const target = screen(route(s));
+			// ease what's shown towards it: progress values directly, the dot by its offset from where it should be
+			if (!shown) shown = { kA, kC: kC0, ni: tNi, link: tLink, si: tSi, dx: 0, dy: 0 };
+			else {
+				const prevDot = dot ?? target;
+				shown = { kA: ease(shown.kA, kA), kC: ease(shown.kC, kC0), ni: ease(shown.ni, tNi), link: ease(shown.link, tLink), si: ease(shown.si, tSi),
+				          dx: (prevDot.x - target.x) * (1 - f), dy: (prevDot.y - target.y) * (1 - f) };
+				if (Math.abs(shown.dx) < 0.3) shown.dx = 0;
+				if (Math.abs(shown.dy) < 0.3) shown.dy = 0;
+			}
+			const kC = shown.kC;
+			const kAs = shown.kA;
+			root.style.setProperty('--ho-lift', kAs.toFixed(4));
+			root.style.setProperty('--ho', kC.toFixed(4));
+			if (ctm) { build.ni = shown.ni; build.link = shown.link; build.si = shown.si; }
+			// keep drawing until everything has caught up with the page
+			settling = shown.kA !== kA || shown.kC !== kC0 || shown.ni !== tNi || shown.link !== tLink || shown.si !== tSi || shown.dx !== 0 || shown.dy !== 0;
+			if (settling) go(); else lastT = 0;
 
 			show = s > 0 && kC < 1;
 			if (show) root.setAttribute('data-ho', ''); else root.removeAttribute('data-ho');
@@ -113,25 +144,25 @@
 				for (let i = 0; i < m; i++) { const p = lerp(qEnd, Q(i), kC); pts.push(`${p.x.toFixed(1)},${p.y.toFixed(1)}`); }
 				dot = qEnd;
 				tail = [];
-			} else if (kA < 1) {
+			} else if (kAs < 1) {
 				// stage 1: shrink into the dot
-				for (let i = 0; i < n; i++) { const p = lerp(P(i), pEnd, kA); pts.push(`${p.x.toFixed(1)},${p.y.toFixed(1)}`); }
+				for (let i = 0; i < n; i++) { const p = lerp(P(i), pEnd, kAs); pts.push(`${p.x.toFixed(1)},${p.y.toFixed(1)}`); }
 				dot = pEnd;
 				tail = [];
 			} else {
 				// stage 2: the dot in flight, with a tail of where it was a moment ago
-				const screen = (p: Pt) => ({ x: p.x, y: p.y - s });
-				dot = screen(route(s));
+				const { dx, dy } = shown;
+				dot = { x: target.x + dx, y: target.y + dy };
 				tail = Array.from({ length: 7 }, (_, j) => {
 					const p = screen(route(Math.max(sA, s - (j + 1) * 14)));
-					return { ...p, r: 3.6 - j * 0.42, o: 0.45 - j * 0.06 };
+					return { x: p.x + dx, y: p.y + dy, r: 3.6 - j * 0.42, o: 0.45 - j * 0.06 };
 				});
 			}
 			path = pts.length ? `M${pts.join('L')}` : '';
 			ink = kC > 0 ? 0.55 + 0.35 * kC : 0.55;
 		}
 		const go = () => { if (!raf) raf = requestAnimationFrame(frame); };
-		frame();
+		frame(performance.now());
 		addEventListener('scroll', go, { passive: true });
 		addEventListener('resize', go, { passive: true });
 		return () => {

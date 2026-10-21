@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Preview from '#lib/site/Preview.svelte';
+	import InfoTip from '#lib/site/InfoTip.svelte';
 	import { onMount } from 'svelte';
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
 	import { mountTracker } from '#lib/tracker/tracker.js';
@@ -128,7 +129,32 @@
 
 <svelte:window onclick={closeInfo} onkeydown={(e) => { closeInfo(e); popKey(e); }} />
 
+<!-- each chart's ⓘ: what it shows and how it's made (the notes that used to sit under the charts) -->
+{#snippet chartInfo(id: string)}
+	{#if id === 'gen'}
+		<p>Each source's output, stacked. The live week is the market's 5-minute dispatch; history is metered output wherever the EA has published it (about six weeks behind). Embedded solar (hatched) is estimated. On one island's chart, HVDC arriving is stacked on top and HVDC leaving is a hatched band taken off the top.</p>
+		<p id="gen-note" hidden></p>
+		<p><a href="/methods/generation">How generation is built</a></p>
+	{:else if id === 'price'}
+		<p>Spot prices at the island reference nodes, Haywards (North Island) and Benmore (South Island): dispatch prices for the live week, the EA's final prices for history. Long ranges show averages; the Prices tab has the spread and the spikes.</p>
+		<p><a href="/methods/prices">How prices are shown</a></p>
+	{:else if id === 'demand'}
+		<p>Electricity taken from the grid (solid), and with estimated embedded solar added back (dashed, with its uncertainty band), which is closer to what was actually used. Long ranges show averages; the summary gives each day's peak.</p>
+		<p><a href="/methods/demand">How demand is worked out</a></p>
+	{:else if id === 'hvdc'}
+		<p>Transfer between Benmore and Haywards, northward positive. Metered once the EA publishes it, about two weeks after each month; before that, estimated from each island's generation and demand (about 10 MW out on average).</p>
+		<p><a href="/methods/hvdc">How HVDC is worked out</a></p>
+	{:else if id === 'co2'}
+		<p>Emissions for each kWh generated: each plant's output times its fuel's emission factor, with Huntly's Rankine units at Genesis's quarterly coal share and each geothermal station's own factor.</p>
+		<p><a href="/methods/emissions">How emissions are worked out</a></p>
+	{:else}
+		<p>Renewable output as a share of all generation, embedded solar included. Geothermal counts as renewable, although it emits some CO₂.</p>
+		<p><a href="/methods/groupings#renewable">How shares are worked out</a></p>
+	{/if}
+{/snippet}
+
 {#snippet popBtn(id: string, name: string)}
+	<InfoTip label="About this chart">{@render chartInfo(id)}</InfoTip>
 	<button type="button" class="pop-btn" onclick={() => togglePop(id)} aria-pressed={popped === id}
 		aria-label={popped === id ? `Shrink the ${name} chart` : `Enlarge the ${name} chart`} title={popped === id ? 'Close' : 'Enlarge'}>
 		{#if popped === id}
@@ -161,8 +187,8 @@
 			{/if}
 			<DownloadMenu items={downloads} />
 			<ShareLink links={() => tracker?.links() ?? null} />
-			<button type="button" class="info-btn" bind:this={infoBtn} aria-expanded={infoOpen} aria-controls="about-data" aria-label="About this data" title="About this data" onclick={() => (infoOpen = !infoOpen)}>
-				<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg>
+			<button type="button" class="pill-btn about-btn" bind:this={infoBtn} aria-expanded={infoOpen} aria-controls="about-data" aria-label="About this data" title="About this data" onclick={() => (infoOpen = !infoOpen)}>
+				<svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg><span class="pill-word">About this data</span>
 			</button>
 			<div class="info-pop" id="about-data" role="region" aria-label="About this data" bind:this={infoBox} hidden={!infoOpen}>
 				<p class="asof" id="asof"></p>
@@ -263,7 +289,6 @@
 					<button type="button" class="nav prev" id="nav-prev" aria-label="Previous 24 h"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 					<button type="button" class="nav next" id="nav-next" aria-label="Next 24 h"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 				</div>
-				<p class="chart-note" id="gen-note" hidden></p>
 			</div>
 		</section>
 
@@ -338,7 +363,7 @@
 						<dt>Hide and show</dt>
 						<dd>Select a colour square to hide that layer. Double-click it, Shift+click it or press and hold it to show only that one (again to show everything); All and None above the list do the rest. In long lists, type in Filter, and select a fuel heading to fold its plants.</dd>
 						<dt>Enlarge, share, download</dt>
-						<dd>The corner button on each chart enlarges it. Share copies a link to this view, live or for the dates shown; Download gives the charts as a picture or the data as a spreadsheet file. The address always holds the whole view, so it can be bookmarked.</dd>
+						<dd>The corner button on each chart enlarges it, and ⓘ beside it says what the chart shows and how it’s made. Share copies a link to this view, live or for the dates shown; Download gives the charts as a picture or the data as a spreadsheet file. The address always holds the whole view, so it can be bookmarked.</dd>
 					</dl>
 					<p><a href="/methods">How the figures are worked out</a></p>
 				</div>

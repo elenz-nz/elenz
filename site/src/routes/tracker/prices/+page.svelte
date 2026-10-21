@@ -20,6 +20,7 @@
 	import HeatMap from '#lib/prices/HeatMap.svelte';
 	import Context from '#lib/site/Context.svelte';
 	import PopButton from '#lib/site/PopButton.svelte';
+	import InfoTip from '#lib/site/InfoTip.svelte';
 	import { barHeight } from '#lib/site/sticky.js';
 	import { rangeName, span } from '#lib/site/context.js';
 	import {
@@ -577,8 +578,8 @@
 			{/if}
 			<DownloadMenu items={downloads} />
 			<ShareLink {links} />
-			<button type="button" class="info-btn" bind:this={infoBtn} aria-expanded={infoOpen} aria-controls="p-about" aria-label="About this data" title="About this data" onclick={() => (infoOpen = !infoOpen)}>
-				<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg>
+			<button type="button" class="pill-btn about-btn" bind:this={infoBtn} aria-expanded={infoOpen} aria-controls="p-about" aria-label="About this data" title="About this data" onclick={() => (infoOpen = !infoOpen)}>
+				<svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg><span class="pill-word">About this data</span>
 			</button>
 			<div class="info-pop" id="p-about" role="region" aria-label="About this data" bind:this={infoBox} hidden={!infoOpen}>
 				<p>Prices from the Electricity Authority: its real-time dispatch feed for the live week (dispatch prices, every 5 minutes), and its final prices for history, usually published the next day.</p>
@@ -628,7 +629,25 @@
 
 	<noscript><p class="notice">The charts need JavaScript turned on.</p></noscript>
 
-	{#snippet popBtn(id: string, name: string)}
+	<!-- each chart's ⓘ: what it shows and how it's made -->
+{#snippet chartInfo(id: string)}
+	{#if id === 'price'}
+		<p>Spot prices at six grid nodes: dispatch prices for the live week, the EA's final prices for history. Shading marks the times the islands were priced apart (Haywards and Benmore more than $10 and 10% apart). Spike-proof is linear to about $100 and compressed above, so spikes don't flatten everything else; Capped cuts at $600; Linear shows it straight. On longer ranges each period's price range at the chosen island.</p>
+		<p><a href="/methods/prices#scales">Price scales</a> · <a href="/methods/prices#dispatch">Dispatch and final prices</a></p>
+	{:else if id === 'spread'}
+		<p>Haywards less Benmore: above zero the North Island is dearer, often when the HVDC link can’t carry any more north.</p>
+		<p><a href="/methods/prices#derived">How the spread is worked out</a></p>
+	{:else if id === 'hvdc'}
+		<p>Transfer between Benmore and Haywards, northward positive: metered once the EA publishes it, estimated before that.</p>
+		<p><a href="/methods/hvdc">How HVDC is worked out</a></p>
+	{:else}
+		<p>Half-hours over $500 and over $1,000/MWh at the chosen node, for each period.</p>
+		<p><a href="/methods/prices#derived">How it's counted</a></p>
+	{/if}
+{/snippet}
+
+{#snippet popBtn(id: string, name: string)}
+	<InfoTip label="About this chart">{@render chartInfo(id)}</InfoTip>
 		<button type="button" class="pop-btn" onclick={() => (popped = popped === id ? null : id)} aria-pressed={popped === id}
 			aria-label={popped === id ? `Shrink the ${name} chart` : `Enlarge the ${name} chart`} title={popped === id ? 'Close' : 'Enlarge'}>
 			{#if popped === id}
@@ -747,13 +766,24 @@
 						<div class="sum-sub">{head[1]}</div>
 						{#if pinned && at >= 0}<div class="sum-pin">Pinned <button type="button" onclick={unpin}>Release</button></div>{/if}
 					</div>
-					<button type="button" class="info-btn" bind:this={helpBtn} aria-expanded={helpOpen} aria-controls="p-help" aria-label="How to use the charts" title="How to use the charts" onclick={() => (helpOpen = !helpOpen)}>
-						<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg>
+					<button type="button" class="ctl-btn" bind:this={helpBtn} aria-expanded={helpOpen} aria-controls="p-help" title="Everything the charts and this list can do" onclick={() => (helpOpen = !helpOpen)}>
+						<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h7M12 4h2M2 12h3M8 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /><circle cx="10.5" cy="4" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /><circle cx="6.5" cy="12" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>Controls
 					</button>
 				</div>
 				<div class="help" id="p-help" role="note" hidden={!helpOpen}>
-					<p>Use the arrows on the price chart, or the date box, to step back through history by the selected range.</p>
-					<p>Select a node's colour square to show or hide its line. Hover the charts, or focus them and use the arrow keys, to read a single interval. Click a chart to pin the time line there (click it again, or press Escape, to release it); Share can then mark that time.</p>
+					<dl>
+						<dt>Read a time</dt>
+						<dd>Hover a chart, or touch and slide on a phone. With a chart focused, ← → move one point (Shift: further).</dd>
+						<dt>Pin it</dt>
+						<dd>Click a chart to hold the time line there; click it again, Release or Escape to let go. Share can then mark that time.</dd>
+						<dt>Move through history</dt>
+						<dd>Range, interval and region are in the bar at the top. The ‹ › arrows beside the date or on the price chart step by the range; the date box jumps to a day; Latest comes back.</dd>
+						<dt>Nodes and scales</dt>
+						<dd>Select a node's colour square in this list to hide or show its line. Spike-proof, Capped and Linear change the price chart's scale; on long ranges, choose the island whose price range is shown.</dd>
+						<dt>Enlarge, share, download</dt>
+						<dd>The corner button on each chart enlarges it; ⓘ says how it's made. Share copies a link to this view; Download gives the charts as a picture or the data as a spreadsheet file.</dd>
+					</dl>
+					<p><a href="/methods/prices">How the figures are worked out</a></p>
 				</div>
 				<table class="mix">
 					<thead><tr><th scope="col">{view?.mode === 'time' ? 'Node' : 'Series'}</th><th scope="col" class="n">{at < 0 ? 'Average' : 'Value'}</th></tr></thead>
@@ -809,12 +839,12 @@
 					<h2>Price captured by fuel</h2>
 					<Context range={rangeName(R.label, endT, R.days)} items={[win ? span(win.from, win.to) : '']} />
 				</div>
+				<InfoTip>Percent is against the average of all fuels. <a href="/methods/prices#derived">How it's worked out</a></InfoTip>
 				<PopButton inline open={popped === 'cap'} name="price captured by fuel chart" onclick={() => (popped = popped === 'cap' ? null : 'cap')} />
 			</div>
 			<p class="sub">What each fuel earned over the range: its output × its island's price, divided by its output.</p>
 			{#if rangeStats && rangeStats.cap.rows.length}
 				<FuelBars rows={rangeStats.cap.rows} avg={rangeStats.cap.avg} />
-				<p class="note">Percent is against the average of all fuels. <a href="/methods/prices#derived">How it's worked out</a></p>
 			{:else}
 				<p class="empty">{status || 'Loading…'}</p>
 			{/if}
@@ -832,11 +862,11 @@
 					{/each}
 				</div>
 				<button type="button" class="tog-scale" aria-pressed={heatScaled} title={heatScaled ? 'Colours fitted to the prices shown' : 'Colours on fixed price bands, so different periods compare'} onclick={() => (heatScaled = !heatScaled)}><i aria-hidden="true"></i>Scale to this view</button>
+				<InfoTip>{heatSeg?.kind === 'months' ? `One row per ${effInt === '1yr' ? 'year' : 'month'}: the average price in each half-hour.` : heatRows.length > 40 ? 'One row per day; scroll for earlier days.' : 'One row per day.'} {heatScaled ? 'Colours fitted to the prices shown.' : 'Colours on fixed price bands, so periods compare.'}</InfoTip>
 				<PopButton inline open={popped === 'heat'} name="price by time of day chart" onclick={() => (popped = popped === 'heat' ? null : 'heat')} />
 				</div>
 			</div>
 			{#if heatRows.length}<HeatMap rows={heatRows} scaled={heatScaled} />{:else}<p class="empty">Loading…</p>{/if}
-			<p class="note">{heatSeg?.kind === 'months' ? `One row per ${effInt === '1yr' ? 'year' : 'month'}: the average price in each half-hour.` : heatRows.length > 40 ? 'One row per day; scroll for earlier days.' : 'One row per day.'} {heatScaled ? 'Colours fitted to the prices shown.' : 'Colours on fixed price bands, so periods compare.'}</p>
 		</section>
 	</div>
 
@@ -855,7 +885,6 @@
 	.card > :global(*) { min-width: 0; }
 	.card h2 { font-size: 0.86rem; font-weight: 600; margin: 0; }
 	.card .sub { margin: 2px 0 0; color: var(--muted); font-size: 0.8rem; }
-	.card .note { margin: 0; color: var(--muted); font-size: 0.76rem; }
 	.tog-scale { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 0.78rem; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2px 10px; min-height: 30px; cursor: pointer; }
 	.tog-scale i { width: 10px; height: 10px; border: 1.5px solid var(--accent); border-radius: 2px; background: var(--accent); }
 	.tog-scale[aria-pressed='false'] { opacity: 0.6; }
@@ -863,7 +892,7 @@
 	.card-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 12px; align-items: flex-start; }
 	.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 	.more { margin: 2px 2px 0; color: var(--muted); font-size: 0.8rem; }
-	.more a, .card .note a { color: inherit; }
+	.more a { color: inherit; }
 	@media (max-width: 900px) {
 		.p-row { grid-template-columns: minmax(0, 1fr); }
 	}
