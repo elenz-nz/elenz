@@ -302,4 +302,13 @@ Recurring upkeep: add Genesis's Rankine coal share to `emissions.js` each quarte
 after quarter end; FY27 Q1 due late Oct 2026); add each year's NZGA geothermal figures (NZ Geothermal Workshop,
 November); renew the Worker's `GITHUB_TOKEN` before it expires (~Oct 2027).
 
-Open questions: written confirmation of terms from the EA before launch; farm mounting (tracking or fixed) to confirm.
+Terms: the EA confirmed by email (21 Oct 2026) that the EMI datasets and the API are CC BY 4.0, covering republishing,
+derived data and a possible paid API for commercial users; attribution is still required (the footer credit).
+
+Coming change: the EA is decommissioning EMI (told us 21 Oct 2026). The real-time dispatch API is being rebuilt and will
+need a new subscription; datasets move to the EA's Datasets pages (ea.govt.nz), and the way to fetch them
+programmatically is likely to change, with plenty of warning. Everything that reads EMI: `emi_live.py` (API,
+`EMI_KEY`), `common.py` `BLOB` (the emidatasets blob container: dispatch, final prices, metered files, offers, the
+register) and `rooftop.py` (`GUEHMT` report). Watch for the EA's notice and plan the switch as one change.
+
+Open questions: farm mounting (tracking or fixed) to confirm.
