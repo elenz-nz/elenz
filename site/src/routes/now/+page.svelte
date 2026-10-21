@@ -102,7 +102,7 @@
 	<Preview title="New Zealand's electricity, right now · ELENZ" description="New Zealand's electricity right now: demand, prices, the generation mix, renewable share, emissions and the HVDC link, live from the Electricity Authority's market data." path="/now" />
 </svelte:head>
 
-<div class="wrap">
+<div class="wrap wide">
 	<Masthead />
 
 	<main class="home">
@@ -164,6 +164,7 @@
 		{#if ex}<PriceExplainer x={ex} />{/if}
 		{#if recNew.length}<RecordLine items={recNew} />{/if}
 
+		<div class="below">
 		<div class="grid">
 			<section class="panel map-panel" aria-label="The two islands">
 				<div class="map" style="aspect-ratio: {W} / {VIEW.h}">
@@ -254,6 +255,7 @@
 		</div>
 
 		{#if liveD && now}<Generators D={liveD} when={clockOnly(now.t)} />{/if}
+		</div>
 	</main>
 
 	<SiteFooter />
@@ -284,6 +286,12 @@
 	.tag { font-size: 0.68rem; color: var(--muted); letter-spacing: 0.04em; font-weight: 500; margin-left: 4px; }
 
 	.grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+	.below { display: grid; gap: 14px; }
+	/* big screens: every generator beside the map and the mix rather than under them */
+	@media (min-width: 1600px) {
+		.below { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); align-items: start; }
+		.below > .grid { position: sticky; top: 12px; }   /* the map and the mix stay in view beside the long generator list */
+	}
 	.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px; min-width: 0; }
 	.p-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
 	.p-head h2 { margin: 0; font-size: 1rem; }

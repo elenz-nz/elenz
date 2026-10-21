@@ -24,7 +24,7 @@ const HISTORY_CRON = '40 */6 * * *'; // must match wrangler.jsonc
 // offered capacity (ingest/offered.py: one file per month and all days)
 // /data/health: the same limits as the GitHub watchdog (watchdog.yml)
 const HEALTH = { liveMinutes: 30, historyDays: 5, rebuildDays: 12 };   // history may lag up to rebuildDays during a rebuild
-const HISTORY_FILE = /^\/data\/history\/(index\.json|progress\.json|day\.json|records\.json|hh\/\d{4}-\d{2}\.json|off\/(?:\d{4}-\d{2}|days)\.json)$/;
+const HISTORY_FILE = /^\/data\/history\/(index\.json|progress\.json|day\.json|records\.json|hh\/\d{4}-\d{2}\.json|tod\.json|off\/(?:\d{4}-\d{2}|days)\.json)$/;
 
 // ---------- link previews for the tracker's pages ----------
 // The pages carry their own preview tags (site/src/lib/site/Preview.svelte); for a linked view the Worker puts what

@@ -1,11 +1,16 @@
 <script lang="ts">
-	// The last 30 days by time of day: one row per NZ day, one cell per half-hour. Renewable share in bands (brown
-	// where generation leaned on thermal plant, green where it was close to all renewable); a fuel's MW in its own
-	// colour, darker for more. Rows from heatRows() in ./data.js.
+	// By time of day: one row per NZ day (or month, or year, on All), one cell per half-hour. Renewable share in bands
+	// (brown where generation leaned on thermal plant, green where it was close to all renewable); a fuel's MW in its
+	// own colour, darker for more: on a fixed scale (hi, its installed capacity now, so years can be compared) or scaled
+	// to the rows shown (hi null). Rows from heatRows() / heatMonthRows() in ./data.js; long lists scroll, latest last.
 	import { REN_BANDS, REN_LEGEND, mwBands } from './data.js';
+	import { stepBands } from '#lib/site/heat.js';
 
-	type Row = { day: number; t: number; v: number[] };
-	let { rows, metric, tok, label }: { rows: Row[]; metric: string; tok: string; label: string } = $props();
+	type Row = { day: number; t: number; v: number[]; lab?: string; long?: string; month?: boolean };
+	let { rows, metric, tok, label, hi = null }: { rows: Row[]; metric: string; tok: string; label: string; hi?: number | null } = $props();
+	let scroller = $state<HTMLDivElement>();
+	// open on the latest rows
+	$effect(() => { void rows; if (scroller) scroller.scrollTop = scroller.scrollHeight; });
 
 	const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 	const WD = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -16,7 +21,7 @@
 	const fmt = (v: number) => Math.round(v).toLocaleString('en-NZ');
 
 	const ren = $derived(metric === 'ren');
-	const bands = $derived(ren ? null : mwBands(rows));
+	const bands = $derived(ren ? null : hi ? stepBands(hi) : mwBands(rows));
 	const edges = $derived(ren ? REN_BANDS : bands!.edges);
 	const bin = (v: number) => { if (v !== v) return -1; let b = 0; while (b < edges.length && v >= edges[b]) b++; return b; };
 	const legend = $derived(ren ? REN_LEGEND : [0, 1, 2, 3, 4, 5].map((q) => (q < 5 ? `${fmt(q * bands!.step)}–${fmt((q + 1) * bands!.step)} MW` : `${fmt(5 * bands!.step)} MW and over`)));
@@ -26,15 +31,15 @@
 </script>
 
 <div class="hm" class:ren style="--fc: var({tok})">
-	<div class="scroll">
+	<div class="scroll" class:tall={rows.length > 40} bind:this={scroller}>
 		<div class="grid" role="img" aria-label={label} onpointerleave={() => (tip = null)}>
 			{#each rows as r, j (r.day)}
 				<div class="r">
-					<span class="d">{j % 5 === 0 || j === rows.length - 1 ? short(r.day) : ''}</span>
+					<span class="d">{r.month ? r.lab : r.lab != null ? (j % 7 === 0 || j === rows.length - 1 ? r.lab : '') : j % 5 === 0 || j === rows.length - 1 ? short(r.day) : ''}</span>
 					<div class="cells">
 						{#each r.v as v, c}
 							<!-- svelte-ignore a11y_no_static_element_interactions (pointer readout only; the legend describes the colours) -->
-							<span class="c b{bin(v)}" onpointermove={(e) => (tip = { text: `${long(r.day)}, ${hh(c)}–${hh(c + 1)}: ${value(v)}`, x: e.clientX, y: e.clientY })}></span>
+							<span class="c b{bin(v)}" onpointermove={(e) => (tip = { text: `${r.long ?? long(r.day)}${r.month ? ' average' : ''}, ${hh(c)}–${hh(c + 1)}: ${value(v)}`, x: e.clientX, y: e.clientY })}></span>
 						{/each}
 					</div>
 				</div>
@@ -62,6 +67,9 @@
 		--h4: color-mix(in srgb, var(--fc) 80%, var(--surface)); --h5: var(--fc);
 	}
 	.scroll { overflow-x: auto; }
+	/* more than 40 rows: a box of about 40 that scrolls, the hour axis kept in view at its foot */
+	.scroll.tall { max-height: calc(40 * (var(--rh, 10px) + 1px) + 20px); overflow-y: auto; overscroll-behavior: contain; }
+	.scroll.tall .r.ax { position: sticky; bottom: 0; background: var(--surface); margin-top: 0; padding-top: 3px; height: 19px; }
 	.grid { min-width: 440px; display: grid; gap: 1px; }
 	.r { display: flex; align-items: center; gap: 8px; height: var(--rh, 10px); }  /* --rh: row height, taller when enlarged */
 	.r.ax { height: 16px; margin-top: 3px; }

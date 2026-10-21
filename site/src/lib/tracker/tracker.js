@@ -157,7 +157,9 @@ export function mountTracker(D, hooks = {}) {
 
   // intPicked: the viewer chose the interval (shared with the Prices tab); otherwise it's this tab's default for the range
   const state = { region: 'NZ', range: '1d', end: null, kind: 'live', int: '5m', intPicked: false, view: 'detailed', unit: 'mw', hover: null, hoverBy: null,
-                  hidden: new Set(), drill: { ...TOP_LEVEL }, open: new Set(), filter: '' };
+                  hidden: new Set(), drill: { ...TOP_LEVEL }, open: new Set(), filter: '',
+                  // zoom: part of the window, { span: hours } at its end (the menu on 1D) or { from, to } (dragged on a chart)
+                  zoom: null };
   // the view to open with: a link's address, or this browser's last view on a plain visit (#lib/site/view.js)
   const init = readView(), q = init.q;
   state.region = init.region;
@@ -166,6 +168,7 @@ export function mountTracker(D, hooks = {}) {
   if (RANGES[init.range].model === 'live' && init.end == null) state.range = init.range;
   else saved = { range: init.range, end: init.end };
   if (init.link) {
+    if (q.zoom) state.zoom = q.zoom;
     if (q.by && Object.hasOwn(VIEWS, q.by)) state.view = q.by;
     if (q.unit === 'pct') state.unit = 'pct';
   } else try {
@@ -182,7 +185,7 @@ export function mountTracker(D, hooks = {}) {
   const groupKey = id => id == null ? null : /^[sox]:/.test(id) ? slug(id.slice(2)) : id;
   const ownQuery = () => {
     const d = state.drill, l = linked;
-    return { by: state.view, unit: state.unit, ...(l ? { group: l.group, fuel: l.fuel, plant: l.plant }
+    return { by: state.view, unit: state.unit, zoom: state.zoom, ...(l ? { group: l.group, fuel: l.fuel, plant: l.plant }
       : { group: groupKey(d.group), fuel: d.fuel, plant: d.plant ? slug(d.plant) : null }) };
   };
   const shared = () => ({ region: state.region, range: state.range, int: state.intPicked ? state.int : null, end: state.end });
@@ -237,11 +240,22 @@ export function mountTracker(D, hooks = {}) {
   }
 
   // ---------- time axis: ticks, labels and the vertical lines at day, week, month or year boundaries ----------
+  // a zoomed view is marked like the range nearest its length; under a day and a half, by its own clock step
+  function zoomMarks(v) {
+    const h = (v.t[v.n - 1] - v.t[0]) / 36e5;
+    if (h <= 36) return { r: 'sub', every: h <= 1.5 ? 15 : h <= 4 ? 30 : h <= 8 ? 60 : h <= 16 ? 120 : 180 };
+    return { r: h <= 96 ? '3d' : h <= 240 ? '7d' : h <= 1100 ? '30d' : h <= 9600 ? '1y' : 'all' };
+  }
   function marks(v) {
-    const out = [], r = state.range;
+    const out = [], zm = v.zoomed ? zoomMarks(v) : null, r = zm ? zm.r : state.range;
     for (let j = 0; j < v.n; j++) {
       const p = lp(v.t[j]), q = j ? lp(v.t[j - 1]) : null;
-      if (RANGES[r].model === 'live') {
+      if (r === 'sub') {
+        const min = p.h * 60 + p.m;
+        if (min % zm.every) continue;
+        const midnight = min === 0;
+        out.push({ j, line: midnight, strong: midnight, label: midnight ? `${DOW[p.dow]} ${p.dom} ${MON[p.mon]}` : p.m ? clock(p) : hourLbl(p), yr: null });
+      } else if (RANGES[r].model === 'live') {
         const every = { '1d': 3, '3d': 6, '7d': 24 }[r];
         if (p.m !== 0 || p.h % every) continue;
         const midnight = p.h === 0;
@@ -277,9 +291,17 @@ export function mountTracker(D, hooks = {}) {
       start = firstAtOrAfter(M.t, state.end - R.days * DAY - (daily ? 2 * 36e5 : 0));
     } else if (state.kind === 'live') start = Math.max(0, M.N - R.n);
     else if (R.days) start = firstAtOrAfter(M.t, M.END - R.days * DAY + (daily ? 36e5 : 0));
+    // the zoom: part of the window ([zf, zt), times); ignored if it would leave fewer than two points
+    let zf = null, zt = null;
+    if (state.zoom && stop - start > 2) {
+      if (state.zoom.span) { zt = M.t[stop - 1] + M.h[stop - 1] * 36e5; zf = zt - state.zoom.span * 36e5; }
+      else { zf = state.zoom.from; zt = state.zoom.to; }
+      const a = Math.max(start, firstAtOrAfter(M.t, zf)), b = Math.min(stop, firstAtOrAfter(M.t, zt));
+      if (b - a >= 2) { start = a; stop = b; } else zf = zt = null;
+    }
     // grouped views start at the first whole day, week or month in the window rather than with a sliver of one
     // (a partial first day's energy, or its average, misleads)
-    if (key && start > 0) { let i = start; while (i < stop && key(M.t[i]) === key(M.t[i - 1])) i++; if (i < stop) start = i; }
+    if (key && start > 0 && zf == null) { let i = start; while (i < stop && key(M.t[i]) === key(M.t[i - 1])) i++; if (i < stop) start = i; }
     if (!key) for (let i = start; i < stop; i++) groups.push([i, i + 1]);
     else for (let a = start, i = start + 1; i <= stop; i++) if (i === stop || key(M.t[i]) !== key(M.t[a])) { groups.push([a, i]); a = i; }
     const n = groups.length;
@@ -288,7 +310,7 @@ export function mountTracker(D, hooks = {}) {
     const avg = arr => { const o = new Float64Array(n); groups.forEach(([a, b], j) => { let s = 0; for (let i = a; i < b; i++) s += arr[i] * M.h[i]; o[j] = s / hrs[j]; }); return o; };
     const max = arr => { const o = new Float64Array(n); groups.forEach(([a, b], j) => { let m = -Infinity; for (let i = a; i < b; i++) m = Math.max(m, arr[i]); o[j] = m; }); return o; };
     const S = SRC[state.region];
-    const v = { n, avg, t: groups.map(([a]) => M.t[a]), hrs, fuels: {} };
+    const v = { n, avg, t: groups.map(([a]) => M.t[a]), hrs, fuels: {}, zoomed: zf != null };
     FUELS.forEach(f => v.fuels[f.k] = avg(S[f.k]));
     v.metered = avg(S.metered); v.underlying = avg(S.underlying); v.tiwai = avg(S.tiwai); v.roofU = avg(S.roofU);
     // peak demand and generation: the highest 5-minute or half-hour value, which daily history keeps alongside its averages
@@ -329,7 +351,7 @@ export function mountTracker(D, hooks = {}) {
   const TOP = 7;
   function fuelLayer(k, group) {
     const f = FUEL[k], r = state.region;
-    return { id: k, name: k === 'hvdc' ? (r === 'NI' ? 'HVDC import' : 'HVDC export') : f.name, tok: f.tok, hatch: f.hatch ? k : null, tag: f.tag,
+    return { id: k, name: k === 'hvdc' ? 'HVDC transfer' : f.name, tok: f.tok, hatch: f.hatch ? k : null, tag: f.tag,
              signed: !!f.signed, s: V.fuels[k], drill: plantsFor(k).length ? { group, fuel: k, plant: null } : null };
   }
   function relayer() {
@@ -615,8 +637,14 @@ export function mountTracker(D, hooks = {}) {
     const c = setup($('cv-gen')), { ctx } = c, n = V.n, pct = pctMode(), energy = energyMode();
     const layers = V.layers.filter(l => !state.hidden.has(l.id) && !(pct && l.id === 'hvdc'));
     const pos = new Float64Array(n), neg = new Float64Array(n), tops = [];
+    // HVDC leaving an island isn't stacked below zero: it's taken off the top of the island's generation (drawn after
+    // the stack as a hatched band), so the stack's top is still what the island generated and the band's underside
+    // what it kept. HVDC arriving is stacked on top as before.
+    let exp = null;
     for (const l of layers) {
-      const a = pct ? Float64Array.from(l.s, pctOf) : energy ? Float64Array.from(l.s, en) : l.s, p0 = Float64Array.from(pos), n0 = Float64Array.from(neg);
+      let a = pct ? Float64Array.from(l.s, pctOf) : energy ? Float64Array.from(l.s, en) : l.s;
+      if (l.id === 'hvdc') { exp = Float64Array.from(a, v => Math.min(0, v)); a = Float64Array.from(a, v => Math.max(0, v)); }
+      const p0 = Float64Array.from(pos), n0 = Float64Array.from(neg);
       for (let j = 0; j < n; j++) { const v = a[j]; if (v > 0) pos[j] += v; else neg[j] += v; }
       tops.push({ l, p0, p1: Float64Array.from(pos), n0, n1: Float64Array.from(neg) });
     }
@@ -662,6 +690,18 @@ export function mountTracker(D, hooks = {}) {
       if (V.partial) wash(X(n - 2), F.x1, `Partial: to ${day(M.END)}`, true);
       if (V.partialFirst) { const p = lp(V.t[0]); wash(F.x0, X(1), `Partial: from ${p.dom} ${MON[p.mon]} ${p.y}`, false); }
     }
+    if (exp && exp.some(v => v < 0)) {
+      const band = () => { ctx.beginPath(); for (let j = 0; j < n; j++) { const x = X(j), y = Y(pos[j]); j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } for (let j = n - 1; j >= 0; j--) ctx.lineTo(X(j), Y(pos[j] + exp[j])); ctx.closePath(); };
+      ctx.save();
+      band(); ctx.globalAlpha = 0.55; ctx.fillStyle = C['--surface']; ctx.fill();   // the generation under it, faded
+      ctx.globalAlpha = 1; const pat = ctx.createPattern(PAT.hvdc, 'repeat'); if (pat.setTransform) pat.setTransform(new DOMMatrix().scale(0.25));
+      band(); ctx.fillStyle = pat; ctx.fill();
+      // its underside: what the island kept
+      ctx.strokeStyle = C['--f-hvdc']; ctx.lineWidth = 1.25; ctx.beginPath();
+      let on = false;
+      for (let j = 0; j < n; j++) { if (exp[j] < 0) { const x = X(j), y = Y(pos[j] + exp[j]); on ? ctx.lineTo(x, y) : ctx.moveTo(x, y); on = true; } else on = false; }
+      ctx.stroke(); ctx.restore();
+    }
     if (dom.lo < 0) { ctx.strokeStyle = C['--ink-2']; ctx.lineWidth = 1; const y = Math.round(Y(0)) + 0.5; ctx.beginPath(); ctx.moveTo(F.x0, y); ctx.lineTo(F.x1, y); ctx.stroke(); }
     if (cap) {
       const y = Math.round(Y(cap)) + 0.5;
@@ -692,7 +732,7 @@ export function mountTracker(D, hooks = {}) {
     // the amount button says what it shows: MW for 5-minute and half-hourly points, energy (MWh, GWh, TWh) for days and longer
     const amt = $('seg-unit').querySelector('[data-v="mw"]');
     if (amt) { const u = isLong() ? eu().unit : 'MW'; if (amt.textContent !== u) amt.textContent = u; }
-    GEN = { F, tops };
+    GEN = { F, tops, pos, exp };
     c.base.F = F;
     c.base.over = (ctx, j) => {
       if (state.hoverBy === 'mouse') return;   // the mouse tooltip shows the time itself
@@ -706,6 +746,7 @@ export function mountTracker(D, hooks = {}) {
   function layerAt(clientX, clientY) {
     if (!GEN) return null;
     const cv = $('cv-gen'), r = cv.getBoundingClientRect(), j = indexAt(cv, clientX), v = GEN.F.Yinv(clientY - r.top);
+    if (GEN.exp && GEN.exp[j] < 0 && v <= GEN.pos[j] && v >= GEN.pos[j] + GEN.exp[j]) return GEN.tops.find(T => T.l.id === 'hvdc')?.l || null;
     for (const T of GEN.tops) if ((v >= T.p0[j] && v <= T.p1[j] && T.p1[j] > T.p0[j]) || (v <= T.n0[j] && v >= T.n1[j] && T.n1[j] < T.n0[j])) return T.l;
     return null;
   }
@@ -950,7 +991,11 @@ export function mountTracker(D, hooks = {}) {
     $('tot-lbl').textContent = totalLabel();
     if (j == null) {
       const R = RANGES[state.range], p0 = lp(V.t[0] ?? M.END);
-      if (state.end == null) {
+      if (V.zoomed) {
+        const z = zoomSpan();
+        $('sum-when').textContent = state.zoom.span && state.end == null ? `Last ${state.zoom.span} hour${state.zoom.span > 1 ? 's' : ''}` : zoomWord(z.to - z.from).replace(/^./, c => c.toUpperCase());
+        $('sum-sub').textContent = `${zoomText()} · energy and averages`;
+      } else if (state.end == null) {
         const pe = lp(M.END);
         $('sum-when').textContent = R.span || `Since ${p0.dom} ${MON[p0.mon]} ${p0.y}`;
         $('sum-sub').textContent = `to ${clock(pe)} ${dayLbl(pe)}${R.model === 'live' ? '' : ' ' + pe.y} · energy and averages`;
@@ -1051,6 +1096,18 @@ export function mountTracker(D, hooks = {}) {
   const endOfToday = () => addDays(midnightOf(models.live.END), 1);
   const ymd = t => { const p = lp(t); return `${p.y}-${String(p.mon + 1).padStart(2, '0')}-${String(p.dom).padStart(2, '0')}`; };
   const firstDay = () => history.index?.first ?? Date.UTC(1997, 6, 31, 12);
+  // a zoom's length and span in words: "2 h 25 min", "1:05 pm – 3:30 pm Mon 19 Oct", "3 Feb – 18 Mar 2026"
+  function zoomWord(ms) {
+    const h = ms / 36e5;
+    if (h >= 48) { const d = Math.round(h / 24); return `${d} days`; }
+    const m = Math.round(ms / 6e4), hh = Math.floor(m / 60), mm = m % 60;
+    return hh ? (mm ? `${hh} h ${mm} min` : `${hh} hour${hh > 1 ? 's' : ''}`) : `${mm} min`;
+  }
+  function zoomText() {
+    const z = zoomSpan(), a = lp(z.from), b = lp(z.to - (isLong() ? 1 : 0));
+    if (isLong()) return `${a.dom} ${MON[a.mon]}${a.y !== b.y ? ' ' + a.y : ''} – ${b.dom} ${MON[b.mon]} ${b.y}`;
+    return a.dom === b.dom && a.mon === b.mon ? `${clock(a)} – ${clock(b)} ${dayLbl(a)}` : `${clock(a)} ${dayLbl(a)} – ${clock(b)} ${dayLbl(b)}`;
+  }
   function syncControls() {
     const seg = $('seg-int'), ints = intsFor(state.range, state.kind);
     if (seg.dataset.for !== ints.join()) {  // each range offers its own intervals
@@ -1074,6 +1131,23 @@ export function mountTracker(D, hooks = {}) {
       next.disabled = state.end == null;
       prev.setAttribute('aria-label', `Previous ${R.label}`); next.setAttribute('aria-label', `Next ${R.label}`);
       prev.title = `Previous ${R.label}`; next.title = state.end == null ? 'Showing the latest data' : `Next ${R.label}`;
+    }
+    // the 1D button names a span chosen from its menu ("3H"); the chip says what a dragged zoom shows
+    const span = state.zoom && state.zoom.span && V && V.zoomed ? state.zoom.span : null;
+    const oneDay = $('seg-range').querySelector('[data-v="1d"]');
+    oneDay.textContent = span ? `${span}H` : '1D';
+    oneDay.title = span ? `Last ${span} hour${span > 1 ? 's' : ''} (select for 24 hours)` : '24 hours';
+    for (const b of spanMenu.querySelectorAll('button[data-h]')) b.setAttribute('aria-checked', String(+b.dataset.h === (span ?? (state.range === '1d' ? 24 : 0))));
+    const chip = $('zoom-reset'), dragged = !!(state.zoom && !state.zoom.span && V && V.zoomed);
+    chip.hidden = !dragged;
+    if (dragged) $('zoom-txt').textContent = zoomText();
+    if (V && V.zoomed) for (const id of ['nav-prev', 'tb-prev', 'nav-next', 'tb-next']) {
+      const b = $(id); if (!b) continue;
+      b.hidden = false;
+      const z = zoomSpan(), word = zoomWord(z.to - z.from), back = /prev/.test(id);
+      b.disabled = back ? z.from - (z.to - z.from) < firstDay() : z.to >= models.live.END + 3e5 - 6e4;
+      b.title = back ? `Previous ${word}` : b.disabled ? 'Showing the latest data' : `Next ${word}`;
+      b.setAttribute('aria-label', back ? `Previous ${word}` : `Next ${word}`);
     }
     $('sel-region').value = state.region;
     for (const [id, val] of [['seg-range', state.range], ['seg-int', state.int]])
@@ -1136,10 +1210,30 @@ export function mountTracker(D, hooks = {}) {
   }
   const step = dir => {
     const R = RANGES[state.range];
+    if (state.zoom && V && V.zoomed) return stepZoom(dir);
     if (R.fixed) return;
     if (dir < 0) setView(state.range, addDays(state.end ?? endOfToday(), -R.days));
     else if (state.end != null) setView(state.range, addDays(state.end, R.days));
   };
+  // zoomed, the arrows move the zoom by its own length, into the next window if need be; forward to the latest data
+  // a span from the menu becomes "the last N hours" again
+  function zoomSpan() { const a = V.t[0], b = V.t[V.n - 1] + V.hrs[V.n - 1] * 36e5; return { from: a, to: b }; }
+  function stepZoom(dir) {
+    const z = zoomSpan(), len = z.to - z.from, latest = models.live.END + 3e5;
+    let from = z.from + dir * len, to = z.to + dir * len;
+    if (to >= latest) {
+      if (state.end == null && dir > 0) return;
+      to = latest; from = to - len;
+      state.zoom = state.zoom.span ? { span: state.zoom.span } : { from, to };
+      return setView(state.range, null, true);
+    }
+    if (from < firstDay()) return;
+    state.zoom = { from, to };
+    const R = RANGES[state.range], wFrom = M.t[0], wEnd = state.end ?? endOfToday(), wStart = R.days ? addDays(wEnd, -R.days) : wFrom;
+    if (from >= wStart && to <= wEnd) rebuild();
+    else setView(state.range, addDays(midnightOf(to - 1), 1), true);
+  }
+  function setZoom(z) { state.zoom = z; state.hover = null; state.hoverBy = null; rebuild(); }
   function rebuild() {
     V = buildView();  // first: the drill-down checks below look at this view's plant sets
     const link = linked && !waiting ? linked : null;
@@ -1165,6 +1259,7 @@ export function mountTracker(D, hooks = {}) {
     state.unit = a.unit === 'pct' ? 'pct' : 'mw';
     state.hidden.clear(); state.filter = ''; state.open.clear();
     linked = { group: a.group, fuel: a.fuel, plant: a.plant, t: null }; waiting = false;
+    state.zoom = a.zoom || null;
     const range = a.range || '1d', end = a.end ?? null;
     if (range !== state.range || end !== state.end || (a.int && a.int !== state.int)) setView(range, end, !!a.int, a.int || null);
     else rebuild();
@@ -1183,14 +1278,45 @@ export function mountTracker(D, hooks = {}) {
   }
 
   $('sel-region').addEventListener('change', e => { if (!['NZ', 'NI', 'SI'].includes(e.target.value)) return; state.region = e.target.value; state.hidden.clear(); rebuild(); });
-  $('seg-range').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || !Object.hasOwn(RANGES, b.dataset.v)) return; setView(b.dataset.v); });
+  $('seg-range').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b || !Object.hasOwn(RANGES, b.dataset.v)) return;
+    if (b.dataset.v === state.range && !state.zoom) return;
+    state.zoom = null; setView(b.dataset.v);
+  });
+  // the menu on 1D: the last hour, 3, 6 or 12 hours of the day (5-minute points), or the whole 24 hours
+  const spanMenu = $('span-menu'), spanBtn = $('btn-span');
+  const closeSpans = () => { spanMenu.hidden = true; spanBtn.setAttribute('aria-expanded', 'false'); };
+  // fixed to the window (the sticky bar clips anything that hangs below it), placed under the button
+  const placeSpans = () => { const r = spanBtn.getBoundingClientRect(); spanMenu.style.top = `${r.bottom + 4}px`; spanMenu.style.left = `${Math.max(8, Math.min(window.innerWidth - 170, r.right - 150))}px`; };
+  spanBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    const open = spanMenu.hidden;
+    if (open) placeSpans();
+    spanMenu.hidden = !open; spanBtn.setAttribute('aria-expanded', String(open));
+    if (open) spanMenu.querySelector('[aria-checked="true"], button')?.focus();
+  });
+  window.addEventListener('scroll', () => { if (!spanMenu.hidden) placeSpans(); }, { passive: true });
+  window.addEventListener('resize', () => { if (!spanMenu.hidden) placeSpans(); });
+  spanMenu.addEventListener('click', e => {
+    const b = e.target.closest('button[data-h]');
+    if (!b) return;
+    closeSpans();
+    const h = +b.dataset.h;
+    state.zoom = h < 24 ? { span: h } : null;
+    if (h < 24 && state.int !== '5m' && state.range === '1d') { state.int = '5m'; state.intPicked = false; }
+    if (state.range === '1d') { state.hover = null; rebuild(); } else setView('1d', state.end);
+  });
+  spanMenu.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSpans(); spanBtn.focus(); } });
+  document.addEventListener('click', e => { if (!spanMenu.hidden && !spanMenu.contains(e.target)) closeSpans(); });
+  $('zoom-reset').addEventListener('click', () => setZoom(null));
   onDateSettled($('in-date'), v => {
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
     if (!m) return;
     const day = midnightOf(Date.UTC(+m[1], +m[2] - 1, +m[3], 12) - 12 * 36e5);  // that date's local midnight
-    setView(state.range, addDays(day, 1));
+    state.zoom = null; setView(state.range, addDays(day, 1));
   });
-  $('btn-latest').addEventListener('click', () => setView(state.range, null));
+  $('btn-latest').addEventListener('click', () => { if (state.zoom && !state.zoom.span) state.zoom = null; setView(state.range, null); });
   for (const id of ['nav-prev', 'tb-prev']) $(id)?.addEventListener('click', () => step(-1));
   for (const id of ['nav-next', 'tb-next']) $(id)?.addEventListener('click', () => step(1));
   $('sel-view').addEventListener('change', e => {
@@ -1256,8 +1382,43 @@ export function mountTracker(D, hooks = {}) {
     tip.style.transform = `translate(${Math.max(pad, x)}px, ${Math.max(pad, y)}px)`;
   }
   const hideTip = () => { tip.hidden = true; };
+  // drag across a chart with the mouse to zoom into that span (every chart follows); the Reset zoom chip, Escape or a
+  // range button goes back. A drag shorter than a few pixels is a click (which pins).
+  let drag = null, dragged = false;
+  function dragBox(cv) {
+    const host = cv.parentElement;
+    let el = host.querySelector(':scope > .zoom-sel');
+    if (!el) { el = document.createElement('div'); el.className = 'zoom-sel'; el.setAttribute('aria-hidden', 'true'); host.appendChild(el); }
+    return el;
+  }
+  function endDrag(e, apply) {
+    if (!drag) return;
+    const d = drag; drag = null;
+    d.el.hidden = true;
+    try { d.cv.releasePointerCapture(e.pointerId); } catch (_) {}
+    if (!apply || !d.moved) return;
+    dragged = true;
+    const j1 = indexAt(d.cv, e.clientX), a = Math.min(d.j0, j1), b = Math.max(d.j0, j1);
+    if (b - a < 1) return;
+    hideTip();
+    setZoom({ from: V.t[a], to: V.t[b] + V.hrs[b] * 36e5 });
+  }
   for (const box of boxes) for (const cv of box.querySelectorAll('canvas')) {
+    cv.addEventListener('pointerdown', e => {
+      if (e.pointerType !== 'mouse' || e.button !== 0 || V.n < 3) return;
+      drag = { cv, x0: e.clientX, j0: indexAt(cv, e.clientX), moved: false, el: dragBox(cv) };
+    });
     cv.addEventListener('pointermove', e => {
+      if (drag && drag.cv === cv) {
+        if (!drag.moved && Math.abs(e.clientX - drag.x0) > 6) { drag.moved = true; try { cv.setPointerCapture(e.pointerId); } catch (_) {} hideTip(); }
+        if (drag.moved) {
+          const r = cv.getBoundingClientRect(), host = cv.parentElement.getBoundingClientRect();
+          const lo = Math.max(r.left + PADL, Math.min(drag.x0, e.clientX)), hi = Math.min(r.right - PADR, Math.max(drag.x0, e.clientX));
+          Object.assign(drag.el.style, { left: `${lo - host.left}px`, width: `${Math.max(0, hi - lo)}px`, top: `${r.top - host.top}px`, height: `${r.height}px` });
+          drag.el.hidden = false;
+          return;
+        }
+      }
       if (state.hoverBy === 'pin') return;   // pinned: the line stays put until a click, Release or Escape
       const j = indexAt(cv, e.clientX), by = e.pointerType === 'touch' ? 'touch' : 'mouse';
       if (j !== state.hover || by !== state.hoverBy) { state.hover = j; state.hoverBy = by; hover(); }
@@ -1271,7 +1432,10 @@ export function mountTracker(D, hooks = {}) {
     });
     // a click pins the time line there; a click on the pinned point (or next to it) releases it. Drilling down is from
     // the list beside the charts.
+    cv.addEventListener('pointerup', e => endDrag(e, true));
+    cv.addEventListener('pointercancel', e => endDrag(e, false));
     cv.addEventListener('click', e => {
+      if (dragged) { dragged = false; return; }   // the end of a zoom drag, not a click
       if (downBy === 'touch') return;
       const j = indexAt(cv, e.clientX);
       hideTip();
@@ -1295,7 +1459,10 @@ export function mountTracker(D, hooks = {}) {
       } else if (e.key === 'PageUp' || e.key === 'PageDown') { e.preventDefault(); step(e.key === 'PageUp' ? -1 : 1); }
       else if (e.key === 'Home') { e.preventDefault(); state.hover = 0; hover(); }
       else if (e.key === 'End') { e.preventDefault(); state.hover = V.n - 1; hover(); }
-      else if (e.key === 'Escape') { state.hover = null; state.hoverBy = null; hover(); }
+      else if (e.key === 'Escape') {
+        if (state.hover == null && state.zoom && !state.zoom.span) { setZoom(null); return; }   // a second Escape leaves a dragged zoom
+        state.hover = null; state.hoverBy = null; hover();
+      }
     });
   }
   window.addEventListener('scroll', hideTip, { passive: true });
@@ -1402,7 +1569,7 @@ export function mountTracker(D, hooks = {}) {
       const R = RANGES[state.range], j = state.hover != null && state.hoverBy !== 'mouse' && V ? state.hover : null;
       return shareLinks('/tracker', { ...shared(), ...ownQuery() }, {
         point: j != null ? V.t[j] : null, pointLabel: j != null ? (isLong() ? heading(j)[0] : chip(j)) : null, tDay: isLong(),
-        days: R.fixed ? null : R.days, latestEnd: endOfToday(),
+        days: R.fixed ? null : R.days, latestEnd: endOfToday(), zoomAt: V && V.zoomed ? zoomSpan() : null,
       });
     },
     destroy() { window.removeEventListener('popstate', onPop); window.removeEventListener('scroll', hideTip); mo.disconnect(); ro.disconnect(); if (mq) mq.removeEventListener('change', retheme); cancelAnimationFrame(raf); },

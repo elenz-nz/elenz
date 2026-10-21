@@ -32,6 +32,7 @@ and across all months:
                              the write allowance); the live job reads both
   hist/rec/months.json.gz, hist/records.json   the Records pages: a summary of every month and the records drawn from
                              them (records.py; published while the history is complete, only when something changed)
+  hist/tod.json              each month's average for every half-hour of the day (tod.py): the heat maps' rows on All
 
 HVDC is metered (EMI HVDC_Flows) wherever published, about two weeks after each month, and estimated from the
 island balances before that (hvdc.py).
@@ -69,6 +70,7 @@ import explain
 import hvdc
 import metered as mt
 import records
+import tod
 import rooftop
 import state as st
 from build_tracker import assemble, enc, enc_na
@@ -545,6 +547,7 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
     done_before = set(done)
     changed_dd = {}
     rec_fresh = {}   # records.py summaries of the months rebuilt this run
+    tod_fresh = {}   # the months rebuilt this run, for tod.py
     stopped = ''
     repairs = 0
     icols = irr_cols()
@@ -645,6 +648,7 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
             put_json(store, f'hist/dd/{month}.json', dd)
             changed_dd[month] = dd
             rec_fresh[month] = records.summarise(hh)
+            tod_fresh[month] = hh
             stored.add(month)
             left.discard(month)
             caps_before[month] = hh['meta']['roof_mw']
@@ -655,6 +659,11 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
     # complete, as day.json is. Three writes stay free for the closing day, index and progress files.
     records.update(store, rec_fresh, sorted(stored), publish=not stopped and not left, log=log,
                    room=lambda n: store.room(n + 3))
+    # the heat maps' monthly time-of-day profiles (tod.py): rebuilt months redone, missing ones read back a few at a time
+    try:
+        tod.update(store, tod_fresh, sorted(stored), room=lambda n: store.room(n + 3), log=log)
+    except Exception as e:  # noqa: BLE001  never fatal: the heat maps fall back to daily rows
+        log(f'time of day: skipped ({type(e).__name__}: {e})')
 
     months = sorted(stored)
     # 'at': when this run saved it; the Worker's health check and the watchdog treat a stale index as expected while a

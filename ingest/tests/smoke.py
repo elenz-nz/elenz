@@ -91,6 +91,10 @@ json.dumps(hhj, allow_nan=False)
 json.dumps(dd, allow_nan=False)
 check(abs(hhj['NI']['price'][0] - float(fin['F|NI'].iloc[0])) < 0.01, 'build_month: history uses the final price')
 check(set(overrides()['price_nodes']) <= set(hhj.get('nodes', {})), 'build_month: every extra node in the half-hourly file')
+import tod  # noqa: E402
+tp = tod.profile(hhj)
+check(len(tp['NI']['hydro']) == 48 and len(tp['SI']['price']) == 48 and sum(x is not None for x in tp['NI']['hydro']) >= 1,
+      'tod: a month by half-hour of the day (48 slots)')
 for k in ('p10', 'p90', 'pmin', 'pmax', 'n500', 'n1000', 'rv_hydro', 'rv_geo', 'batt_d'):
     check(k in dd['NI'] and len(dd['NI'][k]) == len(dd['t']), f'daily: {k}')
 check(dd['NI']['pmin'][0] <= dd['NI']['p10'][0] <= dd['NI']['p90'][0] <= dd['NI']['pmax'][0], 'daily: pmin <= p10 <= p90 <= pmax')

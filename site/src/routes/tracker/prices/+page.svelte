@@ -10,6 +10,7 @@
 	import TrackerTabs from '#lib/site/TrackerTabs.svelte';
 	import { readView, writeView, midnightOf, addDays, ymd, endOfDay, describe, shareLinks } from '#lib/site/view.js';
 	import ShareLink from '#lib/site/ShareLink.svelte';
+	import { heatWindow, heatSource, monthRows } from '#lib/site/heat.js';
 	import { dateSettled } from '#lib/site/datefield.js';
 	import DownloadMenu from '#lib/site/DownloadMenu.svelte';
 	import { composeImage, svgImage, legendOf, csvText, nzTime, utcTime, fileName, CREDIT, LICENCE } from '#lib/site/download.js';
@@ -20,7 +21,7 @@
 	import Context from '#lib/site/Context.svelte';
 	import PopButton from '#lib/site/PopButton.svelte';
 	import { barHeight } from '#lib/site/sticky.js';
-	import { rangeName, span, LOCKED } from '#lib/site/context.js';
+	import { rangeName, span } from '#lib/site/context.js';
 	import {
 		NODES, NODE, priceOf, separated, addRevenue, captured, RANGES, INT_LABEL, atInterval, completeDaily, periods,
 		heat, priceScale, niceTicks, CAP, money, signedMoney, clock, dayLabel, dateLabel, monthLabel, shortDate, timeTicks, nzParts
@@ -52,10 +53,12 @@
 	let busy = $state(false);
 	let viewError = $state('');
 	let heatRows = $state<any[]>([]);
-	let heatSeg: any = null;
+	let heatSeg = $state.raw<any>(null);
 	let heatSpan = $state('');   // the dates the heat map covers, for its context line
 	let endT = $state<number | null>(null); // end of the window (ms), or null for the latest data
-	let heatTo = 0;
+	let heatTo = 0, heatFrom = -1;
+	let heatShort = $state(false);   // a range under a week shows the last week
+	let heatScaled = $state(false);   // the heat map's colours fitted to the rows shown rather than the fixed price bands
 	let popped = $state<string | null>(null); // a lower chart enlarged over the page
 	let winH = $state(800);
 	let infoOpen = $state(false), helpOpen = $state(false);
@@ -203,7 +206,7 @@
 				const m0 = store.merged('day', live), m = completeDaily(m0, m0.histEnd, live);
 				setView(longView(r.days == null ? m : windowOf(m, from, to), m.histEnd));
 			}
-			if (to !== heatTo) loadHeat(to);
+			if (to !== heatTo || heatFrom !== from) { heatFrom = from; loadHeat(from, to); }
 		} catch (e: any) {
 			if (my === token) viewError = e.missing ? 'History is still being prepared. Please check back later.' : `History couldn't be loaded. ${e.message}`;
 		} finally {
@@ -454,23 +457,23 @@
 		return { rows, cap, sepShare: h ? sepH / h : null, spread: wavg(S.NI.price) - wavg(S.SI.price) };
 	});
 
-	// ---------- the heat map: the last 30 days, half-hourly ----------
-	/** The heat map: the 30 days to the end of the window. */
-	async function loadHeat(to: number) {
+	// ---------- the heat map: follows the range (#lib/site/heat.js): by day up to a year, by month on All ----------
+	async function loadHeat(from: number, to: number) {
 		if (!live) return;
 		heatTo = to;
-		const from = to - 30 * 864e5;
-		try {
-			if (!store.has('hh', from, to)) await store.load('hh', from, to);
-			if (heatTo !== to) return;
-			heatSeg = windowOf(store.merged('hh', live), from, to);
-		} catch {
-			heatSeg = windowOf(live, from, to);   // history not ready: the live week only
-		}
-		heatRows = heat(heatSeg, heatKey);
-		heatSpan = heatSeg && heatSeg.n ? span(heatSeg.t[0], heatSeg.t[heatSeg.n - 1] + heatSeg.h[heatSeg.n - 1] * 36e5) : '';
+		const src: any = await heatSource(heatWindow(from, to), store, live);
+		if (heatTo !== to) return;
+		heatSeg = src;
+		heatShort = src.kind === 'days' && src.from < from - 6e4;
+		heatRows = heatRowsOf(src, heatKey);
+		heatSpan = src.kind === 'days' ? (src.seg && src.seg.n ? span(src.seg.t[0], src.seg.t[src.seg.n - 1] + src.seg.h[src.seg.n - 1] * 36e5) : '') : span(Math.max(from, FIRST), to);
 	}
-	$effect(() => { const k = heatKey; untrack(() => { if (heatSeg) heatRows = heat(heatSeg, k); }); });
+	const heatRowsOf = (src: any, k: string) => src.kind === 'months'
+		? monthRows(src.tod, src.from, src.to, (P: any, c: number) => { const a = k === 'HAY' ? P.NI?.price : k === 'BEN' ? P.SI?.price : P.nodes?.[k]; const x = a ? a[c] : null; return x == null ? NaN : x; }, effInt === '1yr')
+		: heat(src.seg, k);
+	$effect(() => { const k = heatKey; void effInt; untrack(() => { if (heatSeg) heatRows = heatRowsOf(heatSeg, k); }); });
+	// nodes the heat map has prices for (the extra nodes start in Sep 2020 for months, and need bus rows for the live week)
+	const heatHas = (k: string) => !!heatSeg && (heatSeg.kind === 'months' ? Object.values(heatSeg.tod).some((P: any) => P.nodes?.[k]) : !!(heatSeg.seg && priceOf(heatSeg.seg, k)));
 
 	// rebuild when the range, interval or data change
 	// (build reads and writes the view, so it runs untracked: only these three trigger it)
@@ -558,7 +561,7 @@
 	<Preview title="Wholesale electricity prices · ELENZ Tracker" description="New Zealand wholesale electricity prices at six grid nodes, every 5 minutes: the gap between the islands, HVDC transfer, the price each fuel earned, and price ranges and spikes back to 1997." path="/tracker/prices" />
 </svelte:head>
 
-<div class="wrap">
+<div class="wrap wide">
 	<Masthead heading />
 	<TrackerTabs>
 		<div class="status">
@@ -820,18 +823,20 @@
 			<div class="card-head">
 				<div>
 					<h2>Price by time of day</h2>
-					<Context range={endT === null ? 'Last 30 days' : rangeName('30 days', endT, 30)} locked={LOCKED} items={[heatSpan, NODE[heatKey]?.name, 'each half-hour']} />
+					<Context range={heatShort ? (endT === null ? 'Last 7 days' : rangeName('7 days', endT, 7)) : rangeName(R.label, endT, R.days)} items={[heatSpan, NODE[heatKey]?.name, heatSeg?.kind === 'months' ? (effInt === '1yr' ? 'yearly' : 'monthly') + ' average of each half-hour' : 'each half-hour']} />
 				</div>
 				<div class="tools">
 				<div class="seg" role="group" aria-label="Node for the heat map">
-					{#each NODES.filter((nd) => nd.ref || (heatSeg && priceOf(heatSeg, nd.k))) as nd}
+					{#each NODES.filter((nd) => nd.ref || heatHas(nd.k)) as nd}
 						<button type="button" aria-pressed={heatKey === nd.k} onclick={() => { heatKey = nd.k; save(); }}>{nd.name}</button>
 					{/each}
 				</div>
+				<button type="button" class="tog-scale" aria-pressed={heatScaled} title={heatScaled ? 'Colours fitted to the prices shown' : 'Colours on fixed price bands, so different periods compare'} onclick={() => (heatScaled = !heatScaled)}><i aria-hidden="true"></i>Scale to this view</button>
 				<PopButton inline open={popped === 'heat'} name="price by time of day chart" onclick={() => (popped = popped === 'heat' ? null : 'heat')} />
 				</div>
 			</div>
-			{#if heatRows.length}<HeatMap rows={heatRows} />{:else}<p class="empty">Loading…</p>{/if}
+			{#if heatRows.length}<HeatMap rows={heatRows} scaled={heatScaled} />{:else}<p class="empty">Loading…</p>{/if}
+			<p class="note">{heatSeg?.kind === 'months' ? `One row per ${effInt === '1yr' ? 'year' : 'month'}: the average price in each half-hour.` : heatRows.length > 40 ? 'One row per day; scroll for earlier days.' : 'One row per day.'} {heatScaled ? 'Colours fitted to the prices shown.' : 'Colours on fixed price bands, so periods compare.'}</p>
 		</section>
 	</div>
 
@@ -851,6 +856,10 @@
 	.card h2 { font-size: 0.86rem; font-weight: 600; margin: 0; }
 	.card .sub { margin: 2px 0 0; color: var(--muted); font-size: 0.8rem; }
 	.card .note { margin: 0; color: var(--muted); font-size: 0.76rem; }
+	.tog-scale { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 0.78rem; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2px 10px; min-height: 30px; cursor: pointer; }
+	.tog-scale i { width: 10px; height: 10px; border: 1.5px solid var(--accent); border-radius: 2px; background: var(--accent); }
+	.tog-scale[aria-pressed='false'] { opacity: 0.6; }
+	.tog-scale[aria-pressed='false'] i { background: none; }
 	.card-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 12px; align-items: flex-start; }
 	.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 	.more { margin: 2px 2px 0; color: var(--muted); font-size: 0.8rem; }

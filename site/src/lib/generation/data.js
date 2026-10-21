@@ -6,6 +6,7 @@
 import { FUELS } from '#lib/tracker/fuels.js';
 import { KEY, aggregate, slice, firstAtOrAfter, nzOffset, DISPATCHABLE } from '#lib/tracker/series.js';
 import CAPACITY from '#lib/tracker/capacity.json';
+import { dayRows, monthRows } from '#lib/site/heat.js';
 
 const DAY = 864e5;
 export const YEAR = 365 * DAY;
@@ -92,16 +93,32 @@ export const REN_LEGEND = ['Under 80%', '80–88%', '88–93%', '93–96%', '96�
 export function heatRows(S, region, mk) {
   const { part, pct } = shares(S, region, mk);
   const val = mk === 'ren' ? pct : part;
-  const rows = new Map();
-  for (let i = 0; i < S.n; i++) {
-    const loc = S.t[i] + nzOffset(S.t[i]), d = Math.floor(loc / DAY), col = Math.floor((loc - d * DAY) / 18e5);
-    let r = rows.get(d);
-    if (!r) rows.set(d, (r = { day: d, t: S.t[i], v: new Array(48).fill(NaN), w: new Array(48).fill(0) }));
-    const v = val[i];
-    if (v === v) { r.v[col] = r.w[col] ? (r.v[col] * r.w[col] + v * S.h[i]) / (r.w[col] + S.h[i]) : v; r.w[col] += S.h[i]; }
-  }
-  return [...rows.values()].sort((a, b) => a.day - b.day);
+  return dayRows(S, (i) => val[i]);
 }
+
+/** The same by month (or year) from hist/tod.json's monthly time-of-day profiles (ingest/tod.py). */
+export function heatMonthRows(months, region, mk, from, to, yearly = false) {
+  const parts = METRIC[mk].parts;
+  return monthRows(months, from, to, (P, k) => {
+    let a = 0, b = 0, any = false;
+    for (const isl of isls(region)) {
+      const I = P[isl];
+      if (!I) continue;
+      for (const f of GEN) {
+        const v = I[f] ? I[f][k] : null;
+        if (v == null) continue;
+        any = true;
+        const x = Math.max(0, v);
+        b += x; if (parts.includes(f)) a += x;
+      }
+    }
+    if (!any) return NaN;
+    return mk === 'ren' ? (b > 0 ? (100 * a) / b : NaN) : a;
+  }, yearly);
+}
+
+/** A metric's installed MW in a region at time t (capacity.json; embedded solar from the registry by month). */
+export const capacityAt = (mk, region, t) => METRIC[mk].parts.reduce((a, k) => a + capacityMWh(k, region, t - 36e5, t), 0);
 
 /** MW bands for a fuel: six equal steps of a round number up to the window's highest half-hour. */
 export function mwBands(rows) {

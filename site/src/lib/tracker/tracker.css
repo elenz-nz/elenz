@@ -35,6 +35,8 @@
 *, *::before, *::after { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-ui); font-size: 14px; line-height: 1.45; }
 .wrap { max-width: 1260px; margin: 0 auto; padding-inline: 20px; padding-block: 18px 40px; display: grid; gap: 14px; }
+/* Tracker and Now use the whole width of a big screen (reading pages keep .wrap's 1,260 px) */
+.wrap.wide { max-width: none; padding-inline: clamp(20px, 2.2vw, 44px); }
 h1, h2, h3 { margin: 0; text-wrap: balance; }
 .num, td.n, .v { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
 
@@ -120,7 +122,7 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 .side { top: calc(var(--tb-h, 46px) + 12px); max-height: calc(100vh - var(--tb-h, 46px) - 24px); }
 
 /* Main layout */
-.layout { display: grid; grid-template-columns: minmax(0, 1fr) 316px; grid-template-rows: auto 1fr; grid-template-areas: "gen side" "more side"; gap: 14px 18px; align-items: start; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) var(--side-w, 316px); grid-template-rows: auto 1fr; grid-template-areas: "gen side" "more side"; gap: 14px 18px; align-items: start; }
 #charts { grid-area: gen; } #charts-more { grid-area: more; } .side { grid-area: side; }
 .charts[aria-busy="true"] canvas { opacity: 0.45; transition: opacity 0.2s; }
 
@@ -267,6 +269,15 @@ footer { border-top: 1px solid var(--line); padding-top: 12px; color: var(--mute
 footer p { margin: 0; max-width: 90ch; }
 a { color: var(--accent); }
 
+@media (min-width: 1600px) {
+  .wide .layout { --side-w: 360px; }
+  .wide #cv-gen { height: 400px; }
+  .wide #cv-price, .wide #cv-demand { height: 150px; }
+}
+@media (min-width: 2200px) {
+  .wide .layout { --side-w: 400px; }
+  .wide #cv-gen { height: 460px; }
+}
 @media (max-width: 920px) {
   .layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-template-areas: "gen" "side" "more"; }
   .side { position: static; max-height: none; }
@@ -353,3 +364,23 @@ a { color: var(--accent); }
   .tabline .tabs a { padding-inline: 5px; font-size: 0.86rem; }
   .tabline .pill-btn, .tabline .info-btn { width: 26px; min-width: 26px; }
 }
+
+/* Shorter ranges: the menu beside 1D, and drag-to-zoom (tracker.js) */
+.span-wrap { margin-left: -6px; }
+.span-btn { display: grid; place-items: center; width: 22px; min-height: 30px; padding: 0; border: 0; border-radius: 4px; background: none; color: var(--ink-2); cursor: pointer; }
+.span-btn:hover, .span-btn[aria-expanded="true"] { color: var(--ink); background: var(--grid); }
+.span-menu { position: fixed; z-index: 30; display: grid; min-width: 150px; padding: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 6px 20px rgb(0 0 0 / 0.15); }
+.span-menu[hidden] { display: none; }
+.span-menu .span-hd { font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding: 2px 8px 4px; }
+.span-menu button { font: inherit; font-size: 0.82rem; text-align: left; color: var(--ink-2); background: none; border: 0; border-radius: 4px; padding: 5px 8px 5px 24px; cursor: pointer; position: relative; }
+.span-menu button:hover, .span-menu button:focus-visible { background: var(--grid); color: var(--ink); }
+.span-menu button[aria-checked="true"] { color: var(--ink); font-weight: 600; }
+.span-menu button[aria-checked="true"]::before { content: ""; position: absolute; left: 9px; top: 50%; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%; background: var(--accent); }
+.span-menu .span-tip { font-size: 0.72rem; color: var(--muted); padding: 6px 8px 2px; border-top: 1px solid var(--grid); margin-top: 4px; }
+.zoom-chip { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 0.78rem; color: var(--ink-2); background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 999px; padding: 3px 11px 3px 9px; min-height: 28px; cursor: pointer; }
+.zoom-chip[hidden] { display: none; }
+.zoom-chip b { color: var(--accent); font-weight: 600; }
+.zoom-chip:hover b { text-decoration: underline; }
+.zoom-sel { position: absolute; pointer-events: none; background: color-mix(in srgb, var(--accent) 16%, transparent); border-inline: 1px solid var(--accent); z-index: 2; }
+.zoom-sel[hidden] { display: none; }
+.charts canvas { cursor: crosshair; }

@@ -17,6 +17,8 @@ test('an address reads and writes back unchanged', () => {
     'region=NI&range=3d&end=2026-10-18&t=2026-10-16T18:30&by=site&unit=pct&fuel=wind&plant=te-apiti',
     'range=all&int=1yr&t=2008-01-01&by=scheme&group=manapouri',
     'region=NI&range=7d&scale=capped&hide=OTA,WKM&band=BEN',
+    'zoom=3h',
+    'range=3d&end=2026-10-19&zoom=2026-10-19T13:05~2026-10-19T15:30',
   ]) {
     const day = /t=\d{4}-\d\d-\d\d(&|$)/.test(qs);
     assert.equal(writeQuery(readQuery(qs), { tDay: day }), qs, qs);
@@ -98,4 +100,20 @@ test('share links: live, fixed to the dates shown, and the marked point', () => 
   assert.equal(midnightOf(addDays(latestEnd, -1)), endOfDay('2026-10-17'));
   assert.equal(shareLinks('/tracker', { range: '30d' }, { latestEnd, days: 30 }).fixed().span, '19 Sep to 18 Oct 2026');
   assert.equal(shareLinks('/tracker', { range: '1y' }, { latestEnd, days: 365 }).fixed().span, '19 Oct 2025 to 18 Oct 2026');
+});
+
+test('zoom: the menu spans and a dragged span', () => {
+  assert.deepEqual(readQuery('zoom=6h'), { zoom: { span: 6 } });
+  assert.deepEqual(readQuery('zoom=5h&x=1'), {});                          // not a span the menu offers
+  assert.deepEqual(readQuery('zoom=2026-10-19T15:30~2026-10-19T13:05'), {}); // backwards
+  assert.deepEqual(readQuery('zoom=2026-10-19~2026-10-20'), {});             // dates alone
+  assert.equal(describe('generation', { zoom: { span: 3 } }), 'Electricity generation · New Zealand · last 3 hours');
+  assert.equal(describe('generation', { zoom: { span: 1 }, end: endOfDay('2026-10-18') }), 'Electricity generation · New Zealand · 1 hour to 18 Oct 2026');
+  const z = readQuery('zoom=2026-10-19T13:05~2026-10-19T15:30').zoom;
+  assert.equal(describe('generation', { range: '3d', zoom: z }), 'Electricity generation · New Zealand · 1:05 pm to 3:30 pm, 19 Oct 2026');
+  assert.equal(describe('prices', { zoom: z }), 'Wholesale electricity prices · New Zealand · last 24 hours');  // Generation tab only
+  // the link to the dates shown pins "the last 3 hours" to those hours
+  const L = shareLinks('/tracker', { range: '1d', zoom: { span: 3 } }, { latestEnd: endOfDay('2026-10-18'), days: 1, zoomAt: z });
+  assert.equal(L.live, 'https://elenz.co.nz/tracker?zoom=3h');
+  assert.equal(L.fixed(false).url, 'https://elenz.co.nz/tracker?end=2026-10-18&zoom=2026-10-19T13:05~2026-10-19T15:30');
 });

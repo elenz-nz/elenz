@@ -1,30 +1,34 @@
 <script lang="ts">
-	// Price by time of day: one row per NZ day, one cell per half-hour, coloured by price band.
+	// Price by time of day: one row per NZ day (or month or year on All, #lib/site/heat.js), one cell per half-hour,
+	// coloured by price band: fixed bands, so periods compare, or (scaled) bands at the sixths of the prices shown.
+	// Long lists scroll, latest last.
 	import { money, shortDate, dayLabel } from './data.js';
+	import { quantileEdges } from '#lib/site/heat.js';
 
-	type Row = { day: number; t: number; v: number[] };
-	let { rows }: { rows: Row[] } = $props();
+	type Row = { day: number; t: number; v: number[]; lab?: string; long?: string; month?: boolean };
+	let { rows, scaled = false }: { rows: Row[]; scaled?: boolean } = $props();
 
-	const BINS = [50, 100, 150, 250, 500];
-	const LEGEND = [
-		{ c: 0, label: 'Under $50' }, { c: 1, label: '$50–100' }, { c: 2, label: '$100–150' },
-		{ c: 3, label: '$150–250' }, { c: 4, label: '$250–500' }, { c: 5, label: 'Over $500' }
-	];
+	const FIXED = [50, 100, 150, 250, 500];
+	const BINS = $derived((scaled && quantileEdges(rows)) || FIXED);
+	const dollars = (v: number) => (v < 0 ? '−$' + Math.abs(v).toLocaleString('en-NZ') : '$' + v.toLocaleString('en-NZ'));
+	const LEGEND = $derived([0, 1, 2, 3, 4, 5].map((c) => ({ c, label: c === 0 ? `Under ${dollars(BINS[0])}` : c === 5 ? `Over ${dollars(BINS[4])}` : `${dollars(BINS[c - 1])}–${dollars(BINS[c]).replace('$', '')}` })));
 	const bin = (v: number) => { if (v !== v) return -1; let b = 0; while (b < BINS.length && v >= BINS[b]) b++; return b; };
+	let scroller = $state<HTMLDivElement>();
+	$effect(() => { void rows; if (scroller) scroller.scrollTop = scroller.scrollHeight; });
 	let tip = $state<{ text: string; x: number; y: number } | null>(null);
 	const hh = (c: number) => `${String(Math.floor(c / 2)).padStart(2, '0')}:${c % 2 ? '30' : '00'}`;
 </script>
 
 <div class="hm">
-	<div class="scroll">
+	<div class="scroll" class:tall={rows.length > 40} bind:this={scroller}>
 		<div class="grid" role="img" aria-label="Heat map of half-hourly prices by day and time of day" onpointerleave={() => (tip = null)}>
 			{#each rows as r, j (r.day)}
 				<div class="r">
-					<span class="d">{j % 5 === 0 || j === rows.length - 1 ? shortDate(r.t) : ''}</span>
+					<span class="d">{r.month ? r.lab : j % (rows.length > 40 ? 7 : 5) === 0 || j === rows.length - 1 ? shortDate(r.t) : ''}</span>
 					<div class="cells">
 						{#each r.v as v, c}
 							<!-- svelte-ignore a11y_no_static_element_interactions (pointer readout only; the cells are summarised by the legend) -->
-							<span class="c b{bin(v)}" onpointermove={(e) => (tip = { text: `${dayLabel(r.t)}, ${hh(c)}–${hh(c + 1)}: ${v === v ? money(v) + '/MWh' : 'no data'}`, x: e.clientX, y: e.clientY })}></span>
+							<span class="c b{bin(v)}" onpointermove={(e) => (tip = { text: `${r.month ? r.long + ' average' : dayLabel(r.t)}, ${hh(c)}–${hh(c + 1)}: ${v === v ? money(v) + '/MWh' : 'no data'}`, x: e.clientX, y: e.clientY })}></span>
 						{/each}
 					</div>
 				</div>
@@ -47,6 +51,8 @@
 		:global(:root:not([data-theme='light'])) .hm { --h0: #2c4244; --h1: #23596a; --h2: #2a7a8e; --h3: #3c9cb3; --h4: #7ccbdb; --h5: #f08a3c; }
 	}
 	.scroll { overflow-x: auto; }
+	.scroll.tall { max-height: calc(40 * (var(--rh, 10px) + 1px) + 20px); overflow-y: auto; overscroll-behavior: contain; }
+	.scroll.tall .r.ax { position: sticky; bottom: 0; background: var(--surface); margin-top: 0; padding-top: 3px; height: 19px; }
 	.grid { min-width: 440px; display: grid; gap: 1px; }
 	.r { display: flex; align-items: center; gap: 8px; height: var(--rh, 10px); }  /* --rh: row height, taller when enlarged */
 	.r.ax { height: 16px; margin-top: 3px; }

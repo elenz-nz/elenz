@@ -10,6 +10,8 @@
 // Generation tab:       by      the grouping (absent: detailed)
 //                       unit    pct (absent: MW)
 //                       group, fuel, plant   the drill-down (plant and set names as slugs, see slug())
+//                       zoom    1h | 3h | 6h | 12h: the last hours of the window (the menu on 1D), or
+//                               YYYY-MM-DDTHH:MM~YYYY-MM-DDTHH:MM: a span dragged on the chart (NZ time, end exclusive)
 // Prices tab:           scale   capped | linear (absent: spike-proof)
 //                       hide    nodes hidden from the price chart, e.g. OTA,ISL
 //                       band    BEN (absent: HAY), the island whose price range the long view shows
@@ -27,7 +29,9 @@ export const INTS = ['5m', '30m', '1d', '1w', '1mo', '1yr'];
 export const GROUPINGS = ['detailed', 'simple', 'site', 'scheme', 'owner', 'flex', 'rf', 'vre'];
 export const SCALES = ['spike', 'capped', 'linear'];
 export const SHARED = ['region', 'range', 'int', 'end', 't'];
-const ORDER = [...SHARED, 'by', 'unit', 'group', 'fuel', 'plant', 'scale', 'hide', 'band'];
+const ORDER = [...SHARED, 'by', 'unit', 'group', 'fuel', 'plant', 'zoom', 'scale', 'hide', 'band'];
+/** The spans the 1D menu offers, in hours. */
+export const SPANS = [1, 3, 6, 12];
 export const OLD_RANGE = { 288: '1d', 864: '3d', 2016: '7d' };
 const FUEL_KEYS = FUELS.map((f) => f.k);
 const DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -94,12 +98,24 @@ export function readQuery(search) {
   one('fuel', (x) => FUEL_KEYS.includes(x));
   one('plant', (x) => SLUG.test(x) && x.length <= 80);
   if (v.plant && PLANT_ALIASES[v.plant]) v.plant = PLANT_ALIASES[v.plant];
+  const z = readZoom(q.get('zoom'));
+  if (z) v.zoom = z;
   one('scale', (x) => SCALES.includes(x));
   const hide = (q.get('hide') || '').split(',').filter((x) => NODE.test(x));
   if (hide.length) v.hide = [...new Set(hide)];
   one('band', (x) => x === 'HAY' || x === 'BEN');
   return v;
 }
+
+/** A zoom from the address: { span: hours } or { from, to } (ms, to exclusive); null if malformed. */
+export function readZoom(x) {
+  if (!x) return null;
+  const m = /^(\d+)h$/.exec(x);
+  if (m) return SPANS.includes(+m[1]) ? { span: +m[1] } : null;
+  const [a, b] = x.split('~'), from = fromStamp(a), to = fromStamp(b);
+  return from != null && to != null && to > from && TIME.test(a) && TIME.test(b) ? { from, to } : null;
+}
+const writeZoom = (z) => z.span ? `${z.span}h` : `${stamp(z.from)}~${stamp(z.to)}`;
 
 /** The query for a view (no leading '?'): defaults left out, keys in a fixed order, ':' and ',' left readable.
  *  tDay: write t as a date alone (daily and longer points). */
@@ -118,6 +134,7 @@ export function writeQuery(v, { tDay = false } = {}) {
     if (k === 'end') add(k, ymd(x - 1));
     else if (k === 't') add(k, stamp(x, !tDay));
     else if (k === 'hide') add(k, x.join(','));
+    else if (k === 'zoom') add(k, writeZoom(x));
     else add(k, x);
   }
   return out.join('&');
@@ -162,7 +179,10 @@ export function describe(tab, v, names = {}) {
   const range = v.range || '1d';
   const daily = (v.int && !['5m', '30m'].includes(v.int)) || range === '1y' || range === 'all';
   let when;
+  const z = tab === 'prices' ? null : v.zoom;
   if (v.t != null) when = daily ? dayText(v.t) : `${clockText(v.t)}, ${dayText(v.t)}`;
+  else if (z && z.span) when = v.end == null ? `last ${z.span} hour${z.span > 1 ? 's' : ''}` : `${z.span} hour${z.span > 1 ? 's' : ''} to ${dayText(v.end - 1)}`;
+  else if (z) when = daily || ymd(z.from) !== ymd(z.to - 1) ? spanText(z.from, z.to - 1) : `${clockText(z.from)} to ${clockText(z.to)}, ${dayText(z.from)}`;
   else if (v.end == null || range === 'all') when = RANGE_LAST[range];
   else when = RANGE_LEN[range] ? `${RANGE_LEN[range]} to ${dayText(v.end - 1)}` : dayText(v.end - 1);
   return [what, REGION_NAME[v.region || 'NZ'], when].join(' · ');
@@ -184,8 +204,9 @@ export function shareUrl(path, view, opts) {
  *  marked if mark. A live window (the last 24 hours) becomes the days it reaches into today, or, with the point
  *  marked, the days ending with the point's if it's earlier. Null when that would be the same as the live link. */
 /** @param {string} path @param {Record<string, any>} v
- *  @param {{ point?: number | null, pointLabel?: string | null, tDay?: boolean, days?: number | null, latestEnd: number }} opts */
-export function shareLinks(path, v, { point = null, pointLabel = null, tDay = false, days = null, latestEnd }) {
+ *  zoomAt: the zoom as times ({ from, to }), for the link to the dates shown, so "the last 3 hours" stays those hours.
+ *  @param {{ point?: number | null, pointLabel?: string | null, tDay?: boolean, days?: number | null, latestEnd: number, zoomAt?: { from: number, to: number } | null }} opts */
+export function shareLinks(path, v, { point = null, pointLabel = null, tDay = false, days = null, latestEnd, zoomAt = null }) {
   const live = v.end == null ? shareUrl(path, { ...v, end: null, t: null }) : null;
   const fixed = (mark = false) => {
     const t = mark && point != null ? point : null;
@@ -193,7 +214,7 @@ export function shareLinks(path, v, { point = null, pointLabel = null, tDay = fa
     if (end != null && t != null && t < addDays(end, -days)) end = addDays(midnightOf(t), 1);
     if (end == null && t == null && live) return null;
     const span = end == null ? null : days === 1 ? dayText(end - 1) : spanText(addDays(end, -days), end - 1);
-    return { url: shareUrl(path, { ...v, end, t }, { tDay }), span };
+    return { url: shareUrl(path, { ...v, end, t, ...(v.zoom && zoomAt ? { zoom: zoomAt } : {}) }, { tDay }), span };
   };
   return { live, point, pointLabel, fixed };
 }

@@ -64,7 +64,7 @@
 				'Share of generation over the range against the same dates a year earlier: renewables, wind, solar, inverter-based, hydro, gas or coal/gas.',
 				'Dispatchable headroom: hydro, gas, coal/gas, diesel and battery capacity not being used.',
 				'Mix by fuel: energy, change on last year, average and peak output, and capacity factor.',
-				'A heat map of the 30 days to the range’s end by time of day, for any of the same shares.',
+				'A heat map of the range by time of day (by month on All), for any of the same series.',
 			],
 		},
 		{
@@ -74,7 +74,7 @@
 				'Prices at six nodes, Ōtāhuhu to Invercargill, with the island spread and HVDC transfer, for the live week and 30 days.',
 				'Each period’s range of half-hourly prices, and half-hours over $500 and $1,000, for 12 months and the whole history.',
 				'Price captured by fuel: what each fuel’s generation was worth on average.',
-				'Price by time of day: a heat map of the last 30 days.',
+				'Price by time of day: a heat map of the range (by month on All).',
 				'Spike-proof, capped and linear scales, and time- and generation-weighted averages.',
 			],
 		},

@@ -145,7 +145,7 @@
 	<Preview title="Electricity generation, prices and demand · ELENZ Tracker" description="New Zealand's electricity generation by fuel, plant, owner or hydro scheme, with wholesale prices, demand, HVDC transfer and emissions, from the last 24 hours back to 1997." path="/tracker" />
 </svelte:head>
 
-<div class="wrap">
+<div class="wrap wide">
 	<Masthead heading />
 	<TrackerTabs>
 		<div class="status">
@@ -191,6 +191,11 @@
 				<button type="button" data-v="1y" title="1 year">1Y</button>
 				<button type="button" data-v="all" title="All history, from August 1997">ALL</button>
 			</div>
+			<div class="span-wrap">
+				<button type="button" class="span-btn" id="btn-span" aria-haspopup="true" aria-expanded="false" aria-controls="span-menu" title="Shorter than a day" aria-label="Shorter ranges">
+					<svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+				</button>
+			</div>
 		</div>
 		<div class="ctl">
 			<span id="lb-int">Interval</span>
@@ -208,7 +213,21 @@
 				<button type="button" class="latest" id="btn-latest" title="Back to the latest data" hidden><svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 3 5 5-5 5M12 3v10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>Latest</button>
 			</div>
 		</div>
+		<button type="button" class="zoom-chip" id="zoom-reset" title="Back to the whole range (Escape)" hidden>
+			<svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="m10.5 10.5 3.5 3.5M5 7h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+			<span id="zoom-txt"></span><b>Reset zoom</b>
+		</button>
 	</nav>
+	<!-- the 1D menu sits outside the sticky bar, which clips anything hanging below it; placed by tracker.js -->
+	<div class="span-menu" id="span-menu" role="group" aria-label="Show the last part of the day" hidden>
+		<span class="span-hd">Last</span>
+		<button type="button" role="menuitemradio" aria-checked="false" data-h="1">1 hour</button>
+		<button type="button" role="menuitemradio" aria-checked="false" data-h="3">3 hours</button>
+		<button type="button" role="menuitemradio" aria-checked="false" data-h="6">6 hours</button>
+		<button type="button" role="menuitemradio" aria-checked="false" data-h="12">12 hours</button>
+		<button type="button" role="menuitemradio" aria-checked="false" data-h="24">24 hours</button>
+		<span class="span-tip">Or drag across any chart to zoom</span>
+	</div>
 
 	<noscript><p class="notice">The charts need JavaScript turned on.</p></noscript>
 
@@ -312,6 +331,8 @@
 						<dd>Click a chart to hold the time line there; click it again, Release or Escape to let go. Share can then mark that time.</dd>
 						<dt>Move through history</dt>
 						<dd>Range, interval and region are in the bar at the top. The ‹ › arrows beside the date, on the generation chart, or Page Up and Page Down step back and forward by the range; the date box jumps to a day; Latest comes back.</dd>
+						<dt>Zoom in</dt>
+						<dd>Drag across any chart to zoom into that stretch; every chart follows. The arrow beside 1D picks the last 1, 3, 6 or 12 hours. While zoomed, the ‹ › arrows step by the zoom’s length, and Reset zoom in the bar (or Escape twice) shows the whole range again.</dd>
 						<dt>Break it down</dt>
 						<dd>Select a name in this list to go from a fuel to its plants and their grid connections. ‹ Back above the list, or the browser’s Back, steps out. The menu above the generation chart groups it other ways (owner, site, flexibility…), and MW/% switches to shares.</dd>
 						<dt>Hide and show</dt>

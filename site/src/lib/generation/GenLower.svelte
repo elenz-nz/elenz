@@ -8,12 +8,13 @@
 	import TimeChart from '#lib/prices/TimeChart.svelte';
 	import { timeTicks, niceTicks } from '#lib/prices/data.js';
 	import Context from '#lib/site/Context.svelte';
-	import { rangeName, span, RES as RES_, LOCKED } from '#lib/site/context.js';
+	import { rangeName, span, RES as RES_ } from '#lib/site/context.js';
 	import { nzOffset } from '#lib/tracker/series.js';
 	import PopButton from '#lib/site/PopButton.svelte';
 	import GenHeat from './GenHeat.svelte';
 	import MixTable from './MixTable.svelte';
-	import { METRICS, METRIC, YEAR, LEVELS, shares, atInterval, windowOf, alignYearAgo, shareOver, heatRows, mixRows, headroom, headroomAt, loadOffered } from './data.js';
+	import { METRICS, METRIC, YEAR, LEVELS, shares, atInterval, windowOf, alignYearAgo, shareOver, heatRows, heatMonthRows, capacityAt, mixRows, headroom, headroomAt, loadOffered } from './data.js';
+	import { heatWindow, heatSource } from '#lib/site/heat.js';
 	import { FUELS } from '#lib/tracker/fuels.js';
 
 	type View = { region: string; range: string; label: string; days: number | null; int: string; kind: string; end: number | null; from: number; to: number; M: any; live: any; history: any };
@@ -29,14 +30,15 @@
 	let popped = $state<string | null>(null);   // a card enlarged over the page: 'share', 'room', 'mix' or 'heat'
 	const pop = (id: string) => (popped = popped === id ? null : id);
 	let prev = $state.raw<any>(null), prevFor = '';   // the window a year earlier
-	let heatSeg = $state.raw<any>(null), heatFor = '';
-	let heatTo = $state(0);
+	let heatSrc = $state.raw<any>(null), heatFor = '';
+	let heatScaled = $state(false);   // the heat map's colours scaled to the rows shown rather than fixed
 
 	onMount(() => {
 		try {
 			const s = JSON.parse(localStorage.getItem('elenz-gen-lower') || 'null');
 			if (s && METRIC[s.metric]) metric = s.metric;
 			if (s && METRIC[s.heat]) heatMetric = s.heat;
+			if (s?.heatScaled) heatScaled = true;
 			if (s && s.compare === false) compare = false;
 			if (s && s.hydro === false) withHydro = false;
 			if (s && (s.room === 'levels' || s.room === 'fuel')) roomView = s.room;
@@ -47,7 +49,7 @@
 		return () => io.disconnect();
 	});
 	function save() {
-		try { localStorage.setItem('elenz-gen-lower', JSON.stringify({ metric, heat: heatMetric, compare, hydro: withHydro, room: roomView, basis: roomBasis })); } catch { /* storage blocked */ }
+		try { localStorage.setItem('elenz-gen-lower', JSON.stringify({ metric, heat: heatMetric, heatScaled, compare, hydro: withHydro, room: roomView, basis: roomBasis })); } catch { /* storage blocked */ }
 	}
 
 	// ---------- the window and a year before it ----------
@@ -219,30 +221,27 @@
 	const lowWord = $derived(v ? ({ '30m': 'half-hour', '1d': 'day', '1w': 'week', '1mo': 'month', '1yr': 'year' } as Record<string, string>)[v.int] ?? 'point' : 'point');
 	let roomHover = $state(-1);
 
-	// ---------- the heat map: always the 30 days to the end of the range ----------
+	// ---------- the heat map: follows the range (#lib/site/heat.js): by day up to a year, by month on All ----------
 	$effect(() => {
 		const w = v, ok = near;
 		untrack(() => {
 			if (!w || !ok || !w.live) return;
-			const to = w.end ?? w.live.t[w.live.n - 1] + 1, from = to - 30 * DAY;
-			const key = `${from}|${to}|${w.live.t[w.live.n - 1]}`;
+			const hw = heatWindow(w.from, w.to);
+			const key = `${hw.kind}|${hw.from}|${hw.to}|${w.live.t[w.live.n - 1]}`;
 			if (key === heatFor) return;
 			heatFor = key;
-			(async () => {
-				let seg;
-				try {
-					if (!w.history.has('hh', from, to)) await w.history.load('hh', from, to);
-					seg = windowOf(w.history.merged('hh', w.live), from, to);
-				} catch {
-					seg = windowOf(w.live, from, to);   // history not ready: the live week only
-				}
-				if (heatFor !== key) return;
-				heatSeg = seg; heatTo = to;
-			})();
+			heatSource(hw, w.history, w.live).then((src) => { if (heatFor === key) heatSrc = src; });
 		});
 	});
 	const hm = $derived(METRIC[heatMetric]);
-	const rows = $derived(heatSeg && v ? heatRows(heatSeg, v.region, heatMetric) : []);
+	const rows = $derived(heatSrc && v ? (heatSrc.kind === 'months'
+		? heatMonthRows(heatSrc.tod, v.region, heatMetric, heatSrc.from, heatSrc.to, v.int === '1yr')
+		: heatRows(heatSrc.seg, v.region, heatMetric)) : []);
+	// a fuel's colours on a fixed scale up to its installed capacity now, so years compare; or scaled to the rows shown
+	// (the top band starts at 80% of capacity for half-hours, 60% for monthly averages, which smooth out the peaks)
+	const heatCap = $derived(heatMetric === 'ren' || !v ? 0 : capacityAt(heatMetric, v.region, v.live.t[v.live.n - 1]));
+	const heatHi = $derived(heatScaled || !heatCap ? null : heatCap * (heatSrc?.kind === 'months' ? 0.6 : 0.8));
+	const heatByMonth = $derived(heatSrc?.kind === 'months');
 
 	// ---------- mix table ----------
 	const mix = $derived(cur && v ? mixRows(cur, v.region, v.from, v.to, canCompare ? prev : null, v.kind !== 'day') : null);
@@ -250,7 +249,8 @@
 	// ---------- what each card covers ----------
 	const rangeChip = $derived(v ? rangeName(v.label, v.end, v.days) : '');
 	const dates = $derived(v ? span(v.from, v.to) : '');
-	const heatChip = $derived(v ? (v.end == null ? 'Last 30 days' : rangeName('30 days', v.end, 30)) : '');
+	// short ranges show at least the last week; otherwise the heat map covers what the charts above do
+	const heatChip = $derived(v && heatSrc ? (heatSrc.kind === 'days' && heatSrc.from < v.from - 6e4 ? (v.end == null ? 'Last 7 days' : rangeName('7 days', v.end, 7)) : rangeChip) : rangeChip);
 </script>
 
 <svelte:window onkeydown={(e) => { if (popped && e.key === 'Escape') popped = null; }} />
@@ -372,25 +372,32 @@
 			</p>
 		</section>
 
-		<section class="card" class:popped={popped === 'heat'} style={popped === 'heat' ? '--rh: 15px' : ''} aria-label="{hm.title} by time of day over 30 days">
+		<section class="card" class:popped={popped === 'heat'} style={popped === 'heat' ? '--rh: 15px' : ''} aria-label="{hm.title} by time of day over the range">
 			<div class="card-head">
 				<div>
 					<h2>{heatMetric === 'ren' ? 'Renewable share' : hm.title} by time of day</h2>
-					<Context range={heatChip} locked={LOCKED} items={[heatTo ? span(heatTo - 30 * DAY, heatTo) : '', heatMetric === 'ren' ? 'each half-hour, % of generation' : 'each half-hour, MW']} />
+					<Context range={heatChip} items={[heatSrc ? span(heatSrc.kind === 'days' && heatSrc.seg?.n ? heatSrc.seg.t[0] : heatSrc.from, heatSrc.to) : '',
+						(heatByMonth ? (v?.int === '1yr' ? 'yearly' : 'monthly') + ' average of each half-hour' : 'each half-hour') + (heatMetric === 'ren' ? ', % of generation' : ', MW')]} />
 				</div>
 				<div class="tools">
 					<div class="seg" role="group" aria-label="Series for the heat map">
 						{#each METRICS as x}<button type="button" aria-pressed={heatMetric === x.k} onclick={() => { heatMetric = x.k; save(); }}>{x.label}</button>{/each}
 					</div>
+					{#if heatMetric !== 'ren'}
+						<button type="button" class="tog box scale" aria-pressed={heatScaled} title={heatScaled ? 'Colours fitted to the rows shown' : 'Colours on a fixed scale (installed capacity now), so different years compare'} onclick={() => { heatScaled = !heatScaled; save(); }}><i aria-hidden="true"></i>Scale to this view</button>
+					{/if}
 					<PopButton inline open={popped === 'heat'} name="time of day chart" onclick={() => pop('heat')} />
 				</div>
 			</div>
 			{#if rows.length}
-				<GenHeat {rows} metric={heatMetric} tok={hm.tok} label="{hm.title} for each half-hour of the last 30 days" />
+				<GenHeat {rows} metric={heatMetric} tok={hm.tok} hi={heatHi} label="{hm.title} for each half-hour, {heatByMonth ? 'by month' : 'by day'}" />
 			{:else}
 				<p class="empty">Loading…</p>
 			{/if}
-			<p class="note">Always the 30 days to the end of the selected range. {heatMetric === 'ren' ? 'Brown marks the half-hours that leaned on thermal plant, usually still evenings at the peak.' : 'Darker means more.'}</p>
+			<p class="note">
+				{heatByMonth ? 'One row per ' + (v?.int === '1yr' ? 'year' : 'month') + ': the average of each half-hour.' : rows.length > 40 ? 'One row per day; scroll for earlier days.' : 'One row per day.'}
+				{heatMetric === 'ren' ? 'Brown marks the half-hours that leaned on thermal plant, usually still evenings at the peak.' : heatScaled ? 'Colours fitted to what’s shown: darker means more.' : `Colours on a fixed scale set by today’s installed ${hm.title.toLowerCase()} capacity${heatCap ? ` (${Math.round(heatCap).toLocaleString('en-NZ')} MW)` : ''}, so earlier years look paler where less was built.`}
+			</p>
 		</section>
 	</div>
 </div>
@@ -410,6 +417,7 @@
 	.tog[aria-pressed='false'] { opacity: 0.6; }
 	.tog[aria-pressed='false'] i { border-top-style: dotted; }
 	.tog.box i { width: 10px; height: 10px; border: 1.5px solid var(--f-hydro); border-radius: 2px; background: var(--f-hydro); }
+	.tog.scale i { border-color: var(--accent); background: var(--accent); }
 	.tog.box[aria-pressed='false'] i { background: none; }
 	.readout { margin: 0; font-size: 0.8rem; color: var(--ink-2); min-height: 1.3em; }
 	.readout b { font-family: var(--font-data); font-weight: 500; color: var(--ink); }
@@ -428,4 +436,9 @@
 	.empty { color: var(--muted); font-size: 0.86rem; padding: 18px 10px; margin: 0; }
 	.row2 { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 14px 18px; align-items: start; }
 	@media (max-width: 900px) { .row2 { grid-template-columns: minmax(0, 1fr); } }
+	/* big screens: share and headroom side by side, the mix and the heat map under them */
+	@media (min-width: 1600px) {
+		.lower { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px 18px; align-items: start; }
+		.row2 { grid-column: 1 / -1; }
+	}
 </style>

@@ -47,7 +47,7 @@
 	<dt>Price spikes</dt>
 	<dd>On 12 months and All: the number of half-hours in each period over $500 and over $1,000/MWh, at the chosen reference node.</dd>
 	<dt>Price by time of day</dt>
-	<dd>A heat map of the last 30 days: one row per day, one column per half-hour, coloured by price at the chosen node.</dd>
+	<dd>A heat map over the selected range (at least the last week): one row per day, one column per half-hour, coloured by price at the chosen node. On All it has one row per month (or year), each the month’s average price in that half-hour, from a file the history job keeps of every month’s time-of-day averages. The colours are fixed price bands, so periods compare; “Scale to this view” sets the bands at the sixths of the prices shown instead.</dd>
 	<dt>Range figures</dt>
 	<dd>Each node’s average and highest price over the range, and the time it was over $500/MWh.</dd>
 </dl>
