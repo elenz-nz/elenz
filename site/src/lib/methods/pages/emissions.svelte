@@ -54,8 +54,8 @@
 ]} />
 
 <h2 id="calc">The calculation</h2>
-<p class="formula">Intensity (g/kWh) = Σ (each source’s MW × its emission factor in t/MWh) ÷ total generation in MW × 1,000
-<small>total generation as on the <a href="/methods/generation#totals">generation page</a>: every source while positive, including embedded solar and battery discharge</small></p>
+<p class="formula">Intensity (g/kWh) = Σ (each source’s MW × its emission factor in t/MWh) ÷ generation less battery discharge in MW × 1,000
+<small>total generation as on the <a href="/methods/generation#totals">generation page</a> (every source while positive, including embedded solar), less battery discharge: that energy was generated, and its emissions counted, when the battery charged, so counting it again would dilute the intensity. em6 does the same (from October 2026).</small></p>
 <ul>
 	<li>Factors count the emissions at the power station only (operational, not lifecycle: building the plant and extracting the fuel aren’t included).</li>
 	<li>Geothermal and gas use each station’s own factor, weighted by its output; the other fuels use one factor each.</li>

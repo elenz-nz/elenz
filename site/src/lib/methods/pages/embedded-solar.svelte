@@ -4,7 +4,7 @@
 </script>
 
 <h2 id="what">What it covers</h2>
-<p>Solar panels on local distribution networks that the system operator doesn’t dispatch: home and business rooftops, and ground-mounted arrays of up to about 10 MW. Their output never reaches the market data as generation; it shows up only as less demand at the grid exit point. The site models it so that generation and underlying demand include it. It is shown hatched and marked as an estimate everywhere it appears.</p>
+<p>Solar panels on local distribution networks that the system operator doesn’t dispatch: home and business rooftops, and small solar farms (ground-mounted arrays of up to about 10 MW). Their output never reaches the market data as generation; it shows up only as less demand at the grid exit point. The site models it so that generation and underlying demand include it. It is shown hatched and marked as an estimate everywhere it appears.</p>
 <p>Dispatched solar farms, including those on local networks such as Kōwhai Park and Lauriston, are measured in the dispatch data and shown as grid solar, not here.</p>
 
 <h2 id="good-for">What it’s good for</h2>
@@ -32,7 +32,7 @@
 		<tbody>
 			<tr><td>Small</td><td class="n">~470 MW</td><td>Systems up to 10 kW, mostly homes</td></tr>
 			<tr><td>Large</td><td class="n">~290 MW</td><td>Systems over 10 kW: businesses, farm sheds</td></tr>
-			<tr><td>Ground-mounted</td><td class="n">~100 MW</td><td>Growth in systems over 10 kW in months when a grid exit point’s new systems averaged 1 MW or more each: arrays rather than roofs (largest at Piako, Blenheim, Southbrook, Huntly, Takanini and Huirangi; see <a href="#ground">the check below</a>)</td></tr>
+			<tr><td>Small solar farms</td><td class="n">~110 MW</td><td>Growth in systems over 10 kW in months when a grid exit point’s new systems averaged 1 MW or more each (500 kW at Ashburton): arrays rather than roofs (largest at Piako, Blenheim, Southbrook, Ashburton, Huntly, Takanini and Huirangi; see <a href="#ground">the check below</a>)</td></tr>
 		</tbody>
 	</table>
 </div>
@@ -73,9 +73,9 @@
 		<tbody>
 			<tr><td>Small</td><td>20°: 40% north, 15% north-east, 15% north-west, 10% east, 10% west; 10% at 10° north</td><td class="n">1.2</td><td class="n">11.5%</td><td class="n">0.95</td></tr>
 			<tr><td>Large</td><td>10°: 35% north, 20% east, 20% west; 25% at 25° north</td><td class="n">1.2</td><td class="n">11.5%</td><td class="n">0.95</td></tr>
-			<tr><td>Ground-mounted</td><td>20°, all north (fixed)</td><td class="n">1.35</td><td class="n">8%</td><td class="n">1.0</td></tr>
+			<tr><td>Small solar farms</td><td>20°, all north (fixed)</td><td class="n">1.35</td><td class="n">8%</td><td class="n">1.0</td></tr>
 		</tbody>
-		<caption>Rooftop orientations are assumptions, not measured. Rooftop losses: soiling 2%, shading 3%, wiring and mismatch 3%, ageing 2.5%, downtime 1.5%; ground arrays have no shading and are newer.</caption>
+		<caption>Rooftop orientations are assumptions, not measured. Rooftop losses: soiling 2%, shading 3%, wiring and mismatch 3%, ageing 2.5%, downtime 1.5%; small solar farms have no shading and are newer.</caption>
 	</table>
 </div>
 <p>Before calibration, the model gave about 1,516 kWh per kW of registered (AC) capacity over 2025, or 1,264 kWh per kW of panels.</p>
@@ -87,11 +87,11 @@
 		<p>The same satellite-and-model chain, run for dispatched solar farms whose output is measured, says how much the satellite and model over- or under-state. Once established, the farms produced between 88% and 98% of what the chain predicted for them (Lauriston, Omeheu, Rangitaiki, Kohirā, Te Herenga o Te Rā, Dannevirke), and the satellite’s yearly sunshine runs up to about 5% above NIWA’s long-term figures in places.</p>
 		<p>So rooftop output is multiplied by 0.95, the middle of that evidence. The “about 6%” is how uncertain that factor is: the right figure could plausibly be anywhere from about 0.89 to 1.01 (one standard deviation). It isn’t applied on top of the 0.95; it is one of the parts of the uncertainty band below.</p>
 	</dd>
-	<dt id="ground">Ground-mounted arrays</dt>
+	<dt id="ground">Small solar farms</dt>
 	<dd>
-		<p>Which registry capacity is ground-mounted comes from the registry itself: growth in systems over 10 kW in months when a grid exit point’s new systems averaged 1 MW or more. That gave about 101 MW in September 2026, largest at Piako (Thames Valley), Blenheim, Southbrook, Huntly, Takanini and Huirangi.</p>
+		<p>Small solar farms are ground-mounted arrays on local networks, up to about 10 MW, that the market doesn’t dispatch. Which registry capacity is one comes from the registry itself: growth in systems over 10 kW in months when a grid exit point’s new systems averaged 1 MW or more (500 kW at Ashburton, below). That gives about 112 MW in September 2026, largest at Piako (Thames Valley), Blenheim, Southbrook, Ashburton, Huntly, Takanini and Huirangi.</p>
 		<p>To check it, every solar export series in the EA’s reconciliation data for August and September 2026 was looked at: 208 series of 0.5 MW or more, one per grid exit point, network and retailer. On their sunniest days, 11 had flat-topped output, at least 2½ hours within 3% of the day’s peak. That shape comes from a big installation whose panels outrun its inverter (or from an export limit); rooftops added together give a rounded curve instead. They were at Blenheim (two, about 22 MW between them), Takanini (11 MW), Southbrook (two, 11 MW), Tuai (4.6 MW), Ashburton, Masterton, Huntly, Waihou and Waikino (2.5–3.7 MW each).</p>
-		<p>Eight of those nine places are among those the registry rule picks out; Ashburton isn’t (about 4 MW, so the estimate treats it as rooftops there). Piako and Huirangi, which the rule counts as ground-mounted, export a rounded curve: their arrays may use much of their own output on site, or track the sun.</p>
+		<p>Eight of those nine places are among those the registry rule picks out. Ashburton’s arrays went in as batches of smaller systems (6.5 MW across 8 in December 2024, 4.6 MW across 8 in August 2025, averaging 500–800 kW), below the rule’s 1 MW, so the rule uses 500 kW there: about 11 MW (October 2026). Piako and Huirangi export a rounded curve, but that comes from using much of their output on site, or from tracking the sun; what is modelled is their generation, not their exports, so they stay small solar farms.</p>
 		<p>The ground type’s settings were fitted to the metered output at Blenheim and Southbrook, the largest flat-topped sites: fixed north-facing panels at 15–25° with DC/AC 1.3–1.4. Modelled as rooftops they came out about 20% low; as their own type, both places come within about 2%.</p>
 	</dd>
 	<dt>Metered exports</dt>

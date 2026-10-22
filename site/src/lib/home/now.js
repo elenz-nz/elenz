@@ -1,6 +1,6 @@
 // The home page's figures: the newest interval of tracker.json, by island and for New Zealand.
 // Totals follow the tracker: generation is the sum of each fuel's output (battery discharge only, no HVDC), the
-// renewable share and emissions intensity are of that total.
+// renewable share and emissions intensity are of that total less battery discharge.
 import { FUELS } from '#lib/tracker/fuels.js';
 import { efAt, geoFactor } from '#lib/tracker/emissions.js';
 
@@ -16,15 +16,19 @@ export function summarise(D) {
   const efOf = (f, isl) => (f.k === 'geo' ? geoFactor(geoPlants(isl), j, t) ?? efAt(f, t) : efAt(f, t));
   const region = (pick, isl) => {
     const fuels = Object.fromEntries(GEN.map((f) => [f.k, pick(f.k)]));
-    let gen = 0, ren = 0, co2 = 0;
+    // battery discharge counts in generation but not in the renewable share or emissions intensity (as em6): it was
+    // generated, and counted, once already when the battery charged
+    let gen = 0, base = 0, ren = 0, co2 = 0;
     for (const f of GEN) {
       const x = fuels[f.k];
       if (x <= 0) continue;
       gen += x;
+      if (f.k === 'batt') continue;
+      base += x;
       if (f.ren) ren += x;
       co2 += x * efOf(f, isl);
     }
-    return { fuels, gen, ren: gen > 0 ? (ren / gen) * 100 : 0, co2: gen > 0 ? (co2 / gen) * 1000 : 0 };
+    return { fuels, gen, ren: base > 0 ? (ren / base) * 100 : 0, co2: base > 0 ? (co2 / base) * 1000 : 0 };
   };
   const isl = (r) => ({
     ...region((k) => at(r, k), r),

@@ -3,11 +3,11 @@
 </script>
 
 <h2 id="renewable">Renewable share</h2>
-<p class="formula">Renewable share = renewable generation ÷ total generation × 100%</p>
+<p class="formula">Renewable share = renewable generation ÷ (total generation − battery discharge) × 100%</p>
 <ul>
 	<li><b>Renewable:</b> geothermal, bioenergy, hydro, wind, grid solar and embedded solar.</li>
 	<li><b>Not renewable:</b> Huntly’s coal/gas Rankine units, gas, diesel and waste heat (Glenbrook).</li>
-	<li><b>Neither:</b> batteries store energy rather than make it; their discharge counts towards total generation but not as renewable. The HVDC link isn’t generation.</li>
+	<li><b>Neither:</b> batteries store energy rather than make it; their discharge counts towards total generation, but is left out of the renewable share altogether (as em6 does): that energy was generated, and counted, when the battery charged. The HVDC link isn’t generation.</li>
 </ul>
 <p>Total generation is as on the <a href="/methods/generation#totals">generation page</a>, including embedded solar. Geothermal counts as renewable although it emits some CO₂ (about 0.05 t/MWh across the fleet now; see <a href="/methods/emissions#geothermal">emissions</a>). Glenbrook counts as zero emissions but not renewable: its fuel is the off-gas of coal-fed ironmaking. Over a range, the share is weighted by generation.</p>
 <p class="note">Official figures, such as MBIE’s, count renewable generation over a year and include plants that aren’t in the market data, so they can differ from the share here.</p>

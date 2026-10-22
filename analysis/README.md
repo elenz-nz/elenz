@@ -68,7 +68,8 @@ capacity, ~1,264 kWh per kW of panels, before calibration.
   Lauriston undecided (×1.01). Fixed at Twin Rivers, Taiohi, Papareireiā, Tauhei (north; Tauhei new, 147 MW),
   Omeheu and Pukenui (east-west vs north nearly tied). Kōwhai Park can't be fitted: dispatch held at ~130-135 MW
   (of ~160 MW AC) and stopped abruptly, to zero for the rest of the day, at 18:10 on 16 Oct, 17:15 on 18 Oct and
-  16:45 on 19 Oct; no output at all 20-22 Oct (as of 22 Oct).
+  16:45 on 19 Oct; no output at all 20-22 Oct (as of 22 Oct). Owner (22 Oct 2026): it tripped off twice and hasn't
+  come back; photos show single-axis trackers, turning east to west, so it is recorded as tracking without a fit.
 - Hence `CAL = 0.95` (about ±6%: one standard deviation on the factor, so about 0.89-1.01; it feeds the
   uncertainty band, it isn't applied on top).
 - Clear-day peaks (`solar_peak_check.py`, 22 Oct 2026): the estimate's highest so far is 748 MW (1 pm, 18 Oct 2026),

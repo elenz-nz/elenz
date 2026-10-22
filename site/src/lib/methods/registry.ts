@@ -31,7 +31,7 @@ export const TOPICS: Topic[] = [
 		summary: 'Solar on local networks that isn’t dispatched, mostly rooftops. Nobody measures it as it happens, so it is modelled from installed capacity and satellite sunshine.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
 		estimate: true,
-		updated: '2026-10-22',
+		updated: '2026-10-23',
 	},
 	{
 		slug: 'demand',
@@ -67,14 +67,14 @@ export const TOPICS: Topic[] = [
 		title: 'Emissions intensity',
 		summary: 'Greenhouse gas per kilowatt-hour generated, from each fuel’s output and emission factor. Every factor the site uses is listed here, with where it comes from.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
-		updated: '2026-10-22',
+		updated: '2026-10-23',
 	},
 	{
 		slug: 'groupings',
 		title: 'Renewable share and groupings',
 		summary: 'How fuels are counted as renewable or fossil, flexible or variable, and how plants are grouped by site, hydro scheme and owner.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
-		updated: '2026-10-17',
+		updated: '2026-10-23',
 	},
 	{
 		slug: 'capacity',

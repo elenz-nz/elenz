@@ -22,7 +22,7 @@ doesn't: dispatch runs 1-2% above metered (wind ~3.5%), so near misses often don
 is settled, `resolved` says which way it went for NEW_DAYS. The website also checks the live week itself.
 
 Definitions follow the rest of the site (src/lib/home/now.js): generation is each fuel's output summed, battery
-discharge only, no HVDC; the renewable share is of that total (geothermal, bioenergy, hydro, wind, grid and embedded
+discharge only, no HVDC; the renewable share is of that total less battery discharge (geothermal, bioenergy, hydro, wind, grid and embedded
 solar); fossil generation is the Rankines (coal or gas), gas, diesel and waste heat; demand is metered grid demand;
 prices are the island reference nodes (Haywards, Benmore), New Zealand's the higher of the two; HVDC is the mid-link
 transfer, northward positive. Embedded solar is modelled, so its records are estimates (the page says so).
@@ -40,7 +40,8 @@ import pandas as pd
 
 from common import NZ
 
-VERSION = 2                # bump when summarise() changes: every month's summary is remade (2: per-day sums for periods)
+VERSION = 3                # bump when summarise() changes: every month's summary is remade (2: per-day sums for periods;
+                           # 3: renewable share without battery discharge)
 REGIONS = ('NZ', 'NI', 'SI')
 GEN = ('geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
 REN = ('geo', 'bio', 'hydro', 'wind', 'solar', 'roof')
@@ -119,7 +120,9 @@ def series(js):
     out = {k: {} for k in list(HALF_HOURS) + list(RUNS) + ['gen', 'renE', 'windE']}
     for r in REGIONS:
         F = {f: np.maximum(v, 0) for f, v in fu[r].items()}   # as the site: each fuel's output, battery discharge only
-        gen = sum(F.values())
+        # the renewable share is of generation less battery discharge (as em6 and the site): that energy was generated,
+        # and counted, once already when the battery charged
+        gen = sum(v for f, v in F.items() if f != 'batt')
         ren = sum(F[f] for f in REN)
         share = np.where(gen > 0, 100 * ren / np.where(gen > 0, gen, 1), np.nan)
         dem = a('NI', 'metered') + a('SI', 'metered') if r == 'NZ' else a(r, 'metered')

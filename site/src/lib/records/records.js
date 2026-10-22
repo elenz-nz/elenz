@@ -212,9 +212,10 @@ function halfHours(D) {
   for (const r of ['NZ', 'NI', 'SI']) {
     const fuel = (f) => (r === 'NZ' ? a('NI', f).map((x, j) => x + a('SI', f)[j]) : a(r, f));
     const F = Object.fromEntries(GEN.map((f) => [f, fuel(f).map((x) => Math.max(0, x))]));
+    // the renewable share leaves battery discharge out (as records.py and the rest of the site)
     const gen = new Array(n).fill(0), ren = new Array(n).fill(0), fos = new Array(n).fill(0);
     for (let j = 0; j < n; j++) {
-      for (const f of GEN) gen[j] += F[f][j];
+      for (const f of GEN) if (f !== 'batt') gen[j] += F[f][j];
       for (const f of REN) ren[j] += F[f][j];
       for (const f of FOSSIL) fos[j] += F[f][j];
     }

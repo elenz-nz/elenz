@@ -341,17 +341,19 @@ export function mountTracker(D, hooks = {}) {
       for (const p of ps) for (let i = 0; i < M.N; i++) { const x = p.s[i]; if (x > 0) { mw[i] += x; em[i] += x * plantEf(k, p.name, M.t[i]); } }
       own[k] = { em: avg(em), mw: avg(mw) };
     }
-    v.gen = new Float64Array(n); v.co2 = new Float64Array(n); v.ren = new Float64Array(n);
+    // the renewable share and emissions intensity leave battery discharge out (as em6 does): that energy was
+    // generated, and counted, once already when the battery charged (v.genR: the generation they're shares of)
+    v.gen = new Float64Array(n); v.genR = new Float64Array(n); v.co2 = new Float64Array(n); v.ren = new Float64Array(n);
     for (let j = 0; j < n; j++) {
-      let tot = 0, em = 0, re = 0;
+      let tot = 0, base = 0, em = 0, re = 0;
       for (const f of FUELS) {
         if (f.k === 'hvdc') continue;
         const x = v.fuels[f.k][j];
         const o = own[f.k];
         const ef = o && o.mw[j] > 0 ? o.em[j] / o.mw[j] : efAt(f, v.t[j]);
-        if (x > 0) { tot += x; em += x * ef; if (f.ren) re += x; }
+        if (x > 0) { tot += x; if (f.k !== 'batt') { base += x; em += x * ef; if (f.ren) re += x; } }
       }
-      v.gen[j] = tot; v.co2[j] = tot ? em / tot * 1000 : 0; v.ren[j] = tot ? re / tot * 100 : 0;
+      v.gen[j] = tot; v.genR[j] = base; v.co2[j] = base ? em / base * 1000 : 0; v.ren[j] = base ? re / base * 100 : 0;
     }
     return v;
   }
@@ -1036,7 +1038,7 @@ export function mountTracker(D, hooks = {}) {
       for (let i = 0; i < V.n; i++) {
         const w = V.hrs[i]; hs += w; pn += V.pNI[i] * w; ps += V.pSI[i] * w; hv += V.hvdc[i] * w;
         pk = Math.max(pk, V.pkMet[i]); if (V.pkGen) pkg = Math.max(pkg, V.pkGen[i]);
-        em += V.co2[i] * V.gen[i] * w; re += V.ren[i] * V.gen[i] * w; gw += V.gen[i] * w;
+        em += V.co2[i] * V.genR[i] * w; re += V.ren[i] * V.genR[i] * w; gw += V.genR[i] * w;
       }
       setSys([
         ...plantRows(true),

@@ -166,7 +166,7 @@
 
 			<section aria-labelledby="all-h" class="sec">
 				<div class="sec-head">
-					<div class="ttl-row"><h2 id="all-h">All-time records · {regionName}</h2><InfoTip label="About these records">Official records use the EA’s metered data and final prices, which arrive 5–6 weeks after each month (final prices a day or two). Newer records come from dispatch data and stay provisional until the metered month confirms them. Embedded solar is modelled, and days the clocks change are left out of the generation and demand records. <a href="/methods/records">How records work</a></InfoTip></div>
+					<div class="ttl-row"><h2 id="all-h">All-time records · {regionName}</h2><InfoTip label="About these records">Official records use the EA’s metered data and final prices, which arrive 5–6 weeks after each month (final prices a day or two). Newer records come from dispatch data and stay provisional until the metered month confirms them. Embedded solar is modelled. <a href="/methods/records">How records work</a></InfoTip></div>
 					<span class="unit">{period === 'tp' ? 'Half-hour averages unless stated' : `Averages over each ${periodOf(period).word}; runs are any length`}</span>
 				</div>
 				<div class="seg per" role="group" aria-label="Records for each">
@@ -262,10 +262,6 @@
 				</section>
 			</div>
 
-<<<<<<< HEAD
-=======
-			<p class="foot">Official records use the EA’s metered data and final prices, which arrive 5–6 weeks after each month (final prices a day or two). Newer records come from dispatch data and stay provisional until the metered month confirms them. Embedded solar is modelled. <a href="/methods/records">How records work</a></p>
->>>>>>> 26147f0 (Next rebuild: Generation_MD's clock-numbered change days before 2009 renumbered (BUILD 7))
 		{/if}
 	</main>
 

@@ -5,10 +5,10 @@ These changes touch files in the history's rebuild fingerprint (`mapping_hash()`
 them starts a rebuild of every month (~4 days at the KV write budget). Bundle them and push them together, and never
 while a rebuild is still running (check `/data/history/progress.json`: `rebuild_left` empty).
 
-All six are ready on the branch `next-rebuild` (items 1-4 and 6 on 17 Oct 2026, item 5 on 21 Oct 2026; `BUILD` 7).
-Cam is holding it (21 Oct 2026) to add more while testing: add further rebuild changes to this branch. To run them: once the current rebuild has finished,
-merge the branch into `main` (on GitHub: open a pull request from `next-rebuild` and merge it), which starts the
-rebuild by itself. When it has finished, delete this file's done items, the old-name entries at the end of
+Items 1-6 were prepared on the branch `next-rebuild` (17-21 Oct 2026; `BUILD` 7).
+Merged into `main` on 23 Oct 2026 (testing round 2, batch G, with item 7), which started the rebuild (BUILD 7); it
+runs until about 27 Oct at the KV write budget. When it has finished, check items 1-7 as each describes, run the Offers
+workflow with "resummarise" ticked (item 6), then delete this file's done items, the old-name entries at the end of
 `[plant_owners]` in `overrides.toml`, and `GAS_ALIAS` in `site/src/lib/tracker/emissions.js`.
 
 ## 1. Mill Creek, May 2014 to Aug 2015 (added 17 Oct 2026)
@@ -81,6 +81,12 @@ so it rides on this rebuild. After it:
 - Run the Offers workflow by hand with "resummarise" ticked, so each month's lowest offered headroom uses the rebuilt output.
 - On `/methods/capacity#headroom`, replace the sentences about the next rebuild with: daily history keeps each day's
   highest half-hour of dispatchable output, so installed headroom's lowest reaches back to 1997.
+
+## 7. Small solar farms at Ashburton (added 23 Oct 2026)
+
+`rooftop.py` `GROUND_KW_AT`: Ashburton (ASB0661) counts growth in systems over 10 kW as small solar farms (ground
+type) at 500 kW average new size rather than 1 MW, adding ~11 MW there (owner decision, 22 Oct 2026). Piako and
+Huirangi stay as the rule has them. Every month's embedded solar changes, so it rides on this rebuild.
 
 ## Not fixable from EMI data
 

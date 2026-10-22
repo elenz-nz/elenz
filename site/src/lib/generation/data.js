@@ -41,13 +41,14 @@ function mwAt(S, k, region, i) {
   return Math.max(0, v);
 }
 
-/** Per point: total generation and the metric's part of it, in MW. */
+/** Per point: total generation and the metric's part of it, in MW. Shares are of generation less battery discharge
+ *  (as em6): that energy was generated, and counted, once already when the battery charged. */
 export function shares(S, region, mk) {
   const parts = METRIC[mk].parts, n = S.n;
   const part = new Float64Array(n), tot = new Float64Array(n), pct = new Float64Array(n);
   for (let i = 0; i < n; i++) {
     let a = 0, b = 0;
-    for (const k of GEN) { const v = mwAt(S, k, region, i); b += v; if (parts.includes(k)) a += v; }
+    for (const k of GEN) { if (k === 'batt') continue; const v = mwAt(S, k, region, i); b += v; if (parts.includes(k)) a += v; }
     part[i] = a; tot[i] = b; pct[i] = b > 0 ? (100 * a) / b : NaN;
   }
   return { part, tot, pct };
@@ -163,7 +164,7 @@ export function mixRows(S, region, from, to, prev, fine) {
   const hours = (to - from) / 36e5;
   const energy = (seg, k) => { let e = 0; if (seg) for (let i = 0; i < seg.n; i++) e += mwAt(seg, k, region, i) * seg.h[i]; return e; };
   const rows = [];
-  let tot = 0, totPrev = 0, ren = 0, renPrev = 0, peakTot = 0;
+  let tot = 0, totPrev = 0, ren = 0, renPrev = 0, peakTot = 0, base = 0, basePrev = 0;   // base: less battery discharge
   if (fine) for (let i = 0; i < S.n; i++) { let v = 0; for (const k of GEN) v += mwAt(S, k, region, i); peakTot = Math.max(peakTot, v); }
   for (const f of FUELS) {
     if (f.k === 'hvdc') continue;
@@ -171,15 +172,15 @@ export function mixRows(S, region, from, to, prev, fine) {
     let peak = 0;
     if (fine) for (let i = 0; i < S.n; i++) peak = Math.max(peak, mwAt(S, f.k, region, i));
     const cap = capacityMWh(f.k, region, from, to);
-    tot += e; if (f.ren) ren += e;
-    if (prev) { totPrev += ep; if (f.ren) renPrev += ep; }
+    tot += e; if (f.ren) ren += e; if (f.k !== 'batt') base += e;
+    if (prev) { totPrev += ep; if (f.ren) renPrev += ep; if (f.k !== 'batt') basePrev += ep; }
     if (e < 0.5 && !(ep > 0.5)) continue;   // nothing from this fuel in either window
     rows.push({ f, e, ep, share: 0, avg: e / hours, peak: fine ? peak : NaN, cf: cap > 0 ? e / cap : NaN });
   }
   for (const r of rows) r.share = tot > 0 ? r.e / tot : 0;
   return {
     rows, tot, totPrev: prev ? totPrev : NaN, avg: tot / hours, peak: fine ? peakTot : NaN,
-    ren, renShare: tot > 0 ? ren / tot : NaN, renSharePrev: prev && totPrev > 0 ? renPrev / totPrev : NaN,
+    ren, renShare: base > 0 ? ren / base : NaN, renSharePrev: prev && basePrev > 0 ? renPrev / basePrev : NaN,
   };
 }
 
