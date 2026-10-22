@@ -213,8 +213,19 @@
 	// ending at midnight leaves out the interval that starts then
 	const windowOf = (S: any, from: number, to: number) => slice(S, firstAtOrAfter(S.t, from), firstAtOrAfter(S.t, to));
 	const latestT = $derived(live ? live.t[live.n - 1] : 0);
+	// whether the live week covers a window starting at `from`: always for the latest window (the live week holds
+	// 7 days less one 5-minute interval, so "7 days" starts one interval before it, as on the Generation tab), and
+	// otherwise within one interval of its start
+	const liveCovers = (from: number) => !!live && (endT === null || from >= live.t[0] - 3e5);
 	// a window ending before the live week reaches back past it: the live ranges then come from half-hourly history
-	const pastLive = $derived(R.src === 'live' && endT !== null && live && endT - (R.days ?? 0) * 864e5 < live.t[0]);
+	const pastLive = $derived(R.src === 'live' && endT !== null && !!live && !liveCovers(windowAt(R).from));
+	/** The window a range shows: [from, to), ending at the chosen date or the latest data. */
+	function windowAt(r: { days: number | null }) {
+		const latest = live.t[live.n - 1];
+		const to = r.days == null || endT === null ? latest + 1 : Math.min(endT, latest + 1);
+		const from = r.days == null ? 0 : endT !== null && to === endT ? addDays(to, -r.days) : to - r.days * 864e5;   // whole local days, like the Generation tab
+		return { from, to };
+	}
 	const intChoices = $derived(pastLive && R.past ? R.past : R.ints);
 	const effInt = $derived(intPicked && intChoices.includes(int) ? int : R.def && intChoices.includes(R.def) ? R.def : intChoices[0]);
 
@@ -223,9 +234,7 @@
 		if (!live) return;
 		const my = ++token;
 		const r = (RANGES as any)[range];
-		const latest = live.t[live.n - 1];
-		const to = r.days == null || endT === null ? latest + 1 : Math.min(endT, latest + 1);
-		const from = r.days == null ? 0 : endT !== null && to === endT ? addDays(to, -r.days) : to - r.days * 864e5;   // whole local days, like the Generation tab
+		const { from, to } = windowAt(r);
 		const iv = effInt;
 		viewError = '';
 		// the zoom narrows the window (5-minute and half-hourly views only); ignored if it would leave under two points
@@ -236,7 +245,7 @@
 			if (zt - zf >= (iv === '30m' ? 36e5 : 2 * 3e5)) isZoomed = true; else { zf = from; zt = to; }
 		}
 		try {
-			if (r.src === 'live' && from >= live.t[0] - 1) {
+			if (r.src === 'live' && liveCovers(from)) {
 				setView(timeView(atInterval(windowOf(live, zf, zt), iv)), isZoomed);
 			} else if (r.src !== 'day') {
 				if (!store.has('hh', from, to)) { busy = true; await store.load('hh', from, to); }
@@ -909,12 +918,11 @@
 		<section class="card" class:popped={popped === 'cap'}>
 			<div class="card-head">
 				<div>
-					<div class="ttl-row"><h2>Price captured by fuel</h2><InfoTip>Percent is against the average of all fuels. <a href="/methods/prices#derived">How it's worked out</a></InfoTip></div>
+					<div class="ttl-row"><h2>Price captured by fuel</h2><InfoTip>What each fuel earned over the range: its output × its island's price, divided by its output. Percent is against the average of all fuels. Battery (charging) is what batteries paid to charge, left out of the average. Hover over a bar (or tap it) for its energy in GWh and what it earned or paid. <a href="/methods/prices#derived">How it's worked out</a></InfoTip></div>
 					<Context range={rangeName(R.label, endT, R.days)} items={[win ? span(win.from, win.to) : '']} />
 				</div>
 				<PopButton inline open={popped === 'cap'} name="price captured by fuel chart" onclick={() => (popped = popped === 'cap' ? null : 'cap')} />
 			</div>
-			<p class="sub">What each fuel earned over the range: its output × its island's price, divided by its output. Battery (charging) is what batteries paid to charge, left out of the average.</p>
 			{#if rangeStats && rangeStats.cap.rows.length}
 				<FuelBars rows={rangeStats.cap.rows} avg={rangeStats.cap.avg} />
 			{:else}
@@ -955,7 +963,6 @@
 	.card { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px 16px; display: grid; gap: 10px; min-width: 0; }
 	.card > :global(*) { min-width: 0; }
 	.card h2 { font-size: 0.86rem; font-weight: 600; margin: 0; }
-	.card .sub { margin: 2px 0 0; color: var(--muted); font-size: 0.8rem; }
 	.tog-scale { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 0.78rem; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2px 10px; min-height: 30px; cursor: pointer; }
 	.tog-scale i { width: 10px; height: 10px; border: 1.5px solid var(--accent); border-radius: 2px; background: var(--accent); }
 	.tog-scale[aria-pressed='false'] { opacity: 0.6; }
