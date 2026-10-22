@@ -105,11 +105,9 @@
 			<div class="h-row">
 				<h1><span class="dot" style="--c:var({d.tok})"></span>{fullName(d)}{#if d.est}<span class="tag est">Estimate</span>{/if}</h1>
 				{#if d.regions.length > 1}
-					<div class="seg" role="group" aria-label="Region">
-						{#each REGIONS as r}
-							<button type="button" aria-pressed={region === r.id} onclick={() => setRegion(r.id)}>{r.name}</button>
-						{/each}
-					</div>
+					<select class="pick" aria-label="Region" value={region} onchange={(e) => setRegion((e.currentTarget as HTMLSelectElement).value)}>
+						{#each REGIONS as r}<option value={r.id}>{r.name}</option>{/each}
+					</select>
 				{/if}
 			</div>
 			<p class="sub">{d.sub}</p>
@@ -244,7 +242,6 @@
 	.h-row { display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; }
 	h1 { font-size: 1.6rem; letter-spacing: -0.02em; line-height: 1.15; display: flex; align-items: center; flex-wrap: wrap; }
 	.sub { margin: 0; color: var(--ink-2); }
-	.seg button { min-height: 32px; padding-inline: 12px; font-size: 0.84rem; }
 	.dot { display: inline-block; flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--c); margin-right: 10px; }
 	.tag { display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em; padding: 1px 7px; border-radius: 999px; background: var(--grid); color: var(--ink-2); margin-left: 8px; white-space: nowrap; }
 	.tag.new { background: var(--warn-bg); color: var(--warn-ink); }
@@ -312,6 +309,5 @@
 	@media (max-width: 640px) {
 		h1 { font-size: 1.3rem; }
 		.big .val { font-size: 2.3rem; }
-		.seg button { padding-inline: 9px; }
 	}
 </style>

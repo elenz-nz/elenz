@@ -646,8 +646,11 @@
 	{/if}
 {/snippet}
 
-{#snippet popBtn(id: string, name: string)}
+{#snippet info(id: string)}
 	<InfoTip label="About this chart">{@render chartInfo(id)}</InfoTip>
+{/snippet}
+
+{#snippet popBtn(id: string, name: string)}
 		<button type="button" class="pop-btn" onclick={() => (popped = popped === id ? null : id)} aria-pressed={popped === id}
 			aria-label={popped === id ? `Shrink the ${name} chart` : `Enlarge the ${name} chart`} title={popped === id ? 'Close' : 'Enlarge'}>
 			{#if popped === id}
@@ -667,9 +670,9 @@
 				<div class="chart" class:popped={popped === 'price'}>
 					<div class="ch-head">
 						{#if view.mode === 'time'}
-							<h2>Wholesale price</h2><span class="unit">$/MWh at each node</span>
+							<h2>Wholesale price</h2>{@render info('price')}<span class="unit">$/MWh at each node</span>
 						{:else}
-							<h2>Price range</h2><span class="unit">$/MWh, each {effInt === '1d' ? 'day' : effInt === '1w' ? 'week' : 'month'}'s half-hours</span>
+							<h2>Price range</h2>{@render info('price')}<span class="unit">$/MWh, each {effInt === '1d' ? 'day' : effInt === '1w' ? 'week' : 'month'}'s half-hours</span>
 						{/if}
 						<div class="legends">
 							{#if view.mode === 'time'}
@@ -716,7 +719,7 @@
 			{#if view && priceY}
 				<div class="chart" class:popped={popped === 'spread'}>
 					<div class="ch-head">
-						<h2>Island spread</h2><span class="unit">Haywards − Benmore, $/MWh{view.mode === 'long' ? ', average' : ''}</span>
+						<h2>Island spread</h2>{@render info('spread')}<span class="unit">Haywards − Benmore, $/MWh{view.mode === 'long' ? ', average' : ''}</span>
 						<div class="legends">
 							<span class="lg"><i class="area" style="--c: var(--o1)"></i>North Island dearer</span>
 							<span class="lg"><i class="area" style="--c: var(--o2)"></i>South Island dearer</span>
@@ -731,7 +734,7 @@
 				{#if view.mode === 'time'}
 					<div class="chart" class:popped={popped === 'hvdc'}>
 						<div class="ch-head">
-							<h2>HVDC transfer</h2><span class="unit">MW, northward positive</span>
+							<h2>HVDC transfer</h2>{@render info('hvdc')}<span class="unit">MW, northward positive</span>
 							<div class="legends"><span class="lg"><i class="area" style="--c: var(--f-hvdc)"></i>Benmore ⇄ Haywards <b>{mw(valOf(view.hvdc))}</b></span></div>
 							{@render popBtn('hvdc', 'HVDC transfer')}
 						</div>
@@ -742,7 +745,7 @@
 				{:else if spikeY}
 					<div class="chart" class:popped={popped === 'spikes'}>
 						<div class="ch-head">
-							<h2>Price spikes</h2><span class="unit">half-hours at {NODE[bandKey].name}</span>
+							<h2>Price spikes</h2>{@render info('spikes')}<span class="unit">half-hours at {NODE[bandKey].name}</span>
 							<div class="legends">
 								<span class="lg"><i class="area" style="--c: var(--o1); opacity: 0.45"></i>Over $500</span>
 								<span class="lg"><i class="area" style="--c: var(--o1)"></i>Over $1,000</span>
@@ -836,10 +839,9 @@
 		<section class="card" class:popped={popped === 'cap'}>
 			<div class="card-head">
 				<div>
-					<h2>Price captured by fuel</h2>
+					<div class="ttl-row"><h2>Price captured by fuel</h2><InfoTip>Percent is against the average of all fuels. <a href="/methods/prices#derived">How it's worked out</a></InfoTip></div>
 					<Context range={rangeName(R.label, endT, R.days)} items={[win ? span(win.from, win.to) : '']} />
 				</div>
-				<InfoTip>Percent is against the average of all fuels. <a href="/methods/prices#derived">How it's worked out</a></InfoTip>
 				<PopButton inline open={popped === 'cap'} name="price captured by fuel chart" onclick={() => (popped = popped === 'cap' ? null : 'cap')} />
 			</div>
 			<p class="sub">What each fuel earned over the range: its output × its island's price, divided by its output.</p>
@@ -852,7 +854,7 @@
 		<section class="card" class:popped={popped === 'heat'} style={popped === 'heat' ? '--rh: 15px' : ''}>
 			<div class="card-head">
 				<div>
-					<h2>Price by time of day</h2>
+					<div class="ttl-row"><h2>Price by time of day</h2><InfoTip>{heatSeg?.kind === 'months' ? `One row per ${effInt === '1yr' ? 'year' : 'month'}: the average price in each half-hour.` : heatRows.length > 40 ? 'One row per day; scroll for earlier days.' : 'One row per day.'} {heatScaled ? 'Colours fitted to the prices shown.' : 'Colours on fixed price bands, so periods compare.'}</InfoTip></div>
 					<Context range={heatShort ? (endT === null ? 'Last 7 days' : rangeName('7 days', endT, 7)) : rangeName(R.label, endT, R.days)} items={[heatSpan, NODE[heatKey]?.name, heatSeg?.kind === 'months' ? (effInt === '1yr' ? 'yearly' : 'monthly') + ' average of each half-hour' : 'each half-hour']} />
 				</div>
 				<div class="tools">
@@ -862,7 +864,6 @@
 					{/each}
 				</div>
 				<button type="button" class="tog-scale" aria-pressed={heatScaled} title={heatScaled ? 'Colours fitted to the prices shown' : 'Colours on fixed price bands, so different periods compare'} onclick={() => (heatScaled = !heatScaled)}><i aria-hidden="true"></i>Scale to this view</button>
-				<InfoTip>{heatSeg?.kind === 'months' ? `One row per ${effInt === '1yr' ? 'year' : 'month'}: the average price in each half-hour.` : heatRows.length > 40 ? 'One row per day; scroll for earlier days.' : 'One row per day.'} {heatScaled ? 'Colours fitted to the prices shown.' : 'Colours on fixed price bands, so periods compare.'}</InfoTip>
 				<PopButton inline open={popped === 'heat'} name="price by time of day chart" onclick={() => (popped = popped === 'heat' ? null : 'heat')} />
 				</div>
 			</div>

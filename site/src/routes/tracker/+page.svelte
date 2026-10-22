@@ -153,8 +153,11 @@
 	{/if}
 {/snippet}
 
-{#snippet popBtn(id: string, name: string)}
+{#snippet info(id: string)}
 	<InfoTip label="About this chart">{@render chartInfo(id)}</InfoTip>
+{/snippet}
+
+{#snippet popBtn(id: string, name: string)}
 	<button type="button" class="pop-btn" onclick={() => togglePop(id)} aria-pressed={popped === id}
 		aria-label={popped === id ? `Shrink the ${name} chart` : `Enlarge the ${name} chart`} title={popped === id ? 'Close' : 'Enlarge'}>
 		{#if popped === id}
@@ -263,7 +266,7 @@
 		<section class="charts" id="charts" tabindex="0" aria-label="Generation chart. Hover or use the left and right arrow keys to read values at a point in time, Page Up and Page Down to move by the range; Escape returns to range totals.">
 			<div class="chart gen" class:popped={popped === 'gen'}>
 				<div class="ch-head">
-					<h2 class="crumbs" id="gen-title">Generation</h2><span class="unit" id="gen-unit">MW, stacked by fuel</span>
+					<h2 class="crumbs" id="gen-title">Generation</h2>{@render info('gen')}<span class="unit" id="gen-unit">MW, stacked by fuel</span>
 					<div class="legends">
 						<span class="lg" id="lg-tot">Total <b id="v-gen"></b></span>
 						<select class="grp" id="sel-view" aria-label="Group the generation sources">
@@ -296,7 +299,7 @@
 		<section class="charts" id="charts-more" tabindex="0" aria-label="Price, demand, HVDC, emissions and renewables charts, on the same time axis as generation.">
 			<div class="chart" class:popped={popped === 'price'}>
 				<div class="ch-head">
-					<h2>Wholesale price</h2><span class="unit">$/MWh</span>
+					<h2>Wholesale price</h2>{@render info('price')}<span class="unit">$/MWh</span>
 					<div class="legends">
 						<span class="lg" id="lg-pni"><i style="--c:var(--p-ni)"></i>North Island · Haywards <b id="v-pni"></b></span>
 						<span class="lg" id="lg-psi"><i style="--c:var(--p-si)"></i>South Island · Benmore <b id="v-psi"></b></span>
@@ -308,7 +311,7 @@
 			</div>
 			<div class="chart" class:popped={popped === 'demand'}>
 				<div class="ch-head">
-					<h2>Demand</h2><span class="unit">MW</span>
+					<h2>Demand</h2>{@render info('demand')}<span class="unit">MW</span>
 					<div class="legends">
 						<span class="lg"><i style="--c:var(--ink)"></i>Metered <b id="v-met"></b></span>
 						<span class="lg"><i class="dash" style="--c:var(--ink-2)"></i>With embedded solar <b id="v-und"></b></span>
@@ -319,17 +322,17 @@
 				<canvas id="cv-demand" role="img" aria-label="Line chart of metered and underlying demand"></canvas>
 			</div>
 			<div class="chart" class:popped={popped === 'hvdc'}>
-				<div class="ch-head"><h2>HVDC transfer</h2><span class="unit">MW, northward positive</span><div class="legends"><span class="lg"><i class="area" style="--c:var(--f-hvdc)"></i>Benmore ⇄ Haywards <b id="v-hv"></b></span></div>{@render popBtn('hvdc', 'HVDC transfer')}</div>
+				<div class="ch-head"><h2>HVDC transfer</h2>{@render info('hvdc')}<span class="unit">MW, northward positive</span><div class="legends"><span class="lg"><i class="area" style="--c:var(--f-hvdc)"></i>Benmore ⇄ Haywards <b id="v-hv"></b></span></div>{@render popBtn('hvdc', 'HVDC transfer')}</div>
 				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
 				<canvas id="cv-hvdc" role="img" aria-label="Area chart of HVDC transfer between the islands"></canvas>
 			</div>
 			<div class="chart" class:popped={popped === 'co2'}>
-				<div class="ch-head"><h2>Emissions intensity</h2><span class="unit">g CO₂e/kWh · <a class="unit-link" href="/methods/emissions">CO₂ per kWh generated</a></span><div class="legends"><span class="lg"><i class="area" style="--c:var(--co2)"></i>Generation mix <b id="v-co2"></b></span></div>{@render popBtn('co2', 'emissions intensity')}</div>
+				<div class="ch-head"><h2>Emissions intensity</h2>{@render info('co2')}<span class="unit">g CO₂e/kWh · <a class="unit-link" href="/methods/emissions">CO₂ per kWh generated</a></span><div class="legends"><span class="lg"><i class="area" style="--c:var(--co2)"></i>Generation mix <b id="v-co2"></b></span></div>{@render popBtn('co2', 'emissions intensity')}</div>
 				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
 				<canvas id="cv-co2" role="img" aria-label="Area chart of emissions intensity"></canvas>
 			</div>
 			<div class="chart" class:popped={popped === 'ren'}>
-				<div class="ch-head"><h2>Renewable share</h2><span class="unit">% of generation</span><div class="legends"><span class="lg"><i style="--c:var(--accent)"></i>Renewables <b id="v-ren"></b></span></div>{@render popBtn('ren', 'renewable share')}</div>
+				<div class="ch-head"><h2>Renewable share</h2>{@render info('ren')}<span class="unit">% of generation</span><div class="legends"><span class="lg"><i style="--c:var(--accent)"></i>Renewables <b id="v-ren"></b></span></div>{@render popBtn('ren', 'renewable share')}</div>
 				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
 				<canvas id="cv-ren" role="img" aria-label="Line chart of renewable share with the time axis"></canvas>
 			</div>

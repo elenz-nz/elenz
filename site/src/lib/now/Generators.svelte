@@ -54,8 +54,8 @@
 <section class="gens" aria-labelledby="gens-h">
 	<div class="p-head">
 		<h2 id="gens-h">Every generator right now</h2>
-		<span class="unit">{when} · {running} of {rows.length} generating</span>
 		<span class="p-info"><InfoTip label="About this list">MW is each plant's 5-minute dispatch target, against its installed capacity. Batteries show negative while charging, as a share of their MW rating. Embedded solar isn't listed. Tap a plant for its history.</InfoTip></span>
+		<span class="unit">{when} · {running} of {rows.length} generating</span>
 	</div>
 
 	<div class="g-ctl">
@@ -137,7 +137,7 @@
 	.gens { display: grid; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px; min-width: 0; }
 	.p-head { display: flex; align-items: baseline; gap: 4px 10px; flex-wrap: wrap; }
 	.p-head h2 { margin: 0; font-size: 1rem; }
-	.p-info { margin-left: auto; align-self: center; }
+	.p-info { margin-left: -6px; align-self: center; }
 	.unit { color: var(--muted); font-size: 0.8rem; font-family: var(--font-data); }
 	.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 	.g-ctl { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }

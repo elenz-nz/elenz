@@ -69,8 +69,10 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   drawn light so the generation behind reads through, and High/Low sit on the generation, never on HVDC. In the energy
   view a partial first or last period (week so far ...) is drawn at its rate so far for a whole period, faded; its note
   is in the tooltip (`partialNote`), not on the chart.
-  Chart notes are ⓘ buttons (`src/lib/site/InfoTip.svelte`, fixed-position popover) beside each chart's enlarge button
-  on both tracker tabs, Now and article figures (`Figure`'s source); the page-level "About this data" is a labelled
+  Chart notes are ⓘ buttons (`src/lib/site/InfoTip.svelte`, fixed-position popover) right after each card's title (owner's
+  rule, Oct 2026: a card is a title with its ⓘ beside it, holding a short description and a link to the method page;
+  `.ttl-row` wraps a title and its ⓘ where the heading isn't a `.ch-head`) on both tracker tabs, Now, Records and
+  article figures (`Figure`'s source). Region and month pickers are boxed dropdowns (`select.pick`), the same everywhere; the page-level "About this data" is a labelled
   pill, and both summaries have a labelled "Controls" panel listing every less obvious feature (keep it up to date).
   Tracker and Now use the full width of big screens (`.wrap.wide`; reading pages keep 1,260 px). The browser tab's title says what the view shows (`describe`), and the
   Worker puts the same title into the page title, og:title and og:url of `/tracker` and `/tracker/prices` for a linked view. The tracker page markup

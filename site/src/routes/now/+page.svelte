@@ -295,7 +295,7 @@
 	.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px; min-width: 0; }
 	.p-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
 	.p-head h2 { margin: 0; font-size: 1rem; }
-	.p-info { margin-left: auto; align-self: center; }
+	.p-info { margin-left: -6px; align-self: center; }
 	.unit { color: var(--muted); font-size: 0.8rem; font-family: var(--font-data); }
 
 	.map { position: relative; width: 100%; max-width: 680px; margin-inline: auto; }

@@ -8,6 +8,7 @@
 	import Masthead from '#lib/site/Masthead.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import Spark from '#lib/records/Spark.svelte';
+	import InfoTip from '#lib/site/InfoTip.svelte';
 	import {
 		DEFS, GROUPS, REGIONS, LIVE_URL, MONTHS, get, notShown, parts, when, step, fmt, recent, milestones, provisional,
 		liveBeats, loadRecords, meteredDue, fullName, dayOf, clock, monthOf, yearOf
@@ -101,12 +102,10 @@
 
 		<div class="toolbar">
 			<div class="ctl">
-				<span>Region</span>
-				<div class="seg" role="group" aria-label="Region">
-					{#each REGIONS as r}
-						<button type="button" aria-pressed={region === r.id} onclick={() => setRegion(r.id)}>{r.name}</button>
-					{/each}
-				</div>
+				<label for="rec-region" class="vh">Region</label>
+				<select class="pick" id="rec-region" value={region} onchange={(e) => setRegion((e.currentTarget as HTMLSelectElement).value)}>
+					{#each REGIONS as r}<option value={r.id}>{r.name}</option>{/each}
+				</select>
 			</div>
 			<a class="how" href="/methods/records">How records work</a>
 		</div>
@@ -155,7 +154,7 @@
 
 			<section aria-labelledby="all-h" class="sec">
 				<div class="sec-head">
-					<h2 id="all-h">All-time records · {regionName}</h2>
+					<div class="ttl-row"><h2 id="all-h">All-time records · {regionName}</h2><InfoTip label="About these records">Official records use the EA’s metered data and final prices, which arrive 5–6 weeks after each month (final prices a day or two). Newer records come from dispatch data and stay provisional until the metered month confirms them. Embedded solar is modelled, and days the clocks change are left out of the generation and demand records. <a href="/methods/records">How records work</a></InfoTip></div>
 					<span class="unit">Half-hour averages unless stated</span>
 				</div>
 				<div class="chips" role="group" aria-label="Show records about">
@@ -223,11 +222,11 @@
 
 				<section class="panel" aria-labelledby="moy-h">
 					<div class="sec-head">
-						<h2 id="moy-h">Records for
+						<div class="ttl-row"><h2 id="moy-h">Records for
 							<select class="pick" bind:value={moy} aria-label="Month of the year">
 								{#each MONTHS as m, i}<option value={i}>{m}</option>{/each}
 							</select>
-						</h2>
+						</h2><InfoTip label="About month records">The best {MONTHS[moy]} on record, so a month can be a record even when the all-time ones hold.</InfoTip></div>
 						<span class="unit">{regionName}</span>
 					</div>
 					<table class="moy">
@@ -243,11 +242,9 @@
 							{/each}
 						</tbody>
 					</table>
-					<p class="note">The best {MONTHS[moy]} on record, so a month can be a record even when the all-time ones hold.</p>
 				</section>
 			</div>
 
-			<p class="foot">Official records use the EA’s metered data and final prices, which arrive 5–6 weeks after each month (final prices a day or two). Newer records come from dispatch data and stay provisional until the metered month confirms them. Embedded solar is modelled, and days the clocks change are left out of the generation and demand records. <a href="/methods/records">How records work</a></p>
 		{/if}
 	</main>
 
@@ -261,15 +258,12 @@
 	.lede { margin: 6px 0 0; color: var(--ink-2); max-width: 70ch; }
 	.pill::before { display: none; }
 	.how { margin-left: auto; color: var(--accent); font-weight: 600; font-size: 0.86rem; }
-	.toolbar .seg button { min-height: 32px; padding-inline: 12px; font-size: 0.84rem; }
 
 	.sec { display: grid; gap: 10px; }
 	.sec h2, .panel h2 { font-size: 1rem; }
 	.sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 	.unit { color: var(--muted); font-size: 0.8rem; }
-	.note, .foot { color: var(--muted); font-size: 0.8rem; margin: 0; }
-	.foot { max-width: 90ch; line-height: 1.55; }
-	.foot a { color: var(--accent); }
+	.note { color: var(--muted); font-size: 0.8rem; margin: 0; }
 	.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px; min-width: 0; display: grid; gap: 10px; align-content: start; }
 	.empty p { margin: 0; color: var(--ink-2); max-width: 70ch; }
 
@@ -348,6 +342,5 @@
 		.prov-row td { padding: 0; }
 		.hero h1 { font-size: 1.3rem; }
 		.how { margin-left: 0; }
-		.toolbar .seg button { padding-inline: 9px; }
 	}
 </style>
