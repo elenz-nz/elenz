@@ -214,7 +214,7 @@
 
 	.pages-list { display: grid; scroll-margin-top: 16px; padding-block: 40px 56px; counter-reset: pg; }
 	/* a faint rule halfway between sections, with room either side */
-	.pg + .pg { margin-top: 72px; padding-top: 72px; border-top: 1px solid var(--grid); }
+	.pg + .pg { margin-top: 128px; padding-top: 128px; border-top: 1px solid var(--grid); }
 	.pg { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 48px; align-items: center; counter-increment: pg; }
 	.pg.flip { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); }
 	.pg.flip .pg-text { order: 2; }
@@ -235,7 +235,7 @@
 
 	@media (max-width: 820px) {
 		.pg, .pg.flip { grid-template-columns: minmax(0, 1fr); gap: 20px; }
-		.pg + .pg { margin-top: 48px; padding-top: 48px; }
+		.pg + .pg { margin-top: 80px; padding-top: 80px; }
 		.pg.flip .pg-text { order: 0; }
 		.view { min-height: 200px; }
 	}
