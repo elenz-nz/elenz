@@ -19,9 +19,10 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   and the 24-hour horizon line along the bottom of the first screen, then a glimpse of each page; add a page to its
   `PAGES` list with a preview component in `src/lib/landing/`. As the page scrolls, `Handoff.svelte` shrinks the horizon
   into its dot, flies it through the Now preview's map (building its rings and HVDC link via `build.svelte.js`) and opens
-  it out onto the Tracker preview, then (stage 4) leaves the end of the Tracker's line and climbs the Records preview's
-  staircase (`RecordsPeek.svelte`: the latest record's progression, path `data-handoff="rec"`, drawn up to the dot by a
-  clip from `build.rec`); shared chart geometry in `geometry.js`, map positions in `src/lib/home/maplayout.js`); `/now` the live page
+  it out onto the Tracker preview (the line grows on its own clock, `GROW`, as the dot passes the line's end and flies
+  on), then climbs the Records preview's staircase on its own clock (`CLIMB`, so it finishes even where the page can't
+  scroll that far; stops are pulled in to the last scroll position) (`RecordsPeek.svelte`: the latest record's
+  progression, path `data-handoff="rec"`, drawn up to the dot by a clip from `build.rec`); shared chart geometry in `geometry.js`, map positions in `src/lib/home/maplayout.js`); `/now` the live page
   (`src/routes/now/+page.svelte`: live figures, the island map with each island's mix ring, the generation mix now,
   from tracker.json's newest interval via `src/lib/home/now.js`; island outlines in `src/lib/home/nzmap.js`, made by
   `analysis/make_nz_map.py`; under the price tiles the price explainer, "Why is the price high?": rules and wording in

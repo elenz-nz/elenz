@@ -5,11 +5,11 @@
 	//      data-handoff="via"): to the North Island ring, which has filled by the time it gets there, then down the
 	//      HVDC route from Haywards to Benmore, drawing the link behind it, and past the South Island ring, which fills
 	//      as it passes (build.svelte.js carries how far each part has built);
-	//   3. land: near the Tracker preview (TrackerPeek, data-handoff="to") the line grows back out of the dot and settles
-	//      on the top of the stack, which fills in beneath it; once landed, the Tracker's own outline takes over;
-	//   4. climb: scrolling on, the dot leaves the end of the Tracker's line ("now"), flies to the Records preview
-	//      (RecordsPeek, data-handoff="rec") and climbs its staircase, each step a time the record was broken, drawing
-	//      it as it goes (build.rec), and rests on the record.
+	//   3. pass: as the dot reaches the end of the Tracker preview's line (TrackerPeek, data-handoff="to"), the line
+	//      starts growing back out from there over GROW ms, the stack filling in beneath it, while the dot flies on;
+	//   4. climb: the dot carries on to the Records preview (RecordsPeek, data-handoff="rec") and, once there, climbs
+	//      its staircase over CLIMB ms whatever the page does, drawing it as it goes (build.rec), and rests on the
+	//      record. It follows the path itself, so it climbs (or descends) whatever shape the record shown has.
 	// Drawn in a fixed overlay between the two charts' positions on screen, read afresh each frame, so it starts on one
 	// and ends on the other wherever they are. Progress goes on <html>: --ho-lift (stage 1, the hero's fill fades),
 	// --ho (stage 3, the Tracker's stack fills in; 1 once landed) and data-ho while the line is away. Nothing happens
@@ -38,6 +38,8 @@
 	const lerp = (p: Pt, q: Pt, k: number) => ({ x: p.x + (q.x - p.x) * k, y: p.y + (q.y - p.y) * k });
 
 	const EASE = 70;   // ms: the time constant of the easing (63% of the way in 70 ms, ~95% in 200 ms)
+	const GROW = 900;  // ms: the Tracker's line growing out once the dot has passed its end
+	const CLIMB = 1600; // ms: the dot climbing the Records staircase, however fast or slow the page is scrolled
 
 	onMount(() => {
 		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -45,7 +47,9 @@
 		const root = document.documentElement;
 		let raf = 0;
 		// what's shown: eased towards the values the scroll position gives (cur), null until the first frame
-		let shown: { kA: number; kC: number; ni: number; link: number; si: number; rec: number; dx: number; dy: number } | null = null;
+		let shown: { kA: number; ni: number; link: number; si: number; dx: number; dy: number } | null = null;
+		// the two clocks: how far the Tracker's line has grown back out (0-1) and how far the dot has climbed the steps
+		let grown = 0, climb = 0;
 		let lastT = 0, settling = false;
 		function frame(now = performance.now()) {
 			raf = 0;
@@ -90,14 +94,26 @@
 				add('ben', hvAt(0), true); // reached by following the route from Haywards
 				add('si', RING.SI);
 			}
-			// then the line grows back out of the dot over the last ~320 px. Where the map sits close above the Tracker
-			// (side by side on desktop) the last map stop comes late, so the flight from it to the Tracker keeps at
-			// least 220 px of scroll and the growing at least 200, landing a little higher on the screen than aimed
+			// the dot reaches the end of the Tracker's line ("now") as that point crosses the middle of the screen (at least
+			// 220 px after the map), and the line grows out from there on its own clock (GROW) while the dot flies on.
+			// On a tall screen the page may end before then, so every stop is pulled in to the last scroll position.
+			const maxS = Math.max(0, document.documentElement.scrollHeight - vh);
 			const last = stops[stops.length - 1].at;
-			const sC = Math.max(travel - Math.min(320, travel * 0.3), last + 220);
-			const land = Math.max(travel, sC + 200);
-			const kC0 = travel <= 0 ? 1 : smooth((s - sC) / (land - sC));
+			const sC = Math.min(Math.max(travel, last + 220), Math.max(last + 40, maxS - 260));
 			stops.push({ p: page(qEnd), at: sC });
+			// then on to the start of the Records staircase, reached as it comes up to a little above the middle of the
+			// screen (or at the foot of the page); the climb runs on its own clock (CLIMB), so it finishes even if the
+			// page has stopped scrolling
+			const recPath = document.querySelector('[data-handoff="rec"]') as SVGPathElement | null;
+			const ctmR = recPath?.getScreenCTM(), L = recPath ? recPath.getTotalLength() : 0;
+			const hasRec = !!(recPath && ctmR && L > 0);
+			const onRec = (u: number) => { const p = recPath!.getPointAtLength(Math.max(0, Math.min(1, u)) * L); const q = new DOMPoint(p.x, p.y).matrixTransform(ctmR!); return { x: q.x, y: q.y + s }; };
+			let c0 = Infinity;
+			if (hasRec) {
+				const start = onRec(0);
+				c0 = Math.min(Math.max(sC + 220, start.y - vh * 0.6), Math.max(sC + 60, maxS - 2));
+				stops.push({ p: start, at: c0 });
+			}
 			// where the dot is (page coordinates) at scroll position v
 			const route = (v: number): Pt => {
 				let i = 0;
@@ -117,82 +133,69 @@
 				const siFrom = ben - 0.3 * (ben - hay);
 				tSi = smooth((s - siFrom) / (si + 100 - siFrom));
 			}
-			// stage 4: from the end of the Tracker's line to the Records staircase, then up it. The flight starts a little
-			// after landing; the climb starts as the staircase comes up to just above the middle of the screen and
-			// takes ~360 px of scroll
-			const recPath = document.querySelector('[data-handoff="rec"]') as SVGPathElement | null;
-			let st4: { leave: number; c0: number; c1: number; at: (v: number) => Pt } | null = null;
-			let tRec = 1;
-			if (recPath) {
-				const ctmR = recPath.getScreenCTM(), L = recPath.getTotalLength();
-				if (ctmR && L > 0) {
-					const onRec = (u: number) => { const p = recPath.getPointAtLength(Math.max(0, Math.min(1, u)) * L); const q = new DOMPoint(p.x, p.y).matrixTransform(ctmR); return { x: q.x, y: q.y + s }; };
-					const from = page(qEnd), start = onRec(0);
-					const leave = land + 60;
-					const c0 = Math.max(leave + 220, start.y - vh * 0.55), c1 = c0 + 360;
-					const at = (v: number): Pt => v <= c0 ? lerp(from, start, smooth((v - leave) / (c0 - leave))) : onRec((v - c0) / (c1 - c0));
-					st4 = { leave, c0, c1, at };
-					tRec = s <= c0 ? 0 : s >= c1 ? 1 : (s - c0) / (c1 - c0);
-				}
-			}
-			const inSt4 = !!st4 && s > st4.leave && s < st4.c1;
-			// the dot's place on screen for this scroll position (stage 2, or 4)
+			// the clocks: the Tracker's line grows once the dot has passed its end; the climb runs once the dot is at the
+			// staircase; scrolling back above either winds it back, faster
+			const step = (v: number, on: boolean, ms: number) => Math.max(0, Math.min(1, v + (on ? dt / ms : -dt / (ms * 0.4))));
+			grown = travel <= 0 ? 1 : step(grown, s >= sC, GROW);
+			const climbing = hasRec && s >= c0 - 1;
+			climb = hasRec ? step(climb, climbing, CLIMB) : 1;
+			const kC = smooth(grown);
+			const u = smooth(climb);
+
+			// the dot's place on screen for this scroll position: flying (stages 2 and the flight to Records, eased) or
+			// climbing (on the staircase's own clock)
 			const screen = (p: Pt) => ({ x: p.x, y: p.y - s });
-			const target = screen(inSt4 ? st4!.at(s) : route(s));
-			// ease what's shown towards it: progress values directly, the dot by its offset from where it should be
-			if (!shown) shown = { kA, kC: kC0, ni: tNi, link: tLink, si: tSi, rec: tRec, dx: 0, dy: 0 };
+			const onStair = hasRec && (climbing || climb > 0);
+			const target = onStair ? screen(onRec(u)) : screen(route(s));
+			if (!shown) shown = { kA, ni: tNi, link: tLink, si: tSi, dx: 0, dy: 0 };
 			else {
 				const prevDot = dot ?? target;
-				shown = { kA: ease(shown.kA, kA), kC: ease(shown.kC, kC0), ni: ease(shown.ni, tNi), link: ease(shown.link, tLink), si: ease(shown.si, tSi), rec: ease(shown.rec, tRec),
-				          dx: (prevDot.x - target.x) * (1 - f), dy: (prevDot.y - target.y) * (1 - f) };
+				const fly = onStair ? 0 : 1;   // on the staircase the dot is exactly where the clip has drawn to
+				shown = { kA: ease(shown.kA, kA), ni: ease(shown.ni, tNi), link: ease(shown.link, tLink), si: ease(shown.si, tSi),
+				          dx: fly * (prevDot.x - target.x) * (1 - f), dy: fly * (prevDot.y - target.y) * (1 - f) };
 				if (Math.abs(shown.dx) < 0.3) shown.dx = 0;
 				if (Math.abs(shown.dy) < 0.3) shown.dy = 0;
 			}
-			const kC = shown.kC;
 			const kAs = shown.kA;
 			root.style.setProperty('--ho-lift', kAs.toFixed(4));
 			root.style.setProperty('--ho', kC.toFixed(4));
 			if (ctm) { build.ni = shown.ni; build.link = shown.link; build.si = shown.si; }
-			if (st4) build.rec = shown.rec;
-			// keep drawing until everything has caught up with the page
-			settling = shown.kA !== kA || shown.kC !== kC0 || shown.ni !== tNi || shown.link !== tLink || shown.si !== tSi || shown.rec !== tRec || shown.dx !== 0 || shown.dy !== 0;
+			if (hasRec) build.rec = u;
+			// keep drawing until everything has caught up: the eased values, and the two clocks
+			settling = shown.kA !== kA || shown.ni !== tNi || shown.link !== tLink || shown.si !== tSi || shown.dx !== 0 || shown.dy !== 0
+				|| (grown > 0 && grown < 1) || (s >= sC ? grown < 1 : grown > 0) || (hasRec && (climbing ? climb < 1 : climb > 0));
 			if (settling) go(); else lastT = 0;
 
-			show = (s > 0 && kC < 1) || inSt4;
+			// the dot is out while it flies or climbs; once it rests on the record (or, with no Records preview, on the
+			// end of the Tracker's line) the page's own marks take over
+			const dotOut = s > 0 && (hasRec ? climb < 1 : s < sC);
+			show = (s > 0 && (kAs < 1 || (kC > 0 && kC < 1))) || dotOut;
 			if (show) root.setAttribute('data-ho', ''); else root.removeAttribute('data-ho');
 			if (!show) return;
 
 			const pts: string[] = [];
-			if (inSt4) {
-				// stage 4: the dot on its way to, and up, the Records staircase
-				const { dx, dy } = shown;
-				dot = { x: target.x + dx, y: target.y + dy };
-				tail = Array.from({ length: 7 }, (_, j) => {
-					const p = screen(st4!.at(Math.max(st4!.leave, s - (j + 1) * 14)));
-					return { x: p.x + dx, y: p.y + dy, r: 3.6 - j * 0.42, o: 0.45 - j * 0.06 };
-				});
-			} else if (kC > 0) {
-				// stage 3: grow out of the dot onto the stack
-				for (let i = 0; i < m; i++) { const p = lerp(qEnd, Q(i), kC); pts.push(`${p.x.toFixed(1)},${p.y.toFixed(1)}`); }
-				dot = qEnd;
-				tail = [];
-			} else if (kAs < 1) {
-				// stage 1: shrink into the dot
+			if (kAs < 1) {
+				// stage 1: the hero's line shrinks into the dot
 				for (let i = 0; i < n; i++) { const p = lerp(P(i), pEnd, kAs); pts.push(`${p.x.toFixed(1)},${p.y.toFixed(1)}`); }
 				dot = pEnd;
 				tail = [];
 			} else {
-				// stage 2: the dot in flight, with a tail of where it was a moment ago
-				const { dx, dy } = shown;
-				dot = { x: target.x + dx, y: target.y + dy };
-				tail = Array.from({ length: 7 }, (_, j) => {
-					const p = screen(route(Math.max(sA, s - (j + 1) * 14)));
-					return { x: p.x + dx, y: p.y + dy, r: 3.6 - j * 0.42, o: 0.45 - j * 0.06 };
-				});
+				if (kC > 0 && kC < 1) {
+					// the Tracker's line grows out of its end, behind the dot, which has already moved on
+					for (let i = 0; i < m; i++) { const p = lerp(qEnd, Q(i), kC); pts.push(`${p.x.toFixed(1)},${p.y.toFixed(1)}`); }
+				}
+				if (dotOut) {
+					const { dx, dy } = shown;
+					dot = { x: target.x + dx, y: target.y + dy };
+					// a tail of where it was a moment ago: along the route in flight, along the steps when climbing
+					tail = Array.from({ length: 7 }, (_, j) => {
+						const p = onStair ? screen(onRec(Math.max(0, u - (j + 1) * 0.018))) : screen(route(Math.max(sA, s - (j + 1) * 14)));
+						return { x: p.x + dx, y: p.y + dy, r: 3.6 - j * 0.42, o: 0.45 - j * 0.06 };
+					});
+				} else { dot = null; tail = []; }
 			}
 			path = pts.length ? `M${pts.join('L')}` : '';
 			ink = kC > 0 ? 0.55 + 0.35 * kC : 0.55;
-			if (inSt4) path = '';
 		}
 		const go = () => { if (!raf) raf = requestAnimationFrame(frame); };
 		frame(performance.now());
