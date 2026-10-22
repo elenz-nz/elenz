@@ -649,15 +649,11 @@ export function mountTracker(D, hooks = {}) {
     const c = setup($('cv-gen')), { ctx } = c, n = V.n, pct = pctMode(), energy = energyMode();
     const layers = V.layers.filter(l => !state.hidden.has(l.id) && !(pct && l.id === 'hvdc'));
     const pos = new Float64Array(n), neg = new Float64Array(n), tops = [];
-    // HVDC leaving an island isn't stacked below zero: it's taken off the top of the island's generation (drawn after
-    // the stack as a hatched band), so the stack's top is still what the island generated and the band's underside
-    // what it kept. HVDC arriving is stacked on top as before.
-    let exp = null;
+    // HVDC is signed like the batteries: arriving is stacked on top of the island's generation, leaving goes below zero
     // a partial first or last period, drawn at its rate so far for a period as long as its neighbour's
     const whole = j => energy && n > 1 && ((j === n - 1 && V.partial) ? V.hrs[n - 2] / V.hrs[j] : (j === 0 && V.partialFirst) ? V.hrs[1] / V.hrs[0] : 1);
     for (const l of layers) {
       let a = pct ? Float64Array.from(l.s, pctOf) : energy ? Float64Array.from(l.s, (v, j) => en(v, j) * whole(j)) : l.s;
-      if (l.id === 'hvdc') { exp = Float64Array.from(a, v => Math.min(0, v)); a = Float64Array.from(a, v => Math.max(0, v)); }
       const p0 = Float64Array.from(pos), n0 = Float64Array.from(neg);
       for (let j = 0; j < n; j++) { const v = a[j]; if (v > 0) pos[j] += v; else neg[j] += v; }
       tops.push({ l, p0, p1: Float64Array.from(pos), n0, n1: Float64Array.from(neg) });
@@ -682,7 +678,7 @@ export function mountTracker(D, hooks = {}) {
       for (const [b, t] of [[L.p0, L.p1], [L.n0, L.n1]]) {
         let any = false; for (let j = 0; j < n; j++) if (t[j] !== b[j]) { any = true; break; }
         if (!any) continue;
-        // HVDC arriving, on top of the stack: lighter than the island's own generation, like the band for HVDC leaving
+        // HVDC (on top arriving, below zero leaving): lighter than the island's own generation
         ctx.fillStyle = fill; ctx.beginPath(); ctx.globalAlpha = L.l.id === 'hvdc' ? 0.55 : 1;
         for (let j = 0; j < n; j++) { const x = X(j), y = Y(t[j]); j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
         for (let j = n - 1; j >= 0; j--) ctx.lineTo(X(j), Y(b[j]));
@@ -702,19 +698,6 @@ export function mountTracker(D, hooks = {}) {
       };
       if (V.partial) wash(X(n - 2), F.x1);
       if (V.partialFirst) wash(F.x0, X(1));
-    }
-    if (exp && exp.some(v => v < 0)) {
-      const band = () => { ctx.beginPath(); for (let j = 0; j < n; j++) { const x = X(j), y = Y(pos[j]); j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } for (let j = n - 1; j >= 0; j--) ctx.lineTo(X(j), Y(pos[j] + exp[j])); ctx.closePath(); };
-      ctx.save();
-      // light, so the generation it was taken from still reads through it
-      band(); ctx.globalAlpha = 0.18; ctx.fillStyle = C['--surface']; ctx.fill();
-      ctx.globalAlpha = 0.45; const pat = ctx.createPattern(PAT.hvdc, 'repeat'); if (pat.setTransform) pat.setTransform(new DOMMatrix().scale(0.25));
-      band(); ctx.fillStyle = pat; ctx.fill(); ctx.globalAlpha = 1;
-      // its underside: what the island kept
-      ctx.strokeStyle = C['--f-hvdc']; ctx.lineWidth = 1.25; ctx.beginPath();
-      let on = false;
-      for (let j = 0; j < n; j++) { if (exp[j] < 0) { const x = X(j), y = Y(pos[j] + exp[j]); on ? ctx.lineTo(x, y) : ctx.moveTo(x, y); on = true; } else on = false; }
-      ctx.stroke(); ctx.restore();
     }
     if (dom.lo < 0) { ctx.strokeStyle = C['--ink-2']; ctx.lineWidth = 1; const y = Math.round(Y(0)) + 0.5; ctx.beginPath(); ctx.moveTo(F.x0, y); ctx.lineTo(F.x1, y); ctx.stroke(); }
     if (cap) {
@@ -747,7 +730,7 @@ export function mountTracker(D, hooks = {}) {
     // the amount button says what it shows: MW for 5-minute and half-hourly points, energy (MWh, GWh, TWh) for days and longer
     const amt = $('seg-unit').querySelector('[data-v="mw"]');
     if (amt) { const u = isLong() ? eu().unit : 'MW'; if (amt.textContent !== u) amt.textContent = u; }
-    GEN = { F, tops, pos, exp };
+    GEN = { F, tops, pos };
     c.base.F = F;
     c.base.over = (ctx, j) => {
       if (state.hoverBy === 'mouse') return;   // the mouse tooltip shows the time itself
@@ -761,7 +744,6 @@ export function mountTracker(D, hooks = {}) {
   function layerAt(clientX, clientY) {
     if (!GEN) return null;
     const cv = $('cv-gen'), r = cv.getBoundingClientRect(), j = indexAt(cv, clientX), v = GEN.F.Yinv(clientY - r.top);
-    if (GEN.exp && GEN.exp[j] < 0 && v <= GEN.pos[j] && v >= GEN.pos[j] + GEN.exp[j]) return GEN.tops.find(T => T.l.id === 'hvdc')?.l || null;
     for (const T of GEN.tops) if ((v >= T.p0[j] && v <= T.p1[j] && T.p1[j] > T.p0[j]) || (v <= T.n0[j] && v >= T.n1[j] && T.n1[j] < T.n0[j])) return T.l;
     return null;
   }

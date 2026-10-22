@@ -132,7 +132,7 @@
 <!-- each chart's ⓘ: what it shows and how it's made (the notes that used to sit under the charts) -->
 {#snippet chartInfo(id: string)}
 	{#if id === 'gen'}
-		<p>Each source's output, stacked. The live week is the market's 5-minute dispatch; history is metered output wherever the EA has published it (about six weeks behind). Embedded solar (hatched) is estimated. On one island's chart, HVDC arriving is stacked on top and HVDC leaving is a hatched band taken off the top.</p>
+		<p>Each source's output, stacked. The live week is the market's 5-minute dispatch; history is metered output wherever the EA has published it (about six weeks behind). Embedded solar (hatched) is estimated. On one island's chart, HVDC arriving is stacked on top and HVDC leaving goes below zero, like battery charging.</p>
 		<p id="gen-note" hidden></p>
 		<p><a href="/methods/generation">How generation is built</a></p>
 	{:else if id === 'price'}
