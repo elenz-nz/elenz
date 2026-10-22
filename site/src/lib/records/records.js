@@ -94,6 +94,8 @@ export function notShown(d, region, rec, R = null, period = 'tp') {
   if (!d.regions.includes(region)) return d.na?.[region] ?? 'Shown for New Zealand';
   if (!rec && period !== 'tp' && d.kind === 'hh' && R && !R.periods) return 'Being worked out from the history; back in a day or so';
   if (!rec) return 'No data yet';
+  // a period's net transfer: "most sent south" is only a record if some period's net flow was south at all
+  if (period !== 'tp' && d.id.startsWith('hvdc_') && rec.v <= 0) return `Never a net ${d.id === 'hvdc_s_max' ? 'south' : 'north'}ward ${periodOf(period).word}`;
   if (rec.constant) {
     if (d.id.startsWith('ren') && rec.v === 100) return 'Always 100%: no fossil plant in the South Island';
     if (d.id === 'fossil_min' && rec.v === 0) return 'No fossil plant in the South Island';
