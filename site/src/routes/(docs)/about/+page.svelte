@@ -62,7 +62,7 @@
 				'HVDC transfer, emissions intensity and renewable share.',
 				'Energy, averages and peaks over the range in the summary table.',
 				'Share of generation over the range against the same dates a year earlier: renewables, wind, solar, inverter-based, hydro, gas or coal/gas.',
-				'Dispatchable headroom: hydro, gas, coal/gas, diesel and battery capacity not being used.',
+				'Spare dispatchable capacity: hydro, gas, coal/gas, diesel and battery capacity not being used.',
 				'Mix by fuel: energy, change on last year, average and peak output, and capacity factor.',
 				'A heat map of the range by time of day (by month on All), for any of the same series.',
 			],

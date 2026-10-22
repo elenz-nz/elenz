@@ -39,10 +39,18 @@
 	const ticks = $derived(ax.ticks);
 	// clock labels every six hours (by position: a clock-change day has 46 or 50 half-hours)
 	const hours = $derived((W < 420 ? [0, 24] : [0, 12, 24, 36]).filter((i) => i < n).map((i) => ({ i, l: clock(day.t0 + i * day.step) })));
+
+	// hover or touch: the half-hour's time and value
+	let hover = $state<number | null>(null);
+	function move(e: PointerEvent) {
+		const r = (e.currentTarget as SVGSVGElement).getBoundingClientRect();
+		const i = Math.round((((e.clientX - r.left) / r.width) * W - L) / (W - L - R) * Math.max(1, n - 1));
+		hover = i >= 0 && i < n && day.v[i] != null ? i : null;
+	}
 </script>
 
 <div class="dc" bind:clientWidth={cw}>
-<svg viewBox="0 0 {W} {H}" role="img" aria-label={label}>
+<svg viewBox="0 0 {W} {H}" role="img" aria-label={label} onpointermove={move} onpointerdown={move} onpointerleave={() => (hover = null)}>
 	{#each ticks as v}
 		<line x1={L} x2={W - R} y1={y(v)} y2={y(v)} class="grid" />
 		<text x={L - 8} y={y(v) + 4} text-anchor="end" class="lab">{fmt(v)}</text>
@@ -56,12 +64,27 @@
 		<line x1={x(at)} x2={x(at)} y1={T} y2={H - B} class="cursor" />
 		<circle cx={x(at)} cy={y(day.v[at] as number)} r="5" style="fill:var({tok})" />
 	{/if}
+	{#if hover !== null && hover !== at}
+		<line x1={x(hover)} x2={x(hover)} y1={T} y2={H - B} class="cursor hov" />
+		<circle cx={x(hover)} cy={y(day.v[hover] as number)} r="3.5" style="fill:var({tok})" />
+	{/if}
 </svg>
+{#if hover !== null}
+	{@const fx = x(hover) / W}
+	<div class="tip" class:flip={fx > 0.7} style="left:{fx * 100}%;top:{(y(day.v[hover] as number) / H) * 100}%" aria-hidden="true">
+		<b>{fmt(day.v[hover] as number)}</b><span>{clock(day.t0 + hover * day.step)}{hover === at ? ' · the record' : ''}</span>
+	</div>
+{/if}
 </div>
 
 <style>
-	.dc { min-width: 0; }
-	svg { width: 100%; height: auto; display: block; }
+	.dc { min-width: 0; position: relative; }
+	svg { width: 100%; height: auto; display: block; touch-action: pan-y; }
+	.hov { stroke-dasharray: none; opacity: 0.5; }
+	.tip { position: absolute; transform: translate(12px, -50%); pointer-events: none; display: grid; gap: 1px; padding: 5px 8px; border-radius: 4px;
+		background: var(--surface); border: 1px solid var(--line); box-shadow: 0 4px 14px rgb(0 0 0 / 0.12); font-size: 0.78rem; color: var(--ink-2); white-space: nowrap; }
+	.tip.flip { transform: translate(calc(-100% - 12px), -50%); }
+	.tip b { font-family: var(--font-data); color: var(--ink); font-size: 0.9rem; }
 	.grid { stroke: var(--grid); stroke-width: 1; }
 	.lab { fill: var(--muted); font-family: var(--font-data); font-size: 12px; }
 	.cursor { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 3 3; }

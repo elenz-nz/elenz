@@ -21,6 +21,10 @@ WINDOW = 7 * 288
 KEYS = ['coal', 'gas', 'diesel', 'geo', 'bio', 'waste', 'hydro', 'wind', 'solar', 'batt']   # bio: bioenergy; waste: waste heat
 
 
+
+# register names spelled wrongly, corrected for display only (the register's name stays the key)
+SPELLING = {'Pirirpaua': 'Piripaua'}
+
 def register():
     """(POC, unit) -> fuel, plant name, nameplate MW: EA register plus facilities/overrides.toml.
 
@@ -276,7 +280,7 @@ def assemble(s, full, roof, log=print, metered=None):
             for k, v in us.items():
                 m = member_of.get(k, 'All units') if ' ' in k else 'All units'
                 by.setdefault(m, []).append((k, v))
-            entry['units'] = [{'name': m if m != 'All units' else f'{pname} (all units)', 'label': m,
+            entry['units'] = [{'name': m if m != 'All units' else f'{pname} (all units)', 'label': SPELLING.get(m, m),
                                'cap': (sum(cap.get(tuple(k.split(' ')), 0) for k, _ in kv) or None) if m != 'All units' else pcap,
                                's': enc(sum(v for _, v in kv))} for m, kv in sorted(by.items())]
         elif len(pocs) > 1:  # a plant on more than one bus (Arapuni, Roxburgh) can be split by grid connection

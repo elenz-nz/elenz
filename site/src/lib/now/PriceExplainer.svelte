@@ -5,13 +5,14 @@
 	// can fold it, and it stays folded until the explainer's state changes.
 	import { money, clock, duration } from './explain.js';
 	import ExplainChart from './ExplainChart.svelte';
+	import InfoTip from '#lib/site/InfoTip.svelte';
 
 	type Row = { k: string; tok: string; title: string; sub: string; now: number; usual: number; effect: number; split?: boolean };
 	type Band = { t0: number; t1: number; med: number; p25: number; p75: number; hl: number; open: number };
 	type X = {
 		t: number; tier: string; variant: string; newLow: boolean; nearZero: boolean; lowStart: number | null;
 		since: number | null; hay: number; ben: number; hi: number; typical: number | null; ratio: number | null;
-		headline: string; line: string; verdict: string; rows: Row[]; link: Row; offersDay: string | null; setterIsl: string;
+		headline: string; line: string; verdict: string; verdictNow?: string; rows: Row[]; link: Row; offersDay: string | null; setterIsl: string;
 		setter: { plant: string; fuel: string; mw: number; cap: number | null; price: number; owner?: string; scheme?: string } | null;
 		chart: { t: number[]; hay: number[]; ben: number[]; band: Band[] };
 	};
@@ -64,13 +65,14 @@
 	{#if open}
 		<div class="pe-body" id="pe-body">
 			<div class="pe-head">
-				<p class="pe-eye">Price explainer</p>
+				<div class="pe-eye">Price explainer <InfoTip label="About the price explainer">Each reason is compared with its recent level for the same half-hour of the week over the last four weeks (wind with its four-week median). The possible price setter is an estimate from the latest generator offers the EA has published. <a href="/methods/price-explainer">How the explainer works</a></InfoTip></div>
 				<h2>{x.headline}</h2>
 				{#if sub}<p class="pe-sub">{sub}</p>{/if}
 			</div>
 			<div class="pe-grid">
 				<div class="pe-main">
 					<p class="pe-verdict">{x.verdict}</p>
+					{#if x.verdictNow}<p class="pe-verdict">{x.verdictNow}</p>{/if}
 					<ul class="pe-rows">
 						{#each [...x.rows, x.link] as r (r.k)}
 							{@const b = bar(r)}
@@ -81,6 +83,7 @@
 							</li>
 						{/each}
 					</ul>
+					<p class="pe-key"><span class="tick-key" aria-hidden="true"></span>recent level for this half-hour of the week (wind: its four-week median)</p>
 				</div>
 
 				<aside class="pe-side">
@@ -111,10 +114,6 @@
 					</div>
 				</aside>
 			</div>
-			<p class="pe-foot">
-				<span class="pe-key"><span class="tick-key" aria-hidden="true"></span>usual for this half-hour of the week (wind: its four-week median)</span>
-				<a href="/methods/price-explainer">How this works</a>
-			</p>
 		</div>
 	{/if}
 
@@ -162,7 +161,7 @@
 
 	.pe-body { border-top: 1px solid var(--line); }
 	.pe-head { padding: 16px 18px 12px; display: grid; gap: 4px; border-bottom: 1px solid var(--grid); }
-	.pe-eye { margin: 0; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+	.pe-eye { margin: 0; display: flex; align-items: center; gap: 2px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 	.tier-open .pe-eye, .var-high .pe-eye, .var-split .pe-eye { color: var(--warn-ink); }
 	.pe-head h2 { margin: 0; font-size: 1.3rem; letter-spacing: -0.01em; }
 	.pe-sub { margin: 0; color: var(--ink-2); font-size: 0.88rem; }
@@ -178,7 +177,7 @@
 	.pe-bar { position: relative; height: 7px; border-radius: 4px; background: var(--grid); }
 	.pe-bar .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--c); }
 	.pe-bar .tick { position: absolute; top: -4px; width: 2px; height: 15px; background: var(--ink); transform: translateX(-1px); }
-	.pe-key { display: inline-flex; align-items: center; gap: 6px; }
+	.pe-key { margin: -4px 0 0; display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--muted); }
 	.tick-key { width: 2px; height: 12px; background: var(--ink); display: inline-block; }
 
 	.pe-side { flex: 1 1 340px; min-width: 0; padding: 16px 18px; background: color-mix(in srgb, var(--bg) 45%, var(--surface)); border-left: 1px solid var(--grid); display: grid; gap: 14px; align-content: start; }
@@ -209,9 +208,6 @@
 	.ps-name small { color: var(--muted); font-size: 0.82rem; }
 	.ps-why { margin: 0; font-size: 0.84rem; color: var(--ink-2); line-height: 1.45; }
 
-	.pe-foot { margin: 0; padding: 10px 18px; border-top: 1px solid var(--grid); display: flex; justify-content: space-between; align-items: center; gap: 6px 14px; flex-wrap: wrap;
-		font-size: 0.78rem; color: var(--muted); }
-	.pe-foot a { color: var(--accent); font-weight: 600; }
 
 	@media (max-width: 640px) {
 		.pe-line { padding: 6px 8px 8px 12px; }

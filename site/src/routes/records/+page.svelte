@@ -45,9 +45,12 @@
 	const regionName = $derived(REGIONS.find((x) => x.id === region)!.name);
 
 	type Row = { d: any; rec: any; na: string | null; prov: any; isNew: boolean };
+	// groups with no record for this region (HVDC for an island) are left out rather than listed as not shown
+	const shownGroups = $derived(GROUPS.filter((g) => DEFS.some((d) => d.group === g && d.regions.includes(region))));
+	$effect(() => { if (cat !== 'all' && !shownGroups.includes(cat)) cat = 'all'; });
 	const groups = $derived.by(() => {
 		if (!R) return [];
-		return GROUPS.filter((g) => cat === 'all' || g === cat).map((g) => ({
+		return shownGroups.filter((g) => cat === 'all' || g === cat).map((g) => ({
 			name: g,
 			rows: DEFS.filter((d) => d.group === g).map((d): Row => {
 				const rec = get(R, d.id, region);
@@ -156,7 +159,7 @@
 					<span class="unit">Half-hour averages unless stated</span>
 				</div>
 				<div class="chips" role="group" aria-label="Show records about">
-					{#each ['all', ...GROUPS] as g}
+					{#each ['all', ...shownGroups] as g}
 						<button type="button" class="chip" aria-pressed={cat === g} onclick={() => (cat = g)}>{g === 'all' ? 'All' : g}</button>
 					{/each}
 				</div>
@@ -188,7 +191,7 @@
 										{:else}
 											<td class="n val">{parts(d, rec.v).n}<small>{parts(d, rec.v).u}</small></td>
 											<td>{when(d, rec)}</td>
-											<td class="muted">{d.kind === 'run' ? (rec.top?.[1] ? `Next longest: ${parts(d, rec.top[1][1]).n} hours, ${dayOf(rec.top[1][0])}` : '') : step(d, rec.prev)}</td>
+											<td class="muted">{d.kind === 'run' ? (rec.top?.[1] ? `${parts(d, rec.top[1][1]).n} hours, ${dayOf(rec.top[1][0])}` : '') : step(d, rec.prev)}</td>
 											<td><Spark steps={rec.steps} end={R.end} tok={d.tok} dashed={!!d.est} /></td>
 										{/if}
 									</tr>

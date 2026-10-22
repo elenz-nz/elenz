@@ -1,11 +1,16 @@
 <script lang="ts">
 	// How a record grew: a step line from the first data to today, one step each time it was broken, the current
 	// record marked, and a provisional one (dashed) beyond it. Hover or tap shows the record at that date.
-	import { yearOf } from './records.js';
+	import { yearOf, trimZeros } from './records.js';
 
-	let { steps, first, end, tok = '--ink', label, fmt, prov = null, dashed = false }:
+	let { steps: all, first: dataFirst, end, tok = '--ink', label, fmt, prov = null, dashed = false, when }:
 		{ steps: [number, number][]; first: number; end: number; tok?: string; label: string; fmt: (v: number) => string;
-		  prov?: { t: number; v: number } | null; dashed?: boolean } = $props();
+		  prov?: { t: number; v: number } | null; dashed?: boolean; when?: (t: number) => string } = $props();
+	// leading zeros left out (grid solar until its first farm): the chart starts at the first record above zero
+	const steps = $derived(trimZeros(all) as [number, number][]);
+	const trimmed = $derived(steps !== all);
+	const first = $derived(trimmed ? steps[0][0] : dataFirst);
+	const whenOf = (t: number) => when ? when(t) : new Date(t).toLocaleDateString('en-NZ', { timeZone: 'Pacific/Auckland', day: 'numeric', month: 'short', year: 'numeric' });
 
 	// drawn at the width it is shown, so labels stay readable on phones
 	let cw = $state(1000);
@@ -42,7 +47,7 @@
 		const a = +yearOf(first), b = +yearOf(t1), every = (b - a) / (W / 90) > 5 ? 10 : b - a > 20 ? 5 : b - a > 8 ? 2 : 1;
 		const out = [];
 		for (let yr = Math.ceil(a / every) * every; yr <= b; yr += every) out.push({ yr, t: Date.UTC(yr, 0, 1) - 13 * 36e5 });
-		return out.filter((q) => q.t >= first);
+		return out.filter((q) => q.t >= first && x(q.t) > L + 14);
 	});
 	const last = $derived(steps[steps.length - 1]);
 
@@ -58,6 +63,7 @@
 </script>
 
 <figure class="prog" bind:clientWidth={cw}>
+	<div class="plot">
 	<svg viewBox="0 0 {W} {H}" role="img" aria-label={label} onpointermove={move} onpointerleave={() => (hover = null)}>
 		{#each ax.ticks as v}
 			<line x1={L} x2={W - Rm} y1={y(v)} y2={y(v)} class="grid" />
@@ -78,12 +84,20 @@
 			<circle cx={x(p[0])} cy={y(p[1])} r="4" style="fill:var({tok})" />
 		{/if}
 	</svg>
+	{#if hover !== null}
+		{@const p = pts[hover]}
+		{@const fx = x(p[0]) / W}
+		<div class="tip" style="left:{fx * 100}%;top:{(y(p[1]) / H) * 100}%" class:flip={fx > 0.7} aria-hidden="true">
+			<b>{fmt(p[1])}</b><span>{prov && hover === pts.length - 1 ? 'Provisional, ' : ''}{whenOf(p[0])}</span>
+		</div>
+	{/if}
+	</div>
 	<figcaption class="readout" aria-live="polite">
 		{#if hover !== null}
 			{@const p = pts[hover]}
-			<b>{fmt(p[1])}</b> {prov && hover === pts.length - 1 ? 'provisional,' : 'from'} {new Date(p[0]).toLocaleDateString('en-NZ', { timeZone: 'Pacific/Auckland', day: 'numeric', month: 'short', year: 'numeric' })}
+			Record {fmt(p[1])} {prov && hover === pts.length - 1 ? 'provisional,' : 'from'} {whenOf(p[0])}
 		{:else}
-			{steps.length - 1 === 0 ? 'Not broken since the data began' : `Broken ${steps.length - 1} times since ${yearOf(first)}`}{prov ? '; dashed: provisional' : ''}. Hover for the record at any date.
+			{steps.length - 1 === 0 ? (trimmed ? `First above zero in ${yearOf(first)}` : 'Not broken since the data began') : `Broken ${steps.length - 1} times since ${trimmed ? `the first above zero in ${yearOf(first)}` : yearOf(first)}`}{prov ? '; dashed: provisional' : ''}. Hover for the record at any date.
 		{/if}
 	</figcaption>
 </figure>
@@ -96,5 +110,10 @@
 	.cursor { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 3 3; }
 	.hole { fill: var(--surface); stroke-width: 2.4; }
 	.readout { color: var(--muted); font-size: 0.8rem; min-height: 1.4em; }
-	.readout b { color: var(--ink); font-family: var(--font-data); }
+	.plot { position: relative; }
+	/* the value and date beside the hovered step */
+	.tip { position: absolute; transform: translate(12px, -50%); pointer-events: none; display: grid; gap: 1px; padding: 5px 8px; border-radius: 4px;
+		background: var(--surface); border: 1px solid var(--line); box-shadow: 0 4px 14px rgb(0 0 0 / 0.12); font-size: 0.78rem; color: var(--ink-2); white-space: nowrap; }
+	.tip.flip { transform: translate(calc(-100% - 12px), -50%); }
+	.tip b { font-family: var(--font-data); color: var(--ink); font-size: 0.9rem; }
 </style>

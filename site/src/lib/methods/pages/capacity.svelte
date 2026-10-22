@@ -52,8 +52,8 @@
 	<li>Each island’s capacity is the sum of its plants; New Zealand’s is both islands.</li>
 </ul>
 
-<h2 id="headroom">Dispatchable headroom</h2>
-<p>The Generation tab’s headroom chart shows how much plant that can be called on was not generating, three ways:</p>
+<h2 id="headroom">Spare dispatchable capacity</h2>
+<p>The Generation tab’s spare dispatchable capacity chart (headroom) shows how much plant that can be called on was not generating, three ways:</p>
 <p class="formula">Headroom = capacity − output, for hydro, gas, coal/gas (Huntly’s Rankines), diesel and batteries<small>for each island and fuel, never below zero, then added up; batteries count discharge only</small></p>
 <ul>
 	<li><b>Installed:</b> capacity is every unit’s installed MW, from the table below. Every unit counts as available, so this is the most there could have been.</li>

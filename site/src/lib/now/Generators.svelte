@@ -36,7 +36,8 @@
 	const running = $derived(rows.filter((r) => r.mw >= 0.5).length);
 
 	const fmt = (v: number) => Math.round(v).toLocaleString('en-NZ').replace('-', '−');
-	const pctText = (r: { pct: number | null; charging: boolean }) => (r.charging ? 'charging' : r.pct == null ? '–' : `${Math.round(Math.max(0, r.pct))}%`);
+	// a charging battery shows how hard it is charging, as a share of its MW rating, below zero
+	const pctText = (r: { pct: number | null; charging: boolean }) => (r.pct == null ? '–' : r.charging ? `−${Math.round(-r.pct)}%` : `${Math.round(Math.max(0, r.pct))}%`);
 	function sortBy(by: string) {
 		if (s.by === by) s.asc = !s.asc;
 		else { s.by = by; s.asc = by === 'name'; }
@@ -54,7 +55,7 @@
 	<div class="p-head">
 		<h2 id="gens-h">Every generator right now</h2>
 		<span class="unit">{when} · {running} of {rows.length} generating</span>
-		<span class="p-info"><InfoTip label="About this list">MW is each plant's 5-minute dispatch target, against its installed capacity. Batteries show negative while charging. Embedded solar isn't listed. Tap a plant for its history.</InfoTip></span>
+		<span class="p-info"><InfoTip label="About this list">MW is each plant's 5-minute dispatch target, against its installed capacity. Batteries show negative while charging, as a share of their MW rating. Embedded solar isn't listed. Tap a plant for its history.</InfoTip></span>
 	</div>
 
 	<div class="g-ctl">
@@ -102,7 +103,7 @@
 						<td class="c-own">{r.owner}</td>
 						<td class="n">{fmt(r.mw)}</td>
 						<td class="n c-pct">
-							<span class="pc"><span>{pctText(r)}</span>{#if r.pct != null && !r.charging}<span class="pbar"><span style="--c:var({r.tok});width:{Math.min(100, Math.max(0, r.pct))}%"></span></span>{/if}</span>
+							<span class="pc" title={r.charging ? 'Charging' : undefined}><span>{pctText(r)}{#if r.charging}<small class="chg">charging</small>{/if}</span>{#if r.pct != null}<span class="pbar" class:charge={r.charging}><span style="--c:var({r.tok});width:{Math.min(100, Math.abs(r.pct))}%"></span></span>{/if}</span>
 						</td>
 					</tr>
 					{#if open.has(r.key)}
@@ -171,6 +172,10 @@
 	.pc { display: inline-grid; justify-items: end; gap: 2px; min-width: 64px; }
 	.pbar { justify-self: stretch; height: 3px; border-radius: 2px; background: var(--grid); overflow: hidden; }
 	.pbar span { display: block; height: 100%; background: var(--c); }
+	/* charging: the bar runs from the right, hollow, so it reads as the other way */
+	.pbar.charge { display: flex; justify-content: flex-end; }
+	.pbar.charge span { background: repeating-linear-gradient(135deg, var(--c) 0 2px, transparent 2px 4px); }
+	.chg { display: block; font-family: var(--font-ui); font-size: 0.68rem; color: var(--muted); text-align: right; }
 	.none { color: var(--muted); padding: 14px 0; }
 	.gtab tfoot th, .gtab tfoot td { padding-top: 8px; border: 0; font-weight: 700; color: var(--ink) !important; text-transform: none !important; letter-spacing: 0 !important; font-size: 0.86rem !important; }
 	/* phones: plant, MW and share of capacity; fuel stays as the dot, island and owner as filters */

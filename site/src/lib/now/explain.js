@@ -202,7 +202,7 @@ export function explainNow(D, plantMeta = {}) {
     const ph = phrase(f, nw ?? 0, us ?? 0, c), phLong = phrase(f, nw ?? 0, us ?? 0, c, true);
     const title = ph ? cap(where + ph) : `${where}${where ? f.name.toLowerCase() : f.name} close to usual`;
     const named = f.k === 'peakers' && peakers.length ? peakers.slice(0, 3).map((p) => `${p.name} ${fmt(p.mw)}`).join(', ') + ' MW · ' : '';
-    const sub = `${named || `${fmt(nw ?? 0)} MW now · `}usually ${fmt(us ?? 0)} MW at this time`;
+    const sub = `${named || `${fmt(nw ?? 0)} MW now · `}recently ${fmt(us ?? 0)} MW at this time`;
     return { ...f, region: r, now: nw ?? 0, usual: us ?? 0, ...c, title, sub, phrase: phLong ? where + phLong : null, bare: phLong, where };
   }).filter((x) => !(x.k === 'solar' && x.now < 30 && x.usual < 30) && !(x.k === 'peakers' && x.now < 10 && x.usual < 10));
   rows.sort((a, b) => b.score - a.score);
@@ -213,7 +213,7 @@ export function explainNow(D, plantMeta = {}) {
     k: 'hvdc', tok: '--f-hvdc', now: Math.abs(hv), usual: Math.abs(hvU),
     effect: isSplit ? 1 : 0, split: isSplit,
     title: isSplit ? `Islands ${money(now.gap)} apart` : 'Islands priced together',
-    sub: `HVDC ${fmt(Math.abs(hv))} MW ${dir(hv)} (estimated) · usually ${fmt(Math.abs(hvU))} MW ${dir(hvU)}` +
+    sub: `HVDC ${fmt(Math.abs(hv))} MW ${dir(hv)} (estimated) · recently ${fmt(Math.abs(hvU))} MW ${dir(hvU)}` +
       (isSplit ? '' : ` · prices ${money(now.gap)} apart`),
   };
 
@@ -225,12 +225,15 @@ export function explainNow(D, plantMeta = {}) {
   const one = top.length && top.every((x) => x.where && x.where === top[0].where);
   const reasons = one ? top.map((x) => x.bare) : top.map((x) => x.phrase);
   const joined = !reasons.length ? '' : one ? `In the ${top[0].where.trim()}, ${reasons.join(' and ')}.` : cap(reasons.join(' and ')) + '.';
-  let headline, line, verdict;
+  // the split's second paragraph is about conditions now rather than why islands split, so it starts "Currently"
+  const currently = !reasons.length ? '' : one ? `Currently, in the ${top[0].where.trim()}, ${reasons.join(' and ')}.` : `Currently, ${reasons.join(' and ')}.`;
+  let headline, line, verdict, verdictNow = '';
   if (variant === 'split') {
     const [hiIsl, loIsl] = northDear ? ['North', 'South'] : ['South', 'North'];
     headline = `Why is the ${hiIsl} Island dearer?`;
     line = `The islands have split: Haywards ${money(now.h)}, Benmore ${money(now.b)} per MWh (30-minute average).`;
-    verdict = `Prices split like this when the HVDC link, or the grid near it, can't carry any more power from the ${loIsl} Island, so each island is priced on its own. ${joined}`.trim();
+    verdict = `Prices split like this when the HVDC link, or the grid near it, can't carry any more power from the ${loIsl} Island, so each island is priced on its own.`;
+    verdictNow = currently;
   } else if (variant === 'high') {
     headline = tier === 'open' ? 'Why is the price high?' : 'Why is the price up?';
     // no "n× usual": the usual is a median of recent prices, and a multiple of it reads as more exact than it is
@@ -250,7 +253,7 @@ export function explainNow(D, plantMeta = {}) {
     const lean = !now.ty ? 'about' : now.hi < 0.67 * now.ty && now.ty - now.hi >= 10 ? 'below'
       : now.hi > 1.3 * now.ty && now.hi - now.ty >= 10 ? 'a little above' : 'about';
     headline = 'Why this price?';
-    line = `${money(now.hi)}/MWh is ${lean} what prices have been recently ${when}` + (lean === 'about' || !now.ty ? '.' : ` (usually about ${money(now.ty)}).`);
+    line = `${money(now.hi)}/MWh is ${lean} what prices have been recently ${when}` + (lean === 'about' || !now.ty ? '.' : ` (recently about ${money(now.ty)}).`);
     verdict = (joined || 'Nothing shown here is far from normal.') + ' The price is set by the most expensive offer needed to meet demand in each 5 minutes.';
   }
 
@@ -282,7 +285,7 @@ export function explainNow(D, plantMeta = {}) {
     t, tier, variant, label, newLow, lowStart, nearZero, since: since(variant === 'split' ? ['split', 'open'] : ['high', 'open']),
     hay: now.h, ben: now.b, hi: now.hi, lo: now.lo, gap: now.gap, typical: now.ty, ratio, level: E.level,
     thresholds: hold ? { highlight: hold.hl, open: hold.open } : null,
-    headline, line, verdict, rows, link, setter, offersDay: E.offers_day, setterIsl: sIsl,
+    headline, line, verdict, verdictNow, rows, link, setter, offersDay: E.offers_day, setterIsl: sIsl,
     chart: { t: t24, hay, ben, band },
   };
 }

@@ -229,7 +229,7 @@
 			</section>
 
 			<section class="panel mix-panel" aria-labelledby="mix-h">
-				<div class="p-head"><h2 id="mix-h">Generation now</h2><span class="unit">{nz ? `${fmt(nz.gen)} MW` : ''}</span><span class="p-info"><InfoTip label="About this table">Generation is dispatch, the market's 5-minute targets for each plant; embedded solar is estimated. <a href="/methods/generation">How generation is built</a></InfoTip></span></div>
+				<div class="p-head"><h2 id="mix-h">Generation now</h2><span class="p-info"><InfoTip label="About this table">Generation is dispatch, the market's 5-minute targets for each plant; embedded solar is estimated. <a href="/methods/generation">How generation is built</a></InfoTip></span></div>
 				{#if now && nz}
 					<div class="stack" aria-hidden="true">
 						{#each now.mix as f}<span class:hatch={f.hatch} style="--c:var({f.tok});width:{(f.mw / nz.gen) * 100}%" title="{f.name} {fmt(f.mw)} MW"></span>{/each}

@@ -226,6 +226,15 @@ export function mountTracker(D, hooks = {}) {
     for (let i = 0; i < 6; i++) if (F.has(t + i * 3e5)) k++;
     return k === 6 ? ' · interpolated' : k ? ` · ${k} of 6 intervals interpolated` : '';
   }
+  // a partial first or last period: what the faded part of the generation chart is
+  function partialNote(j) {
+    if (!isLong() || !V.n) return '';
+    const word = { '1d': 'day', '1w': 'week', '1mo': 'month', '1yr': 'year' }[state.int] || 'period';
+    const rate = energyMode() ? `, drawn at its rate so far for a whole ${word}` : '';
+    if (j === V.n - 1 && V.partial) { const p = lp(M.END); return `Partial ${word}: to ${p.dom} ${MON[p.mon]}${rate}`; }
+    if (j === 0 && V.partialFirst) { const p = lp(V.t[0]); return `Partial ${word}: from ${p.dom} ${MON[p.mon]} ${p.y}${rate}`; }
+    return '';
+  }
   function heading(j) {
     const p = lp(V.t[j]), last = j === V.n - 1 && V.partial;
     // in the energy view generation is the period's total, so the heading names the period rather than an average
@@ -618,8 +627,9 @@ export function mountTracker(D, hooks = {}) {
   // Energy view: where each point is a day or longer, the generation chart, its tooltip and the summary at a point show
   // energy (average MW × the point's hours) rather than average MW, which reads oddly low for anything that varies
   // through the day (a solar farm's daily average is a fraction of its peak). The unit suits the size: MWh for a plant
-  // by the day, GWh for the country by the day or month, TWh by the year. Partial days, weeks and months show the energy
-  // so far.
+  // by the day, GWh for the country by the day or month, TWh by the year. Partial days, weeks and months: the tooltip
+  // and summary give the energy so far, but the chart draws the period at its rate so far for a whole period (faded),
+  // so it doesn't look as if the data stops part way down (owner's call, Oct 2026).
   const energyMode = () => isLong() && !pctMode();
   function eu() {
     if (!V.eu) {
@@ -641,8 +651,10 @@ export function mountTracker(D, hooks = {}) {
     // the stack as a hatched band), so the stack's top is still what the island generated and the band's underside
     // what it kept. HVDC arriving is stacked on top as before.
     let exp = null;
+    // a partial first or last period, drawn at its rate so far for a period as long as its neighbour's
+    const whole = j => energy && n > 1 && ((j === n - 1 && V.partial) ? V.hrs[n - 2] / V.hrs[j] : (j === 0 && V.partialFirst) ? V.hrs[1] / V.hrs[0] : 1);
     for (const l of layers) {
-      let a = pct ? Float64Array.from(l.s, pctOf) : energy ? Float64Array.from(l.s, en) : l.s;
+      let a = pct ? Float64Array.from(l.s, pctOf) : energy ? Float64Array.from(l.s, (v, j) => en(v, j) * whole(j)) : l.s;
       if (l.id === 'hvdc') { exp = Float64Array.from(a, v => Math.min(0, v)); a = Float64Array.from(a, v => Math.max(0, v)); }
       const p0 = Float64Array.from(pos), n0 = Float64Array.from(neg);
       for (let j = 0; j < n; j++) { const v = a[j]; if (v > 0) pos[j] += v; else neg[j] += v; }
@@ -668,10 +680,11 @@ export function mountTracker(D, hooks = {}) {
       for (const [b, t] of [[L.p0, L.p1], [L.n0, L.n1]]) {
         let any = false; for (let j = 0; j < n; j++) if (t[j] !== b[j]) { any = true; break; }
         if (!any) continue;
-        ctx.fillStyle = fill; ctx.beginPath();
+        // HVDC arriving, on top of the stack: lighter than the island's own generation, like the band for HVDC leaving
+        ctx.fillStyle = fill; ctx.beginPath(); ctx.globalAlpha = L.l.id === 'hvdc' ? 0.55 : 1;
         for (let j = 0; j < n; j++) { const x = X(j), y = Y(t[j]); j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
         for (let j = n - 1; j >= 0; j--) ctx.lineTo(X(j), Y(b[j]));
-        ctx.closePath(); ctx.fill();
+        ctx.closePath(); ctx.fill(); ctx.globalAlpha = 1;
         // 1px surface gap along the outer edge separates adjacent fills
         ctx.strokeStyle = C['--surface']; ctx.lineWidth = 1;
         ctx.beginPath(); for (let j = 0; j < n; j++) { const x = X(j), y = Y(t[j]); j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.stroke();
@@ -680,22 +693,21 @@ export function mountTracker(D, hooks = {}) {
     // a period that isn't whole (the one still under way, or the history's first, part year) holds less energy than
     // the rest, so its drop at the end is washed out and labelled rather than read as a fall
     if (energy && n > 1) {
-      const wash = (xa, xb, text, right) => {
+      // the note is in the tooltip and the time chip (partialNote), not on the chart
+      const wash = (xa, xb) => {
         ctx.save(); ctx.globalAlpha = 0.6; ctx.fillStyle = C['--surface'];
         ctx.fillRect(xa, F.top, xb - xa, F.bottom - F.top); ctx.restore();
-        ctx.font = FONT; ctx.textBaseline = 'top'; ctx.textAlign = right ? 'right' : 'left';
-        haloText(ctx, text, right ? F.x1 - 2 : F.x0 + 2, F.top + 22);
       };
-      const day = t => { const p = lp(t); return `${p.dom} ${MON[p.mon]}`; };
-      if (V.partial) wash(X(n - 2), F.x1, `Partial: to ${day(M.END)}`, true);
-      if (V.partialFirst) { const p = lp(V.t[0]); wash(F.x0, X(1), `Partial: from ${p.dom} ${MON[p.mon]} ${p.y}`, false); }
+      if (V.partial) wash(X(n - 2), F.x1);
+      if (V.partialFirst) wash(F.x0, X(1));
     }
     if (exp && exp.some(v => v < 0)) {
       const band = () => { ctx.beginPath(); for (let j = 0; j < n; j++) { const x = X(j), y = Y(pos[j]); j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } for (let j = n - 1; j >= 0; j--) ctx.lineTo(X(j), Y(pos[j] + exp[j])); ctx.closePath(); };
       ctx.save();
-      band(); ctx.globalAlpha = 0.55; ctx.fillStyle = C['--surface']; ctx.fill();   // the generation under it, faded
-      ctx.globalAlpha = 1; const pat = ctx.createPattern(PAT.hvdc, 'repeat'); if (pat.setTransform) pat.setTransform(new DOMMatrix().scale(0.25));
-      band(); ctx.fillStyle = pat; ctx.fill();
+      // light, so the generation it was taken from still reads through it
+      band(); ctx.globalAlpha = 0.18; ctx.fillStyle = C['--surface']; ctx.fill();
+      ctx.globalAlpha = 0.45; const pat = ctx.createPattern(PAT.hvdc, 'repeat'); if (pat.setTransform) pat.setTransform(new DOMMatrix().scale(0.25));
+      band(); ctx.fillStyle = pat; ctx.fill(); ctx.globalAlpha = 1;
       // its underside: what the island kept
       ctx.strokeStyle = C['--f-hvdc']; ctx.lineWidth = 1.25; ctx.beginPath();
       let on = false;
@@ -720,13 +732,14 @@ export function mountTracker(D, hooks = {}) {
       const g = net ? pos.map((v, j) => v + neg[j]) : hv ? pos.map((v, j) => v - (hv.p1[j] - hv.p0[j])) : pos;
       let jh = a, jl = a; for (let j = a + 1; j < b; j++) { if (g[j] > g[jh]) jh = j; if (g[j] < g[jl]) jl = j; }
       const val = v => pct ? (v < 10 ? v.toFixed(1) : Math.round(v)) + '%' : energy ? `${enFmt(v)} ${eu().unit}` : `${fmt(v)} MW`;
-      // the dot sits on the stack's edge at that point (its bottom when charging); the label gives the figure
+      // the dot sits on the edge of the generation at that point (its bottom when charging; under any HVDC arriving
+      // on top); the label gives the figure
       if (net) {
         if (g[jh] > 0.5) extreme(ctx, F, jh, pos[jh], `High ${val(g[jh])}`, C['--ink']);
         if (g[jl] < -0.5) extreme(ctx, F, jl, neg[jl], `Low ${val(-g[jl])} charging`, C['--ink'], 'below');
       } else if (g[jh] > (energy ? 0 : 0.5)) {
-        extreme(ctx, F, jh, pos[jh], `High ${val(g[jh])}`, C['--ink']);
-        if (g[jl] < g[jh] * 0.98) extreme(ctx, F, jl, pos[jl], `Low ${val(g[jl])}`, C['--ink'], true);
+        extreme(ctx, F, jh, g[jh], `High ${val(g[jh])}`, C['--ink']);
+        if (g[jl] < g[jh] * 0.98) extreme(ctx, F, jl, g[jl], `Low ${val(g[jl])}`, C['--ink'], true);
       }
     }
     // the amount button says what it shows: MW for 5-minute and half-hourly points, energy (MWh, GWh, TWh) for days and longer
@@ -1344,7 +1357,8 @@ export function mountTracker(D, hooks = {}) {
   const row = (colour, name, value, extra = '', hatch = false) =>
     `<div class="tip-r"><i class="${hatch ? 'hatch' : ''}" style="--c:${colour}"></i><span>${esc(name)}</span><b>${value}</b>${extra ? `<small>${extra}</small>` : ''}</div>`;
   function tipHtml(cv, j, e) {
-    const mw = isLong() ? 'MW avg' : 'MW', head = `<div class="tip-t">${esc(chip(j))}</div>`;
+    const pn = partialNote(j);
+    const mw = isLong() ? 'MW avg' : 'MW', head = `<div class="tip-t">${esc(chip(j))}</div>` + (pn ? `<div class="tip-n">${esc(pn)}</div>` : '');
     switch (cv.id) {
       case 'cv-gen': {
         const l = layerAt(e.clientX, e.clientY), lv = level();

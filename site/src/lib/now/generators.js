@@ -25,21 +25,28 @@ function capacityNow(name, fallback, today) {
  *   mw: number, cap: number | null, pct: number | null, charging: boolean, href: string, units: Unit[], part: string }} Row */
 /** @typedef {{ fuel: string, island: string, owner: string, by: string, asc: boolean, text: string, on: boolean }} Settings */
 
+// groups whose members are separate stations rather than units of one (Waikaremoana: Kaitawa, Tuai and Piripaua
+// on one river chain): listed here as one row per station, each linking to the group in the tracker
+const STATION_GROUPS = new Set(['Waikaremoana']);
+
 /** Rows for every plant in tracker.json at its newest interval.
  * @param {any} D
  * @returns {Row[]} */
 export function generatorRows(D) {
   const j = D.N - 1, today = TODAY();
-  return (D.plants || []).map((p) => {
+  const plants = (D.plants || []).flatMap((p) => (STATION_GROUPS.has(p.name) && p.units?.length
+    ? p.units.map((u) => ({ ...p, name: u.label || u.name, cap: u.cap, s: u.s, units: [], group: p.name }))
+    : [p]));
+  return plants.map((p) => {
     const mw = p.s?.[j] ?? 0;
-    const cap = capacityNow(p.name, p.cap, today);
+    const cap = p.group ? p.cap : capacityNow(p.name, p.cap, today);
     const f = FUEL[p.fuel] || { name: p.fuel, tok: '--muted' };
     return {
       name: p.name, key: slug(p.name), fuel: p.fuel, fuelName: f.name, tok: f.tok, isl: p.isl,
-      owner: META[p.name]?.owner || 'Other generators',
+      owner: META[p.group || p.name]?.owner || 'Other generators',
       mw, cap, pct: cap ? (mw / cap) * 100 : null,
       charging: p.fuel === 'batt' && mw < -0.5,
-      href: `/tracker?fuel=${p.fuel}&plant=${slug(p.name)}`,
+      href: `/tracker?fuel=${p.fuel}&plant=${slug(p.group || p.name)}`,
       units: (p.units || []).map((u) => ({ name: u.label || u.name, mw: u.s?.[j] ?? 0, cap: u.cap || null })),
       // a station shown whole lists its register plants (they carry a label); a plant on two buses, its connections
       part: (p.units || []).some((u) => u.label) ? 'units' : 'connections',

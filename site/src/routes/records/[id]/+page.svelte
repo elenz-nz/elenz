@@ -9,6 +9,7 @@
 	import Progression from '#lib/records/Progression.svelte';
 	import DayChart from '#lib/records/DayChart.svelte';
 	import { drawRecord } from '#lib/records/shareImage.js';
+	import { stamp } from '#lib/site/viewurl.js';
 	import {
 		DEFS, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats,
 		loadRecords, meteredDue, clock, dayOf, dayLong, monthOf, yearOf, daysBetween, runLength, NEW_DAYS
@@ -26,7 +27,7 @@
 
 	onMount(() => {
 		const q = new URLSearchParams(location.search).get('region');
-		if (q && ['NZ', 'NI', 'SI'].includes(q)) region = q;
+		if (q && ['NZ', 'NI', 'SI'].includes(q) && d.regions.includes(q)) region = q;
 		(async () => {
 			R = await loadRecords();
 			status = R ? 'ok' : 'none';
@@ -103,11 +104,13 @@
 			<p class="crumb"><a href="/records{region === 'NZ' ? '' : `?region=${region}`}">Records</a> › {d.group}</p>
 			<div class="h-row">
 				<h1><span class="dot" style="--c:var({d.tok})"></span>{fullName(d)}{#if d.est}<span class="tag est">Estimate</span>{/if}</h1>
-				<div class="seg" role="group" aria-label="Region">
-					{#each REGIONS as r}
-						<button type="button" aria-pressed={region === r.id} onclick={() => setRegion(r.id)}>{r.name}</button>
-					{/each}
-				</div>
+				{#if d.regions.length > 1}
+					<div class="seg" role="group" aria-label="Region">
+						{#each REGIONS as r}
+							<button type="button" aria-pressed={region === r.id} onclick={() => setRegion(r.id)}>{r.name}</button>
+						{/each}
+					</div>
+				{/if}
 			</div>
 			<p class="sub">{d.sub}</p>
 		</div>
@@ -150,7 +153,7 @@
 
 			<section class="panel" aria-labelledby="grow-h">
 				<div class="p-head"><h2 id="grow-h">How the record grew</h2><span class="unit">Each step is a new record</span></div>
-				<Progression steps={rec.steps} first={R.first} end={R.end} tok={d.tok} fmt={axisFmt} dashed={!!d.est} prov={prov ? { t: prov.t, v: prov.v } : null}
+				<Progression steps={rec.steps} first={R.first} end={R.end} tok={d.tok} fmt={axisFmt} dashed={!!d.est} prov={prov ? { t: prov.t, v: prov.v } : null} when={(t) => d.kind === 'month' ? monthOf(t) : d.kind === 'run' ? dayOf(t) : `${clock(t)}, ${dayOf(t)}`}
 					label="{fullName(d)}, {regionName}: the record over time, from {f(rec.steps[0][1])} in {yearOf(rec.steps[0][0])} to {f(rec.v)} in {yearOf(rec.t)}, broken {rec.n} times" />
 			</section>
 
@@ -158,7 +161,7 @@
 				{#if d.kind === 'hh' && rec.ctx}
 					{@const c = rec.ctx}
 					<section class="panel" aria-labelledby="day-h">
-						<div class="p-head"><h2 id="day-h">The day it fell</h2><a class="link" href="/tracker?region={region}&range=30d&end={ymd(rec.t)}">Open in the tracker</a></div>
+						<div class="p-head"><h2 id="day-h">The day it fell</h2><a class="link" href="/tracker?region={region}&range=1d&int=30m&end={ymd(rec.t)}&t={stamp(rec.t)}">Open in the tracker</a></div>
 						<DayChart day={c.day} t={rec.t} tok={d.tok} fmt={axisFmt} label="{fullName(d)} through {dayLong(rec.t)}, half-hourly, peaking at {f(rec.v)} at {clock(rec.t)}" />
 						<dl class="facts">
 							<div><dt>Demand</dt><dd>{c.demand.toLocaleString('en-NZ')} MW</dd></div>

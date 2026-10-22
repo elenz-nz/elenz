@@ -297,10 +297,10 @@
 		{/if}
 	</section>
 
-	<section class="card" class:popped={popped === 'room'} aria-label="Dispatchable headroom over the range">
+	<section class="card" class:popped={popped === 'room'} aria-label="Spare dispatchable capacity over the range">
 		<div class="card-head">
 			<div>
-				<h2>Dispatchable headroom</h2>
+				<h2>Spare dispatchable capacity</h2>
 				<Context range={rangeChip} items={[dates, v ? `${RES[v.int]}, MW not generating` : '', coarse && roomView === 'levels' && !avgOnly ? `lowest in each ${lowWord}` : '']} />
 			</div>
 			<div class="tools">

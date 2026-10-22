@@ -278,8 +278,17 @@ export function milestones(R, region) {
 
 /** A step chart's points from a progression: [[t, v], ...] -> an SVG path in a w x h box (y down), with the
  *  progression running on to `end` (the data's end). */
+/** A progression without its leading zeros (grid solar's record was 0 MW from 1997 until the first farm): from the
+ *  first step above zero, so the chart isn't mostly a flat line at the bottom. Unchanged if it never leaves zero. */
+export function trimZeros(steps) {
+  if (!steps?.length || steps[0][1] !== 0) return steps;
+  const k = steps.findIndex((s) => s[1] !== 0);
+  return k > 0 ? steps.slice(k) : steps;
+}
+
 export function stepPath(steps, w, h, { end, t0, lo, hi } = {}) {
   if (!steps?.length) return { d: '', x: () => 0, y: () => 0 };
+  steps = trimZeros(steps);
   const a = t0 ?? steps[0][0], b = Math.max(end ?? steps[steps.length - 1][0], a + 1);
   const vs = steps.map((s) => s[1]);
   const min = lo ?? Math.min(...vs), max = hi ?? Math.max(...vs);

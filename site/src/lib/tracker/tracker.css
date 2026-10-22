@@ -33,6 +33,9 @@
   color-scheme: dark;
 }
 *, *::before, *::after { box-sizing: border-box; }
+/* dropdown lists: Chromium on Windows (Edge) draws a select's options on a white list in the select's own text colour,
+   pale grey on white in dark mode, unless the options are given colours too */
+select option, select optgroup { background-color: var(--surface); color: var(--ink); }
 body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-ui); font-size: 14px; line-height: 1.45; }
 .wrap { max-width: 1260px; margin: 0 auto; padding-inline: 20px; padding-block: 18px 40px; display: grid; gap: 14px; }
 /* Tracker and Now use the whole width of a big screen (reading pages keep .wrap's 1,260 px) */
@@ -141,6 +144,7 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 .tip { position: fixed; left: 0; top: 0; z-index: 30; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 7px 10px; box-shadow: 0 6px 18px rgb(0 0 0 / 0.14); font-size: 0.8rem; display: grid; gap: 3px; min-width: 170px; max-width: 320px; }
 .tip[hidden] { display: none; }
 .tip-t { font-weight: 600; color: var(--ink); margin-bottom: 1px; }
+.tip-n { color: var(--muted); font-size: 0.74rem; margin-bottom: 3px; max-width: 30ch; }
 .tip-r { display: grid; grid-template-columns: 10px 1fr auto auto; align-items: baseline; column-gap: 7px; color: var(--ink-2); }
 .tip-r i { align-self: center; }
 .tip-r i { width: 10px; height: 10px; border-radius: 3px; background: var(--c); }

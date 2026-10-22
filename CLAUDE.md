@@ -65,7 +65,10 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   the Reset zoom chip in the bar (or Escape twice) goes back, and a range button or date clears it. The 1D menu
   (`#span-menu`) lives outside the sticky bar because the bar's clip-path clips anything hanging below it. Share's link
   to the dates shown turns a span into fixed times (`zoomAt`). On an island's chart, HVDC leaving is drawn as a hatched
-  band taken off the top of the stack (`exp` in `drawGen`), not below zero; HVDC arriving stays stacked on top.
+  band taken off the top of the stack (`exp` in `drawGen`), not below zero; HVDC arriving stays stacked on top. Both are
+  drawn light so the generation behind reads through, and High/Low sit on the generation, never on HVDC. In the energy
+  view a partial first or last period (week so far ...) is drawn at its rate so far for a whole period, faded; its note
+  is in the tooltip (`partialNote`), not on the chart.
   Chart notes are ⓘ buttons (`src/lib/site/InfoTip.svelte`, fixed-position popover) beside each chart's enlarge button
   on both tracker tabs, Now and article figures (`Figure`'s source); the page-level "About this data" is a labelled
   pill, and both summaries have a labelled "Controls" panel listing every less obvious feature (keep it up to date).
@@ -84,7 +87,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
 - "Every generator right now" on /now (`src/lib/now/Generators.svelte`, rows and settings in `src/lib/now/generators.js`):
   each plant in tracker.json's `plants` at the newest interval, MW against the installed capacity that applies today
   (`capacity.json`, else the register nameplate), fuel, island and owner (`plants.json`); stations shown whole and
-  two-bus plants expand into their `units`. Sort, filters and search live in /now's address (`fuel`, `island`, `owner`
+  two-bus plants expand into their `units`; groups whose members are separate stations (`STATION_GROUPS`: Waikaremoana's
+  Kaitawa, Tuai and Piripaua) are listed one row per station. A charging battery shows a negative % of its MW rating. Sort, filters and search live in /now's address (`fuel`, `island`, `owner`
   as a slug, `sort` = mw | pct | name with `-asc`/`-desc`, `q`, `on=1` generating only); 20 rows until "Show all".
   Each plant links to `/tracker?fuel=<fuel>&plant=<slug>`. Later the index of plant pages (/plants).
 - Footer extras (`src/lib/site/SiteFooter.svelte`): "Report a problem" (`ReportLink.svelte`: an email to hello@elenz.co.nz
