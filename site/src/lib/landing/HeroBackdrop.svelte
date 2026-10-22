@@ -70,8 +70,10 @@
 	:global(html[data-ho]) .line, :global(html[data-ho]) .dot { opacity: 0; }
 	.line { fill: none; stroke: var(--accent); stroke-opacity: 0.55; stroke-width: 1.5; stroke-linejoin: round; }
 	.dot { position: absolute; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--accent); pointer-events: none; }
-	.dot::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--accent); animation: ping 2.2s ease-out infinite; }
-	@keyframes ping { from { transform: scale(1); opacity: 0.6; } to { transform: scale(4); opacity: 0; } }
+	/* the ping is a growing shadow, not a scaled circle: a transform at the chart's right edge counts towards the page's
+	   width, so on narrow screens it made the page scroll sideways (and the scrollbar flicker) on every beat */
+	.dot::after { content: ""; position: absolute; inset: 0; border-radius: 50%; animation: ping 2.2s ease-out infinite; }
+	@keyframes ping { from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 60%, transparent); } to { box-shadow: 0 0 0 13.5px color-mix(in srgb, var(--accent) 0%, transparent); } }
 	.guide { position: absolute; top: 0; bottom: 0; width: 1px; background: color-mix(in srgb, var(--ink-2) 35%, transparent); pointer-events: none; }
 	.hdot { position: absolute; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--surface); border: 2px solid var(--accent); box-sizing: border-box; pointer-events: none; }
 	.peek-tip { position: absolute; width: max-content; transform: translate(-50%, calc(-100% - 12px)); display: grid; gap: 1px; padding: 5px 9px; border-radius: 4px; white-space: nowrap;

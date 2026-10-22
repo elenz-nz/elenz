@@ -62,7 +62,8 @@
 </div>
 
 <style>
-	.trk-peek { display: grid; gap: 4px; }
+	/* the right padding keeps the "now" dot, centred on the chart's right edge, inside the page */
+	.trk-peek { display: grid; gap: 4px; padding-right: 5px; }
 	.plot { position: relative; padding-top: 8px; }
 	svg { display: block; width: 100%; height: auto; overflow: visible; }
 	path { stroke: none; }
@@ -75,8 +76,10 @@
 		opacity: calc((var(--ho, 1) - 0.999) * 1000); }
 	.now { position: absolute; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--accent); pointer-events: none;
 		opacity: calc((var(--ho, 1) - 0.97) * 34); }
-	.now::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--accent); animation: ping 2.2s ease-out infinite; }
-	@keyframes ping { from { transform: scale(1); opacity: 0.6; } to { transform: scale(4); opacity: 0; } }
+	/* the ping is a growing shadow, not a scaled circle: a transform at the chart's right edge counts towards the page's
+	   width, so on narrow screens it made the page scroll sideways (and the scrollbar flicker) on every beat */
+	.now::after { content: ""; position: absolute; inset: 0; border-radius: 50%; animation: ping 2.2s ease-out infinite; }
+	@keyframes ping { from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 60%, transparent); } to { box-shadow: 0 0 0 13.5px color-mix(in srgb, var(--accent) 0%, transparent); } }
 	@media (prefers-reduced-motion: reduce) { .now::after { animation: none; } }
 	.hb { fill: color-mix(in srgb, var(--f-solar) 30%, transparent); }
 	.hf { fill: var(--f-solar); }
