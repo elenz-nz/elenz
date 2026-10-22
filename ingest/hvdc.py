@@ -29,9 +29,10 @@ def estimate(gen_ni, gen_si, load_ni, load_si):
 
 def ends(mid):
     """Mid-link transfer -> (sent from Benmore, received at Haywards), northward positive; the sending end carries
-    the extra half of the link losses."""
+    the extra half of the link losses. With northward positive, Benmore minus Haywards is the loss whichever way the
+    link runs (as LOSS was fitted in analysis/hvdc_fit.py): southward, Haywards sends more than Benmore receives."""
     loss = LOSS * mid ** 2
-    return mid + np.sign(mid) * loss / 2, mid - np.sign(mid) * loss / 2
+    return mid + loss / 2, mid - loss / 2
 
 
 def parse_metered(raw):

@@ -171,6 +171,10 @@ h97 = hvdc.parse_metered(met_get('x/199708_HVDC_flows.csv'))
 h26 = hvdc.parse_metered(met_get('x/202609_HVDC_flows.csv'))
 check(len(h97) == 48 and h97['H|BEN'].abs().max() > 50, 'hvdc: 1997 layout (HVDC_BN/BS/HN/HS) parsed')
 check(len(h26) == 48 and (h26['H|BEN'] - h26['H|HAY']).abs().mean() < 80, 'hvdc: current layout parsed, ends within link losses')
+_mid = pd.Series([500.0, -500.0, 0.0])
+_ben, _hay = hvdc.ends(_mid)
+check(_ben[0] > 500 > _hay[0] and _hay[1] < -500 < _ben[1] and _ben[2] == _hay[2] == 0,
+      'hvdc: the sending end carries the extra losses both ways (Benmore northward, Haywards southward)')
 
 # the /now price explainer (explain.py): usual values from history, offer stacks, the live block and price setter
 import explain as ex  # noqa: E402
