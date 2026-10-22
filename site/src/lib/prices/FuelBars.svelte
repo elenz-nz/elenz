@@ -1,6 +1,7 @@
 <script lang="ts">
 	// Price captured by fuel: one bar per fuel, with the generation-weighted average of all of them as a dashed line.
 	// Battery charging (f.charging) is the price batteries paid: a hatched bar under the battery's, not in the average.
+	// Hovering a row (or tapping it, on touch screens) shows its energy and what it earned or paid in the line below.
 	import { money } from './data.js';
 
 	type Row = { f: { k: string; name: string; tok: string; charging?: boolean }; mwh: number; price: number };
@@ -8,6 +9,9 @@
 
 	const top = $derived(Math.max(avg * 1.25, ...rows.map((r) => r.price), 10));
 	const pct = (v: number) => `${Math.max(0, (100 * v) / top).toFixed(2)}%`;
+	let sel = $state<string | null>(null);
+	const cur = $derived(rows.find((r) => r.f.k === sel) ?? null);
+	const dollars = (v: number) => (v >= 1e9 ? `$${(v / 1e9).toFixed(2)}b` : v >= 1e6 ? `$${(v / 1e6).toFixed(v >= 1e8 ? 0 : 1)}m` : v >= 1e3 ? `$${Math.round(v / 1e3)}k` : `$${Math.round(v)}`);
 	const energy = (mwh: number) => (mwh >= 1e6 ? `${(mwh / 1e6).toFixed(1)} TWh` : mwh >= 1e3 ? `${(mwh / 1e3).toFixed(mwh >= 1e5 ? 0 : 1)} GWh` : `${Math.round(mwh)} MWh`);
 </script>
 
@@ -17,7 +21,11 @@
 			<span>Average {money(avg)}</span>
 		</div>
 		{#each rows as r (r.f.k)}
-			<div class="row" class:chg={r.f.charging} title={r.f.charging ? `Batteries paid ${money(r.price)}/MWh on average to charge ${energy(r.mwh)}` : `${r.f.name}: ${money(r.price)}/MWh on ${energy(r.mwh)}`}>
+			<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (the table below carries the same figures) -->
+			<div class="row" class:chg={r.f.charging} class:on={sel === r.f.k}
+				onpointerenter={(e) => { if (e.pointerType === 'mouse') sel = r.f.k; }}
+				onpointerleave={(e) => { if (e.pointerType === 'mouse' && sel === r.f.k) sel = null; }}
+				onclick={() => (sel = sel === r.f.k ? null : r.f.k)}>
 				<span class="nm">{r.f.name}</span>
 				<span class="track"><span class="bar" style="width: {pct(r.price)}; --c: var({r.f.tok})"></span></span>
 				<span class="v">{money(r.price)}</span>
@@ -25,6 +33,9 @@
 			</div>
 		{/each}
 	</div>
+	<p class="read" aria-live="polite">
+		{#if cur}<strong>{cur.f.name}</strong> · {energy(cur.mwh)} {cur.f.charging ? 'charged' : 'generated'} · {dollars(cur.mwh * cur.price)} {cur.f.charging ? 'paid' : 'earned'} · {money(cur.price)}/MWh{/if}
+	</p>
 	<table class="vh">
 		<caption>Price captured by fuel, $/MWh</caption>
 		<thead><tr><th>Fuel</th><th>$/MWh</th><th>Energy</th></tr></thead>
@@ -35,7 +46,7 @@
 <style>
 	.fb { --lw: 140px; --rw: 104px; }
 	.rows { position: relative; display: grid; gap: 7px; padding-top: 20px; }
-	.row { display: grid; grid-template-columns: var(--lw) 1fr 58px 46px; align-items: center; column-gap: 0; font-size: 0.84rem; }
+	.row { cursor: default; border-radius: 3px; display: grid; grid-template-columns: var(--lw) 1fr 58px 46px; align-items: center; column-gap: 0; font-size: 0.84rem; }
 	.nm { color: var(--ink-2); padding-right: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 	.track { display: block; height: 16px; position: relative; }
 	.bar { position: absolute; inset: 0 auto 0 0; height: 100%; border-radius: 2px; background: var(--c); }
@@ -45,5 +56,9 @@
 	.p { color: var(--muted); font-size: 0.78rem; }
 	.avg { position: absolute; top: 18px; bottom: 0; width: 0; border-left: 1.5px dashed var(--ink-2); z-index: 1; pointer-events: none; }
 	.avg span { position: absolute; top: -19px; transform: translateX(-50%); white-space: nowrap; font-size: 0.72rem; font-family: var(--font-data); color: var(--ink-2); }
+	.row.on .nm { color: var(--ink); }
+	.row.on { background: color-mix(in srgb, var(--ink) 7%, transparent); }
+	.read { min-height: 1.3em; margin: 10px 0 0; font-size: 0.78rem; color: var(--ink-2); font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+	.read strong { font-family: var(--font-ui); font-weight: 600; color: var(--ink); }
 	.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 </style>
