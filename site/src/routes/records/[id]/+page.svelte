@@ -11,7 +11,7 @@
 	import { drawRecord } from '#lib/records/shareImage.js';
 	import { stamp } from '#lib/site/viewurl.js';
 	import {
-		DEFS, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats,
+		LISTED, PERIODS, PERIOD_KEYS, periodOf, periodSub, periodWhen, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats,
 		loadRecords, meteredDue, clock, dayOf, dayLong, monthOf, yearOf, daysBetween, runLength, NEW_DAYS
 	} from '#lib/records/records.js';
 	import type { PageProps } from './$types';
@@ -23,11 +23,16 @@
 	let live = $state<any>({});
 	let status = $state<'loading' | 'none' | 'ok'>('loading');
 	let region = $state('NZ');
+	// a half-hour record's day, week, month or year record (?period=)
+	let period = $state('tp');
+	const per = $derived(d.kind === 'hh' ? period : 'tp');
 	let copied = $state(false);
 
 	onMount(() => {
 		const q = new URLSearchParams(location.search).get('region');
 		if (q && ['NZ', 'NI', 'SI'].includes(q) && d.regions.includes(q)) region = q;
+		const qp = new URLSearchParams(location.search).get('period');
+		if (qp && PERIOD_KEYS.includes(qp)) period = qp;
 		(async () => {
 			R = await loadRecords();
 			status = R ? 'ok' : 'none';
@@ -38,28 +43,39 @@
 			} catch { /* the live check is extra */ }
 		})();
 	});
-	function setRegion(r: string) {
-		region = r;
+	function setRegion(r: string) { region = r; syncUrl(); }
+	function setPeriod(p: string) { period = p; syncUrl(); }
+	function syncUrl() {
 		const u = new URL(location.href);
-		if (r === 'NZ') u.searchParams.delete('region');
-		else u.searchParams.set('region', r);
+		if (region === 'NZ') u.searchParams.delete('region'); else u.searchParams.set('region', region);
+		if (period === 'tp') u.searchParams.delete('period'); else u.searchParams.set('period', period);
 		replaceState(u, {});
 	}
+	// the tracker over the record's period: the day, the week, the month (30 days to its end), the year by month
+	const trackerHref = (t: number) => {
+		const q = (range: string, end: number, extra = '') => `/tracker?region=${region}&range=${range}&end=${ymd(end)}${extra}`;
+		const nzd = (x: number) => new Date(x + 13 * 36e5);
+		if (per === 'day') return q('1d', t, '&int=30m');
+		if (per === 'week') return q('7d', t + 6.5 * 864e5, '&int=30m');
+		if (per === 'month') { const a = nzd(t); return q('30d', Date.UTC(a.getUTCFullYear(), a.getUTCMonth() + 1, 1) - 13 * 36e5 - 864e5 / 2); }
+		if (per === 'year') { const y = nzd(t).getUTCFullYear(); return q('1y', Date.UTC(y, 11, 31) - 12 * 36e5, '&int=1mo'); }
+		return q('1d', t, `&int=30m&t=${stamp(t)}`);
+	};
 
-	const rec = $derived(R ? get(R, d.id, region) : null);
-	const na = $derived(R ? notShown(d, region, rec) : null);
-	const prov = $derived(R && !na ? provisional(R, live, d.id, region) : null);
+	const rec = $derived(R ? get(R, d.id, region, per) : null);
+	const na = $derived(R ? notShown(d, region, rec, R, per) : null);
+	const prov = $derived(R && !na ? (per === 'tp' ? provisional(R, live, d.id, region) : (rec?.prov ?? null)) : null);
 	const isNew = $derived(!!rec?.since && Date.now() - rec.since < NEW_DAYS * 864e5);
 	const regionName = $derived(REGIONS.find((x) => x.id === region)!.name);
-	const f = (v: number) => fmt(d, v);
+	const f = (v: number) => fmt(d, v, per);
 	const axisFmt = (v: number) => (d.unit === '$' ? '$' + Math.round(v).toLocaleString('en-NZ') : d.unit === '%' ? `${+v.toFixed(1)}%` : Math.round(v).toLocaleString('en-NZ'));
 	const ymd = (t: number) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Pacific/Auckland' }).format(t);
-	const others = $derived(DEFS.filter((x) => x.group === d.group && x.id !== d.id));
+	const others = $derived(LISTED.filter((x) => x.group === d.group && x.id !== d.id));
 
 	// one more figure from the record's half-hour, the one that says most about it
 	const extra = $derived.by(() => {
 		const c = rec?.ctx;
-		if (!c || d.kind !== 'hh') return null;
+		if (!c || d.kind !== 'hh' || per !== 'tp') return null;
 		if (d.id.startsWith('demand')) return c.ren != null ? { k: 'Renewable share then', v: `${c.ren.toFixed(1)}%` } : null;
 		if (d.id.startsWith('ren') || d.id === 'fossil_min') return { k: 'Demand then', v: `${c.demand.toLocaleString('en-NZ')} MW` };
 		if (['wind_max', 'solar_max', 'roof_max'].includes(d.id)) return c.gen > 0 ? { k: 'Share of generation then', v: `${((100 * rec.v) / c.gen).toFixed(1)}%` } : null;
@@ -71,19 +87,19 @@
 		const before = rec.steps[rec.steps.length - 2 - i];
 		return { t: s[0], v: s[1], by: before ? Math.abs(s[1] - before[1]) : null, first: !before };
 	}) : []);
-	const moy = $derived(R && d.kind !== 'run' ? (R.moy?.[d.id]?.[region] ?? []) : []);
+	const moy = $derived(R && d.kind !== 'run' && per === 'tp' ? (R.moy?.[d.id]?.[region] ?? []) : []);
 
 	async function copyLink() {
 		try { await navigator.clipboard.writeText(location.href); copied = true; setTimeout(() => (copied = false), 2000); } catch { /* no clipboard: the address bar has it */ }
 	}
 	async function download() {
 		const c = document.createElement('canvas');
-		await drawRecord(c, { d, region, rec, end: R.end, isNew });
+		await drawRecord(c, { d, region, rec, end: R.end, isNew, period: per });
 		c.toBlob((b) => {
 			if (!b) return;
 			const a = document.createElement('a');
 			a.href = URL.createObjectURL(b);
-			a.download = `elenz-record-${d.id}-${region.toLowerCase()}.png`;
+			a.download = `elenz-record-${d.id}${per !== 'tp' ? '-' + per : ''}-${region.toLowerCase()}.png`;
 			a.click();
 			setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 		}, 'image/png');
@@ -101,7 +117,7 @@
 
 	<main class="rec-one">
 		<div class="head">
-			<p class="crumb"><a href="/records{region === 'NZ' ? '' : `?region=${region}`}">Records</a> › {d.group}</p>
+			<p class="crumb"><a href="/records{(() => { const q = new URLSearchParams(); if (region !== 'NZ') q.set('region', region); if (per !== 'tp') q.set('period', per); const x = q.toString(); return x ? '?' + x : ''; })()}">Records</a> › {d.group}</p>
 			<div class="h-row">
 				<h1><span class="dot" style="--c:var({d.tok})"></span>{fullName(d)}{#if d.est}<span class="tag est">Estimate</span>{/if}</h1>
 				{#if d.regions.length > 1}
@@ -110,7 +126,14 @@
 					</select>
 				{/if}
 			</div>
-			<p class="sub">{d.sub}</p>
+			<p class="sub">{periodSub(d, per)}</p>
+			{#if d.kind === 'hh'}
+				<div class="seg per" role="group" aria-label="Record for each">
+					{#each PERIODS as p}
+						<button type="button" aria-pressed={per === p.k} onclick={() => setPeriod(p.k)}>{p.label}</button>
+					{/each}
+				</div>
+			{/if}
 		</div>
 
 		{#if status === 'loading'}
@@ -123,14 +146,14 @@
 			<section class="panel hero-rec" aria-label="The record">
 				<div class="big">
 					<span class="lbl">{regionName}{#if isNew} <span class="tag new">New</span>{/if}</span>
-					<span class="val">{parts(d, rec.v).n}<small>{parts(d, rec.v).u}</small></span>
-					<span class="when">{d.kind === 'run' ? runLength(rec.v) + ', ' : ''}{when(d, rec, true)}</span>
+					<span class="val">{parts(d, rec.v, per).n}<small>{parts(d, rec.v, per).u}</small></span>
+					<span class="when">{d.kind === 'run' ? runLength(rec.v) + ', ' : ''}{when(d, rec, true, per)}</span>
 				</div>
 				<dl class="stats">
 					{#if d.kind === 'run'}
 						{#if rec.top?.[1]}<div><dt>Next longest</dt><dd>{parts(d, rec.top[1][1]).n} hours</dd><dd class="s">from {dayOf(rec.top[1][0])}</dd></div>{/if}
 					{:else if rec.prev}
-						<div><dt>Previous record</dt><dd>{f(rec.prev[1])}</dd><dd class="s">{d.kind === 'month' ? monthOf(rec.prev[0]) : dayOf(rec.prev[0])}</dd></div>
+						<div><dt>Previous record</dt><dd>{f(rec.prev[1])}</dd><dd class="s">{per !== 'tp' ? periodWhen(rec.prev[0], per) : d.kind === 'month' ? monthOf(rec.prev[0]) : dayOf(rec.prev[0])}</dd></div>
 					{/if}
 					{#if !rec.ongoing}
 						<div><dt>Has stood for</dt><dd>{daysBetween(d.kind === 'run' ? rec.t + rec.v * 36e5 : rec.t, Date.now()).toLocaleString('en-NZ')} days</dd><dd class="s">as of today</dd></div>
@@ -151,15 +174,20 @@
 
 			<section class="panel" aria-labelledby="grow-h">
 				<div class="p-head"><h2 id="grow-h">How the record grew</h2><span class="unit">Each step is a new record</span></div>
-				<Progression steps={rec.steps} first={R.first} end={R.end} tok={d.tok} fmt={axisFmt} dashed={!!d.est} prov={prov ? { t: prov.t, v: prov.v } : null} when={(t) => d.kind === 'month' ? monthOf(t) : d.kind === 'run' ? dayOf(t) : `${clock(t)}, ${dayOf(t)}`}
+				<Progression steps={rec.steps} first={R.first} end={R.end} tok={d.tok} fmt={axisFmt} dashed={!!d.est} prov={prov ? { t: prov.t, v: prov.v } : null} when={(t) => per !== 'tp' ? periodWhen(t, per) : d.kind === 'month' ? monthOf(t) : d.kind === 'run' ? dayOf(t) : `${clock(t)}, ${dayOf(t)}`}
 					label="{fullName(d)}, {regionName}: the record over time, from {f(rec.steps[0][1])} in {yearOf(rec.steps[0][0])} to {f(rec.v)} in {yearOf(rec.t)}, broken {rec.n} times" />
 			</section>
 
 			<div class="two">
-				{#if d.kind === 'hh' && rec.ctx}
+				{#if per !== 'tp'}
+					<section class="panel" aria-labelledby="day-h">
+						<div class="p-head"><h2 id="day-h">The {periodOf(per).word} it fell</h2><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div>
+						<p class="note">{periodWhen(rec.t, per, true)}: {parts(d, rec.v, per).n} {parts(d, rec.v, per).u}{d.unit === '%' ? ' of its generation renewable' : ''}{rec.prev ? `, beating ${f(rec.prev[1])} (${periodWhen(rec.prev[0], per)})` : ''}. Open it in the tracker to see what happened through it.</p>
+					</section>
+				{:else if d.kind === 'hh' && rec.ctx}
 					{@const c = rec.ctx}
 					<section class="panel" aria-labelledby="day-h">
-						<div class="p-head"><h2 id="day-h">The day it fell</h2><a class="link" href="/tracker?region={region}&range=1d&int=30m&end={ymd(rec.t)}&t={stamp(rec.t)}">Open in the tracker</a></div>
+						<div class="p-head"><h2 id="day-h">The day it fell</h2><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div>
 						<DayChart day={c.day} t={rec.t} tok={d.tok} fmt={axisFmt} label="{fullName(d)} through {dayLong(rec.t)}, half-hourly, peaking at {f(rec.v)} at {clock(rec.t)}" />
 						<dl class="facts">
 							<div><dt>Demand</dt><dd>{c.demand.toLocaleString('en-NZ')} MW</dd></div>
@@ -187,10 +215,10 @@
 					{:else}
 						<h2 id="prev-h">Recent records</h2>
 						<table class="lst">
-							<thead><tr><th scope="col">{d.kind === 'month' ? 'Month' : 'Half-hour'}</th><th scope="col" class="n">Record</th><th scope="col" class="n">{d.id.endsWith('_min') ? 'Down' : 'Up'}</th></tr></thead>
+							<thead><tr><th scope="col">{per !== 'tp' ? periodOf(per).label : d.kind === 'month' ? 'Month' : 'Half-hour'}</th><th scope="col" class="n">Record</th><th scope="col" class="n">{d.id.endsWith('_min') ? 'Down' : 'Up'}</th></tr></thead>
 							<tbody>
 								{#each history as h}
-									<tr><td>{d.kind === 'month' ? monthOf(h.t) : `${clock(h.t)}, ${dayOf(h.t)}`}</td><td class="n">{f(h.v)}</td><td class="n muted">{h.first ? 'first' : d.unit === '%' ? (h.by ?? 0).toFixed(1) : parts(d, h.by ?? 0).n}</td></tr>
+									<tr><td>{per !== 'tp' ? periodWhen(h.t, per) : d.kind === 'month' ? monthOf(h.t) : `${clock(h.t)}, ${dayOf(h.t)}`}</td><td class="n">{f(h.v)}</td><td class="n muted">{h.first ? 'first' : d.unit === '%' ? (h.by ?? 0).toFixed(1) : parts(d, h.by ?? 0).n}</td></tr>
 								{/each}
 							</tbody>
 						</table>
@@ -216,7 +244,7 @@
 					<button type="button" class="btn" onclick={copyLink}>{copied ? 'Link copied' : 'Copy link'}</button>
 					<button type="button" class="btn" onclick={download}>Download image</button>
 				</div>
-				<span class="note">Half-hour averages from the EA’s metered data and final prices. <a href="/methods/records">How records work</a></span>
+				<span class="note">{per === 'tp' ? 'Half-hour averages' : `Averages over each ${periodOf(per).word}`} from the EA’s metered data and final prices. <a href="/methods/records">How records work</a></span>
 			</div>
 		{/if}
 
@@ -242,6 +270,8 @@
 	.h-row { display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; }
 	h1 { font-size: 1.6rem; letter-spacing: -0.02em; line-height: 1.15; display: flex; align-items: center; flex-wrap: wrap; }
 	.sub { margin: 0; color: var(--ink-2); }
+	.per { justify-self: start; flex-wrap: wrap; }
+	.per button { min-height: 32px; padding-inline: 12px; font-size: 0.84rem; }
 	.dot { display: inline-block; flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--c); margin-right: 10px; }
 	.tag { display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em; padding: 1px 7px; border-radius: 999px; background: var(--grid); color: var(--ink-2); margin-left: 8px; white-space: nowrap; }
 	.tag.new { background: var(--warn-bg); color: var(--warn-ink); }

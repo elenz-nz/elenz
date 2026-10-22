@@ -10,20 +10,23 @@
 	import Spark from '#lib/records/Spark.svelte';
 	import InfoTip from '#lib/site/InfoTip.svelte';
 	import {
-		DEFS, GROUPS, REGIONS, LIVE_URL, MONTHS, get, notShown, parts, when, step, fmt, recent, milestones, provisional,
-		liveBeats, loadRecords, meteredDue, fullName, dayOf, clock, monthOf, yearOf
+		LISTED as DEFS, PERIODS, PERIOD_KEYS, periodOf, periodSub, GROUPS, REGIONS, LIVE_URL, MONTHS, get, notShown, parts, when, step, fmt, recent, milestones, provisional,
+		liveBeats, loadRecords, meteredDue, fullName, dayOf, clock, monthOf, yearOf, periodWhen
 	} from '#lib/records/records.js';
 
 	let R = $state<any>(null);
 	let live = $state<any>({});
 	let status = $state<'loading' | 'none' | 'ok'>('loading');
 	let region = $state('NZ');
+	// the period the table lists: each half-hour record's highest trading period, day, week, month or year (?period=)
+	let period = $state('tp');
 	let cat = $state('all');
 	let moy = $state(new Date(Date.now() + 13 * 36e5).getUTCMonth());   // this month in New Zealand
 
 	onMount(() => {
-		const q = new URLSearchParams(location.search).get('region');
+		const qs = new URLSearchParams(location.search), q = qs.get('region'), qp = qs.get('period');
 		if (q && ['NZ', 'NI', 'SI'].includes(q)) region = q;
+		if (qp && PERIOD_KEYS.includes(qp)) period = qp;
 		(async () => {
 			R = await loadRecords();
 			status = R ? 'ok' : 'none';
@@ -35,17 +38,24 @@
 		})();
 	});
 
-	function setRegion(r: string) {
-		region = r;
+	function setRegion(r: string) { region = r; syncUrl(); }
+	function setPeriod(p: string) { period = p; syncUrl(); }
+	function syncUrl() {
 		const u = new URL(location.href);
-		if (r === 'NZ') u.searchParams.delete('region');
-		else u.searchParams.set('region', r);
+		if (region === 'NZ') u.searchParams.delete('region'); else u.searchParams.set('region', region);
+		if (period === 'tp') u.searchParams.delete('period'); else u.searchParams.set('period', period);
 		replaceState(u, {});
 	}
-	const href = (id: string, r = region) => `/records/${id}${r === 'NZ' ? '' : `?region=${r}`}`;
+	const href = (id: string, r = region, p = period) => {
+		const q = new URLSearchParams();
+		if (r !== 'NZ') q.set('region', r);
+		if (p !== 'tp' && DEFS.find((x) => x.id === id)?.kind === 'hh') q.set('period', p);
+		const qs = q.toString();
+		return `/records/${id}${qs ? '?' + qs : ''}`;
+	};
 	const regionName = $derived(REGIONS.find((x) => x.id === region)!.name);
 
-	type Row = { d: any; rec: any; na: string | null; prov: any; isNew: boolean };
+	type Row = { d: any; rec: any; na: string | null; prov: any; isNew: boolean; p: string };
 	// groups with no record for this region (HVDC for an island) are left out rather than listed as not shown
 	const shownGroups = $derived(GROUPS.filter((g) => DEFS.some((d) => d.group === g && d.regions.includes(region))));
 	$effect(() => { if (cat !== 'all' && !shownGroups.includes(cat)) cat = 'all'; });
@@ -54,22 +64,24 @@
 		return shownGroups.filter((g) => cat === 'all' || g === cat).map((g) => ({
 			name: g,
 			rows: DEFS.filter((d) => d.group === g).map((d): Row => {
-				const rec = get(R, d.id, region);
-				const na = notShown(d, region, rec);
-				return { d, rec, na, prov: na ? null : provisional(R, live, d.id, region), isNew: !na && !!rec?.since && Date.now() - rec.since < 30 * 864e5 };
+				const p = d.kind === 'hh' ? period : 'tp';
+				const rec = get(R, d.id, region, p);
+				const na = notShown(d, region, rec, R, p);
+				const prov = na ? null : p === 'tp' ? provisional(R, live, d.id, region) : (rec?.prov ?? null);
+				return { d, rec, na, prov, p, isNew: !na && !!rec?.since && Date.now() - rec.since < 30 * 864e5 };
 			}),
 		}));
 	});
 	const cards = $derived(R ? recent(R, live).slice(0, 6) : []);
 	const miles = $derived(R ? milestones(R, region).slice(-6).reverse() : []);
-	const MOY = ['demand_max', 'demand_min', 'ren_max', 'ren_month_max', 'wind_max', 'wind_month_max', 'roof_max', 'price_max'];
+	const MOY = ['demand_max', 'demand_min', 'ren_max', 'wind_max', 'solar_max', 'roof_max', 'price_max'];
 	const moyRows = $derived(R ? MOY.map((id) => DEFS.find((d) => d.id === id)!).filter((d) => d.regions.includes(region))
 		.map((d) => ({ d, tv: R.moy?.[d.id]?.[region]?.[moy] ?? null })).filter((x) => x.tv && !notShown(x.d, region, get(R, x.d.id, region))) : []);
 
-	const provText = (d: any, p: any, rec: any) => {
+	const provText = (d: any, p: any, rec: any, per = 'tp') => {
 		const src = p.src === 'live' ? 'Live data shows' : 'Dispatch data shows';
-		const w = d.kind === 'hh' ? `in the ${clock(p.t)} half-hour on ${dayOf(p.t)}` : d.kind === 'run' ? `from ${dayOf(p.t)}${p.ongoing ? ', still going' : ''}` : `in ${monthOf(p.t)}`;
-		return `${src} ${fmt(d, p.v)} ${w}, beyond the record of ${fmt(d, rec.v)}. Confirmed or dropped when the EA publishes the metered data, around ${meteredDue(p.t)}.`;
+		const w = per !== 'tp' && d.kind === 'hh' ? `for ${periodWhen(p.t, per).replace(/^Week/, 'the week')}` : d.kind === 'hh' ? `in the ${clock(p.t)} half-hour on ${dayOf(p.t)}` : d.kind === 'run' ? `from ${dayOf(p.t)}${p.ongoing ? ', still going' : ''}` : `in ${monthOf(p.t)}`;
+		return `${src} ${fmt(d, p.v, per)} ${w}, beyond the record of ${fmt(d, rec.v, per)}. Confirmed or dropped when the EA publishes the metered data, around ${meteredDue(p.t)}.`;
 	};
 	const upBy = (d: any, rec: any) => {
 		if (!rec?.prev) return '';
@@ -93,7 +105,7 @@
 		<section class="hero" aria-labelledby="rec-h">
 			<div>
 				<h1 id="rec-h">Records</h1>
-				<p class="lede">The highest and lowest half-hours, months and runs since 1 August 1997, from the Electricity Authority’s metered data and final prices.</p>
+				<p class="lede">The highest and lowest trading periods, days, weeks, months and years, and the longest runs, since 1 August 1997, from the Electricity Authority’s metered data and final prices.</p>
 			</div>
 			{#if R?.final_to?.gen}
 				<span class="pill" title="Records rest on the EA's metered data, published 5–6 weeks after each month. Anything newer is provisional.">Official to {dayOf(R.final_to.gen)}</span>
@@ -125,7 +137,7 @@
 						{#each cards as c}
 							{@const p = c.prov}
 							{@const shown = p ?? c.rec}
-							<a class="card" class:prov={!!p} href={href(c.d.id, c.region)}>
+							<a class="card" class:prov={!!p} href={href(c.d.id, c.region, 'tp')}>
 								<span class="c-top">
 									<span class="c-name"><span class="dot" style="--c:var({c.d.tok})"></span>{fullName(c.d)} · {c.region}</span>
 									<span class="tags">
@@ -155,7 +167,12 @@
 			<section aria-labelledby="all-h" class="sec">
 				<div class="sec-head">
 					<div class="ttl-row"><h2 id="all-h">All-time records · {regionName}</h2><InfoTip label="About these records">Official records use the EA’s metered data and final prices, which arrive 5–6 weeks after each month (final prices a day or two). Newer records come from dispatch data and stay provisional until the metered month confirms them. Embedded solar is modelled, and days the clocks change are left out of the generation and demand records. <a href="/methods/records">How records work</a></InfoTip></div>
-					<span class="unit">Half-hour averages unless stated</span>
+					<span class="unit">{period === 'tp' ? 'Half-hour averages unless stated' : `Averages over each ${periodOf(period).word}; runs are any length`}</span>
+				</div>
+				<div class="seg per" role="group" aria-label="Records for each">
+					{#each PERIODS as p}
+						<button type="button" aria-pressed={period === p.k} onclick={() => setPeriod(p.k)}>{p.label}</button>
+					{/each}
 				</div>
 				<div class="chips" role="group" aria-label="Show records about">
 					{#each ['all', ...shownGroups] as g}
@@ -181,21 +198,21 @@
 													{#if row.na}<span class="nm">{d.name}</span>{:else}<a class="nm" href={href(d.id)}>{d.name}</a>{/if}
 													{#if d.est}<span class="tag est">Estimate</span>{/if}
 													{#if row.isNew}<span class="tag new">New</span>{/if}
-													<small>{d.sub}</small>
+													<small>{periodSub(d, row.p)}</small>
 												</span>
 											</span>
 										</th>
 										{#if row.na}
 											<td colspan="4" class="na-note">{row.na}</td>
 										{:else}
-											<td class="n val">{parts(d, rec.v).n}<small>{parts(d, rec.v).u}</small></td>
-											<td>{when(d, rec)}</td>
-											<td class="muted">{d.kind === 'run' ? (rec.top?.[1] ? `${parts(d, rec.top[1][1]).n} hours, ${dayOf(rec.top[1][0])}` : '') : step(d, rec.prev)}</td>
+											<td class="n val">{parts(d, rec.v, row.p).n}<small>{parts(d, rec.v, row.p).u}</small></td>
+											<td>{when(d, rec, false, row.p)}</td>
+											<td class="muted">{d.kind === 'run' ? (rec.top?.[1] ? `${parts(d, rec.top[1][1]).n} hours, ${dayOf(rec.top[1][0])}` : '') : step(d, rec.prev, row.p)}</td>
 											<td><Spark steps={rec.steps} end={R.end} tok={d.tok} dashed={!!d.est} /></td>
 										{/if}
 									</tr>
 									{#if row.prov && rec}
-										<tr class="prov-row"><td colspan="5"><span class="tag provtag">Provisional</span> {provText(d, row.prov, rec)}</td></tr>
+										<tr class="prov-row"><td colspan="5"><span class="tag provtag">Provisional</span> {provText(d, row.prov, rec, row.p)}</td></tr>
 									{/if}
 								{/each}
 							</tbody>
@@ -285,6 +302,8 @@
 	.c-sub { display: block; color: var(--muted); font-size: 0.78rem; margin-top: 4px; }
 	.c-foot { color: var(--ink-2); font-size: 0.78rem; border-top: 1px solid var(--grid); padding-top: 8px; }
 
+	.per { justify-self: start; flex-wrap: wrap; }
+	.per button { min-height: 32px; padding-inline: 12px; font-size: 0.84rem; }
 	.chips { display: flex; gap: 6px; flex-wrap: wrap; }
 	.chip { font: inherit; font-size: 0.8rem; font-weight: 500; padding: 5px 11px; min-height: 32px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); cursor: pointer; }
 	.chip:hover { color: var(--ink); border-color: var(--ink-2); }

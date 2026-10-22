@@ -1,6 +1,6 @@
 <script lang="ts">
 	// The list of records comes from the Records pages' own definitions, so this page can't drift from them.
-	import { DEFS, GROUPS, NEW_DAYS } from '#lib/records/records.js';
+	import { LISTED as DEFS, GROUPS, NEW_DAYS } from '#lib/records/records.js';
 	import { REPO } from '../registry.js';
 	const KIND: Record<string, string> = { hh: 'Half-hour', month: 'Calendar month', run: 'Run of half-hours' };
 	const FAM: Record<string, string> = { gen: 'Metered generation and demand', price: 'Final prices', hvdc: 'Metered HVDC' };
@@ -12,8 +12,8 @@
 <dl>
 	<dt>Half-hour records</dt>
 	<dd>The highest or lowest half-hour: each trading period’s average, as the history holds it. A record has to beat the one before it; equalling it doesn’t count.</dd>
-	<dt>Month records</dt>
-	<dd>The highest or lowest calendar month (New Zealand time): the renewable share of the month’s generation, and the month’s wind generation in GWh.</dd>
+	<dt>Days, weeks, months and years</dt>
+	<dd>Each half-hour record also has its highest or lowest day, week (Monday to Sunday), calendar month and calendar year, New Zealand time: the period’s average over its half-hours (MW, or $/MWh for prices), and for the renewable share, renewable energy over all the period’s generation. Averages rather than totals, so periods of different lengths compare fairly: a February isn’t the lowest-demand month just for being short. Only whole periods count, so the history’s first part-year (1997) and the period still under way are left out, and a day needs 90% of its half-hours. Days the clocks change are left out of generation and demand days, as they are for half-hours; a longer period that contains one is averaged over the rest. A period is official when every day in it is official, and a newer one beyond the record is provisional. Pick the period at the top of the records table or on a record’s page. (These replace the earlier month records for the renewable share and wind, whose pages still work.)</dd>
 	<dt>Runs</dt>
 	<dd>The longest unbroken run of half-hours meeting a condition, joined across month boundaries: at least 90% renewable, prices under $5/MWh, or no Huntly Rankine running.</dd>
 </dl>

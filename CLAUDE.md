@@ -35,7 +35,10 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   `src/lib/articles/registry.ts`). `ARTICLES_PUBLIC` there is true (published 15 Oct 2026 with the Winter 2026 review): Articles is in the
   navigation and on the landing page (`ArticlesPeek`); drafts (`draft: true`) stay off the index and are `noindex`, but
   their own address still works for review. `/records` the records (`src/routes/records/`; one page per record at
-  `/records/<id>?region=NI|SI`, prerendered from `DEFS`): the highest and lowest half-hours, months and runs since 1997
+  `/records/<id>?region=NI|SI&period=day|week|month|year`, prerendered from `DEFS`): the highest and lowest half-hours,
+  and for each half-hour record its highest/lowest day, week (Mon-Sun), month and year (`periods` in records.json: period
+  averages, from per-day sums in each month's summary, records.py `PERIODS`, `day_sums`, `period_figures`; the old month
+  records are `old` in `DEFS`, not listed but their pages kept), and runs since 1997
   for NZ and each island, from `/data/history/records.json` (`ingest/records.py`). Names, wording, formatting, the
   share image and the live check (the live week averaged to half-hours, generation and demand records only; also the
   provisional line on /now, `RecordLine.svelte`) are in `src/lib/records/`; `RecordsPeek` on the landing page.

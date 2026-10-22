@@ -20,16 +20,16 @@ export const DEFS = [
   { id: 'demand_max', kind: 'hh', fam: 'gen', group: 'Demand', name: 'Peak demand', sub: 'Highest half-hour of grid demand', unit: 'MW', tok: '--ink', regions: ALL },
   { id: 'demand_min', kind: 'hh', fam: 'gen', group: 'Demand', name: 'Lowest demand', sub: 'Lowest half-hour of grid demand', unit: 'MW', tok: '--ink', regions: ALL },
   { id: 'ren_max', kind: 'hh', fam: 'gen', group: 'Renewables', name: 'Highest renewable share', sub: 'Half-hour', unit: '%', dp: 1, tok: '--g-ren', regions: ALL },
-  { id: 'ren_month_max', kind: 'month', fam: 'gen', group: 'Renewables', name: 'Highest renewable share', sub: 'Calendar month', unit: '%', dp: 1, tok: '--g-ren', regions: ALL },
+  { id: 'ren_month_max', old: true, kind: 'month', fam: 'gen', group: 'Renewables', name: 'Highest renewable share', sub: 'Calendar month', unit: '%', dp: 1, tok: '--g-ren', regions: ALL },
   { id: 'ren_min', kind: 'hh', fam: 'gen', group: 'Renewables', name: 'Lowest renewable share', sub: 'Half-hour', unit: '%', dp: 1, tok: '--g-ren', regions: ALL },
-  { id: 'ren_month_min', kind: 'month', fam: 'gen', group: 'Renewables', name: 'Lowest renewable share', sub: 'Calendar month', unit: '%', dp: 1, tok: '--g-ren', regions: ALL },
+  { id: 'ren_month_min', old: true, kind: 'month', fam: 'gen', group: 'Renewables', name: 'Lowest renewable share', sub: 'Calendar month', unit: '%', dp: 1, tok: '--g-ren', regions: ALL },
   { id: 'ren_run', kind: 'run', fam: 'gen', group: 'Renewables', name: 'Longest run at 90% renewable or more', sub: 'Every half-hour in a row', unit: 'h', tok: '--g-ren', regions: ['NZ', 'NI'],
     na: { SI: 'The South Island’s generation is all renewable' } },
   { id: 'fossil_min', kind: 'hh', fam: 'gen', group: 'Renewables', name: 'Lowest fossil generation', sub: 'Rankines, gas, diesel and waste heat', unit: 'MW', tok: '--g-fossil', regions: ALL },
   { id: 'huntly_off_run', kind: 'run', fam: 'gen', group: 'Renewables', name: 'Longest with no Huntly Rankine running', sub: 'The coal and gas units at Huntly', unit: 'h', tok: '--f-coal', regions: ['NZ'],
     na: { NI: 'Shown for New Zealand', SI: 'Huntly is in the North Island' } },
   { id: 'wind_max', kind: 'hh', fam: 'gen', group: 'Wind and solar', name: 'Peak wind', sub: 'Half-hour', unit: 'MW', tok: '--f-wind', regions: ALL },
-  { id: 'wind_month_max', kind: 'month', fam: 'gen', group: 'Wind and solar', name: 'Windiest month', sub: 'Wind generation in a calendar month', unit: 'GWh', dp: 1, tok: '--f-wind', regions: ALL },
+  { id: 'wind_month_max', old: true, kind: 'month', fam: 'gen', group: 'Wind and solar', name: 'Windiest month', sub: 'Wind generation in a calendar month', unit: 'GWh', dp: 1, tok: '--f-wind', regions: ALL },
   { id: 'solar_max', kind: 'hh', fam: 'gen', group: 'Wind and solar', name: 'Peak grid solar', sub: 'Solar farms the market dispatches', unit: 'MW', tok: '--f-solar', regions: ALL },
   { id: 'roof_max', kind: 'hh', fam: 'gen', group: 'Wind and solar', name: 'Peak embedded solar', sub: 'Rooftops and small arrays, modelled', unit: 'MW', tok: '--f-solar', est: true, regions: ALL },
   { id: 'price_max', kind: 'hh', fam: 'price', group: 'Prices', name: 'Highest price', sub: 'Half-hour, final price', unit: '$', dp: 2, tok: '--accent', regions: ALL },
@@ -42,8 +42,31 @@ export const DEFS = [
     na: { NI: 'Shown for New Zealand', SI: 'Shown for New Zealand' } },
 ];
 export const def = (id) => DEFS.find((d) => d.id === id);
+// The records the pages list: the month records are now the Month period of their half-hour record (Oct 2026), so
+// they keep their own pages (old links) but aren't listed.
+export const LISTED = DEFS.filter((d) => !d.old);
+
+// Periods: each half-hour record also has its highest (or lowest) day, week, month and year (records.py PERIODS),
+// each the period's average (the renewable share: of its generation). Runs don't have periods.
+export const PERIODS = [
+  { k: 'tp', label: 'Trading period', short: 'TP', word: 'half-hour' },
+  { k: 'day', label: 'Day', short: 'Day', word: 'day' },
+  { k: 'week', label: 'Week', short: 'Week', word: 'week' },
+  { k: 'month', label: 'Month', short: 'Month', word: 'month' },
+  { k: 'year', label: 'Year', short: 'Year', word: 'year' },
+];
+export const PERIOD_KEYS = PERIODS.map((p) => p.k);
+export const periodOf = (k) => PERIODS.find((p) => p.k === k) ?? PERIODS[0];
+/** What a record measures for a period: "Average over the day" ("Renewable share of the week's generation"). */
+export function periodSub(d, p) {
+  if (p === 'tp' || d.kind !== 'hh') return d.sub;
+  const w = periodOf(p).word;
+  if (d.unit === '%') return `Share of the ${w}’s generation`;
+  if (d.id === 'gap_max') return `Haywards against Benmore, ${w} average`;
+  return `Average over the ${w}`;
+}
 /** "Peak wind" or, where two records share a name, "Highest renewable share, month". */
-export const fullName = (d) => (DEFS.filter((x) => x.name === d.name).length > 1 ? `${d.name}, ${d.kind === 'month' ? 'month' : 'half-hour'}` : d.name);
+export const fullName = (d) => (DEFS.filter((x) => x.name === d.name && (!x.old || d.old)).length > 1 ? `${d.name}, ${d.kind === 'month' ? 'month' : 'half-hour'}` : d.name);
 
 // milestones: the first time a record passed each level (from its progression)
 export const MILESTONES = [
@@ -56,17 +79,20 @@ export const MILESTONES = [
 
 // ---------- the file ----------
 
-/** The record (or month record, or run) for one id and region, or null. */
-export function get(R, id, region) {
+/** The record (or month record, or run) for one id and region, or null; for a half-hour record, its day, week, month
+ *  or year record when `period` says so. */
+export function get(R, id, region, period = 'tp') {
   const d = def(id);
   if (!R || !d) return null;
+  if (period !== 'tp' && d.kind === 'hh') return R.periods?.[period]?.[id]?.[region] ?? null;
   const group = d.kind === 'hh' ? R.records : d.kind === 'month' ? R.months : R.runs;
   return group?.[id]?.[region] ?? null;
 }
 
 /** Why a record isn't shown for a region: the definition's note, or what its data says (always the same value). */
-export function notShown(d, region, rec) {
+export function notShown(d, region, rec, R = null, period = 'tp') {
   if (!d.regions.includes(region)) return d.na?.[region] ?? 'Shown for New Zealand';
+  if (!rec && period !== 'tp' && d.kind === 'hh' && R && !R.periods) return 'Being worked out from the history; back in a day or so';
   if (!rec) return 'No data yet';
   if (rec.constant) {
     if (d.id.startsWith('ren') && rec.v === 100) return 'Always 100%: no fossil plant in the South Island';
@@ -96,29 +122,31 @@ export const monthShort = (t) => F.monthShort.format(t);
 export const yearOf = (t) => F.year.format(t);
 export const MONTHS = Array.from({ length: 12 }, (_, i) => F.monthName.format(Date.UTC(2026, i, 15)));
 
-/** A value as {n, u}: the number and its unit, for a table cell. */
-export function parts(d, v) {
+/** A value as {n, u}: the number and its unit, for a table cell (a period's MW and $ are averages: "MW avg"). */
+export function parts(d, v, period = 'tp') {
   if (v == null) return { n: '–', u: '' };
-  const dp = d.dp ?? 0;
+  const dp = d.dp ?? 0, avg = period !== 'tp' && d.kind === 'hh' ? ' avg' : '';
   if (d.unit === '$') {
     const big = Math.abs(v) >= 100;
-    return { n: (v < 0 ? '−$' : '$') + Math.abs(v).toLocaleString('en-NZ', { minimumFractionDigits: big ? 0 : 2, maximumFractionDigits: big ? 0 : 2 }), u: '/MWh' };
+    return { n: (v < 0 ? '−$' : '$') + Math.abs(v).toLocaleString('en-NZ', { minimumFractionDigits: big ? 0 : 2, maximumFractionDigits: big ? 0 : 2 }), u: '/MWh' + avg };
   }
+  if (avg && d.unit === 'MW') return { n: v.toLocaleString('en-NZ', { minimumFractionDigits: dp, maximumFractionDigits: dp }), u: 'MW avg' };
   if (d.unit === '%') return { n: v.toFixed(dp), u: '%' };
   if (d.unit === 'h') return { n: v.toLocaleString('en-NZ', { maximumFractionDigits: 1 }), u: v === 1 ? 'hour' : 'hours' };
   return { n: v.toLocaleString('en-NZ', { minimumFractionDigits: dp, maximumFractionDigits: dp }), u: d.unit };
 }
 /** A value as one string: "1,148 MW", "98.9%", "$12,019/MWh", "354 hours". */
-export function fmt(d, v) {
-  const p = parts(d, v);
+export function fmt(d, v, period = 'tp') {
+  const p = parts(d, v, period);
   return d.unit === '%' ? p.n + p.u : d.unit === '$' ? p.n + p.u : `${p.n} ${p.u}`;
 }
 /** "354 hours (14.8 days)" for a long run. */
 export const runLength = (h) => (h >= 48 ? `${h.toLocaleString('en-NZ', { maximumFractionDigits: 1 })} hours (${(h / 24).toFixed(1)} days)` : `${h} hours`);
 
 /** When a record was set: "5:30 pm, 29 May 2001", "May 2001", or a run's start and end. */
-export function when(d, rec, long = false) {
+export function when(d, rec, long = false, period = 'tp') {
   if (!rec) return '';
+  if (period !== 'tp' && d.kind === 'hh') return periodWhen(rec.t, period, long);
   if (d.kind === 'month') return monthOf(rec.t);
   if (d.kind === 'run') {
     const end = rec.t + rec.v * 36e5 - 1800e3;   // the start of its last half-hour
@@ -127,10 +155,18 @@ export function when(d, rec, long = false) {
   return `${clock(rec.t)}, ${long ? dayLong(rec.t) : dayOf(rec.t)}`;
 }
 /** A previous record or progression step: "1,112 MW, 14 Aug 2025". */
-export function step(d, tv) {
+export function step(d, tv, period = 'tp') {
   if (!tv) return '';
-  const w = d.kind === 'month' ? monthShort(tv[0]) : dayOf(tv[0]);
-  return `${fmt(d, tv[1])}, ${w}`;
+  const w = period !== 'tp' && d.kind === 'hh' ? periodWhen(tv[0], period, false, true) : d.kind === 'month' ? monthShort(tv[0]) : dayOf(tv[0]);
+  return `${fmt(d, tv[1], period)}, ${w}`;
+}
+/** A period from its start: "Thursday 24 September 2026", "Week of 21 Sept 2026", "September 2026", "2025". */
+export function periodWhen(t, period, long = false, short = false) {
+  if (period === 'day') return long ? dayLong(t) : dayOf(t);
+  if (period === 'week') return `${short ? 'Wk of' : 'Week of'} ${dayOf(t)}`;
+  if (period === 'month') return short ? monthShort(t) : monthOf(t);
+  if (period === 'year') return yearOf(t);
+  return dayOf(t);
 }
 
 /** Roughly when the EA publishes metered data for the month containing t (5-6 weeks after it ends). */
@@ -243,7 +279,7 @@ export async function loadRecords(fetchFn = fetch) {
 export function recent(R, live, now = Date.now()) {
   if (!R) return [];
   const out = [];
-  for (const d of DEFS) {
+  for (const d of LISTED) {
     for (const r of d.regions) {
       const rec = get(R, d.id, r);
       if (!rec || notShown(d, r, rec)) continue;

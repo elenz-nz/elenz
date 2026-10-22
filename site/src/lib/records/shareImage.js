@@ -1,7 +1,7 @@
 // A record as a 1200 x 630 image (the size link previews use), drawn in the browser for the "Download image"
 // button on a record's page: the mark, the record, when it was set, what it beat, and its progression.
 // Always in the light palette (tracker.css), so it reads the same wherever it is posted.
-import { fmt, fullName, when, step, REGIONS } from './records.js';
+import { fmt, fullName, when, step, REGIONS, periodOf } from './records.js';
 
 const C = {
   bg: '#f2f5f5', ink: '#132020', ink2: '#3f4f4e', muted: '#667574', line: '#d6dfde',
@@ -22,7 +22,7 @@ function mark(ctx, x, y, s) {
 }
 
 /** Draw a record onto a canvas (1200 x 630). isNew: say "New record". */
-export async function drawRecord(canvas, { d, region, rec, end, isNew }) {
+export async function drawRecord(canvas, { d, region, rec, end, isNew, period = 'tp' }) {
   try { await document.fonts.ready; } catch { /* fonts are a nicety */ }
   canvas.width = 1200; canvas.height = 630;
   const ctx = canvas.getContext('2d');
@@ -43,19 +43,19 @@ export async function drawRecord(canvas, { d, region, rec, end, isNew }) {
   ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = col; ctx.beginPath(); ctx.arc(74, 186, 10, 0, 2 * Math.PI); ctx.fill();
   ctx.fillStyle = C.ink2; ctx.font = `500 30px ${UI}`;
-  ctx.fillText(`${fullName(d)} · ${regionName}`, 96, 196);
+  ctx.fillText(`${fullName(d)}${period !== 'tp' ? ' · ' + periodOf(period).label : ''} · ${regionName}`, 96, 196);
 
   // the value, as large as fits beside the chart
-  const value = fmt(d, rec.v);
+  const value = fmt(d, rec.v, period);
   let size = 130;
   ctx.font = `600 ${size}px ${DATA}`;
   while (ctx.measureText(value).width > 640 && size > 60) { size -= 6; ctx.font = `600 ${size}px ${DATA}`; }
   ctx.fillStyle = C.ink; ctx.fillText(value, 60, 210 + size);
   ctx.font = `400 28px ${UI}`; ctx.fillStyle = C.ink2;
-  ctx.fillText(when(d, rec), 64, 270 + size);
+  ctx.fillText(when(d, rec, false, period), 64, 270 + size);
   if (rec.prev) {
     ctx.fillStyle = C.muted; ctx.font = `400 24px ${UI}`;
-    ctx.fillText(`Previous record ${step(d, rec.prev)}`, 64, 312 + size);
+    ctx.fillText(`Previous record ${step(d, rec.prev, period)}`, 64, 312 + size);
   }
 
   // progression: a step line in the right-hand block

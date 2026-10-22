@@ -40,7 +40,7 @@ import pandas as pd
 
 from common import NZ
 
-VERSION = 1                # bump when summarise() changes: every month's summary is remade
+VERSION = 2                # bump when summarise() changes: every month's summary is remade (2: per-day sums for periods)
 REGIONS = ('NZ', 'NI', 'SI')
 GEN = ('geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
 REN = ('geo', 'bio', 'hydro', 'wind', 'solar', 'roof')
@@ -80,6 +80,24 @@ RUNS = {
     'huntly_off_run': ('gen', ('NZ',)),                     # no Huntly Rankine running
 }
 FUEL_OF = {'wind_max': 'wind', 'solar_max': 'solar'}       # records whose context lists the biggest plants
+
+# Periods: every half-hour record also has its highest (or lowest) day, week (Monday to Sunday), calendar month and
+# calendar year. A period's figure is its average over the half-hours it has (MW, %, $/MWh), so periods of different
+# lengths compare fairly (a February isn't the lowest month just for being short); the renewable share is renewable
+# energy over all generation. Only whole periods count: none before the data starts or after it ends, and a day needs
+# 90% of its half-hours (clock-change days are left out of generation and demand days, as for half-hours). A period
+# is official when every day in it is; a newer one beyond the record is provisional.
+PERIODS = ('day', 'week', 'month', 'year')
+DAY_SUMS = ('dem', 'gen', 'ren', 'fossil', 'wind', 'solar', 'roof', 'price', 'gap', 'hvdc')
+DAY_MIN_SHARE = 0.9
+# each record's figure from a period's sums: (sum key, sign) for an average, or 'ren' for the renewable share
+PERIOD_OF = {
+    'demand_max': ('dem', 1), 'demand_min': ('dem', 1), 'ren_max': 'ren', 'ren_min': 'ren', 'fossil_min': ('fossil', 1),
+    'wind_max': ('wind', 1), 'solar_max': ('solar', 1), 'roof_max': ('roof', 1), 'price_max': ('price', 1),
+    'gap_max': ('gap', 1), 'hvdc_n_max': ('hvdc', 1), 'hvdc_s_max': ('hvdc', -1),
+}
+SUM_FAM = {'dem': 'gen', 'gen': 'gen', 'ren': 'gen', 'fossil': 'gen', 'wind': 'gen', 'solar': 'gen', 'roof': 'gen',
+           'price': 'price', 'gap': 'price', 'hvdc': 'hvdc'}
 
 
 # ---------- one month ----------
@@ -135,6 +153,44 @@ def series(js):
                 v = np.where(clk, True, v) if v.dtype == bool else np.where(clk, np.nan, v)
             out[k][r] = v
         out['gen'][r], out['renE'][r], out['windE'][r] = gen, ren, F['wind']
+        # per-day sums for the period records: half-hour values with clock-change days already blanked for
+        # generation and demand (the energy sums for the renewable share are blanked here)
+        out.setdefault('sums', {})[r] = {
+            'dem': out['demand_max'][r], 'gen': np.where(clk, np.nan, gen), 'ren': np.where(clk, np.nan, ren),
+            'fossil': out['fossil_min'][r], 'wind': out['wind_max'][r], 'solar': out['solar_max'][r], 'roof': out['roof_max'][r],
+            'price': price, 'gap': np.abs(nip - sip) if r == 'NZ' else None, 'hvdc': hv if r == 'NZ' else None,
+        }
+    return out
+
+
+def day_sums(js, S=None):
+    """Each NZ day in a month: its start, half-hours, and per region the sum and count of every DAY_SUMS series
+    ({'t': [...], 'n': [...], 's': {region: {key: [[sum, count], ...]}}})."""
+    n, t0, step = js['N'], js['t0'], js['step']
+    S = S or series(js)
+    tt = pd.to_datetime(t0 + np.arange(n) * step, unit='ms', utc=True).tz_convert(NZ)
+    day = tt.normalize()
+    starts = np.flatnonzero(np.r_[True, day[1:] != day[:-1]])
+    bounds = list(starts) + [n]
+    # half-hours a whole day has (46, 48 or 50), from its local midnights
+    full = []
+    for i in starts:
+        d0 = day[i]
+        d1 = (d0.tz_localize(None) + pd.Timedelta(days=1)).tz_localize(NZ)
+        full.append(int(round((d1 - d0).total_seconds() * 1000 / step)))
+    out = {'t': [int(day[i].tz_convert('UTC').timestamp() * 1000) for i in starts], 'n': full, 's': {}}
+    for r in REGIONS:
+        out['s'][r] = {}
+        for k in DAY_SUMS:
+            v = S['sums'][r].get(k)
+            if v is None:
+                continue
+            rows = []
+            for a, b in zip(bounds[:-1], bounds[1:]):
+                x = v[a:b]
+                ok = ~np.isnan(x)
+                rows.append([round(float(x[ok].sum()), 1), int(ok.sum())])
+            out['s'][r][k] = rows
     return out
 
 
@@ -198,7 +254,8 @@ def summarise(js):
             head, tail, inner = run_parts(S[k][r])
             runs[k][r] = {'head': head, 'tail': tail, 'top': [[int(t[i]), m] for i, m in inner]}
     return {'v': VERSION, 'month': js['meta']['month'], 't0': t0, 'step': step, 'n': n,
-            'end': t0 + (n - 1) * step, 'ok': official(js['meta']), 'hh': hh, 'mo': mo, 'run': runs}
+            'end': t0 + (n - 1) * step, 'ok': official(js['meta']), 'hh': hh, 'mo': mo, 'run': runs,
+            'days': day_sums(js, S)}
 
 
 # ---------- all months ----------
@@ -331,6 +388,102 @@ def by_month_of_year(sums, k, r, kind, fam, monthly=False):
     return best
 
 
+def _period_start(t, period):
+    """The start (ms) of the day, week (Monday), month or year that contains NZ day t."""
+    d = pd.Timestamp(t, unit='ms', tz='UTC').tz_convert(NZ).normalize()
+    if period == 'week':
+        d = d - pd.Timedelta(days=d.weekday())
+        d = d.tz_localize(None).tz_localize(NZ)
+    elif period == 'month':
+        d = pd.Timestamp(year=d.year, month=d.month, day=1, tz=NZ)
+    elif period == 'year':
+        d = pd.Timestamp(year=d.year, month=1, day=1, tz=NZ)
+    return int(d.tz_convert('UTC').timestamp() * 1000)
+
+
+def _period_days(start, period):
+    """How many NZ days the period starting at `start` has."""
+    d = pd.Timestamp(start, unit='ms', tz='UTC').tz_convert(NZ)
+    if period == 'day':
+        return 1
+    if period == 'week':
+        return 7
+    if period == 'month':
+        return d.days_in_month
+    return 366 if d.is_leap_year else 365
+
+
+def period_figures(sums, now_ms=None):
+    """Every whole day, week, month and year in the history -> {period: {record: {region: [[start, value, official]]}}},
+    oldest first. A day counts when it has DAY_MIN_SHARE of its half-hours for that series."""
+    days = []   # (t, half-hours, {region: {key: [sum, count]}}, ok)
+    for s in sorted(sums, key=lambda x: x['month']):
+        dd = s.get('days')
+        if not dd:
+            continue
+        for i, t in enumerate(dd['t']):
+            days.append((t, dd['n'][i], {r: {k: v[i] for k, v in dd['s'][r].items()} for r in dd['s']}, s['ok']))
+    if not days:
+        return {}
+    # the first and last days are whole only if the data covers them: drop a part day at either end
+    out = {p: {k: {} for k in PERIOD_OF} for p in PERIODS}
+    for p in PERIODS:
+        groups = {}
+        for d in days:
+            groups.setdefault(_period_start(d[0], p), []).append(d)
+        for start in sorted(groups):
+            ds = groups[start]
+            whole = len({d[0] for d in ds}) == _period_days(start, p)
+            if not whole:
+                continue
+            for k, how in PERIOD_OF.items():
+                for r in HALF_HOURS[k][2]:
+                    keys = ('ren', 'gen') if how == 'ren' else (how[0],)
+                    tot, ok, good = {}, True, True
+                    for key in keys:
+                        a = c = 0.0
+                        for t, nh, S, okd in ds:
+                            sc = S.get(r, {}).get(key)
+                            if sc is None or sc[1] < DAY_MIN_SHARE * nh:
+                                if p == 'day' or SUM_FAM[key] != 'gen':
+                                    good = False
+                                continue   # a clock-change or short day inside a longer period: the rest stands
+                            a += sc[0]; c += sc[1]
+                            ok = ok and okd[SUM_FAM[key]]
+                        if c == 0:
+                            good = False
+                        tot[key] = (a, c)
+                    if not good:
+                        continue
+                    if how == 'ren':
+                        v = 100 * tot['ren'][0] / tot['gen'][0] if tot['gen'][0] > 0 else None
+                    else:
+                        v = how[1] * tot[how[0]][0] / tot[how[0]][1]
+                    if v is None or v != v:
+                        continue
+                    out[p][k].setdefault(r, []).append([start, round(v, HALF_HOURS[k][3]), ok])
+    return out
+
+
+def period_record(figs, kind):
+    """[[start, value, official]] oldest first -> the official record, its progression, and a provisional one beyond it."""
+    steps, best, prov = [], None, None
+    for t, v, ok in figs:
+        if ok:
+            if best is None or _better(kind, v, best):
+                best = v
+                steps.append([t, v])
+        elif best is not None and _better(kind, v, best) and (prov is None or _better(kind, v, prov[1])):
+            prov = [t, v]
+    if not steps:
+        return None
+    out = {'t': steps[-1][0], 'v': steps[-1][1], 'n': len(steps) - 1, 'prev': steps[-2] if len(steps) > 1 else None,
+           'steps': steps}
+    if prov and _better(kind, prov[1], best):
+        out['prov'] = {'t': prov[0], 'v': prov[1]}
+    return out
+
+
 def context(js, k, r, t):
     """The record's half-hour in its setting: that NZ day's series of the record, and what else was happening."""
     n, t0, step = js['N'], js['t0'], js['step']
@@ -418,6 +571,24 @@ def build(sums, old=None, read_month=None, now_ms=None):
                 continue
             out['months'][k][r] = keep('months', k, r, rec, fam)
             out['moy'][k][r] = by_month_of_year(sums, k, r, kind, fam, monthly=True)
+    # the same records by day, week, month and year
+    figs = period_figures(sums)
+    out['periods'] = {}
+    for p in PERIODS:
+        out['periods'][p] = {}
+        for k, (kind, fam, regions, _) in HALF_HOURS.items():
+            out['periods'][p][k] = {}
+            for r in regions:
+                rec = period_record(figs.get(p, {}).get(k, {}).get(r, []), kind)
+                if rec is not None:
+                    prev = (old.get('periods') or {}).get(p, {}).get(k, {}).get(r) or {}
+                    if prev.get('t') == rec['t'] and prev.get('since'):
+                        rec['since'] = prev['since']
+                    elif prev:
+                        rec['since'] = now_ms
+                    if rec.get('since') and now_ms - rec['since'] > 365 * 864e5:
+                        rec['since'] = None
+                    out['periods'][p][k][r] = rec
     for k, (fam, regions) in RUNS.items():
         out['runs'][k] = {}
         for r in regions:
