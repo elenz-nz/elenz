@@ -1,8 +1,8 @@
 # Checks on every push and pull request: the ingest code (syntax and undefined names, then a smoke test on a
 # committed one-hour sample of real dispatch data) and the website (type check, tests and build).
 #
-# Cloudflare deploys main on its own as soon as it's pushed, so these don't block a deploy: a red cross here means
-# check the change straight away (the live job runs new ingest code within 5 minutes).
+# The ingest and site jobs are required checks on main (ruleset "protect main"): a pull request merges, and so
+# deploys the site and the live job's ingest code, only once both pass. Renaming a job means updating the ruleset.
 name: Checks
 
 on:

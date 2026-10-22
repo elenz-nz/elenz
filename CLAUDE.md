@@ -4,6 +4,15 @@ Public NZ electricity tracker at https://elenz.co.nz. The owner knows the power 
 to web development and hosting, so give step-by-step instructions for anything they have to do themselves.
 This repository is public: never commit keys, tokens or personal details.
 
+## Getting changes live
+
+`main` is protected (ruleset "protect main", 23 Oct 2026): no direct pushes; every change goes in through a pull request,
+and it can only merge once the `ingest` and `site` checks (checks.yml) pass. That gates both things a merge sets live: the
+site (Cloudflare redeploys `main`) and the ingest code (the data jobs run from `main` within 5 minutes). Work on a branch,
+push it, open a PR and turn on auto-merge so it merges itself when the checks go green:
+`gh pr create --fill --base main && gh pr merge --auto --squash`. If a check fails, fix it on the branch; nothing reaches
+the site meanwhile. Then report the merge, or the failure, to the owner.
+
 ## Beta note (remove when the site is announced)
 
 Until the site is announced every page shows a thin "Beta" line above the masthead (`site/src/lib/site/Masthead.svelte`,
@@ -14,7 +23,7 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
 
 - `site/`: SvelteKit 3 + Svelte 5, `adapter-static`, every page prerendered. Hosted on Cloudflare Workers as static
   assets (`wrangler.jsonc` at the repo root; build command `cd site && npm ci && npm run build`, deploy command
-  `npx wrangler deploy`). Every push to `main` redeploys. Pages: `/` the landing page (`src/routes/+page.svelte`: the
+  `npx wrangler deploy`). Every merge to `main` redeploys (see Getting changes live). Pages: `/` the landing page (`src/routes/+page.svelte`: the
   logo (stacked on desktop, compact on phones), live total generation with one rotating second figure, a small live stamp,
   and the 24-hour horizon line along the bottom of the first screen, then a glimpse of each page; add a page to its
   `PAGES` list with a preview component in `src/lib/landing/`. As the page scrolls, `Handoff.svelte` shrinks the horizon
@@ -217,7 +226,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   those tables. Rerun it and commit the JSON after refreshing the register or editing the tables.
 - `.github/workflows/checks.yml`: on every push, ruff (syntax errors and undefined names only), `ingest/tests/smoke.py`
   (the live and history paths on a committed one-hour sample of real dispatch data and matching final prices, no network)
-  and the site's `npm run check`, `npm test` (`site/tests/`: the tracker's address), `npm run build` and `npm run check:previews`. Cloudflare deploys `main` regardless, so a red cross means look now.
+  and the site's `npm run check`, `npm test` (`site/tests/`: the tracker's address), `npm run build` and `npm run check:previews`. Its `ingest` and `site` jobs are required checks: a pull request can't
+  merge into `main` (so nothing deploys) until both pass.
 - `.github/workflows/watchdog.yml`: checks the live site every 15 minutes; opens an issue labelled `stale-data`
   (GitHub emails it to the owner) when live data is over 30 minutes old, history over 5 days behind, or the Worker
   can't start a job, and closes it when the data recovers.
