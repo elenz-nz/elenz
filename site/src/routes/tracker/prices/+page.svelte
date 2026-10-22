@@ -11,7 +11,8 @@
 	import { readView, writeView, midnightOf, addDays, ymd, endOfDay, describe, shareLinks } from '#lib/site/view.js';
 	import ShareLink from '#lib/site/ShareLink.svelte';
 	import { heatWindow, heatSource, monthRows } from '#lib/site/heat.js';
-	import { dateSettled } from '#lib/site/datefield.js';
+	import { dateSettled, timeSettled } from '#lib/site/datefield.js';
+	import { stamp, fromStamp } from '#lib/site/viewurl.js';
 	import DownloadMenu from '#lib/site/DownloadMenu.svelte';
 	import { composeImage, svgImage, legendOf, csvText, nzTime, utcTime, fileName, CREDIT, LICENCE } from '#lib/site/download.js';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
@@ -207,6 +208,36 @@
 		const a = view.t0, b = view.t1;
 		return `${clock(a)} – ${clock(b)}${dayLabel(a) === dayLabel(b) ? ' ' + dayLabel(a) : ''}`;
 	});
+	// zoomed, the stretch shown: [from, to) (to = the end of its last interval), and its length in words
+	const zoomEnds = $derived(zoomed && view ? { from: view.t0, to: view.t1 + view.S.h[view.n - 1] * 36e5 } : null);
+	const zoomWord = (ms: number) => {
+		const m = Math.round(ms / 6e4), hh = Math.floor(m / 60), mm = m % 60;
+		return hh ? (mm ? `${hh} h ${mm} min` : `${hh} hour${hh > 1 ? 's' : ''}`) : `${mm} min`;
+	};
+	const zoomStamp = $derived(zoomEnds ? stamp(zoomEnds.to).split('T') : null);   // ['YYYY-MM-DD', 'HH:MM'], NZ time
+	// the date and time boxes, zoomed: the same length of time, ending at t (snapped to 5 minutes). At or past the
+	// newest data a span from the menu (or a stretch as long as one) is "the last N hours" again. The window around it is the day it ends in (or the
+	// latest), widened to 3 days when the stretch starts the day before, so none of it is cut off. As on the Generation tab.
+	function zoomEndAt(t: number | null) {
+		if (!zoomEnds || !live || !t) return;
+		const len = zoomEnds.to - zoomEnds.from, latest = live.t[live.n - 1] + 3e5;
+		const to = Math.max(FIRST + len, Math.min(latest, Math.round(t / 3e5) * 3e5)), from = to - len;
+		hover = -1; pinned = false;
+		if (to === latest) {
+			// back to the newest data: a length the 1D menu offers is live "last N hours" again
+			const span = zoom?.span || ([1, 3, 6, 12].includes(len / 36e5) ? len / 36e5 : null);
+			if (span) { zoom = { span }; range = '1d'; } else zoom = { from, to };
+			endT = null;
+		} else {
+			zoom = { from, to };
+			let end: number | null = addDays(midnightOf(to - 1), 1);
+			if (end >= endOfToday) end = null;
+			const fits = (k: string) => { const d = (RANGES as any)[k].days; return from >= (end == null ? latest - d * 864e5 : addDays(end, -d)); };
+			if (!fits(range)) range = '3d';
+			endT = end;
+		}
+		save();
+	}
 
 	// ---------- building the view ----------
 	// the points of a segment starting in [from, to): a point is the interval that starts at its time, so a window
@@ -547,8 +578,9 @@
 		setEnd(next >= endOfToday ? null : Math.max(next, addDays(FIRST, R.days)));
 	}
 	const isoDay = ymd;
-	const dateValue = $derived(live ? ymd((endT ?? latestT) - 1) : '');
+	const dateValue = $derived(zoomStamp ? zoomStamp[0] : live ? ymd((endT ?? latestT) - 1) : '');
 	function pickDate(v: string) {
+		if (zoomStamp) return zoomEndAt(fromStamp(`${v}T${zoomStamp[1]}`));
 		const t = endOfDay(v);
 		setEnd(t === null || t >= endOfToday ? null : Math.max(t, addDays(FIRST, R.days ?? 0)));
 	}
@@ -676,11 +708,15 @@
 		</div>
 		{#if canMove}
 			<div class="ctl">
-				<label for="p-date">{R.label} ending</label>
+				<label for="p-date">{zoomEnds ? zoomWord(zoomEnds.to - zoomEnds.from) : R.label} ending</label>
 				<div class="datebox">
 					<button type="button" class="step" aria-label="Previous {R.label}" title="Previous {R.label}" disabled={!live || (endT ?? endOfToday) - (R.days ?? 0) * 864e5 <= FIRST} onclick={() => step(-1)}><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
-					<input type="date" id="p-date" value={dateValue} min="1997-08-01" max={live ? isoDay(latestT) : undefined}
+					<input type="date" id="p-date" value={dateValue} min="1997-08-01" max={live ? isoDay(latestT + 3e5) : undefined}
 						title="Shows the selected range ending on this date" use:dateSettled={pickDate} />
+					{#if zoomStamp}
+						<input type="time" id="p-time" step="300" value={zoomStamp[1]} aria-label="Ending at (NZ time)" title="Shows the zoomed hours ending at this time (NZ time)"
+							use:timeSettled={(v: string) => zoomEndAt(fromStamp(`${zoomStamp ? zoomStamp[0] : ''}T${v}`))} />
+					{/if}
 					<button type="button" class="step" aria-label="Next {R.label}" title={atLatest ? 'Showing the latest data' : `Next ${R.label}`} disabled={atLatest} onclick={() => step(1)}><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 					{#if !atLatest}<button type="button" class="latest" title="Back to the latest data" onclick={() => setEnd(null)}><svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 3 5 5-5 5M12 3v10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>Latest</button>{/if}
 				</div>
@@ -859,7 +895,7 @@
 						<dt>Move through history</dt>
 						<dd>Range, interval and region are in the bar at the top. The ‹ › arrows beside the date or on the price chart step by the range; the date box jumps to a day; Latest comes back.</dd>
 						<dt>Zoom in</dt>
-						<dd>On the live week and 30 days, drag across any chart to zoom into that stretch; every chart follows. The arrow beside 1D picks the last 1, 3, 6 or 12 hours. Reset zoom in the bar, Escape, a range button or the date goes back.</dd>
+						<dd>On the live week and 30 days, drag across any chart to zoom into that stretch; every chart follows. The arrow beside 1D picks the last 1, 3, 6 or 12 hours. While zoomed, the date box gains a time: pick the date and time the zoomed hours should end (NZ time) to move them there. Reset zoom in the bar, Escape or a range button goes back.</dd>
 						<dt>Nodes and scales</dt>
 						<dd>Select a node's colour square in this list to hide or show its line. Spike-proof, Capped and Linear change the price chart's scale; on long ranges, choose the island whose price range is shown.</dd>
 						<dt>Enlarge, share, download</dt>

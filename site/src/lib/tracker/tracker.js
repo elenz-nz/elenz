@@ -3,11 +3,11 @@
 
 import { FUELS } from './fuels.js';
 import { efAt, plantEf, BY_PLANT } from './emissions.js';
-import { onDateSettled } from '../site/datefield.js';
+import { onDateSettled, onTimeSettled } from '../site/datefield.js';
 import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTotal } from './series.js';
 import PLANT_META from './plants.json';  // owner and hydro scheme per plant (ingest/plant_meta.py)
 import { readView, writeView, slug, describe, shareLinks } from '#lib/site/view.js';
-import { readQuery } from '#lib/site/viewurl.js';
+import { readQuery, stamp, fromStamp } from '#lib/site/viewurl.js';
 import { composeImage, legendOf, csvText, nzTime, utcTime, fileName, CREDIT, CREDIT_SOLAR, LICENCE } from '#lib/site/download.js';
 export { nzOffset, tzName };
 
@@ -1118,6 +1118,16 @@ export function mountTracker(D, hooks = {}) {
     inp.style.visibility = R.fixed ? 'hidden' : '';  // All has no end date
     inp.value = R.fixed ? '' : ymd(end - 1);
     inp.min = ymd(firstDay()); inp.max = ymd(models.live.END);
+    // zoomed into hours (a span from the 1D menu or a dragged stretch): the boxes give the date and time it ends,
+    // and choosing either moves it there
+    const tin = $('in-time'), zh = zoomedHours();
+    tin.hidden = !zh;
+    if (zh) {
+      const z = zoomSpan(), [d, hm] = stamp(z.to).split('T');
+      $('lb-date').textContent = `${zoomWord(z.to - z.from)} ending`;
+      inp.value = d; tin.value = hm;
+      inp.max = ymd(models.live.END + 3e5);
+    }
     $('btn-latest').hidden = state.end == null;
     // the arrows on the chart and beside the date step by the range
     for (const [p, n] of [['nav-prev', 'nav-next'], ['tb-prev', 'tb-next']]) {
@@ -1231,6 +1241,29 @@ export function mountTracker(D, hooks = {}) {
     else setView(state.range, addDays(midnightOf(to - 1), 1), true);
   }
   function setZoom(z) { state.zoom = z; state.hover = null; state.hoverBy = null; rebuild(); }
+  // zoomed into hours on a 5-minute or half-hourly view
+  function zoomedHours() { return !!(state.zoom && V && V.zoomed && !isLong()); }
+  // the date and time boxes, zoomed: the same length of time, ending at t (snapped to 5 minutes). At or past the newest
+  // data a span from the menu (or a stretch as long as one) is "the last N hours" again. The window around it is the day it ends in (or the latest),
+  // widened to 3 days when the stretch starts the day before, so none of it is cut off.
+  const SPANS = [1, 3, 6, 12];   // the 1D menu's hours (#span-menu)
+  function zoomEndAt(t) {
+    if (!zoomedHours() || !(t > 0)) return;
+    const z = zoomSpan(), len = z.to - z.from, latest = models.live.END + 3e5;
+    const to = Math.max(firstDay() + len, Math.min(latest, Math.round(t / 3e5) * 3e5)), from = to - len;
+    if (to === latest) {
+      // back to the newest data: a length the 1D menu offers is live "last N hours" again
+      const span = state.zoom.span || (SPANS.includes(len / 36e5) ? len / 36e5 : null);
+      if (span) { state.zoom = { span }; return setView('1d', null, true); }
+      state.zoom = { from, to };
+      return setView(state.range, null, true);
+    }
+    state.zoom = { from, to };
+    let end = addDays(midnightOf(to - 1), 1);
+    if (end >= endOfToday()) end = null;
+    const fits = r => from >= (end == null ? latest - RANGES[r].days * DAY : addDays(end, -RANGES[r].days));
+    setView(fits(state.range) || !RANGES['3d'] ? state.range : '3d', end, true);
+  }
   function rebuild() {
     V = buildView();  // first: the drill-down checks below look at this view's plant sets
     const link = linked && !waiting ? linked : null;
@@ -1308,11 +1341,13 @@ export function mountTracker(D, hooks = {}) {
   document.addEventListener('click', e => { if (!spanMenu.hidden && !spanMenu.contains(e.target)) closeSpans(); });
   $('zoom-reset').addEventListener('click', () => setZoom(null));
   onDateSettled($('in-date'), v => {
+    if (zoomedHours()) return zoomEndAt(fromStamp(`${v}T${$('in-time').value || '00:00'}`));
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
     if (!m) return;
     const day = midnightOf(Date.UTC(+m[1], +m[2] - 1, +m[3], 12) - 12 * 36e5);  // that date's local midnight
     state.zoom = null; setView(state.range, addDays(day, 1));
   });
+  onTimeSettled($('in-time'), v => zoomEndAt(fromStamp(`${$('in-date').value}T${v}`)));
   $('btn-latest').addEventListener('click', () => { if (state.zoom && !state.zoom.span) state.zoom = null; setView(state.range, null); });
   for (const id of ['nav-prev', 'tb-prev']) $(id)?.addEventListener('click', () => step(-1));
   for (const id of ['nav-next', 'tb-next']) $(id)?.addEventListener('click', () => step(1));

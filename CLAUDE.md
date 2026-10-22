@@ -85,7 +85,12 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   hours (`zoom=3h`, anchored to the window's end, so it stays live), and a mouse drag across any chart zooms to that
   span (`zoom=YYYY-MM-DDTHH:MM~YYYY-MM-DDTHH:MM`, end exclusive); every chart, the summary and the lower cards follow
   (`buildView` narrows the window). While zoomed the ‹ › arrows step by the zoom's length (moving the window if need be),
-  the Reset zoom chip in the bar (or Escape twice) goes back, and a range button or date clears it. The 1D menu
+  the Reset zoom chip in the bar (or Escape twice) goes back, and a range button clears it. Zoomed on a 5-minute or
+  half-hourly view, the date box gains a time box (`#in-time`; Prices `#p-time`) and reads "3 hours ending": the date and
+  time the stretch ends (NZ time); choosing either moves the stretch there (`zoomEndAt`, both tabs: snapped to 5 minutes,
+  window = the day it ends in, widened to 3D if it starts the day before; at the newest data a menu-length stretch is
+  live "last N hours" again). Without a zoom the date box picks a whole day, as before (`onTimeSettled`/`timeSettled` in
+  datefield.js). The 1D menu
   (`#span-menu`) lives outside the sticky bar because the bar's clip-path clips anything hanging below it. Share's link
   to the dates shown turns a span into fixed times (`zoomAt`). On an island's chart, HVDC leaving is drawn as a hatched
   band taken off the top of the stack (`exp` in `drawGen`), not below zero; HVDC arriving stays stacked on top. Both are

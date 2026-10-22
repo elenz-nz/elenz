@@ -238,6 +238,7 @@
 			<div class="datebox">
 				<button type="button" class="step" id="tb-prev" aria-label="Previous 24 hours"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 				<input type="date" id="in-date" title="Shows the selected range ending on this date" />
+				<input type="time" id="in-time" step="300" aria-label="Ending at (NZ time)" title="Shows the zoomed hours ending at this time (NZ time)" hidden />
 				<button type="button" class="step" id="tb-next" aria-label="Next 24 hours"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 				<button type="button" class="latest" id="btn-latest" title="Back to the latest data" hidden><svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 3 5 5-5 5M12 3v10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>Latest</button>
 			</div>
@@ -360,7 +361,7 @@
 						<dt>Move through history</dt>
 						<dd>Range, interval and region are in the bar at the top. The ‹ › arrows beside the date, on the generation chart, or Page Up and Page Down step back and forward by the range; the date box jumps to a day; Latest comes back.</dd>
 						<dt>Zoom in</dt>
-						<dd>Drag across any chart to zoom into that stretch; every chart follows. The arrow beside 1D picks the last 1, 3, 6 or 12 hours. While zoomed, the ‹ › arrows step by the zoom’s length, and Reset zoom in the bar (or Escape twice) shows the whole range again.</dd>
+						<dd>Drag across any chart to zoom into that stretch; every chart follows. The arrow beside 1D picks the last 1, 3, 6 or 12 hours. While zoomed, the date box gains a time: pick the date and time the zoomed hours should end (NZ time) to move them there, or the ‹ › arrows step by the zoom’s length; Reset zoom in the bar (or Escape twice) shows the whole range again.</dd>
 						<dt>Break it down</dt>
 						<dd>Select a name in this list to go from a fuel to its plants and their grid connections. ‹ Back above the list, or the browser’s Back, steps out. The menu above the generation chart groups it other ways (owner, site, flexibility…), and MW/% switches to shares.</dd>
 						<dt>Hide and show</dt>

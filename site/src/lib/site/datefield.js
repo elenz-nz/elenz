@@ -6,10 +6,16 @@
 const FIRST_YEAR = 1997;
 const SETTLE = 700;   // ms after the last key
 
+const validDate = v => { const m = /^(\d{4})-\d{2}-\d{2}$/.exec(v); return !!m && +m[1] >= FIRST_YEAR && +m[1] <= new Date().getFullYear() + 1; };
+const validTime = v => /^([01]\d|2[0-3]):[0-5]\d$/.test(v);
+
 /** Call apply(value) with each settled 'YYYY-MM-DD' value of the date input el. Returns a function that detaches. */
-export function onDateSettled(el, apply) {
+export const onDateSettled = (el, apply) => onSettled(el, apply, validDate);
+/** The same for a time input ('HH:MM'): typing the hour then the minutes applies once, not at each digit. */
+export const onTimeSettled = (el, apply) => onSettled(el, apply, validTime);
+
+function onSettled(el, apply, valid) {
   let timer = null, lastKey = 0, done = el.value;
-  const valid = v => { const m = /^(\d{4})-\d{2}-\d{2}$/.exec(v); return !!m && +m[1] >= FIRST_YEAR && +m[1] <= new Date().getFullYear() + 1; };
   const go = () => {
     clearTimeout(timer); timer = null;
     const v = el.value;
@@ -37,5 +43,12 @@ export function onDateSettled(el, apply) {
 export function dateSettled(node, apply) {
   let fn = apply;
   const h = onDateSettled(node, v => fn(v));
+  return { update(a) { fn = a; }, destroy: h.destroy };
+}
+
+/** A time input's: <input type="time" use:timeSettled={pick} />. */
+export function timeSettled(node, apply) {
+  let fn = apply;
+  const h = onTimeSettled(node, v => fn(v));
   return { update(a) { fn = a; }, destroy: h.destroy };
 }
