@@ -53,7 +53,7 @@ export const TOPICS: Topic[] = [
 		title: 'Wholesale prices',
 		summary: 'Spot prices at the island reference nodes and four more, dispatch prices for the live week and final prices for history, and the figures the Prices tab derives from them.',
 		shownOn: [['Tracker', '/tracker'], ['Prices', '/tracker/prices'], ['Now', '/now']],
-		updated: '2026-10-22',
+		updated: '2026-10-23',
 	},
 	{
 		slug: 'price-explainer',

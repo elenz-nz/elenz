@@ -1,8 +1,9 @@
 <script lang="ts">
 	// Price captured by fuel: one bar per fuel, with the generation-weighted average of all of them as a dashed line.
+	// Battery charging (f.charging) is the price batteries paid: a hatched bar under the battery's, not in the average.
 	import { money } from './data.js';
 
-	type Row = { f: { k: string; name: string; tok: string }; mwh: number; price: number };
+	type Row = { f: { k: string; name: string; tok: string; charging?: boolean }; mwh: number; price: number };
 	let { rows, avg }: { rows: Row[]; avg: number } = $props();
 
 	const top = $derived(Math.max(avg * 1.25, ...rows.map((r) => r.price), 10));
@@ -16,9 +17,9 @@
 			<span>Average {money(avg)}</span>
 		</div>
 		{#each rows as r (r.f.k)}
-			<div class="row" title="{r.f.name}: {money(r.price)}/MWh on {energy(r.mwh)}">
+			<div class="row" class:chg={r.f.charging} title={r.f.charging ? `Batteries paid ${money(r.price)}/MWh on average to charge ${energy(r.mwh)}` : `${r.f.name}: ${money(r.price)}/MWh on ${energy(r.mwh)}`}>
 				<span class="nm">{r.f.name}</span>
-				<span class="track"><span class="bar" style="width: {pct(r.price)}; background: var({r.f.tok})"></span></span>
+				<span class="track"><span class="bar" style="width: {pct(r.price)}; --c: var({r.f.tok})"></span></span>
 				<span class="v">{money(r.price)}</span>
 				<span class="p">{avg > 0 ? Math.round((100 * r.price) / avg) + '%' : ''}</span>
 			</div>
@@ -32,12 +33,14 @@
 </div>
 
 <style>
-	.fb { --lw: 118px; --rw: 104px; }
+	.fb { --lw: 140px; --rw: 104px; }
 	.rows { position: relative; display: grid; gap: 7px; padding-top: 20px; }
 	.row { display: grid; grid-template-columns: var(--lw) 1fr 58px 46px; align-items: center; column-gap: 0; font-size: 0.84rem; }
 	.nm { color: var(--ink-2); padding-right: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 	.track { display: block; height: 16px; position: relative; }
-	.bar { position: absolute; inset: 0 auto 0 0; height: 100%; border-radius: 2px; }
+	.bar { position: absolute; inset: 0 auto 0 0; height: 100%; border-radius: 2px; background: var(--c); }
+	/* charging: the battery's colour, hatched and outlined, as HVDC leaving is drawn on the Generation tab */
+	.chg .bar { background: repeating-linear-gradient(135deg, var(--c) 0 2px, transparent 2px 5px); box-shadow: inset 0 0 0 1px var(--c); }
 	.v, .p { text-align: right; font-family: var(--font-data); font-variant-numeric: tabular-nums; }
 	.p { color: var(--muted); font-size: 0.78rem; }
 	.avg { position: absolute; top: 18px; bottom: 0; width: 0; border-left: 1.5px dashed var(--ink-2); z-index: 1; pointer-events: none; }

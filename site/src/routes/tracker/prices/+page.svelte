@@ -914,7 +914,7 @@
 				</div>
 				<PopButton inline open={popped === 'cap'} name="price captured by fuel chart" onclick={() => (popped = popped === 'cap' ? null : 'cap')} />
 			</div>
-			<p class="sub">What each fuel earned over the range: its output × its island's price, divided by its output.</p>
+			<p class="sub">What each fuel earned over the range: its output × its island's price, divided by its output. Battery (charging) is what batteries paid to charge, left out of the average.</p>
 			{#if rangeStats && rangeStats.cap.rows.length}
 				<FuelBars rows={rangeStats.cap.rows} avg={rangeStats.cap.avg} />
 			{:else}

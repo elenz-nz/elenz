@@ -95,7 +95,7 @@ import tod  # noqa: E402
 tp = tod.profile(hhj)
 check(len(tp['NI']['hydro']) == 48 and len(tp['SI']['price']) == 48 and sum(x is not None for x in tp['NI']['hydro']) >= 1,
       'tod: a month by half-hour of the day (48 slots)')
-for k in ('p10', 'p90', 'pmin', 'pmax', 'n500', 'n1000', 'rv_hydro', 'rv_geo', 'batt_d'):
+for k in ('p10', 'p90', 'pmin', 'pmax', 'n500', 'n1000', 'rv_hydro', 'rv_geo', 'batt_d', 'batt_c', 'rv_battc'):
     check(k in dd['NI'] and len(dd['NI'][k]) == len(dd['t']), f'daily: {k}')
 check(dd['NI']['pmin'][0] <= dd['NI']['p10'][0] <= dd['NI']['p90'][0] <= dd['NI']['pmax'][0], 'daily: pmin <= p10 <= p90 <= pmax')
 cap_h = dd['NI']['rv_hydro'][0] / max(dd['NI']['hydro'][0], 1)

@@ -20,7 +20,8 @@ Stored (Cloudflare KV in GitHub Actions, data/store locally), one set per NZ cal
   hist/dd/YYYY-MM.json       daily averages for the month, plus each day's peak demand, peak generation and peak
                              dispatchable output (peak.disp: hydro, thermal, battery discharge; dispx without hydro), the spread of each island's half-hourly price (p10, p90, pmin, pmax, n500, n1000 = half-hours
                              over $500 and $1,000) and each fuel's revenue at its island's price (rv_<fuel>, $/h, so
-                             rv / generation is the price it captured; batt_d = battery discharge only)
+                             rv / generation is the price it captured; batt_d = battery discharge only; batt_c and
+                             rv_battc = battery charging and its cost, the price batteries paid)
 and across all months:
   hist/day.json              every day since 2020 (the 1-year and all-time views)
   hist/index.json            months stored, first and last time (published once the backfill has caught up)
@@ -358,6 +359,11 @@ def daily(js, month):
                 continue   # embedded solar isn't paid the spot price
             gen = np.array(js[isl][f], float)
             if f == 'batt':
+                # charging (the net battery output below zero) and what it cost at the island price, for the Prices
+                # page's Battery (charging) row; then discharge only for the battery's own revenue
+                chg = np.maximum(-gen, 0)
+                out[isl]['batt_c'] = mean(chg)
+                out[isl]['rv_battc'] = mean(chg * p)
                 gen = np.maximum(gen, 0)   # discharge only
                 out[isl]['batt_d'] = mean(gen)
             out[isl][f'rv_{f}'] = mean(gen * p)
