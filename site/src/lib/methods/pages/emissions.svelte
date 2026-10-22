@@ -1,5 +1,6 @@
 <script lang="ts">
 	// Every factor on this page is read from the code that applies it (src/lib/tracker/emissions.js and fuels.js).
+	import GoodFor from '../GoodFor.svelte';
 	import {
 		COAL, GAS, GAS_FLEET, GAS_PLANT, GEO_ASSUMED, GEO_DEFAULT, GEO_YEAR_COLS, GEO_YEARS, RANKINE_COAL_SHARE_GENESIS,
 		RANKINE_COAL_SHARE_MBIE, RANKINE_HEAT_RATE, STRATFORD_TCC, rankineFactor,
@@ -41,6 +42,16 @@
 <h2 id="meaning">What it means</h2>
 <p>Emissions intensity is how much greenhouse gas is released for each unit of electricity generated, in grams of CO₂-equivalent per kilowatt-hour (g CO₂e/kWh). A kilowatt-hour runs a 1 kW heater for an hour. CO₂-equivalent counts other greenhouse gases, such as methane, as the amount of CO₂ with the same warming effect.</p>
 <p>Hydro, wind and solar release almost nothing as they generate, so intensity is low when they supply most of the power and rises when gas and coal plants run. Geothermal sits in between, as the steam carries some CO₂ up from underground. Because it is per unit, intensity shows how clean the electricity is at any moment, whether demand is high or low.</p>
+
+<h2 id="good-for">What it’s good for</h2>
+<GoodFor rows={[
+	{ use: 'Yearly or quarterly intensity, national', level: 'good', verdict: 'Huntly’s emissions come within ±5% of Genesis’s reported figures in 20 of 23 quarters, and fossil emissions follow the national inventory year to year.' },
+	{ use: 'Trends over months and years, and seasons', level: 'good', verdict: 'the same factors applied throughout, changing only where the evidence does.' },
+	{ use: 'Half-hourly intensity', level: 'ok', verdict: 'uses average factors.', why: 'A plant’s real efficiency changes with how hard it runs, and Huntly’s coal share is a quarterly average.' },
+	{ use: 'One gas plant’s emissions', level: 'care', verdict: 'today’s gas plants share one average factor, so a peaker reads cleaner than it is and Huntly 5 dirtier.' },
+	{ use: 'Whether Huntly burned coal or gas in a given week or hour', level: 'no', verdict: 'not known: the quarter’s share is applied to every hour of it.' },
+	{ use: 'Lifecycle emissions (building plant, gas leaks upstream)', level: 'no', verdict: 'operational emissions only.' },
+]} />
 
 <h2 id="calc">The calculation</h2>
 <p class="formula">Intensity (g/kWh) = Σ (each source’s MW × its emission factor in t/MWh) ÷ total generation in MW × 1,000

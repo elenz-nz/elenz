@@ -330,4 +330,5 @@ programmatically is likely to change, with plenty of warning. Everything that re
 `EMI_KEY`), `common.py` `BLOB` (the emidatasets blob container: dispatch, final prices, metered files, offers, the
 register) and `rooftop.py` (`GUEHMT` report). Watch for the EA's notice and plan the switch as one change.
 
-Open questions: farm mounting (tracking or fixed) to confirm.
+Open questions: farm mounting is settled for most farms by the clear days of 18-19 Oct 2026 (analysis/README.md); Lauriston,
+Pukenui and Omeheu stay uncertain, and Kōwhai Park can't be fitted while it runs capped and stops in the afternoons.

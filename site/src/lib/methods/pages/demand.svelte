@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { REPO } from '../registry.js';
+	import GoodFor from '../GoodFor.svelte';
 </script>
 
 <h2 id="shows">What the chart shows</h2>
@@ -10,6 +11,16 @@
 	<dd>The dashed line, with its uncertainty band: grid demand plus modelled <a href="/methods/embedded-solar">embedded solar</a>, the power used on rooftops and local networks that never passes through the grid. It is closer to how much electricity people actually used.</dd>
 </dl>
 <p class="formula">Demand with embedded solar = grid demand + embedded solar</p>
+
+<h2 id="good-for">What it’s good for</h2>
+<GoodFor rows={[
+	{ use: 'Grid demand, in history', level: 'good', verdict: 'from the grid’s own meters.' },
+	{ use: 'Grid demand, live week', level: 'good', verdict: 'the dispatch data’s island load, within 1–2% of the metered figures where both exist.' },
+	{ use: 'Peaks on long ranges', level: 'good', verdict: 'each day’s highest half-hour is kept, so peaks aren’t flattened by averaging.' },
+	{ use: 'Demand with embedded solar', level: 'ok', verdict: 'carries the embedded solar estimate’s uncertainty (the band on the chart).' },
+	{ use: 'Total consumption including all local generation', level: 'care', verdict: 'reads a little low.', why: 'Small hydro, wind and cogeneration on local networks that isn’t dispatched isn’t added back.' },
+	{ use: 'Demand at one town or substation', level: 'no', verdict: 'island totals only.' },
+]} />
 
 <h2 id="live">The live week</h2>
 <p>Each dispatch case gives the load at every node. Grid demand for an island is the sum of the load at all its nodes, leaving out the units that are batteries charging (charging is netted against each battery’s output instead). Missing intervals are filled the same way as generation (see <a href="/methods/generation#live">generation</a>).</p>

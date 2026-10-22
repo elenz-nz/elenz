@@ -164,6 +164,10 @@
 	const levelVals = $derived<Record<string, Float64Array>>(roomAt ? Object.fromEntries(LEVELS.map((L: string) => [L, coarse && lowOK(L) ? roomAt[L].low : roomAt[L].tot])) : {});
 	const avgOnly = $derived(coarse && levelsShown.some((L: string) => !lowOK(L)));   // daily history without each day's lowest
 	// offers come the day after: shade the newest points that have none yet
+	// the EA's offer records start on 1 Jan 2013 (and hold nothing reliable before Dec 2012), so on a range reaching
+	// further back the offered levels start part way along while installed capacity covers it all: say so plainly
+	const OFF_FIRST = Date.UTC(2012, 11, 31, 11);   // midnight starting 1 Jan 2013, NZ time
+	const offLate = $derived(!!v && v.from < OFF_FIRST - 864e5 && (roomView === 'levels' || roomBasis !== 'I'));
 	const offGap = $derived.by((): [number, number][] => {
 		const o = levelVals.O;
 		if (!o || !hasOffers) return [];
@@ -314,6 +318,9 @@
 				<PopButton inline open={popped === 'room'} name="headroom chart" onclick={() => pop('room')} />
 			</div>
 		</div>
+		{#if offLate}
+			<p class="off-note" role="note"><b>Offers start in January 2013.</b> The EA’s records of what generators offered begin on 1 January 2013, so {roomView === 'levels' ? 'the Offered and Under $1,000 lines start' : 'this level starts'} there, partway through this range. Installed capacity covers the whole range.</p>
+		{/if}
 		<p class="readout" aria-live="polite">
 			{#if roomHover >= 0 && roomAt && curI && roomHover < curI.n}
 				<span>{pointName(curI.t[roomHover])}</span>
@@ -425,6 +432,8 @@
 	.legend i.lv-O { background: color-mix(in srgb, var(--accent) 20%, transparent); border-top: 1.5px dashed var(--accent); }
 	.legend i.lv-C { background: color-mix(in srgb, var(--accent) 42%, transparent); border-top: 2px solid var(--accent); }
 	.legend i.gap { background: var(--warn-bg); }
+	.off-note { margin: 0; padding: 7px 10px; border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 4px 4px 0; font-size: 0.8rem; color: var(--ink-2); }
+	.off-note b { color: var(--ink); }
 	.empty { color: var(--muted); font-size: 0.86rem; padding: 18px 10px; margin: 0; }
 	.row2 { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 14px 18px; align-items: start; }
 	@media (max-width: 900px) { .row2 { grid-template-columns: minmax(0, 1fr); } }

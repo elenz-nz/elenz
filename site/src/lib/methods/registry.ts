@@ -31,14 +31,14 @@ export const TOPICS: Topic[] = [
 		summary: 'Solar on local networks that isn’t dispatched, mostly rooftops. Nobody measures it as it happens, so it is modelled from installed capacity and satellite sunshine.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
 		estimate: true,
-		updated: '2026-10-17',
+		updated: '2026-10-22',
 	},
 	{
 		slug: 'demand',
 		title: 'Demand',
 		summary: 'Electricity taken from the grid in each island, and with embedded solar added back for underlying demand.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
-		updated: '2026-10-21',
+		updated: '2026-10-22',
 	},
 	{
 		slug: 'hvdc',
@@ -46,7 +46,7 @@ export const TOPICS: Topic[] = [
 		summary: 'Power flowing between the islands on the HVDC link: metered in history, estimated for the live week because the dispatch data doesn’t include it.',
 		shownOn: [['Tracker', '/tracker'], ['Prices', '/tracker/prices'], ['Now', '/now']],
 		estimate: true,
-		updated: '2026-10-17',
+		updated: '2026-10-22',
 	},
 	{
 		slug: 'prices',
@@ -67,7 +67,7 @@ export const TOPICS: Topic[] = [
 		title: 'Emissions intensity',
 		summary: 'Greenhouse gas per kilowatt-hour generated, from each fuel’s output and emission factor. Every factor the site uses is listed here, with where it comes from.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
-		updated: '2026-10-17',
+		updated: '2026-10-22',
 	},
 	{
 		slug: 'groupings',
@@ -81,7 +81,7 @@ export const TOPICS: Topic[] = [
 		title: 'Installed capacity',
 		summary: 'How much each plant could generate, and when that changed, back to 1997: the basis for the Generation tab’s capacity factors and dispatchable headroom.',
 		shownOn: [['Tracker', '/tracker']],
-		updated: '2026-10-18',
+		updated: '2026-10-22',
 	},
 	{
 		slug: 'history',

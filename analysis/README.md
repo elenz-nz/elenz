@@ -62,7 +62,24 @@ capacity, ~1,264 kWh per kW of panels, before calibration.
 - Fitted mounting (tentative, one to two months each): tracking at Lauriston, Rangitaiki, Kohirā, Whitianga,
   Ruawai, Clandeboye, Te Herenga o Te Rā, Dannevirke, Kōwhai Park (confirmed single-axis); fixed east-west at
   Pukenui, Omeheu; fixed north at Twin Rivers, Taiohi, Papareireiā. Ruakākā (not yet generating) is fixed.
-- Hence `CAL = 0.95` (about ±6%).
+- Clear days 18-19 Oct 2026 (satellite clear-sky index ~1.08 at every farm; `farm_check.py` geometries fitted to
+  those two days only, trips left out): tracking clearly best (RMSE margin over the best fixed geometry ×1.35-2.8) at
+  Kohirā, Rangitaiki, Whitianga, Clandeboye, Dannevirke; likely at Ruawai (×1.20) and Te Herenga o Te Rā (×1.12);
+  Lauriston undecided (×1.01). Fixed at Twin Rivers, Taiohi, Papareireiā, Tauhei (north; Tauhei new, 147 MW),
+  Omeheu and Pukenui (east-west vs north nearly tied). Kōwhai Park can't be fitted: dispatch held at ~130-135 MW
+  (of ~160 MW AC) and stopped abruptly, to zero for the rest of the day, at 18:10 on 16 Oct, 17:15 on 18 Oct and
+  16:45 on 19 Oct; no output at all 20-22 Oct (as of 22 Oct).
+- Hence `CAL = 0.95` (about ±6%: one standard deviation on the factor, so about 0.89-1.01; it feeds the
+  uncertainty band, it isn't applied on top).
+- Clear-day peaks (`solar_peak_check.py`, 22 Oct 2026): the estimate's highest so far is 748 MW (1 pm, 18 Oct 2026),
+  ~87% of registry (≈AC) capacity; grid + embedded solar 1,342 MW against ~1,500 MW of all solar (~860 embedded +
+  636 MW in the 15 dispatched farms). South Australia's fleet peaked at 2,070 MW on 7 Oct 2026, ~73% of its panel (DC)
+  capacity (Clean Energy Council, end 2025), so ~85-95% on an AC basis: 87% isn't out of line. Against Aug-Sep 2026
+  metered exports: midday export share p10-p90 0.43-0.54 (0.51 on the clearest quarter of days, 0.46 on the rest);
+  day to day, midday exports = 0.55 × model − 32 MW (NI 0.46, SI 0.68; r 0.95); through the six clearest days each
+  extra modelled MW gives 0.57-0.63 MW of exports. Consistent with ~40% of extra output used on site; can't rule out
+  the model being somewhat high on clear days. Timing matches (best lag 0; exports' centre ~20 minutes after the
+  model's, as morning use on site absorbs early output). Recheck with October 2026's exports (18-19 Oct).
 - Metered rooftop exports (EMI `Volumes/Reconciliation`, injection on distribution networks, solar-shaped
   series, dispatched farms removed): Sep 2026 46.6 GWh, peak 363 MW. Modelled generation 95 GWh after calibration.
   Daily totals correlate at 0.985 (Sep 2026) and 0.991 (Sep 2025); the midday export share is steady (p10–p90
@@ -86,9 +103,16 @@ capacity, ~1,264 kWh per kW of panels, before calibration.
   open rack, no calibration factor).
 - Which registry capacity is ground-mounted: growth in systems over 10 kW in months when an NSP's new systems
   averaged 1 MW or more (`GROUND_KW`): ~101 MW nationally in Sep 2026 (131 MW at 500 kW; 70 MW at 2 MW). Largest at
-  Paeroa (18 MW), Blenheim, Southbrook, Huntly (the Taiohi extension), Takanini. At Blenheim and Southbrook the
+  Piako (PAO1101, Thames Valley; 18 MW; earlier notes said Paeroa), Blenheim, Southbrook, Huntly (the Taiohi
+  extension), Takanini, Huirangi. At Blenheim and Southbrook the
   model then gives 5.39 and 3.38 GWh for September, against 5.5 and 3.4 GWh from metered arrays plus modelled
   rooftops; national September generation 95 → 102 GWh.
+- Scan of every export series (`ground_scan.py`, Aug-Sep 2026): 208 solar series of 0.5 MW or more; 11 have
+  flat-topped output on their five sunniest days (median ≥ 2.5 h within 3% of the day's peak; rooftop aggregates
+  ~1-1.5 h): Blenheim MERX 12.6 MW and ETRN 10.0, Takanini ECOT 11.1, Southbrook MERX 7.2 and MEEN 4.2, Tuai
+  (TUI1101) TAOM 4.6, Ashburton ETRN 3.7, Masterton CNIR 3.6, Huntly ECOT 3.5, Waihou MERX 3.2, Waikino PUNZ 2.5
+  (peaks). Eight of the nine places are in `GROUND_KW`'s list; Ashburton isn't. Piako and Huirangi, in the list,
+  export a rounded curve (self-use on site, or tracking). Flat tops can also be export limits.
 - Grid exit point load (`gxp_fit.py`): regressing metered net offtake (EMI `Grid_export` − `Grid_import`) on the
   model brackets it rather than pinning it down: in levels (time-of-day, weekend and overnight-load controls) the
   ratio is 1.12 (Blenheim) and 1.21 (Southbrook) over Oct 2025 – Sep 2026, higher in winter when cloudy days also

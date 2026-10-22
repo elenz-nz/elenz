@@ -1,9 +1,20 @@
 <script lang="ts">
 	import { REPO } from '../registry.js';
+	import GoodFor from '../GoodFor.svelte';
 </script>
 
 <h2 id="shows">What it shows</h2>
 <p>The HVDC link carries power between Benmore in the South Island and Haywards in the North, through the Cook Strait cables. Positive is northward. The New Zealand view shows the transfer at mid-link; each island’s view shows its own end, what leaves Benmore or arrives at Haywards, as part of that island’s supply. The difference between the ends is the link’s losses.</p>
+
+<h2 id="good-for">What it’s good for</h2>
+<GoodFor rows={[
+	{ use: 'Monthly or yearly transfer, in history', level: 'good', verdict: 'metered at both ends of the link.' },
+	{ use: 'Half-hourly flow, in history', level: 'good', verdict: 'measured, wherever the EA has published the month (about two weeks behind).' },
+	{ use: 'Direction and rough size, live week and recent weeks', level: 'ok', verdict: 'estimated from each island’s balance; about 10 MW out on average.' },
+	{ use: 'Exact MW at a given moment in the live week', level: 'care', verdict: 'can be tens of MW out at times.', why: 'Each island’s own grid losses are only absorbed on average.' },
+	{ use: 'Link losses', level: 'care', verdict: 'a formula of the transfer, not a measurement, until the metered month arrives.' },
+	{ use: 'Each pole, constraints or reserve sharing', level: 'no', verdict: 'not in the data the site uses.' },
+]} />
 
 <h2 id="metered">Metered, in history</h2>
 <p>The EA publishes metered flows at both ends of the link (<code>HVDC_Flows</code>) about two weeks after each month, back to October 1996. Wherever they exist, the history uses them, and the mid-link figure is the average of the two ends.</p>
