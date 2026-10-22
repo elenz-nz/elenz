@@ -1557,19 +1557,22 @@ export function mountTracker(D, hooks = {}) {
     csv() {
       const L = this.links(), layers = V.layers.filter(l => !state.hidden.has(l.id)), u = isLong() ? 'MW average' : 'MW';
       const f1 = v => Math.round(v * 10) / 10, f2 = v => Math.round(v * 100) / 100;
-      const header = ['start_nz', 'start_utc', ...layers.map(l => `${l.name} (${u})`), `${totalLabel()} (${u})`,
+      // generation in the chart's own unit: energy (MWh, GWh or TWh) for days and longer, as the chart shows it; a
+      // partial period's energy is what it generated so far (the chart draws it at its rate for a whole period)
+      const energy = isLong(), gu = energy ? eu().unit : 'MW', g = (v, j) => energy ? +en(v, j).toPrecision(6) : f1(v);
+      const header = ['start_nz', 'start_utc', ...(energy ? ['hours'] : []), ...layers.map(l => `${l.name} (${gu})`), `${totalLabel()} (${gu})`,
         'Price, North Island, Haywards ($/MWh)', 'Price, South Island, Benmore ($/MWh)', `Demand, metered (${u})`, `Demand with embedded solar (${u})`,
         `HVDC transfer, northward (${u})`, 'Emissions intensity (g CO2e/kWh)', 'Renewable share (%)'];
       const rows = [];
       for (let j = 0; j < V.n; j++) {
         let tot = 0;
         if (topIsAll()) tot = V.gen[j]; else for (const l of layers) tot += l.signed ? l.s[j] : Math.max(0, l.s[j]);
-        rows.push([nzTime(V.t[j]), utcTime(V.t[j]), ...layers.map(l => f1(l.s[j])), f1(tot), f2(V.pNI[j]), f2(V.pSI[j]),
+        rows.push([nzTime(V.t[j]), utcTime(V.t[j]), ...(energy ? [f2(V.hrs[j])] : []), ...layers.map(l => g(l.s[j], j)), g(tot, j), f2(V.pNI[j]), f2(V.pSI[j]),
           f1(V.metered[j]), f1(V.underlying[j]), f1(V.hvdc[j]), f1(V.co2[j]), f1(V.ren[j])]);
       }
       const text = csvText([
         `ELENZ: ${describe('generation', { ...shared(), ...ownQuery() }, names())}`,
-        `${spanText()}. Times are the start of each interval.`,
+        `${spanText()}. Times are the start of each interval.` + (energy ? ` Generation is energy in ${gu} over each period ('hours' long; a partial period so far); prices, demand and HVDC are averages.` : ''),
         CREDIT + ' ' + CREDIT_SOLAR, LICENCE,
         'How each series is made: https://elenz.co.nz/methods',
         `This view: ${viewLink(L)}`,

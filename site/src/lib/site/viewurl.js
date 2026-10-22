@@ -179,7 +179,7 @@ export function describe(tab, v, names = {}) {
   const range = v.range || '1d';
   const daily = (v.int && !['5m', '30m'].includes(v.int)) || range === '1y' || range === 'all';
   let when;
-  const z = tab === 'prices' ? null : v.zoom;
+  const z = v.zoom;
   if (v.t != null) when = daily ? dayText(v.t) : `${clockText(v.t)}, ${dayText(v.t)}`;
   else if (z && z.span) when = v.end == null ? `last ${z.span} hour${z.span > 1 ? 's' : ''}` : `${z.span} hour${z.span > 1 ? 's' : ''} to ${dayText(v.end - 1)}`;
   else if (z) when = daily || ymd(z.from) !== ymd(z.to - 1) ? spanText(z.from, z.to - 1) : `${clockText(z.from)} to ${clockText(z.to)}, ${dayText(z.from)}`;

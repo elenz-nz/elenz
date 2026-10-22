@@ -111,7 +111,7 @@ test('zoom: the menu spans and a dragged span', () => {
   assert.equal(describe('generation', { zoom: { span: 1 }, end: endOfDay('2026-10-18') }), 'Electricity generation · New Zealand · 1 hour to 18 Oct 2026');
   const z = readQuery('zoom=2026-10-19T13:05~2026-10-19T15:30').zoom;
   assert.equal(describe('generation', { range: '3d', zoom: z }), 'Electricity generation · New Zealand · 1:05 pm to 3:30 pm, 19 Oct 2026');
-  assert.equal(describe('prices', { zoom: z }), 'Wholesale electricity prices · New Zealand · last 24 hours');  // Generation tab only
+  assert.equal(describe('prices', { zoom: z }), 'Wholesale electricity prices · New Zealand · 1:05 pm to 3:30 pm, 19 Oct 2026');  // both tabs zoom (Oct 2026)
   // the link to the dates shown pins "the last 3 hours" to those hours
   const L = shareLinks('/tracker', { range: '1d', zoom: { span: 3 } }, { latestEnd: endOfDay('2026-10-18'), days: 1, zoomAt: z });
   assert.equal(L.live, 'https://elenz.co.nz/tracker?zoom=3h');

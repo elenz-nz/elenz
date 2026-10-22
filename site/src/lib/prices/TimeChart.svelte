@@ -9,7 +9,8 @@
 	// note: a label beside one point (the range's high) with a dot on it; stamp: the cursor's time in a chip at the top
 	// (touch and keys, where there's no tooltip), as on the Generation tab.
 	// onpoint(e, i) fires as the pointer moves (for the page's tooltip), onleave when it leaves. onpin(i): a click (not a
-	// touch) at point i, to pin the time line there; while pinned the line ignores the pointer.
+	// touch) at point i, to pin the time line there; while pinned the line ignores the pointer. onzoom(from, to): a mouse
+	// drag across the chart, as times (to exclusive: the end of the last point dragged over), to zoom into that span.
 	import { firstAtOrAfter } from '#lib/tracker/series.js';
 
 	type Scale = { f: (v: number) => number; lo: number; hi: number; ticks: number[] };
@@ -17,12 +18,13 @@
 
 	let {
 		t, t0, t1, height = 200, y, fmt = (v: number) => String(v), layers = [], shade = [], marks = [], hover = $bindable(-1),
-		xTicks = [], showX = false, label = '', zero = false, note = null, stamp = null, pinned = false, onpoint, onleave, onpin
+		xTicks = [], showX = false, label = '', zero = false, note = null, stamp = null, pinned = false, onpoint, onleave, onpin, onzoom
 	}: {
 		t: ArrayLike<number>; t0: number; t1: number; height?: number; y: Scale; fmt?: (v: number) => string; layers?: Layer[];
 		shade?: [number, number][]; marks?: { i: number; label: string }[]; hover?: number; xTicks?: { t: number; label: string; minor?: boolean }[];
 		showX?: boolean; label?: string; zero?: boolean; note?: { i: number; v: number; text: string; tok?: string } | null; stamp?: string | null;
 		onpoint?: (e: PointerEvent, i: number) => void; onleave?: (e: PointerEvent) => void; pinned?: boolean; onpin?: (i: number) => void;
+		onzoom?: (from: number, to: number) => void;
 	} = $props();
 
 	let W = $state(600);
@@ -70,14 +72,34 @@
 		return i;
 	}
 	let downBy = '';   // how the last press came: a touch keeps its point without pinning (it scrubs instead)
+	// a mouse drag: from where it was pressed to where the pointer is ([a, b] in px); a few pixels is still a click
+	let drag = $state<{ a: number; b: number; i: number } | null>(null);
+	let dragged = false;
+	const pxOf = (e: MouseEvent) => { const r = (e.currentTarget as SVGSVGElement).getBoundingClientRect(); return Math.max(x0, Math.min(x1, ((e.clientX - r.left) / r.width) * W)); };
+	function down(e: PointerEvent) {
+		if (onzoom && e.pointerType === 'mouse' && e.button === 0) { const px = pxOf(e); drag = { a: px, b: px, i: indexAt(e) }; dragged = false; }
+		move(e);
+	}
+	function up(e: PointerEvent) {
+		if (!drag) return;
+		const d = drag; drag = null;
+		if (Math.abs(d.b - d.a) < 6) return;
+		const j = indexAt(e), lo = Math.min(d.i, j), hi = Math.max(d.i, j);
+		if (hi - lo < 1) return;
+		dragged = true;
+		const step = hi + 1 < n ? t[hi + 1] - t[hi] : hi > 0 ? t[hi] - t[hi - 1] : 0;
+		onzoom?.(t[lo], t[hi] + step);
+	}
 	function move(e: PointerEvent) {
 		if (e.type === 'pointerdown') downBy = e.pointerType;
+		if (drag && e.type === 'pointermove') drag.b = pxOf(e);
 		if (pinned) return;
 		const i = indexAt(e);
 		if (i >= 0 && i !== hover) hover = i;
 		if (i >= 0) onpoint?.(e, i);
 	}
 	function click(e: MouseEvent) {
+		if (dragged) { dragged = false; return; }   // the end of a zoom drag, not a click
 		if (downBy === 'touch' || !onpin) return;
 		const i = indexAt(e);
 		if (i >= 0) onpin(i);
@@ -125,7 +147,7 @@
 <div class="tc" bind:clientWidth={W}>
 	<!-- a click pins the time line; the keyboard moves it with the arrow keys on the page's focusable chart panel -->
 	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
-	<svg width={W} {height} viewBox="0 0 {W} {height}" role="img" aria-label={label} onpointermove={move} onpointerdown={move} onpointerleave={(e) => onleave?.(e)} onclick={click} class:pinnable={!!onpin}>
+	<svg width={W} {height} viewBox="0 0 {W} {height}" role="img" aria-label={label} onpointermove={move} onpointerdown={down} onpointerup={up} onpointerleave={(e) => { drag = null; onleave?.(e); }} onclick={click} class:pinnable={!!onpin}>
 		{#each shade as [a, b]}
 			<rect class="shade" x={Math.max(x0, X(t[a]) - half(a))} y={yTop} width={Math.max(1, X(t[b - 1]) + half(b - 1) - Math.max(x0, X(t[a]) - half(a)))} height={yBot - yTop}></rect>
 		{/each}
@@ -175,6 +197,9 @@
 			{@const sx = Math.max(x0, Math.min(x1 - sw, hx - sw / 2))}
 			<g class="stamp"><rect x={sx} y={yTop} width={sw} height="18" rx="4"></rect><text x={sx + 6} y={yTop + 13}>{stamp}</text></g>
 		{/if}
+		{#if drag && Math.abs(drag.b - drag.a) >= 6}
+			<rect class="zsel" x={Math.min(drag.a, drag.b)} y={yTop} width={Math.abs(drag.b - drag.a)} height={yBot - yTop}></rect>
+		{/if}
 		{#if showX}
 			{#each ticks as tk}
 				{#if X(tk.t) >= x0 - 1 && X(tk.t) <= x1 + 1}
@@ -203,6 +228,7 @@
 	.xt { stroke: var(--line); }
 	.xl.minor { opacity: 0.75; }
 	.mark { fill: var(--o1); }
+	.zsel { fill: color-mix(in srgb, var(--accent) 16%, transparent); stroke: var(--accent); stroke-width: 1; }
 	.ml { fill: var(--ink); font-weight: 500; }
 	.note { fill: var(--ink-2); }
 	/* a halo in the panel colour keeps labels readable over the lines */

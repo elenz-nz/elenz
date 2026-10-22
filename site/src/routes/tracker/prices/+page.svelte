@@ -85,6 +85,7 @@
 		if (v.int) { int = v.int; intPicked = true; }
 		endT = v.end;
 		linkedT = v.t;
+		zoom = v.q.zoom ?? null;
 		let p: any = null;
 		try { p = JSON.parse(localStorage.getItem('elenz-prices') || 'null'); } catch { /* storage blocked: defaults */ }
 		if (v.link) p = { scale: v.q.scale, off: v.q.hide, band: v.q.band, heat: p?.heat };
@@ -120,7 +121,7 @@
 			const nodes = card === cards[0] && view.mode === 'time' ? shown.map((x: any) => ({ name: `${x.name} (${x.node})`, colour: tokColour(x.tok), kind: 'line' })) : [];
 			panels.push({ heading: card.querySelector('h2')?.textContent ?? '', unit: card.querySelector('.unit')?.textContent ?? '', legend: [...nodes, ...legendOf(card)], img, w, h });
 		}
-		const blob = await composeImage({ title: describe('prices', sharedNow()), sub: spanText(), panels, credit: [CREDIT, 'Dispatch prices for the live week, final prices for history.'], link: viewLink() });
+		const blob = await composeImage({ title: describe('prices', { ...sharedNow(), zoom }), sub: spanText(), panels, credit: [CREDIT, 'Dispatch prices for the live week, final prices for history.'], link: viewLink() });
 		return { blob, name: fileName(fileWords(), 'png') };
 	}
 	function csv() {
@@ -139,7 +140,7 @@
 			rows = Array.from({ length: P.n }, (_, j) => [nzTime(P.t[j]).slice(0, 10), ...isl.flatMap(([k]) => cols.map(([c]) => (c.startsWith('n') ? P[k][c][j] : r2(P[k][c][j])))), r2(P.spread[j]), r1(P.hvdc[j])]);
 		}
 		const text = csvText([
-			`ELENZ: ${describe('prices', sharedNow())}`,
+			`ELENZ: ${describe('prices', { ...sharedNow(), zoom })}`,
 			`${spanText()}. Times are the start of each ${view.mode === 'long' ? 'period' : 'interval'}. Dispatch prices for the live week, final prices for history.`,
 			CREDIT, LICENCE, 'How the prices are shown: https://elenz.co.nz/methods/prices', `This view: ${viewLink()}`,
 		], header, rows);
@@ -151,10 +152,10 @@
 		{ label: 'Data for this view', sub: view?.mode === 'long' ? 'Each period’s prices, spread, spikes and HVDC' : 'Node prices, island spread and HVDC', kind: 'CSV' as const, run: () => csv() },
 	];
 	const sharedNow = () => ({ region, range, int: intPicked && intChoices.includes(int) ? int : null, end: R.days == null ? null : endT });
-	const ownNow = () => ({ scale, hide: off, band: bandKey });
+	const ownNow = () => ({ scale, hide: off, band: bandKey, zoom });
 	function save() {
 		writeView(sharedNow(), { query: ownNow() });
-		document.title = `${describe('prices', sharedNow())} · ELENZ`;
+		document.title = `${describe('prices', { ...sharedNow(), zoom })} · ELENZ`;
 		try { localStorage.setItem('elenz-prices', JSON.stringify({ scale, off, band: bandKey, heat: heatKey })); } catch { /* storage blocked */ }
 	}
 	// the links the Share button offers: this view, live or fixed to its dates, and the pinned point (or one chosen with
@@ -167,11 +168,45 @@
 	}
 
 	function pickRange(k: string) {
+		zoom = null;
 		range = k;
 		intPicked = false;   // a new range starts on its default interval, as on the Generation tab
 		save();
 	}
-	const setEnd = (t: number | null) => { endT = t; save(); };
+	const setEnd = (t: number | null) => { if (zoom && !zoom.span) zoom = null; endT = t; save(); };
+
+	// ---------- zoom (as on the Generation tab): part of a 5-minute or half-hourly window, either the last hours of it
+	// ({ span: hours }, from the menu beside 1D, so a live view stays live) or a stretch dragged across a chart
+	// ({ from, to }); a range button, the date or Reset zoom clears it. Long ranges (periods of a day or more) ignore it.
+	let zoom = $state<{ span?: number; from?: number; to?: number } | null>(null);
+	let spanOpen = $state(false);
+	let spanBtn = $state<HTMLButtonElement>(), spanMenu = $state<HTMLDivElement>();
+	let spanPos = $state({ top: 0, left: 0 });
+	function openSpan() {
+		if (spanOpen) { spanOpen = false; return; }
+		const r = spanBtn!.getBoundingClientRect();
+		spanPos = { top: r.bottom + 6, left: Math.max(8, Math.min(innerWidth - 168, r.left - 60)) };
+		spanOpen = true;
+	}
+	function spanOutside(e: Event) {
+		if (!spanOpen) return;
+		if (e instanceof KeyboardEvent) { if (e.key === 'Escape') { spanOpen = false; spanBtn?.focus(); } return; }
+		const t = e.target as Node;
+		if (!spanBtn?.contains(t) && !spanMenu?.contains(t)) spanOpen = false;
+	}
+	function pickSpan(h: number) {
+		spanOpen = false;
+		range = '1d'; intPicked = false;
+		zoom = h < 24 ? { span: h } : null;
+		save();
+	}
+	function setZoom(z: { from: number; to: number } | null) { zoom = z; hover = -1; pinned = false; save(); }
+	const zoomed = $derived(!!zoom && view?.mode === 'time' && !!view?.zoomed);
+	const zoomTxt = $derived.by(() => {
+		if (!zoomed || !view) return '';
+		const a = view.t0, b = view.t1;
+		return `${clock(a)} – ${clock(b)}${dayLabel(a) === dayLabel(b) ? ' ' + dayLabel(a) : ''}`;
+	});
 
 	// ---------- building the view ----------
 	// the points of a segment starting in [from, to): a point is the interval that starts at its time, so a window
@@ -193,14 +228,21 @@
 		const from = r.days == null ? 0 : endT !== null && to === endT ? addDays(to, -r.days) : to - r.days * 864e5;   // whole local days, like the Generation tab
 		const iv = effInt;
 		viewError = '';
+		// the zoom narrows the window (5-minute and half-hourly views only); ignored if it would leave under two points
+		let zf = from, zt = to, isZoomed = false;
+		if (zoom && r.src !== 'day') {
+			if (zoom.span) { zt = to; zf = Math.max(from, to - zoom.span * 36e5); }
+			else if (zoom.from != null && zoom.to != null) { zf = Math.max(from, zoom.from); zt = Math.min(to, zoom.to); }
+			if (zt - zf >= (iv === '30m' ? 36e5 : 2 * 3e5)) isZoomed = true; else { zf = from; zt = to; }
+		}
 		try {
 			if (r.src === 'live' && from >= live.t[0] - 1) {
-				setView(timeView(atInterval(windowOf(live, from, to), iv)));
+				setView(timeView(atInterval(windowOf(live, zf, zt), iv)), isZoomed);
 			} else if (r.src !== 'day') {
 				if (!store.has('hh', from, to)) { busy = true; await store.load('hh', from, to); }
 				if (my !== token) return;
 				const m = store.merged('hh', live);
-				setView(timeView(atInterval(addRevenue(windowOf(m, from, to), undefined, true), iv), m.histEnd));
+				setView(timeView(atInterval(addRevenue(windowOf(m, zf, zt), undefined, true), iv), m.histEnd), isZoomed);
 			} else {
 				if (!store.has('day', 0, 0)) { busy = true; await store.load('day', 0, 0); }
 				if (my !== token) return;
@@ -214,7 +256,8 @@
 			if (my === token) busy = false;
 		}
 	}
-	function setView(v: any) {
+	function setView(v: any, isZoomed = false) {
+		v.zoomed = isZoomed;
 		const keep = view && view.mode === v.mode && hover >= 0 && hover < v.n && view.n === v.n;
 		view = v;
 		if (!keep) { hover = -1; pinned = false; }   // no cursor: the summary shows the whole range, as on the Generation tab
@@ -325,6 +368,10 @@
 		const kind = view.mode === 'long' || (view.histEnd && view.t[Math.max(i, 0)] <= view.histEnd) ? 'final prices' : 'dispatch prices';
 		if (i < 0) {
 			const t0 = view.t[0], t1 = view.t[view.n - 1];
+			if (view.zoomed) {
+				const end = view.S.t[view.S.n - 1] + view.S.h[view.S.n - 1] * 36e5;
+				return [zoom?.span && endT === null ? `Last ${zoom.span} hour${zoom.span > 1 ? 's' : ''}` : 'Zoomed in', `${clock(t0)} – ${clock(end)} ${dayLabel(end)} · averages`];
+			}
 			if (R.days == null) return [`Since ${dateLabel(t0)}`, `to ${dateLabel(t1)} · averages`];
 			if (endT === null) return [`Last ${R.label}`, `to ${clock(t1)} ${dayLabel(t1)} · averages`];
 			return [`${R.label} to ${dateLabel(t1)}`, `${dateLabel(t0)} – ${dateLabel(t1)} · averages`];
@@ -478,7 +525,7 @@
 
 	// rebuild when the range, interval or data change
 	// (build reads and writes the view, so it runs untracked: only these three trigger it)
-	$effect(() => { void range; void int; void intPicked; void live; void endT; untrack(() => build()); });
+	$effect(() => { void range; void int; void intPicked; void live; void endT; void zoom; untrack(() => build()); });
 
 	// ---------- moving through time: the date box and the arrows ----------
 	const canMove = $derived(R.days != null);
@@ -506,7 +553,7 @@
 		else if (e.key === 'Home') { hover = 0; e.preventDefault(); }
 		else if (e.key === 'End') { hover = view.n - 1; e.preventDefault(); }
 		else if (e.key === 'PageUp' || e.key === 'PageDown') { e.preventDefault(); step(e.key === 'PageUp' ? -1 : 1); }
-		else if (e.key === 'Escape') { hover = -1; tipS = null; pinned = false; }
+		else if (e.key === 'Escape') { if (hover < 0 && zoom && !zoom.span) setZoom(null); hover = -1; tipS = null; pinned = false; }
 	}
 	function closeInfo(e: Event) {
 		if (e instanceof KeyboardEvent) {
@@ -554,7 +601,7 @@
 	const fmtMW = (v: number) => (Math.abs(v) >= 1000 ? `${(v / 1000).toLocaleString('en-NZ')}k` : String(v));
 </script>
 
-<svelte:window bind:innerHeight={winH} onclick={closeInfo} onkeydown={closeInfo} />
+<svelte:window bind:innerHeight={winH} onclick={(e) => { closeInfo(e); spanOutside(e); }} onkeydown={(e) => { closeInfo(e); spanOutside(e); }} onscroll={() => (spanOpen = false)} />
 
 <svelte:head>
 	<title>Prices · Tracker · ELENZ</title>
@@ -601,8 +648,13 @@
 			<span id="p-lb-range">Range</span>
 			<div class="seg" role="group" aria-labelledby="p-lb-range">
 				{#each Object.entries({ '1d': '1D', '3d': '3D', '7d': '7D', '30d': '30D', '1y': '1Y', all: 'ALL' }) as [k, l]}
-					<button type="button" aria-pressed={range === k} title={(RANGES as any)[k].label} onclick={() => pickRange(k)}>{l}</button>
+					<button type="button" aria-pressed={range === k} title={(RANGES as any)[k].label} onclick={() => pickRange(k)}>{k === '1d' && zoom?.span && zoomed ? `${zoom.span}H` : l}</button>
 				{/each}
+			</div>
+			<div class="span-wrap p-span">
+				<button type="button" class="span-btn" aria-haspopup="true" aria-expanded={spanOpen} aria-controls="p-span-menu" title="Shorter than a day" aria-label="Shorter ranges" bind:this={spanBtn} onclick={openSpan}>
+					<svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+				</button>
 			</div>
 		</div>
 		<div class="ctl">
@@ -625,7 +677,23 @@
 				</div>
 			</div>
 		{/if}
+		{#if zoomed}
+			<button type="button" class="zoom-chip" title="Back to the whole range (Escape)" onclick={() => { zoom = null; save(); }}>
+				<svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="m10.5 10.5 3.5 3.5M5 7h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+				{#if !zoom?.span}<span>{zoomTxt}</span>{/if}<b>Reset zoom</b>
+			</button>
+		{/if}
 	</nav>
+	<!-- outside the sticky bar, which clips anything hanging below it -->
+		{#if spanOpen}
+			<div class="span-menu" id="p-span-menu" bind:this={spanMenu} style="top:{spanPos.top}px;left:{spanPos.left}px" role="group" aria-label="Show the last part of the day">
+				<span class="span-hd">Last</span>
+				{#each [1, 3, 6, 12, 24] as h}
+					<button type="button" role="menuitemradio" aria-checked={h === 24 ? range === '1d' && !zoom : zoom?.span === h} onclick={() => pickSpan(h)}>{h} hour{h > 1 ? 's' : ''}</button>
+				{/each}
+				<span class="span-tip">Or drag across any chart to zoom</span>
+			</div>
+		{/if}
 
 	<noscript><p class="notice">The charts need JavaScript turned on.</p></noscript>
 
@@ -696,7 +764,7 @@
 						{@render popBtn('price', 'wholesale price')}
 					</div>
 					<div class="plot">
-						<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={popped === 'price' ? popH : 266} showX {xTicks} y={priceY} fmt={fmtTick} layers={priceLayers} note={highNote} stamp={at >= 0 && hoverBy !== 'mouse' ? chip(at) : null}
+						<TimeChart onzoom={view.mode === 'time' ? (a, b) => setZoom({ from: a, to: b }) : undefined} t={view.t} t0={view.t0} t1={view.t1} height={popped === 'price' ? popH : 266} showX {xTicks} y={priceY} fmt={fmtTick} layers={priceLayers} note={highNote} stamp={at >= 0 && hoverBy !== 'mouse' ? chip(at) : null}
 							shade={view.mode === 'time' ? view.shade : []} marks={capMarks} bind:hover onpoint={point('price')} onleave={leave} onpin={pin} {pinned}
 							label="Prices at the grid nodes over the range" zero />
 						{#if canMove}
@@ -726,7 +794,7 @@
 						</div>
 						{@render popBtn('spread', 'island spread')}
 					</div>
-					<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={popped === 'spread' ? popH : 120} y={spreadY} fmt={fmtSpread} zero showX={popped === 'spread'} {xTicks}
+					<TimeChart onzoom={view.mode === 'time' ? (a, b) => setZoom({ from: a, to: b }) : undefined} t={view.t} t0={view.t0} t1={view.t1} height={popped === 'spread' ? popH : 120} y={spreadY} fmt={fmtSpread} zero showX={popped === 'spread'} {xTicks}
 						layers={view.mode === 'time' ? [{ kind: 'posneg', values: view.spread, pos: '--o1', neg: '--o2' }] : [{ kind: 'bars', values: view.P.spread, tok: '--o1', neg: '--o2', opacity: 0.85 }]}
 						shade={view.mode === 'time' ? view.shade : []} bind:hover onpoint={point('spread')} onleave={leave} onpin={pin} {pinned} label="The price gap between Haywards and Benmore" />
 				</div>
@@ -738,7 +806,7 @@
 							<div class="legends"><span class="lg"><i class="area" style="--c: var(--f-hvdc)"></i>Benmore ⇄ Haywards <b>{mw(valOf(view.hvdc))}</b></span></div>
 							{@render popBtn('hvdc', 'HVDC transfer')}
 						</div>
-						<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={popped === 'hvdc' ? popH : 140} y={hvdcY} fmt={fmtMW} zero showX {xTicks}
+						<TimeChart onzoom={view.mode === 'time' ? (a, b) => setZoom({ from: a, to: b }) : undefined} t={view.t} t0={view.t0} t1={view.t1} height={popped === 'hvdc' ? popH : 140} y={hvdcY} fmt={fmtMW} zero showX {xTicks}
 							layers={[{ kind: 'area', values: view.hvdc, tok: '--f-hvdc', opacity: 0.5 }, { kind: 'line', values: view.hvdc, tok: '--f-hvdc', width: 1.3, dot: false }]}
 							shade={view.shade} bind:hover onpoint={point('hvdc')} onleave={leave} onpin={pin} {pinned} label="HVDC transfer between the islands" />
 					</div>
@@ -752,7 +820,7 @@
 							</div>
 							{@render popBtn('spikes', 'price spikes')}
 						</div>
-						<TimeChart t={view.t} t0={view.t0} t1={view.t1} height={popped === 'spikes' ? popH : 140} y={spikeY} fmt={(v) => String(v)} showX {xTicks}
+						<TimeChart onzoom={view.mode === 'time' ? (a, b) => setZoom({ from: a, to: b }) : undefined} t={view.t} t0={view.t0} t1={view.t1} height={popped === 'spikes' ? popH : 140} y={spikeY} fmt={(v) => String(v)} showX {xTicks}
 							layers={[{ kind: 'bars', values: view.P[bandKey === 'BEN' ? 'SI' : 'NI'].n500, tok: '--o1', opacity: 0.45 }, { kind: 'bars', values: view.P[bandKey === 'BEN' ? 'SI' : 'NI'].n1000, tok: '--o1' }]}
 							bind:hover onpoint={point('spikes')} onleave={leave} onpin={pin} {pinned} label="Half-hours with prices over $500 and $1,000 in each period" />
 					</div>
@@ -781,6 +849,8 @@
 						<dd>Click a chart to hold the time line there; click it again, Release or Escape to let go. Share can then mark that time.</dd>
 						<dt>Move through history</dt>
 						<dd>Range, interval and region are in the bar at the top. The ‹ › arrows beside the date or on the price chart step by the range; the date box jumps to a day; Latest comes back.</dd>
+						<dt>Zoom in</dt>
+						<dd>On the live week and 30 days, drag across any chart to zoom into that stretch; every chart follows. The arrow beside 1D picks the last 1, 3, 6 or 12 hours. Reset zoom in the bar, Escape, a range button or the date goes back.</dd>
 						<dt>Nodes and scales</dt>
 						<dd>Select a node's colour square in this list to hide or show its line. Spike-proof, Capped and Linear change the price chart's scale; on long ranges, choose the island whose price range is shown.</dd>
 						<dt>Enlarge, share, download</dt>
