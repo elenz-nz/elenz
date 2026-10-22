@@ -6,7 +6,10 @@
 	//      HVDC route from Haywards to Benmore, drawing the link behind it, and past the South Island ring, which fills
 	//      as it passes (build.svelte.js carries how far each part has built);
 	//   3. land: near the Tracker preview (TrackerPeek, data-handoff="to") the line grows back out of the dot and settles
-	//      on the top of the stack, which fills in beneath it; once landed, the Tracker's own outline takes over.
+	//      on the top of the stack, which fills in beneath it; once landed, the Tracker's own outline takes over;
+	//   4. climb: scrolling on, the dot leaves the end of the Tracker's line ("now"), flies to the Records preview
+	//      (RecordsPeek, data-handoff="rec") and climbs its staircase, each step a time the record was broken, drawing
+	//      it as it goes (build.rec), and rests on the record.
 	// Drawn in a fixed overlay between the two charts' positions on screen, read afresh each frame, so it starts on one
 	// and ends on the other wherever they are. Progress goes on <html>: --ho-lift (stage 1, the hero's fill fades),
 	// --ho (stage 3, the Tracker's stack fills in; 1 once landed) and data-ho while the line is away. Nothing happens
@@ -38,10 +41,11 @@
 
 	onMount(() => {
 		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		build.rec = 0;   // the Records staircase waits for the dot (it stays drawn if there is no hand-off)
 		const root = document.documentElement;
 		let raf = 0;
 		// what's shown: eased towards the values the scroll position gives (cur), null until the first frame
-		let shown: { kA: number; kC: number; ni: number; link: number; si: number; dx: number; dy: number } | null = null;
+		let shown: { kA: number; kC: number; ni: number; link: number; si: number; rec: number; dx: number; dy: number } | null = null;
 		let lastT = 0, settling = false;
 		function frame(now = performance.now()) {
 			raf = 0;
@@ -113,14 +117,33 @@
 				const siFrom = ben - 0.3 * (ben - hay);
 				tSi = smooth((s - siFrom) / (si + 100 - siFrom));
 			}
-			// the dot's place on screen for this scroll position (stage 2)
+			// stage 4: from the end of the Tracker's line to the Records staircase, then up it. The flight starts a little
+			// after landing; the climb starts as the staircase comes up to just above the middle of the screen and
+			// takes ~360 px of scroll
+			const recPath = document.querySelector('[data-handoff="rec"]') as SVGPathElement | null;
+			let st4: { leave: number; c0: number; c1: number; at: (v: number) => Pt } | null = null;
+			let tRec = 1;
+			if (recPath) {
+				const ctmR = recPath.getScreenCTM(), L = recPath.getTotalLength();
+				if (ctmR && L > 0) {
+					const onRec = (u: number) => { const p = recPath.getPointAtLength(Math.max(0, Math.min(1, u)) * L); const q = new DOMPoint(p.x, p.y).matrixTransform(ctmR); return { x: q.x, y: q.y + s }; };
+					const from = page(qEnd), start = onRec(0);
+					const leave = land + 60;
+					const c0 = Math.max(leave + 220, start.y - vh * 0.55), c1 = c0 + 360;
+					const at = (v: number): Pt => v <= c0 ? lerp(from, start, smooth((v - leave) / (c0 - leave))) : onRec((v - c0) / (c1 - c0));
+					st4 = { leave, c0, c1, at };
+					tRec = s <= c0 ? 0 : s >= c1 ? 1 : (s - c0) / (c1 - c0);
+				}
+			}
+			const inSt4 = !!st4 && s > st4.leave && s < st4.c1;
+			// the dot's place on screen for this scroll position (stage 2, or 4)
 			const screen = (p: Pt) => ({ x: p.x, y: p.y - s });
-			const target = screen(route(s));
+			const target = screen(inSt4 ? st4!.at(s) : route(s));
 			// ease what's shown towards it: progress values directly, the dot by its offset from where it should be
-			if (!shown) shown = { kA, kC: kC0, ni: tNi, link: tLink, si: tSi, dx: 0, dy: 0 };
+			if (!shown) shown = { kA, kC: kC0, ni: tNi, link: tLink, si: tSi, rec: tRec, dx: 0, dy: 0 };
 			else {
 				const prevDot = dot ?? target;
-				shown = { kA: ease(shown.kA, kA), kC: ease(shown.kC, kC0), ni: ease(shown.ni, tNi), link: ease(shown.link, tLink), si: ease(shown.si, tSi),
+				shown = { kA: ease(shown.kA, kA), kC: ease(shown.kC, kC0), ni: ease(shown.ni, tNi), link: ease(shown.link, tLink), si: ease(shown.si, tSi), rec: ease(shown.rec, tRec),
 				          dx: (prevDot.x - target.x) * (1 - f), dy: (prevDot.y - target.y) * (1 - f) };
 				if (Math.abs(shown.dx) < 0.3) shown.dx = 0;
 				if (Math.abs(shown.dy) < 0.3) shown.dy = 0;
@@ -130,16 +153,25 @@
 			root.style.setProperty('--ho-lift', kAs.toFixed(4));
 			root.style.setProperty('--ho', kC.toFixed(4));
 			if (ctm) { build.ni = shown.ni; build.link = shown.link; build.si = shown.si; }
+			if (st4) build.rec = shown.rec;
 			// keep drawing until everything has caught up with the page
-			settling = shown.kA !== kA || shown.kC !== kC0 || shown.ni !== tNi || shown.link !== tLink || shown.si !== tSi || shown.dx !== 0 || shown.dy !== 0;
+			settling = shown.kA !== kA || shown.kC !== kC0 || shown.ni !== tNi || shown.link !== tLink || shown.si !== tSi || shown.rec !== tRec || shown.dx !== 0 || shown.dy !== 0;
 			if (settling) go(); else lastT = 0;
 
-			show = s > 0 && kC < 1;
+			show = (s > 0 && kC < 1) || inSt4;
 			if (show) root.setAttribute('data-ho', ''); else root.removeAttribute('data-ho');
 			if (!show) return;
 
 			const pts: string[] = [];
-			if (kC > 0) {
+			if (inSt4) {
+				// stage 4: the dot on its way to, and up, the Records staircase
+				const { dx, dy } = shown;
+				dot = { x: target.x + dx, y: target.y + dy };
+				tail = Array.from({ length: 7 }, (_, j) => {
+					const p = screen(st4!.at(Math.max(st4!.leave, s - (j + 1) * 14)));
+					return { x: p.x + dx, y: p.y + dy, r: 3.6 - j * 0.42, o: 0.45 - j * 0.06 };
+				});
+			} else if (kC > 0) {
 				// stage 3: grow out of the dot onto the stack
 				for (let i = 0; i < m; i++) { const p = lerp(qEnd, Q(i), kC); pts.push(`${p.x.toFixed(1)},${p.y.toFixed(1)}`); }
 				dot = qEnd;
@@ -160,6 +192,7 @@
 			}
 			path = pts.length ? `M${pts.join('L')}` : '';
 			ink = kC > 0 ? 0.55 + 0.35 * kC : 0.55;
+			if (inSt4) path = '';
 		}
 		const go = () => { if (!raf) raf = requestAnimationFrame(frame); };
 		frame(performance.now());
@@ -172,7 +205,7 @@
 			root.style.removeProperty('--ho');
 			root.style.removeProperty('--ho-lift');
 			root.removeAttribute('data-ho');
-			build.ni = build.link = build.si = 1;
+			build.ni = build.link = build.si = build.rec = 1;
 		};
 	});
 	// a new interval reshapes both charts; redraw at the current scroll

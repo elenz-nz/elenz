@@ -1,7 +1,8 @@
 <script lang="ts">
 	// The landing page: the mark, one live figure and the generation mix, then a glimpse of each page.
 	// To add a page, add an entry to PAGES with a preview component in #lib/landing. As the page scrolls, the hero's
-	// horizon line shrinks into its dot, which flies down to the Tracker preview and opens out onto it (Handoff).
+	// horizon line shrinks into its dot, which flies down through the Now map to the Tracker preview, opens out onto it,
+	// then climbs the Records staircase (Handoff).
 	import Preview from '#lib/site/Preview.svelte';
 	import { onMount } from 'svelte';
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
@@ -28,14 +29,14 @@
 	type Page = { href: string; name: string; peek: any; blurb: string; window?: { href: string; label: string } };
 	const PAGES: Page[] = [
 		{ href: '/now', name: 'Now', peek: NowPeek,
-			blurb: 'The system this five minutes: demand, prices at Haywards and Benmore, the HVDC link, emissions, and each island’s generation mix on the map.' },
+			blurb: 'What’s happening on the grid right now: demand, prices, generation, emissions and the power flowing between the islands.' },
 		{ href: '/tracker', name: 'Tracker', peek: TrackerPeek,
-			blurb: 'Generation by fuel, plant, owner or scheme, and prices at six grid nodes with the island spread and what each fuel earned, from the last 24 hours back to 1997.' },
+			blurb: 'Explore New Zealand’s electricity generation and wholesale prices, from single power stations to the whole country, back to 1997.' },
 		{ href: '/records', name: 'Records', peek: RecordsPeek,
-			blurb: 'The highest and lowest half-hours since 1997, for New Zealand and each island: peak demand, renewable share, wind and solar, prices and the HVDC link, and how each record grew.' },
+			blurb: 'The biggest and smallest moments on the grid: peak demand, price spikes, renewable highs and HVDC flows, by half-hour, day, week, month and year.' },
 		{ href: '/articles', name: 'Articles', peek: ArticlesPeek,
 			window: latest ? { href: `/articles/${latest.slug}`, label: `Read ${latest.title}` } : undefined,
-			blurb: 'New records, quarterly reviews and closer looks at how the system is running, written from the same data as the tracker.' },
+			blurb: 'Analysis of New Zealand’s electricity system, using the same data behind the tracker.' },
 	];
 
 	let D = $state<any>(null);
