@@ -9,6 +9,7 @@
 	import { summarise, ring } from '#lib/home/now.js';
 	import { explainNow } from '#lib/now/explain.js';
 	import PriceExplainer from '#lib/now/PriceExplainer.svelte';
+	import PriceButton from '#lib/now/PriceButton.svelte';
 	import RecordLine from '#lib/records/RecordLine.svelte';
 	import Generators from '#lib/now/Generators.svelte';
 	import { loadRecords, freshLive } from '#lib/records/records.js';
@@ -34,7 +35,20 @@
 	let lastD: any = null;
 	let liveD = $state.raw<any>(null);   // the newest tracker.json, for the generator table
 	let recNew = $state<ReturnType<typeof freshLive>>([]);
-	const checkRecords = () => { try { recNew = records && lastD ? freshLive(records, lastD) : []; } catch { recNew = []; } };
+	// records the live data beat today (New Zealand's day): a record stays on /now only for the day it was set
+	const nzDay = (t: number) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Pacific/Auckland' }).format(t);
+	const checkRecords = () => {
+		try { recNew = records && lastD ? freshLive(records, lastD).filter((r: any) => nzDay(r.p.t) === nzDay(lastD.meta.end ?? Date.now())) : []; } catch { recNew = []; }
+	};
+
+	// the price explainer: opens by itself only at extremes; a viewer's choice holds until its state changes
+	let peChoice = $state<boolean | null>(null);
+	let peKey = '';
+	$effect(() => {
+		const k = ex ? `${ex.tier}|${ex.variant}` : '';
+		if (k !== peKey) { peKey = k; peChoice = null; }
+	});
+	const peOpen = $derived(!!ex && (peChoice ?? ex.tier === 'open'));
 
 	const PARTS = new Intl.DateTimeFormat('en-NZ', {
 		timeZone: 'Pacific/Auckland', weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true
@@ -143,7 +157,7 @@
 					<span title="North Island reference price, Haywards"><b class="isl">HAY</b>{now ? money(now.regions.NI.price ?? 0) : '–'}<small>/MWh</small></span>
 					<span title="South Island reference price, Benmore"><b class="isl">BEN</b>{now ? money(now.regions.SI.price ?? 0) : '–'}<small>/MWh</small></span>
 				</span>
-				<span class="k-sub"><a class="k-link" href="/methods/prices">Spot market, every 5 minutes</a></span>
+				{#if ex}<PriceButton x={ex} open={peOpen} onclick={() => (peChoice = !peOpen)} />{:else}<span class="k-sub"><a class="k-link" href="/methods/prices">Spot market, every 5 minutes</a></span>{/if}
 			</div>
 			<div class="kpi">
 				<span class="k-lbl">HVDC</span>
@@ -162,8 +176,7 @@
 			</div>
 		</section>
 
-		{#if ex}<PriceExplainer x={ex} />{/if}
-		{#if recNew.length}<RecordLine items={recNew} />{/if}
+		{#if ex}<PriceExplainer x={ex} open={peOpen} onclose={() => (peChoice = false)} />{/if}
 
 		<div class="below">
 		<div class="grid">
@@ -228,6 +241,8 @@
 				</div>
 			</section>
 
+			<div class="now-side">
+			{#if recNew.length}<RecordLine items={recNew} />{/if}
 			<section class="panel mix-panel" aria-labelledby="mix-h">
 				<div class="p-head"><h2 id="mix-h">Generation now</h2><span class="p-info"><InfoTip label="About this table">Generation is dispatch, the market's 5-minute targets for each plant; embedded solar is estimated. <a href="/methods/generation">How generation is built</a></InfoTip></span></div>
 				{#if now && nz}
@@ -252,6 +267,7 @@
 					<p class="mix-note">{error || 'Loading…'}</p>
 				{/if}
 			</section>
+			</div>
 		</div>
 
 		{#if liveD && now}<Generators D={liveD} when={clockOnly(now.t)} />{/if}
@@ -287,6 +303,7 @@
 
 	.grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 14px; align-items: start; }
 	.below { display: grid; gap: 14px; }
+	.now-side { display: grid; gap: 10px; min-width: 0; align-content: start; }
 	/* big screens: every generator beside the map and the mix rather than under them */
 	@media (min-width: 1600px) {
 		.below { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); align-items: start; }

@@ -51,4 +51,11 @@
 	.awake { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 0.74rem; font-weight: 500; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px 3px 8px; min-height: 26px; cursor: pointer; white-space: nowrap; }
 	.awake:hover { color: var(--ink); border-color: var(--ink-2); }
 	.awake[aria-pressed='true'] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+	/* on: a slow, faint glow, just enough to see it's working */
+	.awake[aria-pressed='true'] { animation: glow 4s ease-in-out infinite; }
+	@keyframes glow {
+		0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 0%, transparent); }
+		50% { box-shadow: 0 0 10px 1px color-mix(in srgb, var(--accent) 45%, transparent); }
+	}
+	@media (prefers-reduced-motion: reduce) { .awake[aria-pressed='true'] { animation: none; box-shadow: 0 0 6px 0 color-mix(in srgb, var(--accent) 35%, transparent); } }
 </style>

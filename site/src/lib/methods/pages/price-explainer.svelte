@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Thresholds and factors come straight from the explainer's own code, so this page can't drift from it.
-	import { FACTORS, RULES } from '#lib/now/explain.js';
+	import { BELOW, FACTORS, RULES } from '#lib/now/explain.js';
 	import { REPO } from '../registry.js';
 	const R = RULES;
 	const usd = (v: number) => '$' + v.toLocaleString('en-NZ');
@@ -67,6 +67,9 @@
 	</table>
 </div>
 <p>Factors are ranked by how far off they are, relative to usual and in MW (a 300 MW swing counts in full), and the top two that tend to move the price the way it has gone lead the explanation. The panel doesn’t label each factor as pushing the price up or down: these are associations with the usual pattern, not a measured cause. Hydro counts for half: it is dispatched to balance everything else, so it follows the other factors more than it leads them. The HVDC transfer and the price gap between the islands are shown against usual too.</p>
+<p><b>Plants below the past week.</b> The data carries no outages, so as a rough stand-in the panel lists baseload thermal, geothermal and cogeneration plants (not hydro or peaking plants, which move with the market) whose last 30 minutes are at least {BELOW.minDrop} MW lower than, and at most {Math.round(BELOW.maxShare * 100)}% of, the median of the same 30 minutes on the other days of the live week. Together they count as a reason when they are at least {BELOW.f.floor} MW below. A plant running low may be out for maintenance or a fault, or simply offered less.</p>
+<p><b>Short jumps.</b> A state holds for {R.holdMin} minutes after its condition ends, so a price that jumps for a few 5-minute intervals and drops back stays highlighted for a while. The panel then says when the price jumped and that it is back, rather than looking for causes in conditions that have already passed. When nothing shown is pushing the price up, it says so, and names what it can't see: grid constraints, reserves, outages it can't detect, and changes in offers.</p>
+<p>Each reason has two bars on one scale: its value now, in its colour, and its recent level for this half-hour of the week, in grey.</p>
 
 <h2 id="setter">The possible price setter</h2>
 <p>Generators’ offers are published the day after, so the newest available day’s final offers (<code>BidsAndOffers</code>, latest revision only) are used, for the same half-hour of the day. Each plant’s offers for that trading period are stacked cheapest first. A plant running part way up one of its offer blocks (at least 1 MW into it and 1 MW short of its end) is on the margin; of those whose block is priced within 25% of their island’s reference price now, the closest is named. None is named when the price is under $5, where many plants offer at similar prices and none stands out. It is labelled an estimate, and called possible rather than likely: offers change from day to day, and node prices differ from the reference price by losses.</p>

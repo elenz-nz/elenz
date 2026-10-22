@@ -24,7 +24,12 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   from tracker.json's newest interval via `src/lib/home/now.js`; island outlines in `src/lib/home/nzmap.js`, made by
   `analysis/make_nz_map.py`; under the price tiles the price explainer, "Why is the price high?": rules and wording in
   `src/lib/now/explain.js`, drawn by `src/lib/now/PriceExplainer.svelte`, from tracker.json's `explain` block (see
-  `ingest/explain.py`); quiet, highlighted or open by itself, rules tested in `analysis/price_triggers.py`); `/articles` records, quarterly reviews and analysis (`src/routes/articles/`; one
+  `ingest/explain.py`); quiet, highlighted or open by itself, rules tested in `analysis/price_triggers.py`; opened from a button in the
+  wholesale price tile (`PriceButton.svelte`, lit when highlighted), the card drops down under the tiles; each reason is a
+  pair of bars, now over its recent level; reasons include plants running well below the past week (`BELOW`, an outage
+  stand-in from the live week's per-plant series), a held state after a short jump says so, and when nothing pushes the
+  price up it says what it can't see; a record the live data beat today is a small link above Generation now
+  (`RecordLine.svelte`), only on the day it was set; Keep screen on glows slowly while on); `/articles` records, quarterly reviews and analysis (`src/routes/articles/`; one
   Svelte file per article in `src/lib/articles/posts/<slug>.svelte` exporting `meta` {title, dek, date, kind, draft}
   from a module script, with `Record`, `Figure` and `Note` components and `articles.css` alongside; the registry is
   `src/lib/articles/registry.ts`). `ARTICLES_PUBLIC` there is true (published 15 Oct 2026 with the Winter 2026 review): Articles is in the

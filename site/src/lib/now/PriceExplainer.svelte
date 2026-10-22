@@ -16,25 +16,14 @@
 		setter: { plant: string; fuel: string; mw: number; cap: number | null; price: number; owner?: string; scheme?: string } | null;
 		chart: { t: number[]; hay: number[]; ben: number[]; band: Band[] };
 	};
-	let { x }: { x: X } = $props();
-
-	// open by default only at extremes; a viewer's choice holds until the state changes
-	let choice = $state<boolean | null>(null);
-	const key = $derived(`${x.tier}|${x.variant}`);
-	let lastKey = '';
-	$effect(() => {
-		if (key !== lastKey) { lastKey = key; choice = null; }
-	});
-	const open = $derived(choice ?? x.tier === 'open');
+	// the button that opens it is in /now's wholesale price tile (PriceButton.svelte); this is the card that drops down
+	let { x, open, onclose }: { x: X; open: boolean; onclose: () => void } = $props();
 
 	const fmt = (v: number) => Math.round(v).toLocaleString('en-NZ');
 	const FUEL: Record<string, string> = { gas: 'gas', diesel: 'diesel', coal: 'coal/gas', hydro: 'hydro', geo: 'geothermal', wind: 'wind', solar: 'solar', batt: 'battery', bio: 'bioenergy', waste: 'waste heat' };
 	const TOK: Record<string, string> = { gas: '--f-gas', diesel: '--f-diesel', coal: '--f-coal', hydro: '--f-hydro', geo: '--f-geo', wind: '--f-wind', solar: '--f-solar', batt: '--f-batt', bio: '--f-bio', waste: '--f-waste' };
 	const DAY = (d: string | null) => d ? new Date(d + 'T12:00:00+13:00').toLocaleDateString('en-NZ', { day: 'numeric', month: 'short', timeZone: 'Pacific/Auckland' }) : '';
 
-	const tag = $derived(x.tier === 'open' ? 'High price' : x.variant === 'split' ? 'Islands split' : x.variant === 'high' ? 'Prices up'
-		: x.variant === 'low' ? (x.newLow ? 'New low' : x.nearZero ? 'Near zero' : 'Low') : 'Price');
-	const button = $derived(open ? 'Hide' : x.tier === 'quiet' ? 'Why this price?' : x.headline);
 	const sub = $derived(
 		x.variant === 'low' ? (x.lowStart ? `${x.nearZero ? 'Near zero' : 'Low'} since ${clock(x.lowStart)}.` : '')
 		: x.since && x.tier !== 'quiet' ? `${x.variant === 'split' ? 'Split' : 'High'} for ${duration(x.t - x.since + 300000)}.` : ''
@@ -47,27 +36,20 @@
 	let narrow = $state(false);
 	const popOut = () => { narrow = innerWidth < 700; bigOpen = true; big?.showModal(); };
 	const shut = () => big?.close();
-	const bar = (r: Row) => { const s = Math.max(r.now, r.usual, 1) * 1.15; return { fill: (r.now / s) * 100, tick: (r.usual / s) * 100 }; };
+	// each reason: now (in its colour) over its recent level (grey), on one scale, so the lengths compare at a glance
+	const bar = (r: Row) => { const s = Math.max(r.now, r.usual, 1) * 1.08; return { now: (r.now / s) * 100, usual: (r.usual / s) * 100 }; };
 </script>
 
+{#if open}
 <section class="pe tier-{x.tier} var-{x.variant}" aria-label="Price explainer">
-	<div class="pe-line">
-		<p class="pe-says">
-			<span class="pe-tag">{#if x.tier !== 'quiet'}<span class="dot" aria-hidden="true"></span>{/if}{tag}</span>
-			<span>{x.line}</span>
-		</p>
-		<button type="button" class="pe-btn" aria-expanded={open} aria-controls="pe-body" onclick={() => (choice = !open)}>
-			{button}
-			<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" class:up={open}><path d="M3 5l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
-		</button>
-	</div>
-
-	{#if open}
 		<div class="pe-body" id="pe-body">
+			<button type="button" class="pe-close" onclick={onclose} aria-label="Close the price explainer">
+				<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+			</button>
 			<div class="pe-head">
 				<div class="pe-eye">Price explainer <InfoTip label="About the price explainer">Each reason is compared with its recent level for the same half-hour of the week over the last four weeks (wind with its four-week median). The possible price setter is an estimate from the latest generator offers the EA has published. <a href="/methods/price-explainer">How the explainer works</a></InfoTip></div>
 				<h2>{x.headline}</h2>
-				{#if sub}<p class="pe-sub">{sub}</p>{/if}
+				<p class="pe-sub">{x.line}{sub ? ` ${sub}` : ''}</p>
 			</div>
 			<div class="pe-grid">
 				<div class="pe-main">
@@ -79,11 +61,11 @@
 							<li>
 								<span class="sw" style="--c:var({r.tok})" aria-hidden="true"></span>
 								<span class="pe-what"><b>{r.title}</b><small>{r.sub}</small></span>
-								<span class="pe-bar" aria-hidden="true"><span class="fill" style="--c:var({r.tok});width:{b.fill}%"></span><span class="tick" style="left:{b.tick}%"></span></span>
+								<span class="pe-bars" aria-hidden="true"><span class="b-now" style="--c:var({r.tok});width:{b.now}%"></span><span class="b-usual" style="width:{b.usual}%"></span></span>
 							</li>
 						{/each}
 					</ul>
-					<p class="pe-key"><span class="tick-key" aria-hidden="true"></span>recent level for this half-hour of the week (wind: its four-week median)</p>
+					<p class="pe-key"><span class="k-now" aria-hidden="true"></span>now <span class="k-usual" aria-hidden="true"></span>recent level for this half-hour of the week (wind: its four-week median)</p>
 				</div>
 
 				<aside class="pe-side">
@@ -115,7 +97,6 @@
 				</aside>
 			</div>
 		</div>
-	{/if}
 
 	<dialog bind:this={big} class="big" aria-labelledby="pe-big-h" onclose={() => (bigOpen = false)}
 		onclick={(e) => { if (e.target === big) shut(); }}>
@@ -131,36 +112,16 @@
 		</div>
 	</dialog>
 </section>
+{/if}
 
 <style>
 	.pe { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; }
-	.pe-line { display: flex; align-items: center; justify-content: space-between; gap: 6px 14px; padding: 4px 6px 4px 14px; flex-wrap: wrap; }
-	.pe-says { margin: 0; display: flex; align-items: center; gap: 4px 10px; flex-wrap: wrap; font-size: 0.9rem; color: var(--ink-2); padding-block: 6px; }
-	.pe-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
-		padding: 3px 8px; border-radius: 999px; background: var(--grid); color: var(--ink-2); white-space: nowrap; }
-	.dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-	.pe-btn { font: inherit; font-size: 0.86rem; font-weight: 600; min-height: 44px; padding: 0 12px; border: 0; border-radius: 4px; background: transparent;
-		color: var(--accent); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
-	.pe-btn:hover { background: var(--accent-soft); }
-	.pe-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-	.pe-btn svg { transition: transform 0.15s; }
-	.pe-btn svg.up { transform: rotate(180deg); }
 
-	/* highlighted: prices up or the islands split (amber), a new low (teal) */
-	.tier-highlight, .tier-open { border-width: 1.5px; }
-	.tier-highlight.var-high, .tier-highlight.var-split, .tier-open { border-color: color-mix(in srgb, var(--warn-ink) 45%, var(--line)); }
-	.tier-highlight.var-high .pe-line, .tier-highlight.var-split .pe-line, .tier-open .pe-line { background: var(--warn-bg); border-radius: 3px 3px 0 0; }
-	.tier-highlight.var-high .pe-tag, .tier-highlight.var-split .pe-tag, .tier-open .pe-tag { background: color-mix(in srgb, var(--warn-ink) 14%, transparent); color: var(--warn-ink); }
-	.tier-highlight.var-low { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
-	.tier-highlight.var-low .pe-line { background: var(--accent-soft); border-radius: 3px 3px 0 0; }
-	.tier-highlight.var-low .pe-tag { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
-	.tier-highlight .pe-btn, .tier-open .pe-btn { background: var(--ink); color: var(--surface); }
-	.tier-highlight .pe-btn:hover, .tier-open .pe-btn:hover { background: var(--ink-2); }
-	.tier-highlight.var-low .pe-btn { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); }
-	.tier-highlight.var-low .pe-btn:hover { background: var(--surface); }
-
-	.pe-body { border-top: 1px solid var(--line); }
-	.pe-head { padding: 16px 18px 12px; display: grid; gap: 4px; border-bottom: 1px solid var(--grid); }
+	.pe-body { position: relative; }
+	.pe-close { position: absolute; top: 8px; right: 8px; width: 40px; height: 40px; border: 0; border-radius: 4px; background: transparent; color: var(--ink-2); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+	.pe-close:hover { background: var(--grid); }
+	.pe-close:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+	.pe-head { padding: 16px 56px 12px 18px; display: grid; gap: 4px; border-bottom: 1px solid var(--grid); }
 	.pe-eye { margin: 0; display: flex; align-items: center; gap: 2px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 	.tier-open .pe-eye, .var-high .pe-eye, .var-split .pe-eye { color: var(--warn-ink); }
 	.pe-head h2 { margin: 0; font-size: 1.3rem; letter-spacing: -0.01em; }
@@ -174,11 +135,14 @@
 	.pe-what { display: grid; gap: 2px; min-width: 0; }
 	.pe-what b { font-weight: 600; font-size: 0.92rem; }
 	.pe-what small { color: var(--muted); font-size: 0.78rem; }
-	.pe-bar { position: relative; height: 7px; border-radius: 4px; background: var(--grid); }
-	.pe-bar .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--c); }
-	.pe-bar .tick { position: absolute; top: -4px; width: 2px; height: 15px; background: var(--ink); transform: translateX(-1px); }
-	.pe-key { margin: -4px 0 0; display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--muted); }
-	.tick-key { width: 2px; height: 12px; background: var(--ink); display: inline-block; }
+	.pe-bars { display: grid; gap: 3px; }
+	.pe-bars span { display: block; border-radius: 3px; min-width: 2px; }
+	.b-now { height: 7px; background: var(--c); }
+	.b-usual { height: 4px; background: color-mix(in srgb, var(--muted) 55%, transparent); }
+	.pe-key { margin: -4px 0 0; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 6px; font-size: 0.78rem; color: var(--muted); }
+	.k-now, .k-usual { display: inline-block; width: 14px; border-radius: 2px; }
+	.k-now { height: 7px; background: var(--ink-2); }
+	.k-usual { height: 4px; margin-left: 8px; background: color-mix(in srgb, var(--muted) 55%, transparent); }
 
 	.pe-side { flex: 1 1 340px; min-width: 0; padding: 16px 18px; background: color-mix(in srgb, var(--bg) 45%, var(--surface)); border-left: 1px solid var(--grid); display: grid; gap: 14px; align-content: start; }
 	.pe-side h3 { margin: 0 0 6px; font-size: 0.86rem; }
@@ -210,10 +174,8 @@
 
 
 	@media (max-width: 640px) {
-		.pe-line { padding: 6px 8px 8px 12px; }
-		.pe-btn { width: 100%; justify-content: center; }
 		.pe-rows li { grid-template-columns: 12px minmax(0, 1fr); }
-		.pe-bar { grid-column: 2; grid-row: 2; }
+		.pe-bars { grid-column: 2; grid-row: 2; }
 		.big-in { padding: 10px 12px 12px; }
 		.pe-side { border-left: 0; border-top: 1px solid var(--grid); }
 		.pe-head, .pe-main, .pe-side { padding-inline: 14px; }

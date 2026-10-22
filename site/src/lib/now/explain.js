@@ -37,6 +37,12 @@ export const FACTORS = [
   { k: 'demand', name: 'Demand', tok: '--ink-2', sign: 1, floor: 150, rel: 0.04 },
 ];
 
+// Plants running well below the past week: a rough stand-in for outages, which the data doesn't carry. Baseload
+// thermal, geothermal and cogeneration only (hydro and peakers move with the market; wind and solar with the weather):
+// each plant's last 30 minutes against the median of the same 30 minutes on the days before in the live week.
+export const BELOW = { fuels: ['geo', 'gas', 'coal', 'bio', 'waste'], minDrop: 30, maxShare: 0.6, f: { k: 'below', name: 'Plants below the past week', tok: '--f-coal', sign: -1, floor: 40, rel: 0.3 } };
+const PEAKER_NAMES = new Set(['Junction Road', 'McKee', 'Stratford', 'Stratford Peaker 1', 'Stratford Peaker 2', 'Huntly 6', 'Whirinaki']);   // ingest/explain.py PEAKERS
+
 const NZT = 'Pacific/Auckland';
 const HALF = 1800000;
 const fmt = (v) => Math.round(v).toLocaleString('en-NZ');
@@ -217,6 +223,47 @@ export function explainNow(D, plantMeta = {}) {
       (isSplit ? '' : ` · prices ${money(now.gap)} apart`),
   };
 
+  // plants running well below the past week (an outage proxy) in the region the reasons are about
+  const below = [];
+  {
+    const day = Math.round(864e5 / step), n6 = nAvg;
+    const mean = (s, j) => { let a = 0, k = 0; for (let i = Math.max(0, j - n6 + 1); i <= j; i++) if (s[i] != null) { a += s[i]; k++; } return k ? a / k : null; };
+    const isl = variant === 'split' ? dear : null;
+    for (const p of D.plants || []) {
+      if (!BELOW.fuels.includes(p.fuel) || PEAKER_NAMES.has(p.name) || (isl && p.isl !== isl) || !p.s) continue;
+      const nw = mean(p.s, J);
+      const past = [];
+      for (let k = 1; J - k * day >= n6; k++) { const v = mean(p.s, J - k * day); if (v != null) past.push(v); }
+      if (nw == null || past.length < 3) continue;
+      past.sort((a, b) => a - b);
+      const us = past[Math.floor(past.length / 2)];
+      if (us - nw >= BELOW.minDrop && nw <= BELOW.maxShare * us) below.push({ name: p.name, now: nw, usual: us, isl: p.isl });
+    }
+    below.sort((a, b) => (b.usual - b.now) - (a.usual - a.now));
+  }
+  if (below.length) {
+    const nw = below.reduce((a, b) => a + b.now, 0), us = below.reduce((a, b) => a + b.usual, 0);
+    const c = compare(BELOW.f, nw, us);
+    const names = below.slice(0, 3).map((b) => b.name);
+    const list = names.length === 1 ? names[0] : names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
+    const ph = `${list} ${names.length === 1 ? 'is' : 'are'} running well below the past week`;
+    rows.push({ ...BELOW.f, region: variant === 'split' ? dear : 'NZ', now: nw, usual: us, ...c,
+      title: cap(ph), sub: below.slice(0, 3).map((b) => `${b.name} ${fmt(b.now)} MW, recently ${fmt(b.usual)}`).join(' · '),
+      phrase: c.effect ? ph : null, bare: c.effect ? ph : null, where: '' });
+    rows.sort((a, b) => b.score - a.score);
+  }
+
+  // a brief spike: the 30-minute hold keeps the state after the price has dropped back, so say so rather than
+  // looking for causes in conditions that have already passed
+  const heldOnly = (variant === 'high' && !now.high && !now.open) || (variant === 'split' && !now.split);
+  let peak = null;
+  if (heldOnly) {
+    for (let j = J - nHold - nAvg + 1; j <= J; j++) {
+      const v = variant === 'split' ? Math.abs((HAY[j] ?? 0) - (BEN[j] ?? 0)) : Math.max(HAY[j] ?? 0, BEN[j] ?? 0);
+      if (j >= 0 && (!peak || v > peak.v)) peak = { v, t: D.t0 + j * step, h: HAY[j], b: BEN[j] };
+    }
+  }
+
   // the explanation in words
   // the top two factors pushing the way the price has gone (either way when it's about usual)
   const want = variant === 'low' ? -1 : variant === 'usual' ? 0 : 1;
@@ -233,15 +280,25 @@ export function explainNow(D, plantMeta = {}) {
     headline = `Why is the ${hiIsl} Island dearer?`;
     line = `The islands have split: Haywards ${money(now.h)}, Benmore ${money(now.b)} per MWh (30-minute average).`;
     verdict = `Prices split like this when the HVDC link, or the grid near it, can't carry any more power from the ${loIsl} Island, so each island is priced on its own.`;
-    verdictNow = currently;
+    verdictNow = currently || `Currently, none of the conditions shown here is pushing the ${hiIsl} Island price up, so the limit may be a grid constraint or an outage this page can't see.`;
+    if (heldOnly && peak) {
+      line = `The islands split for a short time, ${money(peak.h)} at Haywards and ${money(peak.b)} at Benmore at ${clock(peak.t)}, and are back within ${money(Math.abs((HAY[J] ?? 0) - (BEN[J] ?? 0)))} now.`;
+      verdictNow = '';
+    }
   } else if (variant === 'high') {
     headline = tier === 'open' ? 'Why is the price high?' : 'Why is the price up?';
     // no "n× usual": the usual is a median of recent prices, and a multiple of it reads as more exact than it is
     line = tier === 'open'
       ? `Prices are high: ${money(now.hi)}/MWh over the last 30 minutes, far above what they have been recently ${when}.`
       : `Prices are up: ${money(now.hi)}/MWh over the last 30 minutes, higher than they have been recently ${when}.`;
-    verdict = (joined ? joined + ' ' : "None of the factors shown here is far from usual, so the cause may be one this page can't see yet: an outage, a grid constraint, reserves, or how generators have offered. ")
+    verdict = (joined ? joined + ' ' : "None of the conditions shown here is pushing the price up, so the cause is probably one this page can't see: a grid constraint, reserves, an outage it can't detect, or a change in how generators have offered. ")
       + 'The price is set by the most expensive offer needed to meet demand in each 5 minutes.';
+    if (heldOnly && peak) {
+      headline = 'Why did the price jump?';
+      line = `Prices jumped for a short time, to ${money(peak.v)}/MWh at ${clock(peak.t)}, and are back to ${money(Math.max(HAY[J] ?? 0, BEN[J] ?? 0))} now.`;
+      verdict = 'Short jumps like this come from a few 5-minute intervals where the cheaper offers ran short: demand ramping up, a plant ramping down or tripping, or offers changing. They often pass before the conditions below move. '
+        + (joined ? 'Now: ' + joined.charAt(0).toLowerCase() + joined.slice(1) : '');
+    }
   } else if (variant === 'low') {
     const word = nearZero ? 'near zero' : 'low';
     headline = 'Why is the price so low?';
