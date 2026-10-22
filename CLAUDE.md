@@ -291,8 +291,10 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   so bus nodes (HAY2201, BEN2201, OTA2201, ISL2201, INV2201) are missing; WKM2201 is a generating node and is there.
   The real-time API's ~568 rows include the bus nodes. Final prices (`FinalEnergyPrices`) have every node (~246).
   History's `daily()` adds each day's price spread (p10, p90, pmin, pmax, n500, n1000), revenue by fuel at the
-  island price (`rv_<fuel>`, plus `batt_d`, battery discharge) and `nodes` daily means; the Prices page computes
-  revenue for 5-minute and half-hourly data itself (fuel MW × island price).
+  island price (`rv_<fuel>`, plus `batt_d`, battery discharge, and `batt_c`/`rv_battc`, battery charging and its cost,
+  for the Prices tab's Battery (charging) row: the price batteries paid, outside the average) and `nodes` daily means;
+  the Prices page computes revenue for 5-minute and half-hourly data itself (fuel MW × island price). Daily history
+  without `batt_c` (built before 23 Oct 2026) shows no charging row on 12 months and All.
 - The live API now and then returns rows with fields missing (RunDateTime null, ~3 a day); `emi_live.to_frame`
   skips or patches them instead of failing.
 - Open-Meteo rate-limits some shared addresses (HTTP 429). The history job stores missing irradiance as blank and

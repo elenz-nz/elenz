@@ -41,7 +41,7 @@
 	<dt>Generation-weighted average</dt>
 	<dd>Each interval counts by how much was generated, so busy peaks count for more: Σ(each fuel’s MW × its island’s price × hours) ÷ Σ(MW × hours), over every fuel below.</dd>
 	<dt>Price captured by fuel</dt>
-	<dd>The average price a fuel’s generation was worth: its output × its island’s reference price, summed, ÷ its output. Shown as $/MWh and as a percentage of the generation-weighted average. Batteries count discharge only (not the price they paid to charge); embedded solar is left out because it isn’t paid the spot price.</dd>
+	<dd>The average price a fuel’s generation was worth: its output × its island’s reference price, summed, ÷ its output. Shown as $/MWh and as a percentage of the generation-weighted average. Batteries count discharge only; the price they paid to charge is its own row, Battery (charging): charging (the battery’s net output below zero) × its island’s reference price, ÷ the energy charged, left out of the average; embedded solar is left out because it isn’t paid the spot price.</dd>
 	<dt>Price range</dt>
 	<dd>On 12 months and All: each day’s spread of half-hourly final prices: the middle 80% (10th to 90th percentile), lowest and highest. Weeks and months average the daily percentiles and take the lowest and highest half-hour.</dd>
 	<dt>Price spikes</dt>

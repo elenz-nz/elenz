@@ -33,17 +33,28 @@ export const separated = (a, b) => { const d = Math.abs(a - b); return d > 10 &&
 
 // ---------- revenue by fuel (price captured) ----------
 // Each fuel's output × its island's reference price (a volume-weighted price). Embedded solar
-// isn't paid the spot price; batteries count discharge only.
+// isn't paid the spot price; batteries count discharge only, and their charging is a row of its own (CHARGING): the
+// price they paid, left out of the generation-weighted average.
 export const CAP_FUELS = FUELS.filter((f) => f.k !== 'roof' && f.k !== 'hvdc');
+const BATT = FUELS.find((f) => f.k === 'batt');
+export const CHARGING = { k: 'battc', name: 'Battery (charging)', tok: BATT ? BATT.tok : '--f-batt', charging: true };
 
-/** Adds rv_<fuel> (MW × $/MWh) and batt_d (battery discharge MW) per point wherever a segment lacks them, for points
- *  [0, upto): exact for 5-minute and half-hourly data; from daily means for daily history built before BUILD 5.
+/** Adds rv_<fuel> (MW × $/MWh), batt_d (battery discharge MW), batt_c (battery charging MW) and rv_battc (charging
+ *  MW × $/MWh) per point wherever a segment lacks them, for points [0, upto): exact for 5-minute and half-hourly data;
+ *  discharge from daily means for daily history built before BUILD 5. Charging can't be told from a day's net battery
+ *  output, so a daily segment whose history lacks batt_c (built before it was added) gets no charging at all.
  *  force: recompute every point (half-hourly history merged with the live tail). */
 export function addRevenue(S, upto = S.n, force = false) {
   for (const isl of ['NI', 'SI']) {
     const I = S[isl], p = I.price;
     const missing = (a) => force || !a || !a.subarray(0, upto).some((v) => v !== 0);
-    if (missing(I.batt_d)) { I.batt_d = I.batt_d || new Float64Array(S.n); for (let i = 0; i < upto; i++) I.batt_d[i] = Math.max(I.batt[i], 0); }
+    const fine = missing(I.batt_d);   // no stored discharge: the points are 5-minute or half-hourly
+    if (fine) { I.batt_d = I.batt_d || new Float64Array(S.n); for (let i = 0; i < upto; i++) I.batt_d[i] = Math.max(I.batt[i], 0); }
+    const c = I.batt_c || (I.batt_c = new Float64Array(S.n)), r = I.rv_battc || (I.rv_battc = new Float64Array(S.n));
+    if (fine) for (let i = 0; i < upto; i++) { c[i] = Math.max(-I.batt[i], 0); r[i] = c[i] * p[i]; }
+    // daily history with discharge but no charging (built before batt_c): no charging row at all, rather than one
+    // that counts only the live days after it
+    else if (missing(c)) { c.fill(0); r.fill(0); }
     for (const f of CAP_FUELS) {
       const key = 'rv_' + f.k, g = f.k === 'batt' ? I.batt_d : I[f.k];
       if (!g || !missing(I[key])) continue;
@@ -55,20 +66,29 @@ export function addRevenue(S, upto = S.n, force = false) {
 }
 
 /** Price captured by each fuel over points [a, b) of a segment, for a region: [{ f, mwh, price }], plus the
- *  generation-weighted average of all of them. */
+ *  generation-weighted average of all of them. Battery charging follows the battery as its own row (the price
+ *  batteries paid to charge; f.charging), not counted in the average. */
 export function captured(S, region, a = 0, b = S.n) {
   const isls = region === 'NZ' ? ['NI', 'SI'] : [region];
   const rows = [];
   let allE = 0, allR = 0;
-  for (const f of CAP_FUELS) {
+  const sum = (key, rvKey) => {
     let e = 0, r = 0;
     for (const isl of isls) {
-      const I = S[isl], g = f.k === 'batt' ? I.batt_d : I[f.k], rv = I['rv_' + f.k];
+      const I = S[isl], g = I[key], rv = I[rvKey];
       if (!g || !rv) continue;
       for (let i = a; i < b; i++) { e += g[i] * S.h[i]; r += rv[i] * S.h[i]; }
     }
+    return [e, r];
+  };
+  for (const f of CAP_FUELS) {
+    const [e, r] = sum(f.k === 'batt' ? 'batt_d' : f.k, 'rv_' + f.k);
     if (e > 1) rows.push({ f, mwh: e, price: r / e });
     allE += e; allR += r;
+    if (f.k === 'batt') {
+      const [ce, cr] = sum('batt_c', 'rv_battc');
+      if (ce > 1) rows.push({ f: CHARGING, mwh: ce, price: cr / ce });
+    }
   }
   return { rows, avg: allE > 0 ? allR / allE : NaN, mwh: allE };
 }
