@@ -46,7 +46,7 @@ export const TOPICS: Topic[] = [
 		summary: 'Power flowing between the islands on the HVDC link: metered in history, estimated for the live week because the dispatch data doesn’t include it.',
 		shownOn: [['Tracker', '/tracker'], ['Prices', '/tracker/prices'], ['Now', '/now']],
 		estimate: true,
-		updated: '2026-10-22',
+		updated: '2026-10-23',
 	},
 	{
 		slug: 'prices',

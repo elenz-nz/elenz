@@ -130,6 +130,19 @@ island balances had a mean error of 22 MW and read ~22 MW low. A linear fit on b
 (`hvdc.FIT`) has a mean error of ~10 MW and no bias, tested on held-out days and on each month left out of the
 fit (better in five of six months). Link loss between the ends ≈ 5.86e-5 × flow² (59 MW at 1,000 MW).
 
+Early layouts (23 Oct 2026, `hvdc.VERSION` 2). Before 2003 the file has three layouts, month by month: four rows
+(`HVDC_BN/BS/HN/HS`: each end's northward and southward flow; Oct 1996 - Jan 1997), eight rows per pole (`DCP1_*`,
+`DCP2_*`; most months Feb 1997 - Oct 2000), and two rows, `HVDC_BN` and `HVDC_HS` only (39 months: Dec 1997, Aug 1998,
+Jun and Sep 1999, Feb-Sep 2000, Nov 2000 - Dec 2002; 2002 adds BEN3501/HAY3501, which repeat the same two). The
+two-row months meter only each end's sending side, so the old parser read Haywards as zero whenever power went north
+and Benmore as zero whenever it went south, which halved the mid-link transfer (Dec 1997: 367 MW average instead of
+~714). The receiving side is now the sending side less the old link's losses, fitted on every half-hour of 1996-2002
+with both ends metered: north a·P + b·P² with a = 0.0182, b = 4.494e-5 (mean error 1.8 MW over 51,330 half-hours;
+~63 MW at 1,000 MW), south a = 0.0365, b = 3.832e-5 (1.2 MW over 1,845). Dropping the receiving rows from complete
+months and estimating them back: mean error 1.3-2.9 MW (Oct 1996, Jan 1998, Jul 1999). The old link ran near its
+1,040 MW limit northward for weeks in early 1998 (both ends metered, losses 5-6%), so the HVDC north records from
+then are real; the two-row months understated 2000-2002, including the dry winter of 2001's southward flows.
+
 ## Emission factors (`emission_factors.py`, 15 Oct 2026)
 
 Huntly's Rankine units burn coal or gas and the market data doesn't say which. Genesis's quarterly performance

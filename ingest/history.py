@@ -204,12 +204,17 @@ def cap_total(cap, month):
     return round(float(sum(df.values.sum() for df in c.values())), 1)
 
 
+HVDC_REREAD_TO = date(2003, 1, 1)   # months before this are read again when hvdc.VERSION goes up (the old layouts)
+
+
 def add_hvdc(s, m):
-    """Fill in metered HVDC transfer (H|BEN, H|HAY) for month m once EMI publishes it. True if anything changed."""
+    """Fill in metered HVDC transfer (H|BEN, H|HAY) for month m once EMI publishes it, and read a month of the old
+    layouts again when hvdc.VERSION has gone up since it was read (column hv). True if anything changed."""
     for c in ('H|BEN', 'H|HAY'):
         if c not in s:
             s[c] = np.nan
-    need = s.index[s['H|BEN'].isna() | s['H|HAY'].isna()]
+    reread = m < HVDC_REREAD_TO and ('hv' not in s or not (s['hv'] >= hvdc.VERSION).all())
+    need = s.index if reread else s.index[s['H|BEN'].isna() | s['H|HAY'].isna()]
     if not len(need):
         return False
     raw = get(f'{BLOB}/{HVDC_FLOWS}/{m:%Y%m}_HVDC_flows.csv')
@@ -219,6 +224,8 @@ def add_hvdc(s, m):
     if f.empty:
         return False
     s.loc[f.index, ['H|BEN', 'H|HAY']] = f[['H|BEN', 'H|HAY']].values
+    if m < HVDC_REREAD_TO:
+        s['hv'] = hvdc.VERSION
     return True
 
 
@@ -552,6 +559,9 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
     left = set(index.get('rebuild_left', []))
     if rebuild or index.get('hash') != mhash:
         left = set(stored)
+    # the old layouts' metered HVDC is read in a new way (hvdc.VERSION): read those months again and rebuild them
+    if index.get('hv', 1) < hvdc.VERSION:
+        left |= {mo for mo in stored if mo < f'{HVDC_REREAD_TO:%Y-%m}'}
     cap = solar_capacity(store)
     yesterday = datetime.now(NZ).date() - timedelta(days=1)
     caps_before = index.get('roof_mw', {})
@@ -681,7 +691,7 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
     # 'at': when this run saved it; the Worker's health check and the watchdog treat a stale index as expected while a
     # rebuild is under way (rebuild_left not empty, progress saved within two days)
     progress = {'months': months, 'done': sorted(done), 'rebuild_left': sorted(left), 'hash': mhash, 'roof_mw': caps_before,
-                'writes': {today: store.used + 1}, 'at': int(time.time() * 1000)}
+                'writes': {today: store.used + 1}, 'at': int(time.time() * 1000), 'hv': hvdc.VERSION}
     if not changed_dd:
         # no month rebuilt, but a run can still have saved files (a month's state, the solar capacity table) or
         # finished months: record them, so the day's KV write count stays right and finished months aren't revisited

@@ -349,6 +349,10 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   `Grid_import` starts Oct 2000 and until ~2003 covered only local networks' injections, so Generation_MD stands in
   for connection points it lacks (J| columns). HVDC_Flows changed layout three times (HVDC_BN/BS/HN/HS to ~1999,
   DCP1/DCP2 poles, then BEN/HAY connection points; the 3501 rows repeat totals); `hvdc.parse_metered` reads all.
+  39 months between Dec 1997 and Dec 2002 have only HVDC_BN and HVDC_HS (each end's sending side): the receiving side
+  is estimated as sent less the old link's losses (`LOSS_NORTH`, `LOSS_SOUTH`; hvdc.VERSION 2, 23 Oct 2026). Stored
+  months keep their HVDC columns, so history.py re-reads months before 2003 once when hvdc.VERSION goes up (state
+  column `hv`, progress `hv`) and rebuilds them.
   Generation_MD gaps: Huntly's Rankines and unit 5 are missing for Sep 2020 (dispatch fills from 10 Sep), Matahina
   from Oct 2021 (dispatch fills).
 - Clock-change days: Generation_MD numbers them by the clock until Sep 2008 and leaves out an hour (forward: TP5-6
