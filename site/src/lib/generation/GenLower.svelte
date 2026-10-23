@@ -276,7 +276,7 @@
 				{#if canCompare}
 					<button type="button" class="tog" aria-pressed={compare} onclick={() => { compare = !compare; save(); }}><i aria-hidden="true"></i>{prevYear ? `Same dates in ${prevYear}` : 'The year before'}</button>
 				{/if}
-				<PopButton inline open={popped === 'share'} name="share chart" onclick={() => pop('share')} />
+				<PopButton open={popped === 'share'} name="share chart" onclick={() => pop('share')} />
 			</div>
 		</div>
 		<p class="readout" aria-live="polite">
@@ -313,7 +313,7 @@
 					{#each levelsShown as L}<button type="button" aria-pressed={roomBasis === L} onclick={() => { roomBasis = L as any; save(); }}>{L === 'C' ? 'Under $1,000' : LEVEL_NAME[L]}</button>{/each}
 				</div>
 				<button type="button" class="tog box" aria-pressed={withHydro} onclick={() => { withHydro = !withHydro; save(); }}><i aria-hidden="true"></i>Include hydro</button>
-				<PopButton inline open={popped === 'room'} name="headroom chart" onclick={() => pop('room')} />
+				<PopButton open={popped === 'room'} name="headroom chart" onclick={() => pop('room')} />
 			</div>
 		</div>
 		{#if offLate}
@@ -362,7 +362,7 @@
 				<a href="/methods/capacity#use">How capacity factors are worked out</a></InfoTip></div>
 					<Context range={rangeChip} items={[dates, canCompare && prev ? `against ${prevYear ? 'the ' : ''}${prevPhrase}` : '']} />
 				</div>
-				<PopButton inline open={popped === 'mix'} name="mix table" onclick={() => pop('mix')} />
+				<PopButton open={popped === 'mix'} name="mix table" onclick={() => pop('mix')} />
 			</div>
 			{#if mix}
 				<MixTable {mix} prevLabel={canCompare && prev ? (prevYear ?? 'year before') : null} />
@@ -386,7 +386,7 @@
 					{#if heatMetric !== 'ren'}
 						<button type="button" class="tog box scale" aria-pressed={heatScaled} title={heatScaled ? 'Colours fitted to the rows shown' : 'Colours on a fixed scale (installed capacity now), so different years compare'} onclick={() => { heatScaled = !heatScaled; save(); }}><i aria-hidden="true"></i>Scale to this view</button>
 					{/if}
-					<PopButton inline open={popped === 'heat'} name="time of day chart" onclick={() => pop('heat')} />
+					<PopButton open={popped === 'heat'} name="time of day chart" onclick={() => pop('heat')} />
 				</div>
 			</div>
 			{#if rows.length}
@@ -402,6 +402,9 @@
 <style>
 	.lower { display: grid; gap: 14px; margin-top: 14px; }
 	.card { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px 14px; display: grid; gap: 10px; min-width: 0; }
+	/* the enlarge button sits in the card's top right corner (PopButton, .pop-btn in tracker.css), clear of the tools */
+	.card:not(.popped) { position: relative; }
+	.card-head { padding-right: 28px; }
 	.card > :global(*) { min-width: 0; }
 	.card h2 { font-size: 0.86rem; font-weight: 600; margin: 0; }
 	.card-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: flex-start; }
@@ -433,9 +436,10 @@
 	.empty { color: var(--muted); font-size: 0.86rem; padding: 18px 10px; margin: 0; }
 	.row2 { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 14px 18px; align-items: start; }
 	@media (max-width: 900px) { .row2 { grid-template-columns: minmax(0, 1fr); } }
-	/* big screens: share and headroom side by side, the mix and the heat map under them */
+	/* big screens: the four cards in two even columns, split down the centre (share and headroom, then the mix and the
+	   heat map; .row2 steps aside so its cards join the same grid) */
 	@media (min-width: 1600px) {
 		.lower { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px 18px; align-items: start; }
-		.row2 { grid-column: 1 / -1; }
+		.row2 { display: contents; }
 	}
 </style>

@@ -86,4 +86,7 @@
 	.tag { font-size: 0.68rem; color: var(--muted); letter-spacing: 0.04em; }
 	.bar { display: inline-block; height: 6px; border-radius: 1px; vertical-align: 1px; margin-right: 6px; opacity: 0.85; }
 	.flat { color: var(--muted); }
+	/* the row under the pointer is highlighted, as on the Prices tab's price captured by fuel */
+	tbody tr:hover td { background: color-mix(in srgb, var(--ink) 7%, transparent); }
+	tbody tr:hover .nm { color: var(--ink); }
 </style>
