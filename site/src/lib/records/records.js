@@ -318,6 +318,57 @@ export async function loadRecords(fetchFn = fetch) {
   }
 }
 
+// ---------- the record pages' detail (hist/records-detail.json, records.py build_detail) ----------
+export const DETAIL_URL = '/data/history/records-detail.json';
+/** The detail file: each record's best by month (the progression's background line) and the record periods
+ *  themselves (their charts); null if it isn't published yet. */
+export async function loadDetail(fetchFn = fetch) {
+  try {
+    const r = await fetchFn(DETAIL_URL);
+    return r.ok ? await r.json() : null;
+  } catch {
+    return null;
+  }
+}
+/** The background line for a record: [[t, v | null], ...], one point a month (a year for year records), at the
+ *  start of each. */
+export function bgOf(det, id, period, region) {
+  const v = det?.bg?.[id]?.[period]?.[region];
+  if (!v) return null;
+  if (period === 'year') return v.map((x, i) => [nzMidnight(+det.years[i], 0, 1), x]);
+  return v.map((x, i) => { const [y, m] = det.months[i].split('-').map(Number); return [nzMidnight(y, m - 1, 1), x]; });
+}
+/** The record period's own series, if the detail has it for this record: { t, t0, step, v }. */
+export function periodSeries(det, id, period, region, rec) {
+  const x = det?.period?.[period]?.[id]?.[region];
+  return x && rec && x.t === rec.t ? x : null;
+}
+const F2 = {
+  wd: new Intl.DateTimeFormat('en-NZ', { timeZone: NZ, weekday: 'short', day: 'numeric' }),
+  wdh: new Intl.DateTimeFormat('en-NZ', { timeZone: NZ, weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', hour12: true }),
+  dm: new Intl.DateTimeFormat('en-NZ', { timeZone: NZ, day: 'numeric', month: 'short' }),
+  mon: new Intl.DateTimeFormat('en-NZ', { timeZone: NZ, month: 'short' }),
+};
+/** The x axis of a record period's chart: ticks [{ i, l }] and what a point is called in the tooltip. */
+export function periodAxis(period, ser) {
+  const at = (i) => ser.t0 + i * ser.step, n = ser.v.length;
+  if (period === 'day') {
+    return { ticks: [0, 12, 24, 36].filter((i) => i < n).map((i) => ({ i, l: clock(at(i)) })), tip: (i) => `${clock(at(i))}–${clock(at(i + 1))}` };
+  }
+  if (period === 'week') {
+    // each day at its NZ midnight (a clock change shifts the hours by one)
+    const ticks = [];
+    for (let i = 0; i < n; i++) if (Number(P_NZ.formatToParts(at(i)).find((x) => x.type === 'hour')?.value) % 24 === 0) ticks.push({ i, l: F2.wd.format(at(i)) });
+    return { ticks, tip: (i) => F2.wdh.format(at(i)).replace(/\s?([ap])\.?m\.?/i, (_, x) => ` ${x.toLowerCase()}m`) };
+  }
+  if (period === 'month') {
+    return { ticks: [0, 7, 14, 21, 28].filter((i) => i < n).map((i) => ({ i, l: F2.dm.format(at(i) + 6 * 36e5) })), tip: (i) => dayOf(at(i) + 6 * 36e5) };
+  }
+  const ticks = [];
+  for (let i = 0; i < n; i++) { const a = new Date(at(i) + 13 * 36e5), b = new Date(at(i) + 7 * 864e5 + 13 * 36e5); if (i === 0 || (a.getUTCMonth() !== b.getUTCMonth() && b.getUTCMonth() % 3 === 0)) ticks.push({ i: i === 0 ? 0 : i + 1, l: F2.mon.format(i === 0 ? at(0) + 6 * 36e5 : b) }); }
+  return { ticks: ticks.filter((x) => x.i < n), tip: (i) => `Week of ${F2.dm.format(at(i) + 6 * 36e5)}` };
+}
+
 /** New and provisional records for the "recent" cards: newest first. Each { d, region, rec, prov, settled }. */
 export function recent(R, live, now = Date.now()) {
   if (!R) return [];

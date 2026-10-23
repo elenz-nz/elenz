@@ -702,6 +702,120 @@ def build(sums, old=None, read_month=None, now_ms=None):
     return out
 
 
+# ---------- the record pages' extra detail (hist/records-detail.json) ----------
+
+def _period_values(parts, how, dp):
+    """[{key: [sum, count]}, ...] -> each one's own figure (an average, or the renewable share), None where empty."""
+    out = []
+    for P in parts:
+        if how == 'ren':
+            g, r = P.get('gen'), P.get('ren')
+            v = 100 * r[0] / g[0] if g and r and g[0] > 0 else None
+        else:
+            x = P.get(how[0])
+            v = how[1] * x[0] / x[1] if x and x[1] > 0 else None
+        out.append(None if v is None or v != v else (round(v, dp) if dp else int(round(v))))
+    return out
+
+
+def period_series(days, read_month, p, k, r, start):
+    """The record period itself, for its chart: {t0, step, v}: half-hours through a day, hours through a week, days
+    through a month, weeks (from 1 January) through a year."""
+    how, dp = PERIOD_OF[k], HALF_HOURS[k][3]
+    if p in ('month', 'year'):
+        ds = [(t, S.get(r, {})) for t, nh, S in days if _period_start(t, p) == start]
+        if p == 'month':
+            return {'t0': int(start), 'step': 864e5, 'v': _period_values([S for t, S in ds], how, dp)}
+        weeks = {}
+        for i, (t, S) in enumerate(ds):
+            w = weeks.setdefault(i // 7, {})
+            for key, x in S.items():
+                if x is not None:
+                    a = w.setdefault(key, [0.0, 0.0])
+                    a[0] += x[0]
+                    a[1] += x[1]
+        return {'t0': int(start), 'step': 7 * 864e5, 'v': _period_values([weeks[i] for i in sorted(weeks)], how, dp)}
+    # a day or a week: from the half-hourly months it falls in
+    end = _period_start(start, p) + (1 if p == 'day' else 7) * 864e5 + 2 * 36e5   # a little over; trimmed to whole days
+    months = sorted({pd.Timestamp(x, unit='ms', tz='UTC').tz_convert(NZ).strftime('%Y-%m') for x in (start, end - 3 * 36e5)})
+    rows = []
+    for m in months:
+        js = read_month(m) if read_month else None
+        if not js:
+            return None
+        n, t0, step = js['N'], js['t0'], js['step']
+        sums = series(js)['sums'].get(r, {})
+        for i in range(n):
+            rows.append((t0 + i * step, {key: [float(a[i]), 1] for key, a in sums.items() if a is not None and a[i] == a[i]}))
+    last = (pd.Timestamp(start, unit='ms', tz='UTC').tz_convert(NZ).tz_localize(None) + pd.Timedelta(days=1 if p == 'day' else 7)).tz_localize(NZ)
+    stop = int(last.timestamp() * 1000)
+    rows = [x for x in rows if start <= x[0] < stop]
+    if p == 'day':
+        return {'t0': int(start), 'step': 1800e3, 'v': _period_values([S for t, S in rows], how, dp)}
+    hours = {}
+    for t, S in rows:
+        h = hours.setdefault(int((t - start) // 3600e3), {})
+        for key, x in S.items():
+            a = h.setdefault(key, [0.0, 0.0])
+            a[0] += x[0]
+            a[1] += x[1]
+    return {'t0': int(start), 'step': 3600e3, 'v': _period_values([hours.get(i, {}) for i in range(max(hours) + 1 if hours else 0)], how, dp)}
+
+
+def build_detail(sums, rec, read_month=None):
+    """The record pages' extra detail, kept out of records.json (which the Records index loads):
+    bg: each record's best by month through the history (its half-hour, day and week records: the month's best; its
+        month record: every month; its year record: every year), {id: {period: {region: [value or None, ...]}}}
+        against `months` (or `years`), the faint line behind each progression, showing the near misses;
+    period: the record period itself for its chart, {period: {id: {region: {t, t0, step, v}}}} (t: the record's start,
+        so the page can tell it belongs to the record it shows)."""
+    sums = sorted(sums, key=lambda s: s['month'])
+    months = [s['month'] for s in sums]
+    mi = {m: i for i, m in enumerate(months)}
+    years = sorted({m[:4] for m in months})
+    yi = {y: i for i, y in enumerate(years)}
+    figs = period_figures(sums)
+    days = _all_days(sums)
+    bg = {}
+    for k, (kind, fam, regions, dp) in HALF_HOURS.items():
+        better = (lambda a, b: a < b) if kind == 'min' else (lambda a, b: a > b)
+        for r in regions:
+            v = [None] * len(months)
+            for s in sums:
+                e = s['hh'].get(k, {}).get(r)
+                x = e and (e['lo'] if kind == 'min' else e['hi'])
+                if x is not None:
+                    v[mi[s['month']]] = x
+            bg.setdefault(k, {}).setdefault('tp', {})[r] = v
+            for p in PERIODS:
+                rows = figs.get(p, {}).get(k, {}).get(r, [])
+                if p == 'year':
+                    v = [None] * len(years)
+                    for t, x, ok in rows:
+                        v[yi[pd.Timestamp(t, unit='ms', tz='UTC').tz_convert(NZ).strftime('%Y')]] = x
+                else:
+                    v = [None] * len(months)
+                    for t, x, ok in rows:
+                        i = mi.get(pd.Timestamp(t, unit='ms', tz='UTC').tz_convert(NZ).strftime('%Y-%m'))
+                        if i is not None and (v[i] is None or better(x, v[i])):
+                            v[i] = x
+                bg[k].setdefault(p, {})[r] = v
+    cache = {}
+
+    def read_m(m):
+        if m not in cache and read_month:
+            cache[m] = read_month(m)
+        return cache.get(m)
+    per = {}
+    for p in PERIODS:
+        for k, regions in (rec.get('periods') or {}).get(p, {}).items():
+            for r, x in regions.items():
+                ser = period_series(days, read_m, p, k, r, x['t'])
+                if ser and any(v is not None for v in ser['v']):
+                    per.setdefault(p, {}).setdefault(k, {})[r] = {'t': x['t'], **ser}
+    return {'v': VERSION, 'months': months, 'years': years, 'bg': bg, 'period': per}
+
+
 def same(a, b):
     """True if two records files differ only in when they were built."""
     strip = lambda x: {k: v for k, v in (x or {}).items() if k != 'built'}   # noqa: E731
@@ -742,6 +856,15 @@ def update(store, fresh, months, publish, log=print, room=lambda n: True):
         b = store.get(f'hist/hh/{m}.json')
         return json.loads(b) if b else None
     rec = build(list(have.values()), old, read_month)
+    # the record pages' detail: published alongside, when it changes (one more write)
+    try:
+        det = build_detail(list(have.values()), rec, read_month)
+        old_det_raw = store.get('hist/records-detail.json')
+        if (not old_det_raw or json.loads(old_det_raw) != det) and room(2):
+            store.put('hist/records-detail.json', json.dumps(det, separators=(',', ':'), allow_nan=False).encode(), 'application/json')
+            log('records: detail published')
+    except Exception as e:  # noqa: BLE001  the records stand without it
+        log(f'records: detail skipped ({type(e).__name__}: {e})')
     if same(rec, old):
         return
     if not room(1):
