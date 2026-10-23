@@ -26,7 +26,7 @@ concurrency:
 
 env:
   SITE: https://elenz.co.nz
-  LIVE_MINUTES: '30'
+  LIVE_MINUTES: '45'
   HISTORY_DAYS: '5'
   REBUILD_DAYS: '12'   # allowed while a full history rebuild is under way (see the history check below)
 
