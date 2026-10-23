@@ -22,6 +22,7 @@
 <ul>
 	<li>To about 1999: one row per direction at each end (northward and southward at Benmore and Haywards).</li>
 	<li>Then one row per pole.</li>
+	<li>In 39 months between December 1997 and December 2002, only two rows: what Benmore sent north and what Haywards sent south. The receiving end isn’t in the file, so it is estimated as what was sent less the link’s losses, fitted on the months that meter both ends (mean error under 2 MW).</li>
 	<li>From the mid-2000s: flows at the Benmore and Haywards connection points (<code>BEN2201</code>, <code>BEN0161</code>, <code>HAY2201</code>, <code>HAY1101</code>). The 350 kV rows (<code>BEN3501</code>, <code>HAY3501</code>) repeat the totals and are left out.</li>
 </ul>
 

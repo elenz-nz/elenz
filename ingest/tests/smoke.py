@@ -171,6 +171,13 @@ h97 = hvdc.parse_metered(met_get('x/199708_HVDC_flows.csv'))
 h26 = hvdc.parse_metered(met_get('x/202609_HVDC_flows.csv'))
 check(len(h97) == 48 and h97['H|BEN'].abs().max() > 50, 'hvdc: 1997 layout (HVDC_BN/BS/HN/HS) parsed')
 check(len(h26) == 48 and (h26['H|BEN'] - h26['H|HAY']).abs().mean() < 80, 'hvdc: current layout parsed, ends within link losses')
+# the two-row months (HVDC_BN and HVDC_HS only, Dec 1997-Dec 2002): the receiving ends are estimated, not zero
+_hdr = 'POC,NWK_Code,GENERATION_TYPE,TRADER,UNIT_MEASURE,FLOW_DIRECTION,STATUS,TRADING_DATE,' + ','.join(f'TP{i}' for i in range(1, 51))
+_row = lambda poc, kwh: f'{poc},QQQQ,DC,TPNZ,kWh,X,F,01/06/2001,' + ','.join([str(kwh)] * 48) + ',,'   # noqa: E731
+h2 = hvdc.parse_metered((_hdr + '\n' + _row('HVDC_BN', 500000) + '\n' + _row('HVDC_HS', 0) + '\n').encode())
+_loss = hvdc.LOSS_NORTH[0] * 1000 + hvdc.LOSS_NORTH[1] * 1000 ** 2
+check(abs(h2['H|BEN'].iloc[0] - 1000) < 1 and abs(h2['H|HAY'].iloc[0] - (1000 - _loss)) < 1,
+      'hvdc: two-row layout, Haywards estimated as Benmore less the link losses (%.0f MW)' % h2['H|HAY'].iloc[0])
 _mid = pd.Series([500.0, -500.0, 0.0])
 _ben, _hay = hvdc.ends(_mid)
 check(_ben[0] > 500 > _hay[0] and _hay[1] < -500 < _ben[1] and _ben[2] == _hay[2] == 0,
