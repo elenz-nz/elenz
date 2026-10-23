@@ -257,7 +257,7 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   and the site's `npm run check`, `npm test` (`site/tests/`: the tracker's address), `npm run build` and `npm run check:previews`. Its `ingest` and `site` jobs are required checks: a pull request can't
   merge into `main` (so nothing deploys) until both pass.
 - `.github/workflows/watchdog.yml`: checks the live site every 15 minutes; opens an issue labelled `stale-data`
-  (GitHub emails it to the owner) when live data is over 30 minutes old, history over 5 days behind, or the Worker
+  (GitHub emails it to the owner) when live data is over 45 minutes old, history over 5 days behind, or the Worker
   can't start a job, and closes it when the data recovers.
 - `data/`: raw downloads, git-ignored.
 
@@ -286,6 +286,11 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   Older data must come from the EMI files, so every interval must be stored as it arrives.
 - Limits: 60 calls/min, 60 MB/hour. Send `Accept-Encoding: gzip` (168 KB → 11 KB per interval).
 - About 8% of 5-minute intervals have no dispatch case in either source. They are interpolated and the page says so.
+- The live feed sometimes stalls for ~30 minutes and then catches up (24 Oct 2026: 6:30-7:05 and 8:30-9:05 am NZDT):
+  "latest" stays put, then the missed cases arrive late and sparse (19:40 UTC published ~20:05, with 19:35, 19:50 and
+  19:55 never appearing). The alerts (`/data/health`, the watchdog) wait 45 minutes so these pass quietly; the site
+  shows Delayed meanwhile. Issues must stay enabled on the repo: the watchdog reports through them (they were off
+  after the move to elenz-nz, so the watchdog run itself failed on 24 Oct).
 - Tiwai is shown as ordinary demand (owner's call, 21 Oct 2026): no separate summary row or record. The data still
   carries `tiwai` (T, MT), unused by the site, in case it's wanted again.
 - Daily files arrive 1–4 days late. Island reference prices: HAY2201 and BEN2201 rows exist in the API; the
@@ -341,7 +346,7 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   code in `src/lib/tracker/*.js` and `src/lib/home/now.js` is untyped JavaScript and gave ~800 false alarms).
 - GitHub's own schedules (the backups in the three workflows) fire only now and then (9 scheduled runs in two days,
   checked 15 Oct 2026), so they don't protect against the Worker's cron stopping: nothing outside Cloudflare alerts
-  if it does. `/data/health` (Worker) covers that: 200 while live data is under 30 minutes old and history under 5
+  if it does. `/data/health` (Worker) covers that: 200 while live data is under 45 minutes old and history under 5
   days behind, 503 with the reasons otherwise; an outside uptime monitor checks it every 5 minutes and emails the owner.
   During a full rebuild the index is republished only at the end (a few days for BUILD 6), so both checks allow up to
   12 days while `hist/progress.json` shows months left and was saved in the last two days.

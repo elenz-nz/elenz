@@ -23,7 +23,7 @@ const HISTORY_CRON = '40 */6 * * *'; // must match wrangler.jsonc
 // history files the site may request: the index, all days, one half-hourly file per month, the records, and the
 // offered capacity (ingest/offered.py: one file per month and all days)
 // /data/health: the same limits as the GitHub watchdog (watchdog.yml)
-const HEALTH = { liveMinutes: 30, historyDays: 5, rebuildDays: 12 };   // history may lag up to rebuildDays during a rebuild
+const HEALTH = { liveMinutes: 45, historyDays: 5, rebuildDays: 12 };   // history may lag up to rebuildDays during a rebuild
 const HISTORY_FILE = /^\/data\/history\/(index\.json|progress\.json|day\.json|records\.json|records-detail\.json|hh\/\d{4}-\d{2}\.json|tod\.json|off\/(?:\d{4}-\d{2}|days)\.json)$/;
 
 // ---------- link previews for the tracker's pages ----------
