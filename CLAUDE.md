@@ -133,7 +133,7 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   A new kind of public page needs adding to the sitemap's list.
 - Downloads: the Download button on both tracker tabs (`src/lib/site/DownloadMenu.svelte`, beside Share) gives the
   chart as a PNG (the view's title and dates over the charts, each with its heading and legend, the credit line and the
-  view's link at the foot, drawn at twice the screen's resolution in the current light/dark colours) or the view's data
+  view's link at the foot, as wide as the widest chart (so phone-width on a phone; under 480 px the logo takes its own line and the link breaks after / ? & =), drawn at twice the screen's resolution in the current light/dark colours) or the view's data
   as a CSV ('#' header lines: what it is, dates, source, licence CC BY 4.0, the view's link; then one row per point,
   NZ and UTC times). Shared pieces in `src/lib/site/download.js` (`composeImage`, `svgImage` for the Prices tab's SVG
   charts, `legendOf`, `csvText`); the Generation tab's files are made in tracker.js (`image('gen' | 'all')`, `csv()`),
