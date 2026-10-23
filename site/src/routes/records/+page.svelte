@@ -9,7 +9,7 @@
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import Spark from '#lib/records/Spark.svelte';
 	import InfoTip from '#lib/site/InfoTip.svelte';
-	import { energy,
+	import { energy, pace, soFar, toGo, paceAt, periodWhen,
 		LISTED as DEFS, PERIODS, PERIOD_KEYS, periodOf, periodSub, GROUPS, REGIONS, LIVE_URL, MONTHS, get, notShown, parts, when, step, fmt, recent, milestones, provisional,
 		liveBeats, loadRecords, fullName, dayOf, clock, yearOf
 	} from '#lib/records/records.js';
@@ -21,6 +21,9 @@
 	// the period the table lists: each half-hour record's highest trading period, day, week, month or year (?period=)
 	let period = $state('tp');
 	let cat = $state('all');
+	let liveD = $state.raw<any>(null);   // tracker.json: the live week, for the live check and the pace
+	let paceAll = $state(false);          // the pace cards beyond the first PACE_CARDS
+	const PACE_CARDS = 8;
 	let moy = $state(new Date(Date.now() + 13 * 36e5).getUTCMonth());   // this month in New Zealand
 
 	onMount(() => {
@@ -33,7 +36,7 @@
 			if (!R) return;
 			try {
 				const r = await fetch(LIVE_URL, { cache: 'no-cache' });
-				if (r.ok) live = liveBeats(R, await r.json());
+				if (r.ok) { liveD = await r.json(); live = liveBeats(R, liveD); }
 			} catch { /* the live check is extra; the records stand without it */ }
 		})();
 	});
@@ -48,10 +51,10 @@
 	}
 	// the whole row opens its record (the name and description are the link itself, for keyboards and new tabs; a click
 	// anywhere else in the row follows it too, but not a text selection or a click on another link)
-	function rowClick(e: MouseEvent, id: string) {
+	function rowClick(e: MouseEvent, link: string) {
 		if ((e.target as HTMLElement).closest('a, button') || window.getSelection()?.toString()) return;
-		if (e.metaKey || e.ctrlKey) { window.open(href(id), '_blank'); return; }
-		goto(href(id));
+		if (e.metaKey || e.ctrlKey) { window.open(link, '_blank'); return; }
+		goto(link);
 	}
 	const href = (id: string, r = region, p = period) => {
 		const q = new URLSearchParams();
@@ -62,7 +65,8 @@
 	};
 	const regionName = $derived(REGIONS.find((x) => x.id === region)!.name);
 
-	type Row = { d: any; rec: any; na: string | null; prov: any; isNew: boolean; p: string };
+	// link: the record's page; for a record kept for periods only, seen on the half-hour list, its month record
+	type Row = { d: any; rec: any; na: string | null; prov: any; isNew: boolean; p: string; link: string | null };
 	// groups with no record for this region (HVDC for an island) are left out rather than listed as not shown
 	const shownGroups = $derived(GROUPS.filter((g) => DEFS.some((d) => d.group === g && d.regions.includes(region))));
 	$effect(() => { if (cat !== 'all' && !shownGroups.includes(cat)) cat = 'all'; });
@@ -75,11 +79,19 @@
 				const rec = get(R, d.id, region, p);
 				const na = notShown(d, region, rec, R, p);
 				const prov = na ? null : p === 'tp' ? provisional(R, live, d.id, region) : (rec?.prov ?? null);
-				return { d, rec, na, prov, p, isNew: !na && !!rec?.since && Date.now() - rec.since < 30 * 864e5 };
+				const link = !na ? href(d.id) : d.periods && p === 'tp' && d.regions.includes(region) ? href(d.id, region, 'month') : null;
+				return { d, rec, na, prov, p, link, isNew: !na && !!rec?.since && Date.now() - rec.since < 30 * 864e5 };
 			}),
 		}));
 	});
 	const cards = $derived(R ? recent(R, live).slice(0, 6) : []);
+	// heading for a record: one card per record and period, New Zealand's where it is on pace, otherwise an island's
+	const paces = $derived.by(() => {
+		if (!R || !liveD) return [];
+		const seen = new Set<string>();
+		return pace(R, liveD).sort((a, b) => (a.region === 'NZ' ? 0 : 1) - (b.region === 'NZ' ? 0 : 1))
+			.filter((x) => { const k = x.d.id + x.period; return !seen.has(k) && !!seen.add(k); });
+	});
 	const miles = $derived(R ? milestones(R, region).slice(-6).reverse() : []);
 	const MOY = ['demand_max', 'demand_min', 'ren_max', 'wind_max', 'solar_max', 'roof_max', 'price_max'];
 	const moyRows = $derived(R ? MOY.map((id) => DEFS.find((d) => d.id === id)!).filter((d) => d.regions.includes(region))
@@ -125,6 +137,24 @@
 				<p>They come from the full history back to 1997, which is being rebuilt from the EA’s metered data. They will appear here once the rebuild finishes, in the next few days.</p>
 			</section>
 		{:else}
+			{#if paces.length}
+				<section aria-labelledby="pace-h" class="sec">
+					<div class="ttl-row"><h2 id="pace-h">Heading for a record</h2><InfoTip label="About records on pace">This day, week, month or year so far, against its record: listed once half of it has gone, while its average so far beats the record. It uses dispatch data (the live week and the days before it), so it is provisional, and the rest of the period can still change it. <a href="/methods/records">How records work</a></InfoTip></div>
+					<div class="cards">
+						{#each paceAll ? paces : paces.slice(0, PACE_CARDS) as p}
+							<a class="card pace" href={href(p.d.id, p.region, p.period)}>
+								<span class="c-name"><span class="dot" style="--c:var({p.d.tok})"></span>{fullName(p.d)} · {periodOf(p.period).label} · {p.region}</span>
+								<span>
+									<span class="c-val">{parts(p.d, p.v, p.period).n}<small>{parts(p.d, p.v, p.period).u}</small></span>
+									<span class="c-sub">{soFar(p)}, {paceAt(p)}. The record {periodOf(p.period).word} ({periodWhen(p.bestT, p.period)}{p.provBest ? ', provisional' : ''}) had {fmt(p.d, p.ref, p.period)} then; {toGo(p)}.</span>
+								</span>
+							</a>
+						{/each}
+					</div>
+					{#if paces.length > PACE_CARDS}<button type="button" class="more-btn" onclick={() => (paceAll = !paceAll)}>{paceAll ? 'Show fewer' : `Show all ${paces.length}`}</button>{/if}
+				</section>
+			{/if}
+
 			{#if cards.length}
 				<section aria-labelledby="new-h" class="sec">
 					<h2 id="new-h">New and provisional</h2>
@@ -181,10 +211,10 @@
 									{@const d = row.d}
 									{@const rec = row.rec}
 									<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions (the name is the row's link for keyboards) -->
-									<tr class:na={!!row.na} class:prov={!!(row.prov && rec)} class:go={!row.na} title={row.prov && rec ? 'A provisional record beyond this one: see its page' : undefined}
-										onclick={row.na ? undefined : (e) => rowClick(e, d.id)}>
+									<tr class:na={!!row.na} class:prov={!!(row.prov && rec)} class:go={!!row.link} title={row.prov && rec ? 'A provisional record beyond this one: see its page' : undefined}
+										onclick={row.link ? (e) => rowClick(e, row.link!) : undefined}>
 										<th scope="row">
-											<svelte:element this={row.na ? 'span' : 'a'} class="r-name" href={row.na ? undefined : href(d.id)}>
+											<svelte:element this={row.link ? 'a' : 'span'} class="r-name" href={row.link ?? undefined}>
 												<span class="dot" style="--c:var({d.tok})"></span>
 												<span>
 													<span class="nm">{d.name}</span>
@@ -281,6 +311,9 @@
 	.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 10px; }
 	.card { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; display: grid; gap: 8px; align-content: start; color: inherit; text-decoration: none; }
 	.card:hover { border-color: var(--ink-2); }
+	.card.pace { border-left: 3px solid var(--accent); }
+	.more-btn { justify-self: start; margin-top: 8px; font: inherit; font-size: 0.84rem; font-weight: 600; color: var(--accent); background: none; border: 1px solid var(--line); border-radius: 4px; padding: 6px 12px; min-height: 36px; cursor: pointer; }
+	.more-btn:hover { border-color: var(--accent); }
 	.card.prov { border-style: dashed; border-color: color-mix(in srgb, var(--warn-ink) 55%, var(--line)); }
 	.c-name { display: flex; align-items: center; font-size: 0.82rem; color: var(--ink-2); font-weight: 600; }
 	.c-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; }

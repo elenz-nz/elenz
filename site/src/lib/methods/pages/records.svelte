@@ -13,7 +13,7 @@
 	<dt>Half-hour records</dt>
 	<dd>The highest or lowest half-hour: each trading period’s average, as the history holds it. A record has to beat the one before it; equalling it doesn’t count.</dd>
 	<dt>Days, weeks, months and years</dt>
-	<dd>Each half-hour record also has its highest or lowest day, week (Monday to Sunday), calendar month and calendar year, New Zealand time: the period’s average over its half-hours (MW, or $/MWh for prices), and for the renewable share, renewable energy over all the period’s generation. Averages rather than totals, so periods of different lengths compare fairly: a February isn’t the lowest-demand month just for being short. Only whole periods count, so the history’s first part-year (1997) and the period still under way are left out, and a day needs 90% of its half-hours. A period is official when every day in it is official, and a newer one beyond the record is provisional. Pick the period at the top of the records table or on a record’s page. (These replace the earlier month records for the renewable share and wind, whose pages still work.)</dd>
+	<dd>Each half-hour record also has its highest or lowest day, week (Monday to Sunday), calendar month and calendar year, New Zealand time: the period’s average over its half-hours (MW, or $/MWh for prices), and for the renewable share, renewable energy over all the period’s generation. Averages rather than totals, so periods of different lengths compare fairly: a February isn’t the lowest-demand month just for being short. Only whole periods count, so the history’s first part-year (1997) and the period still under way are left out, and a day needs 90% of its half-hours. A period is official when every day in it is official, and a newer one beyond the record is provisional. Pick the period at the top of the records table or on a record’s page. (These replace the earlier month records for the renewable share and wind, whose pages still work.) The lowest price and lowest hydro are kept for these periods only: their half-hours say little (prices often fall to a few cents, and hydro is lowest overnight), but a month or a year of them marks a glut of cheap power or a dry spell. A period record shows its energy beside its average (the average times the period’s hours), though it is ranked by the average.</dd>
 	<dt>Runs</dt>
 	<dd>The longest unbroken run of half-hours meeting a condition, joined across month boundaries: at least 90% renewable, prices under $5/MWh, or no Huntly Rankine running.</dd>
 </dl>
@@ -25,6 +25,9 @@
 <p>The Now page checks the live week itself: when a half-hour of the live data beats a record for generation or demand, a line under the price tiles says so. Prices and HVDC are left to the history: live prices are dispatch prices, which can be far from the final ones (on 9 August 2021 dispatch prices peaked at $356,621/MWh, final prices at $2,698), and live HVDC is an estimate.</p>
 <p>A record is marked <b>New</b> for {NEW_DAYS} days after it first appears in the official records.</p>
 
+<h2 id="pace">On record pace</h2>
+<p>Once half of the current day, week, month or year has gone, the records page lists any record it is on pace to break: where its average so far is ahead of where the record period was at the same point, as in a race. Weeks, months and years compare whole days (the record period’s average after the same number of days); a day compares whole half-hours. The current period comes from the history and the live week after it, both dispatch data, so it is provisional; the rest of the period can still change it, and the page says what the rest would need to average to beat the record outright.</p>
+
 <h2 id="list">Every record</h2>
 <p>Definitions follow the rest of the site: generation is each fuel’s output summed (battery discharge only, no HVDC); the renewable share is of that total less battery discharge, with geothermal, bioenergy, hydro, wind, grid solar and embedded solar counted as renewable (<a href="/methods/groupings">Renewable share and groupings</a>); fossil generation is Huntly’s Rankines, gas, diesel and waste heat; demand is metered grid demand (<a href="/methods/demand">Demand</a>); prices are at the island reference nodes, Haywards and Benmore, and New Zealand’s is the higher of the two.</p>
 <div class="tbl">
@@ -35,7 +38,7 @@
 				{#each DEFS.filter((d) => d.group === g) as d}
 					<tr>
 						<td><a href="/records/{d.id}">{d.name}</a>{#if d.est} <span class="est-tag">Estimate</span>{/if}<br /><small>{d.sub}</small></td>
-						<td>{KIND[d.kind]}</td>
+						<td>{d.periods ? 'Day, week, month and year' : KIND[d.kind]}</td>
 						<td>{regions(d.regions)}</td>
 						<td>{FAM[d.fam]}</td>
 					</tr>

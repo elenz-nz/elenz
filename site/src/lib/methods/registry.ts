@@ -93,9 +93,9 @@ export const TOPICS: Topic[] = [
 	{
 		slug: 'records',
 		title: 'Records',
-		summary: 'The highest and lowest half-hours, months and runs since 1997: which data they rest on, when a record is official or provisional, and what is left out.',
+		summary: 'The highest and lowest half-hours, days, weeks, months, years and runs since 1997: which data they rest on, when a record is official or provisional, when a period is on record pace, and what is left out.',
 		shownOn: [['Records', '/records'], ['Now', '/now']],
-		updated: '2026-10-22',
+		updated: '2026-10-23',
 	},
 ];
 
