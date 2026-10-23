@@ -9,7 +9,7 @@
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import Spark from '#lib/records/Spark.svelte';
 	import InfoTip from '#lib/site/InfoTip.svelte';
-	import {
+	import { energy,
 		LISTED as DEFS, PERIODS, PERIOD_KEYS, periodOf, periodSub, GROUPS, REGIONS, LIVE_URL, MONTHS, get, notShown, parts, when, step, fmt, recent, milestones, provisional,
 		liveBeats, loadRecords, fullName, dayOf, clock, yearOf
 	} from '#lib/records/records.js';
@@ -188,7 +188,7 @@
 										{#if row.na}
 											<td colspan="4" class="na-note">{row.na}</td>
 										{:else}
-											<td class="n val">{parts(d, rec.v, row.p).n}<small>{parts(d, rec.v, row.p).u}</small></td>
+											<td class="n val">{parts(d, rec.v, row.p).n}<small>{parts(d, rec.v, row.p).u}</small>{#if energy(d, rec.t, rec.v, row.p)}<span class="en">{energy(d, rec.t, rec.v, row.p)}</span>{/if}</td>
 											<td>{when(d, rec, false, row.p)}</td>
 											<td class="muted">{d.kind === 'run' ? (rec.top?.[1] ? `${parts(d, rec.top[1][1]).n} hours, ${dayOf(rec.top[1][0])}` : '') : step(d, rec.prev, row.p)}</td>
 											<td><Spark steps={row.prov ? [...rec.steps, [row.prov.t, row.prov.v]] : rec.steps} end={R.end} tok={d.tok} dashed={!!d.est} hollow={!!row.prov} /></td>
@@ -302,6 +302,7 @@
 	a.nm:hover { color: var(--accent); text-decoration: underline; }
 	td.n { text-align: right; }
 	.val { font-family: var(--font-data); font-size: 1rem; font-weight: 600; white-space: nowrap; }
+	.val .en { display: block; font-size: 0.74rem; font-weight: 400; color: var(--muted); }
 	.muted { color: var(--muted); }
 	tr.na .nm { color: var(--ink-2); }
 	.na-note { color: var(--muted); font-size: 0.8rem; }

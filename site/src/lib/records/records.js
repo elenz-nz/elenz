@@ -142,6 +142,36 @@ export function fmt(d, v, period = 'tp') {
   const p = parts(d, v, period);
   return d.unit === '%' ? p.n + p.u : d.unit === '$' ? p.n + p.u : `${p.n} ${p.u}`;
 }
+// A period record's energy (owner's call, 23 Oct 2026): records are ranked by the period's average MW, which is fair
+// across months of 28-31 days, years of 365-366 and clock-change days of 23-25 hours, and the energy is shown beside
+// it as the more familiar figure: average MW x the period's hours (from its NZ local midnights).
+const P_NZ = new Intl.DateTimeFormat('en-CA', { timeZone: NZ, year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', hourCycle: 'h23' });
+function nzMidnight(y, mo, d) {   // mo from 0; Date.UTC rolls over days and months
+  const want = Date.UTC(y, mo, d);
+  let g = want - 13 * 36e5;
+  for (let i = 0; i < 2; i++) {
+    const p = Object.fromEntries(P_NZ.formatToParts(g).map((x) => [x.type, +x.value]));
+    g += want - Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute);
+  }
+  return g;
+}
+/** Hours in the day, week, month or year starting at t (an NZ local midnight). */
+export function periodHours(t, period) {
+  const p = Object.fromEntries(P_NZ.formatToParts(t + 6 * 36e5).map((x) => [x.type, +x.value]));
+  const y = p.year, m = p.month - 1, d = p.day;
+  const end = period === 'day' ? nzMidnight(y, m, d + 1) : period === 'week' ? nzMidnight(y, m, d + 7)
+    : period === 'month' ? nzMidnight(y, m + 1, 1) : period === 'year' ? nzMidnight(y + 1, 0, 1) : t;
+  return (end - nzMidnight(y, m, d)) / 36e5;
+}
+/** The energy of a period record held as an average in MW: "412 GWh", "3,812 GWh", "43.1 TWh"; '' when it isn't one. */
+export function energy(d, t, v, period) {
+  if (period === 'tp' || d.kind !== 'hh' || d.unit !== 'MW' || v == null || t == null) return '';
+  const gwh = Math.abs(v) * periodHours(t, period) / 1000;
+  if (gwh >= 10000) return `${(gwh / 1000).toFixed(1)} TWh`;
+  if (gwh >= 100) return `${Math.round(gwh).toLocaleString('en-NZ')} GWh`;
+  return `${gwh.toFixed(1)} GWh`;
+}
+
 /** "354 hours (14.8 days)" for a long run. */
 export const runLength = (h) => (h >= 48 ? `${h.toLocaleString('en-NZ', { maximumFractionDigits: 1 })} hours (${(h / 24).toFixed(1)} days)` : `${h} hours`);
 

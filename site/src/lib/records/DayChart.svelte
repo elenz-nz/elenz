@@ -40,17 +40,39 @@
 	// clock labels every six hours (by position: a clock-change day has 46 or 50 half-hours)
 	const hours = $derived((W < 420 ? [0, 24] : [0, 12, 24, 36]).filter((i) => i < n).map((i) => ({ i, l: clock(day.t0 + i * day.step) })));
 
-	// hover or touch: the half-hour's time and value
-	let hover = $state<number | null>(null);
-	function move(e: PointerEvent) {
+	// hover: the half-hour's time and value; a click, tap or drag pins it (it stays after the finger lifts; another
+	// click on it, a tap outside the chart or Escape lets go). On touch the tooltip sits above the chart, clear of the finger.
+	let hov = $state<number | null>(null);
+	let pin = $state<number | null>(null);
+	let touch = $state(false);
+	const hover = $derived(hov ?? pin);
+	let box = $state<HTMLElement>();
+	function idx(e: PointerEvent) {
 		const r = (e.currentTarget as SVGSVGElement).getBoundingClientRect();
 		const i = Math.round((((e.clientX - r.left) / r.width) * W - L) / (W - L - R) * Math.max(1, n - 1));
-		hover = i >= 0 && i < n && day.v[i] != null ? i : null;
+		return i >= 0 && i < n && day.v[i] != null ? i : null;
+	}
+	function move(e: PointerEvent) {
+		touch = e.pointerType !== 'mouse';
+		if (touch) { const i = idx(e); if (i !== null) pin = i; hov = null; } else hov = idx(e);
+	}
+	function click(e: MouseEvent) {
+		if (touch) return;
+		const i = idx(e as PointerEvent);
+		pin = i === null || i === pin ? null : i;
+	}
+	function outside(e: Event) {
+		if (pin === null) return;
+		if (e instanceof KeyboardEvent) { if (e.key === 'Escape') pin = null; return; }
+		if (box && !box.contains(e.target as Node)) pin = null;
 	}
 </script>
 
-<div class="dc" bind:clientWidth={cw}>
-<svg viewBox="0 0 {W} {H}" role="img" aria-label={label} onpointermove={move} onpointerdown={move} onpointerleave={() => (hover = null)}>
+<svelte:window onpointerdown={outside} onkeydown={outside} />
+
+<div class="dc" bind:clientWidth={cw} bind:this={box}>
+<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions (pointer readout; the facts below carry the figures) -->
+<svg viewBox="0 0 {W} {H}" role="img" aria-label={label} onpointermove={move} onpointerdown={move} onclick={click} onpointerleave={() => (hov = null)}>
 	{#each ticks as v}
 		<line x1={L} x2={W - R} y1={y(v)} y2={y(v)} class="grid" />
 		<text x={L - 8} y={y(v) + 4} text-anchor="end" class="lab">{fmt(v)}</text>
@@ -65,13 +87,13 @@
 		<circle cx={x(at)} cy={y(day.v[at] as number)} r="5" style="fill:var({tok})" />
 	{/if}
 	{#if hover !== null && hover !== at}
-		<line x1={x(hover)} x2={x(hover)} y1={T} y2={H - B} class="cursor hov" />
+		<line x1={x(hover)} x2={x(hover)} y1={T} y2={H - B} class="cursor hov" class:pinned={hov === null} />
 		<circle cx={x(hover)} cy={y(day.v[hover] as number)} r="3.5" style="fill:var({tok})" />
 	{/if}
 </svg>
 {#if hover !== null}
 	{@const fx = x(hover) / W}
-	<div class="tip" class:flip={fx > 0.7} style="left:{fx * 100}%;top:{(y(day.v[hover] as number) / H) * 100}%" aria-hidden="true">
+	<div class="tip" class:flip={!touch && fx > 0.7} class:above={touch} style={touch ? `left:${Math.min(80, Math.max(20, fx * 100))}%` : `left:${fx * 100}%;top:${(y(day.v[hover] as number) / H) * 100}%`} aria-hidden="true">
 		<b>{fmt(day.v[hover] as number)}</b><span>{clock(day.t0 + hover * day.step)}{hover === at ? ' · the record' : ''}</span>
 	</div>
 {/if}
@@ -84,6 +106,8 @@
 	.tip { position: absolute; transform: translate(12px, -50%); pointer-events: none; display: grid; gap: 1px; padding: 5px 8px; border-radius: 4px;
 		background: var(--surface); border: 1px solid var(--line); box-shadow: 0 4px 14px rgb(0 0 0 / 0.12); font-size: 0.78rem; color: var(--ink-2); white-space: nowrap; }
 	.tip.flip { transform: translate(calc(-100% - 12px), -50%); }
+	.tip.above { top: 0; transform: translate(-50%, calc(-100% - 6px)); z-index: 2; }
+	.cursor.pinned { stroke: var(--accent); opacity: 1; }
 	.tip b { font-family: var(--font-data); color: var(--ink); font-size: 0.9rem; }
 	.grid { stroke: var(--grid); stroke-width: 1; }
 	.lab { fill: var(--muted); font-family: var(--font-data); font-size: 12px; }

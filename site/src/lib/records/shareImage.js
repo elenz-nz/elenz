@@ -1,7 +1,7 @@
 // A record as a 1200 x 630 image (the size link previews use), drawn in the browser for the "Download image"
 // button on a record's page: the mark, the record, when it was set, what it beat, and its progression.
 // Always in the light palette (tracker.css), so it reads the same wherever it is posted.
-import { fmt, fullName, when, step, REGIONS, periodOf } from './records.js';
+import { fmt, fullName, when, step, REGIONS, periodOf, energy } from './records.js';
 
 const C = {
   bg: '#f2f5f5', ink: '#132020', ink2: '#3f4f4e', muted: '#667574', line: '#d6dfde',
@@ -52,10 +52,11 @@ export async function drawRecord(canvas, { d, region, rec, end, isNew, period = 
   while (ctx.measureText(value).width > 640 && size > 60) { size -= 6; ctx.font = `600 ${size}px ${DATA}`; }
   ctx.fillStyle = C.ink; ctx.fillText(value, 60, 210 + size);
   ctx.font = `400 28px ${UI}`; ctx.fillStyle = C.ink2;
-  ctx.fillText(when(d, rec, false, period), 64, 270 + size);
+  const en = energy(d, rec.t, rec.v, period), enPrev = rec.prev ? energy(d, rec.prev[0], rec.prev[1], period) : '';
+  ctx.fillText(when(d, rec, false, period) + (en ? ` · ${en}` : ''), 64, 270 + size);
   if (rec.prev) {
     ctx.fillStyle = C.muted; ctx.font = `400 24px ${UI}`;
-    ctx.fillText(`Previous record ${step(d, rec.prev, period)}`, 64, 312 + size);
+    ctx.fillText(`Previous record ${step(d, rec.prev, period)}${enPrev ? ` (${enPrev})` : ''}`, 64, 312 + size);
   }
 
   // progression: a step line in the right-hand block
