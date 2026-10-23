@@ -11,7 +11,7 @@
 	import { drawRecord } from '#lib/records/shareImage.js';
 	import { stamp } from '#lib/site/viewurl.js';
 	import {
-		LISTED, PERIODS, PERIOD_KEYS, periodOf, periodSub, periodWhen, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats,
+		LISTED, PERIODS, PERIOD_KEYS, periodOf, periodSub, periodWhen, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats, energy,
 		loadRecords, meteredDue, clock, dayOf, dayLong, monthOf, yearOf, daysBetween, runLength, NEW_DAYS
 	} from '#lib/records/records.js';
 	import type { PageProps } from './$types';
@@ -26,7 +26,8 @@
 	// a half-hour record's day, week, month or year record (?period=)
 	let period = $state('tp');
 	const per = $derived(d.kind === 'hh' ? period : 'tp');
-	let copied = $state(false);
+	let shareMsg = $state('');   // "Link copied" for a moment after Share copies the link
+	let busy = $state(false);
 
 	onMount(() => {
 		const q = new URLSearchParams(location.search).get('region');
@@ -89,20 +90,49 @@
 	}) : []);
 	const moy = $derived(R && d.kind !== 'run' && per === 'tp' ? (R.moy?.[d.id]?.[region] ?? []) : []);
 
-	async function copyLink() {
-		try { await navigator.clipboard.writeText(location.href); copied = true; setTimeout(() => (copied = false), 2000); } catch { /* no clipboard: the address bar has it */ }
-	}
-	async function download() {
+	// sharing (records are made to be shared): Share opens the phone's share sheet with the record's image, a line about
+	// it and its link (or the link alone where images can't be shared); on computers it copies the link. Download saves
+	// the image (shareImage.js, 1200 x 630).
+	const en = $derived(rec ? energy(d, rec.t, rec.v, per) : '');
+	const fileName = $derived(`elenz-record-${d.id}${per !== 'tp' ? '-' + per : ''}-${region.toLowerCase()}.png`);
+	const shareText = $derived(rec ? `${isNew ? 'New record: ' : ''}${fullName(d)}${per !== 'tp' ? ` (${periodOf(per).label.toLowerCase()})` : ''}, ${regionName}: ${f(rec.v)}${en ? ` (${en})` : ''}, ${d.kind === 'run' ? runLength(rec.v) + ' from ' : ''}${when(d, rec, false, per)}.` : '');
+	const canShare = typeof navigator !== 'undefined' && !!navigator.share && typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
+	async function image(): Promise<Blob | null> {
 		const c = document.createElement('canvas');
 		await drawRecord(c, { d, region, rec, end: R.end, isNew, period: per });
-		c.toBlob((b) => {
+		return await new Promise((ok) => c.toBlob(ok, 'image/png'));
+	}
+	async function share() {
+		if (busy) return;
+		const url = location.href;
+		if (canShare) {
+			busy = true;
+			try {
+				const b = await image();
+				const file = b ? new File([b], fileName, { type: 'image/png' }) : null;
+				// the link goes in the text too: some apps drop the url when a file is shared
+				if (file && navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], title: document.title, text: `${shareText} ${url}` });
+				else await navigator.share({ title: document.title, text: shareText, url });
+				return;
+			} catch (e: any) { if (e?.name === 'AbortError') return; }   // cancelled; otherwise copy the link
+			finally { busy = false; }
+		}
+		try { await navigator.clipboard.writeText(url); shareMsg = 'Link copied'; }
+		catch { shareMsg = 'Copy the address bar'; }
+		setTimeout(() => (shareMsg = ''), 2000);
+	}
+	async function download() {
+		if (busy) return;
+		busy = true;
+		try {
+			const b = await image();
 			if (!b) return;
 			const a = document.createElement('a');
 			a.href = URL.createObjectURL(b);
-			a.download = `elenz-record-${d.id}${per !== 'tp' ? '-' + per : ''}-${region.toLowerCase()}.png`;
-			a.click();
+			a.download = fileName;
+			document.body.append(a); a.click(); a.remove();
 			setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-		}, 'image/png');
+		} finally { busy = false; }
 	}
 </script>
 
@@ -120,11 +150,23 @@
 			<p class="crumb"><a href="/records{(() => { const q = new URLSearchParams(); if (region !== 'NZ') q.set('region', region); if (per !== 'tp') q.set('period', per); const x = q.toString(); return x ? '?' + x : ''; })()}">Records</a> › {d.group}</p>
 			<div class="h-row">
 				<h1><span class="dot" style="--c:var({d.tok})"></span>{fullName(d)}{#if d.est}<span class="tag est">Estimate</span>{/if}</h1>
-				{#if d.regions.length > 1}
-					<select class="pick" aria-label="Region" value={region} onchange={(e) => setRegion((e.currentTarget as HTMLSelectElement).value)}>
-						{#each REGIONS as r}<option value={r.id}>{r.name}</option>{/each}
-					</select>
-				{/if}
+				<div class="acts">
+					{#if d.regions.length > 1}
+						<select class="pick" aria-label="Region" value={region} onchange={(e) => setRegion((e.currentTarget as HTMLSelectElement).value)}>
+							{#each REGIONS as r}<option value={r.id}>{r.name}</option>{/each}
+						</select>
+					{/if}
+					{#if rec && !na}
+						<button type="button" class="pill-btn" onclick={share} disabled={busy} title={canShare ? 'Share this record' : 'Copy a link to this record'} aria-label={canShare ? 'Share this record' : 'Copy a link to this record'}>
+							<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M8.5 11.5a3.2 3.2 0 0 0 4.6 0l2.6-2.6a3.2 3.2 0 0 0-4.6-4.6l-1 1M11.5 8.5a3.2 3.2 0 0 0-4.6 0l-2.6 2.6a3.2 3.2 0 0 0 4.6 4.6l1-1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+							<span class="pill-word">{shareMsg || 'Share'}</span>
+						</button>
+						<button type="button" class="pill-btn" onclick={download} disabled={busy} title="Download the record as an image" aria-label="Download the record as an image">
+							<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3.5v9M6 8.5l4 4 4-4M4 15.5h12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+							<span class="pill-word">Download</span>
+						</button>
+					{/if}
+				</div>
 			</div>
 			<p class="sub">{periodSub(d, per)}</p>
 			{#if d.kind === 'hh'}
@@ -147,13 +189,14 @@
 				<div class="big">
 					<span class="lbl">{regionName}{#if isNew} <span class="tag new">New</span>{/if}</span>
 					<span class="val">{parts(d, rec.v, per).n}<small>{parts(d, rec.v, per).u}</small></span>
+					{#if en}<span class="en">{en} over the {periodOf(per).word}</span>{/if}
 					<span class="when">{d.kind === 'run' ? runLength(rec.v) + ', ' : ''}{when(d, rec, true, per)}</span>
 				</div>
 				<dl class="stats">
 					{#if d.kind === 'run'}
 						{#if rec.top?.[1]}<div><dt>Next longest</dt><dd>{parts(d, rec.top[1][1]).n} hours</dd><dd class="s">from {dayOf(rec.top[1][0])}</dd></div>{/if}
 					{:else if rec.prev}
-						<div><dt>Previous record</dt><dd>{f(rec.prev[1])}</dd><dd class="s">{per !== 'tp' ? periodWhen(rec.prev[0], per) : d.kind === 'month' ? monthOf(rec.prev[0]) : dayOf(rec.prev[0])}</dd></div>
+						<div><dt>Previous record</dt><dd>{f(rec.prev[1])}</dd><dd class="s">{per !== 'tp' ? periodWhen(rec.prev[0], per) : d.kind === 'month' ? monthOf(rec.prev[0]) : dayOf(rec.prev[0])}{energy(d, rec.prev[0], rec.prev[1], per) ? ` · ${energy(d, rec.prev[0], rec.prev[1], per)}` : ''}</dd></div>
 					{/if}
 					{#if !rec.ongoing}
 						<div><dt>Has stood for</dt><dd>{daysBetween(d.kind === 'run' ? rec.t + rec.v * 36e5 : rec.t, Date.now()).toLocaleString('en-NZ')} days</dd><dd class="s">as of today</dd></div>
@@ -174,7 +217,7 @@
 
 			<section class="panel" aria-labelledby="grow-h">
 				<div class="p-head"><h2 id="grow-h">How the record grew</h2><span class="unit">Each step is a new record</span></div>
-				<Progression steps={rec.steps} first={R.first} end={R.end} tok={d.tok} fmt={axisFmt} dashed={!!d.est} prov={prov ? { t: prov.t, v: prov.v } : null} when={(t) => per !== 'tp' ? periodWhen(t, per) : d.kind === 'month' ? monthOf(t) : d.kind === 'run' ? dayOf(t) : `${clock(t)}, ${dayOf(t)}`}
+				<Progression steps={rec.steps} first={R.first} end={R.end} tok={d.tok} fmt={axisFmt} full={f} dashed={!!d.est} prov={prov ? { t: prov.t, v: prov.v } : null} when={(t) => per !== 'tp' ? periodWhen(t, per) : d.kind === 'month' ? monthOf(t) : d.kind === 'run' ? dayOf(t) : `${clock(t)}, ${dayOf(t)}`}
 					label="{fullName(d)}, {regionName}: the record over time, from {f(rec.steps[0][1])} in {yearOf(rec.steps[0][0])} to {f(rec.v)} in {yearOf(rec.t)}, broken {rec.n} times" />
 			</section>
 
@@ -182,7 +225,7 @@
 				{#if per !== 'tp'}
 					<section class="panel" aria-labelledby="day-h">
 						<div class="p-head"><h2 id="day-h">The {periodOf(per).word} it fell</h2><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div>
-						<p class="note">{periodWhen(rec.t, per, true)}: {parts(d, rec.v, per).n} {parts(d, rec.v, per).u}{d.unit === '%' ? ' of its generation renewable' : ''}{rec.prev ? `, beating ${f(rec.prev[1])} (${periodWhen(rec.prev[0], per)})` : ''}. Open it in the tracker to see what happened through it.</p>
+						<p class="note">{periodWhen(rec.t, per, true)}: {parts(d, rec.v, per).n} {parts(d, rec.v, per).u}{en ? ` (${en})` : ''}{d.unit === '%' ? ' of its generation renewable' : ''}{rec.prev ? `, beating ${f(rec.prev[1])} (${periodWhen(rec.prev[0], per)})` : ''}. Open it in the tracker to see what happened through it.</p>
 					</section>
 				{:else if d.kind === 'hh' && rec.ctx}
 					{@const c = rec.ctx}
@@ -215,10 +258,10 @@
 					{:else}
 						<h2 id="prev-h">Recent records</h2>
 						<table class="lst">
-							<thead><tr><th scope="col">{per !== 'tp' ? periodOf(per).label : d.kind === 'month' ? 'Month' : 'Half-hour'}</th><th scope="col" class="n">Record</th><th scope="col" class="n">{d.id.endsWith('_min') ? 'Down' : 'Up'}</th></tr></thead>
+							<thead><tr><th scope="col">{per !== 'tp' ? periodOf(per).label : d.kind === 'month' ? 'Month' : 'Half-hour'}</th><th scope="col" class="n">Record</th>{#if en}<th scope="col" class="n">Energy</th>{/if}<th scope="col" class="n">{d.id.endsWith('_min') ? 'Down' : 'Up'}</th></tr></thead>
 							<tbody>
 								{#each history as h}
-									<tr><td>{per !== 'tp' ? periodWhen(h.t, per) : d.kind === 'month' ? monthOf(h.t) : `${clock(h.t)}, ${dayOf(h.t)}`}</td><td class="n">{f(h.v)}</td><td class="n muted">{h.first ? 'first' : d.unit === '%' ? (h.by ?? 0).toFixed(1) : parts(d, h.by ?? 0).n}</td></tr>
+									<tr><td>{per !== 'tp' ? periodWhen(h.t, per) : d.kind === 'month' ? monthOf(h.t) : `${clock(h.t)}, ${dayOf(h.t)}`}</td><td class="n">{f(h.v)}</td>{#if en}<td class="n">{energy(d, h.t, h.v, per)}</td>{/if}<td class="n muted">{h.first ? 'first' : d.unit === '%' ? (h.by ?? 0).toFixed(1) : parts(d, h.by ?? 0).n}</td></tr>
 								{/each}
 							</tbody>
 						</table>
@@ -241,10 +284,10 @@
 
 			<div class="share">
 				<div class="btns">
-					<button type="button" class="btn" onclick={copyLink}>{copied ? 'Link copied' : 'Copy link'}</button>
-					<button type="button" class="btn" onclick={download}>Download image</button>
+					<button type="button" class="btn" onclick={share} disabled={busy}>{shareMsg || (canShare ? 'Share' : 'Copy link')}</button>
+					<button type="button" class="btn" onclick={download} disabled={busy}>Download image</button>
 				</div>
-				<span class="note">{per === 'tp' ? 'Half-hour averages' : `Averages over each ${periodOf(per).word}`} from the EA’s metered data and final prices. <a href="/methods/records">How records work</a></span>
+				<span class="note">{per === 'tp' ? 'Half-hour averages' : `Averages over each ${periodOf(per).word}${en ? ', ranked by average so periods of different lengths compare; energy is the average times the hours in the period' : ''}`} from the EA’s metered data and final prices. <a href="/methods/records">How records work</a></span>
 			</div>
 		{/if}
 
@@ -291,6 +334,12 @@
 	.big .val { font-family: var(--font-data); font-size: 3rem; font-weight: 600; letter-spacing: -0.03em; line-height: 1; }
 	.big .val small { font-family: var(--font-ui); font-size: 1.1rem; font-weight: 500; color: var(--muted); margin-left: 8px; letter-spacing: 0; }
 	.when { color: var(--ink-2); }
+	.en { font-family: var(--font-data); font-size: 1.15rem; font-weight: 500; color: var(--ink-2); }
+	.acts { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+	/* labelled on phones too (the tracker's pill buttons shrink to icons there) */
+	.acts .pill-btn { height: 34px; width: auto; padding: 0 12px 0 10px; border-color: var(--line); border-radius: 999px; }
+	.acts .pill-btn .pill-word { display: inline; }
+	.acts .pill-btn:disabled { opacity: 0.6; cursor: progress; }
 	.stats { display: grid; grid-template-columns: repeat(2, minmax(0, auto)); gap: 14px 36px; margin: 0; }
 	.stats dt, .facts dt { color: var(--muted); font-size: 0.76rem; }
 	.stats dd { margin: 2px 0 0; font-family: var(--font-data); font-size: 1.1rem; font-weight: 600; }
