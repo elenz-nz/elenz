@@ -250,6 +250,11 @@ last_day = s_off['days']['t'][-1]
 dn = [v for t, v in zip(np.array(m_off['t0']) + np.arange(m_off['N']) * m_off['step'], nzd) if t >= last_day and v == v]
 check(pc['to'] == s_off['end'] + s_off['step'] and pc['day']['start'] == last_day and dsum[1] == len(dn) and abs(dsum[0] - sum(dn)) < 1,
       'records: the current day so far (pace)')
+det = rc.build_detail([s_off], R, lambda m: m_off)
+dser = det['period'].get('day', {}).get('demand_max', {}).get('NZ')
+check(det['bg']['demand_max']['tp']['NZ'][0] == dm['v'] and (dser is None or (dser['t'] == R['periods']['day']['demand_max']['NZ']['t'] and len(dser['v']) >= 46)),
+      'records: detail (best by month behind the progression, the record day itself)')
+json.dumps(det, allow_nan=False)
 check(R['records']['hydro_min']['NZ']['v'] <= R['records']['hydro_max']['NZ']['v'] and 'price_min' in R['records'] and 'fossil_max' in R['records'],
       'records: hydro high and low, most fossil, lowest price')
 

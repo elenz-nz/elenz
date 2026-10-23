@@ -11,7 +11,7 @@
 	import { drawRecord } from '#lib/records/shareImage.js';
 	import { stamp } from '#lib/site/viewurl.js';
 	import {
-		LISTED, PERIODS, PERIOD_KEYS, periodOf, periodSub, periodWhen, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats, energy, pace, soFar, toGo, needText, paceAt,
+		LISTED, PERIODS, PERIOD_KEYS, periodOf, periodSub, periodWhen, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats, energy, pace, soFar, toGo, needText, paceAt, loadDetail, bgOf, periodSeries, periodAxis,
 		loadRecords, meteredDue, clock, dayOf, dayLong, monthOf, yearOf, daysBetween, runLength, NEW_DAYS
 	} from '#lib/records/records.js';
 	import type { PageProps } from './$types';
@@ -28,6 +28,7 @@
 	// a record kept for periods only (d.periods) has no half-hour record: it opens on its month
 	const per = $derived(d.kind === 'hh' ? (d.periods && period === 'tp' ? 'month' : period) : 'tp');
 	let liveD = $state.raw<any>(null);
+	let det = $state.raw<any>(null);   // records-detail.json: the best by month behind the progression, the record periods
 	let shareMsg = $state('');   // "Link copied" for a moment after Share copies the link
 	let busy = $state(false);
 
@@ -40,6 +41,7 @@
 			R = await loadRecords();
 			status = R ? 'ok' : 'none';
 			if (!R) return;
+			loadDetail().then((x) => (det = x));
 			try {
 				const r = await fetch(LIVE_URL, { cache: 'no-cache' });
 				if (r.ok) { liveD = await r.json(); live = liveBeats(R, liveD); }
@@ -66,6 +68,17 @@
 	};
 
 	const rec = $derived(R ? get(R, d.id, region, per) : null);
+	// the faint line behind the progression: each month's (or year's) best, and how the tooltip names it
+	const bg = $derived(d.kind === 'hh' ? bgOf(det, d.id, per, region) : null);
+	const bgWhen = (t: number) => {
+		const hi = d.id.endsWith('_min') ? 'Lowest' : 'Highest';
+		if (per === 'year') return yearOf(t);
+		if (per === 'month') return monthOf(t);
+		return `${hi} ${per === 'tp' ? 'half-hour' : per} in ${monthOf(t)}`;
+	};
+	// the day, week, month or year the record fell in, for its chart
+	const ser = $derived(per !== 'tp' && rec ? periodSeries(det, d.id, per, region, rec) : null);
+	const serAxis = $derived(ser ? periodAxis(per, ser) : null);
 	// heading for a record: this period so far, while it is on pace to beat the record (records.js pace)
 	const onPace = $derived(R && liveD && per !== 'tp' ? pace(R, liveD).find((x) => x.d.id === d.id && x.region === region && x.period === per) ?? null : null);
 	const na = $derived(R ? notShown(d, region, rec, R, per) : null);
@@ -231,7 +244,7 @@
 
 			<section class="panel" aria-labelledby="grow-h">
 				<div class="p-head"><h2 id="grow-h">How the record grew</h2><span class="unit">Each step is a new record</span></div>
-				<Progression steps={rec.steps} first={R.first} end={R.end} tok={d.tok} fmt={axisFmt} full={f} dashed={!!d.est} prov={prov ? { t: prov.t, v: prov.v } : null} when={(t) => per !== 'tp' ? periodWhen(t, per) : d.kind === 'month' ? monthOf(t) : d.kind === 'run' ? dayOf(t) : `${clock(t)}, ${dayOf(t)}`}
+				<Progression steps={rec.steps} first={R.first} end={R.end} tok={d.tok} fmt={axisFmt} full={f} {bg} {bgWhen} dashed={!!d.est} prov={prov ? { t: prov.t, v: prov.v } : null} when={(t) => per !== 'tp' ? periodWhen(t, per) : d.kind === 'month' ? monthOf(t) : d.kind === 'run' ? dayOf(t) : `${clock(t)}, ${dayOf(t)}`}
 					label="{fullName(d)}, {regionName}: the record over time, from {f(rec.steps[0][1])} in {yearOf(rec.steps[0][0])} to {f(rec.v)} in {yearOf(rec.t)}, broken {rec.n} times" />
 			</section>
 
@@ -239,6 +252,10 @@
 				{#if per !== 'tp'}
 					<section class="panel" aria-labelledby="day-h">
 						<div class="p-head"><h2 id="day-h">The {periodOf(per).word} it fell</h2><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div>
+						{#if ser && serAxis}
+							<DayChart day={ser} t={-1} tok={d.tok} fmt={axisFmt} full={f} xticks={serAxis.ticks} tipAt={serAxis.tip} avg={rec.v} avgLabel="Average {f(rec.v)}"
+								label="{fullName(d)} through {periodWhen(rec.t, per, true)}, {per === 'day' ? 'half-hourly' : per === 'week' ? 'hourly' : per === 'month' ? 'daily' : 'weekly'}, averaging {f(rec.v)}" />
+						{/if}
 						<p class="note">{periodWhen(rec.t, per, true)}: {parts(d, rec.v, per).n} {parts(d, rec.v, per).u}{en ? ` (${en})` : ''}{d.unit === '%' ? ' of its generation renewable' : ''}{rec.prev ? `, beating ${f(rec.prev[1])} (${periodWhen(rec.prev[0], per)})` : ''}. Open it in the tracker to see what happened through it.</p>
 					</section>
 				{:else if d.kind === 'hh' && rec.ctx}

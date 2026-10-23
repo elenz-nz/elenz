@@ -2,13 +2,16 @@
 	// How a record grew: a step line from the first data to today, one step each time it was broken, the current
 	// record marked, and a provisional one (dashed) beyond it. Hover shows the record at that date; a click, tap or
 	// drag pins it (it stays after the finger lifts; another click on it, a tap outside the chart or Escape lets go).
-	// On touch the tooltip sits above the chart, clear of the finger.
+	// On touch the tooltip sits above the chart, clear of the finger. bg: the best of each month (or year) through the
+	// history, drawn faintly behind the record line (records.py build_detail), so the near misses show; the tooltip
+	// gives the record in force at the pointer's date and that month's best.
 	import { yearOf, trimZeros } from './records.js';
 
 	// fmt: axis labels (bare numbers); full: a value with its unit, for the tooltip and readout (fmt if not given)
-	let { steps: all, first: dataFirst, end, tok = '--ink', label, fmt, full, prov = null, dashed = false, when }:
+	let { steps: all, first: dataFirst, end, tok = '--ink', label, fmt, full, prov = null, dashed = false, when, bg = null, bgWhen }:
 		{ steps: [number, number][]; first: number; end: number; tok?: string; label: string; fmt: (v: number) => string;
-		  full?: (v: number) => string; prov?: { t: number; v: number } | null; dashed?: boolean; when?: (t: number) => string } = $props();
+		  full?: (v: number) => string; prov?: { t: number; v: number } | null; dashed?: boolean; when?: (t: number) => string;
+		  bg?: [number, number | null][] | null; bgWhen?: (t: number) => string } = $props();
 	const val = (v: number) => (full ?? fmt)(v);
 	// leading zeros left out (grid solar until its first farm): the chart starts at the first record above zero
 	const steps = $derived(trimZeros(all) as [number, number][]);
@@ -23,6 +26,8 @@
 	const L = 64, Rm = 18, T = 16, B = 30;
 	const pts = $derived(prov ? [...steps, [prov.t, prov.v] as [number, number]] : steps);
 	const t1 = $derived(Math.max(end, pts[pts.length - 1][0]));
+	// the background line, within the chart's dates
+	const bgIn = $derived(bg ? bg.filter((b) => b[0] >= first - 31 * 864e5 && b[0] <= t1) : []);
 
 	// a round axis that holds every step (from zero for most records: the growth is the point)
 	function niceStep(span: number) {
@@ -30,7 +35,7 @@
 		return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * p;
 	}
 	const ax = $derived.by(() => {
-		const vs = pts.map((s) => s[1]);
+		const vs = [...pts.map((s) => s[1]), ...bgIn.map((b) => b[1]).filter((v): v is number => v != null)];
 		let lo = Math.min(...vs), hi = Math.max(...vs);
 		if (lo >= 0 && lo < 0.5 * hi) lo = 0;   // from zero unless the record moved over a narrow range
 		if (hi === lo) hi = lo + 1;
@@ -54,18 +59,42 @@
 		return out.filter((q) => q.t >= first && x(q.t) > L + 14);
 	});
 	const last = $derived(steps[steps.length - 1]);
+	// each month (or year) holds its value until the next: drawn as flat steps, broken where there is none
+	const bgPath = $derived.by(() => {
+		let d = '', pen = false;
+		bgIn.forEach(([t, v], i) => {
+			const nx = i + 1 < bgIn.length ? bgIn[i + 1][0] : Math.min(t1, t + 31 * 864e5);
+			if (v == null) { pen = false; return; }
+			const xa = Math.max(L, x(t)), xb = Math.max(L, x(nx));
+			d += `${pen ? 'L' : 'M'}${xa.toFixed(1)} ${y(v).toFixed(1)} H${xb.toFixed(1)}`;
+			pen = true;
+		});
+		return d;
+	});
 
-	let hov = $state<number | null>(null);   // under the mouse
-	let pin = $state<number | null>(null);   // clicked, tapped or dragged to
+	// the pointer's date (hov: under the mouse; pin: clicked, tapped or dragged to); the record in force then and that
+	// month's best follow from it
+	let hov = $state<number | null>(null);
+	let pin = $state<number | null>(null);
 	let touch = $state(false);               // the last pointer was a finger or pen
-	const hover = $derived(hov ?? pin);
+	const hoverT = $derived(hov ?? pin);
+	const hover = $derived.by(() => {
+		if (hoverT === null || hoverT < pts[0][0]) return null;
+		let i = 0;
+		while (i + 1 < pts.length && pts[i + 1][0] <= hoverT) i++;
+		return i;
+	});
+	const bgAt = $derived.by(() => {
+		if (hoverT === null || !bgIn.length) return null;
+		let b = null;
+		for (const x of bgIn) if (x[0] <= hoverT) b = x; else break;
+		return b && b[1] != null ? b : null;
+	});
 	let fig = $state<HTMLElement>();
 	function at(e: PointerEvent) {
 		const r = (e.currentTarget as SVGSVGElement).getBoundingClientRect();
 		const t = first + (((e.clientX - r.left) / r.width) * W - L) / (W - L - Rm) * (t1 - first);
-		let i = 0;
-		while (i + 1 < pts.length && pts[i + 1][0] <= t) i++;
-		return t < pts[0][0] ? null : i;
+		return t < pts[0][0] ? null : Math.min(t, t1);
 	}
 	function move(e: PointerEvent) {
 		touch = e.pointerType !== 'mouse';
@@ -73,8 +102,9 @@
 	}
 	function click(e: MouseEvent) {
 		if (touch) return;   // a tap pinned it already
-		const i = at(e as PointerEvent);
-		pin = i === null || i === pin ? null : i;
+		const t = at(e as PointerEvent);
+		// a click near the pinned date lets go; elsewhere it moves the pin
+		pin = t === null || (pin !== null && Math.abs(x(t) - x(pin)) < 8) ? null : t;
 	}
 	function outside(e: Event) {
 		if (pin === null) return;
@@ -96,23 +126,26 @@
 		{#each years as q}
 			<text x={x(q.t)} y={H - 8} text-anchor="middle" class="lab">{q.yr}</text>
 		{/each}
+		{#if bgPath}<path d={bgPath} fill="none" class="bg" style="stroke:var({tok})" />{/if}
 		<path d={path} fill="none" style="stroke:var({tok})" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray={dashed ? '6 3' : undefined} />
 		{#if prov}
 			<path d="M{x(prov.t)} {y(last[1])} V{y(prov.v)} H{x(t1)}" fill="none" style="stroke:var({tok})" stroke-width="2" stroke-dasharray="4 4" />
 			<circle cx={x(prov.t)} cy={y(prov.v)} r="5" class="hole" style="stroke:var({tok})" />
 		{/if}
 		<circle cx={x(last[0])} cy={y(last[1])} r="5" style="fill:var({tok})" />
-		{#if hover !== null}
+		{#if hover !== null && hoverT !== null}
 			{@const p = pts[hover]}
-			<line x1={x(p[0])} x2={x(p[0])} y1={T} y2={H - B} class="cursor" class:pinned={hov === null} />
-			<circle cx={x(p[0])} cy={y(p[1])} r="4" style="fill:var({tok})" />
+			<line x1={x(hoverT)} x2={x(hoverT)} y1={T} y2={H - B} class="cursor" class:pinned={hov === null} />
+			<circle cx={x(hoverT)} cy={y(p[1])} r="4" style="fill:var({tok})" />
+			{#if bgAt}<circle cx={x(hoverT)} cy={y(bgAt[1] as number)} r="3.5" class="hole bg-dot" style="stroke:var({tok})" />{/if}
 		{/if}
 	</svg>
-	{#if hover !== null}
+	{#if hover !== null && hoverT !== null}
 		{@const p = pts[hover]}
-		{@const fx = x(p[0]) / W}
+		{@const fx = x(hoverT) / W}
 		<div class="tip" style={touch ? `left:${Math.min(80, Math.max(20, fx * 100))}%` : `left:${fx * 100}%;top:${(y(p[1]) / H) * 100}%`} class:flip={!touch && fx > 0.7} class:above={touch} aria-hidden="true">
-			<b>{val(p[1])}</b><span>{prov && hover === pts.length - 1 ? 'Provisional, ' : ''}{whenOf(p[0])}</span>
+			<b>{val(p[1])}</b><span>{prov && hover === pts.length - 1 ? 'Provisional, ' : 'Record from '}{whenOf(p[0])}</span>
+			{#if bgAt}<span class="bgl">{bgWhen ? bgWhen(bgAt[0]) : ''}: {val(bgAt[1] as number)}</span>{/if}
 		</div>
 	{/if}
 	</div>
@@ -121,7 +154,7 @@
 			{@const p = pts[hover]}
 			Record {val(p[1])} {prov && hover === pts.length - 1 ? 'provisional,' : 'from'} {whenOf(p[0])}{#if hov === null}<button type="button" class="rel" onclick={() => (pin = null)}>Release</button>{/if}
 		{:else}
-			{steps.length - 1 === 0 ? (trimmed ? `First above zero in ${yearOf(first)}` : 'Not broken since the data began') : `Broken ${steps.length - 1} times since ${trimmed ? `the first above zero in ${yearOf(first)}` : yearOf(first)}`}{prov ? '; dashed: provisional' : ''}. {touch ? 'Tap or drag' : 'Hover or click'} for the record at any date.
+			{bgPath ? 'The faint line is the best of each ' + (bgWhen && bgIn.length > 1 && bgIn[1][0] - bgIn[0][0] > 200 * 864e5 ? 'year' : 'month') + '. ' : ''}{steps.length - 1 === 0 ? (trimmed ? `First above zero in ${yearOf(first)}` : 'Not broken since the data began') : `Broken ${steps.length - 1} times since ${trimmed ? `the first above zero in ${yearOf(first)}` : yearOf(first)}`}{prov ? '; dashed: provisional' : ''}. {touch ? 'Tap or drag' : 'Hover or click'} for the record at any date.
 		{/if}
 	</figcaption>
 </figure>
@@ -133,6 +166,9 @@
 	.lab { fill: var(--muted); font-family: var(--font-data); font-size: 12px; }
 	.cursor { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 3 3; }
 	.hole { fill: var(--surface); stroke-width: 2.4; }
+	.bg { stroke-width: 1.2; opacity: 0.35; }
+	.bg-dot { stroke-width: 1.6; }
+	.tip .bgl { color: var(--muted); }
 	.readout { color: var(--muted); font-size: 0.8rem; min-height: 1.4em; }
 	.plot { position: relative; }
 	/* the value and date beside the hovered step */
