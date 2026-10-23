@@ -1,6 +1,7 @@
 <script lang="ts">
 	// A glimpse of the Tracker for the landing page: the last 24 hours of generation, stacked by fuel. No y axis: the
-	// top of the chart is a rounded-up maximum, so a label there would read as a figure it isn't. On the landing page
+	// top of the chart is a rounded-up maximum, so a label there would read as a figure it isn't. Battery and HVDC are
+	// left out (signed series: charging and export would dip below zero). On the landing page
 	// the hero's horizon line lands on this stack as you scroll (Handoff.svelte), which fills in beneath it.
 	import { TK, tracker } from './geometry.js';
 
@@ -21,6 +22,9 @@
 			return { ...l, d: `M${top.join('L')}L${bot.join('L')}Z` };
 		});
 	});
+	// the key lists only the fuels that show as a band at this size (peak at least 2% of the chart's height, ~4 px), so
+	// slivers like waste heat and bioenergy don't wrap it onto a second line; the tracker has the full legend
+	const key = $derived([...S.layers].reverse().filter((l) => Math.max(...l.v) >= G.max * 0.02));
 	// the outline along the top of the stack, where the hero's line lands
 	const top = $derived(`M${G.tot.map((v: number, i: number) => `${x(i).toFixed(1)},${G.y(v).toFixed(1)}`).join('L')}`);
 	const end = $derived({ left: 100, top: (G.y(G.tot[G.tot.length - 1] ?? 0) / H) * 100 });
@@ -57,7 +61,7 @@
 	</div>
 	<div class="ticks">{#each ticks as t}<span style="left:{t.x}%">{t.label}</span>{/each}</div>
 	<ul class="key">
-		{#each [...S.layers].reverse() as l}<li><span class="sw" class:hatch={l.hatch} style="--c:var({l.tok})"></span>{l.name}</li>{/each}
+		{#each key as l}<li><span class="sw" class:hatch={l.hatch} style="--c:var({l.tok})"></span>{l.name}</li>{/each}
 	</ul>
 </div>
 
