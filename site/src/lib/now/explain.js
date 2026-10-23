@@ -271,8 +271,8 @@ export function explainNow(D, plantMeta = {}) {
   // name the island once when both reasons are from it: "In the North Island, wind is ... and gas and coal is ..."
   const one = top.length && top.every((x) => x.where && x.where === top[0].where);
   const reasons = one ? top.map((x) => x.bare) : top.map((x) => x.phrase);
-  const joined = !reasons.length ? '' : one ? `In the ${top[0].where.trim()}, ${reasons.join(' and ')}.` : cap(reasons.join(' and ')) + '.';
-  // the split's second paragraph is about conditions now rather than why islands split, so it starts "Currently"
+  // every explanation is two paragraphs: the first is general (how prices get like this), the second what's going on
+  // now, starting "Currently"
   const currently = !reasons.length ? '' : one ? `Currently, in the ${top[0].where.trim()}, ${reasons.join(' and ')}.` : `Currently, ${reasons.join(' and ')}.`;
   let headline, line, verdict, verdictNow = '';
   if (variant === 'split') {
@@ -291,27 +291,29 @@ export function explainNow(D, plantMeta = {}) {
     line = tier === 'open'
       ? `Prices are high: ${money(now.hi)}/MWh over the last 30 minutes, far above what they have been recently ${when}.`
       : `Prices are up: ${money(now.hi)}/MWh over the last 30 minutes, higher than they have been recently ${when}.`;
-    verdict = (joined ? joined + ' ' : "None of the conditions shown here is pushing the price up, so the cause is probably one this page can't see: a grid constraint, reserves, an outage it can't detect, or a change in how generators have offered. ")
-      + 'The price is set by the most expensive offer needed to meet demand in each 5 minutes.';
+    verdict = 'The price is set by the most expensive offer needed to meet demand in each 5 minutes, so it rises when the cheaper generation runs short.';
+    verdictNow = currently || "Currently, none of the conditions shown here is pushing the price up, so the cause is probably one this page can't see: a grid constraint, reserves, an outage it can't detect, or a change in how generators have offered.";
     if (heldOnly && peak) {
       headline = 'Why did the price jump?';
       line = `Prices jumped for a short time, to ${money(peak.v)}/MWh at ${clock(peak.t)}, and are back to ${money(Math.max(HAY[J] ?? 0, BEN[J] ?? 0))} now.`;
-      verdict = 'Short jumps like this come from a few 5-minute intervals where the cheaper offers ran short: demand ramping up, a plant ramping down or tripping, or offers changing. They often pass before the conditions below move. '
-        + (joined ? 'Now: ' + joined.charAt(0).toLowerCase() + joined.slice(1) : '');
+      verdict = 'Short jumps like this come from a few 5-minute intervals where the cheaper offers ran short: demand ramping up, a plant ramping down or tripping, or offers changing. They often pass before the conditions below move.';
+      verdictNow = currently;
     }
   } else if (variant === 'low') {
     const word = nearZero ? 'near zero' : 'low';
     headline = 'Why is the price so low?';
     line = (newLow ? `Prices ${word} since ${clock(lowStart)}` : `Prices ${word} for ${duration(t - lowStart)}`)
       + (nearZero ? '.' : `: ${money(now.hi)}/MWh over the last 30 minutes.`);
-    verdict = (joined ? joined + ' ' : '') + 'When more low-cost generation is on offer than the country needs, mostly hydro water that would otherwise be spilled, and wind and solar that cost nothing to run, the price falls to a few dollars or less.';
+    verdict = 'When more low-cost generation is on offer than the country needs, mostly hydro water that would otherwise be spilled, and wind and solar that cost nothing to run, the price falls to a few dollars or less.';
+    verdictNow = currently;
   } else {
     // not unusual enough to flag, but say which way it leans: below usual, about usual, or above (under the floor)
     const lean = !now.ty ? 'about' : now.hi < 0.67 * now.ty && now.ty - now.hi >= 10 ? 'below'
       : now.hi > 1.3 * now.ty && now.hi - now.ty >= 10 ? 'a little above' : 'about';
     headline = 'Why this price?';
     line = `${money(now.hi)}/MWh is ${lean} what prices have been recently ${when}` + (lean === 'about' || !now.ty ? '.' : ` (recently about ${money(now.ty)}).`);
-    verdict = (joined || 'Nothing shown here is far from normal.') + ' The price is set by the most expensive offer needed to meet demand in each 5 minutes.';
+    verdict = 'The price is set by the most expensive offer needed to meet demand in each 5 minutes.';
+    verdictNow = currently || 'Currently, nothing shown here is far from normal.';
   }
 
   // the possible price setter: the dearer island's (or Haywards'), an estimate from the latest offers
