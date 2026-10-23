@@ -1,9 +1,10 @@
 <script lang="ts">
-	// The button that enlarges a chart or card over the page, or shrinks it back.
-	let { open, name, inline = false, onclick }: { open: boolean; name: string; inline?: boolean; onclick: () => void } = $props();
+	// The button that enlarges a chart or card over the page, or shrinks it back. It sits in the top right corner of its
+	// chart or card (.pop-btn in tracker.css; the card needs position: relative).
+	let { open, name, onclick }: { open: boolean; name: string; onclick: () => void } = $props();
 </script>
 
-<button type="button" class="pop-btn" class:inline {onclick} aria-pressed={open}
+<button type="button" class="pop-btn" {onclick} aria-pressed={open}
 	aria-label={open ? `Shrink the ${name}` : `Enlarge the ${name}`} title={open ? 'Close' : 'Enlarge'}>
 	{#if open}
 		<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>

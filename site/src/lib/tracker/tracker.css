@@ -161,7 +161,7 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 .pop-btn { position: absolute; top: 9px; right: 6px; display: grid; place-items: center; width: 26px; height: 26px; padding: 0; border: 1px solid transparent; border-radius: 4px; background: none; color: var(--muted); cursor: pointer; }
 .pop-btn:hover, .pop-btn[aria-pressed="true"] { color: var(--ink); background: var(--grid); }
 .chart.popped .pop-btn { top: 11px; right: 10px; }
-.chart.popped { position: fixed; z-index: 26; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(1180px, calc(100vw - 32px)); background: var(--surface); border: 1px solid var(--line) !important; border-radius: 6px; padding: 14px 16px 12px; box-shadow: 0 18px 50px rgb(0 0 0 / 0.28); }
+.chart.popped { position: fixed; z-index: 26; left: 50%; top: 50%; transform: translate(-50%, -50%); width: calc(100vw - 32px); background: var(--surface); border: 1px solid var(--line) !important; border-radius: 6px; padding: 14px 16px 12px; box-shadow: 0 18px 50px rgb(0 0 0 / 0.28); }
 .chart.popped canvas { height: min(62vh, 560px) !important; }
 .pop-backdrop { position: fixed; inset: 0; z-index: 25; border: 0; padding: 0; background: rgb(10 16 16 / 0.45); cursor: zoom-out; }
 .ch-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; min-height: 22px; }
@@ -337,8 +337,7 @@ a { color: var(--accent); }
 
 
 /* Cards under the charts (Generation and Prices tabs) enlarge over the page like the charts do */
-.card.popped { position: fixed; z-index: 26; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(1180px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; border-radius: 6px; box-shadow: 0 18px 50px rgb(0 0 0 / 0.28); }
-.pop-btn.inline { position: static; flex: none; }
+.card.popped { position: fixed; z-index: 26; left: 50%; top: 50%; transform: translate(-50%, -50%); width: calc(100vw - 32px); max-height: calc(100vh - 32px); overflow: auto; border-radius: 6px; box-shadow: 0 18px 50px rgb(0 0 0 / 0.28); }
 
 /* a pinned time line (a click on a chart): said under the summary's heading, with a button to release it */
 .sum-pin { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); }

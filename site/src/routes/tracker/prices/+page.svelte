@@ -957,7 +957,7 @@
 					<div class="ttl-row"><h2>Price captured by fuel</h2><InfoTip>What each fuel earned over the range: its output × its island's price, divided by its output. Percent is against the average of all fuels. Battery (charging) is what batteries paid to charge, left out of the average. Hover over a bar (or tap it) for its energy in GWh and what it earned or paid. <a href="/methods/prices#derived">How it's worked out</a></InfoTip></div>
 					<Context range={rangeName(R.label, endT, R.days)} items={[win ? span(win.from, win.to) : '']} />
 				</div>
-				<PopButton inline open={popped === 'cap'} name="price captured by fuel chart" onclick={() => (popped = popped === 'cap' ? null : 'cap')} />
+				<PopButton open={popped === 'cap'} name="price captured by fuel chart" onclick={() => (popped = popped === 'cap' ? null : 'cap')} />
 			</div>
 			{#if rangeStats && rangeStats.cap.rows.length}
 				<FuelBars rows={rangeStats.cap.rows} avg={rangeStats.cap.avg} />
@@ -978,7 +978,7 @@
 					{/each}
 				</div>
 				<button type="button" class="tog-scale" aria-pressed={heatScaled} title={heatScaled ? 'Colours fitted to the prices shown' : 'Colours on fixed price bands, so different periods compare'} onclick={() => (heatScaled = !heatScaled)}><i aria-hidden="true"></i>Scale to this view</button>
-				<PopButton inline open={popped === 'heat'} name="price by time of day chart" onclick={() => (popped = popped === 'heat' ? null : 'heat')} />
+				<PopButton open={popped === 'heat'} name="price by time of day chart" onclick={() => (popped = popped === 'heat' ? null : 'heat')} />
 				</div>
 			</div>
 			{#if heatRows.length}<HeatMap rows={heatRows} scaled={heatScaled} />{:else}<p class="empty">Loading…</p>{/if}
@@ -999,15 +999,21 @@
 	.card { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px 16px; display: grid; gap: 10px; min-width: 0; }
 	.card > :global(*) { min-width: 0; }
 	.card h2 { font-size: 0.86rem; font-weight: 600; margin: 0; }
+	/* the enlarge button sits in the card's top right corner (PopButton, .pop-btn in tracker.css), clear of the tools */
+	.card:not(.popped) { position: relative; }
 	.tog-scale { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 0.78rem; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2px 10px; min-height: 30px; cursor: pointer; }
 	.tog-scale i { width: 10px; height: 10px; border: 1.5px solid var(--accent); border-radius: 2px; background: var(--accent); }
 	.tog-scale[aria-pressed='false'] { opacity: 0.6; }
 	.tog-scale[aria-pressed='false'] i { background: none; }
-	.card-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 12px; align-items: flex-start; }
+	.card-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 12px; align-items: flex-start; padding-right: 28px; }
 	.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; min-width: 0; max-width: 100%; }
 	.tools .seg { flex-wrap: wrap; }   /* six nodes don't fit a phone's width in one row */
 	.more { margin: 2px 2px 0; color: var(--muted); font-size: 0.8rem; }
 	.more a { color: inherit; }
+	/* big screens: the two cards split down the centre, as on the Generation tab */
+	@media (min-width: 1600px) {
+		.p-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+	}
 	@media (max-width: 900px) {
 		.p-row { grid-template-columns: minmax(0, 1fr); }
 	}
