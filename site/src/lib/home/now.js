@@ -69,13 +69,14 @@ export function ring(mix, region, r) {
 }
 
 /** New Zealand's generation by fuel over the last `hours`, every `every`th interval, for a small stacked chart:
- * { t: [ms], layers: [{ ...fuel, v: [MW] }] } in stack order, fuels with no output dropped. */
+ * { t: [ms], layers: [{ ...fuel, v: [MW] }] } in stack order, fuels with no output dropped. Battery is discharge only
+ * (each island's charging counted as zero, so the stack never dips below the axis); HVDC is left out. */
 export function recent(D, hours = 24, every = 3) {
   const n = Math.min(D.N, Math.round((hours * 3600000) / D.step) + 1);
   const idx = [];
   for (let j = D.N - 1; j >= D.N - n; j -= every) idx.unshift(j);
-  const val = (k, j) => Math.max(0, (D.NI[k]?.[j] ?? 0) + (D.SI[k]?.[j] ?? 0));
-  const layers = GEN.filter((f) => !f.signed).map((f) => ({ ...f, v: idx.map((j) => val(f.k, j)) }))
+  const val = (k, j) => Math.max(0, D.NI[k]?.[j] ?? 0) + Math.max(0, D.SI[k]?.[j] ?? 0);
+  const layers = GEN.filter((f) => !f.signed || f.k === 'batt').map((f) => ({ ...f, v: idx.map((j) => val(f.k, j)) }))
     .filter((f) => f.v.some((x) => x > 0.5));
   return { t: idx.map((j) => D.t0 + j * D.step), layers };
 }

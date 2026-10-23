@@ -127,10 +127,11 @@
 	.pe-head h2 { margin: 0; font-size: 1.3rem; letter-spacing: -0.01em; }
 	.pe-sub { margin: 0; color: var(--ink-2); font-size: 0.88rem; }
 	.pe-grid { display: flex; flex-wrap: wrap; }
-	.pe-main { flex: 999 1 520px; min-width: 0; padding: 16px 18px; display: grid; gap: 12px; align-content: start; }
+	.pe-main { flex: 3 1 520px; min-width: 0; padding: 16px 18px; display: grid; gap: 12px; align-content: start; }
 	.pe-verdict { margin: 0; font-size: 1rem; line-height: 1.5; max-width: 66ch; }
-	.pe-rows { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--grid); }
-	.pe-rows li { display: grid; grid-template-columns: 12px minmax(0, 1fr) 140px; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--grid); }
+	/* the reasons stop at a readable width, so on wide screens each one's bars stay near its words */
+	.pe-rows { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--grid); max-width: 900px; }
+	.pe-rows li { display: grid; grid-template-columns: 12px minmax(0, 1fr) minmax(140px, 28%); gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--grid); }
 	.sw { width: 10px; height: 10px; border-radius: 3px; background: var(--c); display: inline-block; }
 	.pe-what { display: grid; gap: 2px; min-width: 0; }
 	.pe-what b { font-weight: 600; font-size: 0.92rem; }
@@ -144,7 +145,7 @@
 	.k-now { height: 7px; background: var(--ink-2); }
 	.k-usual { height: 4px; margin-left: 8px; background: color-mix(in srgb, var(--muted) 55%, transparent); }
 
-	.pe-side { flex: 1 1 340px; min-width: 0; padding: 16px 18px; background: color-mix(in srgb, var(--bg) 45%, var(--surface)); border-left: 1px solid var(--grid); display: grid; gap: 14px; align-content: start; }
+	.pe-side { flex: 2 1 340px; min-width: 0; padding: 16px 18px; background: color-mix(in srgb, var(--bg) 45%, var(--surface)); border-left: 1px solid var(--grid); display: grid; gap: 14px; align-content: start; }
 	.pe-side h3 { margin: 0 0 6px; font-size: 0.86rem; }
 	.ch-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
 	.ch-head h3 { margin: 0; }

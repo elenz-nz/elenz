@@ -12,10 +12,11 @@
 	// only the plot stretches (a fixed viewBox scaled the text with the width: huge when the side column wrapped under
 	// the reasons at middling window widths)
 	let W = $state(0);
-	const VW = $derived(Math.max(240, W || 420)), VH = $derived(large ? 420 : size === 'tall' ? 360 : 220);
+	// in the panel the height follows the width (a wide side column on big screens gets a taller chart, up to 340 px)
+	const VW = $derived(Math.max(240, W || 420)), VH = $derived(large ? 420 : size === 'tall' ? 360 : Math.round(Math.min(340, Math.max(220, VW * 0.5))));
 	const FS = $derived(large ? 12.5 : 11.5);
 	const L = 48, R = 8, T = 10, B = 24;
-	const NT = $derived(size === 'small' ? 2 : 4);   // steps up the price axis
+	const NT = $derived(size === 'small' && VH < 300 ? 2 : 4);   // steps up the price axis
 	const t0 = $derived(c.t[0]), t1 = $derived(c.t[c.t.length - 1]);
 	const ymax = $derived.by(() => {
 		let m = 0;
