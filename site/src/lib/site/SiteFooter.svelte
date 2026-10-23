@@ -14,7 +14,7 @@
 		{ k: 'x', name: 'X', href: '' },
 		{ k: 'instagram', name: 'Instagram', href: '' },
 		{ k: 'facebook', name: 'Facebook', href: '' },
-		{ k: 'github', name: 'GitHub', href: 'https://github.com/elenz-nz/elenz' },
+		{ k: 'github', name: 'GitHub', href: '' },   // taken off the footer (owner, 23 Oct 2026); the code is linked from About and the method pages
 		{ k: 'mail', name: 'Email hello@elenz.co.nz', href: 'mailto:hello@elenz.co.nz' },
 	];
 	const shown = LINKS.filter((l) => l.href);

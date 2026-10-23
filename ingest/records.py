@@ -40,8 +40,8 @@ import pandas as pd
 
 from common import NZ
 
-VERSION = 3                # bump when summarise() changes: every month's summary is remade (2: per-day sums for periods;
-                           # 3: renewable share without battery discharge)
+VERSION = 4                # bump when summarise() changes: every month's summary is remade (2: per-day sums for periods;
+                           # 3: renewable share without battery discharge; 4: most fossil, hydro high and low, lowest price)
 REGIONS = ('NZ', 'NI', 'SI')
 GEN = ('geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
 REN = ('geo', 'bio', 'hydro', 'wind', 'solar', 'roof')
@@ -62,10 +62,14 @@ HALF_HOURS = {
     'ren_max': ('max', 'gen', REGIONS, 1),
     'ren_min': ('min', 'gen', REGIONS, 1),
     'fossil_min': ('min', 'gen', REGIONS, 0),
+    'fossil_max': ('max', 'gen', REGIONS, 0),
+    'hydro_max': ('max', 'gen', REGIONS, 0),
+    'hydro_min': ('min', 'gen', REGIONS, 0),         # the site shows its periods only (a dry month or year)
     'wind_max': ('max', 'gen', REGIONS, 0),
     'solar_max': ('max', 'gen', REGIONS, 0),
     'roof_max': ('max', 'gen', REGIONS, 0),
     'price_max': ('max', 'price', REGIONS, 2),
+    'price_min': ('min', 'price', REGIONS, 2),        # the site shows its periods only (half-hours go to zero often)
     'gap_max': ('max', 'price', ('NZ',), 2),
     'hvdc_n_max': ('max', 'hvdc', ('NZ',), 0),
     'hvdc_s_max': ('max', 'hvdc', ('NZ',), 0),
@@ -89,15 +93,16 @@ FUEL_OF = {'wind_max': 'wind', 'solar_max': 'solar'}       # records whose conte
 # 90% of its half-hours. A period
 # is official when every day in it is; a newer one beyond the record is provisional.
 PERIODS = ('day', 'week', 'month', 'year')
-DAY_SUMS = ('dem', 'gen', 'ren', 'fossil', 'wind', 'solar', 'roof', 'price', 'gap', 'hvdc')
+DAY_SUMS = ('dem', 'gen', 'ren', 'fossil', 'hydro', 'wind', 'solar', 'roof', 'price', 'gap', 'hvdc')
 DAY_MIN_SHARE = 0.9
 # each record's figure from a period's sums: (sum key, sign) for an average, or 'ren' for the renewable share
 PERIOD_OF = {
     'demand_max': ('dem', 1), 'demand_min': ('dem', 1), 'ren_max': 'ren', 'ren_min': 'ren', 'fossil_min': ('fossil', 1),
+    'fossil_max': ('fossil', 1), 'hydro_max': ('hydro', 1), 'hydro_min': ('hydro', 1), 'price_min': ('price', 1),
     'wind_max': ('wind', 1), 'solar_max': ('solar', 1), 'roof_max': ('roof', 1), 'price_max': ('price', 1),
     'gap_max': ('gap', 1), 'hvdc_n_max': ('hvdc', 1), 'hvdc_s_max': ('hvdc', -1),
 }
-SUM_FAM = {'dem': 'gen', 'gen': 'gen', 'ren': 'gen', 'fossil': 'gen', 'wind': 'gen', 'solar': 'gen', 'roof': 'gen',
+SUM_FAM = {'dem': 'gen', 'gen': 'gen', 'ren': 'gen', 'fossil': 'gen', 'hydro': 'gen', 'wind': 'gen', 'solar': 'gen', 'roof': 'gen',
            'price': 'price', 'gap': 'price', 'hvdc': 'hvdc'}
 
 
@@ -130,10 +135,12 @@ def series(js):
         S = {
             'demand_max': dem, 'demand_min': dem,
             'ren_max': share, 'ren_min': share, 'fossil_min': sum(F[f] for f in FOSSIL),
+            'hydro_max': F['hydro'], 'hydro_min': F['hydro'], 'price_min': price,
             'wind_max': F['wind'], 'solar_max': F['solar'], 'roof_max': F['roof'],
             'price_max': price, 'gap_max': np.abs(nip - sip), 'hvdc_n_max': hv, 'hvdc_s_max': -hv,
             'low_price_run': price < LOW_PRICE, 'ren_run': share >= REN_RUN, 'huntly_off_run': huntly < RUNNING,
         }
+        S['fossil_max'] = S['fossil_min']
         for k, v in S.items():
             regions = HALF_HOURS[k][2] if k in HALF_HOURS else RUNS[k][1]
             if r not in regions:
@@ -143,7 +150,7 @@ def series(js):
         # per-day sums for the period records
         out.setdefault('sums', {})[r] = {
             'dem': out['demand_max'][r], 'gen': gen, 'ren': ren,
-            'fossil': out['fossil_min'][r], 'wind': out['wind_max'][r], 'solar': out['solar_max'][r], 'roof': out['roof_max'][r],
+            'fossil': out['fossil_min'][r], 'hydro': F['hydro'], 'wind': out['wind_max'][r], 'solar': out['solar_max'][r], 'roof': out['roof_max'][r],
             'price': price, 'gap': np.abs(nip - sip) if r == 'NZ' else None, 'hvdc': hv if r == 'NZ' else None,
         }
     return out
@@ -451,6 +458,82 @@ def period_figures(sums, now_ms=None):
     return out
 
 
+def pace_sums(sums):
+    """The current day, week, month and year so far (the period holding the newest day in the history): each region's
+    [sum, count] of every DAY_SUMS series, in half-hours, and where the history ends. The site adds the live week after
+    `to` and compares it with the record period at the same point (records.js pace)."""
+    days = _all_days(sums)
+    if not days:
+        return None
+    last = sorted(sums, key=lambda x: x['month'])[-1]
+    out = {'to': int(last['end'] + last['step'])}
+    for p in PERIODS:
+        start = _period_start(days[-1][0], p)
+        tot = {}
+        for r in REGIONS:
+            for key in DAY_SUMS:
+                parts = [S.get(r, {}).get(key) for t, nh, S in days if t >= start]
+                parts = [x for x in parts if x is not None]
+                if parts:
+                    tot.setdefault(r, {})[key] = [round(sum(x[0] for x in parts), 1), int(sum(x[1] for x in parts))]
+        out[p] = {'start': int(start), 'sums': tot}
+    return out
+
+
+def _all_days(sums):
+    """Every day in the month summaries: [(start, half-hours, {region: {key: [sum, count]}})], oldest first."""
+    days = []
+    for s in sorted(sums, key=lambda x: x['month']):
+        dd = s.get('days')
+        if dd:
+            days += [(t, dd['n'][i], {r: {k: v[i] for k, v in dd['s'][r].items()} for r in dd['s']}) for i, t in enumerate(dd['t'])]
+    return days
+
+
+def _cum(parts, how, dp):
+    """Running figures from [{key: [sum, count]}, ...] (one per day or half-hour): the period's average (or renewable
+    share) up to and including each one, None where there is nothing yet."""
+    keys = ('ren', 'gen') if how == 'ren' else (how[0],)
+    acc = {key: [0.0, 0.0] for key in keys}
+    out = []
+    for P in parts:
+        for key in keys:
+            x = P.get(key)
+            if x is not None:
+                acc[key][0] += x[0]
+                acc[key][1] += x[1]
+        if how == 'ren':
+            v = 100 * acc['ren'][0] / acc['gen'][0] if acc['gen'][0] > 0 else None
+        else:
+            v = how[1] * acc[how[0]][0] / acc[how[0]][1] if acc[how[0]][1] > 0 else None
+        out.append(None if v is None or v != v else (round(v, dp) if dp else int(round(v))))
+    return out
+
+
+def period_curve(days, read_month, p, k, r, start):
+    """The record period's figure at each point through it, so the current period can be compared at the same point
+    (records.js pace): after each half-hour for a day record (from that month's hist/hh), after each day otherwise."""
+    how, dp = PERIOD_OF[k], HALF_HOURS[k][3]
+    if p != 'day':
+        return _cum([S.get(r, {}) for t, nh, S in days if _period_start(t, p) == start], how, dp)
+    js = read_month(pd.Timestamp(start, unit='ms', tz='UTC').tz_convert(NZ).strftime('%Y-%m')) if read_month else None
+    if not js:
+        return None
+    n, t0, step = js['N'], js['t0'], js['step']
+    t = t0 + np.arange(n) * step
+    end = int((pd.Timestamp(start, unit='ms', tz='UTC').tz_convert(NZ).tz_localize(None) + pd.Timedelta(days=1)).tz_localize(NZ).timestamp() * 1000)
+    idx = np.flatnonzero((t >= start) & (t < end))
+    sums = series(js)['sums'].get(r, {})
+    parts = []
+    for i in idx:
+        P = {}
+        for key, arr in sums.items():
+            if arr is not None and arr[i] == arr[i]:
+                P[key] = [float(arr[i]), 1]
+        parts.append(P)
+    return _cum(parts, how, dp)
+
+
 def period_record(figs, kind):
     """[[start, value, official]] oldest first -> the official record, its progression, and a provisional one beyond it."""
     steps, best, prov = [], None, None
@@ -559,6 +642,12 @@ def build(sums, old=None, read_month=None, now_ms=None):
             out['moy'][k][r] = by_month_of_year(sums, k, r, kind, fam, monthly=True)
     # the same records by day, week, month and year
     figs = period_figures(sums)
+    all_days = _all_days(sums)
+
+    def read_m(m):   # a month's hist/hh, cached with the context's
+        if m not in cache and read_month:
+            cache[m] = read_month(m)
+        return cache.get(m)
     out['periods'] = {}
     for p in PERIODS:
         out['periods'][p] = {}
@@ -574,7 +663,13 @@ def build(sums, old=None, read_month=None, now_ms=None):
                         rec['since'] = now_ms
                     if rec.get('since') and now_ms - rec['since'] > 365 * 864e5:
                         rec['since'] = None
+                    # the target's figure through its period, for "on record pace" (the provisional one if it is beyond)
+                    tgt = rec.get('prov') or rec
+                    curve = period_curve(all_days, read_m, p, k, r, tgt['t'])
+                    if curve:
+                        tgt['curve'] = curve
                     out['periods'][p][k][r] = rec
+    out['pace'] = pace_sums(sums)
     for k, (fam, regions) in RUNS.items():
         out['runs'][k] = {}
         for r in regions:

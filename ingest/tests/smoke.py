@@ -236,6 +236,15 @@ d3 = R3['records']['demand_max']['NZ']
 check(d3['v'] == p2['v'] and d3.get('since') == 3 and any(x['k'] == 'demand_max' and x['r'] == 'NZ' and x['ok'] for x in R3['resolved']),
       'records: confirmed when the metered month arrives (new, and listed as settled)')
 check(not rc.same(R2, R3) and rc.same(R3, {**R3, 'built': 0}), 'records: republished only when something changed')
+# the current period so far (records.js pace): the newest day's period, each series' sum and count in half-hours
+pc = R['pace']
+dsum = pc['day']['sums']['NZ']['dem']
+last_day = s_off['days']['t'][-1]
+dn = [v for t, v in zip(np.array(m_off['t0']) + np.arange(m_off['N']) * m_off['step'], nzd) if t >= last_day and v == v]
+check(pc['to'] == s_off['end'] + s_off['step'] and pc['day']['start'] == last_day and dsum[1] == len(dn) and abs(dsum[0] - sum(dn)) < 1,
+      'records: the current day so far (pace)')
+check(R['records']['hydro_min']['NZ']['v'] <= R['records']['hydro_max']['NZ']['v'] and 'price_min' in R['records'] and 'fossil_max' in R['records'],
+      'records: hydro high and low, most fossil, lowest price')
 
 # offered capacity (offered.py): final energy offers summed by plant, the cheap part under $1,000, headroom lows
 import io as _io  # noqa: E402

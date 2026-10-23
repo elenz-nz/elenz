@@ -11,7 +11,7 @@
 	import { drawRecord } from '#lib/records/shareImage.js';
 	import { stamp } from '#lib/site/viewurl.js';
 	import {
-		LISTED, PERIODS, PERIOD_KEYS, periodOf, periodSub, periodWhen, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats, energy,
+		LISTED, PERIODS, PERIOD_KEYS, periodOf, periodSub, periodWhen, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats, energy, pace, soFar, toGo, needText, paceAt,
 		loadRecords, meteredDue, clock, dayOf, dayLong, monthOf, yearOf, daysBetween, runLength, NEW_DAYS
 	} from '#lib/records/records.js';
 	import type { PageProps } from './$types';
@@ -25,7 +25,9 @@
 	let region = $state('NZ');
 	// a half-hour record's day, week, month or year record (?period=)
 	let period = $state('tp');
-	const per = $derived(d.kind === 'hh' ? period : 'tp');
+	// a record kept for periods only (d.periods) has no half-hour record: it opens on its month
+	const per = $derived(d.kind === 'hh' ? (d.periods && period === 'tp' ? 'month' : period) : 'tp');
+	let liveD = $state.raw<any>(null);
 	let shareMsg = $state('');   // "Link copied" for a moment after Share copies the link
 	let busy = $state(false);
 
@@ -40,7 +42,7 @@
 			if (!R) return;
 			try {
 				const r = await fetch(LIVE_URL, { cache: 'no-cache' });
-				if (r.ok) live = liveBeats(R, await r.json());
+				if (r.ok) { liveD = await r.json(); live = liveBeats(R, liveD); }
 			} catch { /* the live check is extra */ }
 		})();
 	});
@@ -64,12 +66,15 @@
 	};
 
 	const rec = $derived(R ? get(R, d.id, region, per) : null);
+	// heading for a record: this period so far, while it is on pace to beat the record (records.js pace)
+	const onPace = $derived(R && liveD && per !== 'tp' ? pace(R, liveD).find((x) => x.d.id === d.id && x.region === region && x.period === per) ?? null : null);
 	const na = $derived(R ? notShown(d, region, rec, R, per) : null);
 	const prov = $derived(R && !na ? (per === 'tp' ? provisional(R, live, d.id, region) : (rec?.prov ?? null)) : null);
 	const isNew = $derived(!!rec?.since && Date.now() - rec.since < NEW_DAYS * 864e5);
 	const regionName = $derived(REGIONS.find((x) => x.id === region)!.name);
 	const f = (v: number) => fmt(d, v, per);
 	const axisFmt = (v: number) => (d.unit === '$' ? '$' + Math.round(v).toLocaleString('en-NZ') : d.unit === '%' ? `${+v.toFixed(1)}%` : Math.round(v).toLocaleString('en-NZ'));
+	const cap = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
 	const ymd = (t: number) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Pacific/Auckland' }).format(t);
 	const others = $derived(LISTED.filter((x) => x.group === d.group && x.id !== d.id));
 
@@ -78,7 +83,7 @@
 		const c = rec?.ctx;
 		if (!c || d.kind !== 'hh' || per !== 'tp') return null;
 		if (d.id.startsWith('demand')) return c.ren != null ? { k: 'Renewable share then', v: `${c.ren.toFixed(1)}%` } : null;
-		if (d.id.startsWith('ren') || d.id === 'fossil_min') return { k: 'Demand then', v: `${c.demand.toLocaleString('en-NZ')} MW` };
+		if (d.id.startsWith('ren') || d.id.startsWith('fossil') || d.id === 'hydro_max') return { k: 'Demand then', v: `${c.demand.toLocaleString('en-NZ')} MW` };
 		if (['wind_max', 'solar_max', 'roof_max'].includes(d.id)) return c.gen > 0 ? { k: 'Share of generation then', v: `${((100 * rec.v) / c.gen).toFixed(1)}%` } : null;
 		if (d.id === 'price_max' || d.id === 'gap_max') return { k: 'Haywards · Benmore', v: `$${Math.round(c.hay).toLocaleString('en-NZ')} · $${Math.round(c.ben).toLocaleString('en-NZ')}` };
 		if (d.id.startsWith('hvdc')) return { k: 'Haywards price then', v: `$${Math.round(c.hay).toLocaleString('en-NZ')}/MWh` };
@@ -171,7 +176,7 @@
 			<p class="sub">{periodSub(d, per)}</p>
 			{#if d.kind === 'hh'}
 				<div class="seg per" role="group" aria-label="Record for each">
-					{#each PERIODS as p}
+					{#each PERIODS.filter((p) => !d.periods || p.k !== 'tp') as p}
 						<button type="button" aria-pressed={per === p.k} onclick={() => setPeriod(p.k)}>{p.label}</button>
 					{/each}
 				</div>
@@ -205,6 +210,14 @@
 					{#if extra}<div><dt>{extra.k}</dt><dd>{extra.v}</dd></div>{/if}
 				</dl>
 			</section>
+
+			{#if onPace}
+				<section class="pace" aria-label="Heading for a record">
+					<span class="tag pacetag">On record pace</span>
+					<p><b>{soFar(onPace)}: {fmt(d, onPace.v, per)} {paceAt(onPace)}</b>, ahead of the record {periodOf(per).word} ({periodWhen(onPace.bestT, per)}{onPace.provBest ? ', provisional' : ''}), which had {fmt(d, onPace.ref, per)} at the same point and finished at {fmt(d, onPace.best, per)}. {cap(toGo(onPace))}. {needText(onPace)}
+						From dispatch data, so provisional until the metered data confirms it.</p>
+				</section>
+			{/if}
 
 			{#if prov}
 				<section class="prov" aria-label="Provisional record">
@@ -347,6 +360,11 @@
 
 	.prov { display: flex; align-items: baseline; gap: 10px; padding: 10px 14px; border: 1px dashed color-mix(in srgb, var(--warn-ink) 55%, var(--line)); background: color-mix(in srgb, var(--warn-bg) 45%, var(--surface)); border-radius: 4px; }
 	.prov p { margin: 0; color: var(--ink-2); font-size: 0.86rem; }
+	.pace { display: flex; align-items: baseline; gap: 10px; padding: 10px 14px; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); border-left: 3px solid var(--accent); background: color-mix(in srgb, var(--accent-soft) 60%, var(--surface)); border-radius: 4px; }
+	.pace p { margin: 0; color: var(--ink-2); font-size: 0.86rem; }
+	.pace b { color: var(--ink); }
+	.tag.pacetag { background: var(--accent); color: var(--surface); margin-left: 0; }
+	@media (max-width: 640px) { .pace, .prov { flex-direction: column; gap: 6px; } }
 
 	.two { display: flex; gap: 14px; flex-wrap: wrap; align-items: start; }
 	.two > :first-child { flex: 999 1 520px; }

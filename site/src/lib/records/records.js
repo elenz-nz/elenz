@@ -8,7 +8,7 @@
 export const RECORDS_URL = '/data/history/records.json';
 export const LIVE_URL = '/data/tracker.json';
 export const NEW_DAYS = 30;        // as records.py: a record is "new" this long after it first appears
-export const GROUPS = ['Demand', 'Renewables', 'Wind and solar', 'Prices', 'HVDC'];
+export const GROUPS = ['Demand', 'Renewables', 'Hydro', 'Wind and solar', 'Prices', 'HVDC'];
 export const REGIONS = [
   { id: 'NZ', name: 'New Zealand', short: 'NZ' },
   { id: 'NI', name: 'North Island', short: 'North' },
@@ -26,13 +26,20 @@ export const DEFS = [
   { id: 'ren_run', kind: 'run', fam: 'gen', group: 'Renewables', name: 'Longest run at 90% renewable or more', sub: 'Every half-hour in a row', unit: 'h', tok: '--g-ren', regions: ['NZ', 'NI'],
     na: { SI: 'The South Island’s generation is all renewable' } },
   { id: 'fossil_min', kind: 'hh', fam: 'gen', group: 'Renewables', name: 'Lowest fossil generation', sub: 'Rankines, gas, diesel and waste heat', unit: 'MW', tok: '--g-fossil', regions: ALL },
+  { id: 'fossil_max', kind: 'hh', v: 4, fam: 'gen', group: 'Renewables', name: 'Most fossil generation', sub: 'Rankines, gas, diesel and waste heat', unit: 'MW', tok: '--g-fossil', regions: ['NZ', 'NI'],
+    na: { SI: 'No fossil plant in the South Island' } },
   { id: 'huntly_off_run', kind: 'run', fam: 'gen', group: 'Renewables', name: 'Longest with no Huntly Rankine running', sub: 'The coal and gas units at Huntly', unit: 'h', tok: '--f-coal', regions: ['NZ'],
     na: { NI: 'Shown for New Zealand', SI: 'Huntly is in the North Island' } },
+  { id: 'hydro_max', kind: 'hh', v: 4, fam: 'gen', group: 'Hydro', name: 'Peak hydro', sub: 'Half-hour', unit: 'MW', tok: '--f-hydro', regions: ALL },
+  // periods: true, records kept for days, weeks, months and years only (their half-hour lows say little): a dry spell.
+  // v: the records.json version that first has a record (records.py VERSION); older files say it is being worked out
+  { id: 'hydro_min', kind: 'hh', v: 4, periods: true, fam: 'gen', group: 'Hydro', name: 'Lowest hydro', sub: 'Hydro generation, a dry spell', unit: 'MW', tok: '--f-hydro', regions: ALL },
   { id: 'wind_max', kind: 'hh', fam: 'gen', group: 'Wind and solar', name: 'Peak wind', sub: 'Half-hour', unit: 'MW', tok: '--f-wind', regions: ALL },
   { id: 'wind_month_max', old: true, kind: 'month', fam: 'gen', group: 'Wind and solar', name: 'Windiest month', sub: 'Wind generation in a calendar month', unit: 'GWh', dp: 1, tok: '--f-wind', regions: ALL },
   { id: 'solar_max', kind: 'hh', fam: 'gen', group: 'Wind and solar', name: 'Peak grid solar', sub: 'Solar farms the market dispatches', unit: 'MW', tok: '--f-solar', regions: ALL },
   { id: 'roof_max', kind: 'hh', fam: 'gen', group: 'Wind and solar', name: 'Peak embedded solar', sub: 'Rooftops and small arrays, modelled', unit: 'MW', tok: '--f-solar', est: true, regions: ALL },
   { id: 'price_max', kind: 'hh', fam: 'price', group: 'Prices', name: 'Highest price', sub: 'Half-hour, final price', unit: '$', dp: 2, tok: '--accent', regions: ALL },
+  { id: 'price_min', kind: 'hh', v: 4, periods: true, fam: 'price', group: 'Prices', name: 'Lowest price', sub: 'Final price, average', unit: '$', dp: 2, tok: '--accent', regions: ALL },
   { id: 'gap_max', kind: 'hh', fam: 'price', group: 'Prices', name: 'Biggest gap between the islands', sub: 'Haywards against Benmore, half-hour', unit: '$', dp: 2, tok: '--accent', regions: ['NZ'],
     na: { NI: 'Shown for New Zealand', SI: 'Shown for New Zealand' } },
   { id: 'low_price_run', kind: 'run', fam: 'price', group: 'Prices', name: 'Longest run of near-zero prices', sub: 'Under $5/MWh (New Zealand: both islands)', unit: 'h', tok: '--accent', regions: ALL },
@@ -92,6 +99,8 @@ export function get(R, id, region, period = 'tp') {
 /** Why a record isn't shown for a region: the definition's note, or what its data says (always the same value). */
 export function notShown(d, region, rec, R = null, period = 'tp') {
   if (!d.regions.includes(region)) return d.na?.[region] ?? 'Shown for New Zealand';
+  if (d.periods && period === 'tp') return 'Kept for days, weeks, months and years';
+  if (!rec && d.v && R && (R.v ?? 0) < d.v) return 'Being worked out from the history; back in a day or so';
   if (!rec && period !== 'tp' && d.kind === 'hh' && R && !R.periods) return 'Being worked out from the history; back in a day or so';
   if (!rec) return 'No data yet';
   // a period's net transfer: "most sent south" is only a record if some period's net flow was south at all
@@ -254,9 +263,10 @@ function halfHours(D) {
     const S = {
       demand_max: avg(dem), demand_min: avg(dem),
       ren_max: G.map((g, i) => (g > 0 ? (100 * Rn[i]) / g : NaN)), fossil_min: avg(fos),
-      wind_max: avg(F.wind), solar_max: avg(F.solar), roof_max: avg(F.roof),
+      wind_max: avg(F.wind), solar_max: avg(F.solar), roof_max: avg(F.roof), hydro_max: avg(F.hydro),
     };
     S.ren_min = S.ren_max;
+    S.fossil_max = S.fossil_min;
     for (const [id, v] of Object.entries(S)) (out[id] ??= {})[r] = v;
   }
   return { T, S: out };
@@ -270,7 +280,7 @@ export function liveBeats(R, D) {
   try { H = halfHours(D); } catch { return {}; }
   const out = {};
   for (const d of DEFS) {
-    if (d.kind !== 'hh' || d.fam !== 'gen' || !H.S[d.id]) continue;
+    if (d.kind !== 'hh' || d.periods || d.fam !== 'gen' || !H.S[d.id]) continue;
     for (const r of d.regions) {
       const rec = get(R, d.id, r), v = H.S[d.id][r];
       if (!rec || !v) continue;
@@ -323,7 +333,7 @@ export function recent(R, live, now = Date.now()) {
   }
   for (const x of R.resolved ?? []) {
     const d = def(x.k);
-    if (d && !x.ok) out.push({ d, region: x.r, rec: get(R, x.k, x.r), settled: x, at: x.at });
+    if (d && !x.ok && !d.periods) out.push({ d, region: x.r, rec: get(R, x.k, x.r), settled: x, at: x.at });
   }
   // one card per record: New Zealand's where it has one, otherwise the newest island's
   out.sort((a, b) => (a.region === 'NZ') - (b.region === 'NZ') || a.at - b.at).reverse();
@@ -383,4 +393,150 @@ export function freshLive(R, D, hours = 24) {
     }
   }
   return out;
+}
+
+// ---------- heading for a record ----------
+// "On record pace" (owner's call, 23 Oct 2026): the current day, week, month or year is ahead of where its record
+// period was at the same point, as in a race. Shown once half of the period has gone, and only while it is ahead.
+// The record's figure through its period is its `curve` (records.py period_curve: after each half-hour for a day,
+// after each day otherwise); the current period's comes from the history (records.json `pace`, every day of the period
+// the history has) and the live week after it (tracker.json, 5-minute dispatch data), so it is provisional. Weeks,
+// months and years compare whole days (a part day would tilt it by the time of day); a day compares whole half-hours.
+// Each record's figure, as records.py PERIOD_OF: [sum key, sign] for an average, 'ren' for the renewable share.
+const PACE_OF = {
+  demand_max: ['dem', 1], demand_min: ['dem', 1], ren_max: 'ren', ren_min: 'ren', fossil_min: ['fossil', 1],
+  fossil_max: ['fossil', 1], hydro_max: ['hydro', 1], hydro_min: ['hydro', 1], wind_max: ['wind', 1],
+  solar_max: ['solar', 1], roof_max: ['roof', 1], price_max: ['price', 1], price_min: ['price', 1],
+  gap_max: ['gap', 1], hvdc_n_max: ['hvdc', 1], hvdc_s_max: ['hvdc', -1],
+};
+export const PACE_SHARE = 0.5;   // shown once this share of the period has gone
+
+/** The NZ local midnight starting the day, week (Monday), month or year that holds t. */
+export function periodStart(t, period) {
+  const p = Object.fromEntries(P_NZ.formatToParts(t).map((x) => [x.type, +x.value]));
+  if (period === 'week') { const wd = (new Date(Date.UTC(p.year, p.month - 1, p.day)).getUTCDay() + 6) % 7; return nzMidnight(p.year, p.month - 1, p.day - wd); }
+  if (period === 'month') return nzMidnight(p.year, p.month - 1, 1);
+  if (period === 'year') return nzMidnight(p.year, 0, 1);
+  return nzMidnight(p.year, p.month - 1, p.day);
+}
+
+// the live week's sums per region in half-hours ([sum, count] per key), for intervals in [from, to)
+function liveSums(D, from, to) {
+  const out = { NZ: {}, NI: {}, SI: {} };
+  if (!D?.N) return out;
+  const w = D.step / 1800e3;
+  const add = (r, k, v) => { if (v == null || !Number.isFinite(v)) return; const x = (out[r][k] ??= [0, 0]); x[0] += v * w; x[1] += w; };
+  const at = (isl, k, j) => { const a = D[isl]?.[k]; return a ? a[j] : null; };
+  for (let j = 0; j < D.N; j++) {
+    const t = D.t0 + j * D.step;
+    if (t < from || t >= to) continue;
+    const isl = {};
+    for (const s of ['NI', 'SI']) {
+      const F = Object.fromEntries(GEN.map((f) => [f, Math.max(0, at(s, f, j) ?? 0)]));
+      isl[s] = {
+        dem: at(s, 'metered', j), gen: GEN.reduce((a, f) => a + (f === 'batt' ? 0 : F[f]), 0), ren: REN.reduce((a, f) => a + F[f], 0),
+        fossil: FOSSIL.reduce((a, f) => a + F[f], 0), hydro: F.hydro, wind: F.wind, solar: F.solar, roof: F.roof, price: at(s, 'price', j),
+      };
+    }
+    for (const s of ['NI', 'SI']) for (const [k, v] of Object.entries(isl[s])) add(s, k, v);
+    const a = isl.NI, b = isl.SI;
+    for (const k of ['dem', 'gen', 'ren', 'fossil', 'hydro', 'wind', 'solar', 'roof']) add('NZ', k, a[k] == null || b[k] == null ? null : a[k] + b[k]);
+    // New Zealand's price is the dearer island's, as records.py; the gap and HVDC are New Zealand's only
+    if (a.price != null && b.price != null) { add('NZ', 'price', Math.max(a.price, b.price)); add('NZ', 'gap', Math.abs(a.price - b.price)); }
+    add('NZ', 'hvdc', D.hvdcN?.[j]);
+  }
+  return out;
+}
+
+/** Records the current periods are on pace to break: [{ d, region, period, start, hours, elapsed, steps, v, ref,
+ *  best, bestT, need }], longest periods first. v: the period so far (to the last whole day, or half-hour for a day);
+ *  ref: the record period's figure at the same point; best: the record (or a provisional one beyond it) and bestT its
+ *  period; need: what the rest of the period can average and still beat it (null where it can't be said simply). */
+export function pace(R, D) {
+  const P = R?.pace;
+  if (!P || !D?.N) return [];
+  const dataEnd = D.t0 + D.N * D.step;
+  const out = [];
+  for (const period of ['year', 'month', 'week', 'day']) {
+    const start = periodStart(dataEnd - 1, period), hours = periodHours(start, period);
+    // up to the last whole day (weeks, months, years) or half-hour (a day); steps: how many, and how many in all
+    const day = period === 'day';
+    const upTo = day ? start + Math.floor((dataEnd - start) / 1800e3) * 1800e3 : periodStart(dataEnd - 1, 'day');
+    const steps = day ? Math.round((upTo - start) / 1800e3) : Math.round((upTo - start) / 864e5);
+    const all = day ? Math.round(hours * 2) : Math.round(hours / 24);
+    if (steps < all * PACE_SHARE || steps >= all) continue;
+    const elapsed = (upTo - start) / 36e5;
+    // the history's sums count only if they are for this same period and end by `upTo`; the live week fills the rest
+    const hist = P[period]?.start === start && P.to <= upTo ? P[period].sums : null;
+    const live = liveSums(D, hist ? P.to : start, upTo);
+    const sum = (r, k) => {
+      const h = hist?.[r]?.[k] ?? [0, 0], l = live[r]?.[k] ?? [0, 0];
+      return [h[0] + l[0], h[1] + l[1]];
+    };
+    for (const d of LISTED) {
+      const how = PACE_OF[d.id];
+      if (!how || d.kind !== 'hh') continue;
+      for (const r of d.regions) {
+        const rec = get(R, d.id, r, period);
+        if (!rec || notShown(d, r, rec, R, period)) continue;
+        const min = d.id.endsWith('_min');
+        const beats = (a, b) => (min ? a < b : a > b);
+        const tgt = rec.prov && beats(rec.prov.v, rec.v) ? rec.prov : rec;
+        const ref = tgt.curve?.[Math.min(steps, tgt.curve.length) - 1];
+        if (ref == null) continue;
+        let v, need = null, n;
+        if (how === 'ren') {
+          const [re] = sum(r, 'ren'), [g, c] = sum(r, 'gen');
+          if (!(g > 0)) continue;
+          v = (100 * re) / g; n = c;
+          // the rest's generation at the rate so far; the share it needs to keep the period's above (or below) the record
+          const gRest = (g / c) * (hours - elapsed) * 2;
+          need = gRest > 0 ? ((tgt.v / 100) * (g + gRest) - re) / gRest * 100 : null;
+        } else {
+          const [s, c] = sum(r, how[0]);
+          if (!(c > 0)) continue;
+          v = (how[1] * s) / c; n = c;
+          need = (tgt.v * hours - v * elapsed) / (hours - elapsed);
+        }
+        // most of the time so far must be covered (the history and the live week can leave a gap between them)
+        if (n / 2 < 0.9 * elapsed) continue;
+        const f = 10 ** (d.dp ?? 0);
+        v = Math.round(v * f) / f;
+        if (!beats(v, ref)) continue;
+        out.push({ d, region: r, period, start, hours, elapsed, steps, v, ref, best: tgt.v, bestT: tgt.t, provBest: tgt !== rec, need });
+      }
+    }
+  }
+  return out;
+}
+
+/** "after 22 days", "by 3:30 pm": the point both periods are compared at. */
+export function paceAt(p) {
+  if (p.period === 'day') return `by ${F.clock.format(p.start + p.steps * 1800e3)}`;
+  return `after ${p.steps} day${p.steps === 1 ? '' : 's'}`;
+}
+/** "October so far", "This week so far", "2026 so far", "Today so far". */
+export function soFar(p) {
+  if (p.period === 'day') return 'Today so far';
+  if (p.period === 'week') return 'This week so far';
+  if (p.period === 'month') return `${F.monthName.format(p.start + 6 * 36e5)} so far`;
+  return `${yearOf(p.start + 6 * 36e5)} so far`;
+}
+/** What is left of the period: "8 days to go", "5 hours to go". */
+export function toGo(p) {
+  const h = p.hours - p.elapsed;
+  if (h < 36) { const x = Math.max(1, Math.round(h)); return `${x} hour${x === 1 ? '' : 's'} to go`; }
+  const x = Math.round(h / 24); return `${x} day${x === 1 ? '' : 's'} to go`;
+}
+/** The pace line's second sentence: what the rest of the period can average and still beat the record. */
+export function needText(p) {
+  const { d, need } = p;
+  if (need == null || !Number.isFinite(need)) return '';
+  const min = d.id.endsWith('_min');
+  // so far ahead that the rest can't undo it: a highest record needing nothing (or less than nothing), a lowest one
+  // a share above 100%
+  if ((!min && need <= 0) || (min && d.unit === '%' && need >= 100)) return 'It is far enough ahead to hold whatever the rest brings.';
+  // "only" when the rest can ease off from the pace so far; otherwise it has to do better than it has
+  if (min) return need >= p.v ? `The rest can average up to ${fmt(d, need, p.period)} and still beat it.` : `The rest has to average under ${fmt(d, need, p.period)} to beat it.`;
+  return need <= p.v ? `The rest needs only ${fmt(d, need, p.period)} to beat it.` : `The rest has to average ${fmt(d, need, p.period)} to beat it.`;
 }
