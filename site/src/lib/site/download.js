@@ -53,10 +53,27 @@ export async function svgImage(svg) {
   } finally { setTimeout(() => URL.revokeObjectURL(url), 1000); }
 }
 
+// a word too wide for a line (the view's link on a phone-width image) cut into pieces that fit, after a / ? & or =
+// where there is one
+function pieces(ctx, w, max) {
+  if (ctx.measureText(w).width <= max) return [w];
+  const out = []; let rest = w;
+  while (rest && ctx.measureText(rest).width > max) {
+    let n = 1;
+    while (n < rest.length && ctx.measureText(rest.slice(0, n + 1)).width <= max) n++;
+    const cut = Math.max(...['/', '?', '&', '='].map((c) => rest.lastIndexOf(c, n - 1) + 1));
+    if (cut > n / 2) n = cut;
+    out.push(rest.slice(0, n)); rest = rest.slice(n);
+  }
+  if (rest) out.push(rest);
+  return out;
+}
 // words split into lines no wider than max
 function wrap(ctx, text, max) {
   const out = []; let line = '';
-  for (const w of text.split(' ')) {
+  for (const word of text.split(' ')) {
+    const ps = pieces(ctx, word, max), w = ps.pop();
+    if (ps.length) { if (line) out.push(line); out.push(...ps); line = ''; }
     const t = line ? line + ' ' + w : w;
     if (line && ctx.measureText(t).width > max) { out.push(line); line = w; } else line = t;
   }
@@ -113,7 +130,10 @@ function logo(ctx, x, y, draw) {
  *  link: the view's address. Drawn at scale (2: sharp on any screen). Resolves to a PNG blob. */
 export async function composeImage({ title, sub, legend = [], panels, credit = [CREDIT], link = '', scale = 2 }) {
   if (document.fonts?.ready) await document.fonts.ready;
-  const inner = Math.ceil(Math.max(...panels.map((p) => p.w), 640)), W = inner + PAD * 2;
+  // as wide as the widest chart: on a phone the charts are phone-width, so the title and credit fit to them rather
+  // than leaving the charts in the left half of a wider image (the floor only keeps the header and foot readable)
+  const inner = Math.ceil(Math.max(...panels.map((p) => p.w), 300)), W = inner + PAD * 2;
+  const narrow = inner < 480;   // too narrow for the title beside the logo: the logo takes its own line
   const measure = document.createElement('canvas').getContext('2d');
   // heights first, then draw
   const layout = (ctx, draw) => {
@@ -121,7 +141,8 @@ export async function composeImage({ title, sub, legend = [], panels, credit = [
     const text = (t, font, colour, lh, max = inner) => { ctx.font = font; for (const l of wrap(ctx, t, max)) { y += lh; if (draw) { ctx.fillStyle = colour; ctx.fillText(l, PAD, y - lh * 0.25); } } };
     // the logo at the top right; the title wraps short of it
     const logoW = logo(ctx, W - PAD, PAD + 2, draw);
-    text(title, `700 21px ${UI}`, css('--ink'), 28, inner - logoW - 24);
+    if (narrow) y += 36;
+    text(title, `700 21px ${UI}`, css('--ink'), 28, narrow ? inner : inner - logoW - 24);
     if (sub) text(sub, `400 13px ${UI}`, css('--ink-2'), 19);
     if (legend.length) { y += 10; y += legendRows(ctx, legend, PAD, y + 12, inner, draw); }
     for (const p of panels) {

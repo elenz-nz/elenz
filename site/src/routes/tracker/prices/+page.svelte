@@ -1004,7 +1004,8 @@
 	.tog-scale[aria-pressed='false'] { opacity: 0.6; }
 	.tog-scale[aria-pressed='false'] i { background: none; }
 	.card-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 12px; align-items: flex-start; }
-	.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+	.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; min-width: 0; max-width: 100%; }
+	.tools .seg { flex-wrap: wrap; }   /* six nodes don't fit a phone's width in one row */
 	.more { margin: 2px 2px 0; color: var(--muted); font-size: 0.8rem; }
 	.more a { color: inherit; }
 	@media (max-width: 900px) {
