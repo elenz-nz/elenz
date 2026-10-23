@@ -89,6 +89,18 @@ export function shareOver(S, region, mk) {
 // renewable share in bands (brown leans on thermal plant, green is near all renewable); a fuel's MW in its own colour
 export const REN_BANDS = [80, 88, 93, 96, 98];
 export const REN_LEGEND = ['Under 80%', '80–88%', '88–93%', '93–96%', '96–98%', '98% and over'];
+/** The renewable share's bands fitted to the rows shown ("Scale to this view"): edges at the sixths of the shares,
+ *  rounded to whole (or, over a narrow spread, half) percentages, with their legend. Null when too few values. */
+export function renBandsScaled(rows) {
+  const all = rows.flatMap((r) => r.v.filter((x) => x === x)).sort((a, b) => a - b);
+  if (all.length < 12) return null;
+  const q = (f) => all[Math.floor(f * (all.length - 1))];
+  const r = q(5 / 6) - q(1 / 6) < 6 ? 0.5 : 1;
+  const e = [1, 2, 3, 4, 5].map((k) => Math.round(q(k / 6) / r) * r);
+  for (let i = 1; i < e.length; i++) if (e[i] <= e[i - 1]) e[i] = e[i - 1] + r;
+  const p = (x) => `${+x.toFixed(1)}`;
+  return { edges: e, legend: [`Under ${p(e[0])}%`, ...[0, 1, 2, 3].map((i) => `${p(e[i])}–${p(e[i + 1])}%`), `${p(e[4])}% and over`] };
+}
 
 /** One row per NZ day, 48 half-hour cells: the metric's share (ren) or MW (a fuel). */
 export function heatRows(S, region, mk) {

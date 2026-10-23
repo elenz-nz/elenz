@@ -375,7 +375,7 @@
 			<div class="card-head">
 				<div>
 					<div class="ttl-row"><h2>{heatMetric === 'ren' ? 'Renewable share' : hm.title} by time of day</h2><InfoTip>{heatByMonth ? 'One row per ' + (v?.int === '1yr' ? 'year' : 'month') + ': the average of each half-hour.' : rows.length > 40 ? 'One row per day; scroll for earlier days.' : 'One row per day.'}
-				{heatMetric === 'ren' ? 'Brown marks the half-hours that leaned on thermal plant, usually still evenings at the peak.' : heatScaled ? 'Colours fitted to what’s shown: darker means more.' : `Colours on a fixed scale set by today’s installed ${hm.title.toLowerCase()} capacity${heatCap ? ` (${Math.round(heatCap).toLocaleString('en-NZ')} MW)` : ''}, so earlier years look paler where less was built.`}</InfoTip></div>
+				{heatMetric === 'ren' ? 'Brown marks the half-hours that leaned on thermal plant, usually still evenings at the peak.' + (heatScaled ? ' Colours fitted to the shares shown, so the bands move with the view.' : ' Fixed bands from 80% to 98%, so periods compare; Scale to this view fits them to what’s shown.') : heatScaled ? 'Colours fitted to what’s shown: darker means more.' : `Colours on a fixed scale set by today’s installed ${hm.title.toLowerCase()} capacity${heatCap ? ` (${Math.round(heatCap).toLocaleString('en-NZ')} MW)` : ''}, so earlier years look paler where less was built.`}</InfoTip></div>
 					<Context range={heatChip} items={[heatSrc ? span(heatSrc.kind === 'days' && heatSrc.seg?.n ? heatSrc.seg.t[0] : heatSrc.from, heatSrc.to) : '',
 						(heatByMonth ? (v?.int === '1yr' ? 'yearly' : 'monthly') + ' average of each half-hour' : 'each half-hour') + (heatMetric === 'ren' ? ', % of generation' : ', MW')]} />
 				</div>
@@ -383,14 +383,12 @@
 					<div class="seg" role="group" aria-label="Series for the heat map">
 						{#each METRICS as x}<button type="button" aria-pressed={heatMetric === x.k} onclick={() => { heatMetric = x.k; save(); }}>{x.label}</button>{/each}
 					</div>
-					{#if heatMetric !== 'ren'}
-						<button type="button" class="tog box scale" aria-pressed={heatScaled} title={heatScaled ? 'Colours fitted to the rows shown' : 'Colours on a fixed scale (installed capacity now), so different years compare'} onclick={() => { heatScaled = !heatScaled; save(); }}><i aria-hidden="true"></i>Scale to this view</button>
-					{/if}
+					<button type="button" class="tog box scale" aria-pressed={heatScaled} title={heatScaled ? 'Colours fitted to the rows shown' : heatMetric === 'ren' ? 'Colours on fixed bands (80% to 98% renewable), so different years compare' : 'Colours on a fixed scale (installed capacity now), so different years compare'} onclick={() => { heatScaled = !heatScaled; save(); }}><i aria-hidden="true"></i>Scale to this view</button>
 					<PopButton open={popped === 'heat'} name="time of day chart" onclick={() => pop('heat')} />
 				</div>
 			</div>
 			{#if rows.length}
-				<GenHeat {rows} metric={heatMetric} tok={hm.tok} hi={heatHi} label="{hm.title} for each half-hour, {heatByMonth ? 'by month' : 'by day'}" />
+				<GenHeat {rows} metric={heatMetric} tok={hm.tok} hi={heatHi} scaled={heatScaled} label="{hm.title} for each half-hour, {heatByMonth ? 'by month' : 'by day'}" />
 			{:else}
 				<p class="empty">Loading…</p>
 			{/if}
