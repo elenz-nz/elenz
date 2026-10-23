@@ -4,7 +4,7 @@
 	// /records/<id>?region=NI.
 	import Preview from '#lib/site/Preview.svelte';
 	import { onMount } from 'svelte';
-	import { replaceState } from '$app/navigation';
+	import { replaceState, goto } from '$app/navigation';
 	import Masthead from '#lib/site/Masthead.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import Spark from '#lib/records/Spark.svelte';
@@ -45,6 +45,13 @@
 		if (region === 'NZ') u.searchParams.delete('region'); else u.searchParams.set('region', region);
 		if (period === 'tp') u.searchParams.delete('period'); else u.searchParams.set('period', period);
 		replaceState(u, {});
+	}
+	// the whole row opens its record (the name and description are the link itself, for keyboards and new tabs; a click
+	// anywhere else in the row follows it too, but not a text selection or a click on another link)
+	function rowClick(e: MouseEvent, id: string) {
+		if ((e.target as HTMLElement).closest('a, button') || window.getSelection()?.toString()) return;
+		if (e.metaKey || e.ctrlKey) { window.open(href(id), '_blank'); return; }
+		goto(href(id));
 	}
 	const href = (id: string, r = region, p = period) => {
 		const q = new URLSearchParams();
@@ -173,17 +180,19 @@
 								{#each g.rows as row}
 									{@const d = row.d}
 									{@const rec = row.rec}
-									<tr class:na={!!row.na} class:prov={!!(row.prov && rec)} title={row.prov && rec ? 'A provisional record beyond this one: see its page' : undefined}>
+									<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions (the name is the row's link for keyboards) -->
+									<tr class:na={!!row.na} class:prov={!!(row.prov && rec)} class:go={!row.na} title={row.prov && rec ? 'A provisional record beyond this one: see its page' : undefined}
+										onclick={row.na ? undefined : (e) => rowClick(e, d.id)}>
 										<th scope="row">
-											<span class="r-name">
+											<svelte:element this={row.na ? 'span' : 'a'} class="r-name" href={row.na ? undefined : href(d.id)}>
 												<span class="dot" style="--c:var({d.tok})"></span>
 												<span>
-													{#if row.na}<span class="nm">{d.name}</span>{:else}<a class="nm" href={href(d.id)}>{d.name}</a>{/if}
+													<span class="nm">{d.name}</span>
 													{#if d.est}<span class="tag est">Estimate</span>{/if}
 													{#if row.isNew}<span class="tag new">New</span>{/if}
 													<small>{periodSub(d, row.p)}</small>
 												</span>
-											</span>
+											</svelte:element>
 										</th>
 										{#if row.na}
 											<td colspan="4" class="na-note">{row.na}</td>
@@ -298,8 +307,10 @@
 	.r-name .dot { margin-top: 5px; }
 	.r-name small { display: block; color: var(--muted); font-size: 0.76rem; margin-top: 1px; }
 	.nm { font-weight: 600; color: var(--ink); }
-	a.nm { text-decoration: none; }
-	a.nm:hover { color: var(--accent); text-decoration: underline; }
+	a.r-name { color: inherit; text-decoration: none; }
+	tr.go { cursor: pointer; }
+	tr.go:hover > * { background: color-mix(in srgb, var(--ink) 5%, transparent); }
+	tr.go:hover .nm, a.r-name:focus-visible .nm { color: var(--accent); text-decoration: underline; }
 	td.n { text-align: right; }
 	.val { font-family: var(--font-data); font-size: 1rem; font-weight: 600; white-space: nowrap; }
 	.val .en { display: block; font-size: 0.74rem; font-weight: 400; color: var(--muted); }
@@ -329,6 +340,9 @@
 		.tbl thead { display: none; }
 		.tbl table, .tbl tbody { display: block; }
 		.tbl tbody tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 12px; padding: 10px 12px; border-bottom: 1px solid var(--grid); }
+		/* phones: each row is a card, shaded whole while pressed */
+		.tbl tbody tr.go:hover > * { background: none; }
+		.tbl tbody tr.go:active { background: color-mix(in srgb, var(--ink) 7%, transparent); }
 		.tbl tbody tr.grp { display: block; padding: 0; }
 		.tbl tbody tr.prov { border-left: 2px dashed color-mix(in srgb, var(--warn-ink) 65%, var(--line)); padding-left: 10px; }
 		.tbl tbody tr.prov > th[scope='row'] { border-left: 0; padding-left: 0; }
