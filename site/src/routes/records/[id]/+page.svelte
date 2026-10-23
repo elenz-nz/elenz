@@ -223,8 +223,9 @@
 				<section class="prov" aria-label="Provisional record">
 					<span class="tag provtag">Provisional</span>
 					<p>{prov.src === 'live' ? 'Live data shows' : 'Dispatch data shows'} <b>{f(prov.v)}</b>
-						{d.kind === 'hh' ? `in the ${clock(prov.t)} half-hour on ${dayOf(prov.t)}` : d.kind === 'run' ? `from ${dayOf(prov.t)}` : `in ${monthOf(prov.t)}`},
-						beyond the record. Dispatch data runs a little above the metered data, so it is confirmed or dropped when the EA publishes the metered data, around {meteredDue(prov.t)}.</p>
+						{per === 'day' ? `on ${dayOf(prov.t)}` : per === 'week' ? `in the week of ${dayOf(prov.t)}` : per === 'month' ? `in ${monthOf(prov.t)}` : per === 'year' ? `in ${yearOf(prov.t)}`
+							: d.kind === 'hh' ? `in the ${clock(prov.t)} half-hour on ${dayOf(prov.t)}` : d.kind === 'run' ? `from ${dayOf(prov.t)}` : `in ${monthOf(prov.t)}`},
+						beyond the record. Dispatch data runs a little above the metered data, so it is confirmed or dropped when the EA publishes the metered data, around {meteredDue(per === 'week' ? prov.t + 6.5 * 864e5 : per === 'year' ? Date.UTC(+yearOf(prov.t), 11, 15) : prov.t)}.</p>
 				</section>
 			{/if}
 

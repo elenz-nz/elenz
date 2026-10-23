@@ -112,7 +112,6 @@
 		<section class="hero" aria-labelledby="rec-h">
 			<div>
 				<h1 id="rec-h">Records</h1>
-				<p class="lede">The highest and lowest trading periods, days, weeks, months and years, and the longest runs, since 1 August 1997, from the Electricity Authority’s metered data and final prices.</p>
 			</div>
 			{#if R?.final_to?.gen}
 				<span class="pill" title="Records rest on the EA's metered data, published 5–6 weeks after each month. Anything newer is provisional.">Official to {dayOf(R.final_to.gen)}</span>
@@ -291,7 +290,6 @@
 	.rec-page { display: grid; gap: 14px; }
 	.hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px 20px; flex-wrap: wrap; padding-block: 6px 2px; }
 	.hero h1 { font-size: 1.6rem; letter-spacing: -0.02em; line-height: 1.15; }
-	.lede { margin: 6px 0 0; color: var(--ink-2); max-width: 70ch; }
 	.pill::before { display: none; }
 	.how { margin-left: auto; color: var(--accent); font-weight: 600; font-size: 0.86rem; }
 
