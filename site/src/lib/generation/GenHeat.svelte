@@ -2,12 +2,14 @@
 	// By time of day: one row per NZ day (or month, or year, on All), one cell per half-hour. Renewable share in bands
 	// (brown where generation leaned on thermal plant, green where it was close to all renewable); a fuel's MW in its
 	// own colour, darker for more: on a fixed scale (hi, its installed capacity now, so years can be compared) or scaled
-	// to the rows shown (hi null). Rows from heatRows() / heatMonthRows() in ./data.js; long lists scroll, latest last.
-	import { REN_BANDS, REN_LEGEND, mwBands } from './data.js';
+	// to the rows shown (hi null). The renewable share's bands are fixed (80-98%) or, scaled, fitted to the shares shown
+	// (renBandsScaled), which the early years on All need: most of their half-hours are under 80%.
+	// Rows from heatRows() / heatMonthRows() in ./data.js; long lists scroll, latest last.
+	import { REN_BANDS, REN_LEGEND, mwBands, renBandsScaled } from './data.js';
 	import { stepBands } from '#lib/site/heat.js';
 
 	type Row = { day: number; t: number; v: number[]; lab?: string; long?: string; month?: boolean };
-	let { rows, metric, tok, label, hi = null }: { rows: Row[]; metric: string; tok: string; label: string; hi?: number | null } = $props();
+	let { rows, metric, tok, label, hi = null, scaled = false }: { rows: Row[]; metric: string; tok: string; label: string; hi?: number | null; scaled?: boolean } = $props();
 	let scroller = $state<HTMLDivElement>();
 	// open on the latest rows
 	$effect(() => { void rows; if (scroller) scroller.scrollTop = scroller.scrollHeight; });
@@ -21,10 +23,11 @@
 	const fmt = (v: number) => Math.round(v).toLocaleString('en-NZ');
 
 	const ren = $derived(metric === 'ren');
+	const renFit = $derived(ren && scaled ? renBandsScaled(rows) : null);
 	const bands = $derived(ren ? null : hi ? stepBands(hi) : mwBands(rows));
-	const edges = $derived(ren ? REN_BANDS : bands!.edges);
+	const edges = $derived(ren ? (renFit?.edges ?? REN_BANDS) : bands!.edges);
 	const bin = (v: number) => { if (v !== v) return -1; let b = 0; while (b < edges.length && v >= edges[b]) b++; return b; };
-	const legend = $derived(ren ? REN_LEGEND : [0, 1, 2, 3, 4, 5].map((q) => (q < 5 ? `${fmt(q * bands!.step)}–${fmt((q + 1) * bands!.step)} MW` : `${fmt(5 * bands!.step)} MW and over`)));
+	const legend = $derived(ren ? (renFit?.legend ?? REN_LEGEND) : [0, 1, 2, 3, 4, 5].map((q) => (q < 5 ? `${fmt(q * bands!.step)}–${fmt((q + 1) * bands!.step)} MW` : `${fmt(5 * bands!.step)} MW and over`)));
 	const value = (v: number) => (v !== v ? 'no data' : ren ? `${v.toFixed(1)}% renewable` : `${fmt(v)} MW`);
 
 	let tip = $state<{ text: string; x: number; y: number } | null>(null);
