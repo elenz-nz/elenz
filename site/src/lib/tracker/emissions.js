@@ -51,6 +51,7 @@ export const RANKINE_COAL_SHARE_GENESIS = [
   ['FY24 Q1', 0.24], ['FY24 Q2', 0.49], ['FY24 Q3', 0.67], ['FY24 Q4', 0.99],
   ['FY25 Q1', 0.91], ['FY25 Q2', 0.21], ['FY25 Q3', 0.91], ['FY25 Q4', 0.95],
   ['FY26 Q1', 0.88], ['FY26 Q2', 0.14], ['FY26 Q3', 0.28], ['FY26 Q4', 0.24],
+  ['FY27 Q1', 0.23],  // FY27 Q1 Performance Report, 21 Oct 2026: 155 GWh, 23% coal
 ];
 export const RANKINE_COAL_SHARE = [...RANKINE_COAL_SHARE_MBIE, ...RANKINE_COAL_SHARE_GENESIS];
 
