@@ -21,6 +21,10 @@ Preview links (since 24 Oct 2026): Cloudflare Workers Builds builds every other 
 (e.g. `preview-test-elenz`). The `previews` block in `wrangler.jsonc` points it at the live KV namespace, so it shows
 live data; that's safe because only the Worker's scheduled handler writes to KV and previews run no crons. Its pages
 keep elenz.co.nz as their canonical address. The build's check on the pull request says whether it built.
+Each branch's preview copies the dashboard's "Previews Base" build settings the first time it builds and keeps that copy:
+after changing the base (preview command `npx wrangler preview`), an existing branch keeps its old settings, so use a
+fresh branch. A preview build's check links under `.../previews/<branch>/builds/`; one under `.../production/builds/`
+on a branch went down the wrong path.
 When a change is something the owner should see before it goes live, open the PR without auto-merge, send the preview
 link, and turn on auto-merge once they've approved it.
 
