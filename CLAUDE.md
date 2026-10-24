@@ -16,6 +16,12 @@ push it, open a PR and turn on auto-merge so it merges itself when the checks go
 If a check fails, fix it on the branch; nothing reaches the site meanwhile. Then report the merge, or the failure, to
 the owner. Merged branches are deleted automatically.
 
+Preview links (since 24 Oct 2026): `preview_urls` is on in `wrangler.jsonc` and Cloudflare Workers Builds builds
+non-production branches, so each pushed branch gets its own address, `https://<branch>-elenz.elenz.workers.dev`
+(the build's check on the pull request links to it). It reads the same live data from KV; crons don't run there.
+When a change is something the owner should see before it goes live, open the PR without auto-merge, send the preview
+link, and turn on auto-merge once they've approved it.
+
 ## Beta note (remove when the site is announced)
 
 Until the site is announced every page shows a thin "Beta" line above the masthead (`site/src/lib/site/Masthead.svelte`,

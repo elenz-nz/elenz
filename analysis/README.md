@@ -147,7 +147,7 @@ then are real; the two-row months understated 2000-2002, including the dry winte
 
 Huntly's Rankine units burn coal or gas and the market data doesn't say which. Genesis's quarterly performance
 reports give, for the Rankines combined (not per unit): output, the share of their fuel that was coal, coal and gas
-burned for generation, and generation emissions. 24 quarters, FY21 Q1 (Jul–Sep 2020) to FY26 Q4 (Apr–Jun 2026).
+burned for generation, and generation emissions. 25 quarters, FY21 Q1 (Jul–Sep 2020) to FY27 Q1 (Jul–Sep 2026; added 24 Oct 2026, 23% coal).
 
 - Our dispatch data's Rankine output matches Genesis's reported Rankine output within 1–2% every full quarter.
 - Gas: 54.1 kg CO₂e/GJ (MfE Measuring Emissions guide, natural gas, stationary combustion). Coal: 91.8, fitted to

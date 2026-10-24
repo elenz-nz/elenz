@@ -5,7 +5,9 @@
   "main": "worker/index.js",
   "compatibility_date": "2026-09-01",
   "workers_dev": true,
-  "preview_urls": false,
+  // a preview address for every version uploaded from a branch (Workers Builds, non-production branches): check a
+  // pull request on a phone before it merges. Crons run only on the deployed version, so previews start no jobs.
+  "preview_urls": true,
   // keep variables and secrets set in the Cloudflare dashboard (GITHUB_TOKEN) when a code push redeploys
   "keep_vars": true,
   // every 5 minutes, just after each interval's dispatch case is published: triggers the GitHub live data job.
