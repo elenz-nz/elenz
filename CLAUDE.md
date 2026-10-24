@@ -10,8 +10,11 @@ This repository is public: never commit keys, tokens or personal details.
 and it can only merge once the `ingest` and `site` checks (checks.yml) pass. That gates both things a merge sets live: the
 site (Cloudflare redeploys `main`) and the ingest code (the data jobs run from `main` within 5 minutes). Work on a branch,
 push it, open a PR and turn on auto-merge so it merges itself when the checks go green:
-`gh pr create --fill --base main && gh pr merge --auto --squash`. If a check fails, fix it on the branch; nothing reaches
-the site meanwhile. Then report the merge, or the failure, to the owner.
+`gh pr create --fill --base main && gh pr merge --auto --squash`. From a Claude session, where `gh pr` commands fail
+(GraphQL isn't available), use the REST API: `gh api repos/elenz-nz/elenz/pulls -X POST -f head=<branch> -f base=main
+-f title=... -f body=...`, then `gh api -X PUT repos/elenz-nz/elenz/pulls/<n>/ccr/auto_merge -f merge_method=squash`.
+If a check fails, fix it on the branch; nothing reaches the site meanwhile. Then report the merge, or the failure, to
+the owner. Merged branches are deleted automatically.
 
 ## Beta note (remove when the site is announced)
 
@@ -115,8 +118,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   live "last N hours" again). Without a zoom the date box picks a whole day, as before (`onTimeSettled`/`timeSettled` in
   datefield.js). The 1D menu
   (`#span-menu`) lives outside the sticky bar because the bar's clip-path clips anything hanging below it. Share's link
-  to the dates shown turns a span into fixed times (`zoomAt`). On an island's chart, HVDC leaving is drawn as a hatched
-  band taken off the top of the stack (`exp` in `drawGen`), not below zero; HVDC arriving stays stacked on top. Both are
+  to the dates shown turns a span into fixed times (`zoomAt`). On an island's chart, HVDC is signed like the batteries
+  (23 Oct 2026): arriving is stacked on top of the island's generation, leaving is drawn below zero (`drawGen`). Both are
   drawn light so the generation behind reads through, and High/Low sit on the generation, never on HVDC. In the energy
   view a partial first or last period (week so far ...) is drawn at its rate so far for a whole period, faded; its note
   is in the tooltip (`partialNote`), not on the chart.
@@ -223,7 +226,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   (Workers KV Storage: Edit). KV namespace id lives in `wrangler.jsonc`. A run with no new data saves nothing.
 - `.github/workflows/history.yml`: runs `history.py`, triggered every 6 hours by the Worker's second cron. The first
   run backfills ~2,200 daily files (resumes next run if it hits its time budget). KV writes: ~3 per changed month,
-  ~225 for a full backfill or rebuild, on top of the live job's ~600/day, so avoid more than one full rebuild a day.
+  so a full rebuild of all ~351 months takes about 3-4 days at `WRITE_BUDGET` (280 a day, on top of the live job's
+  ~600/day); never start one while another is running. The Worker starts the Offers workflow (`offers.yml`) with it.
 - `worker/index.js`: serves static assets, `/data/tracker.json` from KV (binding `DATA`), falling back to the
   bundled snapshot, and `/data/history/{index,day,hh/YYYY-MM}.json` from KV keys `hist/*`; rewrites the title,
   og:title and og:url of the tracker's two pages for a linked view (from its address), which `run_worker_first` in
@@ -380,15 +384,16 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
    previews and the analysis scripts use elenz.co.nz; nothing depends on https://elenz.elenz.workers.dev any more.
 2. Live data via GitHub Actions + Workers KV (set up Oct 2026). A paid server running `update.py` in a loop is the
    upgrade path if GitHub's schedule delays become a problem.
-3. History since Aug 1997 on the tracker page: 30 days, 1 year, All (BUILD 6, Oct 2026; was Sep 2020).
-   Daily history keeps each day's peak demand and peak generation (total output including embedded solar). BUILD 4
-   (embedded solar model, metered HVDC) finished 16 Oct 2026. BUILD 5 (Prices page fields, bioenergy and waste heat)
-   pushed 16 Oct 2026: every month's state gains the other nodes' final prices (one monthly final-prices file each),
-   then the month is rebuilt; expect a couple of runs before `hist/index.json` and `day.json` are republished.
-4. Pages: landing (`/`), live (`/now`), tracker (Generation and Prices tabs), About, and Articles (`/articles`, published 15 Oct 2026 with the Winter 2026 review). Stale-data watchdog, Cloudflare Web Analytics and a Buy Me a
-   Coffee link are in place.
-5. Then the brief's build order: plant pages, map, hydro panel and records (planned as short record articles),
-   offer stacks and downloads.
+3. History since Aug 1997 on the tracker page: 30 days, 1 year, All (BUILD 6, finished Oct 2026; was Sep 2020).
+   Daily history keeps each day's peak demand and peak generation (total output including embedded solar).
+   BUILD 7 (`facilities/NEXT_REBUILD.md` items 1-7) started 23 Oct 2026 (commit 9709b43); by 24 Oct it had rebuilt
+   Aug 1997-Dec 2021 (293 of 351 months) and should finish on 25 Oct NZ time. Then check each item as NEXT_REBUILD.md
+   says, run the Offers workflow with "resummarise", and do its cleanup (a scheduled follow-up does this ~28 Oct).
+4. Pages: landing (`/`), live (`/now`, with the price explainer and Every generator right now), tracker (Generation and
+   Prices tabs), Records (`/records`), Articles (`/articles`, published 15 Oct 2026 with the Winter 2026 review), About,
+   Data and methods (`/methods`) and Privacy. Stale-data watchdog, uptime monitor, Cloudflare Web Analytics and a Buy
+   Me a Coffee link are in place. The site isn't announced yet (Beta note).
+5. Then the brief's build order: plant pages (`/plants/<slug>`), map, hydro panel, offer stacks and downloads.
 
 Recurring upkeep: add Genesis's Rankine coal share to `emissions.js` each quarter (performance report ~3 weeks
 after quarter end; FY27 Q1 due late Oct 2026); add each year's NZGA geothermal figures (NZ Geothermal Workshop,
