@@ -8,18 +8,20 @@ transfer and emissions, every 5 minutes and back to 1997. Built on free Electric
 | Page | What's on it |
 | --- | --- |
 | `/` | Landing page: live total generation, the mix right now, the last 24 hours, and a glimpse of each page |
-| `/now` | Live figures (demand, renewable share, island prices, HVDC, emissions, embedded solar) and a map of each island's mix |
-| `/tracker` | Linked charts on one time axis: generation by fuel (drill down to plant), prices, demand, HVDC, emissions intensity, renewable share. 24 hours to All (since Aug 1997), NZ or either island |
+| `/now` | Live figures (demand, renewable share, island prices, HVDC, emissions, embedded solar), a map of each island's mix, a price explainer ("Why is the price high?") and every generator's output right now |
+| `/tracker` | Linked charts on one time axis: generation by fuel (drill down to plant), prices, demand, HVDC, emissions intensity, renewable share. 1 hour to All (since Aug 1997), NZ or either island; every view has its own link, and charts download as PNG or CSV |
 | `/tracker/prices` | Six node prices, the island spread and HVDC; daily price ranges, price captured by fuel, a time-of-day heat map |
-| `/records` | The highest and lowest half-hours, months and runs since 1997 for NZ and each island, each with its own page (how it grew, the day it fell); provisional records from the live week |
+| `/records` | The highest and lowest half-hours, days, weeks, months, years and runs since 1997 for NZ and each island, each with its own page (how it grew, the period it fell in); provisional records from the live week and periods heading for a record |
 | `/articles` | Quarterly reviews, records and analysis |
-| `/about` | How each chart is built: sources, estimates and their uncertainty |
+| `/about` | What Elenz is, what each page shows, support and contact |
+| `/methods` | Data and methods: every dataset used, and a page per series with its calculation, checks and limits |
+| `/privacy` | What the site collects (cookie-free analytics, settings kept in your browser) |
 
 ## How it fits together
 
 ```
                     Cloudflare cron (in the site's Worker)
-                     │ every 5 min           │ every 6 h                     │ every 15 min
+                     │ every 5 min           │ every 6 h (and offers.yml)    │ every 15 min
                      ▼                       ▼                               ▼
 EMI dispatch API ─► ingest/update.py   EMI metered data ─► ingest/history.py  .github/workflows/watchdog.yml
                      │ (GitHub Actions)  daily dispatch files, │ (GitHub Actions) opens an issue if data
@@ -81,8 +83,11 @@ variable. `.emi_key` is git-ignored; never commit the key.
 
 ```
 python3 ingest/tests/smoke.py              # live and history paths on committed sample data, no network
-cd site && npm run check && npm run build
+cd site && npm run check && npm test && npm run build && npm run check:previews
 ```
+
+`main` is protected: changes go in through a pull request, which can merge only once these checks pass. Every merge
+redeploys the site, and the data jobs run the new code within 5 minutes.
 
 ## How the data updates
 
@@ -97,7 +102,9 @@ Run the same job on your own computer with `python3 ingest/update.py` (it uses `
 
 **History:** `.github/workflows/history.yml` runs `ingest/history.py` every 6 hours. It builds each month from metered
 data once the EA publishes it, adds newly published daily dispatch files and final prices, and writes per-month
-half-hourly files and one daily file to KV. It keeps to 280 KV writes a day (the free plan allows 1,000 and the live
+half-hourly files and one daily file to KV, plus the records (`ingest/records.py`), the heat maps' monthly averages
+(`ingest/tod.py`) and the price explainer's usual values (`ingest/explain.py`). `.github/workflows/offers.yml`, started
+with it, reduces the EA's daily generator offers to offered capacity by plant (`ingest/offered.py`). History keeps to 280 KV writes a day (the free plan allows 1,000 and the live
 job uses about 600), so a full rebuild of every month since 1997 takes about four days; bump `BUILD` in `history.py`
 after changing how months are built. Changes to the plant register, `facilities/overrides.toml` or
 `facilities/metered_plants.csv` trigger a rebuild automatically.
@@ -107,7 +114,7 @@ after changing how months are built. Changes to the plant register, `facilities/
 updates stop.
 
 **Monitoring:** `/data/status.json` shows the last trigger result for each job, and `/data/history/progress.json`
-the history job's progress. `/data/health` returns 200 while live data is under 30 minutes old and history under
+the history job's progress. `/data/health` returns 200 while live data is under 45 minutes old (the EA's feed sometimes stalls for ~30 minutes and catches up) and history under
 5 days behind (12 during a rebuild), and 503 with the reasons otherwise; an outside uptime monitor checks it.
 `.github/workflows/watchdog.yml` opens a `stale-data` issue on the same conditions and closes it on recovery.
 
@@ -124,7 +131,8 @@ The history job warns the same way about Generation_MD codes it doesn't know: ad
 
 ## Data and licence
 
-Data from www.emi.ea.govt.nz provided by the Electricity Authority (New Zealand), CC BY 4.0.
+Data from www.emi.ea.govt.nz provided by the Electricity Authority (New Zealand), CC BY 4.0 (the EA confirmed in
+October 2026 that this covers republishing and derived data, with attribution).
 Irradiance: Himawari satellite data (JMA/JAXA) via Open-Meteo, CC BY 4.0; ERA5 reanalysis (Copernicus) via
 Open-Meteo for 2013–15. Coal share of Huntly's Rankines before FY21 from MBIE energy statistics, CC BY 4.0.
 

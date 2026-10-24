@@ -6,8 +6,8 @@ them starts a rebuild of every month (~4 days at the KV write budget). Bundle th
 while a rebuild is still running (check `/data/history/progress.json`: `rebuild_left` empty).
 
 Items 1-6 were prepared on the branch `next-rebuild` (17-21 Oct 2026; `BUILD` 7).
-Merged into `main` on 23 Oct 2026 (testing round 2, batch G, with item 7), which started the rebuild (BUILD 7); it
-runs until about 27 Oct at the KV write budget. When it has finished, check items 1-7 as each describes, run the Offers
+Merged into `main` on 23 Oct 2026 (testing round 2, batch G, with item 7), which started the rebuild (BUILD 7); by
+24 Oct it had reached Dec 2021 (58 months left) and should finish on 25 Oct NZ time at the KV write budget. When it has finished, check items 1-7 as each describes, run the Offers
 workflow with "resummarise" ticked (item 6), then delete this file's done items, the old-name entries at the end of
 `[plant_owners]` in `overrides.toml`, and `GAS_ALIAS` in `site/src/lib/tracker/emissions.js`.
 
