@@ -20,5 +20,10 @@
     "run_worker_first": ["/data/*", "/tracker", "/tracker/prices"]
   },
   // Workers KV namespace "elenz-data": the GitHub jobs write tracker.json (ingest/update.py) and hist/* (ingest/history.py) here
-  "kv_namespaces": [{ "binding": "DATA", "id": "dd69ad9aae3343c8b3ca5722ddf45548" }]
+  "kv_namespaces": [{ "binding": "DATA", "id": "dd69ad9aae3343c8b3ca5722ddf45548" }],
+  // Worker Previews (each branch's preview link, built by `wrangler preview`): the same KV namespace, so a preview shows
+  // the live data. Safe because only the scheduled handler writes to KV, and previews run no crons.
+  "previews": {
+    "kv_namespaces": [{ "binding": "DATA", "id": "dd69ad9aae3343c8b3ca5722ddf45548" }]
+  }
 }
