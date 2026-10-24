@@ -5,8 +5,9 @@
   "main": "worker/index.js",
   "compatibility_date": "2026-09-01",
   "workers_dev": true,
-  // a preview address for every version uploaded from a branch (Workers Builds, non-production branches): check a
-  // pull request on a phone before it merges. Crons run only on the deployed version, so previews start no jobs.
+  // preview addresses for branches (Workers Builds builds every non-production branch with `npx wrangler preview`,
+  // at https://<branch>-elenz.elenz.workers.dev): check a pull request on a phone before it merges. Previews run no
+  // crons, so they start no jobs; see "previews" below.
   "preview_urls": true,
   // keep variables and secrets set in the Cloudflare dashboard (GITHUB_TOKEN) when a code push redeploys
   "keep_vars": true,
@@ -20,5 +21,10 @@
     "run_worker_first": ["/data/*", "/tracker", "/tracker/prices"]
   },
   // Workers KV namespace "elenz-data": the GitHub jobs write tracker.json (ingest/update.py) and hist/* (ingest/history.py) here
-  "kv_namespaces": [{ "binding": "DATA", "id": "dd69ad9aae3343c8b3ca5722ddf45548" }]
+  "kv_namespaces": [{ "binding": "DATA", "id": "dd69ad9aae3343c8b3ca5722ddf45548" }],
+  // Worker Previews (each branch's preview link, built by `wrangler preview`): the same KV namespace, so a preview shows
+  // the live data. Safe because only the scheduled handler writes to KV, and previews run no crons.
+  "previews": {
+    "kv_namespaces": [{ "binding": "DATA", "id": "dd69ad9aae3343c8b3ca5722ddf45548" }]
+  }
 }
