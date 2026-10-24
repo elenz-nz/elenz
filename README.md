@@ -88,6 +88,8 @@ cd site && npm run check && npm test && npm run build && npm run check:previews
 
 `main` is protected: changes go in through a pull request, which can merge only once these checks pass. Every merge
 redeploys the site, and the data jobs run the new code within 5 minutes.
+Each branch also gets a preview of the site with live data at `https://<branch>-elenz.elenz.workers.dev`
+(Cloudflare Worker Previews), to check a change before it merges.
 
 ## How the data updates
 
