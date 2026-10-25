@@ -144,7 +144,7 @@
 		const unit = per === 'year' ? 'year' : 'month', hi = d.id.endsWith('_min') ? 'lowest' : 'highest';
 		const what = per === 'year' || per === 'month' ? `each ${per}’s figure` : `the ${hi} ${per === 'tp' ? 'half-hour' : per} in each month`;
 		return `${n === 0 ? (tr ? `First above zero in ${yearOf(trimZeros(rec.steps)[0][0])}` : 'Not broken since the data began') : `Broken ${n} ${n === 1 ? 'time' : 'times'} since ${since}`}.`
-			+ (bg ? ` The faint line is ${what}; the ${unit} still running sits in a hatched band marked “so far”, its line dotted, because it isn’t finished; hovering there says how long is left.` : '')
+			+ (bg ? ` The faint line is ${what}; the ${unit} still running sits in a hatched band, its line dotted, because it isn’t finished; hovering there gives its figure so far and how long is left.` : '')
 			+ (udem ? ` The dashed line is the same with embedded solar added back: what ${region === 'NZ' ? 'the country' : 'the island'} used, met partly by rooftops and small arrays behind the meter. It is there for information only, not a record, because embedded solar is modelled (from August 2013; zero before).` : '')
 			+ (prov ? ' Dashed step: provisional, from dispatch data.' : '')
 			+ ' Hover or tap for the record at any date; click to pin it. Drag across the chart to zoom in; Reset zoom or Escape goes back.';

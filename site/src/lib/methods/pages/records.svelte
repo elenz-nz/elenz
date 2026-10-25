@@ -45,7 +45,7 @@
 <ul>
 	<li><b>How the record grew</b> shows every time the record was broken since 1997, worked out from the half-hours that beat everything before them. A key above the chart names each line.</li>
 	<li><b>The faint line</b> behind it is the best of each month (each year, for year records), so the near misses show.</li>
-	<li><b>The month or year still running</b> sits in a hatched band marked “so far”, with its line dotted: it is the figure so far, not a finished period. Hovering there says how long is left.</li>
+	<li><b>The month or year still running</b> sits in a hatched band, with its line dotted: it is the figure so far, not a finished period. Hovering there gives that figure and how long is left.</li>
 	<li><b>The period it fell</b>: a day, week, month or year record’s page also charts the period itself (its half-hours, hours, days or weeks) around its average.</li>
 	<li><b>“Has stood for”</b> counts from the end of the record’s half-hour, day, week, month or year, when it was set.</li>
 	<li><b>Zoom</b>: drag across either chart with a mouse; Reset zoom or Escape goes back.</li>

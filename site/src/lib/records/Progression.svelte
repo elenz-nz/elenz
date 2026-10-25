@@ -7,9 +7,9 @@
 	// each month (or year) through the history, drawn faintly behind the record line (records.py build_detail), so the
 	// near misses show; the tooltip gives the record in force at the pointer's date and that month's best. The month
 	// (or year) still running is drawn as it stands so far across the whole period (the chart's dates run on to its
-	// end), dotted, in a hatched band labelled "so far" (a wash like the tracker's partial periods didn't show on a
-	// single line; owner, 25 Oct 2026), and the tooltip there says how long is left ("6 days to go"). Month and year records leave the running period out of `bg` (it isn't whole), so the page passes its figure
-	// so far as `now` ({ t: its start, v }). info (demand records only): the same line for demand with embedded solar
+	// end), dotted, in a hatched band (a wash like the tracker's partial periods didn't show on a single line; owner,
+	// 25 Oct 2026), and the tooltip there says "so far" and how long is left ("6 days to go"). Month and year
+	// records leave the running period out of `bg` (it isn't whole), so the page passes its figure so far as `now` ({ t: its start, v }). info (demand records only): the same line for demand with embedded solar
 	// added back, drawn dashed above the faint line for information (embedded solar is modelled, so it is never a
 	// record), with infoNow for its running period and infoLabel naming it in the tooltip. The page's ⓘ beside the heading explains the chart; zoom and pin are bound
 	// to the page, which shows Reset zoom and Release in the card's heading (ChartControls).
@@ -118,7 +118,7 @@
 		}
 		return d;
 	}
-	// the running period goes on its own (dotted, in the "so far" band), joined to the one before it
+	// the running period goes on its own (dotted, in the hatched band), joined to the one before it
 	const running = (list: { t: number; v: number | null; to: number }[]) => !!cur && list.length > 0 && list[list.length - 1].t === cur.t;
 	const bgPath = $derived(flat(running(segs) ? segs.slice(0, -1) : segs));
 	const infoPath = $derived(flat(running(isegs) ? isegs.slice(0, -1) : isegs));
@@ -132,13 +132,11 @@
 	const infoCur = $derived(curOf(isegs));
 	// the running period, joined to the one before it, dotted
 	const curPath = $derived(curOf(segs));
-	// the "so far" band: inside it when there is room, otherwise just left of it
+	// the hatched band over the running period, within the plot
 	const band = $derived.by(() => {
 		if (!cur) return null;
 		const a = Math.max(L, x(cur.t)), b = Math.min(W - Rm, x(cur.to));
-		if (b <= L || a >= W - Rm) return null;
-		const inside = b - a >= 44;
-		return { a, b, lx: inside ? (a + b) / 2 : a - 4, anchor: inside ? 'middle' : 'end' };
+		return b <= L || a >= W - Rm ? null : { a, b };
 	});
 
 	// the pointer's date (hov: under the mouse; pin: clicked, tapped or dragged to); the record in force then and that
@@ -229,10 +227,9 @@
 			<pattern id="{uid}-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" class="hatch" /></pattern>
 		</defs>
 		{#if band}
-			<!-- the period still running: a hatched band, labelled, behind everything -->
+			<!-- the period still running: a hatched band behind everything -->
 			<rect class="part" x={band.a} y={T} width={band.b - band.a} height={H - T - B} fill="url(#{uid}-hatch)" />
 			<line class="part-edge" x1={band.a} x2={band.a} y1={T} y2={H - B} />
-			<text class="part-l" x={band.lx} y={T + 11} text-anchor={band.anchor}>so far</text>
 		{/if}
 		{#each ax.ticks as v}
 			<line x1={L} x2={W - Rm} y1={y(v)} y2={y(v)} class="grid" />
@@ -303,10 +300,9 @@
 	.info-dot { stroke-dasharray: 2 1.5; }
 	.tip i { font-style: normal; opacity: 0.8; }
 	.bg-dot { stroke-width: 1.6; }
-	/* a period still under way: a hatched band, its edge and a "so far" label */
+	/* a period still under way: a hatched band and its edge */
 	.hatch { stroke: var(--muted); stroke-width: 1; opacity: 0.22; }
 	.part-edge { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 2 3; opacity: 0.6; }
-	.part-l { fill: var(--muted); font-size: 11px; font-style: italic; }
 	.zsel { fill: color-mix(in srgb, var(--accent) 16%, transparent); stroke: var(--accent); stroke-width: 1; }
 	.tip .bgl { color: var(--muted); }
 	.tip .togo { font-style: italic; }
