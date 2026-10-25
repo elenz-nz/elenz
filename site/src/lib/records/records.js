@@ -338,6 +338,11 @@ export function bgOf(det, id, period, region) {
   if (period === 'year') return v.map((x, i) => [nzMidnight(+det.years[i], 0, 1), x]);
   return v.map((x, i) => { const [y, m] = det.months[i].split('-').map(Number); return [nzMidnight(y, m - 1, 1), x]; });
 }
+/** When the month (or year) of a point of the faint best-by-month line ends: the next NZ local midnight starting one. */
+export function bgEnd(t, year) {
+  const p = Object.fromEntries(P_NZ.formatToParts(t + 6 * 36e5).map((x) => [x.type, +x.value]));
+  return year ? nzMidnight(p.year + 1, 0, 1) : nzMidnight(p.year, p.month, 1);
+}
 /** The record period's own series, if the detail has it for this record: { t, t0, step, v }. */
 export function periodSeries(det, id, period, region, rec) {
   const x = det?.period?.[period]?.[id]?.[region];
@@ -504,29 +509,13 @@ function liveSums(D, from, to) {
  *  ref: the record period's figure at the same point; best: the record (or a provisional one beyond it) and bestT its
  *  period; need: what the rest of the period can average and still beat it (null where it can't be said simply). */
 export function pace(R, D) {
-  const P = R?.pace;
-  if (!P || !D?.N) return [];
-  const dataEnd = D.t0 + D.N * D.step;
   const out = [];
   for (const period of ['year', 'month', 'week', 'day']) {
-    const start = periodStart(dataEnd - 1, period), hours = periodHours(start, period);
-    // up to the last whole day (weeks, months, years) or half-hour (a day); steps: how many, and how many in all
-    const day = period === 'day';
-    const upTo = day ? start + Math.floor((dataEnd - start) / 1800e3) * 1800e3 : periodStart(dataEnd - 1, 'day');
-    const steps = day ? Math.round((upTo - start) / 1800e3) : Math.round((upTo - start) / 864e5);
-    const all = day ? Math.round(hours * 2) : Math.round(hours / 24);
-    if (steps < all * PACE_SHARE || steps >= all) continue;
-    const elapsed = (upTo - start) / 36e5;
-    // the history's sums count only if they are for this same period and end by `upTo`; the live week fills the rest
-    const hist = P[period]?.start === start && P.to <= upTo ? P[period].sums : null;
-    const live = liveSums(D, hist ? P.to : start, upTo);
-    const sum = (r, k) => {
-      const h = hist?.[r]?.[k] ?? [0, 0], l = live[r]?.[k] ?? [0, 0];
-      return [h[0] + l[0], h[1] + l[1]];
-    };
+    const c = periodNow(R, D, period);
+    if (!c || c.steps < c.all * PACE_SHARE || c.steps >= c.all) continue;
+    const { start, hours, elapsed, steps } = c;
     for (const d of LISTED) {
-      const how = PACE_OF[d.id];
-      if (!how || d.kind !== 'hh') continue;
+      if (!PACE_OF[d.id] || d.kind !== 'hh') continue;
       for (const r of d.regions) {
         const rec = get(R, d.id, r, period);
         if (!rec || notShown(d, r, rec, R, period)) continue;
@@ -535,30 +524,64 @@ export function pace(R, D) {
         const tgt = rec.prov && beats(rec.prov.v, rec.v) ? rec.prov : rec;
         const ref = tgt.curve?.[Math.min(steps, tgt.curve.length) - 1];
         if (ref == null) continue;
-        let v, need = null, n;
-        if (how === 'ren') {
-          const [re] = sum(r, 'ren'), [g, c] = sum(r, 'gen');
-          if (!(g > 0)) continue;
-          v = (100 * re) / g; n = c;
-          // the rest's generation at the rate so far; the share it needs to keep the period's above (or below) the record
-          const gRest = (g / c) * (hours - elapsed) * 2;
-          need = gRest > 0 ? ((tgt.v / 100) * (g + gRest) - re) / gRest * 100 : null;
-        } else {
-          const [s, c] = sum(r, how[0]);
-          if (!(c > 0)) continue;
-          v = (how[1] * s) / c; n = c;
-          need = (tgt.v * hours - v * elapsed) / (hours - elapsed);
-        }
-        // most of the time so far must be covered (the history and the live week can leave a gap between them)
-        if (n / 2 < 0.9 * elapsed) continue;
-        const f = 10 ** (d.dp ?? 0);
-        v = Math.round(v * f) / f;
+        const f = figureSoFar(c, d, r, tgt.v);
+        if (!f) continue;
+        const { v, need } = f;
         if (!beats(v, ref)) continue;
         out.push({ d, region: r, period, start, hours, elapsed, steps, v, ref, best: tgt.v, bestT: tgt.t, provBest: tgt !== rec, need });
       }
     }
   }
   return out;
+}
+
+/** The current day, week, month or year as far as the data goes: { period, start, hours, elapsed, steps, all, sum },
+ *  sum(region, key) the history's sums for it plus the live week's ([total, half-hours]). Null without both files. */
+export function periodNow(R, D, period) {
+  const P = R?.pace;
+  if (!P || !D?.N) return null;
+  const dataEnd = D.t0 + D.N * D.step;
+  const start = periodStart(dataEnd - 1, period), hours = periodHours(start, period);
+  // up to the last whole day (weeks, months, years) or half-hour (a day); steps: how many, and how many in all
+  const day = period === 'day';
+  const upTo = day ? start + Math.floor((dataEnd - start) / 1800e3) * 1800e3 : periodStart(dataEnd - 1, 'day');
+  const steps = day ? Math.round((upTo - start) / 1800e3) : Math.round((upTo - start) / 864e5);
+  const all = day ? Math.round(hours * 2) : Math.round(hours / 24);
+  const elapsed = (upTo - start) / 36e5;
+  // the history's sums count only if they are for this same period and end by `upTo`; the live week fills the rest
+  const hist = P[period]?.start === start && P.to <= upTo ? P[period].sums : null;
+  const live = liveSums(D, hist ? P.to : start, upTo);
+  const sum = (r, k) => {
+    const h = hist?.[r]?.[k] ?? [0, 0], l = live[r]?.[k] ?? [0, 0];
+    return [h[0] + l[0], h[1] + l[1]];
+  };
+  return { period, start, hours, elapsed, steps, all, sum };
+}
+
+/** A record's figure for the period so far (periodNow's c): { v, need }, need being what the rest of the period can
+ *  average and still beat `best` (when given); null when the record has no such figure or too little is covered. */
+export function figureSoFar(c, d, r, best = null) {
+  const how = PACE_OF[d.id];
+  if (!how || d.kind !== 'hh' || !(c.elapsed > 0)) return null;
+  const { sum, hours, elapsed } = c;
+  let v, need = null, n;
+  if (how === 'ren') {
+    const [re] = sum(r, 'ren'), [g, cn] = sum(r, 'gen');
+    if (!(g > 0)) return null;
+    v = (100 * re) / g; n = cn;
+    // the rest's generation at the rate so far; the share it needs to keep the period's above (or below) the record
+    const gRest = (g / cn) * (hours - elapsed) * 2;
+    need = best != null && gRest > 0 ? ((best / 100) * (g + gRest) - re) / gRest * 100 : null;
+  } else {
+    const [s, cn] = sum(r, how[0]);
+    if (!(cn > 0)) return null;
+    v = (how[1] * s) / cn; n = cn;
+    need = best != null ? (best * hours - v * elapsed) / (hours - elapsed) : null;
+  }
+  // most of the time so far must be covered (the history and the live week can leave a gap between them)
+  if (n / 2 < 0.9 * elapsed) return null;
+  const f = 10 ** (d.dp ?? 0);
+  return { v: Math.round(v * f) / f, need };
 }
 
 /** "after 22 days", "by 3:30 pm": the point both periods are compared at. */
@@ -575,8 +598,12 @@ export function soFar(p) {
 }
 /** What is left of the period: "8 days to go", "5 hours to go". */
 export function toGo(p) {
-  const h = p.hours - p.elapsed;
-  if (h < 36) { const x = Math.max(1, Math.round(h)); return `${x} hour${x === 1 ? '' : 's'} to go`; }
+  return hoursToGo(p.hours - p.elapsed);
+}
+/** "8 days to go", "5 hours to go", "40 minutes to go" for a number of hours left. */
+export function hoursToGo(h) {
+  if (h < 1) { const x = Math.max(1, Math.round(h * 60)); return `${x} minute${x === 1 ? '' : 's'} to go`; }
+  if (h < 36) { const x = Math.round(h); return `${x} hour${x === 1 ? '' : 's'} to go`; }
   const x = Math.round(h / 24); return `${x} day${x === 1 ? '' : 's'} to go`;
 }
 /** The pace line's second sentence: what the rest of the period can average and still beat the record. */

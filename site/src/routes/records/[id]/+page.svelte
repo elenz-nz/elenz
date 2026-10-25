@@ -11,7 +11,7 @@
 	import { drawRecord } from '#lib/records/shareImage.js';
 	import { stamp } from '#lib/site/viewurl.js';
 	import {
-		LISTED, PERIODS, PERIOD_KEYS, periodOf, periodSub, periodWhen, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats, energy, pace, soFar, toGo, needText, paceAt, loadDetail, bgOf, periodSeries, periodAxis,
+		LISTED, PERIODS, PERIOD_KEYS, periodOf, periodSub, periodWhen, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats, energy, pace, soFar, toGo, needText, paceAt, periodNow, figureSoFar, loadDetail, bgOf, periodSeries, periodAxis,
 		loadRecords, meteredDue, clock, dayOf, dayLong, monthOf, yearOf, daysBetween, runLength, NEW_DAYS
 	} from '#lib/records/records.js';
 	import type { PageProps } from './$types';
@@ -77,6 +77,13 @@
 		if (per === 'month') return monthOf(t);
 		return `${hi} ${per === 'tp' ? 'half-hour' : per} in ${monthOf(t)}`;
 	};
+	// a month or year record's running period so far: the faint line's last step (records-detail leaves it out)
+	const bgNow = $derived.by(() => {
+		if (!bg || (per !== 'month' && per !== 'year')) return null;
+		const c = periodNow(R, liveD, per);
+		const f = c ? figureSoFar(c, d, region) : null;
+		return c && f ? { t: c.start, v: f.v, at: c.start + c.elapsed * 36e5 } : null;
+	});
 	// the day, week, month or year the record fell in, for its chart
 	const ser = $derived(per !== 'tp' && rec ? periodSeries(det, d.id, per, region, rec) : null);
 	const serAxis = $derived(ser ? periodAxis(per, ser) : null);
@@ -245,7 +252,7 @@
 
 			<section class="panel" aria-labelledby="grow-h">
 				<div class="p-head"><h2 id="grow-h">How the record grew</h2><span class="unit">Each step is a new record</span></div>
-				<Progression steps={rec.steps} first={R.first} end={R.end} tok={d.tok} fmt={axisFmt} full={f} {bg} {bgWhen} dashed={!!d.est} prov={prov ? { t: prov.t, v: prov.v } : null} when={(t) => per !== 'tp' ? periodWhen(t, per) : d.kind === 'month' ? monthOf(t) : d.kind === 'run' ? dayOf(t) : `${clock(t)}, ${dayOf(t)}`}
+				<Progression steps={rec.steps} first={R.first} end={R.end} tok={d.tok} fmt={axisFmt} full={f} {bg} {bgWhen} now={bgNow} dashed={!!d.est} prov={prov ? { t: prov.t, v: prov.v } : null} when={(t) => per !== 'tp' ? periodWhen(t, per) : d.kind === 'month' ? monthOf(t) : d.kind === 'run' ? dayOf(t) : `${clock(t)}, ${dayOf(t)}`}
 					label="{fullName(d)}, {regionName}: the record over time, from {f(rec.steps[0][1])} in {yearOf(rec.steps[0][0])} to {f(rec.v)} in {yearOf(rec.t)}, broken {rec.n} times" />
 			</section>
 

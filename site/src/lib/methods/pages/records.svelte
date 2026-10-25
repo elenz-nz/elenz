@@ -17,7 +17,7 @@
 	<dt>Runs</dt>
 	<dd>The longest unbroken run of half-hours meeting a condition, joined across month boundaries: at least 90% renewable, prices under $5/MWh, or no Huntly Rankine running.</dd>
 </dl>
-<p>Each record’s page shows how it grew: every time it was broken since 1997, worked out from the half-hours that beat everything before them. A faint line behind it gives the best of each month (each year, for year records), so the near misses show. A day, week, month or year record’s page also charts the period itself: its half-hours, hours, days or weeks, around its average.</p>
+<p>Each record’s page shows how it grew: every time it was broken since 1997, worked out from the half-hours that beat everything before them. A faint line behind it gives the best of each month (each year, for year records), so the near misses show. The month (or year) still running is shown as it stands so far, and the line fades out over what is left of it. A day, week, month or year record’s page also charts the period itself: its half-hours, hours, days or weeks, around its average.</p>
 
 <h2 id="official">Official and provisional</h2>
 <p>A record is official once it rests on final data. The history uses the EA’s metered generation and demand for every month it has published (about 5–6 weeks after the month ends), final prices (usually the next day) and metered HVDC flows (about two weeks after the month). See <a href="/methods/history">History since 1997</a>.</p>
