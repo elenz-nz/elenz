@@ -7,12 +7,14 @@
 	import Masthead from '#lib/site/Masthead.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import Progression from '#lib/records/Progression.svelte';
+	import InfoTip from '#lib/site/InfoTip.svelte';
+	import ChartControls from '#lib/records/ChartControls.svelte';
 	import DayChart from '#lib/records/DayChart.svelte';
 	import { drawRecord } from '#lib/records/shareImage.js';
 	import { stamp } from '#lib/site/viewurl.js';
 	import {
 		LISTED, PERIODS, PERIOD_KEYS, periodOf, periodSub, periodWhen, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats, energy, pace, soFar, toGo, needText, paceAt, periodNow, figureSoFar, loadDetail, bgOf, periodSeries, periodAxis,
-		loadRecords, meteredDue, clock, dayOf, dayLong, monthOf, yearOf, daysBetween, runLength, NEW_DAYS
+		loadRecords, trimZeros, periodHours, meteredDue, clock, dayOf, dayLong, monthOf, yearOf, daysBetween, runLength, NEW_DAYS
 	} from '#lib/records/records.js';
 	import type { PageProps } from './$types';
 
@@ -82,7 +84,7 @@
 		if (!bg || (per !== 'month' && per !== 'year')) return null;
 		const c = periodNow(R, liveD, per);
 		const f = c ? figureSoFar(c, d, region) : null;
-		return c && f ? { t: c.start, v: f.v, at: c.start + c.elapsed * 36e5 } : null;
+		return c && f ? { t: c.start, v: f.v } : null;
 	});
 	// the day, week, month or year the record fell in, for its chart
 	const ser = $derived(per !== 'tp' && rec ? periodSeries(det, d.id, per, region, rec) : null);
@@ -98,6 +100,36 @@
 	const cap = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
 	const ymd = (t: number) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Pacific/Auckland' }).format(t);
 	const others = $derived(LISTED.filter((x) => x.group === d.group && x.id !== d.id));
+
+	// when the record was set: the end of its period (a year record stands from the year's end, not its start), the
+	// end of its half-hour or month, or of its run
+	const recEnd = $derived.by(() => {
+		if (!rec) return 0;
+		if (d.kind === 'run') return rec.t + rec.v * 36e5;
+		if (per !== 'tp') return rec.t + periodHours(rec.t, per) * 36e5;
+		if (d.kind === 'month') return rec.t + periodHours(rec.t, 'month') * 36e5;
+		return rec.t + 1800e3;
+	});
+	// the two charts' zoom and pinned point, for Reset zoom and Release in their headings
+	let growZoom = $state<[number, number] | null>(null);
+	let growPin = $state<number | null>(null);
+	let dayZoom = $state<[number, number] | null>(null);
+	const monYr = (t: number) => new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', month: 'short', year: 'numeric' }).format(t);
+	// a new record, region or period starts both charts afresh
+	$effect(() => { void d.id; void region; void per; growZoom = null; growPin = null; dayZoom = null; });
+
+	// the progression's ⓘ: how many times it has been broken, what the faint line is
+	const growNote = $derived.by(() => {
+		if (!rec) return '';
+		const tr = trimZeros(rec.steps) !== rec.steps, n = rec.steps.length - 1 - (tr ? rec.steps.findIndex((s: [number, number]) => s[1] !== 0) : 0);
+		const since = tr ? `the first above zero in ${yearOf(trimZeros(rec.steps)[0][0])}` : monthOf(R.first);
+		const unit = per === 'year' ? 'year' : 'month', hi = d.id.endsWith('_min') ? 'lowest' : 'highest';
+		const what = per === 'year' || per === 'month' ? `each ${per}’s figure` : `the ${hi} ${per === 'tp' ? 'half-hour' : per} in each month`;
+		return `${n === 0 ? (tr ? `First above zero in ${yearOf(trimZeros(rec.steps)[0][0])}` : 'Not broken since the data began') : `Broken ${n} ${n === 1 ? 'time' : 'times'} since ${since}`}.`
+			+ (bg ? ` The faint line is ${what}; the ${unit} still running is shown as it stands so far, washed out, and hovering there says how long is left.` : '')
+			+ (prov ? ' Dashed: provisional, from dispatch data.' : '')
+			+ ' Hover or tap for the record at any date; click to pin it. Drag across the chart to zoom in; Reset zoom or Escape goes back.';
+	});
 
 	// one more figure from the record's half-hour, the one that says most about it
 	const extra = $derived.by(() => {
@@ -225,7 +257,7 @@
 						<div><dt>Previous record</dt><dd>{f(rec.prev[1])}</dd><dd class="s">{per !== 'tp' ? periodWhen(rec.prev[0], per) : d.kind === 'month' ? monthOf(rec.prev[0]) : dayOf(rec.prev[0])}{energy(d, rec.prev[0], rec.prev[1], per) ? ` · ${energy(d, rec.prev[0], rec.prev[1], per)}` : ''}</dd></div>
 					{/if}
 					{#if !rec.ongoing}
-						<div><dt>Has stood for</dt><dd>{daysBetween(d.kind === 'run' ? rec.t + rec.v * 36e5 : rec.t, Date.now()).toLocaleString('en-NZ')} days</dd><dd class="s">as of today</dd></div>
+						<div><dt>Has stood for</dt><dd>{daysBetween(recEnd, Date.now()).toLocaleString('en-NZ')} days</dd><dd class="s">since {dayOf(recEnd)}</dd></div>
 					{/if}
 					<div><dt>Broken</dt><dd>{rec.n} {rec.n === 1 ? 'time' : 'times'}</dd><dd class="s">since {monthOf(R.first)}</dd></div>
 					{#if extra}<div><dt>{extra.k}</dt><dd>{extra.v}</dd></div>{/if}
@@ -251,17 +283,17 @@
 			{/if}
 
 			<section class="panel" aria-labelledby="grow-h">
-				<div class="p-head"><h2 id="grow-h">How the record grew</h2><span class="unit">Each step is a new record</span></div>
-				<Progression steps={rec.steps} first={R.first} end={R.end} tok={d.tok} fmt={axisFmt} full={f} {bg} {bgWhen} now={bgNow} dashed={!!d.est} prov={prov ? { t: prov.t, v: prov.v } : null} when={(t) => per !== 'tp' ? periodWhen(t, per) : d.kind === 'month' ? monthOf(t) : d.kind === 'run' ? dayOf(t) : `${clock(t)}, ${dayOf(t)}`}
+				<div class="p-head"><div class="ttl-row"><h2 id="grow-h">How the record grew</h2><InfoTip label="About this chart">{growNote} <a href="/methods/records">How records work</a></InfoTip></div><div class="ctls">{#if growZoom || growPin !== null}<ChartControls zoomed={!!growZoom} pinned={growPin !== null} text={growZoom ? `${monYr(growZoom[0])} – ${monYr(growZoom[1])}` : ''} onreset={() => (growZoom = null)} onrelease={() => (growPin = null)} />{:else}<span class="unit">Each step is a new record</span>{/if}</div></div>
+				<Progression steps={rec.steps} first={R.first} end={R.end} tok={d.tok} fmt={axisFmt} full={f} {bg} {bgWhen} now={bgNow} bind:zoom={growZoom} bind:pin={growPin} dashed={!!d.est} prov={prov ? { t: prov.t, v: prov.v } : null} when={(t) => per !== 'tp' ? periodWhen(t, per) : d.kind === 'month' ? monthOf(t) : d.kind === 'run' ? dayOf(t) : `${clock(t)}, ${dayOf(t)}`}
 					label="{fullName(d)}, {regionName}: the record over time, from {f(rec.steps[0][1])} in {yearOf(rec.steps[0][0])} to {f(rec.v)} in {yearOf(rec.t)}, broken {rec.n} times" />
 			</section>
 
 			<div class="two">
 				{#if per !== 'tp'}
 					<section class="panel" aria-labelledby="day-h">
-						<div class="p-head"><h2 id="day-h">The {periodOf(per).word} it fell</h2><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div>
+						<div class="p-head"><h2 id="day-h">The {periodOf(per).word} it fell</h2><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
 						{#if ser && serAxis}
-							<DayChart day={ser} t={-1} tok={d.tok} fmt={axisFmt} full={f} xticks={serAxis.ticks} tipAt={serAxis.tip} avg={rec.v} avgLabel="Average {f(rec.v)}"
+							<DayChart day={ser} t={-1} tok={d.tok} fmt={axisFmt} full={f} xticks={serAxis.ticks} tipAt={serAxis.tip} labAt={serAxis.lab} bind:zoom={dayZoom} avg={rec.v} avgLabel="Average {f(rec.v)}"
 								label="{fullName(d)} through {periodWhen(rec.t, per, true)}, {per === 'day' ? 'half-hourly' : per === 'week' ? 'hourly' : per === 'month' ? 'daily' : 'weekly'}, averaging {f(rec.v)}" />
 						{/if}
 						<p class="note">{periodWhen(rec.t, per, true)}: {parts(d, rec.v, per).n} {parts(d, rec.v, per).u}{en ? ` (${en})` : ''}{d.unit === '%' ? ' of its generation renewable' : ''}{rec.prev ? `, beating ${f(rec.prev[1])} (${periodWhen(rec.prev[0], per)})` : ''}. Open it in the tracker to see what happened through it.</p>
@@ -269,8 +301,8 @@
 				{:else if d.kind === 'hh' && rec.ctx}
 					{@const c = rec.ctx}
 					<section class="panel" aria-labelledby="day-h">
-						<div class="p-head"><h2 id="day-h">The day it fell</h2><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div>
-						<DayChart day={c.day} t={rec.t} tok={d.tok} fmt={axisFmt} label="{fullName(d)} through {dayLong(rec.t)}, half-hourly, peaking at {f(rec.v)} at {clock(rec.t)}" />
+						<div class="p-head"><h2 id="day-h">The day it fell</h2><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
+						<DayChart day={c.day} t={rec.t} tok={d.tok} fmt={axisFmt} bind:zoom={dayZoom} label="{fullName(d)} through {dayLong(rec.t)}, half-hourly, peaking at {f(rec.v)} at {clock(rec.t)}" />
 						<dl class="facts">
 							<div><dt>Demand</dt><dd>{c.demand.toLocaleString('en-NZ')} MW</dd></div>
 							<div><dt>Generation</dt><dd>{c.gen.toLocaleString('en-NZ')} MW</dd></div>
@@ -363,6 +395,7 @@
 	.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px; min-width: 0; display: grid; gap: 10px; align-content: start; }
 	.panel p { margin: 0; }
 	.p-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+	.p-head .ctls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-height: 28px; }
 	h2 { font-size: 1rem; }
 	.unit, .note { color: var(--muted); font-size: 0.8rem; }
 	.note { margin: 0; }

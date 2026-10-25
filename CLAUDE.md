@@ -76,6 +76,12 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   link; computers: copies the link) and Download (the 1200 x 630 PNG from `shareImage.js`) beside the region picker,
   and again at its foot. Its two charts (`Progression`, `DayChart`) pin a point on click, tap or drag (it stays after
   the finger lifts; another click, a tap outside or Escape lets go), and on touch the tooltip sits above the chart.
+  A mouse drag across either zooms into that span (owner's call, 25 Oct 2026; the y axis fits what is shown, the
+  progression's x axis turns to months, `DayChart` labels with `periodAxis`'s `lab` past its usual ticks). Zoom and pin
+  are bound to the page, which shows Reset zoom and Pinned · Release in the card's heading (`ChartControls.svelte`), never
+  over the chart; Escape lets go of the pin first, then the zoom. The progression's explanation is the ⓘ beside "How the
+  record grew" (`growNote`), not a line under the chart. "Has stood for" counts from the end of the record's period
+  (`recEnd`: a year record from 1 January after it), not its start.
   Records added 23 Oct 2026 (records.py VERSION 4): most fossil generation, peak hydro, and, for days/weeks/months/years
   only (`periods: true` in DEFS), lowest hydro and lowest price: the half-hour list shows their day record (`Average over
   the day`), and their page opens on its day (owner's report, 25 Oct 2026: the note there looked like a gap). A record
@@ -89,8 +95,10 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   `hist/records-detail.json` (records.py `build_detail`, published with records.json when it changes; served by the
   Worker; loaded only by record pages via `loadDetail`): `bg`, each record's best by month (by year for year records)
   against `months`/`years`, the faint line behind `Progression` (`bgOf`; its hover follows the pointer's date and gives
-  the record in force and that month's best; the month or year still running carries on past the data to its end
-  (`bgEnd`), fading out, and the tooltip there says how long is left (`hoursToGo`); month and year records' files leave
+  the record in force and that month's best; the month or year still running is drawn across its whole span (the
+  axis runs on to its end, `bgEnd`) and washed out like the tracker's partial periods (a 0.6 surface wash, the
+  segment drawn a little stronger first so it stays readable), and the tooltip there says how long is left
+  (`hoursToGo`, counted from the start of today like "Heading for a record"); month and year records' files leave
   the running period out, so the page passes its figure so far as `now`, from `periodNow`/`figureSoFar`, the same sums as
   "Heading for a record"); `period`, each period record's own series (`period_series`: half-hours
   for a day, hours for a week, days for a month, weeks for a year), charted on its page by `DayChart` with
