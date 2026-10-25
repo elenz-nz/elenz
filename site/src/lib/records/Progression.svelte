@@ -1,23 +1,31 @@
 <script lang="ts">
 	// How a record grew: a step line from the first data to today, one step each time it was broken, the current
 	// record marked, and a provisional one (dashed) beyond it. Hover shows the record at that date; a click, tap or
-	// drag pins it (it stays after the finger lifts; another click on it, a tap outside the chart or Escape lets go).
-	// On touch the tooltip sits above the chart, clear of the finger. bg: the best of each month (or year) through the
-	// history, drawn faintly behind the record line (records.py build_detail), so the near misses show; the tooltip
-	// gives the record in force at the pointer's date and that month's best.
-	import { yearOf, trimZeros } from './records.js';
+	// touch drag pins it (it stays after the finger lifts; Release, another click on it, a tap outside the chart or
+	// Escape lets go). On touch the tooltip sits above the chart, clear of the finger. A mouse drag across the chart
+	// zooms into that span (at least two months; the axes follow); Reset zoom or Escape goes back. bg: the best of
+	// each month (or year) through the history, drawn faintly behind the record line (records.py build_detail), so the
+	// near misses show; the tooltip gives the record in force at the pointer's date and that month's best. The month
+	// (or year) still running is drawn as it stands so far across the whole period, washed out like the tracker's
+	// partial periods (the chart's dates run on to its end), and the tooltip there says how long is left ("6 days to
+	// go"). Month and year records leave the running period out of `bg` (it isn't whole), so the page passes its figure
+	// so far as `now` ({ t: its start, v }). The page's ⓘ beside the heading explains the chart; zoom and pin are bound
+	// to the page, which shows Reset zoom and Release in the card's heading (ChartControls).
+	import { trimZeros, bgEnd, hoursToGo, periodStart } from './records.js';
 
 	// fmt: axis labels (bare numbers); full: a value with its unit, for the tooltip and readout (fmt if not given)
-	let { steps: all, first: dataFirst, end, tok = '--ink', label, fmt, full, prov = null, dashed = false, when, bg = null, bgWhen }:
+	let { steps: all, first: dataFirst, end, tok = '--ink', label, fmt, full, prov = null, dashed = false, when, bg = null, bgWhen, now = null, zoom = $bindable(null), pin = $bindable(null) }:
 		{ steps: [number, number][]; first: number; end: number; tok?: string; label: string; fmt: (v: number) => string;
 		  full?: (v: number) => string; prov?: { t: number; v: number } | null; dashed?: boolean; when?: (t: number) => string;
-		  bg?: [number, number | null][] | null; bgWhen?: (t: number) => string } = $props();
+		  bg?: [number, number | null][] | null; bgWhen?: (t: number) => string;
+		  now?: { t: number; v: number } | null; zoom?: [number, number] | null; pin?: number | null } = $props();
 	const val = (v: number) => (full ?? fmt)(v);
 	// leading zeros left out (grid solar until its first farm): the chart starts at the first record above zero
 	const steps = $derived(trimZeros(all) as [number, number][]);
 	const trimmed = $derived(steps !== all);
 	const first = $derived(trimmed ? steps[0][0] : dataFirst);
 	const whenOf = (t: number) => when ? when(t) : new Date(t).toLocaleDateString('en-NZ', { timeZone: 'Pacific/Auckland', day: 'numeric', month: 'short', year: 'numeric' });
+	const uid = $props.id();
 
 	// drawn at the width it is shown, so labels stay readable on phones
 	let cw = $state(1000);
@@ -26,18 +34,43 @@
 	const L = 64, Rm = 18, T = 16, B = 30;
 	const pts = $derived(prov ? [...steps, [prov.t, prov.v] as [number, number]] : steps);
 	const t1 = $derived(Math.max(end, pts[pts.length - 1][0]));
-	// the background line, within the chart's dates
-	const bgIn = $derived(bg ? bg.filter((b) => b[0] >= first - 31 * 864e5 && b[0] <= t1) : []);
+	const bgYear = $derived(!!bg && bg.length > 1 && bg[1][0] - bg[0][0] > 200 * 864e5);
+	// the background line within the chart's dates, with the running period's figure so far (now) in place of its gap;
+	// each entry holds until the next (or its own period's end)
+	const bgIn = $derived.by(() => {
+		if (!bg) return [];
+		const a = bg.filter((b) => b[0] >= first - 31 * 864e5 && b[0] <= t1 && !(now && b[0] >= now.t));
+		return now && a.length ? [...a, [now.t, now.v] as [number, number | null]] : a;
+	});
+	// the period still running: the faint line's last month (or year), if it ends after the data; drawn across its
+	// whole span, washed out, and the chart's dates run on to its end
+	const cur = $derived.by(() => {
+		const b = bgIn[bgIn.length - 1];
+		if (!b || b[1] == null) return null;
+		const to = bgEnd(b[0], bgYear);
+		return to > t1 ? { t: b[0], v: b[1], to } : null;
+	});
+	const tx = $derived(cur ? cur.to : t1);
+	const segs = $derived(bgIn.map(([t, v], i) => ({ t, v, to: i + 1 < bgIn.length ? bgIn[i + 1][0] : cur ? cur.to : Math.min(t1, bgEnd(t, bgYear)) })));
 
-	// a round axis that holds every step (from zero for most records: the growth is the point)
+	// zoom: [from, to] in time, or the whole history
+	const MIN_ZOOM = 61 * 864e5;
+	const za = $derived(zoom ? zoom[0] : first);
+	const zb = $derived(zoom ? zoom[1] : tx);
+
+	// a round axis that holds every value shown (from zero for most records: the growth is the point)
 	function niceStep(span: number) {
 		const raw = span / 4, p = 10 ** Math.floor(Math.log10(raw || 1)), m = raw / p;
 		return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * p;
 	}
 	const ax = $derived.by(() => {
-		const vs = [...pts.map((s) => s[1]), ...bgIn.map((b) => b[1]).filter((v): v is number => v != null)];
+		const inView = (a: number, b: number) => b > za && a < zb;
+		const vs: number[] = [];
+		pts.forEach(([t, v], i) => { if (inView(t, i + 1 < pts.length ? pts[i + 1][0] : t1 + 1)) vs.push(v); });
+		for (const s of segs) if (s.v != null && inView(s.t, s.to)) vs.push(s.v);
+		if (!vs.length) vs.push(pts[pts.length - 1][1]);
 		let lo = Math.min(...vs), hi = Math.max(...vs);
-		if (lo >= 0 && lo < 0.5 * hi) lo = 0;   // from zero unless the record moved over a narrow range
+		if (lo >= 0 && lo < 0.5 * hi) lo = 0;   // from zero unless the values span a narrow range
 		if (hi === lo) hi = lo + 1;
 		const st = niceStep(hi - lo);
 		lo = Math.floor(lo / st) * st; hi = Math.ceil(hi / st) * st;
@@ -45,37 +78,52 @@
 		for (let v = lo; v <= hi + st / 2; v += st) ticks.push(v);
 		return { lo, hi, ticks };
 	});
-	const x = (t: number) => L + ((t - first) / (t1 - first)) * (W - L - Rm);
+	const x = (t: number) => L + ((t - za) / (zb - za)) * (W - L - Rm);
 	const y = (v: number) => T + (1 - (v - ax.lo) / (ax.hi - ax.lo)) * (H - T - B);
 	const path = $derived.by(() => {
 		let d = `M${x(steps[0][0]).toFixed(1)} ${y(steps[0][1]).toFixed(1)}`;
 		for (const [t, v] of steps.slice(1)) d += ` H${x(t).toFixed(1)} V${y(v).toFixed(1)}`;
 		return d + (prov ? ` H${x(prov.t).toFixed(1)}` : ` H${x(t1).toFixed(1)}`);
 	});
-	const years = $derived.by(() => {
-		const a = +yearOf(first), b = +yearOf(t1), every = (b - a) / (W / 90) > 5 ? 10 : b - a > 20 ? 5 : b - a > 8 ? 2 : 1;
-		const out = [];
-		for (let yr = Math.ceil(a / every) * every; yr <= b; yr += every) out.push({ yr, t: Date.UTC(yr, 0, 1) - 13 * 36e5 });
-		return out.filter((q) => q.t >= first && x(q.t) > L + 14);
+	// x labels: years, or months when zoomed in (every 1, 2, 3 or 6 months; January carries the year)
+	const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+	const xticks = $derived.by(() => {
+		const nzStart = (y: number, m: number) => Date.UTC(y, m, 1) - 13 * 36e5;
+		const months = (zb - za) / (30.44 * 864e5), fit = Math.max(2, (W - L - Rm) / 80);
+		const k = [1, 2, 3, 6, 12, 24, 60, 120].find((k) => months / k <= fit) ?? 120;
+		const a = new Date(za + 13 * 36e5), out = [];
+		for (let y = a.getUTCFullYear(), m = a.getUTCMonth(); ; m++) {
+			if (m === 12) { m = 0; y++; }
+			const t = nzStart(y, m);
+			if (t > zb) break;
+			if (k >= 12 ? m === 0 && y % (k / 12) === 0 : m % k === 0) out.push({ t, l: m === 0 ? String(y) : MON[m] });
+		}
+		return out.filter((q) => q.t >= za && x(q.t) > L + 14);
 	});
 	const last = $derived(steps[steps.length - 1]);
 	// each month (or year) holds its value until the next: drawn as flat steps, broken where there is none
-	const bgPath = $derived.by(() => {
+	function flat(list: { t: number; v: number | null; to: number }[]) {
 		let d = '', pen = false;
-		bgIn.forEach(([t, v], i) => {
-			const nx = i + 1 < bgIn.length ? bgIn[i + 1][0] : Math.min(t1, t + 31 * 864e5);
-			if (v == null) { pen = false; return; }
-			const xa = Math.max(L, x(t)), xb = Math.max(L, x(nx));
-			d += `${pen ? 'L' : 'M'}${xa.toFixed(1)} ${y(v).toFixed(1)} H${xb.toFixed(1)}`;
+		for (const s of list) {
+			if (s.v == null) { pen = false; continue; }
+			d += `${pen ? 'L' : 'M'}${x(s.t).toFixed(1)} ${y(s.v).toFixed(1)} H${x(s.to).toFixed(1)}`;
 			pen = true;
-		});
+		}
 		return d;
+	}
+	const bgPath = $derived(flat(cur ? segs.slice(0, -1) : segs));
+	// the running period, joined to the one before it; drawn stronger than the rest so that, once washed like the
+	// tracker's partial periods, it reads as a lighter version of the faint line
+	const curPath = $derived.by(() => {
+		if (!cur) return '';
+		const prev = segs.length > 1 ? segs[segs.length - 2] : null;
+		const y0 = prev && prev.v != null && prev.to >= cur.t ? y(prev.v) : y(cur.v);
+		return `M${x(cur.t).toFixed(1)} ${y0.toFixed(1)} V${y(cur.v).toFixed(1)} H${x(cur.to).toFixed(1)}`;
 	});
 
 	// the pointer's date (hov: under the mouse; pin: clicked, tapped or dragged to); the record in force then and that
 	// month's best follow from it
 	let hov = $state<number | null>(null);
-	let pin = $state<number | null>(null);
 	let touch = $state(false);               // the last pointer was a finger or pen
 	const hoverT = $derived(hov ?? pin);
 	const hover = $derived.by(() => {
@@ -85,31 +133,66 @@
 		return i;
 	});
 	const bgAt = $derived.by(() => {
-		if (hoverT === null || !bgIn.length) return null;
+		if (hoverT === null) return null;
 		let b = null;
-		for (const x of bgIn) if (x[0] <= hoverT) b = x; else break;
-		return b && b[1] != null ? b : null;
+		for (const s of segs) if (s.t <= hoverT) b = s; else break;
+		return b && b.v != null ? b : null;
 	});
+	// in the period still running: how long is left of it, from now
+	// (counted from the start of today, as "Heading for a record" does, until the last two days, then from now)
+	const left = $derived.by(() => {
+		if (!cur || hoverT === null || hoverT < cur.t) return null;
+		const nowT = Date.now(), fromNow = (cur.to - nowT) / 36e5;
+		return hoursToGo(Math.max(0, fromNow < 48 ? fromNow : (cur.to - periodStart(nowT, 'day')) / 36e5));
+	});
+	const ahead = $derived(hoverT !== null && hoverT > t1);   // past the record line's end: only the faint line goes on
+
 	let fig = $state<HTMLElement>();
+	const pxOf = (e: PointerEvent) => { const r = (e.currentTarget as SVGSVGElement).getBoundingClientRect(); return ((e.clientX - r.left) / r.width) * W; };
+	const tOf = (px: number) => za + ((px - L) / (W - L - Rm)) * (zb - za);
 	function at(e: PointerEvent) {
-		const r = (e.currentTarget as SVGSVGElement).getBoundingClientRect();
-		const t = first + (((e.clientX - r.left) / r.width) * W - L) / (W - L - Rm) * (t1 - first);
-		return t < pts[0][0] ? null : Math.min(t, t1);
+		const t = tOf(pxOf(e));
+		return t < pts[0][0] ? null : Math.max(za, Math.min(t, zb));
+	}
+	// a mouse drag: from where it was pressed to where the pointer is, in px; a few pixels is still a click
+	let drag = $state<{ a: number; b: number } | null>(null);
+	let dragged = false;
+	function down(e: PointerEvent) {
+		move(e);
+		if (e.pointerType === 'mouse' && e.button === 0) {
+			const px = pxOf(e);
+			drag = { a: px, b: px }; dragged = false;
+			(e.currentTarget as Element).setPointerCapture?.(e.pointerId);
+		}
+	}
+	function up() {
+		if (!drag) return;
+		const d = drag; drag = null;
+		if (Math.abs(d.b - d.a) < 6) return;
+		dragged = true;
+		let a = Math.max(first, tOf(Math.min(d.a, d.b))), b = Math.min(tx, tOf(Math.max(d.a, d.b)));
+		if (b - a < MIN_ZOOM) { const m = (a + b) / 2; a = Math.max(first, m - MIN_ZOOM / 2); b = Math.min(tx, a + MIN_ZOOM); a = Math.max(first, b - MIN_ZOOM); }
+		zoom = a <= first && b >= tx ? null : [a, b];
 	}
 	function move(e: PointerEvent) {
 		touch = e.pointerType !== 'mouse';
 		if (touch) { pin = at(e); hov = null; } else hov = at(e);
+		if (drag) drag.b = Math.max(L, Math.min(W - Rm, pxOf(e)));
 	}
 	function click(e: MouseEvent) {
 		if (touch) return;   // a tap pinned it already
+		if (dragged) { dragged = false; return; }   // the end of a zoom drag, not a click
 		const t = at(e as PointerEvent);
 		// a click near the pinned date lets go; elsewhere it moves the pin
 		pin = t === null || (pin !== null && Math.abs(x(t) - x(pin)) < 8) ? null : t;
 	}
 	function outside(e: Event) {
-		if (pin === null) return;
-		if (e instanceof KeyboardEvent) { if (e.key === 'Escape') pin = null; return; }
-		if (fig && !fig.contains(e.target as Node)) pin = null;
+		if (e instanceof KeyboardEvent) {
+			if (e.key !== 'Escape') return;
+			if (pin !== null) pin = null; else if (zoom) zoom = null;
+			return;
+		}
+		if (pin !== null && fig && !fig.contains(e.target as Node)) pin = null;
 	}
 </script>
 
@@ -117,67 +200,83 @@
 
 <figure class="prog" bind:clientWidth={cw} bind:this={fig}>
 	<div class="plot">
-	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions (pointer readout; the figcaption and the table below carry the figures) -->
-	<svg viewBox="0 0 {W} {H}" role="img" aria-label={label} onpointermove={move} onpointerdown={move} onclick={click} onpointerleave={() => (hov = null)}>
+	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions (pointer readout; the readout and the table below carry the figures) -->
+	<svg class="chart" viewBox="0 0 {W} {H}" role="img" aria-label={label} onpointermove={move} onpointerdown={down} onpointerup={up} onclick={click} onpointerleave={() => (hov = null)} class:zoomable={!touch}>
+		<defs><clipPath id="{uid}-clip"><rect x={L} y={T - 8} width={W - L - Rm} height={H - T - B + 16} /></clipPath></defs>
 		{#each ax.ticks as v}
 			<line x1={L} x2={W - Rm} y1={y(v)} y2={y(v)} class="grid" />
 			<text x={L - 8} y={y(v) + 4} text-anchor="end" class="lab">{fmt(v)}</text>
 		{/each}
-		{#each years as q}
-			<text x={x(q.t)} y={H - 8} text-anchor="middle" class="lab">{q.yr}</text>
+		{#each xticks as q}
+			<text x={x(q.t)} y={H - 8} text-anchor="middle" class="lab">{q.l}</text>
 		{/each}
-		{#if bgPath}<path d={bgPath} fill="none" class="bg" style="stroke:var({tok})" />{/if}
-		<path d={path} fill="none" style="stroke:var({tok})" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray={dashed ? '6 3' : undefined} />
-		{#if prov}
-			<path d="M{x(prov.t)} {y(last[1])} V{y(prov.v)} H{x(t1)}" fill="none" style="stroke:var({tok})" stroke-width="2" stroke-dasharray="4 4" />
-			<circle cx={x(prov.t)} cy={y(prov.v)} r="5" class="hole" style="stroke:var({tok})" />
-		{/if}
-		<circle cx={x(last[0])} cy={y(last[1])} r="5" style="fill:var({tok})" />
+		<g clip-path="url(#{uid}-clip)">
+			{#if bgPath}<path d={bgPath} fill="none" class="bg" style="stroke:var({tok})" />{/if}
+			{#if cur}
+				<!-- the period still running, as it stands so far, washed out like the tracker's partial periods -->
+				{#if curPath}<path d={curPath} fill="none" class="bg cur" style="stroke:var({tok})" />{/if}
+				<rect class="wash" x={x(cur.t)} y={T} width={Math.max(0, x(cur.to) - x(cur.t))} height={H - T - B} />
+			{/if}
+			<path d={path} fill="none" style="stroke:var({tok})" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray={dashed ? '6 3' : undefined} />
+			{#if prov}
+				<path d="M{x(prov.t)} {y(last[1])} V{y(prov.v)} H{x(t1)}" fill="none" style="stroke:var({tok})" stroke-width="2" stroke-dasharray="4 4" />
+				<circle cx={x(prov.t)} cy={y(prov.v)} r="5" class="hole" style="stroke:var({tok})" />
+			{/if}
+			<circle cx={x(last[0])} cy={y(last[1])} r="5" style="fill:var({tok})" />
+		</g>
 		{#if hover !== null && hoverT !== null}
 			{@const p = pts[hover]}
 			<line x1={x(hoverT)} x2={x(hoverT)} y1={T} y2={H - B} class="cursor" class:pinned={hov === null} />
-			<circle cx={x(hoverT)} cy={y(p[1])} r="4" style="fill:var({tok})" />
-			{#if bgAt}<circle cx={x(hoverT)} cy={y(bgAt[1] as number)} r="3.5" class="hole bg-dot" style="stroke:var({tok})" />{/if}
+			{#if !ahead}<circle cx={x(hoverT)} cy={y(p[1])} r="4" style="fill:var({tok})" />{/if}
+			{#if bgAt}<circle cx={x(hoverT)} cy={y(bgAt.v as number)} r="3.5" class="hole bg-dot" style="stroke:var({tok})" />{/if}
+		{/if}
+		{#if drag && Math.abs(drag.b - drag.a) >= 6}
+			<rect class="zsel" x={Math.min(drag.a, drag.b)} y={T} width={Math.abs(drag.b - drag.a)} height={H - T - B} />
 		{/if}
 	</svg>
-	{#if hover !== null && hoverT !== null}
+	{#if hover !== null && hoverT !== null && !drag}
 		{@const p = pts[hover]}
 		{@const fx = x(hoverT) / W}
-		<div class="tip" style={touch ? `left:${Math.min(80, Math.max(20, fx * 100))}%` : `left:${fx * 100}%;top:${(y(p[1]) / H) * 100}%`} class:flip={!touch && fx > 0.7} class:above={touch} aria-hidden="true">
+		{@const ty = ahead && bgAt ? y(bgAt.v as number) : y(p[1])}
+		<div class="tip" style={touch ? `left:${Math.min(80, Math.max(20, fx * 100))}%` : `left:${fx * 100}%;top:${(ty / H) * 100}%`} class:flip={!touch && fx > 0.7} class:above={touch} aria-hidden="true">
 			<b>{val(p[1])}</b><span>{prov && hover === pts.length - 1 ? 'Provisional, ' : 'Record from '}{whenOf(p[0])}</span>
-			{#if bgAt}<span class="bgl">{bgWhen ? bgWhen(bgAt[0]) : ''}: {val(bgAt[1] as number)}</span>{/if}
+			{#if bgAt}<span class="bgl">{bgWhen ? bgWhen(bgAt.t) : ''}{left ? ' so far' : ''}: {val(bgAt.v as number)}</span>{/if}
+			{#if left}<span class="bgl togo">{left}</span>{/if}
 		</div>
 	{/if}
 	</div>
-	<figcaption class="readout" aria-live="polite">
+	<figcaption class="sr" aria-live="polite">
 		{#if hover !== null}
 			{@const p = pts[hover]}
-			Record {val(p[1])} {prov && hover === pts.length - 1 ? 'provisional,' : 'from'} {whenOf(p[0])}{#if hov === null}<button type="button" class="rel" onclick={() => (pin = null)}>Release</button>{/if}
-		{:else}
-			{bgPath ? 'The faint line is the best of each ' + (bgWhen && bgIn.length > 1 && bgIn[1][0] - bgIn[0][0] > 200 * 864e5 ? 'year' : 'month') + '. ' : ''}{steps.length - 1 === 0 ? (trimmed ? `First above zero in ${yearOf(first)}` : 'Not broken since the data began') : `Broken ${steps.length - 1} times since ${trimmed ? `the first above zero in ${yearOf(first)}` : yearOf(first)}`}{prov ? '; dashed: provisional' : ''}. {touch ? 'Tap or drag' : 'Hover or click'} for the record at any date.
+			Record {val(p[1])} {prov && hover === pts.length - 1 ? 'provisional,' : 'from'} {whenOf(p[0])}{#if bgAt}; {bgWhen ? bgWhen(bgAt.t) : ''}{left ? ' so far' : ''}: {val(bgAt.v as number)}{/if}{#if left}; {left}{/if}
 		{/if}
 	</figcaption>
 </figure>
 
 <style>
 	.prog { margin: 0; display: grid; gap: 4px; }
-	svg { width: 100%; height: auto; display: block; touch-action: pan-y; }
+	svg.chart { width: 100%; height: auto; display: block; touch-action: pan-y; user-select: none; }
+	svg.zoomable { cursor: crosshair; }
 	.grid { stroke: var(--grid); stroke-width: 1; }
 	.lab { fill: var(--muted); font-family: var(--font-data); font-size: 12px; }
 	.cursor { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 3 3; }
 	.hole { fill: var(--surface); stroke-width: 2.4; }
 	.bg { stroke-width: 1.2; opacity: 0.35; }
+	.bg.cur { opacity: 0.55; }
 	.bg-dot { stroke-width: 1.6; }
+	/* a period still under way: washed out as the tracker washes its partial periods */
+	.wash { fill: var(--surface); opacity: 0.6; }
+	.zsel { fill: color-mix(in srgb, var(--accent) 16%, transparent); stroke: var(--accent); stroke-width: 1; }
 	.tip .bgl { color: var(--muted); }
-	.readout { color: var(--muted); font-size: 0.8rem; min-height: 1.4em; }
+	.tip .togo { font-style: italic; }
 	.plot { position: relative; }
 	/* the value and date beside the hovered step */
 	.tip { position: absolute; transform: translate(12px, -50%); pointer-events: none; display: grid; gap: 1px; padding: 5px 8px; border-radius: 4px;
-		background: var(--surface); border: 1px solid var(--line); box-shadow: 0 4px 14px rgb(0 0 0 / 0.12); font-size: 0.78rem; color: var(--ink-2); white-space: nowrap; }
+		background: var(--surface); border: 1px solid var(--line); box-shadow: 0 4px 14px rgb(0 0 0 / 0.12); font-size: 0.78rem; color: var(--ink-2); white-space: nowrap; z-index: 1; }
 	.tip.flip { transform: translate(calc(-100% - 12px), -50%); }
 	/* touch: above the chart, centred on the point, so the finger doesn't hide it */
 	.tip.above { top: 0; transform: translate(-50%, calc(-100% - 6px)); z-index: 2; }
 	.cursor.pinned { stroke: var(--accent); stroke-dasharray: none; }
-	.rel { font: inherit; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); background: none; border: 0; padding: 0 4px; margin-left: 8px; cursor: pointer; }
 	.tip b { font-family: var(--font-data); color: var(--ink); font-size: 0.9rem; }
+	.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 </style>

@@ -76,6 +76,12 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   link; computers: copies the link) and Download (the 1200 x 630 PNG from `shareImage.js`) beside the region picker,
   and again at its foot. Its two charts (`Progression`, `DayChart`) pin a point on click, tap or drag (it stays after
   the finger lifts; another click, a tap outside or Escape lets go), and on touch the tooltip sits above the chart.
+  A mouse drag across either zooms into that span (owner's call, 25 Oct 2026; the y axis fits what is shown, the
+  progression's x axis turns to months, `DayChart` labels with `periodAxis`'s `lab` past its usual ticks). Zoom and pin
+  are bound to the page, which shows Reset zoom and Pinned · Release in the card's heading (`ChartControls.svelte`), never
+  over the chart; Escape lets go of the pin first, then the zoom. The progression's explanation is the ⓘ beside "How the
+  record grew" (`growNote`), not a line under the chart. "Has stood for" counts from the end of the record's period
+  (`recEnd`: a year record from 1 January after it), not its start.
   Records added 23 Oct 2026 (records.py VERSION 4): most fossil generation, peak hydro, and, for days/weeks/months/years
   only (`periods: true` in DEFS), lowest hydro and lowest price: the half-hour list shows their day record (`Average over
   the day`), and their page opens on its day (owner's report, 25 Oct 2026: the note there looked like a gap). A record
@@ -89,7 +95,12 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   `hist/records-detail.json` (records.py `build_detail`, published with records.json when it changes; served by the
   Worker; loaded only by record pages via `loadDetail`): `bg`, each record's best by month (by year for year records)
   against `months`/`years`, the faint line behind `Progression` (`bgOf`; its hover follows the pointer's date and gives
-  the record in force and that month's best); `period`, each period record's own series (`period_series`: half-hours
+  the record in force and that month's best; the month or year still running is drawn across its whole span (the
+  axis runs on to its end, `bgEnd`) and washed out like the tracker's partial periods (a 0.6 surface wash, the
+  segment drawn a little stronger first so it stays readable), and the tooltip there says how long is left
+  (`hoursToGo`, counted from the start of today like "Heading for a record"); month and year records' files leave
+  the running period out, so the page passes its figure so far as `now`, from `periodNow`/`figureSoFar`, the same sums as
+  "Heading for a record"); `period`, each period record's own series (`period_series`: half-hours
   for a day, hours for a week, days for a month, weeks for a year), charted on its page by `DayChart` with
   `periodAxis`'s ticks and the record as a dashed average line.
   Until the history is complete the file isn't published and the page says the records are being worked out. `article-template` is a draft layout sample. Articles dated after today (NZ time, at build) are scheduled: hidden like drafts until a build on or after their date (`scheduled`/`hidden` in the registry; any push rebuilds). Series: an article with `series: '<key>'` and `part: n` in its meta (keys in `SERIES` in the registry) shows "Part n of N" under its title and `SeriesNav` (all parts, previous/next) at its end, and the index folds the series into one card. No series is defined now: the first, "Inside the wholesale market" (7 parts), was removed on 18 Oct 2026 while the owner rethinks its content; commit 21c8b47 is the last with it (its pages, `src/lib/articles/series/wholesale.ts`, data JSON and cover PNGs). `analysis/wholesale_prices.py` (after `analysis/price_fetch.py`) still makes its figures, and `PriceCover` its covers. Article charts are Svelte SVG components in `src/lib/articles/charts/` (Columns (with optional same-axis `marks`), HBars, DotRank, Lines (`xzero`, `xticks` for year and clock axes), TimeStack (`labelEvery`, fixed `ymax`/`pmax` to compare two charts), OfferStack (a supply curve from generator offers), Scatter, Ridgeline (one row per year, each on its own scale), TimeMoney (share of time against share of money by band), SplitBar (one whole in parts), MarketDiagram (the market as a flow); site colour tokens, hover readouts, a data table under each) plus `Stats` for headline figures; an article's chart data is a JSON file in `src/lib/articles/data/`, written by a script in `analysis/` (`winter_2026.py` for the Winter 2026 review, which also prints every figure quoted in the text). Quarterly reviews open with `ReviewCover`
