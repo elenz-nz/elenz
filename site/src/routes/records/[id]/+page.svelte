@@ -25,8 +25,9 @@
 	let region = $state('NZ');
 	// a half-hour record's day, week, month or year record (?period=)
 	let period = $state('tp');
-	// a record kept for periods only (d.periods) has no half-hour record: it opens on its month
-	const per = $derived(d.kind === 'hh' ? (d.periods && period === 'tp' ? 'month' : period) : 'tp');
+	// a record kept for periods only (d.periods) has no half-hour record: it opens on its day, as the Records list
+	// shows it on the half-hour list
+	const per = $derived(d.kind === 'hh' ? (d.periods && period === 'tp' ? 'day' : period) : 'tp');
 	let liveD = $state.raw<any>(null);
 	let det = $state.raw<any>(null);   // records-detail.json: the best by month behind the progression, the record periods
 	let shareMsg = $state('');   // "Link copied" for a moment after Share copies the link
@@ -165,7 +166,7 @@
 
 	<main class="rec-one">
 		<div class="head">
-			<p class="crumb"><a href="/records{(() => { const q = new URLSearchParams(); if (region !== 'NZ') q.set('region', region); if (per !== 'tp') q.set('period', per); const x = q.toString(); return x ? '?' + x : ''; })()}">Records</a> › {d.group}</p>
+			<p class="crumb"><a href="/records{(() => { const q = new URLSearchParams(); if (region !== 'NZ') q.set('region', region); if (period !== 'tp') q.set('period', period); const x = q.toString(); return x ? '?' + x : ''; })()}">Records</a> › {d.group}</p>
 			<div class="h-row">
 				<h1><span class="dot" style="--c:var({d.tok})"></span>{fullName(d)}{#if d.est}<span class="tag est">Estimate</span>{/if}</h1>
 				<div class="acts">
