@@ -2,8 +2,22 @@
 	// The list of records comes from the Records pages' own definitions, so this page can't drift from them.
 	import { LISTED as DEFS, GROUPS, NEW_DAYS } from '#lib/records/records.js';
 	import { REPO } from '../registry.js';
-	const KIND: Record<string, string> = { hh: 'Half-hour', month: 'Calendar month', run: 'Run of half-hours' };
-	const FAM: Record<string, string> = { gen: 'Metered generation and demand', price: 'Final prices', hvdc: 'Metered HVDC' };
+	// what each record measures, in a line (the definitions' own `sub` is written for the Records list, where some say
+	// only "Half-hour")
+	const WHAT: Record<string, string> = {
+		demand_max: 'Grid demand: metered, not counting embedded solar', demand_min: 'Grid demand: metered, not counting embedded solar',
+		ren_max: 'Renewable share of generation', ren_min: 'Renewable share of generation',
+		ren_run: 'Half-hours in a row at 90% renewable or more', fossil_min: 'Huntly’s Rankines, gas, diesel and waste heat',
+		fossil_max: 'Huntly’s Rankines, gas, diesel and waste heat', huntly_off_run: 'Half-hours in a row with no Huntly Rankine generating',
+		hydro_max: 'Hydro generation', hydro_min: 'Hydro generation: a dry spell', wind_max: 'Wind generation',
+		solar_max: 'Solar farms the market dispatches', roof_max: 'Rooftops and small arrays on local networks, modelled',
+		price_max: 'Island reference price (final)', price_min: 'Island reference price (final)',
+		gap_max: 'Haywards price against Benmore', low_price_run: 'Half-hours in a row under $5/MWh (New Zealand: both islands)',
+		hvdc_n_max: 'Benmore to Haywards', hvdc_s_max: 'Haywards to Benmore',
+	};
+	const kept = (d: any) => (d.kind === 'run' ? 'Run (any length)' : d.periods ? 'Day, week, month, year' : 'Half-hour, day, week, month, year');
+	const DATA: Record<string, string> = { gen: 'Metered generation and demand', price: 'Final prices', hvdc: 'Metered HVDC' };
+	const dataOf = (d: any) => (d.est ? 'Modelled (embedded solar)' : DATA[d.fam]);
 	const regions = (r: string[]) => (r.length === 3 ? 'New Zealand, each island' : r.map((x) => ({ NZ: 'New Zealand', NI: 'North Island', SI: 'South Island' })[x]).join(', '));
 </script>
 
@@ -13,11 +27,11 @@
 	<dt>Half-hour records</dt>
 	<dd>The highest or lowest half-hour: each trading period’s average, as the history holds it. A record has to beat the one before it; equalling it doesn’t count.</dd>
 	<dt>Days, weeks, months and years</dt>
-	<dd>Each half-hour record also has its highest or lowest day, week (Monday to Sunday), calendar month and calendar year, New Zealand time: the period’s average over its half-hours (MW, or $/MWh for prices), and for the renewable share, renewable energy over all the period’s generation. Averages rather than totals, so periods of different lengths compare fairly: a February isn’t the lowest-demand month just for being short. Only whole periods count, so the history’s first part-year (1997) and the period still under way are left out, and a day needs 90% of its half-hours. A period is official when every day in it is official, and a newer one beyond the record is provisional. Pick the period at the top of the records table or on a record’s page. (These replace the earlier month records for the renewable share and wind, whose pages still work.) The lowest price and lowest hydro are kept for these periods only: their half-hours say little (prices often fall to a few cents, and hydro is lowest overnight), but a month or a year of them marks a glut of cheap power or a dry spell. A period record shows its energy beside its average (the average times the period’s hours), though it is ranked by the average.</dd>
+	<dd>Each half-hour record also has its highest or lowest day, week (Monday to Sunday), calendar month and calendar year, New Zealand time: the period’s average over its half-hours (MW, or $/MWh for prices), and for the renewable share, renewable energy over all the period’s generation. Averages rather than totals, so periods of different lengths compare fairly: a February isn’t the lowest-demand month just for being short. Only whole periods count, so the history’s first part-year (1997) and the period still under way are left out, and a day needs 90% of its half-hours. A period is official when every day in it is official, and a newer one beyond the record is provisional. Pick the period at the top of the records table or on a record’s page. (These replace the earlier month records for the renewable share and wind, whose pages still work.) The lowest price and lowest hydro are kept for these periods only: their half-hours say little (prices often fall to a few cents, and hydro is lowest overnight), but a month or a year of them marks a glut of cheap power or a dry spell; the half-hour list shows their lowest day. A period record shows its energy beside its average (the average times the period’s hours), though it is ranked by the average.</dd>
 	<dt>Runs</dt>
 	<dd>The longest unbroken run of half-hours meeting a condition, joined across month boundaries: at least 90% renewable, prices under $5/MWh, or no Huntly Rankine running.</dd>
 </dl>
-<p>Each record’s page shows how it grew: every time it was broken since 1997, worked out from the half-hours that beat everything before them. A faint line behind it gives the best of each month (each year, for year records), so the near misses show. The month (or year) still running is shown as it stands so far, washed out like a partial period on the tracker, and hovering there says how long is left. Drag across either chart with a mouse to zoom in. “Has stood for” counts from the end of the record’s half-hour, day, week, month or year, when it was set. A day, week, month or year record’s page also charts the period itself: its half-hours, hours, days or weeks, around its average.</p>
+<p>Each record’s page shows how it grew: every time it was broken since 1997, worked out from the half-hours that beat everything before them. A faint line behind it gives the best of each month (each year, for year records), so the near misses show; a key above the chart names each line. The month (or year) still running is shown as it stands so far, washed out like a partial period on the tracker, and hovering there says how long is left. Drag across either chart with a mouse to zoom in. “Has stood for” counts from the end of the record’s half-hour, day, week, month or year, when it was set. A day, week, month or year record’s page also charts the period itself: its half-hours, hours, days or weeks, around its average.</p>
 
 <h2 id="official">Official and provisional</h2>
 <p>A record is official once it rests on final data. The history uses the EA’s metered generation and demand for every month it has published (about 5–6 weeks after the month ends), final prices (usually the next day) and metered HVDC flows (about two weeks after the month). See <a href="/methods/history">History since 1997</a>.</p>
@@ -28,19 +42,22 @@
 <h2 id="pace">On record pace</h2>
 <p>Once half of the current day, week, month or year has gone, the records page lists any record it is on pace to break: where its average so far is ahead of where the record period was at the same point, as in a race. Weeks, months and years compare whole days (the record period’s average after the same number of days); a day compares whole half-hours. The current period comes from the history and the live week after it, both dispatch data, so it is provisional; the rest of the period can still change it, and the page says what the rest would need to average to beat the record outright.</p>
 
+<h2 id="demand">Demand and embedded solar</h2>
+<p>Demand records are metered grid demand: what the grid delivered. Embedded solar (rooftops and small arrays on local networks) meets part of the country’s use before it reaches a grid meter, so it isn’t in them. It is modelled rather than metered (<a href="/methods/embedded-solar">Embedded solar</a>), from August 2013 (zero before, when the registry starts), so demand with it added back can’t be a record. The demand records’ pages show it for information: a dashed line above the faint one, the same best each month (or day, week, month or year) with embedded solar added back, and its figure in the tooltip, marked as an estimate. Half-hour lows fall overnight, when there is no solar, so the two lines meet there; daytime and longer periods show the gap growing as rooftop solar has.</p>
+
 <h2 id="list">Every record</h2>
-<p>Definitions follow the rest of the site: generation is each fuel’s output summed (battery discharge only, no HVDC); the renewable share is of that total less battery discharge, with geothermal, bioenergy, hydro, wind, grid solar and embedded solar counted as renewable (<a href="/methods/groupings">Renewable share and groupings</a>); fossil generation is Huntly’s Rankines, gas, diesel and waste heat; demand is metered grid demand (<a href="/methods/demand">Demand</a>); prices are at the island reference nodes, Haywards and Benmore, and New Zealand’s is the higher of the two.</p>
+<p>Definitions follow the rest of the site: generation is each fuel’s output summed (battery discharge only, no HVDC); the renewable share is of that total less battery discharge, with geothermal, bioenergy, hydro, wind, grid solar and embedded solar counted as renewable (<a href="/methods/groupings">Renewable share and groupings</a>); fossil generation is Huntly’s Rankines, gas, diesel and waste heat; demand is metered grid demand (<a href="/methods/demand">Demand</a>), which leaves out what rooftops and small arrays supply behind the meter; prices are at the island reference nodes, Haywards and Benmore, and New Zealand’s is the higher of the two.</p>
 <div class="tbl">
 	<table>
-		<thead><tr><th>Record</th><th>Kind</th><th>Kept for</th><th>Official with</th></tr></thead>
+		<thead><tr><th>Record</th><th>Kept for</th><th>Regions</th><th>Rests on</th></tr></thead>
 		<tbody>
 			{#each GROUPS as g}
 				{#each DEFS.filter((d) => d.group === g) as d}
 					<tr>
-						<td><a href="/records/{d.id}">{d.name}</a>{#if d.est} <span class="est-tag">Estimate</span>{/if}<br /><small>{d.sub}</small></td>
-						<td>{d.periods ? 'Day, week, month and year' : KIND[d.kind]}</td>
+						<td><a href="/records/{d.id}">{d.name}</a>{#if d.est} <span class="est-tag">Estimate</span>{/if}<br /><small>{WHAT[d.id] ?? d.sub}</small></td>
+						<td>{kept(d)}</td>
 						<td>{regions(d.regions)}</td>
-						<td>{FAM[d.fam]}</td>
+						<td>{dataOf(d)}</td>
 					</tr>
 				{/each}
 			{/each}
