@@ -65,7 +65,7 @@
 	};
 	const regionName = $derived(REGIONS.find((x) => x.id === region)!.name);
 
-	// link: the record's page; for a record kept for periods only, seen on the half-hour list, its month record
+	// link: the record's page
 	type Row = { d: any; rec: any; na: string | null; prov: any; isNew: boolean; p: string; link: string | null };
 	// groups with no record for this region (HVDC for an island) are left out rather than listed as not shown
 	const shownGroups = $derived(GROUPS.filter((g) => DEFS.some((d) => d.group === g && d.regions.includes(region))));
@@ -75,11 +75,14 @@
 		return shownGroups.filter((g) => cat === 'all' || g === cat).map((g) => ({
 			name: g,
 			rows: DEFS.filter((d) => d.group === g).map((d): Row => {
-				const p = d.kind === 'hh' ? period : 'tp';
+				// a record kept for periods only (lowest hydro, lowest price) shows its day record on the half-hour list
+				const p = d.kind !== 'hh' ? 'tp' : d.periods && period === 'tp' ? 'day' : period;
 				const rec = get(R, d.id, region, p);
 				const na = notShown(d, region, rec, R, p);
 				const prov = na ? null : p === 'tp' ? provisional(R, live, d.id, region) : (rec?.prov ?? null);
-				const link = !na ? href(d.id) : d.periods && p === 'tp' && d.regions.includes(region) ? href(d.id, region, 'month') : null;
+				// its page opens on the day record by itself, so the link leaves the list's period off and Back to Records
+				// returns to the same list
+				const link = na ? null : d.periods && period === 'tp' ? href(d.id, region, 'tp') : href(d.id);
 				return { d, rec, na, prov, p, link, isNew: !na && !!rec?.since && Date.now() - rec.since < 30 * 864e5 };
 			}),
 		}));

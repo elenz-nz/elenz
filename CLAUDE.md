@@ -77,8 +77,9 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   and again at its foot. Its two charts (`Progression`, `DayChart`) pin a point on click, tap or drag (it stays after
   the finger lifts; another click, a tap outside or Escape lets go), and on touch the tooltip sits above the chart.
   Records added 23 Oct 2026 (records.py VERSION 4): most fossil generation, peak hydro, and, for days/weeks/months/years
-  only (`periods: true` in DEFS; the half-hour list shows them as a note linking to their month), lowest hydro and lowest
-  price. A DEFS entry's `v` is the records.json version that first has it; an older file says it is being worked out.
+  only (`periods: true` in DEFS), lowest hydro and lowest price: the half-hour list shows their day record (`Average over
+  the day`), and their page opens on its day (owner's report, 25 Oct 2026: the note there looked like a gap). A record
+  page's "Records" breadcrumb returns to the list's own period (`period`, the one asked for), not the page's `per`. A DEFS entry's `v` is the records.json version that first has it; an older file says it is being worked out.
   "Heading for a record" (owner's call, 23 Oct 2026): `pace()` in records.js lists a current day/week/month/year once
   half of it has gone (`PACE_SHARE`) and only while it is ahead of its record period at the same point (whole days, or
   half-hours for a day), from records.json `pace` (records.py `pace_sums`: the current periods' sums in the history,
