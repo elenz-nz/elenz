@@ -333,7 +333,14 @@ export async function loadDetail(fetchFn = fetch) {
 /** The background line for a record: [[t, v | null], ...], one point a month (a year for year records), at the
  *  start of each. */
 export function bgOf(det, id, period, region) {
-  const v = det?.bg?.[id]?.[period]?.[region];
+  return lineOf(det, det?.bg?.[id]?.[period]?.[region], period);
+}
+/** For the demand records: the same line for demand with embedded solar added back (records.py build_detail `udem`),
+ *  drawn dashed for information only; null for other records, or before the detail file has it. */
+export function udemOf(det, id, period, region) {
+  return lineOf(det, det?.udem?.[id]?.[period]?.[region], period);
+}
+function lineOf(det, v, period) {
   if (!v) return null;
   if (period === 'year') return v.map((x, i) => [nzMidnight(+det.years[i], 0, 1), x]);
   return v.map((x, i) => { const [y, m] = det.months[i].split('-').map(Number); return [nzMidnight(y, m - 1, 1), x]; });

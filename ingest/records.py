@@ -40,8 +40,9 @@ import pandas as pd
 
 from common import NZ
 
-VERSION = 4                # bump when summarise() changes: every month's summary is remade (2: per-day sums for periods;
-                           # 3: renewable share without battery discharge; 4: most fossil, hydro high and low, lowest price)
+VERSION = 5                # bump when summarise() changes: every month's summary is remade (2: per-day sums for periods;
+                           # 3: renewable share without battery discharge; 4: most fossil, hydro high and low, lowest price;
+                           # 5: info, the month's highest and lowest half-hour of demand with embedded solar added back)
 REGIONS = ('NZ', 'NI', 'SI')
 GEN = ('geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
 REN = ('geo', 'bio', 'hydro', 'wind', 'solar', 'roof')
@@ -122,7 +123,7 @@ def series(js):
     nip, sip = a('NI', 'price'), a('SI', 'price')
     hv = _arr(js.get('hvdcN'), n)
     huntly = sum((_arr(p['s'], n) for p in js.get('plants', []) if p['name'].startswith('Huntly Rankine')), np.zeros(n))
-    out = {k: {} for k in list(HALF_HOURS) + list(RUNS) + ['gen', 'renE', 'windE']}
+    out = {k: {} for k in list(HALF_HOURS) + list(RUNS) + ['gen', 'renE', 'windE', 'udem']}
     for r in REGIONS:
         F = {f: np.maximum(v, 0) for f, v in fu[r].items()}   # as the site: each fuel's output, battery discharge only
         # the renewable share is of generation less battery discharge (as em6 and the site): that energy was generated,
@@ -147,6 +148,9 @@ def series(js):
                 continue
             out[k][r] = v
         out['gen'][r], out['renE'][r], out['windE'][r] = gen, ren, F['wind']
+        # demand with embedded solar added back (what the region used, met partly behind the meter): for information
+        # beside the demand records, never a record itself (embedded solar is modelled)
+        out['udem'][r] = dem + np.nan_to_num(F['roof'])
         # per-day sums for the period records
         out.setdefault('sums', {})[r] = {
             'dem': out['demand_max'][r], 'gen': gen, 'ren': ren,
@@ -240,6 +244,10 @@ def summarise(js):
         share = round(100 * ren / gen, 1) if gen > 0 else None
         mo['ren_month_max'][r] = mo['ren_month_min'][r] = share
         mo['wind_month_max'][r] = round(float(np.nansum(S['windE'][r])) * step / 3.6e6 / 1000, 1)   # MW x ms -> GWh
+    info = {'udem': {}}
+    for r in REGIONS:
+        ok = S['udem'][r][~np.isnan(S['udem'][r])]
+        info['udem'][r] = {'lo': round(float(ok.min())), 'hi': round(float(ok.max()))} if len(ok) else None
     runs = {}
     for k, (_, regions) in RUNS.items():
         runs[k] = {}
@@ -247,7 +255,7 @@ def summarise(js):
             head, tail, inner = run_parts(S[k][r])
             runs[k][r] = {'head': head, 'tail': tail, 'top': [[int(t[i]), m] for i, m in inner]}
     return {'v': VERSION, 'month': js['meta']['month'], 't0': t0, 'step': step, 'n': n,
-            'end': t0 + (n - 1) * step, 'ok': official(js['meta']), 'hh': hh, 'mo': mo, 'run': runs,
+            'end': t0 + (n - 1) * step, 'ok': official(js['meta']), 'hh': hh, 'mo': mo, 'run': runs, 'info': info,
             'days': day_sums(js, S)}
 
 
@@ -768,7 +776,10 @@ def build_detail(sums, rec, read_month=None):
         month record: every month; its year record: every year), {id: {period: {region: [value or None, ...]}}}
         against `months` (or `years`), the faint line behind each progression, showing the near misses;
     period: the record period itself for its chart, {period: {id: {region: {t, t0, step, v}}}} (t: the record's start,
-        so the page can tell it belongs to the record it shows)."""
+        so the page can tell it belongs to the record it shows);
+    udem: for the demand records, the same as bg for demand with embedded solar added back (half-hours from each
+        month's summary `info`; days to years as the period's average demand plus its average embedded solar), drawn
+        dashed above the faint line for information only: embedded solar is modelled, so it is never a record."""
     sums = sorted(sums, key=lambda s: s['month'])
     months = [s['month'] for s in sums]
     mi = {m: i for i, m in enumerate(months)}
@@ -800,6 +811,32 @@ def build_detail(sums, rec, read_month=None):
                         if i is not None and (v[i] is None or better(x, v[i])):
                             v[i] = x
                 bg[k].setdefault(p, {})[r] = v
+    udem = {}
+    for k in ('demand_max', 'demand_min'):
+        kind, _, regions, _ = HALF_HOURS[k]
+        better = (lambda a, b: a < b) if kind == 'min' else (lambda a, b: a > b)
+        for r in regions:
+            v = [None] * len(months)
+            for s in sums:
+                e = (s.get('info') or {}).get('udem', {}).get(r)
+                if e:
+                    v[mi[s['month']]] = e['lo' if kind == 'min' else 'hi']
+            if any(x is not None for x in v):   # summaries made before VERSION 5 have no info
+                udem.setdefault(k, {}).setdefault('tp', {})[r] = v
+            for p in PERIODS:
+                roof = {t: x for t, x, ok in figs.get(p, {}).get('roof_max', {}).get(r, [])}
+                rows = [(t, x + roof[t]) for t, x, ok in figs.get(p, {}).get(k, {}).get(r, []) if t in roof]
+                if p == 'year':
+                    v = [None] * len(years)
+                    for t, x in rows:
+                        v[yi[pd.Timestamp(t, unit='ms', tz='UTC').tz_convert(NZ).strftime('%Y')]] = round(x)
+                else:
+                    v = [None] * len(months)
+                    for t, x in rows:
+                        i = mi.get(pd.Timestamp(t, unit='ms', tz='UTC').tz_convert(NZ).strftime('%Y-%m'))
+                        if i is not None and (v[i] is None or better(x, v[i])):
+                            v[i] = round(x)
+                udem.setdefault(k, {}).setdefault(p, {})[r] = v
     cache = {}
 
     def read_m(m):
@@ -813,7 +850,7 @@ def build_detail(sums, rec, read_month=None):
                 ser = period_series(days, read_m, p, k, r, x['t'])
                 if ser and any(v is not None for v in ser['v']):
                     per.setdefault(p, {}).setdefault(k, {})[r] = {'t': x['t'], **ser}
-    return {'v': VERSION, 'months': months, 'years': years, 'bg': bg, 'period': per}
+    return {'v': VERSION, 'months': months, 'years': years, 'bg': bg, 'udem': udem, 'period': per}
 
 
 def same(a, b):

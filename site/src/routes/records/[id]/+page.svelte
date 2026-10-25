@@ -13,7 +13,7 @@
 	import { drawRecord } from '#lib/records/shareImage.js';
 	import { stamp } from '#lib/site/viewurl.js';
 	import {
-		LISTED, PERIODS, PERIOD_KEYS, periodOf, periodSub, periodWhen, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats, energy, pace, soFar, toGo, needText, paceAt, periodNow, figureSoFar, loadDetail, bgOf, periodSeries, periodAxis,
+		LISTED, PERIODS, PERIOD_KEYS, periodOf, periodSub, periodWhen, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats, energy, pace, soFar, toGo, needText, paceAt, periodNow, figureSoFar, loadDetail, bgOf, udemOf, periodSeries, periodAxis,
 		loadRecords, trimZeros, periodHours, meteredDue, clock, dayOf, dayLong, monthOf, yearOf, daysBetween, runLength, NEW_DAYS
 	} from '#lib/records/records.js';
 	import type { PageProps } from './$types';
@@ -80,6 +80,24 @@
 		return `${hi} ${per === 'tp' ? 'half-hour' : per} in ${monthOf(t)}`;
 	};
 	// a month or year record's running period so far: the faint line's last step (records-detail leaves it out)
+	// demand records: the same line for demand with embedded solar added back, dashed, for information only
+	const isDemand = $derived(d.id === 'demand_max' || d.id === 'demand_min');
+	// it starts where embedded solar does (Aug 2013): before that it would sit on the faint line
+	const udem = $derived.by(() => {
+		const u: [number, number | null][] | null = isDemand && d.kind === 'hh' ? udemOf(det, d.id, per, region) : null;
+		if (!u || !bg || u.length !== bg.length) return u;
+		const i = u.findIndex((x, k) => x[1] != null && bg[k][1] != null && x[1] !== bg[k][1]);
+		return i < 0 ? null : u.map((x, k) => (k < i ? [x[0], null] : x) as [number, number | null]);
+	});
+	const udemNow = $derived.by(() => {
+		if (!udem || (per !== 'month' && per !== 'year')) return null;
+		const c = periodNow(R, liveD, per);
+		const a = c ? figureSoFar(c, d, region) : null, b = c ? figureSoFar(c, def('roof_max'), region) : null;
+		return c && a && b ? { t: c.start, v: Math.round(a.v + b.v) } : null;
+	});
+	// the key over the progression: what each line is
+	const bgKey = $derived(per === 'year' ? 'Each year' : per === 'month' ? 'Each month'
+		: `${d.id.endsWith('_min') ? 'Lowest' : 'Highest'} ${per === 'tp' ? 'half-hour' : per} each month`);
 	const bgNow = $derived.by(() => {
 		if (!bg || (per !== 'month' && per !== 'year')) return null;
 		const c = periodNow(R, liveD, per);
@@ -127,7 +145,8 @@
 		const what = per === 'year' || per === 'month' ? `each ${per}’s figure` : `the ${hi} ${per === 'tp' ? 'half-hour' : per} in each month`;
 		return `${n === 0 ? (tr ? `First above zero in ${yearOf(trimZeros(rec.steps)[0][0])}` : 'Not broken since the data began') : `Broken ${n} ${n === 1 ? 'time' : 'times'} since ${since}`}.`
 			+ (bg ? ` The faint line is ${what}; the ${unit} still running is shown as it stands so far, washed out, and hovering there says how long is left.` : '')
-			+ (prov ? ' Dashed: provisional, from dispatch data.' : '')
+			+ (udem ? ` The dashed line is the same with embedded solar added back: what ${region === 'NZ' ? 'the country' : 'the island'} used, met partly by rooftops and small arrays behind the meter. It is there for information only, not a record, because embedded solar is modelled (from August 2013; zero before).` : '')
+			+ (prov ? ' Dashed step: provisional, from dispatch data.' : '')
 			+ ' Hover or tap for the record at any date; click to pin it. Drag across the chart to zoom in; Reset zoom or Escape goes back.';
 	});
 
@@ -283,8 +302,13 @@
 			{/if}
 
 			<section class="panel" aria-labelledby="grow-h">
-				<div class="p-head"><div class="ttl-row"><h2 id="grow-h">How the record grew</h2><InfoTip label="About this chart">{growNote} <a href="/methods/records">How records work</a></InfoTip></div><div class="ctls">{#if growZoom || growPin !== null}<ChartControls zoomed={!!growZoom} pinned={growPin !== null} text={growZoom ? `${monYr(growZoom[0])} – ${monYr(growZoom[1])}` : ''} onreset={() => (growZoom = null)} onrelease={() => (growPin = null)} />{:else}<span class="unit">Each step is a new record</span>{/if}</div></div>
-				<Progression steps={rec.steps} first={R.first} end={R.end} tok={d.tok} fmt={axisFmt} full={f} {bg} {bgWhen} now={bgNow} bind:zoom={growZoom} bind:pin={growPin} dashed={!!d.est} prov={prov ? { t: prov.t, v: prov.v } : null} when={(t) => per !== 'tp' ? periodWhen(t, per) : d.kind === 'month' ? monthOf(t) : d.kind === 'run' ? dayOf(t) : `${clock(t)}, ${dayOf(t)}`}
+				<div class="p-head"><div class="ttl-row"><h2 id="grow-h">How the record grew</h2><InfoTip label="About this chart">{growNote} <a href="/methods/records">How records work</a></InfoTip></div><div class="ctls">{#if growZoom || growPin !== null}<ChartControls zoomed={!!growZoom} pinned={growPin !== null} text={growZoom ? `${monYr(growZoom[0])} – ${monYr(growZoom[1])}` : ''} onreset={() => (growZoom = null)} onrelease={() => (growPin = null)} />{/if}</div></div>
+				<ul class="key" aria-label="Key">
+					<li><svg width="22" height="8" aria-hidden="true"><line x1="0" x2="22" y1="4" y2="4" style="stroke:var({d.tok})" stroke-width="2.4" /></svg>Record</li>
+					{#if bg}<li><svg width="22" height="8" aria-hidden="true"><line x1="0" x2="22" y1="4" y2="4" style="stroke:var({d.tok})" stroke-width="1.2" opacity="0.35" /></svg>{bgKey}</li>{/if}
+					{#if udem}<li><svg width="22" height="8" aria-hidden="true"><line x1="0" x2="22" y1="4" y2="4" style="stroke:var({d.tok})" stroke-width="1.3" stroke-dasharray="4 3" opacity="0.6" /></svg>With embedded solar added back <span class="muted">(estimate, not a record)</span></li>{/if}
+				</ul>
+				<Progression steps={rec.steps} first={R.first} end={R.end} tok={d.tok} fmt={axisFmt} full={f} {bg} {bgWhen} now={bgNow} info={udem} infoNow={udemNow} infoLabel="With embedded solar" bind:zoom={growZoom} bind:pin={growPin} dashed={!!d.est} prov={prov ? { t: prov.t, v: prov.v } : null} when={(t) => per !== 'tp' ? periodWhen(t, per) : d.kind === 'month' ? monthOf(t) : d.kind === 'run' ? dayOf(t) : `${clock(t)}, ${dayOf(t)}`}
 					label="{fullName(d)}, {regionName}: the record over time, from {f(rec.steps[0][1])} in {yearOf(rec.steps[0][0])} to {f(rec.v)} in {yearOf(rec.t)}, broken {rec.n} times" />
 			</section>
 
@@ -395,6 +419,9 @@
 	.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px; min-width: 0; display: grid; gap: 10px; align-content: start; }
 	.panel p { margin: 0; }
 	.p-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+	.key { list-style: none; margin: 4px 0 2px; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 0.78rem; color: var(--ink-2); }
+	.key li { display: inline-flex; align-items: center; gap: 6px; }
+	.key .muted { color: var(--muted); }
 	.p-head .ctls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-height: 28px; }
 	h2 { font-size: 1rem; }
 	.unit, .note { color: var(--muted); font-size: 0.8rem; }
