@@ -6,10 +6,10 @@
 	// zooms into that span (at least two months; the axes follow); Reset zoom or Escape goes back. bg: the best of
 	// each month (or year) through the history, drawn faintly behind the record line (records.py build_detail), so the
 	// near misses show; the tooltip gives the record in force at the pointer's date and that month's best. The month
-	// (or year) still running is drawn as it stands so far across the whole period, washed out like the tracker's
-	// partial periods (the chart's dates run on to its end), and the tooltip there says how long is left ("6 days to
-	// go"). Month and year records leave the running period out of `bg` (it isn't whole), so the page passes its figure
-	// so far as `now` ({ t: its start, v }). info (demand records only): the same line for demand with embedded solar
+	// (or year) still running is drawn as it stands so far across the whole period (the chart's dates run on to its
+	// end), dotted, in a hatched band (a wash like the tracker's partial periods didn't show on a single line; owner,
+	// 25 Oct 2026), and the tooltip there says "so far" and how long is left ("6 days to go"). Month and year
+	// records leave the running period out of `bg` (it isn't whole), so the page passes its figure so far as `now` ({ t: its start, v }). info (demand records only): the same line for demand with embedded solar
 	// added back, drawn dashed above the faint line for information (embedded solar is modelled, so it is never a
 	// record), with infoNow for its running period and infoLabel naming it in the tooltip. The page's ⓘ beside the heading explains the chart; zoom and pin are bound
 	// to the page, which shows Reset zoom and Release in the card's heading (ChartControls).
@@ -48,7 +48,7 @@
 	const bgIn = $derived(within(bg, now));
 	const infoIn = $derived(within(info, infoNow));
 	// the period still running: the faint line's last month (or year), if it ends after the data; drawn across its
-	// whole span, washed out, and the chart's dates run on to its end
+	// whole span, dotted in a hatched band, and the chart's dates run on to its end
 	const cur = $derived.by(() => {
 		const b = bgIn[bgIn.length - 1];
 		if (!b || b[1] == null) return null;
@@ -118,7 +118,7 @@
 		}
 		return d;
 	}
-	// the running period goes on its own (drawn stronger, then washed), joined to the one before it
+	// the running period goes on its own (dotted, in the hatched band), joined to the one before it
 	const running = (list: { t: number; v: number | null; to: number }[]) => !!cur && list.length > 0 && list[list.length - 1].t === cur.t;
 	const bgPath = $derived(flat(running(segs) ? segs.slice(0, -1) : segs));
 	const infoPath = $derived(flat(running(isegs) ? isegs.slice(0, -1) : isegs));
@@ -130,9 +130,14 @@
 		return `M${x(c.t).toFixed(1)} ${y0.toFixed(1)} V${y(c.v).toFixed(1)} H${x(c.to).toFixed(1)}`;
 	}
 	const infoCur = $derived(curOf(isegs));
-	// the running period, joined to the one before it; drawn stronger than the rest so that, once washed like the
-	// tracker's partial periods, it reads as a lighter version of the faint line
+	// the running period, joined to the one before it, dotted
 	const curPath = $derived(curOf(segs));
+	// the hatched band over the running period, within the plot
+	const band = $derived.by(() => {
+		if (!cur) return null;
+		const a = Math.max(L, x(cur.t)), b = Math.min(W - Rm, x(cur.to));
+		return b <= L || a >= W - Rm ? null : { a, b };
+	});
 
 	// the pointer's date (hov: under the mouse; pin: clicked, tapped or dragged to); the record in force then and that
 	// month's best follow from it
@@ -217,7 +222,15 @@
 	<div class="plot">
 	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions (pointer readout; the readout and the table below carry the figures) -->
 	<svg class="chart" viewBox="0 0 {W} {H}" role="img" aria-label={label} onpointermove={move} onpointerdown={down} onpointerup={up} onclick={click} onpointerleave={() => (hov = null)} class:zoomable={!touch}>
-		<defs><clipPath id="{uid}-clip"><rect x={L} y={T - 8} width={W - L - Rm} height={H - T - B + 16} /></clipPath></defs>
+		<defs>
+			<clipPath id="{uid}-clip"><rect x={L} y={T - 8} width={W - L - Rm} height={H - T - B + 16} /></clipPath>
+			<pattern id="{uid}-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" class="hatch" /></pattern>
+		</defs>
+		{#if band}
+			<!-- the period still running: a hatched band behind everything -->
+			<rect class="part" x={band.a} y={T} width={band.b - band.a} height={H - T - B} fill="url(#{uid}-hatch)" />
+			<line class="part-edge" x1={band.a} x2={band.a} y1={T} y2={H - B} />
+		{/if}
 		{#each ax.ticks as v}
 			<line x1={L} x2={W - Rm} y1={y(v)} y2={y(v)} class="grid" />
 			<text x={L - 8} y={y(v) + 4} text-anchor="end" class="lab">{fmt(v)}</text>
@@ -231,9 +244,8 @@
 			{#if infoPath}<path d={infoPath} fill="none" class="bg info" style="stroke:var({tok})" />{/if}
 			{#if infoCur}<path d={infoCur} fill="none" class="bg info cur" style="stroke:var({tok})" />{/if}
 			{#if cur}
-				<!-- the period still running, as it stands so far, washed out like the tracker's partial periods -->
+				<!-- the period still running, as it stands so far: dotted -->
 				{#if curPath}<path d={curPath} fill="none" class="bg cur" style="stroke:var({tok})" />{/if}
-				<rect class="wash" x={x(cur.t)} y={T} width={Math.max(0, x(cur.to) - x(cur.t))} height={H - T - B} />
 			{/if}
 			<path d={path} fill="none" style="stroke:var({tok})" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray={dashed ? '6 3' : undefined} />
 			{#if prov}
@@ -282,14 +294,15 @@
 	.cursor { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 3 3; }
 	.hole { fill: var(--surface); stroke-width: 2.4; }
 	.bg { stroke-width: 1.2; opacity: 0.35; }
-	.bg.cur { opacity: 0.55; }
+	.bg.cur { opacity: 0.75; stroke-width: 1.8; stroke-dasharray: 0.1 3.4; stroke-linecap: round; }
 	/* demand with embedded solar: dashed so it can't be taken for the record or the faint line */
 	.bg.info { stroke-dasharray: 4 3; stroke-width: 1.3; }
 	.info-dot { stroke-dasharray: 2 1.5; }
 	.tip i { font-style: normal; opacity: 0.8; }
 	.bg-dot { stroke-width: 1.6; }
-	/* a period still under way: washed out as the tracker washes its partial periods */
-	.wash { fill: var(--surface); opacity: 0.6; }
+	/* a period still under way: a hatched band and its edge */
+	.hatch { stroke: var(--muted); stroke-width: 1; opacity: 0.22; }
+	.part-edge { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 2 3; opacity: 0.6; }
 	.zsel { fill: color-mix(in srgb, var(--accent) 16%, transparent); stroke: var(--accent); stroke-width: 1; }
 	.tip .bgl { color: var(--muted); }
 	.tip .togo { font-style: italic; }

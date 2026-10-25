@@ -95,9 +95,10 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   `hist/records-detail.json` (records.py `build_detail`, published with records.json when it changes; served by the
   Worker; loaded only by record pages via `loadDetail`): `bg`, each record's best by month (by year for year records)
   against `months`/`years`, the faint line behind `Progression` (`bgOf`; its hover follows the pointer's date and gives
-  the record in force and that month's best; the month or year still running is drawn across its whole span (the
-  axis runs on to its end, `bgEnd`) and washed out like the tracker's partial periods (a 0.6 surface wash, the
-  segment drawn a little stronger first so it stays readable), and the tooltip there says how long is left
+  the record in force and that month's best; the month or year still running (owner, 25 Oct 2026: a tracker-style wash
+  barely showed on a single line, so a hatched band instead) is drawn across its whole span (the
+  axis runs on to its end, `bgEnd`), its line dotted, in a hatched band (`band`; no label on the chart, owner's call: the
+  tooltip says "so far"; the key above the chart names the hatch), and the tooltip there says how long is left
   (`hoursToGo`, counted from the start of today like "Heading for a record"); month and year records' files leave
   the running period out, so the page passes its figure so far as `now`, from `periodNow`/`figureSoFar`, the same sums as
   "Heading for a record"); `period`, each period record's own series (`period_series`: half-hours

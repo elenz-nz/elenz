@@ -144,7 +144,7 @@
 		const unit = per === 'year' ? 'year' : 'month', hi = d.id.endsWith('_min') ? 'lowest' : 'highest';
 		const what = per === 'year' || per === 'month' ? `each ${per}’s figure` : `the ${hi} ${per === 'tp' ? 'half-hour' : per} in each month`;
 		return `${n === 0 ? (tr ? `First above zero in ${yearOf(trimZeros(rec.steps)[0][0])}` : 'Not broken since the data began') : `Broken ${n} ${n === 1 ? 'time' : 'times'} since ${since}`}.`
-			+ (bg ? ` The faint line is ${what}; the ${unit} still running is shown as it stands so far, washed out, and hovering there says how long is left.` : '')
+			+ (bg ? ` The faint line is ${what}; the ${unit} still running sits in a hatched band, its line dotted, because it isn’t finished; hovering there gives its figure so far and how long is left.` : '')
 			+ (udem ? ` The dashed line is the same with embedded solar added back: what ${region === 'NZ' ? 'the country' : 'the island'} used, met partly by rooftops and small arrays behind the meter. It is there for information only, not a record, because embedded solar is modelled (from August 2013; zero before).` : '')
 			+ (prov ? ' Dashed step: provisional, from dispatch data.' : '')
 			+ ' Hover or tap for the record at any date; click to pin it. Drag across the chart to zoom in; Reset zoom or Escape goes back.';
@@ -306,6 +306,7 @@
 				<ul class="key" aria-label="Key">
 					<li><svg width="22" height="8" aria-hidden="true"><line x1="0" x2="22" y1="4" y2="4" style="stroke:var({d.tok})" stroke-width="2.4" /></svg>Record</li>
 					{#if bg}<li><svg width="22" height="8" aria-hidden="true"><line x1="0" x2="22" y1="4" y2="4" style="stroke:var({d.tok})" stroke-width="1.2" opacity="0.35" /></svg>{bgKey}</li>{/if}
+					{#if bg}<li><svg width="14" height="12" aria-hidden="true"><defs><pattern id="key-hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="4" stroke="var(--muted)" stroke-width="1" opacity="0.5" /></pattern></defs><rect width="14" height="12" fill="url(#key-hatch)" /></svg>{per === 'year' ? 'This year' : 'This month'} so far</li>{/if}
 					{#if udem}<li><svg width="22" height="8" aria-hidden="true"><line x1="0" x2="22" y1="4" y2="4" style="stroke:var({d.tok})" stroke-width="1.3" stroke-dasharray="4 3" opacity="0.6" /></svg>With embedded solar added back <span class="muted">(estimate, not a record)</span></li>{/if}
 				</ul>
 				<Progression steps={rec.steps} first={R.first} end={R.end} tok={d.tok} fmt={axisFmt} full={f} {bg} {bgWhen} now={bgNow} info={udem} infoNow={udemNow} infoLabel="With embedded solar" bind:zoom={growZoom} bind:pin={growPin} dashed={!!d.est} prov={prov ? { t: prov.t, v: prov.v } : null} when={(t) => per !== 'tp' ? periodWhen(t, per) : d.kind === 'month' ? monthOf(t) : d.kind === 'run' ? dayOf(t) : `${clock(t)}, ${dayOf(t)}`}
