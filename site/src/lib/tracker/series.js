@@ -175,11 +175,14 @@ async function getJSON(path) {
 
 /** Loads and caches the history files; merges them with the live week. */
 export function historyStore(base = '/data/history') {
-  const H = { index: null, at: 0, day: null, hh: new Map() };
+  // v: bumped whenever a kind's loaded files change, so a model merged earlier knows it's stale (the lower cards and
+  // heat maps load half-hourly months into this same store; a model merged before them lacked those months, and a
+  // view of a window they covered came out empty, which crashed the tracker page, 26 Oct 2026)
+  const H = { index: null, at: 0, day: null, hh: new Map(), v: { hh: 0, day: 0 } };
   async function index() {
     if (!H.index || Date.now() - H.at > 3600e3) {
       const ix = await getJSON(`${base}/index.json`);
-      if (H.index && ix.built !== H.index.built) { H.day = null; H.hh.clear(); }  // rebuilt since: drop cached files
+      if (H.index && ix.built !== H.index.built) { H.day = null; H.hh.clear(); H.v.hh++; H.v.day++; }  // rebuilt since: drop cached files
       H.index = ix; H.at = Date.now();
     }
     return H.index;
@@ -187,6 +190,8 @@ export function historyStore(base = '/data/history') {
   const monthOf = t => { const d = new Date(local(t)); return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`; };
   return {
     get index() { return H.index; },
+    /** Changes whenever the loaded files of this kind change (see H.v). */
+    version(kind) { return H.v[kind]; },
     /** Months of half-hourly history covering [from, to], among those published. */
     monthsFor(from, to) {
       const ix = H.index, want = [];
@@ -207,9 +212,10 @@ export function historyStore(base = '/data/history') {
     /** Fetch what a view of [from, to] needs: 'hh' the half-hourly months covering it, 'day' the daily file. */
     async load(kind, from, to) {
       await index();
-      if (kind === 'day') { if (!H.day) H.day = fromLayout(await getJSON(`${base}/day.json`)); return; }
+      if (kind === 'day') { if (!H.day) { H.day = fromLayout(await getJSON(`${base}/day.json`)); H.v.day++; } return; }
       const want = this.monthsFor(from, to).filter(m => !H.hh.has(m));
       await Promise.all(want.map(async m => H.hh.set(m, fromLayout(await getJSON(`${base}/hh/${m}.json`)))));
+      if (want.length) H.v.hh++;
     },
     /** History of one kind followed by the live week (5-minute segment) averaged to the same step. With from and to,
      *  only the points in [from, to) are joined, each month cut before joining (the heat maps and the year-earlier

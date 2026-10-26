@@ -1171,7 +1171,10 @@ export function mountTracker(D, hooks = {}) {
   }
 
   // ---------- models: the live week, and history merged with it (loaded when a long range is first chosen) ----------
-  const merge = kind => toModel(history.merged(kind, models.live), models.live.END);
+  // hv: the store's version it was merged from; a model older than the files loaded since is merged again (setView)
+  const merge = kind => Object.assign(toModel(history.merged(kind, models.live), models.live.END), { hv: history.version(kind) });
+  // the span of history a window [end − range, end) needs (the latest 31 days when end is null)
+  const spanFor = (r, end) => { const to = end ?? models.live.END; return [end == null ? to - 31 * DAY : end - RANGES[r].days * DAY - DAY, to]; };
   function useModel() {
     const m = models[state.kind];
     if (m !== M) { M = m; derive(); }
@@ -1179,7 +1182,7 @@ export function mountTracker(D, hooks = {}) {
   function report(extra = {}) {
     const ix = history.index, kind = state.kind;
     hooks.status?.({ range: state.range, kind, past: state.end != null, loading: false, error: '', liveEnd: models.live.END,
-                     histFirst: kind !== 'live' && V ? V.t[0] : null, histEnd: kind !== 'live' ? Math.min(M.histEnd, (state.end ?? Infinity) - 1) : null,
+                     histFirst: kind !== 'live' && V && V.n ? V.t[0] : null, histEnd: kind !== 'live' ? Math.min(M.histEnd, (state.end ?? Infinity) - 1) : null,
                      histBuilt: ix && ix.built, ...extra });
   }
   // which data a window needs: the live 5-minute week if it covers it, otherwise half-hourly or daily history
@@ -1199,7 +1202,7 @@ export function mountTracker(D, hooks = {}) {
     if (R.fixed || (end != null && end >= endOfToday())) end = null;
     const kind = kindFor(r, end), ticket = ++pending;
     if (kind !== 'live') {
-      const to = end ?? models.live.END, from = end == null ? to - 31 * DAY : end - R.days * DAY - DAY;
+      const [from, to] = spanFor(r, end);
       if (!history.has(kind, from, to) || !models[kind]) {
         report({ range: r, kind, loading: true });
         $('charts').setAttribute('aria-busy', 'true');
@@ -1214,6 +1217,8 @@ export function mountTracker(D, hooks = {}) {
         }
         if (ticket !== pending) return;  // another view was chosen while this one loaded
       }
+      // files loaded since the model was merged (by the lower cards, or a refresh): merge again so it has them
+      if (models[kind].hv !== history.version(kind)) models[kind] = merge(kind);
     }
     if (r !== state.range && !keepInt) state.intPicked = false;   // a new range starts on its default interval
     state.range = r; state.end = end; state.kind = kind;
@@ -1611,7 +1616,9 @@ export function mountTracker(D, hooks = {}) {
       if (state.end == null || state.kind === 'live') state.kind = kindFor(state.range, state.end);
       M = null; useModel(); updateAsof(); rebuild();
       // history gains days a few times a day: refresh what's loaded, at most hourly (history.load checks the age)
-      for (const kind of ['hh', 'day']) if (models[kind]) history.load(kind, models.live.END - 31 * DAY, models.live.END).then(() => {
+      // (a refresh after a history rebuild drops every cached file, so a past window being shown is loaded again too)
+      for (const kind of ['hh', 'day']) if (models[kind]) Promise.all([spanFor('30d', null), ...(state.kind === kind && state.end != null ? [spanFor(state.range, state.end)] : [])]
+        .map(([a, b]) => history.load(kind, a, b))).then(() => {
         models[kind] = merge(kind);
         if (state.kind === kind) { M = null; useModel(); rebuild(); }
       }).catch(() => {});
