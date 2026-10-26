@@ -1,0 +1,5 @@
+# Cloudflare static-asset headers. Branch previews (https://<branch>-elenz.elenz.workers.dev) serve the whole site;
+# keep them out of search engines so Google doesn't treat them as copies of elenz.co.nz. (A placeholder matches one
+# label of the host.) The Worker adds the same header to the responses it makes itself (worker/index.js).
+https://:preview.elenz.workers.dev/*
+  X-Robots-Tag: noindex
