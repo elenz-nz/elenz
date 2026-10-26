@@ -9,13 +9,20 @@
 // ---------- New Zealand time (handles the NZST/NZDT change; offset cached per hour) ----------
 const NZ_PARTS = new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' });
 const offCache = new Map();
+function offsetAt(h) {
+  const p = Object.fromEntries(NZ_PARTS.formatToParts(new Date(h * 36e5)).map(x => [x.type, x.value]));
+  return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute) - h * 36e5;
+}
+// The offset by UTC hour, cached a 24-hour block at a time: when the offset is the same at both ends of the block
+// (clock changes are months apart, so there was none in between) the whole block takes it, otherwise each hour is
+// worked out. A year of half-hours needs ~730 formatter calls instead of ~8,800.
 export function nzOffset(t) {
   const h = Math.floor(t / 36e5);
   let o = offCache.get(h);
   if (o === undefined) {
-    const p = Object.fromEntries(NZ_PARTS.formatToParts(new Date(h * 36e5)).map(x => [x.type, x.value]));
-    o = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute) - h * 36e5;
-    offCache.set(h, o);
+    const b = Math.floor(h / 24) * 24, a = offsetAt(b), z = offsetAt(b + 24);
+    for (let k = 0; k < 24; k++) offCache.set(b + k, a === z ? a : offsetAt(b + k));
+    o = offCache.get(h);
   }
   return o;
 }
@@ -204,19 +211,23 @@ export function historyStore(base = '/data/history') {
       const want = this.monthsFor(from, to).filter(m => !H.hh.has(m));
       await Promise.all(want.map(async m => H.hh.set(m, fromLayout(await getJSON(`${base}/hh/${m}.json`)))));
     },
-    /** History of one kind followed by the live week (5-minute segment) averaged to the same step. */
-    merged(kind, live) {
+    /** History of one kind followed by the live week (5-minute segment) averaged to the same step. With from and to,
+     *  only the points in [from, to) are joined, each month cut before joining (the heat maps and the year-earlier
+     *  line: joining every month loaded, a year or more, on each step made the tracker's arrows slow). */
+    merged(kind, live, from = -Infinity, to = Infinity) {
       const ix = H.index;
-      const hist = kind === 'day' ? [H.day] : [...H.hh.keys()].sort().map(m => H.hh.get(m));
+      let hist = kind === 'day' ? [H.day] : [...H.hh.keys()].sort().map(m => H.hh.get(m));
       if (!hist.length || !hist[0]) throw new Error('History is still being prepared. Please check back later.');
       const step = kind === 'day' ? KEY.day : KEY.hh;
       const last = hist[hist.length - 1], histEnd = Math.min(ix.end, last.t[last.n - 1]);
+      if (kind !== 'day' && (from > -Infinity || to < Infinity)) hist = hist.filter(s => s.n && s.t[s.n - 1] >= from && s.t[0] < to);
       // the live tail starts at the first period wholly after the history
-      const from = firstAtOrAfter(live.t, kind === 'day' ? histEnd + 864e5 - 36e5 : histEnd + 18e5);
-      let a = from;
+      let a = firstAtOrAfter(live.t, kind === 'day' ? histEnd + 864e5 - 36e5 : histEnd + 18e5);
       while (a < live.n && step(live.t[a]) === step(histEnd)) a++;
-      const tail = aggregate(slice(live, a, live.n), step);
-      return { ...concat([...hist.map(s => slice(s, 0, firstAtOrAfter(s.t, histEnd + 1))), tail]), histEnd };
+      const agg = aggregate(slice(live, a, live.n), step);
+      const tail = from > -Infinity || to < Infinity ? slice(agg, firstAtOrAfter(agg.t, from), firstAtOrAfter(agg.t, to)) : agg;
+      const upTo = Math.min(to, histEnd + 1);
+      return { ...concat([...hist.map(s => slice(s, firstAtOrAfter(s.t, from), firstAtOrAfter(s.t, upTo))), tail]), histEnd };
     },
   };
 }

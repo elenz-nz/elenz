@@ -1186,6 +1186,7 @@ export function mountTracker(D, hooks = {}) {
   // keepInt: keep a chosen interval across a range change; wantInt: the interval to open on (from the address);
   // opening: the view a link or this browser's last visit opens on, after which a link's drill-down applies
   async function setView(r, end = state.end, keepInt = false, wantInt = null, opening = false) {
+    cancelAnimationFrame(soonRaf); clearTimeout(soonTimer); stepEnd = undefined;   // a queued step or range gives way
     const R = RANGES[r];
     if (!opening) waiting = false;   // the viewer moved on before the linked view loaded: its drill-down applies now
     if (R.fixed || (end != null && end >= endOfToday())) end = null;
@@ -1215,12 +1216,25 @@ export function mountTracker(D, hooks = {}) {
     if (opening) waiting = false;
     useModel(); rebuild();
   }
+  // A click on the arrows or a range shows its effect at once (the date box, the pressed button) and the new view is
+  // built just after that paint (the next frame, then a task), so the page answers the click straight away. Only the
+  // latest queued view is built; quick steps add up through stepEnd, the end the queued step will show.
+  let soonRaf = 0, soonTimer = 0, stepEnd;   // stepEnd: undefined when no step is waiting (null is the latest data)
+  function soon(fn) {
+    cancelAnimationFrame(soonRaf); clearTimeout(soonTimer);
+    soonRaf = requestAnimationFrame(() => { soonTimer = setTimeout(fn, 0); });
+  }
   const step = dir => {
     const R = RANGES[state.range];
     if (state.zoom && V && V.zoomed) return stepZoom(dir);
     if (R.fixed) return;
-    if (dir < 0) setView(state.range, addDays(state.end ?? endOfToday(), -R.days));
-    else if (state.end != null) setView(state.range, addDays(state.end, R.days));
+    const from = stepEnd !== undefined ? stepEnd : state.end;
+    if (dir > 0 && from == null) return;
+    let end = addDays(from ?? endOfToday(), dir * R.days);
+    if (end >= endOfToday()) end = null;
+    stepEnd = end;
+    $('in-date').value = ymd((end ?? endOfToday()) - 1);
+    soon(() => { const e = stepEnd; stepEnd = undefined; setView(state.range, e); });
   };
   // zoomed, the arrows move the zoom by its own length, into the next window if need be; forward to the latest data
   // a span from the menu becomes "the last N hours" again
@@ -1297,14 +1311,19 @@ export function mountTracker(D, hooks = {}) {
   window.addEventListener('popstate', onPop);
   // the page's lower section (src/lib/generation/GenLower.svelte) works from the same window: told on every rebuild
   let lastShared = '';
+  // The lower cards are told after the charts above have painted (the next frame, then a task), so a click on the
+  // arrows or a range shows its charts at once and the cards follow a moment later; several quick steps tell them once.
+  let shareTimer = 0;
   function share() {
     if (!hooks.view || !V || !V.n) return;
     const R = RANGES[state.range], from = V.t[0], to = V.t[V.n - 1] + V.hrs[V.n - 1] * 36e5;
     const key = [state.region, state.range, state.int, state.kind, state.end, from, to, M.END].join('|');
     if (key === lastShared) return;   // grouping, drill-down and hidden layers don't change it
     lastShared = key;
-    hooks.view({ region: state.region, range: state.range, label: R.label, days: R.days ?? null, int: state.int, kind: state.kind,
-                 end: state.end, from, to, M, live: models.live, history });
+    const w = { region: state.region, range: state.range, label: R.label, days: R.days ?? null, int: state.int, kind: state.kind,
+                end: state.end, from, to, M, live: models.live, history };
+    clearTimeout(shareTimer);
+    requestAnimationFrame(() => { clearTimeout(shareTimer); shareTimer = setTimeout(() => { if (lastShared === key) hooks.view(w); }, 0); });
   }
 
   $('sel-region').addEventListener('change', e => { if (!['NZ', 'NI', 'SI'].includes(e.target.value)) return; state.region = e.target.value; state.hidden.clear(); rebuild(); });
@@ -1312,7 +1331,9 @@ export function mountTracker(D, hooks = {}) {
     const b = e.target.closest('button');
     if (!b || !Object.hasOwn(RANGES, b.dataset.v)) return;
     if (b.dataset.v === state.range && !state.zoom) return;
-    state.zoom = null; setView(b.dataset.v);
+    for (const x of $('seg-range').querySelectorAll('button')) x.setAttribute('aria-pressed', String(x === b));
+    stepEnd = undefined;
+    soon(() => { state.zoom = null; setView(b.dataset.v); });
   });
   // the menu on 1D: the last hour, 3, 6 or 12 hours of the day (5-minute points), or the whole 24 hours
   const spanMenu = $('span-menu'), spanBtn = $('btn-span');

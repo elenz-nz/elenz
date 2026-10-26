@@ -34,7 +34,7 @@ export async function heatSource(w, history, live) {
   }
   try {
     if (!history.has('hh', w.from, w.to)) await history.load('hh', w.from, w.to);
-    return { kind: 'days', seg: windowOf(history.merged('hh', live), w.from, w.to), from: w.from, to: w.to };
+    return { kind: 'days', seg: history.merged('hh', live, w.from, w.to), from: w.from, to: w.to };
   } catch {
     return { kind: 'days', seg: windowOf(live, w.from, w.to), from: w.from, to: w.to };   // history not ready
   }
