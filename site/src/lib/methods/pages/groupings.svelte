@@ -26,7 +26,7 @@
 	<dt>Inverter-based vs synchronous</dt>
 	<dd><b>Inverter-based:</b> wind and solar, connected through power electronics. <b>Synchronous:</b> hydro, geothermal and thermal plant (including bioenergy and waste heat), whose spinning generators add inertia and system strength. Batteries are inverter-based too, but shown separately.</dd>
 	<dt>By site</dt>
-	<dd>The plants that together make up 95% of each fuel’s output over the range get a layer each, at most 12 per fuel; the rest of that fuel is grouped as “Other”.</dd>
+	<dd>The plants that together make up 95% of each fuel’s output over the range get a layer each, at most 12 per fuel; the rest of that fuel is grouped as “Other”. Plants are listed largest first by installed capacity, here and when a fuel or group is opened, so the order stays the same whatever the range.</dd>
 	<dt>By hydro scheme</dt>
 	<dd>Hydro only, by river system, each listed upstream to downstream: Tekapo (Takapō A, B); Waitaki (Ōhau A, B, C, Benmore, Aviemore, Waitaki); Waikato (Aratiatia to Karāpiro, eight stations); Manapōuri; Clutha (Clyde, Roxburgh); Tongariro (Tokaanu, Rangipo); Waikaremoana; Rangitaiki (Aniwhenua, Wheao and Flaxy, Matahina); Waipori (Deep Stream, Waipori 2A/3/4); and other hydro.</dd>
 	<dt>By owner</dt>
