@@ -70,7 +70,7 @@
 				try {
 					if (!w.history.has(kind, a, b)) await w.history.load(kind, a, b);
 					if (prevFor !== key) return;
-					prev = windowOf(w.history.merged(kind, w.live), a, b);
+					prev = w.history.merged(kind, w.live, a, b);
 				} catch { if (prevFor === key) prev = null; }
 			})();
 		});

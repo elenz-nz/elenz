@@ -168,7 +168,7 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   masthead, footer (© line, data credits, link icons: fill in a `href` in its `LINKS` to show a social account), logo mark and Buy Me a Coffee link in `src/lib/site/`); the canvas chart code is `src/lib/tracker/tracker.js` (vanilla JS, driven by
   element ids in the page; each chart is drawn once per view into an off-screen base, and moving the time line only
   copies the base back and draws the line, dots and time chip over it (`paint`), so scrubbing stays smooth on phones:
-  call `render()` when anything other than the hover point changes, `hover()` when only the point moves), styles in `src/lib/tracker/tracker.css` (colour tokens, light/dark). The fuel table
+  call `render()` when anything other than the hover point changes, `hover()` when only the point moves; a click on the ‹ › arrows or a range button answers at once (date box, pressed button) and the view is built just after that paint (`soon()`, quick steps add up through `stepEnd`), and the lower cards are told a frame later (`share()`), so clicks stay under ~50 ms at phone speed: keep heavy work out of click handlers; `history.merged(kind, live, from, to)` joins only the window a card needs), styles in `src/lib/tracker/tracker.css` (colour tokens, light/dark). The fuel table
   (colours, renewable flags, fallback emission factors) is `src/lib/tracker/fuels.js`, shared with the home pages;
   every emissions calculation goes through `src/lib/tracker/emissions.js` (the Rankines' quarterly factor, each
   geothermal station's own factor by year; evidence in `analysis/emission_factors.py` and `analysis/README.md`).
