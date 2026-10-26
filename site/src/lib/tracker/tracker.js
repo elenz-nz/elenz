@@ -6,6 +6,7 @@ import { efAt, plantEf, BY_PLANT } from './emissions.js';
 import { onDateSettled, onTimeSettled } from '../site/datefield.js';
 import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTotal } from './series.js';
 import PLANT_META from './plants.json';  // owner and hydro scheme per plant (ingest/plant_meta.py)
+import CAPACITY from './capacity.json';   // installed MW per plant (ingest/capacity.py)
 import { readView, writeView, slug, describe, shareLinks } from '#lib/site/view.js';
 import { readQuery, stamp, fromStamp } from '#lib/site/viewurl.js';
 import { composeImage, legendOf, csvText, nzTime, utcTime, fileName, CREDIT, CREDIT_SOLAR, LICENCE } from '#lib/site/download.js';
@@ -151,8 +152,14 @@ export function mountTracker(D, hooks = {}) {
   // Embedded solar has no plants: its drill-down shows each island's estimate instead (not drillable further).
   const roofIslands = () => ['NI', 'SI'].map(isl => ({ name: `Embedded solar · ${isl === 'NI' ? 'North' : 'South'} Island`, fuel: 'roof', isl, poc: [], cap: null, roof: true,
                                                        s: M[isl].roof, u: M[isl + 's'].roofU }));
+  // Plants are listed largest first by installed MW (the most a plant has had in capacity.json, else its register
+  // nameplate), so the order, and each plant's shade, stay the same whatever range is shown (owner's call, 26 Oct 2026;
+  // the loaded data's own order changed between the live week and history)
+  const MAX_MW = new Map(CAPACITY.plants.map(p => [p.name, Math.max(0, ...p.rows.map(r => r[2] ?? 0))]));
+  const sizeOf = p => MAX_MW.get(p.name) ?? p.cap ?? 0;
+  const bySize = (a, b) => sizeOf(b) - sizeOf(a) || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
   const plantsFor = (fuel, r = state.region) => (fuel === 'roof' ? roofIslands().filter(p => p.s.some(v => v > 0.5)) : M.plants)
-    .filter(p => p.fuel === fuel && (r === 'NZ' || p.isl === r));
+    .filter(p => p.fuel === fuel && (r === 'NZ' || p.isl === r)).sort(bySize);
   const plantByName = name => M.plants.find(p => p.name === name);
 
   // intPicked: the viewer chose the interval (shared with the Prices tab); otherwise it's this tab's default for the range
@@ -378,11 +385,11 @@ export function mountTracker(D, hooks = {}) {
                                     hatch: p.roof ? 'roof' : null, u: p.roof ? V.avg(p.u) : null, drill: p.roof ? null : { group: d.group, fuel: d.fuel, plant: p.name } }));
     } else if (d.group && setById(d.group)) {
       // a set's plants, each in a shade of its fuel colour, grouped by fuel in the summary
-      // a hydro scheme's stations in river order, upstream first; other sets by fuel, then output over the view
+      // a hydro scheme's stations in river order, upstream first; other sets by fuel, then largest first
       const set = setById(d.group), seen = {}, river = p => PLANT_META[p.name]?.river ?? 99;
       const order = set.id.startsWith('s:') && set.id !== 's:Other hydro'
         ? (a, b) => river(a) - river(b)
-        : (a, b) => FUELS.findIndex(f => f.k === a.fuel) - FUELS.findIndex(f => f.k === b.fuel) || energy(b) - energy(a);
+        : (a, b) => FUELS.findIndex(f => f.k === a.fuel) - FUELS.findIndex(f => f.k === b.fuel) || bySize(a, b);
       for (const p of [...set.plants].sort(order)) {
         const i = seen[p.fuel] = (seen[p.fuel] ?? -1) + 1;
         L.push({ id: 'p:' + p.name, name: p.name, tok: FUEL[p.fuel].tok, shade: i, section: set.fuel ? null : p.fuel, s: V.avg(p.s), plant: p,
@@ -405,7 +412,7 @@ export function mountTracker(D, hooks = {}) {
           if (by === 'scheme') { if (f.k === 'hydro') mine.forEach((x, i) => L.push(setLayer(x, i))); continue; }
           if (by === 'site') {
             const small = new Set(mine.flatMap(x => x.plants));
-            const ps = plantsFor(f.k).filter(p => !small.has(p)).sort((a, b) => energy(b) - energy(a));
+            const ps = plantsFor(f.k).filter(p => !small.has(p));   // largest first (which plants get a row is by output)
             if (!ps.length || f.k === 'roof') { L.push({ ...fuelLayer(f.k, null), section: f.k }); continue; }
             ps.forEach((p, i) => L.push({ id: 'p:' + p.name, name: p.name, tok: f.tok, shade: i, section: f.k, s: V.avg(p.s), plant: p,
                                           drill: { group: null, fuel: null, plant: p.name } }));
@@ -1278,7 +1285,48 @@ export function mountTracker(D, hooks = {}) {
     const fits = r => from >= (end == null ? latest - RANGES[r].days * DAY : addDays(end, -RANGES[r].days));
     setView(fits(state.range) || !RANGES['3d'] ? state.range : '3d', end, true);
   }
+  // A rebuild (a new range, new data) can bring layers the last view didn't have: a plant that didn't run in the live
+  // week, or a site moved into or out of "Other ..." in the By site view. state.hidden only lists what was switched off,
+  // so these used to come back on and undo "Only this". So picks() keeps each plant's own last state (memo, across
+  // rebuilds, while anything is hidden at this drill-down level): a plant's row sets it; an "Other ..." row sets its
+  // plants only when it was switched on or off itself (its state differs from what its plants say). keepPicks() then
+  // shows a layer if any of its plants was showing, else as the layer was; a layer nothing is known about follows what
+  // most of the last view's layers were (off after "Only this", on after hiding a few). If that leaves nothing showing
+  // where something was, all show again.
+  const plantNames = l => l.plant ? [l.plant.name] : setById(l.id)?.plants.map(p => p.name) ?? [];
+  let memo = null;
+  function picks() {
+    const drill = JSON.stringify(state.drill);
+    if (!V || !V.layers || !state.hidden.size) { memo = null; return null; }
+    if (!memo || memo.drill !== drill) memo = { drill, plants: new Map() };
+    const ids = new Map(), P = memo.plants;
+    for (const l of V.layers) {
+      const on = !state.hidden.has(l.id), names = plantNames(l);
+      ids.set(l.id, on);
+      if (names.length === 1) { P.set(names[0], on); continue; }
+      const known = names.filter(n => P.has(n));
+      if (!known.length || known.some(n => P.get(n)) !== on) { for (const n of names) P.set(n, on); continue; }
+      // as its plants say: those not seen on their own row show only if every known one does (no pick inside it)
+      const all = known.every(n => P.get(n));
+      for (const n of names) if (!P.has(n)) P.set(n, all);
+    }
+    return { drill, ids };
+  }
+  function keepPicks(prev) {
+    if (!prev) return;
+    if (prev.drill !== JSON.stringify(state.drill)) { state.hidden.clear(); memo = null; return; }  // the drill-down was dropped
+    const P = memo.plants, was = [...prev.ids.values()], dflt = was.filter(Boolean).length * 2 > was.length;
+    let any = false;
+    for (const l of V.layers) {
+      const known = plantNames(l).filter(n => P.has(n));
+      const on = known.length ? known.some(n => P.get(n)) : prev.ids.get(l.id) ?? dflt;
+      if (on) state.hidden.delete(l.id); else state.hidden.add(l.id);
+      any ||= on;
+    }
+    if (!any && was.some(Boolean)) { state.hidden.clear(); memo = null; }
+  }
   function rebuild() {
+    const prev = picks();   // from the outgoing view
     V = buildView();  // first: the drill-down checks below look at this view's plant sets
     const link = linked && !waiting ? linked : null;
     if (link) state.drill = fromLink(link);
@@ -1286,7 +1334,7 @@ export function mountTracker(D, hooks = {}) {
     if (d.plant) { const p = plantByName(d.plant); if (!p || (state.region !== 'NZ' && p.isl !== state.region)) d.plant = null; }
     if (d.fuel && !plantsFor(d.fuel).length) { d.fuel = null; d.plant = null; }
     if (d.group && !(setById(d.group)?.plants.length || groupById(d.group)?.f?.some(k => present[state.region].includes(k)))) { d.group = null; d.plant = null; }
-    relayer(); state.hover = null;
+    relayer(); keepPicks(prev); state.hover = null;
     if (link) {
       linked = null;
       const j = link.t != null ? pointAt(link.t) : null;
