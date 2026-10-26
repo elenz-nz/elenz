@@ -20,7 +20,9 @@ Preview links (since 24 Oct 2026): Cloudflare Workers Builds builds every other 
 (Worker Previews, open beta), so each pushed branch gets its own address, `https://<branch>-elenz.elenz.workers.dev`
 (e.g. `preview-test-elenz`). The `previews` block in `wrangler.jsonc` points it at the live KV namespace, so it shows
 live data; that's safe because only the Worker's scheduled handler writes to KV and previews run no crons. Its pages
-keep elenz.co.nz as their canonical address. The build's check on the pull request says whether it built.
+keep elenz.co.nz as their canonical address, and every host but elenz.co.nz is sent `X-Robots-Tag: noindex`
+(`site/static/_headers` for static files; `noindexOffSite` in `worker/index.js` for the Worker's own responses), so
+Google doesn't index previews as copies. `preview_urls` is set explicitly because `workers_dev` is off. The build's check on the pull request says whether it built.
 Each branch's preview copies the dashboard's "Previews Base" build settings the first time it builds and keeps that copy:
 after changing the base (preview command `npx wrangler preview`), an existing branch keeps its old settings, so use a
 fresh branch. A preview build's check links under `.../previews/<branch>/builds/`; one under `.../production/builds/`
@@ -413,7 +415,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
 ## Status and next steps
 
 1. Site live at https://elenz.co.nz (Cloudflare Workers custom domain). The watchdog, UptimeRobot, article link
-   previews and the analysis scripts use elenz.co.nz; nothing depends on https://elenz.elenz.workers.dev any more.
+   previews and the analysis scripts use elenz.co.nz. The old https://elenz.elenz.workers.dev address is off
+   (`workers_dev: false`, 26 Oct 2026) after Google indexed copies of pages there.
 2. Live data via GitHub Actions + Workers KV (set up Oct 2026). A paid server running `update.py` in a loop is the
    upgrade path if GitHub's schedule delays become a problem.
 3. History since Aug 1997 on the tracker page: 30 days, 1 year, All (BUILD 6, finished Oct 2026; was Sep 2020).
