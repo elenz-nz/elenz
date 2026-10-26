@@ -54,8 +54,8 @@
 	const notice = $derived.by(() => {
 		if (!meta) return '';
 		if (view && view.kind !== 'live') {
-			if (view.histEnd == null) return '';
-			const days = `${dayYear(view.histFirst!)} to ${dayYear(view.histEnd)}`;
+			if (view.histFirst == null || view.histEnd == null || !Number.isFinite(view.histFirst) || !Number.isFinite(view.histEnd)) return '';   // an empty window has no dates to name
+			const days = `${dayYear(view.histFirst)} to ${dayYear(view.histEnd)}`;
 			return view.past
 				? `Dispatch data from the Electricity Authority's daily dispatch files, ${days}.`
 				: `Dispatch data from the Electricity Authority: its daily dispatch files, ${days}, then its real-time dispatch feed to ${when(view.liveEnd)}.`;
