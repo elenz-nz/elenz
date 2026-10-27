@@ -1,6 +1,6 @@
 <script lang="ts">
-	// link to Elenz's Buy Me a Coffee page
-	let { label = 'Buy me a coffee' }: { label?: string } = $props();
+	// link to Elenz's support page (Buy Me a Coffee); the label stays first-person plural, never "me"
+	let { label = 'Support Elenz' }: { label?: string } = $props();
 </script>
 
 <a class="coffee" href="https://buymeacoffee.com/elenz" target="_blank" rel="noopener">

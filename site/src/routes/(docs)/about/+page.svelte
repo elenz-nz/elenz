@@ -129,12 +129,12 @@
 		<p>The code behind the site, including every correction made to the EA’s data and the analysis behind each estimate, is on <a href="https://github.com/elenz-nz/elenz">GitHub</a>.</p>
 
 		<h2 id="support">Support Elenz</h2>
-		<p>Elenz is free and has no ads. If you find it useful, a coffee helps keep it running and improving.</p>
-		<div><Coffee label="Buy Elenz a coffee" /></div>
+		<p>Elenz is free and has no ads. If you find it useful, your support helps us keep it running and improving.</p>
+		<div><Coffee /></div>
 
 		<section class="ab-contact" class:flash id="contact" aria-labelledby="contact-h">
 			<h2 id="contact-h">Contact</h2>
-			<p>Questions, corrections and ideas: <a href="mailto:hello@elenz.co.nz">hello@elenz.co.nz</a>.</p>
+			<p>We’d like to hear your questions, corrections and ideas: <a href="mailto:hello@elenz.co.nz">hello@elenz.co.nz</a>.</p>
 		</section>
 	</div>
 </main>
