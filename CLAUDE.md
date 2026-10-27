@@ -287,7 +287,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   overlap, or the JSON is stale: after editing the CSV, run `python3 ingest/capacity.py` and commit both. A new plant
   that isn't generating yet gets a `pending` row with no dates.
 - `facilities/NEXT_REBUILD.md`: changes waiting for the next full history rebuild (they touch fingerprinted files).
-  Bundle them into one rebuild; never start one while another is running.
+  Bundle them into one rebuild; never start one while another is running. While a build is being collected, its items
+  go on the branch `next-rebuild` (a draft PR), not on `main`.
 - `ingest/plant_meta.py` writes `site/src/lib/tracker/plants.json` (plant → owner, hydro scheme) from the register and
   those tables. Rerun it and commit the JSON after refreshing the register or editing the tables.
 - `.github/workflows/checks.yml`: on every push, ruff (syntax errors and undefined names only), `ingest/tests/smoke.py`
@@ -424,7 +425,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
    BUILD 7 (Mill Creek 2014-15, Kawerau TG1/TG2, West Wind as one plant, Ōtāhuhu names, clock-change days before
    2009, daily peak dispatchable output, Ashburton's small solar farms) ran 23-27 Oct 2026 (commit 9709b43); every
    item checked out on the published files on 27 Oct, the Offers workflow was rerun with "resummarise", and the old
-   plant names were cleaned up. `facilities/NEXT_REBUILD.md` is empty until the next fingerprinted change.
+   plant names were cleaned up. BUILD 8 is being collected on the branch `next-rebuild` (draft PR), held until the
+   owner says go; see `facilities/NEXT_REBUILD.md`.
 4. Pages: landing (`/`), live (`/now`, with the price explainer and Every generator right now), tracker (Generation and
    Prices tabs), Records (`/records`), Articles (`/articles`, published 15 Oct 2026 with the Winter 2026 review), About,
    Data and methods (`/methods`) and Privacy. Stale-data watchdog, uptime monitor, Cloudflare Web Analytics and a Buy
