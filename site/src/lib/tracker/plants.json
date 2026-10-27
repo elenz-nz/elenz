@@ -108,9 +108,6 @@
 "Kawerau":{
 "owner":"Mercury"
 },
-"Kawerau (TOPP1)":{
-"owner":"Other generators"
-},
 "Kawerau (TOPP2)":{
 "owner":"Other generators"
 },
@@ -185,12 +182,6 @@
 },
 "Omeheu Solar Farm":{
 "owner":"Other generators"
-},
-"Otahuhu A":{
-"owner":"Contact"
-},
-"Otahuhu B":{
-"owner":"Contact"
 },
 "Paerau Gorge":{
 "owner":"Contact"
@@ -346,12 +337,6 @@
 "river":5
 },
 "West Wind":{
-"owner":"Meridian"
-},
-"West Wind 1":{
-"owner":"Meridian"
-},
-"West Wind 2":{
 "owner":"Meridian"
 },
 "Whakamaru":{

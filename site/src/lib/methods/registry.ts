@@ -81,7 +81,7 @@ export const TOPICS: Topic[] = [
 		title: 'Installed capacity',
 		summary: 'How much each plant could generate, and when that changed, back to 1997: the basis for the Generation tab’s capacity factors and dispatchable headroom.',
 		shownOn: [['Tracker', '/tracker']],
-		updated: '2026-10-22',
+		updated: '2026-10-27',
 	},
 	{
 		slug: 'history',

@@ -159,13 +159,10 @@ export const GAS_PLANT = {
 const TCC_END = Date.UTC(2026, 2, 31, 11);   // Taranaki Combined Cycle (in 'Stratford' with the peakers) closed in Mar 2026 (Contact's FY26 results; derated 2022-23)
 export const STRATFORD_TCC = 0.40;
 
-// history built before Oct 2026 spells them without macrons
-const GAS_ALIAS = { 'Otahuhu A': 'Ōtāhuhu A', 'Otahuhu B': 'Ōtāhuhu B' };
-
 /** Gas factor (t CO₂e/MWh) for a plant at time t: a closed plant's own, otherwise the fleet average. */
 export function gasEf(name, t) {
   if (name === 'Stratford' && t < TCC_END) return STRATFORD_TCC;
-  return GAS_PLANT[GAS_ALIAS[name] ?? name] ?? GAS_FLEET;
+  return GAS_PLANT[name] ?? GAS_FLEET;
 }
 
 /** A plant's own factor for fuels that vary by plant (geothermal, gas), or null for the others. */
