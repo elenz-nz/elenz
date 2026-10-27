@@ -123,12 +123,6 @@ tiwai = "TWI2201"
 "New Plymouth" = "Contact"
 "Southdown" = "Mercury"
 "Kawerau TG1/TG2" = "Other generators"
-# the old names, which history keeps until the rebuild that renamed them finishes: delete once it has
-"Otahuhu A" = "Contact"
-"Otahuhu B" = "Contact"
-"West Wind 1" = "Meridian"
-"West Wind 2" = "Meridian"
-"Kawerau (TOPP1)" = "Other generators"
 
 # Hydro schemes for the "By hydro scheme" view, each listed upstream to downstream. Hydro stations not listed
 # here are shown as "Other hydro".

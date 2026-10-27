@@ -120,7 +120,7 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   two tabs (`src/lib/site/TrackerTabs.svelte`, under the masthead): Generation at `/tracker` and Prices at `/tracker/prices`
   (`src/routes/tracker/prices/+page.svelte`: six node prices, the island spread and HVDC on one time axis for the live week and
   30 days; each period's price range, spread and half-hours over $500/$1,000 for 12 months and All; price captured by fuel;
-  a time-of-day heat map. Data shaping in `src/lib/prices/data.js`, SVG charts in `src/lib/prices/`. Under the Generation tab's charts, `src/lib/generation/GenLower.svelte`: a share of generation over the range with the same dates a year earlier (365 days; not on All), dispatchable headroom (hydro, gas, coal/gas, diesel and battery capacity less output at three levels: installed (`capacity.json`), offered and offered under $1,000/MWh (`hist/off/*` from `ingest/offered.py`); Levels view (nested areas) or By fuel (one level stacked, hydro on top and optional); where a chart point spans more data, each level's lowest within it, which for installed capacity on daily history needs `peak.disp`/`peak.dispx`, each day's highest half-hour of dispatchable output with and without hydro, added at the next rebuild; method on /methods/capacity#headroom), the mix by fuel with capacity factors (from `capacity.json`; peaks only for half-hourly or finer data; batteries count discharge, daily history's `batt_d`), and the range by time of day; data shaping in `src/lib/generation/data.js`. Both tabs' heat maps follow the range
+  a time-of-day heat map. Data shaping in `src/lib/prices/data.js`, SVG charts in `src/lib/prices/`. Under the Generation tab's charts, `src/lib/generation/GenLower.svelte`: a share of generation over the range with the same dates a year earlier (365 days; not on All), dispatchable headroom (hydro, gas, coal/gas, diesel and battery capacity less output at three levels: installed (`capacity.json`), offered and offered under $1,000/MWh (`hist/off/*` from `ingest/offered.py`); Levels view (nested areas) or By fuel (one level stacked, hydro on top and optional); where a chart point spans more data, each level's lowest within it, which for installed capacity on daily history needs `peak.disp`/`peak.dispx`, each day's highest half-hour of dispatchable output with and without hydro (since BUILD 7); method on /methods/capacity#headroom), the mix by fuel with capacity factors (from `capacity.json`; peaks only for half-hourly or finer data; batteries count discharge, daily history's `batt_d`), and the range by time of day; data shaping in `src/lib/generation/data.js`. Both tabs' heat maps follow the range
   (`src/lib/site/heat.js`): one row per day from half-hourly history up to 400 days (at least the last 7), scrolling
   past 40 rows (latest at the foot), and one row per month (or year) for All from `hist/tod.json` (`ingest/tod.py`);
   colours on a fixed scale (generation: set by today's installed capacity; the renewable share: fixed bands 80-98%;
@@ -238,7 +238,7 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   region, its progression, context for its half-hour, the best for each month of the year, provisional records from
   dispatch months and which ones were settled) is published while the history is complete, only when it changes. Official
   means metered generation (meta.source), final prices, metered HVDC. Clock-change days count like any other
-  once BUILD 7 has run (before it, Generation_MD's clock-numbered days before 2009 were left out).
+  (since BUILD 7; before it, Generation_MD's clock-numbered days before 2009 were left out).
   Try it on downloaded months: `python3 ingest/records.py <folder of YYYY-MM.json> [out.json]`.
   `offered.py` (its own workflow, `offers.yml`, started by the Worker with the history job every 6 hours): final
   generator energy offers from the EA's daily offers files (from 1 Jan 2013, published the day after; ~230 GB in all,
@@ -421,9 +421,10 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
    upgrade path if GitHub's schedule delays become a problem.
 3. History since Aug 1997 on the tracker page: 30 days, 1 year, All (BUILD 6, finished Oct 2026; was Sep 2020).
    Daily history keeps each day's peak demand and peak generation (total output including embedded solar).
-   BUILD 7 (`facilities/NEXT_REBUILD.md` items 1-7) started 23 Oct 2026 (commit 9709b43); by 24 Oct it had rebuilt
-   Aug 1997-Dec 2021 (293 of 351 months) and should finish on 25 Oct NZ time. Then check each item as NEXT_REBUILD.md
-   says, run the Offers workflow with "resummarise", and do its cleanup (a scheduled follow-up does this ~28 Oct).
+   BUILD 7 (Mill Creek 2014-15, Kawerau TG1/TG2, West Wind as one plant, Ōtāhuhu names, clock-change days before
+   2009, daily peak dispatchable output, Ashburton's small solar farms) ran 23-27 Oct 2026 (commit 9709b43); every
+   item checked out on the published files on 27 Oct, the Offers workflow was rerun with "resummarise", and the old
+   plant names were cleaned up. `facilities/NEXT_REBUILD.md` is empty until the next fingerprinted change.
 4. Pages: landing (`/`), live (`/now`, with the price explainer and Every generator right now), tracker (Generation and
    Prices tabs), Records (`/records`), Articles (`/articles`, published 15 Oct 2026 with the Winter 2026 review), About,
    Data and methods (`/methods`) and Privacy. Stale-data watchdog, uptime monitor, Cloudflare Web Analytics and a Buy
