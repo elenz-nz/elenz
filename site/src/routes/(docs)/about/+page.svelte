@@ -56,7 +56,7 @@
 			name: 'Tracker: Generation', href: '/tracker',
 			lede: 'Linked charts on one time axis, with one hover line driving a summary table.',
 			items: [
-				'Generation stacked by fuel, or grouped by site, hydro scheme, owner, flexibility, renewable vs fossil, or inverter-based vs synchronous; in MW or as a share. Drill down from a fuel to its plants and their units.',
+				'Generation stacked by fuel, or grouped by site, hydro scheme, owner, flexibility, renewable vs fossil, or inverter vs synchronous; in MW or as a share. Drill down from a fuel to its plants and their units.',
 				'Wholesale prices at Haywards and Benmore.',
 				'Demand at the grid, and with embedded solar added back.',
 				'HVDC transfer, emissions intensity and renewable share.',

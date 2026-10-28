@@ -154,7 +154,7 @@ const REGION_NAME = { NZ: 'New Zealand', NI: 'North Island', SI: 'South Island' 
 const RANGE_LAST = { '1d': 'last 24 hours', '3d': 'last 3 days', '7d': 'last 7 days', '30d': 'last 30 days', '1y': 'last 12 months', all: 'since 1997' };
 const RANGE_LEN = { '1d': null, '3d': '3 days', '7d': '7 days', '30d': '30 days', '1y': '12 months' };
 const GROUP_NAME = { ren: 'Renewable', fossil: 'Fossil', fast: 'Fast flexible', vre: 'Wind and solar', resid: 'Synchronous', solar: 'Solar' };
-const BY_NAME = { site: 'by site', scheme: 'by hydro scheme', owner: 'by owner', simple: 'by group', flex: 'by flexibility', rf: 'renewable vs fossil', vre: 'inverter-based vs synchronous' };
+const BY_NAME = { site: 'by site', scheme: 'by hydro scheme', owner: 'by owner', simple: 'by group', flex: 'by flexibility', rf: 'renewable vs fossil', vre: 'inverter vs synchronous' };
 const PLANT_NAMES = Object.fromEntries(Object.keys(PLANTS).map((n) => [slug(n), n]));
 const SET_NAMES = Object.fromEntries(Object.values(PLANTS).flatMap((m) => [m.scheme, m.owner]).filter(Boolean).map((n) => [slug(n), n]));
 const MON = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');

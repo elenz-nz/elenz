@@ -312,6 +312,13 @@ a { color: var(--accent); }
   .mast-r { gap: 0; }
   .pages a { padding: 6px 7px; font-size: 0.86rem; }
   #cv-gen { height: 264px; }
+  /* the generation chart's header in two rows: title and grouping, then the buttons and the total */
+  .chart.gen .legends { display: contents; }
+  .chart.gen #sel-view { order: 1; }
+  .chart.gen .ch-head .seg, .chart.gen #btn-price { order: 2; }
+  .chart.gen #lg-tot { order: 3; }
+  .chart.gen .ch-head { gap: 6px 8px; align-items: center; }
+  .chart.gen .ch-head .info-tip { margin-left: -6px; }
   .nav { width: 26px; height: 38px; }
   .seg button { padding: 2px 7px; }
   .ctl + .ctl { padding-left: 0; border-left: 0; }

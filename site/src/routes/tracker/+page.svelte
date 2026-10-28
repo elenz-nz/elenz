@@ -132,23 +132,48 @@
 <!-- each chart's ⓘ: what it shows and how it's made (the notes that used to sit under the charts) -->
 {#snippet chartInfo(id: string)}
 	{#if id === 'gen'}
-		<p>Each source's output, stacked, or as separate lines with the chart buttons. The live week is the market's 5-minute dispatch; history is metered output wherever the EA has published it (about six weeks behind). Embedded solar (hatched) is estimated. On one island's chart, HVDC arriving is stacked on top and HVDC leaving goes below zero, like battery charging. $ Price adds the island reference prices on a right axis, spike-proof like the Prices tab.</p>
+		<ul>
+			<li>Each source's output, stacked, or one line each with the chart buttons (to compare plants or fuels).</li>
+			<li>The live week is the market's 5-minute dispatch; history is metered output wherever the EA has published it (about six weeks behind).</li>
+			<li>Embedded solar (hatched) is estimated.</li>
+			<li>On one island's chart, HVDC arriving is stacked on top and HVDC leaving goes below zero, like battery charging.</li>
+			<li>$ Price adds the island reference prices on a right axis, spike-proof like the Prices tab.</li>
+		</ul>
 		<p id="gen-note" hidden></p>
 		<p><a href="/methods/generation">How generation is built</a></p>
 	{:else if id === 'price'}
-		<p>Spot prices at the island reference nodes, Haywards (North Island) and Benmore (South Island): dispatch prices for the live week, the EA's final prices for history. Long ranges show averages; the Prices tab has the spread and the spikes.</p>
+		<ul>
+			<li>Spot prices at the island reference nodes, Haywards (North Island) and Benmore (South Island).</li>
+			<li>Dispatch prices for the live week, the EA's final prices for history.</li>
+			<li>Long ranges show averages; the Prices tab has the spread and the spikes.</li>
+		</ul>
 		<p><a href="/methods/prices">How prices are shown</a></p>
 	{:else if id === 'demand'}
-		<p>Electricity taken from the grid (solid), and with estimated embedded solar added back (dashed, with its uncertainty band), which is closer to what was actually used. Long ranges show averages; the summary gives each day's peak.</p>
+		<ul>
+			<li>Solid: electricity taken from the grid.</li>
+			<li>Dashed: with estimated embedded solar added back, closer to what was actually used (the band is its uncertainty).</li>
+			<li>Long ranges show averages; the summary gives each day's peak.</li>
+		</ul>
 		<p><a href="/methods/demand">How demand is worked out</a></p>
 	{:else if id === 'hvdc'}
-		<p>Transfer between Benmore and Haywards, northward positive. Metered once the EA publishes it, about two weeks after each month; before that, estimated from each island's generation and demand (about 10 MW out on average).</p>
+		<ul>
+			<li>Transfer between Benmore and Haywards, northward positive.</li>
+			<li>Metered once the EA publishes it, about two weeks after each month.</li>
+			<li>Before that, estimated from each island's generation and demand (about 10 MW out on average).</li>
+		</ul>
 		<p><a href="/methods/hvdc">How HVDC is worked out</a></p>
 	{:else if id === 'co2'}
-		<p>Grams of CO₂-equivalent for each kWh generated: each plant's output times its fuel's emission factor, with Huntly's Rankine units at Genesis's quarterly coal share and each geothermal station's own factor.</p>
+		<ul>
+			<li>Grams of CO₂-equivalent for each kWh generated: each plant's output times its fuel's emission factor.</li>
+			<li>Huntly's Rankine units at Genesis's quarterly coal share.</li>
+			<li>Each geothermal station at its own factor.</li>
+		</ul>
 		<p><a href="/methods/emissions">How emissions are worked out</a></p>
 	{:else}
-		<p>Renewable output as a share of all generation, embedded solar included. Geothermal counts as renewable, although it emits some CO₂.</p>
+		<ul>
+			<li>Renewable output as a share of all generation, embedded solar included.</li>
+			<li>Geothermal counts as renewable, although it emits some CO₂.</li>
+		</ul>
 		<p><a href="/methods/groupings#renewable">How shares are worked out</a></p>
 	{/if}
 {/snippet}
@@ -278,7 +303,7 @@
 							<option value="owner">By owner</option>
 							<option value="flex">Flexibility</option>
 							<option value="rf">Renewable vs fossil</option>
-							<option value="vre">Inverter-based vs synchronous</option>
+							<option value="vre">Inverter vs synchronous</option>
 						</select>
 						<div class="seg" role="group" aria-label="Show generation as an amount (MW, or energy on long ranges) or as a share of total generation" id="seg-unit">
 							<button type="button" data-v="mw" aria-pressed="true">MW</button>
