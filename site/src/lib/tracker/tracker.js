@@ -579,16 +579,33 @@ export function mountTracker(D, hooks = {}) {
     const Y = v => bottom - (v - dom.lo) / (dom.hi - dom.lo) * (bottom - top);
     const Yinv = y => dom.lo + (bottom - y) / (bottom - top) * (dom.hi - dom.lo);
     ctx.font = FONT; ctx.textBaseline = 'middle'; ctx.textAlign = 'right';
-    for (const t of dom.ticks) {
+    const skip = axisUnit(ctx, dom.ticks.map(Y), top, bottom, opt.unit, x0 - 7);
+    dom.ticks.forEach((t, i) => {
       const y = Math.round(Y(t)) + 0.5;
       ctx.strokeStyle = t === 0 && dom.lo < 0 ? C['--line'] : C['--grid']; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke();
-      ctx.fillStyle = C['--muted']; ctx.fillText(tickFmt(t), x0 - 7, y);
-    }
+      if (!skip.has(i)) { ctx.font = FONT; ctx.fillStyle = C['--muted']; ctx.fillText(tickFmt(t), x0 - 7, y); }
+    });
     ctx.strokeStyle = C['--line'];
     for (const mk of V.marks) if (mk.line) { const x = Math.round(X(mk.j)) + 0.5; ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke(); }
     if (axis) drawAxis(ctx, X, bottom, x0, x1);
     return { X, Y, Yinv, x0, x1, top, bottom };
+  }
+  // The axis's unit (MW, $/MWh ...) in small type just under its top label, in place of a unit beside the chart's title
+  // (owner's call, 29 Oct 2026: tidier on phones). ys: the tick labels' heights; a label the unit would sit on is left
+  // out (returned as indexes to skip). x: the labels' edge; align: right for the left axis, left for the right axis.
+  const UNIT_FONT = '600 10px "Schibsted Grotesk", system-ui, sans-serif';
+  function axisUnit(ctx, ys, top, bottom, unit, x, align = 'right') {
+    const skip = new Set();
+    if (!unit) return skip;
+    let k = -1;
+    ys.forEach((y, i) => { if (y >= top - 1 && y <= bottom + 1 && (k < 0 || y < ys[k])) k = i; });
+    if (k < 0) return skip;
+    const uy = Math.max(ys[k], top + 3) + 12;
+    ys.forEach((y, i) => { if (i !== k && Math.abs(y - uy) < 11) skip.add(i); });
+    ctx.save(); ctx.font = UNIT_FONT; ctx.fillStyle = C['--muted']; ctx.textAlign = align; ctx.textBaseline = 'middle';
+    ctx.fillText(unit, x, uy); ctx.restore();
+    return skip;
   }
   function drawAxis(ctx, X, bottom, x0, x1) {
     ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.font = FONT;
@@ -721,7 +738,7 @@ export function mountTracker(D, hooks = {}) {
       const both = nice(mn, Math.max(mx, pct ? 0.1 : 1), 5), step = both.ticks[1] - both.ticks[0];
       if (-mn >= 0.6 * step) dom = both; else dom.lo = mn * 1.2;
     }
-    const F = frame(c, dom, pct ? v => (Number.isInteger(v) ? v : v.toFixed(1)) + '%' : energy ? v => (Math.abs(v - Math.round(v)) < 1e-9 ? fmt(v) : String(+v.toFixed(2))) : v => fmt(v), { axis: true });
+    const F = frame(c, dom, pct ? v => (Number.isInteger(v) ? v : v.toFixed(1)) + '%' : energy ? v => (Math.abs(v - Math.round(v)) < 1e-9 ? fmt(v) : String(+v.toFixed(2))) : v => fmt(v), { axis: true, unit: pct ? '%' : energy ? eu().unit : 'MW' });
     const { X, Y } = F;
     if (lines) {
       // up to eight lines: 2 px with a ring of the panel colour so crossings read; more: thinner, no ring.
@@ -815,8 +832,8 @@ export function mountTracker(D, hooks = {}) {
   // to about $100, compressed above), so a spike doesn't flatten the rest. Owner's call, 29 Oct 2026.
   function priceSeries() {
     const r = state.region, out = [];
-    if (r !== 'SI') out.push(['North Island · Haywards', V.pNI, C['--p-ni'], null]);
-    if (r !== 'NI') out.push(['South Island · Benmore', V.pSI, C['--p-si'], [6, 3]]);
+    if (r !== 'SI') out.push(['North Island · Haywards', V.pNI, C['--p-ni'], [6, 3]]);
+    if (r !== 'NI') out.push(['South Island · Benmore', V.pSI, C['--p-si'], [2, 3]]);
     return out;
   }
   const priceTick = v => (v < 0 ? '−' : '') + '$' + (Math.abs(v) >= 1000 ? Math.abs(v) / 1000 + 'k' : fmt(Math.abs(v)));
@@ -829,19 +846,21 @@ export function mountTracker(D, hooks = {}) {
     const Y = v => F.bottom - (sc.f(v) - sc.lo) / (top - sc.lo || 1) * (F.bottom - F.top);
     // the right axis: labels only (the gridlines are the MW axis's), with a short tick at each
     ctx.font = FONT; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-    let last = Infinity;
-    for (const t of sc.ticks) {
-      const y = Y(t);
-      if (y < F.top - 1 || y > F.bottom + 1 || last - y < 12) continue;
+    // labels that fit (12 px apart), then the unit under the top one
+    const shown = []; let last = Infinity;
+    for (const t of sc.ticks) { const y = Y(t); if (y < F.top - 1 || y > F.bottom + 1 || last - y < 12) continue; shown.push([t, y]); last = y; }
+    const skip = axisUnit(ctx, shown.map(([, y]) => y), F.top, F.bottom, '$/MWh', F.x1 + 7, 'left');
+    ctx.font = FONT; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    for (const [i, [t, y]] of shown.entries()) {
+      if (skip.has(i)) continue;
       ctx.strokeStyle = C['--line']; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(F.x1, Math.round(y) + 0.5); ctx.lineTo(F.x1 + 4, Math.round(y) + 0.5); ctx.stroke();
       ctx.fillStyle = C['--muted']; ctx.fillText(priceTick(t), F.x1 + 7, y);
-      last = y;
     }
-    // Benmore first, so Haywards is on top where they meet (as on the price chart); each with a ring of the panel
-    // colour. Benmore's is dashed here, so its teal doesn't read as one more hydro line.
-    for (const [, a, col, dash] of ser.slice().reverse()) for (const [w, s] of [[3.5, C['--surface']], [1.75, col]]) {
+    // Benmore first, so Haywards is on top where they meet (as on the price chart); thin and dashed (Haywards long
+    // dashes, Benmore short), each over a ring of the panel colour, so they don't read as generation lines
+    for (const [, a, col, dash] of ser.slice().reverse()) for (const [w, s] of [[2.5, C['--surface']], [1.25, col]]) {
       ctx.save(); ctx.strokeStyle = s; ctx.lineWidth = w; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.beginPath();
-      if (dash && s === col) ctx.setLineDash(dash);
+      if (dash) ctx.setLineDash(dash);
       let on = false;
       for (let j = 0; j < V.n; j++) { const v = a[j]; if (v !== v) { on = false; continue; } const x = F.X(j), y = Y(v); on ? ctx.lineTo(x, y) : ctx.moveTo(x, y); on = true; }
       ctx.stroke(); ctx.restore();
@@ -866,7 +885,7 @@ export function mountTracker(D, hooks = {}) {
     const c = setup($('cv-price')), { ctx } = c;
     let mx = 0; for (let j = 0; j < V.n; j++) mx = Math.max(mx, V.pNI[j], V.pSI[j]);
     const dom = nice(0, mx * 1.08, ticksFor('cv-price', 3));
-    const F = frame(c, dom, v => '$' + fmt(v)), { X, Y } = F;
+    const F = frame(c, dom, v => '$' + fmt(v), { unit: '$/MWh' }), { X, Y } = F;
     const r = state.region, aNI = r === 'SI' ? 0.35 : 1, aSI = r === 'NI' ? 0.35 : 1;
     line(ctx, X, Y, V.pSI, alpha(C['--p-si'], aSI));
     line(ctx, X, Y, V.pNI, alpha(C['--p-ni'], aNI));
@@ -885,7 +904,7 @@ export function mountTracker(D, hooks = {}) {
     let mn = Infinity, mx = 0;
     for (let j = 0; j < V.n; j++) { mx = Math.max(mx, V.underlying[j], V.metered[j]); mn = Math.min(mn, V.metered[j]); }
     const dom = nice(mn * 0.95, mx * 1.02, ticksFor('cv-demand', 3));
-    const F = frame(c, dom, v => fmt(v)), { X, Y } = F;
+    const F = frame(c, dom, v => fmt(v), { unit: 'MW' }), { X, Y } = F;
     // the embedded solar estimate's uncertainty (± one standard deviation) as a band around the dashed line
     if (V.roofU.some(u => u > 0.5)) band(ctx, X, Y, V.underlying.map((v, j) => v - V.roofU[j]), V.underlying.map((v, j) => v + V.roofU[j]), alpha(C['--ink-2'], 0.22));
     line(ctx, X, Y, V.underlying, C['--ink-2'], 1.5, [4, 3]);
@@ -896,7 +915,7 @@ export function mountTracker(D, hooks = {}) {
     const c = setup($('cv-hvdc')), { ctx } = c;
     let mn = 0, mx = 0; for (let j = 0; j < V.n; j++) { mn = Math.min(mn, V.hvdc[j]); mx = Math.max(mx, V.hvdc[j]); }
     const dom = nice(mn, mx, ticksFor('cv-hvdc', 2));
-    const F = frame(c, dom, v => fmt(v)), { X, Y } = F;
+    const F = frame(c, dom, v => fmt(v), { unit: 'MW' }), { X, Y } = F;
     area(ctx, X, Y, V.hvdc, 0, alpha(C['--f-hvdc'], 0.35));
     line(ctx, X, Y, V.hvdc, C['--f-hvdc'], 1.5);
     ctx.font = FONT; ctx.fillStyle = C['--muted']; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
@@ -908,7 +927,7 @@ export function mountTracker(D, hooks = {}) {
     const c = setup($('cv-co2')), { ctx } = c;
     let mx = 0; for (let j = 0; j < V.n; j++) mx = Math.max(mx, V.co2[j]);
     const dom = nice(0, Math.max(mx, 10) * 1.1, ticksFor('cv-co2', 2));
-    const F = frame(c, dom, v => fmt(v)), { X, Y } = F;
+    const F = frame(c, dom, v => fmt(v), { unit: 'g/kWh' }), { X, Y } = F;
     area(ctx, X, Y, V.co2, 0, alpha(C['--co2'], 0.28));
     line(ctx, X, Y, V.co2, C['--co2'], 1.5);
     c.base.F = F; c.base.over = (ctx, j) => dot(ctx, X(j), Y(V.co2[j]), C['--co2']);
@@ -920,7 +939,7 @@ export function mountTracker(D, hooks = {}) {
     const big = !!$('cv-ren').closest('.popped'), st = 100 - lo <= 25 ? 5 : 100 - lo <= 50 ? 10 : 20;
     const dom = { lo, hi: 100, ticks: big ? Array.from({ length: Math.floor((100 - lo) / st) + 1 }, (_, i) => lo + i * st)
       : lo <= 50 ? [lo, 50, 100].filter((v, i, a) => a.indexOf(v) === i) : [lo, Math.round((lo + 100) / 2 / 5) * 5, 100] };
-    const F = frame(c, dom, v => v + '%', { axis: true }), { X, Y } = F;
+    const F = frame(c, dom, v => v + '%', { axis: true, unit: '%' }), { X, Y } = F;
     area(ctx, X, Y, V.ren, lo, alpha(C['--accent'], 0.14));
     line(ctx, X, Y, V.ren, C['--accent']);
     c.base.F = F; c.base.over = (ctx, j) => dot(ctx, X(j), Y(V.ren[j]), C['--accent']);
@@ -947,11 +966,11 @@ export function mountTracker(D, hooks = {}) {
       unit: V.layers.length > 1 ? 'MW, by grid connection' : 'MW',
     }[lv];
     const per = { '1d': 'a day', '1w': 'a week', '1mo': 'a month', '1yr': 'a year' }[state.int];
+    // the unit is on the chart's axis; the canvas's description says it in full for screen readers
     const shape = linesMode() ? unitTxt.replace('stacked by', 'by') : unitTxt;
-    $('gen-unit').textContent = (pctMode() ? shape.replace(/^MW/, '% of all generation') : energyMode() ? shape.replace(/^MW/, `${eu().unit} ${per}`) : shape)
-      + (state.price ? ' · price $/MWh, right' : '');
-    $('cv-gen').setAttribute('aria-label', (linesMode() ? 'Line chart of generation, one line per source' : 'Stacked area chart of generation by source')
-      + (state.price ? ', with wholesale prices on a right axis' : ''));
+    const unitFull = pctMode() ? shape.replace(/^MW/, '% of all generation') : energyMode() ? shape.replace(/^MW/, `${eu().unit} ${per}`) : shape;
+    $('cv-gen').setAttribute('aria-label', (linesMode() ? 'Line chart of generation, one line per source' : 'Stacked area chart of generation') + ` (${unitFull})`
+      + (state.price ? ', with wholesale prices in $/MWh on a right axis' : ''));
     $('cv-gen').closest('.chart').classList.toggle('priced', state.price);
     const note = $('gen-note'), txt = NOTES[state.view] || '';
     note.hidden = !txt;
@@ -1779,7 +1798,7 @@ export function mountTracker(D, hooks = {}) {
           const gen = id === 'cv-gen';
           return {
             heading: gen ? $('gen-title').textContent.replace(/›/g, ' › ').replace(/\s+/g, ' ').trim() : card.querySelector('h2').textContent,
-            unit: (gen ? $('gen-unit') : card.querySelector('.unit')).textContent,
+            unit: '',   // each chart carries its unit on its axis
             legend: gen ? (which === 'gen' ? [] : genLegend()) : legendOf(card),
             img: src, w: cv.clientWidth, h: cv.clientHeight,
           };

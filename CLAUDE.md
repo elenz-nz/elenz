@@ -164,11 +164,11 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   the list's squares follow (`syncSwatches`); the tooltip lists the lines at that time, nearest first. Price over the
   generation chart (`#btn-price`, `state.price`, address `price=on`; off by default, owner's call): both island prices
   for NZ, the island's own on an island's chart, on a right axis with the Prices tab's spike-proof scale (`priceScale`
-  from `#lib/prices/data.js`), Benmore dashed so it doesn't read as a hydro line. While it's on every chart's right margin
+  from `#lib/prices/data.js`), thin and dashed (Haywards long dashes, Benmore short) so they don't read as generation lines. While it's on every chart's right margin
   widens (`padR()`) so the time axes stay lined up. Both are kept with the grouping in localStorage `elenz-view`.
   Chart notes are ⓘ buttons (`src/lib/site/InfoTip.svelte`, fixed-position popover) right after each card's title (owner's
   rule, Oct 2026: a card is a title with its ⓘ beside it, holding a short description and a link to the method page;
-  `.ttl-row` wraps a title and its ⓘ where the heading isn't a `.ch-head`) on both tracker tabs, Now, Records and
+  `.ttl-row` wraps a title and its ⓘ where the heading isn't a `.ch-head`). On the Generation tab each chart's unit (MW/GWh/TWh, %, $/MWh, g/kWh) is drawn in small type under its top axis label (`axisUnit` in tracker.js; the price overlay's under the right axis's), not beside the title (owner's call, 29 Oct 2026, tidier on phones); the full description is in the canvas's aria-label on both tracker tabs, Now, Records and
   article figures (`Figure`'s source). Region and month pickers are boxed dropdowns (`select.pick`), the same everywhere; the page-level "About this data" is a labelled
   pill, and both summaries have a labelled "Controls" panel listing every less obvious feature (keep it up to date).
   Tracker and Now use the full width of big screens (`.wrap.wide`; reading pages keep 1,260 px). The browser tab's title says what the view shows (`describe`), and the
