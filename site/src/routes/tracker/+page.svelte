@@ -132,7 +132,7 @@
 <!-- each chart's ⓘ: what it shows and how it's made (the notes that used to sit under the charts) -->
 {#snippet chartInfo(id: string)}
 	{#if id === 'gen'}
-		<p>Each source's output, stacked. The live week is the market's 5-minute dispatch; history is metered output wherever the EA has published it (about six weeks behind). Embedded solar (hatched) is estimated. On one island's chart, HVDC arriving is stacked on top and HVDC leaving goes below zero, like battery charging.</p>
+		<p>Each source's output, stacked, or as separate lines with the chart buttons. The live week is the market's 5-minute dispatch; history is metered output wherever the EA has published it (about six weeks behind). Embedded solar (hatched) is estimated. On one island's chart, HVDC arriving is stacked on top and HVDC leaving goes below zero, like battery charging. $ Price adds the island reference prices on a right axis, spike-proof like the Prices tab.</p>
 		<p id="gen-note" hidden></p>
 		<p><a href="/methods/generation">How generation is built</a></p>
 	{:else if id === 'price'}
@@ -284,6 +284,11 @@
 							<button type="button" data-v="mw" aria-pressed="true">MW</button>
 							<button type="button" data-v="pct" aria-pressed="false">%</button>
 						</div>
+						<div class="seg" role="group" aria-label="Chart type: stacked areas, or one line per source to compare them" id="seg-chart">
+							<button type="button" data-v="stacked" aria-pressed="true" aria-label="Stacked" title="Stacked: sources piled up to the total"><svg width="16" height="14" viewBox="0 0 16 14" aria-hidden="true"><path d="M1 13V9l4-2 5 1 5-3v8z" fill="currentColor" opacity="0.45" /><path d="M1 9V5l4-3 5 2 5-3v4l-5 3-5-1z" fill="currentColor" /></svg></button>
+							<button type="button" data-v="lines" aria-pressed="false" aria-label="Lines" title="Lines: each source on its own, to compare them"><svg width="16" height="14" viewBox="0 0 16 14" aria-hidden="true"><path d="M1 11l4-3 4 2 6-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /><path d="M1 5l4 2 4-3 6 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" opacity="0.5" /></svg></button>
+						</div>
+						<button type="button" class="tgl" id="btn-price" aria-pressed="false" title="Draw the wholesale price over this chart, on a right axis">$ Price</button>
 					</div>
 					{@render popBtn('gen', 'generation')}
 				</div>
@@ -364,6 +369,8 @@
 						<dd>Drag across any chart to zoom into that stretch; every chart follows. The arrow beside 1D picks the last 1, 3, 6 or 12 hours. While zoomed, the date box gains a time: pick the date and time the zoomed hours should end (NZ time) to move them there, or the ‹ › arrows step by the zoom’s length; Reset zoom in the bar (or Escape twice) shows the whole range again.</dd>
 						<dt>Break it down</dt>
 						<dd>Select a name in this list to go from a fuel to its plants and their grid connections. ‹ Back above the list, or the browser’s Back, steps out. The menu above the generation chart groups it other ways (owner, site, flexibility…), and MW/% switches to shares.</dd>
+						<dt>Compare sources</dt>
+						<dd>The two chart buttons beside MW/% switch the generation chart between stacked areas and lines, one per source, so plants or fuels can be compared on one scale: drill into a fuel or choose By site, then hide what you don’t need or use “show only this”. Up to eight lines get their own colours. $ Price draws the island prices over the chart on a right axis (spike-proof: linear to about $100, compressed above); select it again to take them off.</dd>
 						<dt>Hide and show</dt>
 						<dd>Select a colour square to hide that layer. Double-click it, Shift+click it or press and hold it to show only that one (again to show everything); All and None above the list do the rest. In long lists, type in Filter, and select a fuel heading to fold its plants.</dd>
 						<dt>Enlarge, share, download</dt>

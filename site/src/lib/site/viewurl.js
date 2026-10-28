@@ -9,6 +9,8 @@
 //                       t       YYYY-MM-DDTHH:MM (NZ time) or YYYY-MM-DD: the point the summary opens on
 // Generation tab:       by      the grouping (absent: detailed)
 //                       unit    pct (absent: MW)
+//                       chart   lines (absent: stacked): each source as its own line, to compare them
+//                       price   on (absent: off): the island prices drawn over the generation chart, on a right axis
 //                       group, fuel, plant   the drill-down (plant and set names as slugs, see slug())
 //                       zoom    1h | 3h | 6h | 12h: the last hours of the window (the menu on 1D), or
 //                               YYYY-MM-DDTHH:MM~YYYY-MM-DDTHH:MM: a span dragged on the chart (NZ time, end exclusive)
@@ -29,7 +31,7 @@ export const INTS = ['5m', '30m', '1d', '1w', '1mo', '1yr'];
 export const GROUPINGS = ['detailed', 'simple', 'site', 'scheme', 'owner', 'flex', 'rf', 'vre'];
 export const SCALES = ['spike', 'capped', 'linear'];
 export const SHARED = ['region', 'range', 'int', 'end', 't'];
-const ORDER = [...SHARED, 'by', 'unit', 'group', 'fuel', 'plant', 'zoom', 'scale', 'hide', 'band'];
+const ORDER = [...SHARED, 'by', 'unit', 'chart', 'price', 'group', 'fuel', 'plant', 'zoom', 'scale', 'hide', 'band'];
 /** The spans the 1D menu offers, in hours. */
 export const SPANS = [1, 3, 6, 12];
 export const OLD_RANGE = { 288: '1d', 864: '3d', 2016: '7d' };
@@ -94,6 +96,8 @@ export function readQuery(search) {
   if (t != null) v.t = t;
   one('by', (x) => GROUPINGS.includes(x));
   one('unit', (x) => x === 'pct' || x === 'mw');
+  one('chart', (x) => x === 'lines' || x === 'stacked');
+  one('price', (x) => x === 'on' || x === 'off');
   one('group', (x) => SLUG.test(x) && x.length <= 60);
   one('fuel', (x) => FUEL_KEYS.includes(x));
   one('plant', (x) => SLUG.test(x) && x.length <= 80);
@@ -129,6 +133,8 @@ export function writeQuery(v, { tDay = false } = {}) {
     if (k === 'range' && x === '1d') continue;
     if (k === 'by' && x === 'detailed') continue;
     if (k === 'unit' && x !== 'pct') continue;
+    if (k === 'chart' && x !== 'lines') continue;
+    if (k === 'price' && x !== 'on') continue;
     if (k === 'scale' && x === 'spike') continue;
     if (k === 'band' && x === 'HAY') continue;
     if (k === 'end') add(k, ymd(x - 1));

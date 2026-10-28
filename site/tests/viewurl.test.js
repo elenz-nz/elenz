@@ -18,6 +18,8 @@ test('an address reads and writes back unchanged', () => {
     'range=all&int=1yr&t=2008-01-01&by=scheme&group=manapouri',
     'region=NI&range=7d&scale=capped&hide=OTA,WKM&band=BEN',
     'zoom=3h',
+    'by=site&chart=lines&price=on&fuel=hydro',
+    'region=SI&unit=pct&price=on',
     'range=3d&end=2026-10-19&zoom=2026-10-19T13:05~2026-10-19T15:30',
   ]) {
     const day = /t=\d{4}-\d\d-\d\d(&|$)/.test(qs);
@@ -26,8 +28,8 @@ test('an address reads and writes back unchanged', () => {
 });
 
 test('defaults are left out and unknown values dropped', () => {
-  assert.equal(writeQuery({ region: 'NZ', range: '1d', by: 'detailed', unit: 'mw', scale: 'spike', band: 'HAY', hide: [] }), '');
-  assert.deepEqual(readQuery('?region=AU&range=2w&int=10m&end=2026-13-40&t=noon&by=colour&unit=gw&fuel=nuclear&plant=Not%20a%20slug&hide=x,OTA&band=OTA'), { hide: ['OTA'] });
+  assert.equal(writeQuery({ region: 'NZ', range: '1d', by: 'detailed', unit: 'mw', chart: 'stacked', price: 'off', scale: 'spike', band: 'HAY', hide: [] }), '');
+  assert.deepEqual(readQuery('?region=AU&range=2w&int=10m&end=2026-13-40&t=noon&by=colour&unit=gw&chart=pie&price=yes&fuel=nuclear&plant=Not%20a%20slug&hide=x,OTA&band=OTA'), { hide: ['OTA'] });
   assert.deepEqual(readQuery('?range=2016'), { range: '7d' });   // the old interval-count ranges
 });
 
