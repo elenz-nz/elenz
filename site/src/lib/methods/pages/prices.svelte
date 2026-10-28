@@ -54,6 +54,7 @@
 <p>The Prices tab’s HVDC chart is the same series as the Generation tab’s; see <a href="/methods/hvdc">HVDC transfer</a>.</p>
 
 <h2 id="scales">Price scales</h2>
+<p>The menu beside the Prices tab’s price chart chooses the scale. The price drawn over the Generation tab’s chart (its $ Price button) always uses the spike-proof scale.</p>
 <dl>
 	<dt>Spike-proof</dt>
 	<dd>Linear to about $100, compressed above it, so a single spike doesn’t flatten everything else: the chart plots sign(p) × log₁₀(1 + |p| ÷ 100), which also handles negative prices.</dd>
