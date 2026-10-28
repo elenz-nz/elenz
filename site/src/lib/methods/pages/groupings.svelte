@@ -23,7 +23,7 @@
 	<dd>As in the renewable share above. Waste heat sits with the fossils.</dd>
 	<dt>Flexibility</dt>
 	<dd>By how readily output can follow demand. <b>Inflexible:</b> geothermal, which runs flat out around the clock, and industrial cogeneration (bioenergy and waste heat), which follows its mill or steelworks. <b>Slow flexible:</b> Huntly’s Rankine units, which take hours to start and ramp slowly. <b>Fast flexible:</b> hydro, gas and diesel. <b>Variable:</b> wind and solar, which follow the weather. Grouping is by fuel, so gas cogeneration counts as fast flexible.</dd>
-	<dt>Inverter-based vs synchronous</dt>
+	<dt>Inverter vs synchronous</dt>
 	<dd><b>Inverter-based:</b> wind and solar, connected through power electronics. <b>Synchronous:</b> hydro, geothermal and thermal plant (including bioenergy and waste heat), whose spinning generators add inertia and system strength. Batteries are inverter-based too, but shown separately.</dd>
 	<dt>By site</dt>
 	<dd>The plants that together make up 95% of each fuel’s output over the range get a layer each, at most 12 per fuel; the rest of that fuel is grouped as “Other”. Plants are listed largest first by installed capacity, here and when a fuel or group is opened, so the order stays the same whatever the range.</dd>

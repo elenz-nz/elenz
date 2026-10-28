@@ -9,6 +9,8 @@ import PLANT_META from './plants.json';  // owner and hydro scheme per plant (in
 import CAPACITY from './capacity.json';   // installed MW per plant (ingest/capacity.py)
 import { readView, writeView, slug, describe, shareLinks } from '#lib/site/view.js';
 import { readQuery, stamp, fromStamp } from '#lib/site/viewurl.js';
+import { priceScale } from '#lib/prices/data.js';
+import { fit } from '#lib/site/fitselect.js';
 import { composeImage, legendOf, csvText, nzTime, utcTime, fileName, CREDIT, CREDIT_SOLAR, LICENCE } from '#lib/site/download.js';
 export { nzOffset, tzName };
 
@@ -163,7 +165,7 @@ export function mountTracker(D, hooks = {}) {
   const plantByName = name => M.plants.find(p => p.name === name);
 
   // intPicked: the viewer chose the interval (shared with the Prices tab); otherwise it's this tab's default for the range
-  const state = { region: 'NZ', range: '1d', end: null, kind: 'live', int: '5m', intPicked: false, view: 'detailed', unit: 'mw', hover: null, hoverBy: null,
+  const state = { region: 'NZ', range: '1d', end: null, kind: 'live', int: '5m', intPicked: false, view: 'detailed', unit: 'mw', chart: 'stacked', price: false, hover: null, hoverBy: null,
                   hidden: new Set(), drill: { ...TOP_LEVEL }, open: new Set(), filter: '',
                   // zoom: part of the window, { span: hours } at its end (the menu on 1D) or { from, to } (dragged on a chart)
                   zoom: null };
@@ -178,10 +180,14 @@ export function mountTracker(D, hooks = {}) {
     if (q.zoom) state.zoom = q.zoom;
     if (q.by && Object.hasOwn(VIEWS, q.by)) state.view = q.by;
     if (q.unit === 'pct') state.unit = 'pct';
+    if (q.chart === 'lines') state.chart = 'lines';
+    if (q.price === 'on') state.price = true;
   } else try {
     const s = JSON.parse(localStorage.getItem('elenz-view') || 'null');
     if (s && Object.hasOwn(VIEWS, s.view)) state.view = s.view;
     if (s?.unit === 'pct') state.unit = 'pct';
+    if (s?.chart === 'lines') state.chart = 'lines';
+    if (s?.price === true) state.price = true;
   } catch (e) {}
   if (!RANGES[state.range].ints.includes(state.int)) { state.int = RANGES[state.range].def || RANGES[state.range].ints[0]; state.intPicked = false; }
   // a link's drill-down and point wait for the window they belong to: a long range or past date loads its history
@@ -192,13 +198,13 @@ export function mountTracker(D, hooks = {}) {
   const groupKey = id => id == null ? null : /^[sox]:/.test(id) ? slug(id.slice(2)) : id;
   const ownQuery = () => {
     const d = state.drill, l = linked;
-    return { by: state.view, unit: state.unit, zoom: state.zoom, ...(l ? { group: l.group, fuel: l.fuel, plant: l.plant }
+    return { by: state.view, unit: state.unit, chart: state.chart, price: state.price ? 'on' : null, zoom: state.zoom, ...(l ? { group: l.group, fuel: l.fuel, plant: l.plant }
       : { group: groupKey(d.group), fuel: d.fuel, plant: d.plant ? slug(d.plant) : null }) };
   };
   const shared = () => ({ region: state.region, range: state.range, int: state.intPicked ? state.int : null, end: state.end });
   // push: a drill-down step, so Back steps out of it. The browser tab's title says what the view shows.
   const save = (push = false) => {
-    writeView(shared(), { store: { view: state.view, unit: state.unit }, query: ownQuery(), push });
+    writeView(shared(), { store: { view: state.view, unit: state.unit, chart: state.chart, price: state.price }, query: ownQuery(), push });
     const d = state.drill;
     document.title = describe('generation', { ...shared(), ...ownQuery() }, { plant: d.plant, group: d.group ? groupById(d.group)?.name : null }) + ' · ELENZ';
   };
@@ -466,7 +472,7 @@ export function mountTracker(D, hooks = {}) {
   let C = {}, PAT = {};
   function readColours() {
     const cs = getComputedStyle(document.documentElement);
-    for (const t of ['--ink', '--ink-2', '--muted', '--line', '--grid', '--surface', '--accent', '--accent-soft', '--co2', '--p-ni', '--p-si', '--f-coal', '--f-gas', '--f-diesel', '--f-geo', '--f-bio', '--f-waste', '--f-hydro', '--f-wind', '--f-solar', '--f-batt', '--f-hvdc', '--g-fossil', '--g-ren', '--g-fast', '--g-vre', '--g-resid', '--o1', '--o2', '--o3', '--o4', '--o5', '--o6'])
+    for (const t of ['--ink', '--ink-2', '--muted', '--line', '--grid', '--surface', '--accent', '--accent-soft', '--co2', '--p-ni', '--p-si', '--f-coal', '--f-gas', '--f-diesel', '--f-geo', '--f-bio', '--f-waste', '--f-hydro', '--f-wind', '--f-solar', '--f-batt', '--f-hvdc', '--g-fossil', '--g-ren', '--g-fast', '--g-vre', '--g-resid', '--o1', '--o2', '--o3', '--o4', '--o5', '--o6', '--l1', '--l2', '--l3', '--l4', '--l5', '--l6', '--l7', '--l8'])
       C[t] = cs.getPropertyValue(t).trim();
     PAT = {};
     for (const f of FUELS) if (f.hatch) PAT[f.k] = hatchOf(C[f.tok]);
@@ -493,10 +499,39 @@ export function mountTracker(D, hooks = {}) {
     const f = t => { t = (t + 1) % 1; return t < 1 / 6 ? p + (q - p) * 6 * t : t < 1 / 2 ? q : t < 2 / 3 ? p + (q - p) * (2 / 3 - t) * 6 : p; };
     return '#' + [f(h + 1 / 3), f(h), f(h - 1 / 3)].map(x => Math.round(x * 255).toString(16).padStart(2, '0')).join('');
   }
+  // Lines view: fuels and groups keep their own colours. When two to eight lines are shown and some are shades of one
+  // fuel (a fuel's plants, sites, a plant's connections) or grey "Other" rows, which are hard to tell apart as thin
+  // lines, each line gets a colour from the line palette (--l1..--l8, checked for colour-blind separation in light and
+  // dark). A line keeps its colour while others are hidden or shown (SLOT); more than eight keep their fuel shades.
+  const LINE_MAX = 8, SLOT = new Map();
+  let lineSlots = null;
+  function shadesClash(layers) {
+    const seen = new Set();
+    for (const l of layers) {
+      if (l.shade == null && !l.muted) continue;
+      const k = l.muted ? 'muted' : l.tok;
+      if (seen.has(k)) return true;
+      seen.add(k);
+    }
+    return false;
+  }
+  function assignLines(layers) {
+    lineSlots = null;
+    if (state.chart !== 'lines' || layers.length < 2 || layers.length > LINE_MAX || !shadesClash(layers)) { SLOT.clear(); return; }
+    const ids = new Set(layers.map(l => l.id));
+    for (const id of [...SLOT.keys()]) if (!ids.has(id)) SLOT.delete(id);
+    const used = new Set(SLOT.values());
+    for (const l of layers) if (!SLOT.has(l.id)) { let k = 0; while (used.has(k)) k++; SLOT.set(l.id, k); used.add(k); }
+    lineSlots = SLOT;
+  }
+  // a layer's colour as drawn: its line colour in the lines view, otherwise its fill
+  const lc = l => lineSlots && lineSlots.has(l.id) ? C[`--l${lineSlots.get(l.id) + 1}`] : colourOf(l);
   const colourOf = l => l.muted ? alpha(C['--muted'], 0.5) : l.light ? shade(C[l.tok], 3) : l.shade != null ? shade(C[l.tok], l.shade) : C[l.tok];
 
   // ---------- chart frame ----------
-  const PADL = 50, PADR = 12;
+  // the right margin widens for the price axis when the price is drawn over generation; every chart takes the same
+  // margins so their time axes line up
+  const PADL = 50, padR = () => state.price ? 50 : 12;
   const FONT = '11px "IBM Plex Mono", ui-monospace, Menlo, monospace';
   let exportScale = 0;   // while drawing a download: at least twice the screen's pixels, so the image is sharp
   // Each chart is drawn once per view into an off-screen copy, its base (fills, lines, axes, labels, highs and lows).
@@ -540,21 +575,38 @@ export function mountTracker(D, hooks = {}) {
     const { ctx, w, h } = c;
     const axis = opt.axis || c.popped;
     const top = 8, bottom = h - (axis ? 24 : 6);
-    const x0 = PADL, x1 = w - PADR, n = V.n;
+    const x0 = PADL, x1 = w - padR(), n = V.n;
     const X = j => x0 + (n <= 1 ? 0 : j / (n - 1)) * (x1 - x0);
     const Y = v => bottom - (v - dom.lo) / (dom.hi - dom.lo) * (bottom - top);
     const Yinv = y => dom.lo + (bottom - y) / (bottom - top) * (dom.hi - dom.lo);
     ctx.font = FONT; ctx.textBaseline = 'middle'; ctx.textAlign = 'right';
-    for (const t of dom.ticks) {
+    const skip = axisUnit(ctx, dom.ticks.map(Y), top, bottom, opt.unit, x0 - 7);
+    dom.ticks.forEach((t, i) => {
       const y = Math.round(Y(t)) + 0.5;
       ctx.strokeStyle = t === 0 && dom.lo < 0 ? C['--line'] : C['--grid']; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke();
-      ctx.fillStyle = C['--muted']; ctx.fillText(tickFmt(t), x0 - 7, y);
-    }
+      if (!skip.has(i)) { ctx.font = FONT; ctx.fillStyle = C['--muted']; ctx.fillText(tickFmt(t), x0 - 7, y); }
+    });
     ctx.strokeStyle = C['--line'];
     for (const mk of V.marks) if (mk.line) { const x = Math.round(X(mk.j)) + 0.5; ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke(); }
     if (axis) drawAxis(ctx, X, bottom, x0, x1);
     return { X, Y, Yinv, x0, x1, top, bottom };
+  }
+  // The axis's unit (MW, $/MWh ...) in small type just under its top label, in place of a unit beside the chart's title
+  // (owner's call, 29 Oct 2026: tidier on phones). ys: the tick labels' heights; a label the unit would sit on is left
+  // out (returned as indexes to skip). x: the labels' edge; align: right for the left axis, left for the right axis.
+  const UNIT_FONT = '600 10px "Schibsted Grotesk", system-ui, sans-serif';
+  function axisUnit(ctx, ys, top, bottom, unit, x, align = 'right') {
+    const skip = new Set();
+    if (!unit) return skip;
+    let k = -1;
+    ys.forEach((y, i) => { if (y >= top - 1 && y <= bottom + 1 && (k < 0 || y < ys[k])) k = i; });
+    if (k < 0) return skip;
+    const uy = Math.max(ys[k], top + 3) + 12;
+    ys.forEach((y, i) => { if (i !== k && Math.abs(y - uy) < 11) skip.add(i); });
+    ctx.save(); ctx.font = UNIT_FONT; ctx.fillStyle = C['--muted']; ctx.textAlign = align; ctx.textBaseline = 'middle';
+    ctx.fillText(unit, x, uy); ctx.restore();
+    return skip;
   }
   function drawAxis(ctx, X, bottom, x0, x1) {
     ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.font = FONT;
@@ -652,24 +704,34 @@ export function mountTracker(D, hooks = {}) {
   const enFmt = v => { const a = Math.abs(v); return a >= 100 || a === 0 ? fmt(v) : v.toFixed(a >= 10 ? 1 : 2); };
   const genVal = (v, j) => energyMode() ? enFmt(en(v, j)) : fmt(v);  // a generation figure at point j, as the chart shows it
   const genUnit = () => energyMode() ? eu().unit : 'MW';
+  // Stacked (the default) or lines (chart=lines): each source as its own line from zero, so plants or fuels can be
+  // compared directly (owner's request, 26 Oct 2026). Lines keep the stack's units (MW, energy, %) and its axis rules.
+  const linesMode = () => state.chart === 'lines';
   function drawGen() {
-    const c = setup($('cv-gen')), { ctx } = c, n = V.n, pct = pctMode(), energy = energyMode();
+    const c = setup($('cv-gen')), { ctx } = c, n = V.n, pct = pctMode(), energy = energyMode(), lines = linesMode();
     const layers = V.layers.filter(l => !state.hidden.has(l.id) && !(pct && l.id === 'hvdc'));
+    assignLines(layers); syncSwatches();
     const pos = new Float64Array(n), neg = new Float64Array(n), tops = [];
     // HVDC is signed like the batteries: arriving is stacked on top of the island's generation, leaving goes below zero
     // a partial first or last period, drawn at its rate so far for a period as long as its neighbour's
     const whole = j => energy && n > 1 && ((j === n - 1 && V.partial) ? V.hrs[n - 2] / V.hrs[j] : (j === 0 && V.partialFirst) ? V.hrs[1] / V.hrs[0] : 1);
+    let mx = 0, mn = 0;
     for (const l of layers) {
       let a = pct ? Float64Array.from(l.s, pctOf) : energy ? Float64Array.from(l.s, (v, j) => en(v, j) * whole(j)) : l.s;
+      if (lines) {
+        for (let j = 0; j < n; j++) { const v = a[j]; if (v > mx) mx = v; if (v < mn) mn = v; }
+        tops.push({ l, a });
+        continue;
+      }
       const p0 = Float64Array.from(pos), n0 = Float64Array.from(neg);
       for (let j = 0; j < n; j++) { const v = a[j]; if (v > 0) pos[j] += v; else neg[j] += v; }
       tops.push({ l, p0, p1: Float64Array.from(pos), n0, n1: Float64Array.from(neg) });
     }
-    let mx = 0, mn = 0; for (let j = 0; j < n; j++) { mx = Math.max(mx, pos[j]); mn = Math.min(mn, neg[j]); }
+    if (!lines) for (let j = 0; j < n; j++) { mx = Math.max(mx, pos[j]); mn = Math.min(mn, neg[j]); }
     const cap = pct || energy ? null : capacityOf();   // nameplate is a MW line, so only on MW views
     if (cap) mx = Math.max(mx, cap * 1.04);
     if (pct) mx = Math.min(mx, 100);  // rounding can push a full stack a hair over 100
-    const full = pct && topIsAll();  // the whole mix: a fixed 0–100% axis
+    const full = pct && topIsAll() && !lines;  // the whole mix stacked: a fixed 0–100% axis
     let dom = full ? { lo: 0, hi: 100, ticks: [0, 25, 50, 75, 100] } : nice(0, Math.max(mx, pct ? 0.1 : 1), 5);
     if (mn < 0) {
       // below zero (battery charging, HVDC leaving the island): gridlines and labels on both sides when the negative
@@ -677,9 +739,18 @@ export function mountTracker(D, hooks = {}) {
       const both = nice(mn, Math.max(mx, pct ? 0.1 : 1), 5), step = both.ticks[1] - both.ticks[0];
       if (-mn >= 0.6 * step) dom = both; else dom.lo = mn * 1.2;
     }
-    const F = frame(c, dom, pct ? v => (Number.isInteger(v) ? v : v.toFixed(1)) + '%' : energy ? v => (Math.abs(v - Math.round(v)) < 1e-9 ? fmt(v) : String(+v.toFixed(2))) : v => fmt(v), { axis: true });
+    const F = frame(c, dom, pct ? v => (Number.isInteger(v) ? v : v.toFixed(1)) + '%' : energy ? v => (Math.abs(v - Math.round(v)) < 1e-9 ? fmt(v) : String(+v.toFixed(2))) : v => fmt(v), { axis: true, unit: pct ? '%' : energy ? eu().unit : 'MW' });
     const { X, Y } = F;
-    for (const L of tops) {
+    if (lines) {
+      // up to eight lines: 2 px with a ring of the panel colour so crossings read; more: thinner, no ring.
+      // The first in the list (largest) is drawn last, on top. Embedded solar (estimated) dashed, HVDC dotted.
+      const many = tops.length > LINE_MAX;
+      for (const T of tops.slice().reverse()) {
+        const dash = T.l.hatch ? [5, 3] : T.l.id === 'hvdc' ? [1.5, 3] : null;
+        if (!many) line(ctx, X, Y, T.a, C['--surface'], 4);
+        line(ctx, X, Y, T.a, lc(T.l), many ? 1.25 : 2, dash);
+      }
+    } else for (const L of tops) {
       let fill = L.l.hatch ? ctx.createPattern(L.l.shade != null ? hatchOf(colourOf(L.l)) : PAT[L.l.hatch], 'repeat') : colourOf(L.l);
       if (fill && fill.setTransform) fill.setTransform(new DOMMatrix().scale(0.25));
       for (const [b, t] of [[L.p0, L.p1], [L.n0, L.n1]]) {
@@ -714,7 +785,9 @@ export function mountTracker(D, hooks = {}) {
       ctx.font = FONT; ctx.fillStyle = C['--ink-2']; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
       ctx.fillText(`Nameplate ${fmt(cap)} MW`, F.x1, y - 3);
     }
-    if (n > 2 && !full) {
+    const P = state.price ? priceOver(ctx, F) : null;
+    // the stack's high and low (lines: none, each line's own figures are in the tooltip and the list)
+    if (n > 2 && !full && !lines) {
       // a period still in progress (or the history's first, part year) isn't a fair high or low in energy
       const a = energy && V.partialFirst ? 1 : 0, b = energy && V.partial ? n - 1 : n;
       // generation only: HVDC flowing into an island is drawn on the stack but isn't the island's generation.
@@ -737,9 +810,12 @@ export function mountTracker(D, hooks = {}) {
     // the amount button says what it shows: MW for 5-minute and half-hourly points, energy (MWh, GWh, TWh) for days and longer
     const amt = $('seg-unit').querySelector('[data-v="mw"]');
     if (amt) { const u = isLong() ? eu().unit : 'MW'; if (amt.textContent !== u) amt.textContent = u; }
-    GEN = { F, tops, pos };
+    GEN = { F, tops, pos, lines };
     c.base.F = F;
     c.base.over = (ctx, j) => {
+      // a dot where the time line crosses each line, and each price
+      if (lines && tops.length <= 12) for (const T of tops) dot(ctx, F.X(j), F.Y(T.a[j]), lc(T.l));
+      if (P) for (const [, a, col] of P.ser) if (a[j] === a[j]) dot(ctx, F.X(j), P.Y(a[j]), col);
       if (state.hoverBy === 'mouse') return;   // the mouse tooltip shows the time itself
       const lbl = chip(j);
       ctx.font = '600 11px "IBM Plex Mono", ui-monospace, monospace'; const tw = ctx.measureText(lbl).width;
@@ -748,9 +824,60 @@ export function mountTracker(D, hooks = {}) {
       ctx.fillStyle = C['--surface']; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(lbl, x + 6, F.top + 9.5);
     };
   }
+  // the list's colour squares follow the chart: line colours in the lines view, fills otherwise
+  function syncSwatches() {
+    for (const l of V.layers) if (l.row) { const c = lc(l); if (l.row.dataset.lc !== c) { l.row.style.setProperty('--c', c); l.row.dataset.lc = c; } }
+  }
+  // The price over the generation chart (price=on; off unless chosen): the island reference prices, both for New
+  // Zealand, the island's own on an island's chart, on a right axis with the Prices tab's spike-proof scale (linear
+  // to about $100, compressed above), so a spike doesn't flatten the rest. Owner's call, 29 Oct 2026.
+  function priceSeries() {
+    const r = state.region, out = [];
+    if (r !== 'SI') out.push(['North Island · Haywards', V.pNI, C['--p-ni'], [6, 3]]);
+    if (r !== 'NI') out.push(['South Island · Benmore', V.pSI, C['--p-si'], [2, 3]]);
+    return out;
+  }
+  const priceTick = v => (v < 0 ? '−' : '') + '$' + (Math.abs(v) >= 1000 ? Math.abs(v) / 1000 + 'k' : fmt(Math.abs(v)));
+  function priceOver(ctx, F) {
+    const ser = priceSeries();
+    let lo = 0, hi = 0;
+    for (const [, a] of ser) for (let j = 0; j < V.n; j++) { const v = a[j]; if (v === v) { if (v < lo) lo = v; if (v > hi) hi = v; } }
+    const sc = priceScale('spike', lo, Math.max(hi, 20));
+    const top = Math.max(sc.hi, sc.f(sc.ticks[sc.ticks.length - 1]));
+    const Y = v => F.bottom - (sc.f(v) - sc.lo) / (top - sc.lo || 1) * (F.bottom - F.top);
+    // the right axis: labels only (the gridlines are the MW axis's), with a short tick at each
+    ctx.font = FONT; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    // labels that fit (12 px apart), then the unit under the top one
+    const shown = []; let last = Infinity;
+    for (const t of sc.ticks) { const y = Y(t); if (y < F.top - 1 || y > F.bottom + 1 || last - y < 12) continue; shown.push([t, y]); last = y; }
+    const skip = axisUnit(ctx, shown.map(([, y]) => y), F.top, F.bottom, '$/MWh', F.x1 + 7, 'left');
+    ctx.font = FONT; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    for (const [i, [t, y]] of shown.entries()) {
+      if (skip.has(i)) continue;
+      ctx.strokeStyle = C['--line']; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(F.x1, Math.round(y) + 0.5); ctx.lineTo(F.x1 + 4, Math.round(y) + 0.5); ctx.stroke();
+      ctx.fillStyle = C['--muted']; ctx.fillText(priceTick(t), F.x1 + 7, y);
+    }
+    // Benmore first, so Haywards is on top where they meet (as on the price chart); thin and dashed (Haywards long
+    // dashes, Benmore short), each over a ring of the panel colour, so they don't read as generation lines
+    for (const [, a, col, dash] of ser.slice().reverse()) for (const [w, s] of [[2.5, C['--surface']], [1.25, col]]) {
+      ctx.save(); ctx.strokeStyle = s; ctx.lineWidth = w; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.beginPath();
+      if (dash) ctx.setLineDash(dash);
+      let on = false;
+      for (let j = 0; j < V.n; j++) { const v = a[j]; if (v !== v) { on = false; continue; } const x = F.X(j), y = Y(v); on ? ctx.lineTo(x, y) : ctx.moveTo(x, y); on = true; }
+      ctx.stroke(); ctx.restore();
+    }
+    return { Y, ser };
+  }
   function layerAt(clientX, clientY) {
     if (!GEN) return null;
-    const cv = $('cv-gen'), r = cv.getBoundingClientRect(), j = indexAt(cv, clientX), v = GEN.F.Yinv(clientY - r.top);
+    const cv = $('cv-gen'), r = cv.getBoundingClientRect(), j = indexAt(cv, clientX);
+    if (GEN.lines) {
+      // the line nearest the pointer, within 10 px
+      const y = clientY - r.top; let best = null, bd = 10;
+      for (const T of GEN.tops) { const d = Math.abs(GEN.F.Y(T.a[j]) - y); if (d < bd) { bd = d; best = T.l; } }
+      return best;
+    }
+    const v = GEN.F.Yinv(clientY - r.top);
     for (const T of GEN.tops) if ((v >= T.p0[j] && v <= T.p1[j] && T.p1[j] > T.p0[j]) || (v <= T.n0[j] && v >= T.n1[j] && T.n1[j] < T.n0[j])) return T.l;
     return null;
   }
@@ -759,7 +886,7 @@ export function mountTracker(D, hooks = {}) {
     const c = setup($('cv-price')), { ctx } = c;
     let mx = 0; for (let j = 0; j < V.n; j++) mx = Math.max(mx, V.pNI[j], V.pSI[j]);
     const dom = nice(0, mx * 1.08, ticksFor('cv-price', 3));
-    const F = frame(c, dom, v => '$' + fmt(v)), { X, Y } = F;
+    const F = frame(c, dom, v => '$' + fmt(v), { unit: '$/MWh' }), { X, Y } = F;
     const r = state.region, aNI = r === 'SI' ? 0.35 : 1, aSI = r === 'NI' ? 0.35 : 1;
     line(ctx, X, Y, V.pSI, alpha(C['--p-si'], aSI));
     line(ctx, X, Y, V.pNI, alpha(C['--p-ni'], aNI));
@@ -778,7 +905,7 @@ export function mountTracker(D, hooks = {}) {
     let mn = Infinity, mx = 0;
     for (let j = 0; j < V.n; j++) { mx = Math.max(mx, V.underlying[j], V.metered[j]); mn = Math.min(mn, V.metered[j]); }
     const dom = nice(mn * 0.95, mx * 1.02, ticksFor('cv-demand', 3));
-    const F = frame(c, dom, v => fmt(v)), { X, Y } = F;
+    const F = frame(c, dom, v => fmt(v), { unit: 'MW' }), { X, Y } = F;
     // the embedded solar estimate's uncertainty (± one standard deviation) as a band around the dashed line
     if (V.roofU.some(u => u > 0.5)) band(ctx, X, Y, V.underlying.map((v, j) => v - V.roofU[j]), V.underlying.map((v, j) => v + V.roofU[j]), alpha(C['--ink-2'], 0.22));
     line(ctx, X, Y, V.underlying, C['--ink-2'], 1.5, [4, 3]);
@@ -789,7 +916,7 @@ export function mountTracker(D, hooks = {}) {
     const c = setup($('cv-hvdc')), { ctx } = c;
     let mn = 0, mx = 0; for (let j = 0; j < V.n; j++) { mn = Math.min(mn, V.hvdc[j]); mx = Math.max(mx, V.hvdc[j]); }
     const dom = nice(mn, mx, ticksFor('cv-hvdc', 2));
-    const F = frame(c, dom, v => fmt(v)), { X, Y } = F;
+    const F = frame(c, dom, v => fmt(v), { unit: 'MW' }), { X, Y } = F;
     area(ctx, X, Y, V.hvdc, 0, alpha(C['--f-hvdc'], 0.35));
     line(ctx, X, Y, V.hvdc, C['--f-hvdc'], 1.5);
     ctx.font = FONT; ctx.fillStyle = C['--muted']; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
@@ -801,7 +928,7 @@ export function mountTracker(D, hooks = {}) {
     const c = setup($('cv-co2')), { ctx } = c;
     let mx = 0; for (let j = 0; j < V.n; j++) mx = Math.max(mx, V.co2[j]);
     const dom = nice(0, Math.max(mx, 10) * 1.1, ticksFor('cv-co2', 2));
-    const F = frame(c, dom, v => fmt(v)), { X, Y } = F;
+    const F = frame(c, dom, v => fmt(v), { unit: 'g/kWh' }), { X, Y } = F;
     area(ctx, X, Y, V.co2, 0, alpha(C['--co2'], 0.28));
     line(ctx, X, Y, V.co2, C['--co2'], 1.5);
     c.base.F = F; c.base.over = (ctx, j) => dot(ctx, X(j), Y(V.co2[j]), C['--co2']);
@@ -813,7 +940,7 @@ export function mountTracker(D, hooks = {}) {
     const big = !!$('cv-ren').closest('.popped'), st = 100 - lo <= 25 ? 5 : 100 - lo <= 50 ? 10 : 20;
     const dom = { lo, hi: 100, ticks: big ? Array.from({ length: Math.floor((100 - lo) / st) + 1 }, (_, i) => lo + i * st)
       : lo <= 50 ? [lo, 50, 100].filter((v, i, a) => a.indexOf(v) === i) : [lo, Math.round((lo + 100) / 2 / 5) * 5, 100] };
-    const F = frame(c, dom, v => v + '%', { axis: true }), { X, Y } = F;
+    const F = frame(c, dom, v => v + '%', { axis: true, unit: '%' }), { X, Y } = F;
     area(ctx, X, Y, V.ren, lo, alpha(C['--accent'], 0.14));
     line(ctx, X, Y, V.ren, C['--accent']);
     c.base.F = F; c.base.over = (ctx, j) => dot(ctx, X(j), Y(V.ren[j]), C['--accent']);
@@ -840,7 +967,12 @@ export function mountTracker(D, hooks = {}) {
       unit: V.layers.length > 1 ? 'MW, by grid connection' : 'MW',
     }[lv];
     const per = { '1d': 'a day', '1w': 'a week', '1mo': 'a month', '1yr': 'a year' }[state.int];
-    $('gen-unit').textContent = pctMode() ? unitTxt.replace(/^MW/, '% of all generation') : energyMode() ? unitTxt.replace(/^MW/, `${eu().unit} ${per}`) : unitTxt;
+    // the unit is on the chart's axis; the canvas's description says it in full for screen readers
+    const shape = linesMode() ? unitTxt.replace('stacked by', 'by') : unitTxt;
+    const unitFull = pctMode() ? shape.replace(/^MW/, '% of all generation') : energyMode() ? shape.replace(/^MW/, `${eu().unit} ${per}`) : shape;
+    $('cv-gen').setAttribute('aria-label', (linesMode() ? 'Line chart of generation, one line per source' : 'Stacked area chart of generation') + ` (${unitFull})`
+      + (state.price ? ', with wholesale prices in $/MWh on a right axis' : ''));
+    $('cv-gen').closest('.chart').classList.toggle('priced', state.price);
     const note = $('gen-note'), txt = NOTES[state.view] || '';
     note.hidden = !txt;
     note.textContent = txt ? txt + ' ' : '';
@@ -1166,8 +1298,10 @@ export function mountTracker(D, hooks = {}) {
     $('sel-region').value = state.region;
     for (const [id, val] of [['seg-range', state.range], ['seg-int', state.int]])
       for (const b of $(id).querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v === val));
-    $('sel-view').value = state.view;
+    $('sel-view').value = state.view; fit($('sel-view'));   // only as wide as the choice (#lib/site/fitselect.js)
     for (const b of $('seg-unit').querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v === state.unit));
+    for (const b of $('seg-chart').querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v === state.chart));
+    $('btn-price').setAttribute('aria-pressed', String(state.price));
   }
 
   // ---------- models: the live week, and history merged with it (loaded when a long range is first chosen) ----------
@@ -1354,6 +1488,8 @@ export function mountTracker(D, hooks = {}) {
     state.region = a.region || 'NZ';
     state.view = a.by && Object.hasOwn(VIEWS, a.by) ? a.by : 'detailed';
     state.unit = a.unit === 'pct' ? 'pct' : 'mw';
+    state.chart = a.chart === 'lines' ? 'lines' : 'stacked';
+    state.price = a.price === 'on';
     state.hidden.clear(); state.filter = ''; state.open.clear();
     linked = { group: a.group, fuel: a.fuel, plant: a.plant, t: null }; waiting = false;
     state.zoom = a.zoom || null;
@@ -1434,6 +1570,13 @@ export function mountTracker(D, hooks = {}) {
     if (!b || !['mw', 'pct'].includes(b.dataset.v) || b.dataset.v === state.unit) return;
     state.unit = b.dataset.v; syncControls(); renderCrumbs(); render(); save();
   });
+  $('seg-chart').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b || !['stacked', 'lines'].includes(b.dataset.v) || b.dataset.v === state.chart) return;
+    state.chart = b.dataset.v; syncControls(); renderCrumbs(); render(); save();
+  });
+  // the price over the generation chart: every chart's right margin changes with it, so all are redrawn
+  $('btn-price').addEventListener('click', () => { state.price = !state.price; syncControls(); renderCrumbs(); render(); save(); });
   $('mix-filter').addEventListener('input', e => { state.filter = e.target.value; applyFilter(); });
   $('mix-all').addEventListener('click', () => { state.hidden.clear(); syncHidden(); });
   $('mix-none').addEventListener('click', () => { for (const l of V.layers) state.hidden.add(l.id); syncHidden(); });
@@ -1443,29 +1586,43 @@ export function mountTracker(D, hooks = {}) {
   const boxes = [$('charts'), $('charts-more')];
   const tip = $('tip');
   const indexAt = (cv, clientX) => {
-    const r = cv.getBoundingClientRect(), x0 = PADL, x1 = r.width - PADR;
+    const r = cv.getBoundingClientRect(), x0 = PADL, x1 = r.width - padR();
     const f = (clientX - r.left - x0) / (x1 - x0);
     return Math.max(0, Math.min(V.n - 1, Math.round(f * (V.n - 1))));
   };
   const row = (colour, name, value, extra = '', hatch = false) =>
     `<div class="tip-r"><i class="${hatch ? 'hatch' : ''}" style="--c:${colour}"></i><span>${esc(name)}</span><b>${value}</b>${extra ? `<small>${extra}</small>` : ''}</div>`;
+  // the generation chart's tooltip: the layer under the pointer (or the total); in the lines view the lines at that
+  // time, largest first (up to 8, the one nearest the pointer first)
+  function genTip(j, e, head) {
+    const mw = isLong() ? 'MW avg' : 'MW';
+    if (GEN && GEN.lines) {
+      const gu = genUnit(), near = layerAt(e.clientX, e.clientY), shown = GEN.tops.map(T => T.l);
+      const val = l => pctMode() && !l.signed ? pctOf(l.s[j], j).toFixed(1) + '%' : genVal(l.s[j], j);
+      const extra = l => pctMode() && !l.signed ? 'of all generation' : l.signed ? `${gu} · ${signedTxt(l, l.s[j], false)}` : gu;
+      const list = shown.slice().sort((a, b) => b.s[j] - a.s[j]).filter(l => l !== near).slice(0, near ? 7 : 8);
+      if (near) list.unshift(near);
+      const more = shown.length - list.length;
+      return head + list.map(l => row(lc(l), l.name, val(l), extra(l), !!l.hatch)).join('') + (more > 0 ? `<div class="tip-n">and ${more} more in the list</div>` : '');
+    }
+    const l = layerAt(e.clientX, e.clientY), lv = level();
+    let tot = 0;
+    if (topIsAll()) tot = V.gen[j]; else for (const x of V.layers) tot += x.signed ? x.s[j] : Math.max(0, x.s[j]);
+    const gu = genUnit();
+    if (!l) return head + row(C['--ink'], totalLabel(), genVal(tot, j), gu);
+    const v = l.s[j];
+    const uj = l.id === 'roof' ? V.roofU[j] : l.u ? l.u[j] : 0, pm = uj > 0.5 ? ` ± ${fmt(uj)}` : '';
+    if (pctMode() && !l.signed) return head + row(colourOf(l), l.name, pctOf(v, j).toFixed(1) + '%', `of all generation · ${fmt(v)} ${mw}${pm}`, !!l.hatch);
+    const pmE = energyMode() && uj > 0.5 ? ` ± ${genVal(uj, j)}` : pm;
+    const extra = l.signed ? `${gu} · ${signedTxt(l, v, false)}` : `${gu}${pmE}${tot > 0.5 ? ` · ${(v / tot * 100).toFixed(1)}%` : ''}`;
+    return head + row(colourOf(l), l.name, genVal(v, j), extra, !!l.hatch);
+  }
+  const priceRows = j => state.price ? priceSeries().map(([name, a, col]) => row(col, name, a[j] === a[j] ? money(a[j]) : '–', '/MWh')).join('') : '';
   function tipHtml(cv, j, e) {
     const pn = partialNote(j);
     const mw = isLong() ? 'MW avg' : 'MW', head = `<div class="tip-t">${esc(chip(j))}</div>` + (pn ? `<div class="tip-n">${esc(pn)}</div>` : '');
     switch (cv.id) {
-      case 'cv-gen': {
-        const l = layerAt(e.clientX, e.clientY), lv = level();
-        let tot = 0;
-        if (topIsAll()) tot = V.gen[j]; else for (const x of V.layers) tot += x.signed ? x.s[j] : Math.max(0, x.s[j]);
-        const gu = genUnit();
-        if (!l) return head + row(C['--ink'], totalLabel(), genVal(tot, j), gu);
-        const v = l.s[j];
-        const uj = l.id === 'roof' ? V.roofU[j] : l.u ? l.u[j] : 0, pm = uj > 0.5 ? ` ± ${fmt(uj)}` : '';
-        if (pctMode() && !l.signed) return head + row(colourOf(l), l.name, pctOf(v, j).toFixed(1) + '%', `of all generation · ${fmt(v)} ${mw}${pm}`, !!l.hatch);
-        const pmE = energyMode() && uj > 0.5 ? ` ± ${genVal(uj, j)}` : pm;
-        const extra = l.signed ? `${gu} · ${signedTxt(l, v, false)}` : `${gu}${pmE}${tot > 0.5 ? ` · ${(v / tot * 100).toFixed(1)}%` : ''}`;
-        return head + row(colourOf(l), l.name, genVal(v, j), extra, !!l.hatch);
-      }
+      case 'cv-gen': return genTip(j, e, head) + priceRows(j);
       case 'cv-price':
         return head + row(C['--p-ni'], 'North Island · Haywards', money(V.pNI[j]), '/MWh') + row(C['--p-si'], 'South Island · Benmore', money(V.pSI[j]), '/MWh');
       case 'cv-demand':
@@ -1520,7 +1677,7 @@ export function mountTracker(D, hooks = {}) {
         if (!drag.moved && Math.abs(e.clientX - drag.x0) > 6) { drag.moved = true; try { cv.setPointerCapture(e.pointerId); } catch (_) {} hideTip(); }
         if (drag.moved) {
           const r = cv.getBoundingClientRect(), host = cv.parentElement.getBoundingClientRect();
-          const lo = Math.max(r.left + PADL, Math.min(drag.x0, e.clientX)), hi = Math.min(r.right - PADR, Math.max(drag.x0, e.clientX));
+          const lo = Math.max(r.left + PADL, Math.min(drag.x0, e.clientX)), hi = Math.min(r.right - padR(), Math.max(drag.x0, e.clientX));
           Object.assign(drag.el.style, { left: `${lo - host.left}px`, width: `${Math.max(0, hi - lo)}px`, top: `${r.top - host.top}px`, height: `${r.height}px` });
           drag.el.hidden = false;
           return;
@@ -1585,7 +1742,7 @@ export function mountTracker(D, hooks = {}) {
   const ro = new ResizeObserver(() => render());
   for (const box of boxes) ro.observe(box);
   for (const id of CHARTS) ro.observe($(id));   // an enlarged chart changes height without its panel changing width
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => render());
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fit($('sel-view')); render(); });
 
   // ---------- for the downloads ----------
   const names = () => ({ plant: state.drill.plant, group: state.drill.group ? groupById(state.drill.group)?.name : null });
@@ -1601,8 +1758,14 @@ export function mountTracker(D, hooks = {}) {
   // the generation chart's sources as a legend: the layers shown, in stack order from the top
   // the address a download names: the live view while it's live, otherwise its dates (and a pinned point)
   const viewLink = L => (L.live && L.point == null ? L.live : (L.fixed(L.point != null) || { url: L.live }).url);
-  const genLegend = () => V.layers.filter(l => !state.hidden.has(l.id) && !(pctMode() && l.id === 'hvdc')).slice().reverse()
-    .map(l => ({ name: l.name, colour: colourOf(l), kind: 'fill', hatch: !!l.hatch }));
+  // (lines: the list's order, each as a line); then the prices when they're drawn over it
+  const genLegend = () => {
+    const ls = V.layers.filter(l => !state.hidden.has(l.id) && !(pctMode() && l.id === 'hvdc'));
+    const out = linesMode() ? ls.map(l => ({ name: l.name, colour: lc(l), kind: l.hatch || l.id === 'hvdc' ? 'dash' : 'line' }))
+      : ls.slice().reverse().map(l => ({ name: l.name, colour: colourOf(l), kind: 'fill', hatch: !!l.hatch }));
+    if (state.price) for (const [name, , col, dash] of priceSeries()) out.push({ name: `Price, ${name} ($/MWh, right axis)`, colour: col, kind: dash ? 'dash' : 'line' });
+    return out;
+  };
 
   readColours();
   rebuild();
@@ -1636,7 +1799,7 @@ export function mountTracker(D, hooks = {}) {
           const gen = id === 'cv-gen';
           return {
             heading: gen ? $('gen-title').textContent.replace(/›/g, ' › ').replace(/\s+/g, ' ').trim() : card.querySelector('h2').textContent,
-            unit: (gen ? $('gen-unit') : card.querySelector('.unit')).textContent,
+            unit: '',   // each chart carries its unit on its axis
             legend: gen ? (which === 'gen' ? [] : genLegend()) : legendOf(card),
             img: src, w: cv.clientWidth, h: cv.clientHeight,
           };
