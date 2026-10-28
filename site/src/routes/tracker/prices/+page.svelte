@@ -826,7 +826,6 @@
 						</div>
 						{@render popBtn('price', 'wholesale price')}
 					</div>
-					<div class="legends lg-foot">{@render priceKey()}</div>
 					<div class="plot">
 						<TimeChart onzoom={view.mode === 'time' ? (a, b) => setZoom({ from: a, to: b }) : undefined} t={view.t} t0={view.t0} t1={view.t1} height={popped === 'price' ? popH : 266} showX {xTicks} y={priceY} fmt={fmtTick} layers={priceLayers} note={highNote} stamp={at >= 0 && hoverBy !== 'mouse' ? chip(at) : null}
 							shade={view.mode === 'time' ? view.shade : []} marks={capMarks} bind:hover onpoint={point('price')} onleave={leave} onpin={pin} {pinned}
@@ -840,6 +839,7 @@
 							</button>
 						{/if}
 					</div>
+					<div class="legends lg-foot">{@render priceKey()}</div>
 				</div>
 			{:else}
 				<p class="empty">{status || 'Loading…'}</p>
@@ -1022,7 +1022,7 @@
 		.ch-head .lg-set { display: none; }
 		.scale-pick { order: 1; }
 		.node-seg { order: 2; }
-		.lg-foot { display: flex; margin: 6px 0 2px; margin-left: 0; gap: 4px 12px; font-size: 0.76rem; }
+		.lg-foot { display: flex; margin: 4px 0 2px; margin-left: 0; gap: 4px 12px; font-size: 0.76rem; }
 	}
 	.empty { color: var(--muted); font-size: 0.86rem; padding: 18px 10px; margin: 0; }
 	.sep { margin: 0; font-size: 0.8rem; padding: 6px 9px; border-radius: 4px; background: var(--grid); color: var(--ink-2); }
