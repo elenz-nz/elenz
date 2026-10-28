@@ -10,6 +10,7 @@ import CAPACITY from './capacity.json';   // installed MW per plant (ingest/capa
 import { readView, writeView, slug, describe, shareLinks } from '#lib/site/view.js';
 import { readQuery, stamp, fromStamp } from '#lib/site/viewurl.js';
 import { priceScale } from '#lib/prices/data.js';
+import { fit } from '#lib/site/fitselect.js';
 import { composeImage, legendOf, csvText, nzTime, utcTime, fileName, CREDIT, CREDIT_SOLAR, LICENCE } from '#lib/site/download.js';
 export { nzOffset, tzName };
 
@@ -1297,23 +1298,10 @@ export function mountTracker(D, hooks = {}) {
     $('sel-region').value = state.region;
     for (const [id, val] of [['seg-range', state.range], ['seg-int', state.int]])
       for (const b of $(id).querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v === val));
-    $('sel-view').value = state.view; fitSelect($('sel-view'));
+    $('sel-view').value = state.view; fit($('sel-view'));   // only as wide as the choice (#lib/site/fitselect.js)
     for (const b of $('seg-unit').querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v === state.unit));
     for (const b of $('seg-chart').querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v === state.chart));
     $('btn-price').setAttribute('aria-pressed', String(state.price));
-  }
-
-  // the grouping menu is only as wide as the choice it shows (a select is normally as wide as its longest option),
-  // so the chart's controls fit in two rows on a phone (owner's call, 29 Oct 2026)
-  let measure = null;
-  function fitSelect(sel) {
-    const o = sel.options[sel.selectedIndex];
-    if (!o) return;
-    const cs = getComputedStyle(sel);
-    const ctx = (measure || (measure = document.createElement('canvas').getContext('2d')));
-    ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
-    const w = ctx.measureText(o.text).width + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth);
-    sel.style.width = `${Math.ceil(w) + 2}px`;
   }
 
   // ---------- models: the live week, and history merged with it (loaded when a long range is first chosen) ----------
@@ -1754,7 +1742,7 @@ export function mountTracker(D, hooks = {}) {
   const ro = new ResizeObserver(() => render());
   for (const box of boxes) ro.observe(box);
   for (const id of CHARTS) ro.observe($(id));   // an enlarged chart changes height without its panel changing width
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fitSelect($('sel-view')); render(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fit($('sel-view')); render(); });
 
   // ---------- for the downloads ----------
   const names = () => ({ plant: state.drill.plant, group: state.drill.group ? groupById(state.drill.group)?.name : null });

@@ -11,6 +11,8 @@
 	// onpoint(e, i) fires as the pointer moves (for the page's tooltip), onleave when it leaves. onpin(i): a click (not a
 	// touch) at point i, to pin the time line there; while pinned the line ignores the pointer. onzoom(from, to): a mouse
 	// drag across the chart, as times (to exclusive: the end of the last point dragged over), to zoom into that span.
+	// unit: the axis's unit ($/MWh, MW ...) in small type under its top label (owner's call, 29 Oct 2026: replaces a unit
+	// beside the card's title, which took a row on phones); a label it would sit on is left out.
 	import { firstAtOrAfter } from '#lib/tracker/series.js';
 
 	type Scale = { f: (v: number) => number; lo: number; hi: number; ticks: number[] };
@@ -18,13 +20,13 @@
 
 	let {
 		t, t0, t1, height = 200, y, fmt = (v: number) => String(v), layers = [], shade = [], marks = [], hover = $bindable(-1),
-		xTicks = [], showX = false, label = '', zero = false, note = null, stamp = null, pinned = false, onpoint, onleave, onpin, onzoom
+		xTicks = [], showX = false, label = '', zero = false, note = null, stamp = null, pinned = false, onpoint, onleave, onpin, onzoom, unit = ''
 	}: {
 		t: ArrayLike<number>; t0: number; t1: number; height?: number; y: Scale; fmt?: (v: number) => string; layers?: Layer[];
 		shade?: [number, number][]; marks?: { i: number; label: string }[]; hover?: number; xTicks?: { t: number; label: string; minor?: boolean }[];
 		showX?: boolean; label?: string; zero?: boolean; note?: { i: number; v: number; text: string; tok?: string } | null; stamp?: string | null;
 		onpoint?: (e: PointerEvent, i: number) => void; onleave?: (e: PointerEvent) => void; pinned?: boolean; onpin?: (i: number) => void;
-		onzoom?: (from: number, to: number) => void;
+		onzoom?: (from: number, to: number) => void; unit?: string;
 	} = $props();
 
 	let W = $state(600);
@@ -34,6 +36,16 @@
 	const X = (v: number) => L + ((v - t0) / (t1 - t0 || 1)) * (W - L - R);
 	const Y = (v: number) => T + ((y.hi - y.f(v)) / (y.hi - y.lo || 1)) * (height - T - B);
 	const x0 = $derived(L), x1 = $derived(W - R), yTop = T, yBot = $derived(height - B);
+	// where the unit sits (just under the top tick label) and which labels it would cover
+	const unitAt = $derived.by(() => {
+		if (!unit) return null;
+		const ys = y.ticks.map((tk) => Y(tk));
+		let k = -1;
+		ys.forEach((v, i) => { if (v >= yTop - 1 && v <= yBot + 1 && (k < 0 || v < ys[k])) k = i; });
+		if (k < 0) return null;
+		const uy = Math.max(ys[k], yTop + 3) + 12;
+		return { y: uy, skip: new Set(ys.flatMap((v, i) => (i !== k && Math.abs(v - uy) < 11 ? [i] : []))) };
+	});
 	// half the gap to the next point: bar width and shading edges
 	const half = (i: number) => (i + 1 < n ? (X(t[i + 1]) - X(t[i])) / 2 : i > 0 ? (X(t[i]) - X(t[i - 1])) / 2 : 4);
 
@@ -151,10 +163,11 @@
 		{#each shade as [a, b]}
 			<rect class="shade" x={Math.max(x0, X(t[a]) - half(a))} y={yTop} width={Math.max(1, X(t[b - 1]) + half(b - 1) - Math.max(x0, X(t[a]) - half(a)))} height={yBot - yTop}></rect>
 		{/each}
-		{#each y.ticks as tk}
+		{#each y.ticks as tk, i}
 			<line class={tk === 0 && zero ? 'zero' : 'grid'} x1={x0} x2={x1} y1={Y(tk)} y2={Y(tk)}></line>
-			<text class="yl" x={x0 - 6} y={Y(tk) + 4} text-anchor="end">{fmt(tk)}</text>
+			{#if !unitAt?.skip.has(i)}<text class="yl" x={x0 - 6} y={Y(tk) + 4} text-anchor="end">{fmt(tk)}</text>{/if}
 		{/each}
+		{#if unitAt}<text class="yu" x={x0 - 6} y={unitAt.y + 4} text-anchor="end">{unit}</text>{/if}
 		{#each layers as ly}
 			{#if ly.kind === 'band' && ly.lo && ly.hi}
 				<path d={bandPath(ly.lo, ly.hi)} style="fill: var({ly.tok}); opacity: {ly.opacity ?? 0.25}"></path>
@@ -215,6 +228,7 @@
 	.tc { width: 100%; touch-action: pan-y; }
 	svg { display: block; cursor: crosshair; overflow: hidden; }
 	text { font-family: var(--font-data); font-size: 10.5px; fill: var(--muted); }
+	.yu { font-family: var(--font-ui); font-size: 10px; font-weight: 600; }
 	.grid { stroke: var(--grid); }
 	.zero { stroke: var(--ink-2); stroke-width: 1; }
 	.shade { fill: var(--warn-bg); }
