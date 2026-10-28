@@ -23,7 +23,7 @@ export const TOPICS: Topic[] = [
 		title: 'Generation',
 		summary: 'What each plant and fuel is generating: the dispatch data for the live week, metered output for history, each unit mapped to its plant and fuel.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
-		updated: '2026-10-23',
+		updated: '2026-10-29',
 	},
 	{
 		slug: 'embedded-solar',
@@ -53,7 +53,7 @@ export const TOPICS: Topic[] = [
 		title: 'Wholesale prices',
 		summary: 'Spot prices at the island reference nodes and four more, dispatch prices for the live week and final prices for history, and the figures the Prices tab derives from them.',
 		shownOn: [['Tracker', '/tracker'], ['Prices', '/tracker/prices'], ['Now', '/now']],
-		updated: '2026-10-23',
+		updated: '2026-10-29',
 	},
 	{
 		slug: 'price-explainer',
@@ -74,7 +74,7 @@ export const TOPICS: Topic[] = [
 		title: 'Renewable share and groupings',
 		summary: 'How fuels are counted as renewable or fossil, flexible or variable, and how plants are grouped by site, hydro scheme and owner.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
-		updated: '2026-10-26',
+		updated: '2026-10-29',
 	},
 	{
 		slug: 'capacity',
