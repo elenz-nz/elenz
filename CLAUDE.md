@@ -15,6 +15,14 @@ push it, open a PR and turn on auto-merge so it merges itself when the checks go
 -f title=... -f body=...`, then `gh api -X PUT repos/elenz-nz/elenz/pulls/<n>/ccr/auto_merge -f merge_method=squash`.
 If a check fails, fix it on the branch; nothing reaches the site meanwhile. Then report the merge, or the failure, to
 the owner. Merged branches are deleted automatically.
+Auto-merge only works while something is still to wait for: on a PR whose checks have all passed GitHub refuses it
+(HTTP 422 "Pull request is in clean status"). Then merge it directly:
+`gh api -X PUT repos/elenz-nz/elenz/pulls/<n>/merge -f merge_method=squash` (the checks still gate it: GitHub refuses a
+merge while a required check is failing or pending). After a squash merge, `git checkout main && git pull` before the
+next branch; the old local branch has no remote any more, which is expected.
+A Claude session can't push until the repository is attached with push access (`add_repo`, owner `elenz-nz`, repo
+`elenz`, access `push`); a push refused with "not in this session's authorized repository set" (HTTP 403) means that
+step was skipped, not that anything is wrong with the repository or its token.
 
 Preview links (since 24 Oct 2026): Cloudflare Workers Builds builds every other branch with `npx wrangler preview`
 (Worker Previews, open beta), so each pushed branch gets its own address, `https://<branch>-elenz.elenz.workers.dev`
@@ -28,7 +36,8 @@ after changing the base (preview command `npx wrangler preview`), an existing br
 fresh branch. A preview build's check links under `.../previews/<branch>/builds/`; one under `.../production/builds/`
 on a branch went down the wrong path.
 When a change is something the owner should see before it goes live, open the PR without auto-merge, send the preview
-link, and turn on auto-merge once they've approved it.
+link, and once they've approved it merge it directly (by then its checks have passed, so auto-merge would be refused,
+see above); turn on auto-merge instead only if a check is still running.
 
 ## Beta note (remove when the site is announced)
 
