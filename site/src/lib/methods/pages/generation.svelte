@@ -54,7 +54,8 @@
 	<li><b>Te Mihi</b>: Te Mihi 1 and 2.</li>
 	<li><b>Southdown</b>: Southdown and Southdown 5.</li>
 </ul>
-<p>Two plants generate onto two buses and can be split by grid connection: Arapuni (<code>ARI1101</code>, <code>ARI1102</code>) and Roxburgh (<code>ROX2201</code>, <code>ROX1101</code>).</p>
+<p>Three plants generate onto two buses and can be split by grid connection: Arapuni (<code>ARI1101</code>, <code>ARI1102</code>), Roxburgh (<code>ROX2201</code>, <code>ROX1101</code>) and West Wind (<code>WWD1102</code>, <code>WWD1103</code>). The metered history has more than one point for some other plants, but those are meters rather than grid connections (an embedded plant’s local network point, a connection that moved), so those plants are shown whole.</p>
+<p>The metered history sees the stations above only whole, so over a range that reaches back into it they show a “Whole station (metered)” row beside their units, which cover only the dispatch data’s weeks.</p>
 
 <h2 id="totals">Totals, peaks and capacity</h2>
 <p class="formula">Total generation = Σ every source’s output while positive

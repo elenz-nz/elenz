@@ -382,7 +382,8 @@ export function mountTracker(D, hooks = {}) {
     const r = state.region, d = state.drill, L = [], groups = VIEWS[state.view].groups;
     if (d.plant) {
       const p = plantByName(d.plant), f = FUEL[p.fuel];
-      if (p.units) p.units.forEach((u, i) => L.push({ id: u.name, name: u.label || busLabel(u.name), tok: f.tok, shade: i, signed: !!f.signed, s: V.avg(u.s), cap: u.cap }));
+      const us = unitsOf(p);
+      if (us) us.forEach((u, i) => L.push({ id: u.name, name: unitLabel(u), tok: f.tok, shade: i, signed: !!f.signed, s: V.avg(u.s), cap: u.cap }));
       else L.push({ id: p.name, name: p.name, tok: f.tok, signed: !!f.signed, s: V.avg(p.s), cap: p.cap });
     } else if (d.fuel) {
       const ps = plantsFor(d.fuel), f = FUEL[d.fuel];
@@ -445,8 +446,29 @@ export function mountTracker(D, hooks = {}) {
     }
     V.layers = L; V.eu = null;
   }
-  // "ROX2201 ROX0" -> "220 kV · ROX2201": the POC code carries the bus voltage
+  // A plant's units are its grid connections ("ARI1101": Arapuni, Roxburgh, West Wind) or, for a station shown whole
+  // ([plant_groups]: Huntly Rankines, Stratford, Waikaremoana, Te Mihi, Southdown), its register plants. The metered
+  // history knows those stations only whole ("Stratford (all units)"), so a range reaching into it shows that row
+  // beside the members. Daily history files carry no labels, so they are worked out here.
+  const isConn = k => /^[A-Z]{3}\d{4}( |$)/.test(k);
+  // "ROX2201" -> "220 kV · ROX2201": the POC code carries the bus voltage
   const busLabel = k => { const poc = k.split(' ')[0]; const kv = parseInt(poc.slice(3, 6), 10); return `${kv} kV · ${poc}`; };
+  const SPELLING = { Pirirpaua: 'Piripaua' };   // as in ingest/build_tracker.py
+  const unitLabel = u => isConn(u.name) ? busLabel(u.name) : / \(all units\)$/.test(u.name) ? 'Whole station (metered)'
+    : SPELLING[u.name] || u.name;
+  // Split by grid connection only plants the dispatch data puts on more than one bus. The metered history has more
+  // points for some plants, but they are meters, not grid connections: an embedded plant's local network point
+  // (Glenbrook's GLN0111, Cobb's STK0661), a connection that moved (Pātea), generator-bus meters (Benmore before 2012)
+  // (owner's report, 29 Oct 2026). MULTI_BUS in case the live week has one of them idle on a bus.
+  const MULTI_BUS = new Set(['Arapuni', 'Roxburgh', 'West Wind']);
+  const byConn = p => p.units.every(u => isConn(u.name));
+  function unitsOf(p) {
+    if (!p.units) return null;
+    if (!byConn(p)) return p.units;
+    const live = models.live.plants.some(q => q.name === p.name && q.units && q.units.length > 1 && byConn(q));
+    return MULTI_BUS.has(p.name) || live ? p.units : null;
+  }
+  const unitBy = () => { const p = state.drill.plant && plantByName(state.drill.plant); return !p || !p.units || byConn(p) ? 'grid connection' : p.name === 'Waikaremoana' ? 'station' : 'unit'; };
   const level = () => state.drill.plant ? 'unit' : state.drill.fuel ? 'plant' : state.drill.group ? 'fuel' : 'top';
   function drillTo(d) {
     linked = null; state.drill = d; state.hidden.clear(); state.filter = ''; relayer(); buildSummary(); render(); save(true);
@@ -964,7 +986,7 @@ export function mountTracker(D, hooks = {}) {
       top: { site: 'MW, stacked by site', scheme: 'MW, hydro by scheme', owner: 'MW, stacked by owner' }[VIEWS[state.view].by]
         || (VIEWS[state.view].groups ? 'MW, stacked by group' : 'MW, stacked by fuel'),
       fuel: setById(d.group) ? 'MW, stacked by plant' : 'MW, stacked by fuel', plant: d.fuel === 'roof' ? 'MW, estimated, by island' : 'MW, stacked by plant',
-      unit: V.layers.length > 1 ? 'MW, by grid connection' : 'MW',
+      unit: V.layers.length > 1 ? `MW, by ${unitBy()}` : 'MW',
     }[lv];
     const per = { '1d': 'a day', '1w': 'a week', '1mo': 'a month', '1yr': 'a year' }[state.int];
     // the unit is on the chart's axis; the canvas's description says it in full for screen readers
@@ -983,7 +1005,7 @@ export function mountTracker(D, hooks = {}) {
       $('sum-level-txt').textContent = {
         fuel: () => `${groupById(d.group).name}${setById(d.group) ? ' plants' : ''} · ${REGION[state.region]}`,
         plant: () => d.fuel === 'roof' ? `Embedded solar (estimated) · ${REGION[state.region]}` : `${FUEL[d.fuel].name} plants · ${REGION[state.region]}`,
-        unit: () => V.layers.length > 1 ? `${d.plant} · by grid connection` : d.plant,
+        unit: () => V.layers.length > 1 ? `${d.plant} · by ${unitBy()}` : d.plant,
       }[lv]();
       $('sum-back').textContent = `‹ ${up.label === 'Generation' ? 'All sources' : up.label}`;
       $('sum-back').onclick = () => drillTo(up.to);

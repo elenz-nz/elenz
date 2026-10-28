@@ -356,7 +356,13 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
 - Huntly Rankine units 1, 2, 4 are "Coal/Gas" in the register and can switch fuel invisibly to the market, so they
   are labelled coal/gas. Huntly 5 and 6 are gas.
 - Arapuni (ARI1101, ARI1102) and Roxburgh (ROX2201, ROX1101) generate onto two buses each, so they appear as two
-  rows. The site splits a plant by grid connection only where it feeds more than one bus.
+  rows. The site splits a plant by grid connection only where it feeds more than one bus (`unitsOf` in tracker.js:
+  `MULTI_BUS` (Arapuni, Roxburgh, West Wind) or split in the live week); the metered history's extra points for other
+  plants (Glenbrook GLN0111, Whareroa HWA1101, Pātea's move ...) are meters, so those plants are shown whole (owner's
+  report, 29 Oct 2026). When ranges join, a month or the live week where a split plant wasn't split still counts in its
+  units (series.js `concat`, history.py `combine_days`), so units always add up to the plant; a station shown whole
+  keeps its metered months as "Whole station (metered)" beside its members. Daily history has no unit labels before
+  29 Oct 2026, so tracker.js works them out (`unitLabel`).
 - The plant register lags reality: Kaiwaikawe (MPE1101 KWK0), Kōwhai Park (ISL0661 KPS0) and Ruakākā solar
   (BRB0331 RUS0) were missing; Pātea moved from HWA1101 to OHG1101 in June 2026 and OHG1101 has no island in
   the feed. These are fixed in `facilities/overrides.toml`.
