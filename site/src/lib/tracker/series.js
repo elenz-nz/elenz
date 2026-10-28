@@ -141,20 +141,30 @@ export function concat(segs) {
     for (const p of s.plants) {
       const k = plantKey(p);
       let q = plants.get(k);
-      if (!q) plants.set(k, (q = { name: p.name, fuel: p.fuel, isl: p.isl, poc: [], cap: null, s: new Float64Array(n), units: new Map() }));
+      if (!q) plants.set(k, (q = { name: p.name, fuel: p.fuel, isl: p.isl, poc: [], cap: null, s: new Float64Array(n), units: new Map(), whole: [] }));
       q.s.set(p.s, pos);
       q.poc = [...new Set([...q.poc, ...p.poc])].sort();
       if (p.cap != null) q.cap = p.cap;  // the latest capacity
-      for (const u of p.units || []) {
-        if (!q.units.has(u.name)) q.units.set(u.name, { name: u.name, cap: u.cap, s: new Float64Array(n) });
-        q.units.get(u.name).s.set(u.s, pos);
-      }
+      if (p.units) for (const u of p.units) unitOf(q, u.name, u.cap, u.label).s.set(u.s, pos);
+      else q.whole.push([pos, p.s, p.poc]);
     }
     pos += s.n;
   }
-  for (const q of plants.values()) out.plants.push({ ...q, units: q.units.size > 1 ? [...q.units.values()].sort((a, b) => a.name < b.name ? -1 : 1) : undefined });
+  for (const { whole, ...q } of plants.values()) {
+    // a segment where the plant wasn't split (one grid connection that month, or the live week) still counts in its
+    // units, so they add up to the plant: on its connection, or as the whole station
+    if (q.units.size) for (const [at, s, poc] of whole) unitOf(q, poc.length === 1 ? poc[0] : `${q.name} (all units)`, null).s.set(s, at);
+    out.plants.push({ ...q, units: q.units.size > 1 ? [...q.units.values()].sort((a, b) => a.name < b.name ? -1 : 1) : undefined });
+  }
   out.plants.sort((a, b) => (a.fuel < b.fuel ? -1 : a.fuel > b.fuel ? 1 : 0) || b.s.reduce((x, y) => x + y, 0) - a.s.reduce((x, y) => x + y, 0));
   return out;
+  function unitOf(q, name, cap, label) {
+    let u = q.units.get(name);
+    if (!u) q.units.set(name, (u = { name, cap, s: new Float64Array(n) }));
+    if (label) u.label = label;
+    if (u.cap == null && cap != null) u.cap = cap;
+    return u;
+  }
 }
 
 /** First index with t >= x (t ascending). */
