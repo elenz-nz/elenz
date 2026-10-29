@@ -8,7 +8,7 @@ import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTot
 import PLANT_META from './plants.json';  // owner and hydro scheme per plant (ingest/plant_meta.py)
 import CAPACITY from './capacity.json';   // installed MW per plant (ingest/capacity.py)
 import { readView, writeView, slug, describe, shareLinks } from '#lib/site/view.js';
-import { readQuery, stamp, fromStamp } from '#lib/site/viewurl.js';
+import { readQuery, stamp, fromStamp, FOLDABLE, FOLD_DEFAULT, foldList } from '#lib/site/viewurl.js';
 import { priceScale } from '#lib/prices/data.js';
 import { fit } from '#lib/site/fitselect.js';
 import { composeImage, legendOf, csvText, nzTime, utcTime, fileName, CREDIT, CREDIT_SOLAR, LICENCE } from '#lib/site/download.js';
@@ -167,6 +167,8 @@ export function mountTracker(D, hooks = {}) {
   // intPicked: the viewer chose the interval (shared with the Prices tab); otherwise it's this tab's default for the range
   const state = { region: 'NZ', range: '1d', end: null, kind: 'live', int: '5m', intPicked: false, view: 'detailed', unit: 'mw', chart: 'stacked', price: false, hover: null, hoverBy: null,
                   hidden: new Set(), drill: { ...TOP_LEVEL }, open: new Set(), filter: '',
+                  // fold: the charts under the generation chart shown as one line (title and value), not drawn
+                  fold: new Set(FOLD_DEFAULT),
                   // zoom: part of the window, { span: hours } at its end (the menu on 1D) or { from, to } (dragged on a chart)
                   zoom: null };
   // the view to open with: a link's address, or this browser's last view on a plain visit (#lib/site/view.js)
@@ -182,12 +184,14 @@ export function mountTracker(D, hooks = {}) {
     if (q.unit === 'pct') state.unit = 'pct';
     if (q.chart === 'lines') state.chart = 'lines';
     if (q.price === 'on') state.price = true;
+    if (q.fold) state.fold = new Set(q.fold);
   } else try {
     const s = JSON.parse(localStorage.getItem('elenz-view') || 'null');
     if (s && Object.hasOwn(VIEWS, s.view)) state.view = s.view;
     if (s?.unit === 'pct') state.unit = 'pct';
     if (s?.chart === 'lines') state.chart = 'lines';
     if (s?.price === true) state.price = true;
+    if (Array.isArray(s?.fold)) state.fold = new Set(foldList(s.fold));
   } catch (e) {}
   if (!RANGES[state.range].ints.includes(state.int)) { state.int = RANGES[state.range].def || RANGES[state.range].ints[0]; state.intPicked = false; }
   // a link's drill-down and point wait for the window they belong to: a long range or past date loads its history
@@ -198,13 +202,13 @@ export function mountTracker(D, hooks = {}) {
   const groupKey = id => id == null ? null : /^[sox]:/.test(id) ? slug(id.slice(2)) : id;
   const ownQuery = () => {
     const d = state.drill, l = linked;
-    return { by: state.view, unit: state.unit, chart: state.chart, price: state.price ? 'on' : null, zoom: state.zoom, ...(l ? { group: l.group, fuel: l.fuel, plant: l.plant }
+    return { by: state.view, unit: state.unit, chart: state.chart, price: state.price ? 'on' : null, fold: foldList([...state.fold]), zoom: state.zoom, ...(l ? { group: l.group, fuel: l.fuel, plant: l.plant }
       : { group: groupKey(d.group), fuel: d.fuel, plant: d.plant ? slug(d.plant) : null }) };
   };
   const shared = () => ({ region: state.region, range: state.range, int: state.intPicked ? state.int : null, end: state.end });
   // push: a drill-down step, so Back steps out of it. The browser tab's title says what the view shows.
   const save = (push = false) => {
-    writeView(shared(), { store: { view: state.view, unit: state.unit, chart: state.chart, price: state.price }, query: ownQuery(), push });
+    writeView(shared(), { store: { view: state.view, unit: state.unit, chart: state.chart, price: state.price, fold: foldList([...state.fold]) }, query: ownQuery(), push });
     const d = state.drill;
     document.title = describe('generation', { ...shared(), ...ownQuery() }, { plant: d.plant, group: d.group ? groupById(d.group)?.name : null }) + ' · ELENZ';
   };
@@ -1177,24 +1181,32 @@ export function mountTracker(D, hooks = {}) {
         l.cells.b.style.transform = `scaleX(${l.signed || tot <= 0 ? 0 : Math.max(0, e / tot)})`;
       }
       $('tot-q').textContent = en(tot); $('tot-s').textContent = layers.some(l => l.signed) && !topIsAll() ? 'net' : '100%';
-      let pn = 0, ps = 0, pk = 0, pkg = 0, hv = 0, em = 0, gw = 0, re = 0, hs = 0;
+      let pn = 0, ps = 0, pk = 0, pkg = 0, hv = 0, em = 0, gw = 0, re = 0, hs = 0, mt = 0, ud = 0;
       for (let i = 0; i < V.n; i++) {
-        const w = V.hrs[i]; hs += w; pn += V.pNI[i] * w; ps += V.pSI[i] * w; hv += V.hvdc[i] * w;
+        const w = V.hrs[i]; hs += w; pn += V.pNI[i] * w; ps += V.pSI[i] * w; hv += V.hvdc[i] * w; mt += V.metered[i] * w; ud += V.underlying[i] * w;
         pk = Math.max(pk, V.pkMet[i]); if (V.pkGen) pkg = Math.max(pkg, V.pkGen[i]);
         em += V.co2[i] * V.genR[i] * w; re += V.ren[i] * V.genR[i] * w; gw += V.genR[i] * w;
       }
+      const hvNet = Math.abs(hv) >= 1e6 ? ['HVDC, net transfer', (Math.abs(hv) / 1e6).toFixed(2), hv >= 0 ? 'TWh north' : 'TWh south']
+        : ['HVDC, net transfer', (Math.abs(hv) / 1000).toFixed(1), hv >= 0 ? 'GWh north' : 'GWh south'];
       setSys([
         ...plantRows(true),
         ['Price, North Island', money(pn / hs), 'avg'],
         ['Price, South Island', money(ps / hs), 'avg'],
         ['Peak demand, metered', fmt(pk), 'MW'],
         V.pkGen && ['Peak generation', fmt(pkg), 'MW'],
-        Math.abs(hv) >= 1e6 ? ['HVDC, net transfer', (Math.abs(hv) / 1e6).toFixed(2), hv >= 0 ? 'TWh north' : 'TWh south']
-          : ['HVDC, net transfer', (Math.abs(hv) / 1000).toFixed(1), hv >= 0 ? 'GWh north' : 'GWh south'],
+        hvNet,
         ['Emissions intensity', fmt(em / gw), 'g/kWh'],
         ['Renewable share', (re / gw).toFixed(1) + '%', ''],
       ]);
       for (const id of ['v-gen', 'v-pni', 'v-psi', 'v-met', 'v-und', 'v-hv', 'v-co2', 'v-ren']) $(id).textContent = '';
+      // a folded chart's line has no chart to hover, so away from the time line it shows the range's figure
+      if (hs > 0 && gw > 0) {
+        // "avg"/"net" is its own element, so phones can leave it out (tracker.css); every part is a number we made
+        const rest = { price: [['v-pni', 'avg', money(pn / hs)], ['v-psi', 'avg', money(ps / hs)]], demand: [['v-met', 'avg', `${fmt(mt / hs)} MW`], ['v-und', 'avg', `${fmt(ud / hs)} MW`]],
+          hvdc: [['v-hv', 'net', `${hvNet[1]} ${hvNet[2]}`]], co2: [['v-co2', 'avg', `${fmt(em / gw)} g/kWh`]], ren: [['v-ren', 'avg', `${(re / gw).toFixed(1)}%`]] };
+        for (const k of state.fold) for (const [id, pre, t] of rest[k] || []) $(id).innerHTML = `<small class="pre">${pre} </small>${esc(t)}`;
+      }
       return;
     }
     const [when, sub] = heading(j), long = isLong();
@@ -1228,16 +1240,22 @@ export function mountTracker(D, hooks = {}) {
     if (state.hidden.size || !topIsAll()) { shown = 0; for (const l of layers) if (!state.hidden.has(l.id) && l.id !== 'hvdc') shown += l.signed && !topIsAll() ? l.s[j] : Math.max(0, l.s[j]); }
     $('v-gen').textContent = `${genVal(shown, j)} ${genUnit()}`;
     $('v-pni').textContent = money(V.pNI[j]); $('v-psi').textContent = money(V.pSI[j]);
-    $('v-met').textContent = fmt(V.metered[j]); $('v-und').textContent = fmt(V.underlying[j]);
-    $('v-hv').textContent = `${hvTxt(V.hvdc[j])} ${V.hvdc[j] > 0.5 ? 'north' : V.hvdc[j] < -0.5 ? 'south' : ''}`;
-    $('v-co2').textContent = fmt(V.co2[j]); $('v-ren').textContent = V.ren[j].toFixed(1) + '%';
+    // a folded chart has no axis to carry the unit, so its figures say it
+    const u = (k, unit) => state.fold.has(k) ? ' ' + unit : '';
+    $('v-met').textContent = fmt(V.metered[j]) + u('demand', 'MW'); $('v-und').textContent = fmt(V.underlying[j]) + u('demand', 'MW');
+    $('v-hv').textContent = `${hvTxt(V.hvdc[j])}${u('hvdc', 'MW')} ${V.hvdc[j] > 0.5 ? 'north' : V.hvdc[j] < -0.5 ? 'south' : ''}`;
+    $('v-co2').textContent = fmt(V.co2[j]) + u('co2', 'g/kWh'); $('v-ren').textContent = V.ren[j].toFixed(1) + '%';
   }
 
   // ---------- orchestration ----------
-  const CHARTS = ['cv-gen', 'cv-price', 'cv-demand', 'cv-hvdc', 'cv-co2', 'cv-ren'];
+  const CHARTS = ['cv-gen', 'cv-price', 'cv-ren', 'cv-demand', 'cv-hvdc', 'cv-co2'];   // page order (the download's too)
+  // a folded chart is only its heading (title, ⓘ, the value at the time line), so it isn't drawn or painted until it
+  // opens (its ResizeObserver then redraws everything)
+  const unfolded = id => id === 'cv-gen' || !state.fold.has(id.slice(3));
+  const DRAW = { 'cv-gen': drawGen, 'cv-price': drawPrice, 'cv-demand': drawDemand, 'cv-hvdc': drawHvdc, 'cv-co2': drawCo2, 'cv-ren': drawRen };
   let raf = 0, stale = true;
-  function drawAll() { drawGen(); drawPrice(); drawDemand(); drawHvdc(); drawCo2(); drawRen(); }
-  const paintAll = () => { for (const id of CHARTS) paint(id); };
+  function drawAll() { for (const id of CHARTS) if (unfolded(id)) DRAW[id](); }
+  const paintAll = () => { for (const id of CHARTS) if (unfolded(id)) paint(id); };
   function schedule() {
     $('sum-pin').hidden = state.hoverBy !== 'pin' || state.hover == null;
     cancelAnimationFrame(raf);
@@ -1324,6 +1342,16 @@ export function mountTracker(D, hooks = {}) {
     for (const b of $('seg-unit').querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v === state.unit));
     for (const b of $('seg-chart').querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v === state.chart));
     $('btn-price').setAttribute('aria-pressed', String(state.price));
+    syncFold();
+  }
+  // the folded charts: the card's class (CSS hides the canvas) and each title button's state
+  function syncFold() {
+    for (const k of FOLDABLE) {
+      const cv = $('cv-' + k), card = cv.closest('.chart'), on = state.fold.has(k), b = card.querySelector('[data-fold]');
+      card.classList.toggle('folded', on);
+      b.setAttribute('aria-expanded', String(!on));
+      b.title = on ? 'Show this chart' : 'Fold this chart to one line';
+    }
   }
 
   // ---------- models: the live week, and history merged with it (loaded when a long range is first chosen) ----------
@@ -1512,6 +1540,7 @@ export function mountTracker(D, hooks = {}) {
     state.unit = a.unit === 'pct' ? 'pct' : 'mw';
     state.chart = a.chart === 'lines' ? 'lines' : 'stacked';
     state.price = a.price === 'on';
+    state.fold = new Set(a.fold ?? FOLD_DEFAULT);
     state.hidden.clear(); state.filter = ''; state.open.clear();
     linked = { group: a.group, fuel: a.fuel, plant: a.plant, t: null }; waiting = false;
     state.zoom = a.zoom || null;
@@ -1599,6 +1628,13 @@ export function mountTracker(D, hooks = {}) {
   });
   // the price over the generation chart: every chart's right margin changes with it, so all are redrawn
   $('btn-price').addEventListener('click', () => { state.price = !state.price; syncControls(); renderCrumbs(); render(); save(); });
+  // a lower chart's title folds it to one line or opens it again (not while it's enlarged)
+  for (const b of $('charts-more').querySelectorAll('[data-fold]')) b.addEventListener('click', () => {
+    const k = b.dataset.fold;
+    if (!FOLDABLE.includes(k) || b.closest('.popped')) return;
+    if (state.fold.has(k)) state.fold.delete(k); else state.fold.add(k);
+    syncFold(); render(); save();
+  });
   $('mix-filter').addEventListener('input', e => { state.filter = e.target.value; applyFilter(); });
   $('mix-all').addEventListener('click', () => { state.hidden.clear(); syncHidden(); });
   $('mix-none').addEventListener('click', () => { for (const l of V.layers) state.hidden.add(l.id); syncHidden(); });
@@ -1809,10 +1845,10 @@ export function mountTracker(D, hooks = {}) {
       }).catch(() => {});
     },
     // ---------- downloads (#lib/site/DownloadMenu.svelte, #lib/site/download.js) ----------
-    // which: 'gen' (the generation chart) or 'all' (all six charts). Resolves to { blob, name }.
+    // which: 'gen' (the generation chart) or 'all' (every chart shown: folded ones are left out). Resolves to { blob, name }.
     async image(which) {
       const L = this.links(), views = { ...shared(), ...ownQuery() };
-      const ids = which === 'gen' ? ['cv-gen'] : ['cv-gen', 'cv-price', 'cv-demand', 'cv-hvdc', 'cv-co2', 'cv-ren'];
+      const ids = which === 'gen' ? ['cv-gen'] : CHARTS.filter(unfolded);
       exportScale = 2; drawAll(); paintAll();   // redraw at double resolution, copy, then back to the screen's own
       try {
         const panels = ids.map(id => {
@@ -1820,7 +1856,7 @@ export function mountTracker(D, hooks = {}) {
           src.width = cv.width; src.height = cv.height; src.getContext('2d').drawImage(cv, 0, 0);
           const gen = id === 'cv-gen';
           return {
-            heading: gen ? $('gen-title').textContent.replace(/›/g, ' › ').replace(/\s+/g, ' ').trim() : card.querySelector('h2').textContent,
+            heading: gen ? $('gen-title').textContent.replace(/›/g, ' › ').replace(/\s+/g, ' ').trim() : card.querySelector('h2').textContent.trim(),
             unit: '',   // each chart carries its unit on its axis
             legend: gen ? (which === 'gen' ? [] : genLegend()) : legendOf(card),
             img: src, w: cv.clientWidth, h: cv.clientHeight,

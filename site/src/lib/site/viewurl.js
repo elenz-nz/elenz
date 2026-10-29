@@ -11,6 +11,8 @@
 //                       unit    pct (absent: MW)
 //                       chart   lines (absent: stacked): each source as its own line, to compare them
 //                       price   on (absent: off): the island prices drawn over the generation chart, on a right axis
+//                       fold    the charts under it folded to one line, e.g. price,ren (absent: FOLD_DEFAULT,
+//                               all of them; none: all open)
 //                       group, fuel, plant   the drill-down (plant and set names as slugs, see slug())
 //                       zoom    1h | 3h | 6h | 12h: the last hours of the window (the menu on 1D), or
 //                               YYYY-MM-DDTHH:MM~YYYY-MM-DDTHH:MM: a span dragged on the chart (NZ time, end exclusive)
@@ -31,9 +33,17 @@ export const INTS = ['5m', '30m', '1d', '1w', '1mo', '1yr'];
 export const GROUPINGS = ['detailed', 'simple', 'site', 'scheme', 'owner', 'flex', 'rf', 'vre'];
 export const SCALES = ['spike', 'capped', 'linear'];
 export const SHARED = ['region', 'range', 'int', 'end', 't'];
-const ORDER = [...SHARED, 'by', 'unit', 'chart', 'price', 'group', 'fuel', 'plant', 'zoom', 'scale', 'hide', 'band'];
+const ORDER = [...SHARED, 'by', 'unit', 'chart', 'price', 'fold', 'group', 'fuel', 'plant', 'zoom', 'scale', 'hide', 'band'];
 /** The spans the 1D menu offers, in hours. */
 export const SPANS = [1, 3, 6, 12];
+// the Generation tab's charts under the generation chart that fold to one line, in page order; all start folded
+// (owner's call, 29 Oct 2026: price and renewable share are also on $ Price and the share card, and the page is
+// cleaner, on portrait phones above all), so a link needs `fold` only when some are open
+export const FOLDABLE = ['price', 'ren', 'demand', 'hvdc', 'co2'];
+export const FOLD_DEFAULT = FOLDABLE;
+/** A fold list in page order without repeats (anything else dropped). */
+export const foldList = (xs) => FOLDABLE.filter((k) => xs.includes(k));
+const sameFold = (a, b) => a.length === b.length && a.every((k, i) => k === b[i]);
 export const OLD_RANGE = { 288: '1d', 864: '3d', 2016: '7d' };
 const FUEL_KEYS = FUELS.map((f) => f.k);
 const DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -98,6 +108,9 @@ export function readQuery(search) {
   one('unit', (x) => x === 'pct' || x === 'mw');
   one('chart', (x) => x === 'lines' || x === 'stacked');
   one('price', (x) => x === 'on' || x === 'off');
+  const fold = q.get('fold');
+  if (fold === 'none') v.fold = [];
+  else if (fold) { const f = foldList(fold.split(',')); if (f.length) v.fold = f; }
   one('group', (x) => SLUG.test(x) && x.length <= 60);
   one('fuel', (x) => FUEL_KEYS.includes(x));
   one('plant', (x) => SLUG.test(x) && x.length <= 80);
@@ -128,6 +141,7 @@ export function writeQuery(v, { tDay = false } = {}) {
   const add = (k, x) => out.push(`${k}=${encodeURIComponent(x).replace(/%3A/gi, ':').replace(/%2C/gi, ',')}`);
   for (const k of ORDER) {
     const x = v[k];
+    if (k === 'fold') { if (Array.isArray(x)) { const f = foldList(x); if (!sameFold(f, FOLD_DEFAULT)) add(k, f.length ? f.join(',') : 'none'); } continue; }
     if (x == null || x === '' || (Array.isArray(x) && !x.length)) continue;
     if (k === 'region' && x === 'NZ') continue;
     if (k === 'range' && x === '1d') continue;

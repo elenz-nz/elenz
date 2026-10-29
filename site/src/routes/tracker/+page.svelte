@@ -11,6 +11,7 @@
 	import ShareLink from '#lib/site/ShareLink.svelte';
 	import DownloadMenu from '#lib/site/DownloadMenu.svelte';
 	import { barHeight } from '#lib/site/sticky.js';
+	import { FOLD_DEFAULT } from '#lib/site/viewurl.js';
 
 	type Meta = { intervals: number; expected: number; end: number; api_from: number | null; built: number };
 
@@ -72,7 +73,7 @@
 		if (!t) return [];
 		return [
 			{ label: 'Generation chart', sub: 'Image with title, dates, sources and credit', kind: 'PNG' as const, run: () => t.image('gen') },
-			{ label: 'All six charts', sub: 'Generation, price, demand, HVDC, emissions and renewables', kind: 'PNG' as const, run: () => t.image('all') },
+			{ label: 'All charts shown', sub: 'Generation and each chart open under it', kind: 'PNG' as const, run: () => t.image('all') },
 			{ label: 'Data for this view', sub: 'Every source shown, prices, demand, HVDC and emissions', kind: 'CSV' as const, run: () => t.csv() },
 		];
 	};
@@ -180,6 +181,14 @@
 
 {#snippet info(id: string)}
 	<InfoTip label="About this chart">{@render chartInfo(id)}</InfoTip>
+{/snippet}
+
+<!-- a lower chart's title folds it to one line (title, ⓘ, the value at the time line) or opens it; tracker.js keeps
+     the state (address key fold) and sets aria-expanded -->
+{#snippet foldTitle(id: string, title: string)}
+	<h2 class="fold-h"><button type="button" class="fold-btn" data-fold={id} aria-expanded={!FOLD_DEFAULT.includes(id)} aria-controls={`cv-${id}`}>
+		<svg class="chev" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5l3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>{title}
+	</button></h2>
 {/snippet}
 
 {#snippet popBtn(id: string, name: string)}
@@ -327,10 +336,10 @@
 		</section>
 
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-		<section class="charts" id="charts-more" tabindex="0" aria-label="Price, demand, HVDC, emissions and renewables charts, on the same time axis as generation.">
-			<div class="chart" class:popped={popped === 'price'}>
+		<section class="charts" id="charts-more" tabindex="0" aria-label="Price, renewable share, demand, HVDC and emissions charts, on the same time axis as generation.">
+			<div class="chart folded" class:popped={popped === 'price'}>
 				<div class="ch-head">
-					<h2>Wholesale price</h2>{@render info('price')}
+					{@render foldTitle('price', 'Wholesale price')}{@render info('price')}
 					<div class="legends">
 						<span class="lg" id="lg-pni"><i style="--c:var(--p-ni)"></i>North Island · Haywards <b id="v-pni"></b></span>
 						<span class="lg" id="lg-psi"><i style="--c:var(--p-si)"></i>South Island · Benmore <b id="v-psi"></b></span>
@@ -340,9 +349,14 @@
 				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
 				<canvas id="cv-price" role="img" aria-label="Line chart of reference node prices"></canvas>
 			</div>
-			<div class="chart" class:popped={popped === 'demand'}>
+			<div class="chart folded" class:popped={popped === 'ren'}>
+				<div class="ch-head">{@render foldTitle('ren', 'Renewable share')}{@render info('ren')}<div class="legends"><span class="lg"><i style="--c:var(--accent)"></i>Renewables <b id="v-ren"></b></span></div>{@render popBtn('ren', 'renewable share')}</div>
+				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
+				<canvas id="cv-ren" role="img" aria-label="Line chart of renewable share with the time axis"></canvas>
+			</div>
+			<div class="chart folded" class:popped={popped === 'demand'}>
 				<div class="ch-head">
-					<h2>Demand</h2>{@render info('demand')}
+					{@render foldTitle('demand', 'Demand')}{@render info('demand')}
 					<div class="legends">
 						<span class="lg"><i style="--c:var(--ink)"></i>Metered <b id="v-met"></b></span>
 						<span class="lg"><i class="dash" style="--c:var(--ink-2)"></i>With embedded solar <b id="v-und"></b></span>
@@ -352,20 +366,15 @@
 				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
 				<canvas id="cv-demand" role="img" aria-label="Line chart of metered and underlying demand"></canvas>
 			</div>
-			<div class="chart" class:popped={popped === 'hvdc'}>
-				<div class="ch-head"><h2>HVDC transfer</h2>{@render info('hvdc')}<div class="legends"><span class="lg"><i class="area" style="--c:var(--f-hvdc)"></i>Benmore ⇄ Haywards <b id="v-hv"></b></span></div>{@render popBtn('hvdc', 'HVDC transfer')}</div>
+			<div class="chart folded" class:popped={popped === 'hvdc'}>
+				<div class="ch-head">{@render foldTitle('hvdc', 'HVDC transfer')}{@render info('hvdc')}<div class="legends"><span class="lg"><i class="area" style="--c:var(--f-hvdc)"></i>Benmore ⇄ Haywards <b id="v-hv"></b></span></div>{@render popBtn('hvdc', 'HVDC transfer')}</div>
 				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
 				<canvas id="cv-hvdc" role="img" aria-label="Area chart of HVDC transfer between the islands"></canvas>
 			</div>
-			<div class="chart" class:popped={popped === 'co2'}>
-				<div class="ch-head"><h2>Emissions intensity</h2>{@render info('co2')}<div class="legends"><span class="lg"><i class="area" style="--c:var(--co2)"></i>Generation mix <b id="v-co2"></b></span></div>{@render popBtn('co2', 'emissions intensity')}</div>
+			<div class="chart folded" class:popped={popped === 'co2'}>
+				<div class="ch-head">{@render foldTitle('co2', 'Emissions intensity')}{@render info('co2')}<div class="legends"><span class="lg"><i class="area" style="--c:var(--co2)"></i>Generation mix <b id="v-co2"></b></span></div>{@render popBtn('co2', 'emissions intensity')}</div>
 				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
 				<canvas id="cv-co2" role="img" aria-label="Area chart of emissions intensity"></canvas>
-			</div>
-			<div class="chart" class:popped={popped === 'ren'}>
-				<div class="ch-head"><h2>Renewable share</h2>{@render info('ren')}<div class="legends"><span class="lg"><i style="--c:var(--accent)"></i>Renewables <b id="v-ren"></b></span></div>{@render popBtn('ren', 'renewable share')}</div>
-				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
-				<canvas id="cv-ren" role="img" aria-label="Line chart of renewable share with the time axis"></canvas>
 			</div>
 		</section>
 		{#if popped}<button type="button" class="pop-backdrop" aria-label="Close the enlarged chart" onclick={() => (popped = null)}></button>{/if}
@@ -398,6 +407,8 @@
 						<dd>The two chart buttons beside MW/% switch the generation chart between stacked areas and lines, one per source, so plants or fuels can be compared on one scale: drill into a fuel or choose By site, then hide what you don’t need or use “show only this”. Up to eight lines get their own colours. $ Price draws the island prices over the chart on a right axis (spike-proof: linear to about $100, compressed above); select it again to take them off.</dd>
 						<dt>Hide and show</dt>
 						<dd>Select a colour square to hide that layer. Double-click it, Shift+click it or press and hold it to show only that one (again to show everything); All and None above the list do the rest. In long lists, type in Filter, and select a fuel heading to fold its plants.</dd>
+						<dt>Open more charts</dt>
+						<dd>The charts under generation start folded to one line each: its value at the time line, or for the whole range when nothing is selected. Select a title to open that chart, and again to fold it. Price can also go over the generation chart ($ Price), and the share card further down charts the renewable share.</dd>
 						<dt>Enlarge, share, download</dt>
 						<dd>The corner button on each chart enlarges it, and ⓘ beside it says what the chart shows and how it’s made. Share copies a link to this view, live or for the dates shown; Download gives the charts as a picture or the data as a spreadsheet file. The address always holds the whole view, so it can be bookmarked.</dd>
 					</dl>
