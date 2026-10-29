@@ -28,7 +28,7 @@
 	<dt>By site</dt>
 	<dd>The plants that together make up 95% of each fuel’s output over the range get a layer each, at most 12 per fuel; the rest of that fuel is grouped as “Other”. Plants are listed largest first by installed capacity, here and when a fuel or group is opened, so the order stays the same whatever the range.</dd>
 	<dt>By hydro scheme</dt>
-	<dd>Hydro only, by river system, each listed upstream to downstream: Tekapo (Takapō A, B); Waitaki (Ōhau A, B, C, Benmore, Aviemore, Waitaki); Waikato (Aratiatia to Karāpiro, eight stations); Manapōuri; Clutha (Clyde, Roxburgh); Tongariro (Tokaanu, Rangipo); Waikaremoana; Rangitaiki (Aniwhenua, Wheao and Flaxy, Matahina); Waipori (Deep Stream, Waipori 2A/3/4); and other hydro.</dd>
+	<dd>Hydro only, by river system, each listed upstream to downstream: Tekapo (Tekapo A, B); Waitaki (Ōhau A, B, C, Benmore, Aviemore, Waitaki); Waikato (Aratiatia to Karāpiro, eight stations); Manapōuri; Clutha (Clyde, Roxburgh); Tongariro (Tokaanu, Rangipo); Waikaremoana; Rangitaiki (Aniwhenua, Wheao and Flaxy, Matahina); Waipori (Deep Stream, Waipori 2A/3/4); and other hydro.</dd>
 	<dt>By owner</dt>
 	<dd>Each plant’s operator in the EA register, grouped as Meridian, Contact (including Manawa Energy, formerly Trustpower, which Contact took over in July 2025), Mercury (including Nga Awa Pūrua, which it operates), Genesis, Nova and other generators. Plants the register doesn’t list yet, and plants seen only in the metered history, have their owner set by hand. Today’s owners apply to the whole history, so earlier sales and transfers aren’t shown.</dd>
 </dl>

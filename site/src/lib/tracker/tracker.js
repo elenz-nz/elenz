@@ -1023,7 +1023,7 @@ export function mountTracker(D, hooks = {}) {
   }
   // Long lists (the site view, a fuel's plants) get a filter box; the site view groups its rows under collapsible
   // fuel headings with subtotals. Section headings toggle open; their colour square hides every row in them.
-  const norm = t => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();  // "takapo" finds "Takapō"
+  const norm = t => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();  // "ohau" finds "Ōhau"
   function toggleHidden(ids, tr) {
     const off = !ids.every(id => state.hidden.has(id));
     for (const id of ids) off ? state.hidden.add(id) : state.hidden.delete(id);

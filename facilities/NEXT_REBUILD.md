@@ -20,7 +20,18 @@ To start it (only when the owner says go): bring the branch up to date with `mai
 merge. Afterwards check each item, run the Offers workflow with "resummarise" if an item changes generation, and clear
 the done items from this file.
 
-Nothing added yet.
+### 1. Tekapo A and B (owner's call, 30 Oct 2026)
+
+The site spells the stations Tekapo A and Tekapo B, like their scheme ("Tekapo" in `[hydro_schemes]`), not the
+register's "Takapō A/B". Changed: `[plant_names]` in `overrides.toml` (the dispatch data's names), the two rows in
+`metered_plants.csv` (the metered history's names), `[hydro_schemes]`, the rows in `plant_capacity.csv` and
+`capacity.json`, `plants.json`, the groupings method page, and `PLANT_ALIASES` (old `plant=takapo-a`/`takapo-b`
+links forward). Until the rebuild has remade every month, the history still says "Takapō A/B", and those two plants
+show no capacity factor on 30 days, 1 year and All.
+
+Check afterwards: By hydro scheme > Tekapo lists Tekapo A and Tekapo B on 24 hours, 30 days and All; no "Takapō"
+anywhere in the tracker (search the plant list for "takapo"); `/tracker?fuel=hydro&plant=takapo-a` opens Tekapo A;
+their capacity factors are back in the mix table.
 
 ## Not fixable from EMI data
 

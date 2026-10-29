@@ -241,16 +241,6 @@
 "Taiohi Solar Farm":{
 "owner":"Other generators"
 },
-"Takapō A":{
-"owner":"Genesis",
-"scheme":"Tekapo",
-"river":0
-},
-"Takapō B":{
-"owner":"Genesis",
-"scheme":"Tekapo",
-"river":1
-},
 "Tararua Wind Farm 3":{
 "owner":"Contact"
 },
@@ -295,6 +285,16 @@
 },
 "Te Āpiti":{
 "owner":"Meridian"
+},
+"Tekapo A":{
+"owner":"Genesis",
+"scheme":"Tekapo",
+"river":0
+},
+"Tekapo B":{
+"owner":"Genesis",
+"scheme":"Tekapo",
+"river":1
 },
 "Teviot":{
 "owner":"Other generators"

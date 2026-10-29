@@ -98,9 +98,9 @@ Stratford,gas,NI,2022-05-31,2023-10-30,572,override,EA plant register (Dispatche
 Stratford,gas,NI,2023-10-31,2026-03-31,542,override,EA plant register (DispatchedGenerationPlant.csv); https://www.investing.com/news/company-news/contact-energy-fy26-slides-renewable-pivot-drives-31-ebitdaf-gain-93CH-4847780,TCC derated to 330
 Stratford,gas,NI,2026-04-01,,212,override,https://www.investing.com/news/company-news/contact-energy-fy26-slides-renewable-pivot-drives-31-ebitdaf-gain-93CH-4847780; EA plant register (DispatchedGenerationPlant.csv),TCC closed Mar 2026 (last output Dec 2025); peakers only
 Taiohi Solar Farm,solar,NI,2025-09-15,,22.4,register,EA plant register (DispatchedGenerationPlant.csv),
-Takapō A,hydro,SI,,2015-12-31,25,register,EA plant register (DispatchedGenerationPlant.csv),
-Takapō A,hydro,SI,2016-01-01,,30,override,"https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",output above 25 MW from 2016; Wikipedia 30 MW; register 25
-Takapō B,hydro,SI,,,160.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Tekapo A,hydro,SI,,2015-12-31,25,register,EA plant register (DispatchedGenerationPlant.csv),
+Tekapo A,hydro,SI,2016-01-01,,30,override,"https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand; Elenz: step in metered output (Generation_MD, monthly peak half-hour)",output above 25 MW from 2016; Wikipedia 30 MW; register 25
+Tekapo B,hydro,SI,,,160.0,register,EA plant register (DispatchedGenerationPlant.csv),
 Tararua Wind Farm 3,wind,NI,2007-02-01,,93.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 2007-02, the first month the history has its output (in service from 2007-01)"
 Tararua stage I,wind,NI,1999-12-01,,36.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 1999-12, the first month the history has its output (in service from 1999-01)"
 Tararua stage II,wind,NI,2004-04-01,,37.0,register,EA plant register (DispatchedGenerationPlant.csv),"counted from 2004-04, the first month the history has its output (in service from 2004-01)"
