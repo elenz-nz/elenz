@@ -187,9 +187,21 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 .fold-btn .chev { flex: none; color: var(--muted); transition: transform 0.15s; }
 .chart.folded .fold-btn .chev { transform: rotate(-90deg); }
 .chart.folded { padding-bottom: 10px; }
+.chart.folded .ch-head { padding-right: 0; }
+.lg .pre { font-family: var(--font-ui); font-weight: 400; color: var(--muted); }
 .chart.folded canvas, .chart.folded .pop-btn { display: none; }
 .chart.folded .ch-head h2 { color: var(--ink-2); }
 .chart.popped .fold-btn { pointer-events: none; }
+/* phones: a folded chart stays one line, its title then just its figures (each still has its colour key; the names are
+   in the open chart's key, the ⓘ and the tooltip), without "avg"/"net" */
+@media (max-width: 560px) {
+  .chart.folded .ch-head { flex-wrap: nowrap; align-items: center; gap: 4px 8px; }
+  .chart.folded .ch-head h2 { flex: none; }
+  .chart.folded .legends { flex-wrap: nowrap; gap: 4px 10px; min-width: 0; }
+  .chart.folded .lg { font-size: 0; gap: 4px; white-space: nowrap; }
+  .chart.folded .lg b { font-size: 0.78rem; }
+  .chart.folded .lg .pre { display: none; }
+}
 .chart.popped .fold-btn .chev { display: none; }
 @media (prefers-reduced-motion: reduce) { .fold-btn .chev { transition: none; } }
 .ttl-row { display: flex; align-items: center; gap: 2px; min-width: 0; }

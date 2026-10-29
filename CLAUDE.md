@@ -179,9 +179,12 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   emissions: the two folded by default sit together at the top, owner's call) folds to one line from its title (`foldTitle` in the page, a button with aria-expanded; `state.fold`,
   `syncFold` in tracker.js; `.chart.folded` in tracker.css): the heading, ⓘ and legend values stay (they follow the
   time line), the canvas and enlarge button go, and a folded chart isn't drawn (`unfolded` in drawAll/paintAll; its
-  ResizeObserver redraws when it opens). Price and renewable share start folded (`FOLD_DEFAULT` in viewurl.js), as
-  $ Price and the share card show them too; the prerendered page has them folded so the load doesn't jump. Address
-  key `fold` (e.g. `fold=demand`, `fold=none`; absent: the default), kept in `elenz-view`. "All charts shown" in
+  ResizeObserver redraws when it opens). All five start folded (`FOLD_DEFAULT` in viewurl.js; owner's call, cleaner,
+  above all on portrait phones; price and renewable share are also on $ Price and the share card); the prerendered
+  page has them folded so the load doesn't jump. A folded line shows its figures at the time line with their unit
+  (there's no axis), or the range's average (net for HVDC) when nothing is hovered, "avg"/"net" in `.pre`; under
+  560 px it stays on one line, the series names hidden (`font-size: 0` on `.lg`). Address key `fold` (the folded
+  ones, e.g. `fold=price,ren`, `fold=none` for all open; absent: the default, all), kept in `elenz-view`. "All charts shown" in
   Downloads leaves folded charts out; the CSV keeps every column.
   Chart notes are ⓘ buttons (`src/lib/site/InfoTip.svelte`, fixed-position popover) right after each card's title (owner's
   rule, Oct 2026: a card is a title with its ⓘ beside it, holding a short description and a link to the method page;

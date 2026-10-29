@@ -36,9 +36,10 @@ test('defaults are left out and unknown values dropped', () => {
   assert.deepEqual(readQuery('?range=2016'), { range: '7d' });   // the old interval-count ranges
 });
 
-test('folded charts: the default is left out, any order reads the same, nothing folded is none', () => {
-  assert.equal(writeQuery({ fold: ['price', 'ren'] }), '');
-  assert.equal(writeQuery({ fold: ['ren', 'price'] }), '');
+test('folded charts: the default (all) is left out, any order reads the same, nothing folded is none', () => {
+  assert.equal(writeQuery({ fold: ['price', 'ren', 'demand', 'hvdc', 'co2'] }), '');
+  assert.equal(writeQuery({ fold: ['co2', 'hvdc', 'demand', 'ren', 'price'] }), '');
+  assert.equal(writeQuery({ fold: ['ren', 'price'] }), 'fold=price,ren');
   assert.equal(writeQuery({ fold: [] }), 'fold=none');
   assert.deepEqual(readQuery('?fold=ren,co2,ren'), { fold: ['ren', 'co2'] });
   assert.deepEqual(readQuery('?fold=none'), { fold: [] });

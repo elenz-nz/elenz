@@ -1202,9 +1202,10 @@ export function mountTracker(D, hooks = {}) {
       for (const id of ['v-gen', 'v-pni', 'v-psi', 'v-met', 'v-und', 'v-hv', 'v-co2', 'v-ren']) $(id).textContent = '';
       // a folded chart's line has no chart to hover, so away from the time line it shows the range's figure
       if (hs > 0 && gw > 0) {
-        const rest = { price: [['v-pni', 'avg ' + money(pn / hs)], ['v-psi', 'avg ' + money(ps / hs)]], demand: [['v-met', `avg ${fmt(mt / hs)} MW`], ['v-und', `avg ${fmt(ud / hs)} MW`]],
-          hvdc: [['v-hv', `net ${hvNet[1]} ${hvNet[2]}`]], co2: [['v-co2', `avg ${fmt(em / gw)} g/kWh`]], ren: [['v-ren', `avg ${(re / gw).toFixed(1)}%`]] };
-        for (const k of state.fold) for (const [id, t] of rest[k] || []) $(id).textContent = t;
+        // "avg"/"net" is its own element, so phones can leave it out (tracker.css); every part is a number we made
+        const rest = { price: [['v-pni', 'avg', money(pn / hs)], ['v-psi', 'avg', money(ps / hs)]], demand: [['v-met', 'avg', `${fmt(mt / hs)} MW`], ['v-und', 'avg', `${fmt(ud / hs)} MW`]],
+          hvdc: [['v-hv', 'net', `${hvNet[1]} ${hvNet[2]}`]], co2: [['v-co2', 'avg', `${fmt(em / gw)} g/kWh`]], ren: [['v-ren', 'avg', `${(re / gw).toFixed(1)}%`]] };
+        for (const k of state.fold) for (const [id, pre, t] of rest[k] || []) $(id).innerHTML = `<small class="pre">${pre} </small>${esc(t)}`;
       }
       return;
     }
@@ -1239,9 +1240,11 @@ export function mountTracker(D, hooks = {}) {
     if (state.hidden.size || !topIsAll()) { shown = 0; for (const l of layers) if (!state.hidden.has(l.id) && l.id !== 'hvdc') shown += l.signed && !topIsAll() ? l.s[j] : Math.max(0, l.s[j]); }
     $('v-gen').textContent = `${genVal(shown, j)} ${genUnit()}`;
     $('v-pni').textContent = money(V.pNI[j]); $('v-psi').textContent = money(V.pSI[j]);
-    $('v-met').textContent = fmt(V.metered[j]); $('v-und').textContent = fmt(V.underlying[j]);
-    $('v-hv').textContent = `${hvTxt(V.hvdc[j])} ${V.hvdc[j] > 0.5 ? 'north' : V.hvdc[j] < -0.5 ? 'south' : ''}`;
-    $('v-co2').textContent = fmt(V.co2[j]); $('v-ren').textContent = V.ren[j].toFixed(1) + '%';
+    // a folded chart has no axis to carry the unit, so its figures say it
+    const u = (k, unit) => state.fold.has(k) ? ' ' + unit : '';
+    $('v-met').textContent = fmt(V.metered[j]) + u('demand', 'MW'); $('v-und').textContent = fmt(V.underlying[j]) + u('demand', 'MW');
+    $('v-hv').textContent = `${hvTxt(V.hvdc[j])}${u('hvdc', 'MW')} ${V.hvdc[j] > 0.5 ? 'north' : V.hvdc[j] < -0.5 ? 'south' : ''}`;
+    $('v-co2').textContent = fmt(V.co2[j]) + u('co2', 'g/kWh'); $('v-ren').textContent = V.ren[j].toFixed(1) + '%';
   }
 
   // ---------- orchestration ----------
