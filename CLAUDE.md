@@ -162,7 +162,15 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   time the stretch ends (NZ time); choosing either moves the stretch there (`zoomEndAt`, both tabs: snapped to 5 minutes,
   window = the day it ends in, widened to 3D if it starts the day before; at the newest data a menu-length stretch is
   live "last N hours" again). Without a zoom the date box picks a whole day, as before (`onTimeSettled`/`timeSettled` in
-  datefield.js). The 1D menu
+  datefield.js). The date box is the site's own calendar on both tabs (`<date-pick>`, `src/lib/site/datepick.js`, a
+  custom element with `value`/`min`/`max`/`disabled` and a `change` event, hung from `<body>` so the bar's clip
+  doesn't cut it; owner's report TRK-07: Firefox's picker redrew the chart while scrolling its month and year lists):
+  moving between months or years changes nothing until a day is picked, which closes it; the month name opens a year
+  list, then months. On 1D a past day is labelled "Day" (it shows that whole day). A past window counts whole local
+  days back (`addDays` in `buildView` and `spanFor`), so a clock change inside it no longer adds an hour of the day
+  before (CHT-10). A range button while a dragged zoom is shown opens that range around the zoom (`endAround`); one
+  that leaves a pinned moment out offers it back as a chip in the bar, "Pinned: Go to ..." (`#pin-go`, `showPinGo`,
+  `offerPin`/`pinAfter` in `rebuild()`), which opens that range around it, pinned (owner's call ZM-02, 30 Oct 2026). The 1D menu
   (`#span-menu`) lives outside the sticky bar because the bar's clip-path clips anything hanging below it. Share's link
   to the dates shown turns a span into fixed times (`zoomAt`). On an island's chart, HVDC is signed like the batteries
   (23 Oct 2026): arriving is stacked on top of the island's generation, leaving is drawn below zero (`drawGen`). Both are

@@ -12,6 +12,7 @@
 	import ShareLink from '#lib/site/ShareLink.svelte';
 	import { heatWindow, heatSource, monthRows } from '#lib/site/heat.js';
 	import { dateSettled, timeSettled } from '#lib/site/datefield.js';
+	import '#lib/site/datepick.js';   // <date-pick>, the date box's calendar
 	import { stamp, fromStamp } from '#lib/site/viewurl.js';
 	import DownloadMenu from '#lib/site/DownloadMenu.svelte';
 	import { composeImage, svgImage, legendOf, csvText, nzTime, utcTime, fileName, CREDIT, LICENCE } from '#lib/site/download.js';
@@ -709,11 +710,11 @@
 		</div>
 		{#if canMove}
 			<div class="ctl">
-				<label for="p-date">{zoomEnds ? zoomWord(zoomEnds.to - zoomEnds.from) : R.label} ending</label>
+				<span id="lb-p-date" class="ctl-lbl">{zoomEnds ? `${zoomWord(zoomEnds.to - zoomEnds.from)} ending` : R.days === 1 && endT !== null ? 'Day' : `${R.label} ending`}</span>
 				<div class="datebox">
 					<button type="button" class="step" aria-label="Previous {R.label}" title="Previous {R.label}" disabled={!live || (endT ?? endOfToday) - (R.days ?? 0) * 864e5 <= FIRST} onclick={() => step(-1)}><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
-					<input type="date" id="p-date" value={dateValue} min="1997-08-01" max={live ? isoDay(latestT + 3e5) : undefined}
-						title="Shows the selected range ending on this date" use:dateSettled={pickDate} />
+					<date-pick id="p-date" aria-labelledby="lb-p-date" value={dateValue} min="1997-08-01" max={live ? isoDay(latestT + 3e5) : ''}
+						title="Shows the selected range ending on this date" use:dateSettled={pickDate}></date-pick>
 					{#if zoomStamp}
 						<input type="time" id="p-time" step="300" value={zoomStamp[1]} aria-label="Ending at (NZ time)" title="Shows the zoomed hours ending at this time (NZ time)"
 							use:timeSettled={(v: string) => zoomEndAt(fromStamp(`${zoomStamp ? zoomStamp[0] : ''}T${v}`))} />

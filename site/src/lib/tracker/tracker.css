@@ -114,6 +114,44 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 .datebox { display: inline-flex; align-items: center; gap: 4px; }
 .datebox input { font: inherit; font-size: 0.8rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2px 6px; min-height: 28px; color-scheme: inherit; }
 .datebox input:disabled { color: var(--muted); }
+.ctl > .ctl-lbl { font-size: 0.72rem; white-space: nowrap; }
+/* the date box's own calendar (#lib/site/datepick.js): the button in the bar, and the calendar hung from <body> */
+date-pick { display: inline-block; }
+.dp-btn { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 0.8rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2px 8px; min-height: 28px; cursor: pointer; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dp-btn svg { color: var(--muted); flex: none; }
+.dp-btn:hover:not(:disabled) { border-color: var(--accent); }
+.dp-btn:hover:not(:disabled) svg, .dp-btn[aria-expanded="true"] svg { color: var(--accent); }
+.dp-btn[aria-expanded="true"] { border-color: var(--accent); }
+.dp-btn:disabled { color: var(--muted); cursor: default; }
+.dp-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.datebox button.dp-btn { color: var(--ink); padding: 2px 8px; font-size: 0.8rem; }
+.datebox button.dp-btn:hover { background: var(--surface); }
+.dp-pop { position: fixed; z-index: 40; width: 272px; max-width: calc(100vw - 16px); box-sizing: border-box; padding: 10px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 28px rgb(0 0 0 / 0.18); font-family: var(--font-ui); font-size: 0.86rem; }
+.dp-pop button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; border-radius: 6px; }
+.dp-pop button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.dp-pop button:disabled { color: var(--line); cursor: default; }
+.dp-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 6px; min-height: 32px; }
+.dp-nav { display: grid; place-items: center; width: 32px; height: 32px; color: var(--ink-2); }
+.dp-nav:hover:not(:disabled) { background: var(--grid); color: var(--ink); }
+.dp-title { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; font-weight: 650; }
+.dp-title svg { color: var(--muted); }
+.dp-title:hover { background: var(--grid); }
+.dp-cap { font-weight: 650; padding-left: 4px; }
+.dp-back { padding: 5px 10px; color: var(--accent); font-weight: 600; }
+.dp-back:hover { background: var(--accent-soft); }
+.dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.dp-dow { text-align: center; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em; color: var(--muted); padding: 2px 0 4px; }
+.dp-day { height: 34px; font-variant-numeric: tabular-nums; }
+.dp-day.out { color: var(--muted); }
+.dp-day:hover:not(:disabled) { background: var(--grid); }
+.dp-day.today { box-shadow: inset 0 0 0 1px var(--accent); }
+.dp-day.sel, .dp-pop .sel { background: var(--accent); color: var(--surface); font-weight: 650; }
+.dp-day.sel:hover, .dp-pop .sel:hover { background: color-mix(in srgb, var(--accent) 85%, var(--ink)); }
+.dp-years { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; max-height: 236px; overflow-y: auto; overscroll-behavior: contain; }
+.dp-months { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.dp-years button, .dp-months button { height: 38px; font-variant-numeric: tabular-nums; }
+.dp-years button:hover:not(:disabled):not(.sel), .dp-months button:hover:not(:disabled):not(.sel) { background: var(--grid); }
+@media (pointer: coarse) { .dp-day { height: 40px; } .dp-pop { width: 300px; } }
 .datebox input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .datebox button { font: inherit; font-size: 0.78rem; border: 1px solid var(--line); background: var(--surface); color: var(--accent); border-radius: 4px; padding: 3px 9px; min-height: 28px; cursor: pointer; }
 .datebox button:hover { background: var(--grid); }

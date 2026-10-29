@@ -2,7 +2,8 @@
 // typing or arrow-keying: entering a year digit by digit gives 0002, 0020, 0201, 2015, and holding the up arrow on
 // the year steps through every year between, so each one loaded and drew in turn. A date picked with the mouse
 // applies at once; one being typed waits until the keys stop for a moment, Enter is pressed or the box loses focus,
-// and a year before the data starts (part way through typing it) is never applied.
+// and a year before the data starts (part way through typing it) is never applied. The tracker's date boxes are now
+// <date-pick> (#lib/site/datepick.js), which changes only when a day is picked; the typing rules still serve the time box.
 const FIRST_YEAR = 1997;
 const SETTLE = 700;   // ms after the last key
 
@@ -22,9 +23,11 @@ function onSettled(el, apply, valid) {
     if (v === done || !valid(v)) return;
     done = v; apply(v);
   };
+  // <date-pick> (#lib/site/datepick.js) only changes when a day is picked, so it applies at once
+  const picker = el.localName === 'date-pick';
   const onChange = () => {
     clearTimeout(timer);
-    if (Date.now() - lastKey < 1000) timer = setTimeout(go, SETTLE); else go();
+    if (!picker && Date.now() - lastKey < 1000) timer = setTimeout(go, SETTLE); else go();
   };
   const onKey = e => { if (e.key === 'Enter') go(); else lastKey = Date.now(); };
   el.addEventListener('change', onChange);
