@@ -53,13 +53,6 @@ test('plant and set slugs', () => {
   assert.equal(slug('Other generators'), 'other-generators');
 });
 
-test('old group slugs forward: the Tekapo scheme is Takapō', () => {
-  assert.equal(slug('Takapō'), 'takapo');
-  assert.equal(readQuery('?by=scheme&group=tekapo').group, 'takapo');
-  assert.equal(readQuery('?by=scheme&group=waitaki').group, 'waitaki');
-  assert.equal(describe('generation', readQuery('?by=scheme&group=tekapo')).split(' · ')[0], 'Takapō generation');
-});
-
 test('no two plants share a slug', () => {
   // the same plant spelt with and without macrons (the register's Ōtāhuhu A, the metered history's Otahuhu A) is fine
   const plain = (n) => n.normalize('NFD').replace(/[\u0300-\u036f]/g, '');

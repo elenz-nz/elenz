@@ -147,8 +147,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   it opens the share sheet. A click on any chart pins the time line there (accent line, "Pinned · Release" under the
   summary's heading; another click on it, Release or Escape lets go); drilling down is from the summary list only (the
   generation chart no longer drills on click). Touch keeps its point without pinning, so it can still scrub; a tap on
-  the line a touch left (within `TAP_PX`, without sliding) lets it go (owner's report CHT-02, 30 Oct 2026). A pin
-  survives a rebuild whose view still shows that moment (`pinT` in `rebuild()`: grouping, region, drill-down, a range
+  the line a touch left (within `TAP_PX`, without sliding) lets it go (owner's report CHT-02, 30 Oct 2026). A pin, or
+  a touch's point, survives a rebuild whose view still shows that moment (`pinT`/`keepBy` in `rebuild()`: grouping, region, drill-down, a range
   with the same points; GRP-01). Charts allow pinch-zoom of the page (`touch-action: pan-y pinch-zoom`, PHN-03).
   The Prices tab zooms the same way on its 5-minute and half-hourly views (`zoom` state in its page, the same address
   key; `onzoom` on `TimeChart`; its 1D menu sits outside the sticky bar). Downloads on daily and longer intervals give
@@ -312,8 +312,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   `analysis/make_points.py`), `rooftop_capacity.json` (capacity snapshot the live job uses until the history job
   has stored `hist/roof_cap.json`).
 - `facilities/overrides.toml`: curated corrections (any change rebuilds history, except the site-only `[owners]`,
-  `[plant_owners]` and `[hydro_schemes]`; the Takapō scheme was "Tekapo" until 30 Oct 2026 (SITE-15), and old
-  `group=tekapo` links forward through `GROUP_ALIASES` in viewurl.js), `[plant_groups]` (stations the metered history only sees whole: Huntly
+  `[plant_owners]` and `[hydro_schemes]`; the scheme is "Tekapo" (owner's call, 30 Oct 2026), its stations keep the
+  register's "Takapō A/B"), `[plant_groups]` (stations the metered history only sees whole: Huntly
   Rankines, Stratford, Waikaremoana, Te Mihi, Southdown, shown as one plant everywhere with their register plants as
   units), `[solar_farms_in_registry]` (dispatched farms the
   distributed-generation registry also counts), plus `[owners]`, `[plant_owners]` and `[hydro_schemes]` for the

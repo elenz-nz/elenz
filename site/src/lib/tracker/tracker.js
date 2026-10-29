@@ -90,7 +90,7 @@ export function mountTracker(D, hooks = {}) {
 
   // ---------- plant sets: views stacked by site, hydro scheme or owner ----------
   // A set is a list of plants shown as one layer; drilling into it lists its plants.
-  const SCHEMES = ['Takapō', 'Waitaki', 'Waikato', 'Manapōuri', 'Clutha', 'Tongariro', 'Waikaremoana', 'Rangitaiki', 'Waipori', 'Other hydro'];
+  const SCHEMES = ['Tekapo', 'Waitaki', 'Waikato', 'Manapōuri', 'Clutha', 'Tongariro', 'Waikaremoana', 'Rangitaiki', 'Waipori', 'Other hydro'];
   // stacking order chosen so neighbouring brand colours stay distinguishable (colour-blind checked)
   const OWNERS = ['Genesis', 'Meridian', 'Contact', 'Mercury', 'Nova', 'Other generators'];
   const hydroOnly = () => VIEWS[state.view].by === 'scheme';
@@ -1523,9 +1523,11 @@ export function mountTracker(D, hooks = {}) {
   }
   function rebuild() {
     const prev = picks();   // from the outgoing view
-    // a pinned time line stays where it was when the new view still shows that moment (grouping, region, drill-down,
-    // MW/%: owner's report GRP-01, 30 Oct 2026); anything else that rebuilds starts unpinned
-    const pinT = state.hoverBy === 'pin' && state.hover != null && V?.t ? V.t[state.hover] : null;
+    // a pinned time line, or the point a touch or the arrow keys left, stays where it was when the new view still
+    // shows that moment (grouping, region, drill-down: owner's report GRP-01, 30 Oct 2026, on a computer and on a
+    // phone); anything else that rebuilds starts afresh
+    const keepBy = ['pin', 'touch', 'key'].includes(state.hoverBy) ? state.hoverBy : null;
+    const pinT = keepBy && state.hover != null && V?.t ? V.t[state.hover] : null;
     V = buildView();  // first: the drill-down checks below look at this view's plant sets
     const link = linked && !waiting ? linked : null;
     if (link) state.drill = fromLink(link);
@@ -1535,8 +1537,8 @@ export function mountTracker(D, hooks = {}) {
     if (d.group && !(setById(d.group)?.plants.length || groupById(d.group)?.f?.some(k => present[state.region].includes(k)))) { d.group = null; d.plant = null; }
     relayer(); keepPicks(prev); state.hover = null;
     const pinJ = pinT != null ? pointAt(pinT) : null;
-    if (pinJ != null && V.t[pinJ] === pinT) { state.hover = pinJ; state.hoverBy = 'pin'; }
-    else if (state.hoverBy === 'pin') state.hoverBy = null;
+    if (pinJ != null && V.t[pinJ] === pinT) { state.hover = pinJ; state.hoverBy = keepBy; }
+    else if (keepBy) state.hoverBy = null;
     if (link) {
       linked = null;
       const j = link.t != null ? pointAt(link.t) : null;

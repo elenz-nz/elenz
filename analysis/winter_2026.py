@@ -32,7 +32,7 @@ GEN = ['geo', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar']
 REN = ['geo', 'hydro', 'wind', 'solar']
 SCHEMES = {  # the main schemes in facilities/overrides.toml [hydro_schemes], with each scheme's island (the small
     # Waipori and Rangitaiki schemes are left out)
-    'Waitaki': 'SI', 'Manapōuri': 'SI', 'Clutha': 'SI', 'Takapō': 'SI',
+    'Waitaki': 'SI', 'Manapōuri': 'SI', 'Clutha': 'SI', 'Tekapo': 'SI',
     'Waikato': 'NI', 'Tongariro': 'NI', 'Waikaremoana': 'NI'}
 
 
