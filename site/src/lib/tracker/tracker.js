@@ -7,7 +7,7 @@ import { onDateSettled, onTimeSettled } from '../site/datefield.js';
 import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTotal } from './series.js';
 import PLANT_META from './plants.json';  // owner and hydro scheme per plant (ingest/plant_meta.py)
 import CAPACITY from './capacity.json';   // installed MW per plant (ingest/capacity.py)
-import { readView, writeView, slug, describe, shareLinks } from '#lib/site/view.js';
+import { readView, writeView, slug, describe, shareLinks, setTitle } from '#lib/site/view.js';
 import { readQuery, stamp, fromStamp, FOLDABLE, FOLD_DEFAULT, foldList } from '#lib/site/viewurl.js';
 import { priceScale } from '#lib/prices/data.js';
 import { fit } from '#lib/site/fitselect.js';
@@ -210,7 +210,7 @@ export function mountTracker(D, hooks = {}) {
   const save = (push = false) => {
     writeView(shared(), { store: { view: state.view, unit: state.unit, chart: state.chart, price: state.price, fold: foldList([...state.fold]) }, query: ownQuery(), push });
     const d = state.drill;
-    document.title = describe('generation', { ...shared(), ...ownQuery() }, { plant: d.plant, group: d.group ? groupById(d.group)?.name : null }) + ' · ELENZ';
+    setTitle(describe('generation', { ...shared(), ...ownQuery() }, { plant: d.plant, group: d.group ? groupById(d.group)?.name : null }) + ' · ELENZ');
   };
 
   // ---------- time helpers ----------
@@ -247,15 +247,18 @@ export function mountTracker(D, hooks = {}) {
   function partialNote(j) {
     if (!isLong() || !V.n) return '';
     const word = { '1d': 'day', '1w': 'week', '1mo': 'month', '1yr': 'year' }[state.int] || 'period';
-    const rate = energyMode() ? `, drawn at its rate so far for a whole ${word}` : '';
-    if (j === V.n - 1 && V.partial) { const p = lp(M.END); return `Partial ${word}: to ${p.dom} ${MON[p.mon]}${rate}`; }
+    const rate = energyMode() ? `, drawn at its rate ${j === V.n - 1 && V.partialCut ? 'over the days shown' : 'so far'} for a whole ${word}` : '';
+    if (j === V.n - 1 && V.partial) return `Partial ${word}: ${partialTo()}${rate}`;
     if (j === 0 && V.partialFirst) { const p = lp(V.t[0]); return `Partial ${word}: from ${p.dom} ${MON[p.mon]} ${p.y}${rate}`; }
     return '';
   }
+  // where the last period's data stops: the newest data, or the end of a past window
+  const partialTo = () => { const p = lp(V.partialTo); return `to ${p.dom} ${MON[p.mon]}${V.partialCut ? ' ' + p.y : ''}`; };
   function heading(j) {
     const p = lp(V.t[j]), last = j === V.n - 1 && V.partial;
     // in the energy view generation is the period's total, so the heading names the period rather than an average
-    const per = (word, avg, avgSoFar) => energyMode() ? (last ? `the ${word} so far` : `the whole ${word}`) : (last ? avgSoFar : avg);
+    const per = (word, avg, avgSoFar) => energyMode() ? (last ? (V.partialCut ? `the part of the ${word} shown` : `the ${word} so far`) : `the whole ${word}`)
+      : (last ? (V.partialCut ? `average over the part shown` : avgSoFar) : avg);
     const h = {
       '1d': [`${DOW[p.dow]} ${p.dom} ${MON[p.mon]} ${p.y}`, per('day', 'daily average', 'daily average so far')],
       '1w': [`Week of ${p.dom} ${MON[p.mon]} ${p.y}`, per('week', 'weekly average', 'average for the week so far')],
@@ -343,8 +346,11 @@ export function mountTracker(D, hooks = {}) {
     const pk = M.peak && M.peak[state.region];
     v.pkMet = max(pk ? pk.metered : S.metered);
     v.pkGen = pk ? (pk.gen ? max(pk.gen) : null) : max(genTotal(M, state.region));
-    // the last day, week or month is incomplete when it runs up to the newest data
-    v.partial = state.end == null && isLong() && n > 0 && key(M.END + 3e5) === key(v.t[n - 1]);
+    // the last day, week or month is incomplete when it runs up to the newest data, or when the window ends part way
+    // through it (a past window on 1 year with weeks or months: owner's report TRK-04, 26 Oct 2026)
+    v.partialCut = stop < M.N && isLong() && n > 0 && key(M.t[stop]) === key(v.t[n - 1]);
+    v.partial = isLong() && n > 0 && (v.partialCut || (state.end == null && key(M.END + 3e5) === key(v.t[n - 1])));
+    v.partialTo = v.partialCut ? M.t[stop - 1] : M.END;
     // the first point is partial when the data starts part way through its period (the history's first year, 1997)
     v.partialFirst = isLong() && n > 0 && start < stop && key(M.t[start] - M.h[start] * 36e5) === key(M.t[start]);
     v.pNI = avg(M.NIs.price); v.pSI = avg(M.SIs.price); v.hvdc = avg(M.hvdcN);
@@ -1211,7 +1217,8 @@ export function mountTracker(D, hooks = {}) {
     }
     const [when, sub] = heading(j), long = isLong();
     $('sum-when').textContent = when;
-    $('sum-sub').textContent = sub;
+    // a partial last period says where its data stops here too, not only in the mouse tooltip: touch has none (TRK-04)
+    $('sum-sub').textContent = j === V.n - 1 && V.partial ? `${sub} · ${partialTo()}` : sub;
     $('col-q').textContent = genUnit();
     let tot = 0;
     if (topIsAll()) tot = V.gen[j]; else for (const l of layers) tot += l.signed ? l.s[j] : Math.max(0, l.s[j]);
@@ -1516,6 +1523,11 @@ export function mountTracker(D, hooks = {}) {
   }
   function rebuild() {
     const prev = picks();   // from the outgoing view
+    // a pinned time line, or the point a touch or the arrow keys left, stays where it was when the new view still
+    // shows that moment (grouping, region, drill-down: owner's report GRP-01, 30 Oct 2026, on a computer and on a
+    // phone); anything else that rebuilds starts afresh
+    const keepBy = ['pin', 'touch', 'key'].includes(state.hoverBy) ? state.hoverBy : null;
+    const pinT = keepBy && state.hover != null && V?.t ? V.t[state.hover] : null;
     V = buildView();  // first: the drill-down checks below look at this view's plant sets
     const link = linked && !waiting ? linked : null;
     if (link) state.drill = fromLink(link);
@@ -1524,6 +1536,9 @@ export function mountTracker(D, hooks = {}) {
     if (d.fuel && !plantsFor(d.fuel).length) { d.fuel = null; d.plant = null; }
     if (d.group && !(setById(d.group)?.plants.length || groupById(d.group)?.f?.some(k => present[state.region].includes(k)))) { d.group = null; d.plant = null; }
     relayer(); keepPicks(prev); state.hover = null;
+    const pinJ = pinT != null ? pointAt(pinT) : null;
+    if (pinJ != null && V.t[pinJ] === pinT) { state.hover = pinJ; state.hoverBy = keepBy; }
+    else if (keepBy) state.hoverBy = null;
     if (link) {
       linked = null;
       const j = link.t != null ? pointAt(link.t) : null;
@@ -1648,6 +1663,11 @@ export function mountTracker(D, hooks = {}) {
     const f = (clientX - r.left - x0) / (x1 - x0);
     return Math.max(0, Math.min(V.n - 1, Math.round(f * (V.n - 1))));
   };
+  // the window x of point j on a chart (the inverse of indexAt)
+  const xAt = (cv, j) => {
+    const r = cv.getBoundingClientRect(), x0 = PADL, x1 = r.width - padR();
+    return r.left + x0 + (V.n > 1 ? j / (V.n - 1) : 0) * (x1 - x0);
+  };
   const row = (colour, name, value, extra = '', hatch = false) =>
     `<div class="tip-r"><i class="${hatch ? 'hatch' : ''}" style="--c:${colour}"></i><span>${esc(name)}</span><b>${value}</b>${extra ? `<small>${extra}</small>` : ''}</div>`;
   // the generation chart's tooltip: the layer under the pointer (or the total); in the lines view the lines at that
@@ -1731,6 +1751,7 @@ export function mountTracker(D, hooks = {}) {
       drag = { cv, x0: e.clientX, j0: indexAt(cv, e.clientX), moved: false, el: dragBox(cv) };
     });
     cv.addEventListener('pointermove', e => {
+      if (tap && Math.abs(e.clientX - tap.x0) > 8) tap = null;   // sliding: a scrub, not a tap
       if (drag && drag.cv === cv) {
         if (!drag.moved && Math.abs(e.clientX - drag.x0) > 6) { drag.moved = true; try { cv.setPointerCapture(e.pointerId); } catch (_) {} hideTip(); }
         if (drag.moved) {
@@ -1750,12 +1771,18 @@ export function mountTracker(D, hooks = {}) {
     cv.addEventListener('pointerdown', e => {
       downBy = e.pointerType;
       if (state.hoverBy === 'pin' || e.pointerType !== 'touch') return;   // a touch keeps its point; a click pins (below)
+      // a touch keeps its point after the finger lifts; a tap on that line (without sliding) lets it go (owner's
+      // report CHT-02, 30 Oct 2026: on a phone there was no way to release it)
+      tap = state.hoverBy === 'touch' && state.hover != null && Math.abs(e.clientX - xAt(cv, state.hover)) <= TAP_PX ? { x0: e.clientX } : null;
       state.hover = indexAt(cv, e.clientX); state.hoverBy = 'touch'; hover();
     });
     // a click pins the time line there; a click on the pinned point (or next to it) releases it. Drilling down is from
     // the list beside the charts.
-    cv.addEventListener('pointerup', e => endDrag(e, true));
-    cv.addEventListener('pointercancel', e => endDrag(e, false));
+    cv.addEventListener('pointerup', e => {
+      if (tap && e.pointerType === 'touch') { tap = null; state.hover = null; state.hoverBy = null; hover(); return; }
+      endDrag(e, true);
+    });
+    cv.addEventListener('pointercancel', e => { tap = null; endDrag(e, false); });
     cv.addEventListener('click', e => {
       if (dragged) { dragged = false; return; }   // the end of a zoom drag, not a click
       if (downBy === 'touch') return;
@@ -1766,7 +1793,8 @@ export function mountTracker(D, hooks = {}) {
       hover();
     });
   }
-  let downBy = '';
+  let downBy = '', tap = null;
+  const TAP_PX = 18;   // how near the time line a tap must land to let it go
   $('sum-unpin').addEventListener('click', () => { state.hover = null; state.hoverBy = null; hover(); });
   for (const box of boxes) {
     box.addEventListener('pointerleave', e => { hideTip(); if (e.pointerType === 'mouse' && state.hoverBy !== 'pin') { state.hover = null; hover(); } });

@@ -38,6 +38,7 @@
 	<li><b>Upgrades and derating:</b> Manapōuri, Clyde, Arapuni, Whakamaru, Karāpiro, Benmore and Ōhau B and C; Wairakei, Mokai, Ngāwhā, Ngā Tamariki and Ōhaaki. The register shows today’s figure for the whole history.</li>
 	<li><b>Closures and retired plant:</b> New Plymouth, Ōtāhuhu A and B, the old Stratford gas turbines, Te Awamutu, Edgecumbe, Te Rapa, and the Taranaki Combined Cycle (closed March 2026).</li>
 	<li><b>Staged commissioning:</b> Turitea, Te Rere Hau and Harapaki, which opened in stages.</li>
+	<li><b>Plants that run above their listed figure:</b> Coleridge (42 MW from May 2026), Ngā Awa Pūrua (148 MW from April 2023) and Te Huka 3 (54 MW) run above the register’s figure all the time, so their capacity is what they run at.</li>
 	<li><b>Figures counted twice:</b> the register repeats a station’s figure on each of its connections or units at Benmore (2009–12), Matahina and Whareroa, and splits West Wind’s 142.6 MW as 80 + 80.</li>
 </ul>
 <p>Corrections come from the operators’ announcements, Wikipedia’s station histories, and steps in the metered output itself, where a plant starts generating above its old figure. Each row says which.</p>

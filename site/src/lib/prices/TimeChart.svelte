@@ -225,7 +225,7 @@
 </div>
 
 <style>
-	.tc { width: 100%; touch-action: pan-y; }
+	.tc { width: 100%; touch-action: pan-y pinch-zoom; }
 	svg { display: block; cursor: crosshair; overflow: hidden; }
 	text { font-family: var(--font-data); font-size: 10.5px; fill: var(--muted); }
 	.yu { font-family: var(--font-ui); font-size: 10px; font-weight: 600; }

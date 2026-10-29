@@ -79,3 +79,20 @@ export function tabHref(path) {
   const qs = writeQuery({ ...shared, ...own });
   return path + (qs ? '?' + qs : '');
 }
+
+// The browser tab's title on the tracker's tabs says what the view shows. Phones sometimes showed the address in the
+// tab instead until a reload (owner's report SITE-06, 25 Oct 2026; not reproduced on a computer). So the title is set
+// again when the page comes back into view or is restored from the back/forward cache, while it's still this page's.
+let titled = { path: '', title: '' }, titleHooked = false;
+/** Set the tab's title for the page at `location.pathname`, and keep it there. */
+export function setTitle(title) {
+  if (typeof document === 'undefined') return;
+  titled = { path: location.pathname, title };
+  document.title = title;
+  if (titleHooked) return;
+  titleHooked = true;
+  const again = () => { if (document.visibilityState === 'visible' && location.pathname === titled.path && document.title !== titled.title) document.title = titled.title; };
+  document.addEventListener('visibilitychange', again);
+  window.addEventListener('pageshow', again);
+  window.addEventListener('popstate', () => setTimeout(again, 0));
+}

@@ -272,10 +272,13 @@ under macron names the history doesn't use, and has no end date for TCC (closed 
   uprated in 2001). Whakamaru 100 → 124 one unit a year 2017-20, dates from the output steps. Karāpiro 96 → 112.5
   (Sep 2025). Benmore 540 → 552 (May 2024) → 570, Ōhau C 212 → 220 and Ōhau B → 220 (30 Jul 2026). Takapō A 30 from
   2016 (output above 25 from then; register 25).
+  Coleridge 40 → 42 from 27 May 2026 (dispatched at 42 MW all day since 20 Oct 2026; Manawa lists 39.5).
 - Geothermal: Wairakei 167 → 181 (binary plant, Jun 2005) → 136 (May 2014, ~45 MW of steam to Te Mihi). Ōhaaki ~65
   (built as 104; steamfield decline, undated) → 43.7 from 2013. Mokai 55 → 95 (May 2005) → 112 (Jun 2007). Ngāwhā 10
   → 25 (Aug 2008, OEC3) → 57 (Dec 2020, OEC4; the register has only OEC4). Ngā Tamariki 86 → 132 (unit 5, Jan 2026).
   Rotokawa 29 → 35 (2003). Te Mihi 166 from its first output (Nov 2013; register 181).
+  Ngā Awa Pūrua 144 → 148 from Apr 2023 and Te Huka 3 54 (register 51.4): both run above their listed capacity
+  all the time, so the capacity is what they run at (owner's call, 30 Oct 2026, after /now showed them over 100%).
 - Thermal: Stratford 200 (old turbines) → 577 (TCC from Mar 1998 alongside them) → 377 (2002) → 589 (peakers, May
   2011) → 572 → 542 (TCC derated, register) → 212 (TCC closed Mar 2026). New Plymouth 600 to Dec 2007, 100 May-Dec
   2008. Ōtāhuhu A 180 to Apr 2004 (its last output); Ōtāhuhu B 385 → 404 (2005), to Sep 2015. Southdown 130 → 180
