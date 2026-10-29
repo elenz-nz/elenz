@@ -146,7 +146,10 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   copies a link to the live view or to the dates shown (`shareLinks`), optionally marking the pinned point; on phones
   it opens the share sheet. A click on any chart pins the time line there (accent line, "Pinned · Release" under the
   summary's heading; another click on it, Release or Escape lets go); drilling down is from the summary list only (the
-  generation chart no longer drills on click). Touch keeps its point without pinning, so it can still scrub.
+  generation chart no longer drills on click). Touch keeps its point without pinning, so it can still scrub; a tap on
+  the line a touch left (within `TAP_PX`, without sliding) lets it go (owner's report CHT-02, 30 Oct 2026). A pin
+  survives a rebuild whose view still shows that moment (`pinT` in `rebuild()`: grouping, region, drill-down, a range
+  with the same points; GRP-01). Charts allow pinch-zoom of the page (`touch-action: pan-y pinch-zoom`, PHN-03).
   The Prices tab zooms the same way on its 5-minute and half-hourly views (`zoom` state in its page, the same address
   key; `onzoom` on `TimeChart`; its 1D menu sits outside the sticky bar). Downloads on daily and longer intervals give
   generation as energy in the chart's unit, with an `hours` column (a partial period: energy so far).
@@ -165,7 +168,9 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   (23 Oct 2026): arriving is stacked on top of the island's generation, leaving is drawn below zero (`drawGen`). Both are
   drawn light so the generation behind reads through, and High/Low sit on the generation, never on HVDC. In the energy
   view a partial first or last period (week so far ...) is drawn at its rate so far for a whole period, faded; its note
-  is in the tooltip (`partialNote`), not on the chart. Chart type (owner's call, 29 Oct 2026): Stacked (default) or Lines (`#seg-chart`,
+  is in the tooltip (`partialNote`), not on the chart, and the summary's sub-line says where the data stops (for
+  touch). The last period is partial when it runs up to the newest data or when a past window ends part way through
+  it (`partialCut`, e.g. 1 year by weeks ending on a Thursday; TRK-04, 30 Oct 2026). Chart type (owner's call, 29 Oct 2026): Stacked (default) or Lines (`#seg-chart`,
   `state.chart`, address `chart=lines`), each visible layer as its own line from zero in the same unit (MW, energy, %),
   no High/Low; fuels and groups keep their colours, and when 2-8 lines are shown and some are shades of one fuel (plants,
   sites, connections) or grey "Other" rows, each takes a colour from the line palette `--l1`..`--l8` (tracker.css,
@@ -191,7 +196,7 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   `.ttl-row` wraps a title and its ⓘ where the heading isn't a `.ch-head`). On the Generation tab each chart's unit (MW/GWh/TWh, %, $/MWh, g/kWh) is drawn in small type under its top axis label (`axisUnit` in tracker.js; the price overlay's under the right axis's), not beside the title (owner's call, 29 Oct 2026, tidier on phones); the full description is in the canvas's aria-label. The grouping menu is sized to the choice it shows (`fitSelect`), and under 560 px the generation chart's header is two rows (title, ⓘ and grouping; then MW/%, chart type, $ Price and the total: `.chart.gen .legends { display: contents }` with `order`); the ⓘ notes on this tab are short bullet points (owner's call, 29 Oct 2026). The Prices tab follows suit: the scale is a fitted dropdown (`fitSelect` action, `#lib/site/fitselect.js`, shared with tracker.js), `TimeChart`'s `unit` puts each chart's unit under its top label, the ⓘ notes are bullets, and under 560 px the price chart's header is two rows (title, ⓘ, scale; then Haywards/Benmore on long ranges) with its key (`priceKey`) moved under the chart on both tracker tabs, Now, Records and
   article figures (`Figure`'s source). Region and month pickers are boxed dropdowns (`select.pick`), the same everywhere; the page-level "About this data" is a labelled
   pill, and both summaries have a labelled "Controls" panel listing every less obvious feature (keep it up to date).
-  Tracker and Now use the full width of big screens (`.wrap.wide`; reading pages keep 1,260 px). The browser tab's title says what the view shows (`describe`), and the
+  Tracker and Now use the full width of big screens (`.wrap.wide`; reading pages keep 1,260 px). The browser tab's title says what the view shows (`describe`, set through `setTitle` in `#lib/site/view.js`, which sets it again when the page comes back into view or from the back/forward cache: phones sometimes showed the address instead, SITE-06), and the
   Worker puts the same title into the page title, og:title and og:url of `/tracker` and `/tracker/prices` for a linked view. The tracker page markup
   is in `src/routes/tracker/+page.svelte` (About and Data and methods share one layout with a contents sidebar, the route group `src/routes/(docs)/`; About page: `src/routes/(docs)/about/+page.svelte`, short: what each page shows, where the data comes from in brief, support, contact; links to its old `#m-*` sections forward to the method pages. Data and methods: `/methods` overview, `/methods/sources` every dataset, `/methods/<slug>` one page per series (generation, embedded-solar, demand, hvdc, prices, price-explainer, emissions, groupings, history); topics and datasets in `src/lib/methods/registry.ts` (each page's header and "Data used" box come from it, so a dataset is described once), bodies in `src/lib/methods/pages/<slug>.svelte`, styles in `methods.css`. The emissions and price explainer pages import their factors and rules from `emissions.js` and `explain.js`, so they stay in step; the other pages are prose: when a method changes, update its page and its `updated` date; shared
   masthead, footer (© line, data credits, link icons: fill in a `href` in its `LINKS` to show a social account), logo mark and the "Support Elenz" link to Buy Me a Coffee in `src/lib/site/`; site copy speaks as "we", never "I" or "me"); the canvas chart code is `src/lib/tracker/tracker.js` (vanilla JS, driven by
@@ -210,6 +215,12 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   Kaitawa, Tuai and Piripaua) are listed one row per station. A charging battery shows a negative % of its MW rating. Sort, filters and search live in /now's address (`fuel`, `island`, `owner`
   as a slug, `sort` = mw | pct | name with `-asc`/`-desc`, `q`, `on=1` generating only); 20 rows until "Show all".
   Each plant links to `/tracker?fuel=<fuel>&plant=<slug>`. Later the index of plant pages (/plants).
+- Not found (SITE-07, 30 Oct 2026): `src/routes/404/+page.svelte` prerenders `build/404.html` (noindex, not in the
+  sitemap), which Cloudflare serves with status 404 for any address with no file (`assets.not_found_handling:
+  "404-page"` in wrangler.jsonc; before it, a missing page was an empty reply, blank on phones); `src/routes/+error.svelte`
+  shows the same page (`src/lib/site/NotFound.svelte`: masthead, the address asked for, a way back to the nearest
+  section, the main pages, Report) when a link inside the site leads nowhere. Asset addresses are from the site root
+  (`paths.relative: false` in vite.config.ts), since 404.html is served at any depth.
 - Footer extras (`src/lib/site/SiteFooter.svelte`): "Report a problem" (`ReportLink.svelte`: an email to hello@elenz.co.nz
   with the page title and full address, so the view, filled in when clicked) and a link to `/privacy`
   (`src/routes/(docs)/privacy/+page.svelte`, in the About/methods sidebar). The privacy page describes what the code
@@ -301,7 +312,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   `analysis/make_points.py`), `rooftop_capacity.json` (capacity snapshot the live job uses until the history job
   has stored `hist/roof_cap.json`).
 - `facilities/overrides.toml`: curated corrections (any change rebuilds history, except the site-only `[owners]`,
-  `[plant_owners]` and `[hydro_schemes]`), `[plant_groups]` (stations the metered history only sees whole: Huntly
+  `[plant_owners]` and `[hydro_schemes]`; the Takapō scheme was "Tekapo" until 30 Oct 2026 (SITE-15), and old
+  `group=tekapo` links forward through `GROUP_ALIASES` in viewurl.js), `[plant_groups]` (stations the metered history only sees whole: Huntly
   Rankines, Stratford, Waikaremoana, Te Mihi, Southdown, shown as one plant everywhere with their register plants as
   units), `[solar_farms_in_registry]` (dispatched farms the
   distributed-generation registry also counts), plus `[owners]`, `[plant_owners]` and `[hydro_schemes]` for the

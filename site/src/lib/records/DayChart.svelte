@@ -161,7 +161,7 @@
 
 <style>
 	.dc { min-width: 0; position: relative; }
-	svg.chart { width: 100%; height: auto; display: block; touch-action: pan-y; user-select: none; }
+	svg.chart { width: 100%; height: auto; display: block; touch-action: pan-y pinch-zoom; user-select: none; }
 	svg.zoomable { cursor: crosshair; }
 	.zsel { fill: color-mix(in srgb, var(--accent) 16%, transparent); stroke: var(--accent); stroke-width: 1; }
 	.hov { stroke-dasharray: none; opacity: 0.5; }

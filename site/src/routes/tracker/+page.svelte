@@ -214,7 +214,8 @@
 		<div class="status">
 			<span class="tstatus" role="status">{status}</span>
 			{#if meta}
-				{#if view && (view.kind !== 'live' || view.past) && !view.loading && !view.error}
+				{#if view && (view.kind !== 'live' || view.past) && !view.error}
+					<!-- also while that history loads: it flashed Live on every step through 30 days (TRK-05, 26 Oct 2026) -->
 					<span class="pill hist" title="History from the EA's daily dispatch files">History</span>
 				{:else if live}
 					<span class="pill live" title="Data to {when(meta.end)}. Updated from the EMI real-time dispatch feed every 5 minutes"><span class="pword">Live · </span>{clockOnly(meta.end)}</span>
@@ -396,7 +397,7 @@
 						<dt>Read a time</dt>
 						<dd>Hover a chart, or touch and slide on a phone. With a chart focused, ← → move one point (Shift: further), Home and End jump to the ends.</dd>
 						<dt>Pin it</dt>
-						<dd>Click a chart to hold the time line there; click it again, Release or Escape to let go. Share can then mark that time.</dd>
+						<dd>Click a chart to hold the time line there; click it again, Release or Escape to let go. It stays put when you change the grouping, region or chart type. On a phone the line stays where your finger lifts; tap it again to let go. Share can then mark that time.</dd>
 						<dt>Move through history</dt>
 						<dd>Range, interval and region are in the bar at the top. The ‹ › arrows beside the date, on the generation chart, or Page Up and Page Down step back and forward by the range; the date box jumps to a day; Latest comes back.</dd>
 						<dt>Zoom in</dt>

@@ -8,7 +8,7 @@
 	import { fromLayout, historyStore, firstAtOrAfter, slice, nzOffset } from '#lib/tracker/series.js';
 	import Masthead from '#lib/site/Masthead.svelte';
 	import TrackerTabs from '#lib/site/TrackerTabs.svelte';
-	import { readView, writeView, midnightOf, addDays, ymd, endOfDay, describe, shareLinks } from '#lib/site/view.js';
+	import { readView, writeView, midnightOf, addDays, ymd, endOfDay, describe, shareLinks, setTitle } from '#lib/site/view.js';
 	import ShareLink from '#lib/site/ShareLink.svelte';
 	import { heatWindow, heatSource, monthRows } from '#lib/site/heat.js';
 	import { dateSettled, timeSettled } from '#lib/site/datefield.js';
@@ -157,7 +157,7 @@
 	const ownNow = () => ({ scale, hide: off, band: bandKey, zoom });
 	function save() {
 		writeView(sharedNow(), { query: ownNow() });
-		document.title = `${describe('prices', { ...sharedNow(), zoom })} · ELENZ`;
+		setTitle(`${describe('prices', { ...sharedNow(), zoom })} · ELENZ`);
 		try { localStorage.setItem('elenz-prices', JSON.stringify({ scale, off, band: bandKey, heat: heatKey })); } catch { /* storage blocked */ }
 	}
 	// the links the Share button offers: this view, live or fixed to its dates, and the pinned point (or one chosen with

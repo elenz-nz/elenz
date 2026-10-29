@@ -287,7 +287,7 @@
 
 <style>
 	.prog { margin: 0; display: grid; gap: 4px; }
-	svg.chart { width: 100%; height: auto; display: block; touch-action: pan-y; user-select: none; }
+	svg.chart { width: 100%; height: auto; display: block; touch-action: pan-y pinch-zoom; user-select: none; }
 	svg.zoomable { cursor: crosshair; }
 	.grid { stroke: var(--grid); stroke-width: 1; }
 	.lab { fill: var(--muted); font-family: var(--font-data); font-size: 12px; }

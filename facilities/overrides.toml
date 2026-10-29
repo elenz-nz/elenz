@@ -127,7 +127,7 @@ tiwai = "TWI2201"
 # Hydro schemes for the "By hydro scheme" view, each listed upstream to downstream. Hydro stations not listed
 # here are shown as "Other hydro".
 [hydro_schemes]
-Tekapo = ["Takapō A", "Takapō B"]
+"Takapō" = ["Takapō A", "Takapō B"]
 Waitaki = ["Ōhau A", "Ōhau B", "Ōhau C", "Benmore", "Aviemore", "Waitaki"]
 Waikato = ["Aratiatia", "Ōhakuri", "Ātiamuri", "Whakamaru", "Maraetai", "Waipāpa", "Arapuni", "Karāpiro"]
 "Manapōuri" = ["Manapōuri"]

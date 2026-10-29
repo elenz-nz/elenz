@@ -54,7 +54,7 @@
 <section class="gens" aria-labelledby="gens-h">
 	<div class="p-head">
 		<h2 id="gens-h">Every generator right now</h2>
-		<span class="p-info"><InfoTip label="About this list">MW is each plant's 5-minute dispatch target, against its installed capacity. Batteries show negative while charging, as a share of their MW rating. Embedded solar isn't listed. Tap a plant for its history.</InfoTip></span>
+		<span class="p-info"><InfoTip label="About this list">MW is each plant's 5-minute dispatch target, against its installed capacity (a plant that runs above its listed capacity counts what it runs at). The list has every plant that has generated in the past 7 days, so one that hasn't run all week (a peaker on standby, say) isn't in it. Batteries show negative while charging, as a share of their MW rating. Embedded solar isn't listed. Tap a plant for its history.</InfoTip></span>
 		<span class="unit">{when} · {running} of {rows.length} generating</span>
 	</div>
 

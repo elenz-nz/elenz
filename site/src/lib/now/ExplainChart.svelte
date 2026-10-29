@@ -101,7 +101,7 @@
 
 <style>
 	.plot { width: 100%; min-width: 0; }
-	svg { display: block; max-width: 100%; touch-action: pan-y; }
+	svg { display: block; max-width: 100%; touch-action: pan-y pinch-zoom; }
 	.grid { stroke: var(--grid); stroke-width: 1; }
 	.ax { fill: var(--muted); font-size: var(--fs); font-family: var(--font-data); }
 	.band { fill: var(--f-hydro); opacity: 0.16; }

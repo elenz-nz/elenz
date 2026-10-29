@@ -74,14 +74,14 @@ export const TOPICS: Topic[] = [
 		title: 'Renewable share and groupings',
 		summary: 'How fuels are counted as renewable or fossil, flexible or variable, and how plants are grouped by site, hydro scheme and owner.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
-		updated: '2026-10-29',
+		updated: '2026-10-30',
 	},
 	{
 		slug: 'capacity',
 		title: 'Installed capacity',
 		summary: 'How much each plant could generate, and when that changed, back to 1997: the basis for the Generation tab’s capacity factors and dispatchable headroom.',
 		shownOn: [['Tracker', '/tracker']],
-		updated: '2026-10-27',
+		updated: '2026-10-30',
 	},
 	{
 		slug: 'history',

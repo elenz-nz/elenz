@@ -57,6 +57,8 @@ export const slug = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').to
 
 /** Old plant slugs that should still open their plant after a rename: { 'old-slug': 'new-slug' }. */
 export const PLANT_ALIASES = {};
+// old group slugs from earlier links: the Takapō scheme was "Tekapo" until 30 Oct 2026
+export const GROUP_ALIASES = { tekapo: 'takapo' };
 
 // ---------- NZ days and times ----------
 const DAY = 864e5;
@@ -115,6 +117,7 @@ export function readQuery(search) {
   one('fuel', (x) => FUEL_KEYS.includes(x));
   one('plant', (x) => SLUG.test(x) && x.length <= 80);
   if (v.plant && PLANT_ALIASES[v.plant]) v.plant = PLANT_ALIASES[v.plant];
+  if (v.group && GROUP_ALIASES[v.group]) v.group = GROUP_ALIASES[v.group];
   const z = readZoom(q.get('zoom'));
   if (z) v.zoom = z;
   one('scale', (x) => SCALES.includes(x));
