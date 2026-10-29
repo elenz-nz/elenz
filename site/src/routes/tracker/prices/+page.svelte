@@ -12,6 +12,7 @@
 	import ShareLink from '#lib/site/ShareLink.svelte';
 	import { heatWindow, heatSource, monthRows } from '#lib/site/heat.js';
 	import { dateSettled, timeSettled } from '#lib/site/datefield.js';
+	import '#lib/site/datepick.js';   // <date-pick>, the date box's calendar
 	import { stamp, fromStamp } from '#lib/site/viewurl.js';
 	import DownloadMenu from '#lib/site/DownloadMenu.svelte';
 	import { composeImage, svgImage, legendOf, csvText, nzTime, utcTime, fileName, CREDIT, LICENCE } from '#lib/site/download.js';
@@ -24,7 +25,7 @@
 	import InfoTip from '#lib/site/InfoTip.svelte';
 	import { fitSelect } from '#lib/site/fitselect.js';
 	import { barHeight } from '#lib/site/sticky.js';
-	import { rangeName, span } from '#lib/site/context.js';
+	import { span } from '#lib/site/context.js';
 	import {
 		NODES, NODE, priceOf, separated, addRevenue, captured, RANGES, INT_LABEL, atInterval, completeDaily, periods,
 		heat, priceScale, niceTicks, CAP, money, signedMoney, clock, dayLabel, dateLabel, monthLabel, shortDate, timeTicks, nzParts
@@ -709,11 +710,11 @@
 		</div>
 		{#if canMove}
 			<div class="ctl">
-				<label for="p-date">{zoomEnds ? zoomWord(zoomEnds.to - zoomEnds.from) : R.label} ending</label>
+				<span id="lb-p-date" class="ctl-lbl">{zoomEnds ? `${zoomWord(zoomEnds.to - zoomEnds.from)} ending` : R.days === 1 && endT !== null ? 'Day' : `${R.label} ending`}</span>
 				<div class="datebox">
 					<button type="button" class="step" aria-label="Previous {R.label}" title="Previous {R.label}" disabled={!live || (endT ?? endOfToday) - (R.days ?? 0) * 864e5 <= FIRST} onclick={() => step(-1)}><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
-					<input type="date" id="p-date" value={dateValue} min="1997-08-01" max={live ? isoDay(latestT + 3e5) : undefined}
-						title="Shows the selected range ending on this date" use:dateSettled={pickDate} />
+					<date-pick id="p-date" aria-labelledby="lb-p-date" value={dateValue} min="1997-08-01" max={live ? isoDay(latestT + 3e5) : ''}
+						title="Shows the selected range ending on this date" use:dateSettled={pickDate}></date-pick>
 					{#if zoomStamp}
 						<input type="time" id="p-time" step="300" value={zoomStamp[1]} aria-label="Ending at (NZ time)" title="Shows the zoomed hours ending at this time (NZ time)"
 							use:timeSettled={(v: string) => zoomEndAt(fromStamp(`${zoomStamp ? zoomStamp[0] : ''}T${v}`))} />
@@ -974,7 +975,7 @@
 			<div class="card-head">
 				<div>
 					<div class="ttl-row"><h2>Price captured by fuel</h2><InfoTip>What each fuel earned over the range: its output × its island's price, divided by its output. Percent is against the average of all fuels. Battery (charging) is what batteries paid to charge, left out of the average. Hover over a bar (or tap it) for its energy in GWh and what it earned or paid. <a href="/methods/prices#derived">How it's worked out</a></InfoTip></div>
-					<Context range={rangeName(R.label, endT, R.days)} items={[win ? span(win.from, win.to) : '']} />
+					<Context range={win ? span(win.from, win.to) : ''} />
 				</div>
 				<PopButton open={popped === 'cap'} name="price captured by fuel chart" onclick={() => (popped = popped === 'cap' ? null : 'cap')} />
 			</div>
@@ -988,7 +989,7 @@
 			<div class="card-head">
 				<div>
 					<div class="ttl-row"><h2>Price by time of day</h2><InfoTip>{heatSeg?.kind === 'months' ? `One row per ${effInt === '1yr' ? 'year' : 'month'}: the average price in each half-hour.` : heatRows.length > 40 ? 'One row per day; scroll for earlier days.' : 'One row per day.'} {heatScaled ? 'Colours fitted to the prices shown.' : 'Colours on fixed price bands, so periods compare.'}</InfoTip></div>
-					<Context range={heatShort ? (endT === null ? 'Last 7 days' : rangeName('7 days', endT, 7)) : rangeName(R.label, endT, R.days)} items={[heatSpan, NODE[heatKey]?.name, heatSeg?.kind === 'months' ? (effInt === '1yr' ? 'yearly' : 'monthly') + ' average of each half-hour' : 'each half-hour']} />
+					<Context range={heatSpan} items={[NODE[heatKey]?.name, heatSeg?.kind === 'months' ? (effInt === '1yr' ? 'yearly' : 'monthly') + ' average of each half-hour' : 'each half-hour']} />
 				</div>
 				<div class="tools">
 				<div class="seg" role="group" aria-label="Node for the heat map">

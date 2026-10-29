@@ -4,6 +4,7 @@
 import { FUELS } from './fuels.js';
 import { efAt, plantEf, BY_PLANT } from './emissions.js';
 import { onDateSettled, onTimeSettled } from '../site/datefield.js';
+import '../site/datepick.js';   // <date-pick>: the date box's calendar (TRK-07)
 import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTotal } from './series.js';
 import PLANT_META from './plants.json';  // owner and hydro scheme per plant (ingest/plant_meta.py)
 import CAPACITY from './capacity.json';   // installed MW per plant (ingest/capacity.py)
@@ -317,7 +318,8 @@ export function mountTracker(D, hooks = {}) {
     if (state.end != null) {
       // [end − range, end); daily points sit at local midnight, which moves an hour at the clock changes
       stop = firstAtOrAfter(M.t, state.end);
-      start = firstAtOrAfter(M.t, state.end - R.days * DAY - (daily ? 2 * 36e5 : 0));
+      // whole local days back, so a clock change inside the window doesn't add an hour of the day before (CHT-10)
+      start = firstAtOrAfter(M.t, addDays(state.end, -R.days) - (daily ? 2 * 36e5 : 0));
     } else if (state.kind === 'live') start = Math.max(0, M.N - R.n);
     else if (R.days) start = firstAtOrAfter(M.t, M.END - R.days * DAY + (daily ? 36e5 : 0));
     // the zoom: part of the window ([zf, zt), times); ignored if it would leave fewer than two points
@@ -1279,6 +1281,23 @@ export function mountTracker(D, hooks = {}) {
   const endOfToday = () => addDays(midnightOf(models.live.END), 1);
   const ymd = t => { const p = lp(t); return `${p.y}-${String(p.mon + 1).padStart(2, '0')}-${String(p.dom).padStart(2, '0')}`; };
   const firstDay = () => history.index?.first ?? Date.UTC(1997, 6, 31, 12);
+  // the end (exclusive local midnight, or null for the latest) of range r with moment t near its middle
+  function endAround(t, r) {
+    const R = RANGES[r];
+    if (R.fixed || !R.days) return null;
+    let end = addDays(midnightOf(t), Math.ceil(R.days / 2));
+    end = Math.max(end, addDays(midnightOf(firstDay()), R.days));
+    return end >= endOfToday() ? null : end;
+  }
+  // a range change that drops a pin offers it back: "Go to 9:25 pm Mon 12 Oct" in the bar
+  let offerPin = null, pinAfter = null, shownOffer = null;
+  const pinLabel = j => chip(j);
+  function showPinGo(o) {
+    shownOffer = o;
+    const b = $('pin-go');
+    b.hidden = !o;
+    if (o) { $('pin-go-txt').textContent = o.label; b.title = `Show ${RANGES[state.range].label} around ${o.label}, pinned there`; }
+  }
   // a zoom's length and span in words: "2 h 25 min", "1:05 pm – 3:30 pm Mon 19 Oct", "3 Feb – 18 Mar 2026"
   function zoomWord(ms) {
     const h = ms / 36e5;
@@ -1299,7 +1318,9 @@ export function mountTracker(D, hooks = {}) {
     }
     // the date control: the chosen range ends on this date (today = the latest data)
     const R = RANGES[state.range], inp = $('in-date'), end = state.end ?? endOfToday();
-    $('lb-date').textContent = R.fixed ? 'All data' : `${R.label} ending`;
+    // a past day on 1D is that whole day, so the box says "Day" rather than "24 hours ending" (CHT-10)
+    $('lb-date').textContent = R.fixed ? 'All data' : state.range === '1d' && state.end != null ? 'Day' : `${R.label} ending`;
+    if (inp._sync) inp._sync();   // the calendar button's spoken label follows
     inp.disabled = !!R.fixed;
     inp.style.visibility = R.fixed ? 'hidden' : '';  // All has no end date
     inp.value = R.fixed ? '' : ymd(end - 1);
@@ -1365,7 +1386,7 @@ export function mountTracker(D, hooks = {}) {
   // hv: the store's version it was merged from; a model older than the files loaded since is merged again (setView)
   const merge = kind => Object.assign(toModel(history.merged(kind, models.live), models.live.END), { hv: history.version(kind) });
   // the span of history a window [end − range, end) needs (the latest 31 days when end is null)
-  const spanFor = (r, end) => { const to = end ?? models.live.END; return [end == null ? to - 31 * DAY : end - RANGES[r].days * DAY - DAY, to]; };
+  const spanFor = (r, end) => { const to = end ?? models.live.END; return [end == null ? to - 31 * DAY : addDays(end, -RANGES[r].days) - DAY, to]; };
   function useModel() {
     const m = models[state.kind];
     if (m !== M) { M = m; derive(); }
@@ -1526,8 +1547,11 @@ export function mountTracker(D, hooks = {}) {
     // a pinned time line, or the point a touch or the arrow keys left, stays where it was when the new view still
     // shows that moment (grouping, region, drill-down: owner's report GRP-01, 30 Oct 2026, on a computer and on a
     // phone); anything else that rebuilds starts afresh
-    const keepBy = ['pin', 'touch', 'key'].includes(state.hoverBy) ? state.hoverBy : null;
-    const pinT = keepBy && state.hover != null && V?.t ? V.t[state.hover] : null;
+    const want = pinAfter; pinAfter = null;
+    const keepBy = want != null ? 'pin' : ['pin', 'touch', 'key'].includes(state.hoverBy) ? state.hoverBy : null;
+    const pinT = want ?? (keepBy && state.hover != null && V?.t ? V.t[state.hover] : null);
+    const pinH = want != null ? 0 : keepBy && state.hover != null && V?.hrs ? V.hrs[state.hover] : 0;
+    const offer = offerPin; offerPin = null;
     V = buildView();  // first: the drill-down checks below look at this view's plant sets
     const link = linked && !waiting ? linked : null;
     if (link) state.drill = fromLink(link);
@@ -1537,8 +1561,12 @@ export function mountTracker(D, hooks = {}) {
     if (d.group && !(setById(d.group)?.plants.length || groupById(d.group)?.f?.some(k => present[state.region].includes(k)))) { d.group = null; d.plant = null; }
     relayer(); keepPicks(prev); state.hover = null;
     const pinJ = pinT != null ? pointAt(pinT) : null;
-    if (pinJ != null && V.t[pinJ] === pinT) { state.hover = pinJ; state.hoverBy = keepBy; }
+    // kept when the moment is still on screen as the same point or within a longer one (a day, a week); a finer view
+    // (a pinned day opened on 5-minute data) drops it rather than pin its first minutes
+    if (pinJ != null && (V.t[pinJ] === pinT || V.hrs[pinJ] >= pinH)) { state.hover = pinJ; state.hoverBy = keepBy; }
     else if (keepBy) state.hoverBy = null;
+    // a pin a range change didn't keep: offer to go there instead (owner's call ZM-02, 30 Oct 2026)
+    showPinGo(offer && state.hoverBy !== 'pin' ? offer : null);
     if (link) {
       linked = null;
       const j = link.t != null ? pointAt(link.t) : null;
@@ -1588,7 +1616,23 @@ export function mountTracker(D, hooks = {}) {
     if (b.dataset.v === state.range && !state.zoom) return;
     for (const x of $('seg-range').querySelectorAll('button')) x.setAttribute('aria-pressed', String(x === b));
     stepEnd = undefined;
-    soon(() => { state.zoom = null; setView(b.dataset.v); });
+    const r = b.dataset.v;
+    // a dragged zoom carries over: the new range is centred on what was zoomed (owner's call ZM-02, 30 Oct 2026);
+    // a pinned moment stays pinned if the new range shows it, and otherwise is offered (Go to ...)
+    const z = state.zoom && !state.zoom.span && V?.zoomed ? state.zoom : null;
+    const pin = !z && state.hoverBy === 'pin' && state.hover != null && V ? { t: V.t[state.hover], label: pinLabel(state.hover) } : null;
+    soon(() => {
+      state.zoom = null;
+      if (z && !RANGES[r].fixed) { setView(r, endAround((z.from + z.to) / 2, r)); return; }
+      offerPin = pin; setView(r);
+    });
+  });
+  // Go to the pinned moment the last range change left out: that range around it, pinned there
+  $('pin-go').addEventListener('click', () => {
+    const o = shownOffer;
+    if (!o) return;
+    showPinGo(null);
+    pinAfter = o.t; setView(state.range, RANGES[state.range].fixed ? null : endAround(o.t, state.range));
   });
   // the menu on 1D: the last hour, 3, 6 or 12 hours of the day (5-minute points), or the whole 24 hours
   const spanMenu = $('span-menu'), spanBtn = $('btn-span');

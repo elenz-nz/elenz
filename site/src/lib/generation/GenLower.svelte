@@ -8,7 +8,7 @@
 	import TimeChart from '#lib/prices/TimeChart.svelte';
 	import { timeTicks, niceTicks } from '#lib/prices/data.js';
 	import Context from '#lib/site/Context.svelte';
-	import { rangeName, span, RES as RES_ } from '#lib/site/context.js';
+	import { span, RES as RES_ } from '#lib/site/context.js';
 	import { nzOffset } from '#lib/tracker/series.js';
 	import PopButton from '#lib/site/PopButton.svelte';
 	import InfoTip from '#lib/site/InfoTip.svelte';
@@ -252,10 +252,8 @@
 	const mix = $derived(cur && v ? mixRows(cur, v.region, v.from, v.to, canCompare ? prev : null, v.kind !== 'day') : null);
 
 	// ---------- what each card covers ----------
-	const rangeChip = $derived(v ? rangeName(v.label, v.end, v.days) : '');
 	const dates = $derived(v ? span(v.from, v.to) : '');
 	// short ranges show at least the last week; otherwise the heat map covers what the charts above do
-	const heatChip = $derived(v && heatSrc ? (heatSrc.kind === 'days' && heatSrc.from < v.from - 6e4 ? (v.end == null ? 'Last 7 days' : rangeName('7 days', v.end, 7)) : rangeChip) : rangeChip);
 </script>
 
 <svelte:window onkeydown={(e) => { if (popped && e.key === 'Escape') popped = null; }} />
@@ -267,7 +265,8 @@
 				<div class="ttl-row"><h2>{metric === 'ren' ? 'Renewable share' : `${m.title} share`}</h2><InfoTip>{#if canCompare}Dashed: the same dates a year earlier (365 days before){v && v.int === '5m' ? ', half-hourly' : ''}.{:else if v && v.days == null}No comparison on the full history.{:else}The year before is outside the history.{/if}
 			{#if m.note}{m.title}: {m.note}.{/if}
 			<a href="/methods/groupings#renewable">How shares are worked out</a></InfoTip></div>
-				<Context range={rangeChip} items={[dates, v ? `${RES[v.int]}, % of generation` : '']} />
+				<!-- every lower card names only its dates, on both tabs (owner's call, 30 Oct 2026) -->
+				<Context range={dates} items={[v ? `${RES[v.int]}, % of generation` : '']} />
 			</div>
 			<div class="tools">
 				<div class="seg" role="group" aria-label="Series for the share chart">
@@ -301,7 +300,7 @@
 			<div>
 				<div class="ttl-row"><h2>Spare dispatchable capacity</h2><InfoTip>Dispatchable capacity not generating{withHydro ? '' : ', hydro left out'}: installed, offered, and offered under $1,000/MWh.
 			{v && v.region !== 'NZ' ? 'One island only: the HVDC link isn’t counted. ' : ''}{avgOnly ? 'Daily averages where history doesn’t yet keep each day’s lowest. ' : ''}{!hasOffers ? 'No offers loaded for these dates yet. ' : ''}<a href="/methods/capacity#headroom">How it's worked out</a></InfoTip></div>
-				<Context range={rangeChip} items={[dates, v ? `${RES[v.int]}, MW not generating` : '', coarse && roomView === 'levels' && !avgOnly ? `lowest in each ${lowWord}` : '']} />
+				<Context range={dates} items={[v ? `${RES[v.int]}, MW not generating` : '', coarse && roomView === 'levels' && !avgOnly ? `lowest in each ${lowWord}` : '']} />
 			</div>
 			<div class="tools">
 				<div class="seg" role="group" aria-label="Headroom view">
@@ -360,7 +359,7 @@
 				<div>
 					<div class="ttl-row"><h2>Mix by fuel</h2><InfoTip>Energy over the range{v && v.kind === 'day' ? ' (peaks need half-hourly data, so long ranges leave them out)' : ''}{canCompare && prev ? '; “vs” is the change in energy on the same dates a year earlier' : ''}.
 				<a href="/methods/capacity#use">How capacity factors are worked out</a></InfoTip></div>
-					<Context range={rangeChip} items={[dates, canCompare && prev ? `against ${prevYear ? 'the ' : ''}${prevPhrase}` : '']} />
+					<Context range={dates} items={[canCompare && prev ? `against ${prevYear ? 'the ' : ''}${prevPhrase}` : '']} />
 				</div>
 				<PopButton open={popped === 'mix'} name="mix table" onclick={() => pop('mix')} />
 			</div>
@@ -376,7 +375,7 @@
 				<div>
 					<div class="ttl-row"><h2>{heatMetric === 'ren' ? 'Renewable share' : hm.title} by time of day</h2><InfoTip>{heatByMonth ? 'One row per ' + (v?.int === '1yr' ? 'year' : 'month') + ': the average of each half-hour.' : rows.length > 40 ? 'One row per day; scroll for earlier days.' : 'One row per day.'}
 				{heatMetric === 'ren' ? 'Brown marks the half-hours that leaned on thermal plant, usually still evenings at the peak.' + (heatScaled ? ' Colours fitted to the shares shown, so the bands move with the view.' : ' Fixed bands from 80% to 98%, so periods compare; Scale to this view fits them to what’s shown.') : heatScaled ? 'Colours fitted to what’s shown: darker means more.' : `Colours on a fixed scale set by today’s installed ${hm.title.toLowerCase()} capacity${heatCap ? ` (${Math.round(heatCap).toLocaleString('en-NZ')} MW)` : ''}, so earlier years look paler where less was built.`}</InfoTip></div>
-					<Context range={heatChip} items={[heatSrc ? span(heatSrc.kind === 'days' && heatSrc.seg?.n ? heatSrc.seg.t[0] : heatSrc.from, heatSrc.to) : '',
+					<Context range={heatSrc ? span(heatSrc.kind === 'days' && heatSrc.seg?.n ? heatSrc.seg.t[0] : heatSrc.from, heatSrc.to) : ''} items={[
 						(heatByMonth ? (v?.int === '1yr' ? 'yearly' : 'monthly') + ' average of each half-hour' : 'each half-hour') + (heatMetric === 'ren' ? ', % of generation' : ', MW')]} />
 				</div>
 				<div class="tools">
