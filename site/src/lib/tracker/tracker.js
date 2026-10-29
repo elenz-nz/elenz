@@ -1181,24 +1181,31 @@ export function mountTracker(D, hooks = {}) {
         l.cells.b.style.transform = `scaleX(${l.signed || tot <= 0 ? 0 : Math.max(0, e / tot)})`;
       }
       $('tot-q').textContent = en(tot); $('tot-s').textContent = layers.some(l => l.signed) && !topIsAll() ? 'net' : '100%';
-      let pn = 0, ps = 0, pk = 0, pkg = 0, hv = 0, em = 0, gw = 0, re = 0, hs = 0;
+      let pn = 0, ps = 0, pk = 0, pkg = 0, hv = 0, em = 0, gw = 0, re = 0, hs = 0, mt = 0, ud = 0;
       for (let i = 0; i < V.n; i++) {
-        const w = V.hrs[i]; hs += w; pn += V.pNI[i] * w; ps += V.pSI[i] * w; hv += V.hvdc[i] * w;
+        const w = V.hrs[i]; hs += w; pn += V.pNI[i] * w; ps += V.pSI[i] * w; hv += V.hvdc[i] * w; mt += V.metered[i] * w; ud += V.underlying[i] * w;
         pk = Math.max(pk, V.pkMet[i]); if (V.pkGen) pkg = Math.max(pkg, V.pkGen[i]);
         em += V.co2[i] * V.genR[i] * w; re += V.ren[i] * V.genR[i] * w; gw += V.genR[i] * w;
       }
+      const hvNet = Math.abs(hv) >= 1e6 ? ['HVDC, net transfer', (Math.abs(hv) / 1e6).toFixed(2), hv >= 0 ? 'TWh north' : 'TWh south']
+        : ['HVDC, net transfer', (Math.abs(hv) / 1000).toFixed(1), hv >= 0 ? 'GWh north' : 'GWh south'];
       setSys([
         ...plantRows(true),
         ['Price, North Island', money(pn / hs), 'avg'],
         ['Price, South Island', money(ps / hs), 'avg'],
         ['Peak demand, metered', fmt(pk), 'MW'],
         V.pkGen && ['Peak generation', fmt(pkg), 'MW'],
-        Math.abs(hv) >= 1e6 ? ['HVDC, net transfer', (Math.abs(hv) / 1e6).toFixed(2), hv >= 0 ? 'TWh north' : 'TWh south']
-          : ['HVDC, net transfer', (Math.abs(hv) / 1000).toFixed(1), hv >= 0 ? 'GWh north' : 'GWh south'],
+        hvNet,
         ['Emissions intensity', fmt(em / gw), 'g/kWh'],
         ['Renewable share', (re / gw).toFixed(1) + '%', ''],
       ]);
       for (const id of ['v-gen', 'v-pni', 'v-psi', 'v-met', 'v-und', 'v-hv', 'v-co2', 'v-ren']) $(id).textContent = '';
+      // a folded chart's line has no chart to hover, so away from the time line it shows the range's figure
+      if (hs > 0 && gw > 0) {
+        const rest = { price: [['v-pni', 'avg ' + money(pn / hs)], ['v-psi', 'avg ' + money(ps / hs)]], demand: [['v-met', `avg ${fmt(mt / hs)} MW`], ['v-und', `avg ${fmt(ud / hs)} MW`]],
+          hvdc: [['v-hv', `net ${hvNet[1]} ${hvNet[2]}`]], co2: [['v-co2', `avg ${fmt(em / gw)} g/kWh`]], ren: [['v-ren', `avg ${(re / gw).toFixed(1)}%`]] };
+        for (const k of state.fold) for (const [id, t] of rest[k] || []) $(id).textContent = t;
+      }
       return;
     }
     const [when, sub] = heading(j), long = isLong();
