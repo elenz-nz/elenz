@@ -4,6 +4,8 @@
 
 <h2 id="shows">What the chart shows</h2>
 <p>The generation chart stacks every source in MW, from the base: geothermal, bioenergy, waste heat, Huntly’s coal/gas Rankine units, gas, diesel, hydro, wind, grid-scale solar and embedded solar (hatched, as it is an estimate), with batteries as a separate layer (below zero while charging). On an island’s own chart, HVDC is shown like the batteries: arriving over the link it is stacked on top, leaving it goes below zero, so the top of the stack is what the island generated plus what it imported. It can also show each source as a percentage of total generation, group the sources in other ways (see <a href="/methods/groupings">groupings</a>), and drill down from a fuel to its plants, and from a plant to its grid connections or units.</p>
+<p>The chart buttons switch it between the stack and lines: each source drawn on its own from zero, in the same units, so plants or fuels can be compared directly. Fuels and groups keep their colours; when two to eight plants or sites of one fuel are shown, each gets its own colour from a separate palette chosen to stay distinguishable with colour-blindness, and keeps it while others are hidden or shown. Embedded solar is dashed and HVDC dotted. The stack’s highest and lowest points are labelled; the lines view leaves that to the tooltip and the list.</p>
+<p>$ Price draws the island reference prices over the chart on a right-hand axis (both for New Zealand, the island’s own on an island’s chart), on the same spike-proof scale as the Prices tab (see <a href="/methods/prices#scales">price scales</a>). It is off unless chosen. Each chart’s unit is written under the top label of its axis: MW for 5-minute and half-hourly points, energy (MWh, GWh or TWh) for days and longer, or % for shares.</p>
 
 <h2 id="live">The live week: dispatch data</h2>
 <p>Every five minutes the system operator runs a dispatch case: a solve of the whole market that sets each generating unit’s output for the next interval and the price at every node. The site reads each case from the Electricity Authority’s real-time dispatch feed, usually a minute or two after the interval starts, and keeps the last seven days at 5-minute resolution.</p>
@@ -52,7 +54,8 @@
 	<li><b>Te Mihi</b>: Te Mihi 1 and 2.</li>
 	<li><b>Southdown</b>: Southdown and Southdown 5.</li>
 </ul>
-<p>Two plants generate onto two buses and can be split by grid connection: Arapuni (<code>ARI1101</code>, <code>ARI1102</code>) and Roxburgh (<code>ROX2201</code>, <code>ROX1101</code>).</p>
+<p>Three plants generate onto two buses and can be split by grid connection: Arapuni (<code>ARI1101</code>, <code>ARI1102</code>), Roxburgh (<code>ROX2201</code>, <code>ROX1101</code>) and West Wind (<code>WWD1102</code>, <code>WWD1103</code>). The metered history has more than one point for some other plants, but those are meters rather than grid connections (an embedded plant’s local network point, a connection that moved), so those plants are shown whole.</p>
+<p>The metered history sees the stations above only whole, so over a range that reaches back into it they show a “Whole station (metered)” row beside their units, which cover only the dispatch data’s weeks.</p>
 
 <h2 id="totals">Totals, peaks and capacity</h2>
 <p class="formula">Total generation = Σ every source’s output while positive

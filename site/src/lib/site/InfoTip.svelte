@@ -40,4 +40,8 @@
 	.info-pop-tip :global(a) { color: var(--accent); }
 	.info-pop-tip :global(p) { margin: 0 0 6px; }
 	.info-pop-tip :global(p:last-child) { margin-bottom: 0; }
+	/* a note in short points: one idea a line, easier to read than a paragraph */
+	.info-pop-tip :global(ul) { margin: 0 0 8px; padding-left: 1.1em; }
+	.info-pop-tip :global(li) { margin: 0 0 4px; }
+	.info-pop-tip :global(li::marker) { color: var(--muted); }
 </style>

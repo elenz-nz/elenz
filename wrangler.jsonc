@@ -20,6 +20,9 @@
   "assets": {
     "directory": "./site/build",
     "binding": "ASSETS",
+    // an address with no file gets the site's not-found page (site/build/404.html, from src/routes/404) with status
+    // 404, instead of an empty reply (blank on phones). SITE-07, 30 Oct 2026.
+    "not_found_handling": "404-page",
     // the Worker answers /data/* itself, and adds link-preview tags to the tracker's pages (worker/index.js)
     "run_worker_first": ["/data/*", "/tracker", "/tracker/prices"]
   },

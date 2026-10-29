@@ -10,7 +10,10 @@ export default defineConfig({
 				runes: ({ filename }) =>
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
-			adapter: adapter()
+			adapter: adapter(),
+			// asset addresses from the site root (/_app/...), not relative to the page: the not-found page (404.html) is
+			// served at any address, e.g. /records/not-a-record, where relative ones would point to /records/_app/...
+			paths: { relative: false }
 		})
 	]
 });

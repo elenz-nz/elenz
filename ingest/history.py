@@ -400,7 +400,7 @@ def daily(js, month):
         q = {k: p[k] for k in ('name', 'fuel', 'isl', 'poc', 'cap')}
         q['s'] = mean(p['s'])
         if 'units' in p:
-            q['units'] = [{'name': u['name'], 'cap': u['cap'], 's': mean(u['s'])} for u in p['units']]
+            q['units'] = [{**{k: u[k] for k in ('name', 'cap', 'label') if k in u}, 's': mean(u['s'])} for u in p['units']]
         out['plants'].append(q)
     return out
 
@@ -429,12 +429,17 @@ def combine_days(dds):
             q = plants.get(key)
             if q is None:
                 q = plants[key] = {'name': p['name'], 'fuel': p['fuel'], 'isl': p['isl'], 'poc': [], 'cap': None,
-                                   's': np.zeros(n), 'units': {}}
+                                   's': np.zeros(n), 'units': {}, 'whole': []}
             q['s'][pos:pos + m] = p['s']
             q['poc'] = sorted(set(q['poc']) | set(p['poc']))
             q['cap'] = p['cap'] if p['cap'] is not None else q['cap']   # the latest month's capacity
             for u in p.get('units', []):
-                q['units'].setdefault(u['name'], {'name': u['name'], 'cap': u['cap'], 's': np.zeros(n)})['s'][pos:pos + m] = u['s']
+                qu = q['units'].setdefault(u['name'], {'name': u['name'], 'cap': u['cap'], 's': np.zeros(n)})
+                qu['s'][pos:pos + m] = u['s']
+                if u.get('label'):
+                    qu['label'] = u['label']
+            if 'units' not in p:
+                q['whole'].append((pos, m, p['s'], p['poc']))
         pos += m
         for isl in ('NI', 'SI'):  # a series missing from a month (no output anywhere) is zero
             for k, v in out[isl].items():
@@ -443,10 +448,17 @@ def combine_days(dds):
             v += [None] * (pos - len(v))
     out['N'] = n
     for q in plants.values():
+        # a month where the plant wasn't split (one grid connection that month) still counts in its units, so they add
+        # up to the plant: on its connection, or as the whole station (as series.js concat does on the site)
+        if q['units']:
+            for at, m, s, poc in q['whole']:
+                name = poc[0] if len(poc) == 1 else f"{q['name']} (all units)"
+                q['units'].setdefault(name, {'name': name, 'cap': None, 's': np.zeros(n)})['s'][at:at + m] = s
         entry = {k: q[k] for k in ('name', 'fuel', 'isl', 'poc', 'cap')}
         entry['s'] = enc(q['s'])
         if len(q['units']) > 1:
-            entry['units'] = [{'name': u['name'], 'cap': u['cap'], 's': enc(u['s'])} for u in sorted(q['units'].values(), key=lambda u: u['name'])]
+            entry['units'] = [{**{k: u[k] for k in ('name', 'cap', 'label') if k in u}, 's': enc(u['s'])}
+                              for u in sorted(q['units'].values(), key=lambda u: u['name'])]
         out['plants'].append(entry)
     out['plants'].sort(key=lambda p: (p['fuel'], -sum(p['s'])))
     return out

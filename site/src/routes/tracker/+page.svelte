@@ -11,6 +11,7 @@
 	import ShareLink from '#lib/site/ShareLink.svelte';
 	import DownloadMenu from '#lib/site/DownloadMenu.svelte';
 	import { barHeight } from '#lib/site/sticky.js';
+	import { FOLD_DEFAULT } from '#lib/site/viewurl.js';
 
 	type Meta = { intervals: number; expected: number; end: number; api_from: number | null; built: number };
 
@@ -72,7 +73,7 @@
 		if (!t) return [];
 		return [
 			{ label: 'Generation chart', sub: 'Image with title, dates, sources and credit', kind: 'PNG' as const, run: () => t.image('gen') },
-			{ label: 'All six charts', sub: 'Generation, price, demand, HVDC, emissions and renewables', kind: 'PNG' as const, run: () => t.image('all') },
+			{ label: 'All charts shown', sub: 'Generation and each chart open under it', kind: 'PNG' as const, run: () => t.image('all') },
 			{ label: 'Data for this view', sub: 'Every source shown, prices, demand, HVDC and emissions', kind: 'CSV' as const, run: () => t.csv() },
 		];
 	};
@@ -132,29 +133,62 @@
 <!-- each chart's ⓘ: what it shows and how it's made (the notes that used to sit under the charts) -->
 {#snippet chartInfo(id: string)}
 	{#if id === 'gen'}
-		<p>Each source's output, stacked. The live week is the market's 5-minute dispatch; history is metered output wherever the EA has published it (about six weeks behind). Embedded solar (hatched) is estimated. On one island's chart, HVDC arriving is stacked on top and HVDC leaving goes below zero, like battery charging.</p>
+		<ul>
+			<li>Each source's output, stacked, or one line each with the chart buttons (to compare plants or fuels).</li>
+			<li>The live week is the market's 5-minute dispatch; history is metered output wherever the EA has published it (about six weeks behind).</li>
+			<li>Embedded solar (hatched) is estimated.</li>
+			<li>On one island's chart, HVDC arriving is stacked on top and HVDC leaving goes below zero, like battery charging.</li>
+			<li>$ Price adds the island reference prices on a right axis, spike-proof like the Prices tab.</li>
+		</ul>
 		<p id="gen-note" hidden></p>
 		<p><a href="/methods/generation">How generation is built</a></p>
 	{:else if id === 'price'}
-		<p>Spot prices at the island reference nodes, Haywards (North Island) and Benmore (South Island): dispatch prices for the live week, the EA's final prices for history. Long ranges show averages; the Prices tab has the spread and the spikes.</p>
+		<ul>
+			<li>Spot prices at the island reference nodes, Haywards (North Island) and Benmore (South Island).</li>
+			<li>Dispatch prices for the live week, the EA's final prices for history.</li>
+			<li>Long ranges show averages; the Prices tab has the spread and the spikes.</li>
+		</ul>
 		<p><a href="/methods/prices">How prices are shown</a></p>
 	{:else if id === 'demand'}
-		<p>Electricity taken from the grid (solid), and with estimated embedded solar added back (dashed, with its uncertainty band), which is closer to what was actually used. Long ranges show averages; the summary gives each day's peak.</p>
+		<ul>
+			<li>Solid: electricity taken from the grid.</li>
+			<li>Dashed: with estimated embedded solar added back, closer to what was actually used (the band is its uncertainty).</li>
+			<li>Long ranges show averages; the summary gives each day's peak.</li>
+		</ul>
 		<p><a href="/methods/demand">How demand is worked out</a></p>
 	{:else if id === 'hvdc'}
-		<p>Transfer between Benmore and Haywards, northward positive. Metered once the EA publishes it, about two weeks after each month; before that, estimated from each island's generation and demand (about 10 MW out on average).</p>
+		<ul>
+			<li>Transfer between Benmore and Haywards, northward positive.</li>
+			<li>Metered once the EA publishes it, about two weeks after each month.</li>
+			<li>Before that, estimated from each island's generation and demand (about 10 MW out on average).</li>
+		</ul>
 		<p><a href="/methods/hvdc">How HVDC is worked out</a></p>
 	{:else if id === 'co2'}
-		<p>Emissions for each kWh generated: each plant's output times its fuel's emission factor, with Huntly's Rankine units at Genesis's quarterly coal share and each geothermal station's own factor.</p>
+		<ul>
+			<li>Grams of CO₂-equivalent for each kWh generated: each plant's output times its fuel's emission factor.</li>
+			<li>Huntly's Rankine units at Genesis's quarterly coal share.</li>
+			<li>Each geothermal station at its own factor.</li>
+		</ul>
 		<p><a href="/methods/emissions">How emissions are worked out</a></p>
 	{:else}
-		<p>Renewable output as a share of all generation, embedded solar included. Geothermal counts as renewable, although it emits some CO₂.</p>
+		<ul>
+			<li>Renewable output as a share of all generation, embedded solar included.</li>
+			<li>Geothermal counts as renewable, although it emits some CO₂.</li>
+		</ul>
 		<p><a href="/methods/groupings#renewable">How shares are worked out</a></p>
 	{/if}
 {/snippet}
 
 {#snippet info(id: string)}
 	<InfoTip label="About this chart">{@render chartInfo(id)}</InfoTip>
+{/snippet}
+
+<!-- a lower chart's title folds it to one line (title, ⓘ, the value at the time line) or opens it; tracker.js keeps
+     the state (address key fold) and sets aria-expanded -->
+{#snippet foldTitle(id: string, title: string)}
+	<h2 class="fold-h"><button type="button" class="fold-btn" data-fold={id} aria-expanded={!FOLD_DEFAULT.includes(id)} aria-controls={`cv-${id}`}>
+		<svg class="chev" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5l3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>{title}
+	</button></h2>
 {/snippet}
 
 {#snippet popBtn(id: string, name: string)}
@@ -180,7 +214,8 @@
 		<div class="status">
 			<span class="tstatus" role="status">{status}</span>
 			{#if meta}
-				{#if view && (view.kind !== 'live' || view.past) && !view.loading && !view.error}
+				{#if view && (view.kind !== 'live' || view.past) && !view.error}
+					<!-- also while that history loads: it flashed Live on every step through 30 days (TRK-05, 26 Oct 2026) -->
 					<span class="pill hist" title="History from the EA's daily dispatch files">History</span>
 				{:else if live}
 					<span class="pill live" title="Data to {when(meta.end)}. Updated from the EMI real-time dispatch feed every 5 minutes"><span class="pword">Live · </span>{clockOnly(meta.end)}</span>
@@ -267,7 +302,7 @@
 		<section class="charts" id="charts" tabindex="0" aria-label="Generation chart. Hover or use the left and right arrow keys to read values at a point in time, Page Up and Page Down to move by the range; Escape returns to range totals.">
 			<div class="chart gen" class:popped={popped === 'gen'}>
 				<div class="ch-head">
-					<h2 class="crumbs" id="gen-title">Generation</h2>{@render info('gen')}<span class="unit" id="gen-unit">MW, stacked by fuel</span>
+					<h2 class="crumbs" id="gen-title">Generation</h2>{@render info('gen')}
 					<div class="legends">
 						<span class="lg" id="lg-tot">Total <b id="v-gen"></b></span>
 						<select class="grp" id="sel-view" aria-label="Group the generation sources">
@@ -278,12 +313,17 @@
 							<option value="owner">By owner</option>
 							<option value="flex">Flexibility</option>
 							<option value="rf">Renewable vs fossil</option>
-							<option value="vre">Inverter-based vs synchronous</option>
+							<option value="vre">Inverter vs synchronous</option>
 						</select>
 						<div class="seg" role="group" aria-label="Show generation as an amount (MW, or energy on long ranges) or as a share of total generation" id="seg-unit">
 							<button type="button" data-v="mw" aria-pressed="true">MW</button>
 							<button type="button" data-v="pct" aria-pressed="false">%</button>
 						</div>
+						<div class="seg" role="group" aria-label="Chart type: stacked areas, or one line per source to compare them" id="seg-chart">
+							<button type="button" data-v="stacked" aria-pressed="true" aria-label="Stacked" title="Stacked: sources piled up to the total"><svg width="16" height="14" viewBox="0 0 16 14" aria-hidden="true"><path d="M1 13V9l4-2 5 1 5-3v8z" fill="currentColor" opacity="0.45" /><path d="M1 9V5l4-3 5 2 5-3v4l-5 3-5-1z" fill="currentColor" /></svg></button>
+							<button type="button" data-v="lines" aria-pressed="false" aria-label="Lines" title="Lines: each source on its own, to compare them"><svg width="16" height="14" viewBox="0 0 16 14" aria-hidden="true"><path d="M1 11l4-3 4 2 6-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /><path d="M1 5l4 2 4-3 6 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" opacity="0.5" /></svg></button>
+						</div>
+						<button type="button" class="tgl" id="btn-price" aria-pressed="false" title="Draw the wholesale price over this chart, on a right axis">$ Price</button>
 					</div>
 					{@render popBtn('gen', 'generation')}
 				</div>
@@ -297,10 +337,10 @@
 		</section>
 
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-		<section class="charts" id="charts-more" tabindex="0" aria-label="Price, demand, HVDC, emissions and renewables charts, on the same time axis as generation.">
-			<div class="chart" class:popped={popped === 'price'}>
+		<section class="charts" id="charts-more" tabindex="0" aria-label="Price, renewable share, demand, HVDC and emissions charts, on the same time axis as generation.">
+			<div class="chart folded" class:popped={popped === 'price'}>
 				<div class="ch-head">
-					<h2>Wholesale price</h2>{@render info('price')}<span class="unit">$/MWh</span>
+					{@render foldTitle('price', 'Wholesale price')}{@render info('price')}
 					<div class="legends">
 						<span class="lg" id="lg-pni"><i style="--c:var(--p-ni)"></i>North Island · Haywards <b id="v-pni"></b></span>
 						<span class="lg" id="lg-psi"><i style="--c:var(--p-si)"></i>South Island · Benmore <b id="v-psi"></b></span>
@@ -310,9 +350,14 @@
 				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
 				<canvas id="cv-price" role="img" aria-label="Line chart of reference node prices"></canvas>
 			</div>
-			<div class="chart" class:popped={popped === 'demand'}>
+			<div class="chart folded" class:popped={popped === 'ren'}>
+				<div class="ch-head">{@render foldTitle('ren', 'Renewable share')}{@render info('ren')}<div class="legends"><span class="lg"><i style="--c:var(--accent)"></i>Renewables <b id="v-ren"></b></span></div>{@render popBtn('ren', 'renewable share')}</div>
+				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
+				<canvas id="cv-ren" role="img" aria-label="Line chart of renewable share with the time axis"></canvas>
+			</div>
+			<div class="chart folded" class:popped={popped === 'demand'}>
 				<div class="ch-head">
-					<h2>Demand</h2>{@render info('demand')}<span class="unit">MW</span>
+					{@render foldTitle('demand', 'Demand')}{@render info('demand')}
 					<div class="legends">
 						<span class="lg"><i style="--c:var(--ink)"></i>Metered <b id="v-met"></b></span>
 						<span class="lg"><i class="dash" style="--c:var(--ink-2)"></i>With embedded solar <b id="v-und"></b></span>
@@ -322,20 +367,15 @@
 				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
 				<canvas id="cv-demand" role="img" aria-label="Line chart of metered and underlying demand"></canvas>
 			</div>
-			<div class="chart" class:popped={popped === 'hvdc'}>
-				<div class="ch-head"><h2>HVDC transfer</h2>{@render info('hvdc')}<span class="unit">MW, northward positive</span><div class="legends"><span class="lg"><i class="area" style="--c:var(--f-hvdc)"></i>Benmore ⇄ Haywards <b id="v-hv"></b></span></div>{@render popBtn('hvdc', 'HVDC transfer')}</div>
+			<div class="chart folded" class:popped={popped === 'hvdc'}>
+				<div class="ch-head">{@render foldTitle('hvdc', 'HVDC transfer')}{@render info('hvdc')}<div class="legends"><span class="lg"><i class="area" style="--c:var(--f-hvdc)"></i>Benmore ⇄ Haywards <b id="v-hv"></b></span></div>{@render popBtn('hvdc', 'HVDC transfer')}</div>
 				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
 				<canvas id="cv-hvdc" role="img" aria-label="Area chart of HVDC transfer between the islands"></canvas>
 			</div>
-			<div class="chart" class:popped={popped === 'co2'}>
-				<div class="ch-head"><h2>Emissions intensity</h2>{@render info('co2')}<span class="unit">g CO₂e/kWh · <a class="unit-link" href="/methods/emissions">CO₂ per kWh generated</a></span><div class="legends"><span class="lg"><i class="area" style="--c:var(--co2)"></i>Generation mix <b id="v-co2"></b></span></div>{@render popBtn('co2', 'emissions intensity')}</div>
+			<div class="chart folded" class:popped={popped === 'co2'}>
+				<div class="ch-head">{@render foldTitle('co2', 'Emissions intensity')}{@render info('co2')}<div class="legends"><span class="lg"><i class="area" style="--c:var(--co2)"></i>Generation mix <b id="v-co2"></b></span></div>{@render popBtn('co2', 'emissions intensity')}</div>
 				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
 				<canvas id="cv-co2" role="img" aria-label="Area chart of emissions intensity"></canvas>
-			</div>
-			<div class="chart" class:popped={popped === 'ren'}>
-				<div class="ch-head"><h2>Renewable share</h2>{@render info('ren')}<span class="unit">% of generation</span><div class="legends"><span class="lg"><i style="--c:var(--accent)"></i>Renewables <b id="v-ren"></b></span></div>{@render popBtn('ren', 'renewable share')}</div>
-				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
-				<canvas id="cv-ren" role="img" aria-label="Line chart of renewable share with the time axis"></canvas>
 			</div>
 		</section>
 		{#if popped}<button type="button" class="pop-backdrop" aria-label="Close the enlarged chart" onclick={() => (popped = null)}></button>{/if}
@@ -357,15 +397,19 @@
 						<dt>Read a time</dt>
 						<dd>Hover a chart, or touch and slide on a phone. With a chart focused, ← → move one point (Shift: further), Home and End jump to the ends.</dd>
 						<dt>Pin it</dt>
-						<dd>Click a chart to hold the time line there; click it again, Release or Escape to let go. Share can then mark that time.</dd>
+						<dd>Click a chart to hold the time line there; click it again, Release or Escape to let go. It stays put when you change the grouping, region or chart type. On a phone the line stays where your finger lifts; tap it again to let go. Share can then mark that time.</dd>
 						<dt>Move through history</dt>
 						<dd>Range, interval and region are in the bar at the top. The ‹ › arrows beside the date, on the generation chart, or Page Up and Page Down step back and forward by the range; the date box jumps to a day; Latest comes back.</dd>
 						<dt>Zoom in</dt>
 						<dd>Drag across any chart to zoom into that stretch; every chart follows. The arrow beside 1D picks the last 1, 3, 6 or 12 hours. While zoomed, the date box gains a time: pick the date and time the zoomed hours should end (NZ time) to move them there, or the ‹ › arrows step by the zoom’s length; Reset zoom in the bar (or Escape twice) shows the whole range again.</dd>
 						<dt>Break it down</dt>
 						<dd>Select a name in this list to go from a fuel to its plants and their grid connections. ‹ Back above the list, or the browser’s Back, steps out. The menu above the generation chart groups it other ways (owner, site, flexibility…), and MW/% switches to shares.</dd>
+						<dt>Compare sources</dt>
+						<dd>The two chart buttons beside MW/% switch the generation chart between stacked areas and lines, one per source, so plants or fuels can be compared on one scale: drill into a fuel or choose By site, then hide what you don’t need or use “show only this”. Up to eight lines get their own colours. $ Price draws the island prices over the chart on a right axis (spike-proof: linear to about $100, compressed above); select it again to take them off.</dd>
 						<dt>Hide and show</dt>
 						<dd>Select a colour square to hide that layer. Double-click it, Shift+click it or press and hold it to show only that one (again to show everything); All and None above the list do the rest. In long lists, type in Filter, and select a fuel heading to fold its plants.</dd>
+						<dt>Open more charts</dt>
+						<dd>The charts under generation start folded to one line each: its value at the time line, or for the whole range when nothing is selected. Select a title to open that chart, and again to fold it. Price can also go over the generation chart ($ Price), and the share card further down charts the renewable share.</dd>
 						<dt>Enlarge, share, download</dt>
 						<dd>The corner button on each chart enlarges it, and ⓘ beside it says what the chart shows and how it’s made. Share copies a link to this view, live or for the dates shown; Download gives the charts as a picture or the data as a spreadsheet file. The address always holds the whole view, so it can be bookmarked.</dd>
 					</dl>

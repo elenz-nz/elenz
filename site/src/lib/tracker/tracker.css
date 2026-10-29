@@ -5,6 +5,8 @@
   --f-coal: #4b4744; --f-gas: #d9731f; --f-geo: #a63a78; --f-hydro: #2f6db8; --f-wind: #2f9a78;
   --f-solar: #c48e10; --f-batt: #7356c4; --f-hvdc: #71838f; --co2: #6d5a4c;
   --o1: #f58025; --o2: #39a0b8; --o3: #e02030; --o4: #e2c400; --o5: #a8690c; --o6: #55605f;
+  /* line palette (generation chart, lines view): eight hues checked for colour-blind separation on --surface */
+  --l1: #2a78d6; --l2: #eb6834; --l3: #1baf7a; --l4: #eda100; --l5: #e87ba4; --l6: #008300; --l7: #6250d6; --l8: #e34948;
   --f-diesel: #b23a2a; --f-bio: #6b8a23; --f-waste: #8a6a55; --g-fossil: #96501a; --g-ren: #208a68; --g-fast: #2b7fa8; --g-vre: #a39a1a; --g-resid: #2f5aa8;
   --p-ni: #132020; --p-si: #0d6275; --live-bg: #dcefe4; --live-ink: #1d6440;
   --font-ui: "Schibsted Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -16,7 +18,7 @@
     --line: #2f3e3e; --grid: #243030; --land: #2e3d3d; --accent: #5cb5c8; --accent-soft: #163239; --warn-bg: #2e2412; --warn-ink: #e9c98a;
     --f-coal: #5f5a57; --f-gas: #cc7a2e; --f-geo: #c4508f; --f-hydro: #4f8bd6; --f-wind: #2fa883;
     --f-solar: #bb8c18; --f-batt: #8a72d8; --f-hvdc: #7f909b; --co2: #a8927f;
-    --o1: #f08a3c; --o2: #4fb3cb; --o3: #e5484d; --o4: #e0c51c; --o5: #c78a1a; --o6: #a9b4b3;
+    --o1: #f08a3c; --o2: #4fb3cb; --o3: #e5484d; --o4: #e0c51c; --o5: #c78a1a; --o6: #a9b4b3; --l1: #3987e5; --l2: #d95926; --l3: #199e70; --l4: #c98500; --l5: #d55181; --l6: #008300; --l7: #9085e9; --l8: #e66767;
     --f-diesel: #bf3a52; --f-bio: #8fb03c; --f-waste: #a88a74; --g-fossil: #a8693a; --g-ren: #2ea88a; --g-fast: #3c97c2; --g-vre: #9a9020; --g-resid: #5784d0;
     --p-ni: #e1e9e9; --p-si: #5cb5c8; --live-bg: #16301f; --live-ink: #8fd3a8;
     color-scheme: dark;
@@ -27,7 +29,7 @@
   --line: #2f3e3e; --grid: #243030; --land: #2e3d3d; --accent: #5cb5c8; --accent-soft: #163239; --warn-bg: #2e2412; --warn-ink: #e9c98a;
   --f-coal: #5f5a57; --f-gas: #cc7a2e; --f-geo: #c4508f; --f-hydro: #4f8bd6; --f-wind: #2fa883;
   --f-solar: #bb8c18; --f-batt: #8a72d8; --f-hvdc: #7f909b; --co2: #a8927f;
-  --o1: #f08a3c; --o2: #4fb3cb; --o3: #e5484d; --o4: #e0c51c; --o5: #c78a1a; --o6: #a9b4b3;
+  --o1: #f08a3c; --o2: #4fb3cb; --o3: #e5484d; --o4: #e0c51c; --o5: #c78a1a; --o6: #a9b4b3; --l1: #3987e5; --l2: #d95926; --l3: #199e70; --l4: #c98500; --l5: #d55181; --l6: #008300; --l7: #9085e9; --l8: #e66767;
   --f-diesel: #bf3a52; --f-bio: #8fb03c; --f-waste: #a88a74; --g-fossil: #a8693a; --g-ren: #2ea88a; --g-fast: #3c97c2; --g-vre: #9a9020; --g-resid: #5784d0;
   --p-ni: #e1e9e9; --p-si: #5cb5c8; --live-bg: #16301f; --live-ink: #8fd3a8;
   color-scheme: dark;
@@ -87,6 +89,12 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .seg button { font: inherit; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.02em; border: 1px solid transparent; background: transparent; color: var(--ink-2); padding: 2px 9px; min-height: 26px; border-radius: 3px; cursor: pointer; white-space: nowrap; }
 .seg button:hover { color: var(--ink); background: color-mix(in srgb, var(--surface) 60%, transparent); }
 .seg button[aria-pressed="true"] { background: var(--surface); border-color: var(--ink-2); color: var(--ink); font-weight: 600; }
+.seg button svg { display: block; }
+/* an on/off button beside the segmented controls (the price over the generation chart) */
+.tgl { font: inherit; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.02em; min-height: 30px; padding: 2px 10px; border-radius: 4px; border: 1px solid var(--line); background: transparent; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
+.tgl:hover { color: var(--ink); border-color: var(--muted); }
+.tgl[aria-pressed="true"] { background: var(--surface); border-color: var(--ink-2); color: var(--ink); font-weight: 600; box-shadow: inset 0 -2px 0 var(--p-si); }
+.tgl:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* the region and month pickers: boxed, with a chevron, so they read as dropdowns (owner's call, Oct 2026) */
 select.pick { font: inherit; font-size: 0.95rem; font-weight: 700; color: var(--ink); background-color: var(--surface); cursor: pointer; border: 1px solid var(--line); border-radius: 4px; padding: 3px 26px 3px 9px; appearance: none;
   background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
@@ -135,6 +143,7 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 .plot { position: relative; }
 .nav { position: absolute; top: calc(50% - 33px); width: 30px; height: 44px; display: grid; place-items: center; padding: 0; border-radius: 4px; border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 88%, transparent); color: var(--ink-2); cursor: pointer; opacity: 0.7; }
 .nav.prev { left: 54px; } .nav.next { right: 16px; }
+.chart.priced .nav.next { right: 54px; }   /* clear of the price axis */
 .nav:hover:not(:disabled), .nav:focus-visible { opacity: 1; color: var(--ink); background: var(--surface); }
 .nav:disabled { opacity: 0.25; cursor: default; }
 .nav[hidden] { display: none; }
@@ -153,7 +162,7 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 .tip-r i.hatch { background: repeating-linear-gradient(135deg, var(--c) 0 2px, transparent 2px 4px); box-shadow: inset 0 0 0 1px var(--c); }
 .tip-r b { font-family: var(--font-data); font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
 .tip-r small { color: var(--muted); font-size: 0.74rem; white-space: nowrap; }
-.charts { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 6px 4px 8px; min-width: 0; touch-action: pan-y; }
+.charts { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 6px 4px 8px; min-width: 0; touch-action: pan-y pinch-zoom; }
 .chart { padding: 12px 10px 6px; position: relative; }
 .chart .ch-head { padding-right: 30px; }
 .chart + .chart { border-top: 1px solid var(--line); }
@@ -169,6 +178,32 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 .ch-head .unit { color: var(--muted); font-size: 0.78rem; }
 /* a card's ⓘ sits right after its title (owner's call, Oct 2026): .ch-head's gap pulled in, or the title in .ttl-row */
 .ch-head .info-tip { margin-left: -10px; align-self: center; width: 24px; height: 24px; }
+/* the charts under generation fold to one line from their title (tracker.js syncFold): the heading stays, with its
+   value at the time line; the canvas and the enlarge button go */
+.fold-h { margin: 0; }
+.fold-btn { display: inline-flex; align-items: center; gap: 5px; margin: -3px 0 -3px -4px; padding: 3px 4px; border: 0; border-radius: 4px; background: none; color: inherit; font: inherit; cursor: pointer; }
+.fold-btn:hover { background: var(--grid); }
+.fold-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.fold-btn .chev { flex: none; color: var(--muted); transition: transform 0.15s; }
+.chart.folded .fold-btn .chev { transform: rotate(-90deg); }
+.chart.folded { padding-bottom: 10px; }
+.chart.folded .ch-head { padding-right: 0; }
+.lg .pre { font-family: var(--font-ui); font-weight: 400; color: var(--muted); }
+.chart.folded canvas, .chart.folded .pop-btn { display: none; }
+.chart.folded .ch-head h2 { color: var(--ink-2); }
+.chart.popped .fold-btn { pointer-events: none; }
+/* phones: a folded chart stays one line, its title then just its figures (each still has its colour key; the names are
+   in the open chart's key, the ⓘ and the tooltip), without "avg"/"net" */
+@media (max-width: 560px) {
+  .chart.folded .ch-head { flex-wrap: nowrap; align-items: center; gap: 4px 8px; }
+  .chart.folded .ch-head h2 { flex: none; }
+  .chart.folded .legends { flex-wrap: nowrap; gap: 4px 10px; min-width: 0; }
+  .chart.folded .lg { font-size: 0; gap: 4px; white-space: nowrap; }
+  .chart.folded .lg b { font-size: 0.78rem; }
+  .chart.folded .lg .pre { display: none; }
+}
+.chart.popped .fold-btn .chev { display: none; }
+@media (prefers-reduced-motion: reduce) { .fold-btn .chev { transition: none; } }
 .ttl-row { display: flex; align-items: center; gap: 2px; min-width: 0; }
 .ttl-row h2 { min-width: 0; }
 .ch-head .unit-link { color: inherit; text-decoration: underline dotted; text-underline-offset: 2px; }
@@ -303,6 +338,13 @@ a { color: var(--accent); }
   .mast-r { gap: 0; }
   .pages a { padding: 6px 7px; font-size: 0.86rem; }
   #cv-gen { height: 264px; }
+  /* the generation chart's header in two rows: title and grouping, then the buttons and the total */
+  .chart.gen .legends { display: contents; }
+  .chart.gen #sel-view { order: 1; }
+  .chart.gen .ch-head .seg, .chart.gen #btn-price { order: 2; }
+  .chart.gen #lg-tot { order: 3; }
+  .chart.gen .ch-head { gap: 6px 8px; align-items: center; }
+  .chart.gen .ch-head .info-tip { margin-left: -6px; }
   .nav { width: 26px; height: 38px; }
   .seg button { padding: 2px 7px; }
   .ctl + .ctl { padding-left: 0; border-left: 0; }

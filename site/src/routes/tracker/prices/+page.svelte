@@ -8,7 +8,7 @@
 	import { fromLayout, historyStore, firstAtOrAfter, slice, nzOffset } from '#lib/tracker/series.js';
 	import Masthead from '#lib/site/Masthead.svelte';
 	import TrackerTabs from '#lib/site/TrackerTabs.svelte';
-	import { readView, writeView, midnightOf, addDays, ymd, endOfDay, describe, shareLinks } from '#lib/site/view.js';
+	import { readView, writeView, midnightOf, addDays, ymd, endOfDay, describe, shareLinks, setTitle } from '#lib/site/view.js';
 	import ShareLink from '#lib/site/ShareLink.svelte';
 	import { heatWindow, heatSource, monthRows } from '#lib/site/heat.js';
 	import { dateSettled, timeSettled } from '#lib/site/datefield.js';
@@ -22,6 +22,7 @@
 	import Context from '#lib/site/Context.svelte';
 	import PopButton from '#lib/site/PopButton.svelte';
 	import InfoTip from '#lib/site/InfoTip.svelte';
+	import { fitSelect } from '#lib/site/fitselect.js';
 	import { barHeight } from '#lib/site/sticky.js';
 	import { rangeName, span } from '#lib/site/context.js';
 	import {
@@ -156,7 +157,7 @@
 	const ownNow = () => ({ scale, hide: off, band: bandKey, zoom });
 	function save() {
 		writeView(sharedNow(), { query: ownNow() });
-		document.title = `${describe('prices', { ...sharedNow(), zoom })} · ELENZ`;
+		setTitle(`${describe('prices', { ...sharedNow(), zoom })} · ELENZ`);
 		try { localStorage.setItem('elenz-prices', JSON.stringify({ scale, off, band: bandKey, heat: heatKey })); } catch { /* storage blocked */ }
 	}
 	// the links the Share button offers: this view, live or fixed to its dates, and the pinned point (or one chosen with
@@ -745,22 +746,47 @@
 	<!-- each chart's ⓘ: what it shows and how it's made -->
 {#snippet chartInfo(id: string)}
 	{#if id === 'price'}
-		<p>Spot prices at six grid nodes: dispatch prices for the live week, the EA's final prices for history. Shading marks the times the islands were priced apart (Haywards and Benmore more than $10 and 10% apart). Spike-proof is linear to about $100 and compressed above, so spikes don't flatten everything else; Capped cuts at $600; Linear shows it straight. On longer ranges each period's price range at the chosen island.</p>
+		<ul>
+			<li>Spot prices at six grid nodes, in $/MWh: dispatch prices for the live week, the EA's final prices for history.</li>
+			<li>Shading marks the times the islands were priced apart (Haywards and Benmore more than $10 and 10% apart).</li>
+			<li>On 12 months and All: each day's, week's or month's half-hours at the chosen node, lowest to highest and the middle 80%, with the average as a line and the other island's average dashed.</li>
+			<li>Scales: Spike-proof is linear to about $100 and compressed above, so spikes don't flatten everything else; Capped cuts at $600; Linear shows it straight.</li>
+		</ul>
 		<p><a href="/methods/prices#scales">Price scales</a> · <a href="/methods/prices#dispatch">Dispatch and final prices</a></p>
 	{:else if id === 'spread'}
-		<p>Haywards less Benmore: above zero the North Island is dearer, often when the HVDC link can’t carry any more north.</p>
+		<ul>
+			<li>Haywards less Benmore, in $/MWh (on long ranges, each period's average).</li>
+			<li>Above zero the North Island is dearer, often when the HVDC link can’t carry any more north.</li>
+		</ul>
 		<p><a href="/methods/prices#derived">How the spread is worked out</a></p>
 	{:else if id === 'hvdc'}
-		<p>Transfer between Benmore and Haywards, northward positive: metered once the EA publishes it, estimated before that.</p>
+		<ul>
+			<li>Transfer between Benmore and Haywards in MW, northward positive.</li>
+			<li>Metered once the EA publishes it, estimated before that.</li>
+		</ul>
 		<p><a href="/methods/hvdc">How HVDC is worked out</a></p>
 	{:else}
-		<p>Half-hours over $500 and over $1,000/MWh at the chosen node, for each period.</p>
+		<ul>
+			<li>How many half-hours in each period were over $500 and over $1,000/MWh.</li>
+			<li>At the node chosen for the price range above.</li>
+		</ul>
 		<p><a href="/methods/prices#derived">How it's counted</a></p>
 	{/if}
 {/snippet}
 
 {#snippet info(id: string)}
 	<InfoTip label="About this chart">{@render chartInfo(id)}</InfoTip>
+{/snippet}
+
+<!-- the price chart's key (in its header, or under it on phones) -->
+{#snippet priceKey()}
+	{#if view?.mode === 'time'}
+		<span class="lg"><i class="area" style="--c: var(--warn-bg); opacity: 1"></i>Islands priced apart</span>
+	{:else}
+		<span class="lg"><i class="area" style="--c: var({bandKey === 'BEN' ? '--p-si' : '--p-ni'}); opacity: 0.25"></i>Low to high</span>
+		<span class="lg"><i class="area" style="--c: var({bandKey === 'BEN' ? '--p-si' : '--p-ni'}); opacity: 0.55"></i>Middle 80%</span>
+		<span class="lg"><i class="dash" style="--c: var({bandKey === 'BEN' ? '--p-ni' : '--p-si'})"></i>{bandKey === 'BEN' ? 'Haywards' : 'Benmore'}</span>
+	{/if}
 {/snippet}
 
 {#snippet popBtn(id: string, name: string)}
@@ -782,36 +808,28 @@
 			{#if view && priceY}
 				<div class="chart" class:popped={popped === 'price'}>
 					<div class="ch-head">
-						{#if view.mode === 'time'}
-							<h2>Wholesale price</h2>{@render info('price')}<span class="unit">$/MWh at each node</span>
-						{:else}
-							<h2>Price range</h2>{@render info('price')}<span class="unit">$/MWh, each {effInt === '1d' ? 'day' : effInt === '1w' ? 'week' : 'month'}'s half-hours</span>
-						{/if}
+						<h2>{view.mode === 'time' ? 'Wholesale price' : 'Price range'}</h2>{@render info('price')}
 						<div class="legends">
-							{#if view.mode === 'time'}
-								<span class="lg"><i class="area" style="--c: var(--warn-bg); opacity: 1"></i>Islands priced apart</span>
-							{:else}
-								<span class="lg"><i class="area" style="--c: var({bandKey === 'BEN' ? '--p-si' : '--p-ni'}); opacity: 0.25"></i>Low to high</span>
-								<span class="lg"><i class="area" style="--c: var({bandKey === 'BEN' ? '--p-si' : '--p-ni'}); opacity: 0.55"></i>Middle 80%</span>
-								<span class="lg"><i class="dash" style="--c: var({bandKey === 'BEN' ? '--p-ni' : '--p-si'})"></i>{bandKey === 'BEN' ? 'Haywards' : 'Benmore'}</span>
-								<div class="seg" role="group" aria-label="Node for the price range">
+							<!-- the key: here on wider screens, under the chart on phones (so the header keeps to two rows) -->
+							<span class="lg-set">{@render priceKey()}</span>
+							{#if view.mode !== 'time'}
+								<div class="seg node-seg" role="group" aria-label="Node for the price range">
 									{#each ['HAY', 'BEN'] as k}
 										<button type="button" aria-pressed={bandKey === k} onclick={() => { bandKey = k; save(); }}>{NODE[k].name}</button>
 									{/each}
 								</div>
 							{/if}
-							<div class="seg" role="group" aria-label="Price scale">
-								{#each SCALES as s}
-									<button type="button" aria-pressed={scale === s.k} title={s.title} onclick={() => { scale = s.k; save(); }}>{s.label}</button>
-								{/each}
-							</div>
+							<select class="grp scale-pick" aria-label="Price scale" title={SCALES.find((s) => s.k === scale)?.title} value={scale} use:fitSelect={scale}
+								onchange={(e) => { const v = e.currentTarget.value; if (SCALES.some((s) => s.k === v)) { scale = v; save(); } }}>
+								{#each SCALES as s}<option value={s.k}>{s.label}</option>{/each}
+							</select>
 						</div>
 						{@render popBtn('price', 'wholesale price')}
 					</div>
 					<div class="plot">
 						<TimeChart onzoom={view.mode === 'time' ? (a, b) => setZoom({ from: a, to: b }) : undefined} t={view.t} t0={view.t0} t1={view.t1} height={popped === 'price' ? popH : 266} showX {xTicks} y={priceY} fmt={fmtTick} layers={priceLayers} note={highNote} stamp={at >= 0 && hoverBy !== 'mouse' ? chip(at) : null}
 							shade={view.mode === 'time' ? view.shade : []} marks={capMarks} bind:hover onpoint={point('price')} onleave={leave} onpin={pin} {pinned}
-							label="Prices at the grid nodes over the range" zero />
+							label="Prices at the grid nodes over the range, $/MWh" zero unit="$/MWh" />
 						{#if canMove}
 							<button type="button" class="nav prev" aria-label="Previous {R.label}" title="Previous {R.label}" onclick={() => step(-1)}>
 								<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -821,6 +839,7 @@
 							</button>
 						{/if}
 					</div>
+					<div class="legends lg-foot">{@render priceKey()}</div>
 				</div>
 			{:else}
 				<p class="empty">{status || 'Loading…'}</p>
@@ -832,14 +851,14 @@
 			{#if view && priceY}
 				<div class="chart" class:popped={popped === 'spread'}>
 					<div class="ch-head">
-						<h2>Island spread</h2>{@render info('spread')}<span class="unit">Haywards − Benmore, $/MWh{view.mode === 'long' ? ', average' : ''}</span>
+						<h2>Island spread</h2>{@render info('spread')}
 						<div class="legends">
 							<span class="lg"><i class="area" style="--c: var(--o1)"></i>North Island dearer</span>
 							<span class="lg"><i class="area" style="--c: var(--o2)"></i>South Island dearer</span>
 						</div>
 						{@render popBtn('spread', 'island spread')}
 					</div>
-					<TimeChart onzoom={view.mode === 'time' ? (a, b) => setZoom({ from: a, to: b }) : undefined} t={view.t} t0={view.t0} t1={view.t1} height={popped === 'spread' ? popH : 120} y={spreadY} fmt={fmtSpread} zero showX={popped === 'spread'} {xTicks}
+					<TimeChart onzoom={view.mode === 'time' ? (a, b) => setZoom({ from: a, to: b }) : undefined} t={view.t} t0={view.t0} t1={view.t1} height={popped === 'spread' ? popH : 120} y={spreadY} fmt={fmtSpread} zero showX={popped === 'spread'} {xTicks} unit="$/MWh"
 						layers={view.mode === 'time' ? [{ kind: 'posneg', values: view.spread, pos: '--o1', neg: '--o2' }] : [{ kind: 'bars', values: view.P.spread, tok: '--o1', neg: '--o2', opacity: 0.85 }]}
 						shade={view.mode === 'time' ? view.shade : []} bind:hover onpoint={point('spread')} onleave={leave} onpin={pin} {pinned} label="The price gap between Haywards and Benmore" />
 				</div>
@@ -847,25 +866,25 @@
 				{#if view.mode === 'time'}
 					<div class="chart" class:popped={popped === 'hvdc'}>
 						<div class="ch-head">
-							<h2>HVDC transfer</h2>{@render info('hvdc')}<span class="unit">MW, northward positive</span>
+							<h2>HVDC transfer</h2>{@render info('hvdc')}
 							<div class="legends"><span class="lg"><i class="area" style="--c: var(--f-hvdc)"></i>Benmore ⇄ Haywards <b>{mw(valOf(view.hvdc))}</b></span></div>
 							{@render popBtn('hvdc', 'HVDC transfer')}
 						</div>
-						<TimeChart onzoom={view.mode === 'time' ? (a, b) => setZoom({ from: a, to: b }) : undefined} t={view.t} t0={view.t0} t1={view.t1} height={popped === 'hvdc' ? popH : 140} y={hvdcY} fmt={fmtMW} zero showX {xTicks}
+						<TimeChart onzoom={view.mode === 'time' ? (a, b) => setZoom({ from: a, to: b }) : undefined} t={view.t} t0={view.t0} t1={view.t1} height={popped === 'hvdc' ? popH : 140} y={hvdcY} fmt={fmtMW} zero showX {xTicks} unit="MW"
 							layers={[{ kind: 'area', values: view.hvdc, tok: '--f-hvdc', opacity: 0.5 }, { kind: 'line', values: view.hvdc, tok: '--f-hvdc', width: 1.3, dot: false }]}
 							shade={view.shade} bind:hover onpoint={point('hvdc')} onleave={leave} onpin={pin} {pinned} label="HVDC transfer between the islands" />
 					</div>
 				{:else if spikeY}
 					<div class="chart" class:popped={popped === 'spikes'}>
 						<div class="ch-head">
-							<h2>Price spikes</h2>{@render info('spikes')}<span class="unit">half-hours at {NODE[bandKey].name}</span>
+							<h2>Price spikes</h2>{@render info('spikes')}
 							<div class="legends">
 								<span class="lg"><i class="area" style="--c: var(--o1); opacity: 0.45"></i>Over $500</span>
 								<span class="lg"><i class="area" style="--c: var(--o1)"></i>Over $1,000</span>
 							</div>
 							{@render popBtn('spikes', 'price spikes')}
 						</div>
-						<TimeChart onzoom={view.mode === 'time' ? (a, b) => setZoom({ from: a, to: b }) : undefined} t={view.t} t0={view.t0} t1={view.t1} height={popped === 'spikes' ? popH : 140} y={spikeY} fmt={(v) => String(v)} showX {xTicks}
+						<TimeChart onzoom={view.mode === 'time' ? (a, b) => setZoom({ from: a, to: b }) : undefined} t={view.t} t0={view.t0} t1={view.t1} height={popped === 'spikes' ? popH : 140} y={spikeY} fmt={(v) => String(v)} showX {xTicks} unit="½-hours"
 							layers={[{ kind: 'bars', values: view.P[bandKey === 'BEN' ? 'SI' : 'NI'].n500, tok: '--o1', opacity: 0.45 }, { kind: 'bars', values: view.P[bandKey === 'BEN' ? 'SI' : 'NI'].n1000, tok: '--o1' }]}
 							bind:hover onpoint={point('spikes')} onleave={leave} onpin={pin} {pinned} label="Half-hours with prices over $500 and $1,000 in each period" />
 					</div>
@@ -897,7 +916,7 @@
 						<dt>Zoom in</dt>
 						<dd>On the live week and 30 days, drag across any chart to zoom into that stretch; every chart follows. The arrow beside 1D picks the last 1, 3, 6 or 12 hours. While zoomed, the date box gains a time: pick the date and time the zoomed hours should end (NZ time) to move them there. Reset zoom in the bar, Escape or a range button goes back.</dd>
 						<dt>Nodes and scales</dt>
-						<dd>Select a node's colour square in this list to hide or show its line. Spike-proof, Capped and Linear change the price chart's scale; on long ranges, choose the island whose price range is shown.</dd>
+						<dd>Select a node's colour square in this list to hide or show its line. The menu beside the price chart's title changes its scale (Spike-proof, Capped or Linear); on long ranges, choose the island whose price range is shown.</dd>
 						<dt>Enlarge, share, download</dt>
 						<dd>The corner button on each chart enlarges it; ⓘ says how it's made. Share copies a link to this view; Download gives the charts as a picture or the data as a spreadsheet file.</dd>
 					</dl>
@@ -992,6 +1011,19 @@
 
 <style>
 	.plot .nav { top: calc(50% - 22px); }
+	.lg-set { display: contents; }
+	.lg-foot { display: none; }
+	/* phones: the price chart's header in two rows (title, ⓘ and scale; then the node on long ranges), its key under
+	   the chart (owner's call, 29 Oct 2026) */
+	@media (max-width: 560px) {
+		.chart .ch-head { gap: 6px 8px; align-items: center; }
+		.chart .ch-head :global(.info-tip) { margin-left: -6px; }
+		.ch-head .legends { display: contents; }
+		.ch-head .lg-set { display: none; }
+		.scale-pick { order: 1; }
+		.node-seg { order: 2; }
+		.lg-foot { display: flex; margin: 4px 0 2px; margin-left: 0; gap: 4px 12px; font-size: 0.76rem; }
+	}
 	.empty { color: var(--muted); font-size: 0.86rem; padding: 18px 10px; margin: 0; }
 	.sep { margin: 0; font-size: 0.8rem; padding: 6px 9px; border-radius: 4px; background: var(--grid); color: var(--ink-2); }
 	.sep.on { background: var(--warn-bg); color: var(--warn-ink); font-weight: 600; }
