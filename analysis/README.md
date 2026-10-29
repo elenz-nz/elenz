@@ -270,7 +270,7 @@ under macron names the history doesn't use, and has no end date for TCC (closed 
   were refurbished, then 800 (854 installed, consent limit 800). Clyde 432 → 464 from Nov 2015, when output first goes
   past 432 (Wikipedia dates the consent change to 2005; the output says otherwise). Arapuni 188.7 → 196.7 (four units
   uprated in 2001). Whakamaru 100 → 124 one unit a year 2017-20, dates from the output steps. Karāpiro 96 → 112.5
-  (Sep 2025). Benmore 540 → 552 (May 2024) → 570, Ōhau C 212 → 220 and Ōhau B → 220 (30 Jul 2026). Takapō A 30 from
+  (Sep 2025). Benmore 540 → 552 (May 2024) → 570, Ōhau C 212 → 220 and Ōhau B → 220 (30 Jul 2026). Tekapo A 30 from
   2016 (output above 25 from then; register 25).
   Coleridge 40 → 42 from 27 May 2026 (dispatched at 42 MW all day since 20 Oct 2026; Manawa lists 39.5).
 - Geothermal: Wairakei 167 → 181 (binary plant, Jun 2005) → 136 (May 2014, ~45 MW of steam to Te Mihi). Ōhaaki ~65

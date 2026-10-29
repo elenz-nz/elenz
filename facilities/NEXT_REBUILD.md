@@ -11,12 +11,27 @@ names, clock-change days before 2009, daily peak dispatchable output, small sola
 
 ## BUILD 8: collecting, held until the owner says go (opened 28 Oct 2026)
 
-BUILD 8's items are gathered on the branch `next-rebuild` (draft pull request "BUILD 8 (held)"), not on `main`. That
-branch already has `BUILD = 8`, so merging it starts the rebuild. Put every fingerprinted change there, with its
-numbered section in that branch's copy of this file saying what to check once the rebuild has run. Don't put
-fingerprinted changes on `main` meanwhile (they would start a rebuild without the rest), and don't take the pull
-request out of draft or turn on auto-merge until the owner says to start (expected early November 2026). Before
-merging: bring the branch up to date with `main`, check `rebuild_left` is empty, and let the checks pass.
+This is the branch `next-rebuild` (draft pull request "BUILD 8 (held)"). `BUILD` is already 8 here, so merging it
+starts a full rebuild of every month (~4 days). Add each fingerprinted change to this branch with a numbered section
+below saying what changed and what to check once the rebuild has run.
+
+To start it (only when the owner says go): bring the branch up to date with `main`, check
+`/data/history/progress.json` has `rebuild_left` empty, mark the pull request ready for review, let the checks pass and
+merge. Afterwards check each item, run the Offers workflow with "resummarise" if an item changes generation, and clear
+the done items from this file.
+
+### 1. Tekapo A and B (owner's call, 30 Oct 2026)
+
+The site spells the stations Tekapo A and Tekapo B, like their scheme ("Tekapo" in `[hydro_schemes]`), not the
+register's "Takapō A/B". Changed: `[plant_names]` in `overrides.toml` (the dispatch data's names), the two rows in
+`metered_plants.csv` (the metered history's names), `[hydro_schemes]`, the rows in `plant_capacity.csv` and
+`capacity.json`, `plants.json`, the groupings method page, and `PLANT_ALIASES` (old `plant=takapo-a`/`takapo-b`
+links forward). Until the rebuild has remade every month, the history still says "Takapō A/B", and those two plants
+show no capacity factor on 30 days, 1 year and All.
+
+Check afterwards: By hydro scheme > Tekapo lists Tekapo A and Tekapo B on 24 hours, 30 days and All; no "Takapō"
+anywhere in the tracker (search the plant list for "takapo"); `/tracker?fuel=hydro&plant=takapo-a` opens Tekapo A;
+their capacity factors are back in the mix table.
 
 ## Not fixable from EMI data
 

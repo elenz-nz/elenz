@@ -83,11 +83,12 @@ warnings.simplefilter("ignore", pd.errors.PerformanceWarning)  # wide monthly fr
 FINAL = 'Datasets/Wholesale/DispatchAndPricing/FinalEnergyPrices'
 HVDC_FLOWS = 'Datasets/Wholesale/Metered_data/HVDC_Flows'
 
-BUILD = 7                    # bump to rebuild every month's JSON after changing how it is built (2: final prices, 3: peak generation,
+BUILD = 8                    # bump to rebuild every month's JSON after changing how it is built (2: final prices, 3: peak generation,
                              # 4: satellite rooftop solar model by point, metered HVDC; 5: more price nodes, daily price
                              # spread and revenue by fuel, bioenergy and waste heat; 6: metered history back to Aug 1997,
                              # metered generation wherever published, plant groups; 7: Generation_MD's clock-numbered
                              # change days before 2009 renumbered (metered.straighten()), Mill Creek 2014-15, peak.disp)
+                             # 8: (being collected, see facilities/NEXT_REBUILD.md)
 GEN_FUELS = ('geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
 DISPATCHABLE = ('hydro', 'gas', 'coal', 'diesel', 'batt')   # as DISPATCHABLE in site/src/lib/tracker/series.js
 WRITE_BUDGET = 280           # KV writes a day (UTC) for this job; the live job needs ~600 of the 1,000
