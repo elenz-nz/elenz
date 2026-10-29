@@ -22,8 +22,12 @@ export function rangeName(label, end, days) {
 export function span(from, to) {
   const a = parts(from), b = parts(to - 1);
   if (to - from <= 4 * 864e5) {
-    const bEnd = parts(to - 1);
-    return `${WD[a.wd]} ${a.d} ${MON[a.mo]}, ${clock(a)} – ${WD[bEnd.wd]} ${bEnd.d} ${MON[bEnd.mo]}${bEnd.y !== a.y ? ' ' + bEnd.y : ''}`;
+    // whole days (a past window ends at midnight): just the days; otherwise the clock at both ends
+    const bEnd = parts(to - 1), e = parts(to), whole = e.h === 0 && e.mi === 0 && a.h === 0 && a.mi === 0;
+    const yr = bEnd.y !== a.y ? ' ' + bEnd.y : '';
+    if (whole && a.d === bEnd.d && a.mo === bEnd.mo) return `${WD[a.wd]} ${a.d} ${MON[a.mo]} ${a.y}`;
+    if (whole) return `${WD[a.wd]} ${a.d}${a.mo === bEnd.mo ? '' : ' ' + MON[a.mo]} – ${WD[bEnd.wd]} ${bEnd.d} ${MON[bEnd.mo]} ${bEnd.y}`;
+    return `${WD[a.wd]} ${a.d} ${MON[a.mo]}, ${clock(a)} – ${WD[e.wd]} ${e.d} ${MON[e.mo]}${yr}, ${clock(e)}`;
   }
   const left = a.y === b.y ? `${a.d} ${MON[a.mo]}` : `${a.d} ${MON[a.mo]} ${a.y}`;
   return `${left} – ${b.d} ${MON[b.mo]} ${b.y}`;

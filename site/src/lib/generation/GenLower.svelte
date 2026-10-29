@@ -267,7 +267,8 @@
 				<div class="ttl-row"><h2>{metric === 'ren' ? 'Renewable share' : `${m.title} share`}</h2><InfoTip>{#if canCompare}Dashed: the same dates a year earlier (365 days before){v && v.int === '5m' ? ', half-hourly' : ''}.{:else if v && v.days == null}No comparison on the full history.{:else}The year before is outside the history.{/if}
 			{#if m.note}{m.title}: {m.note}.{/if}
 			<a href="/methods/groupings#renewable">How shares are worked out</a></InfoTip></div>
-				<Context range={rangeChip} items={[dates, v ? `${RES[v.int]}, % of generation` : '']} />
+				<!-- the share and headroom cards name only their dates (owner's call, 30 Oct 2026) -->
+				<Context range={dates} items={[v ? `${RES[v.int]}, % of generation` : '']} />
 			</div>
 			<div class="tools">
 				<div class="seg" role="group" aria-label="Series for the share chart">
@@ -301,7 +302,7 @@
 			<div>
 				<div class="ttl-row"><h2>Spare dispatchable capacity</h2><InfoTip>Dispatchable capacity not generating{withHydro ? '' : ', hydro left out'}: installed, offered, and offered under $1,000/MWh.
 			{v && v.region !== 'NZ' ? 'One island only: the HVDC link isn’t counted. ' : ''}{avgOnly ? 'Daily averages where history doesn’t yet keep each day’s lowest. ' : ''}{!hasOffers ? 'No offers loaded for these dates yet. ' : ''}<a href="/methods/capacity#headroom">How it's worked out</a></InfoTip></div>
-				<Context range={rangeChip} items={[dates, v ? `${RES[v.int]}, MW not generating` : '', coarse && roomView === 'levels' && !avgOnly ? `lowest in each ${lowWord}` : '']} />
+				<Context range={dates} items={[v ? `${RES[v.int]}, MW not generating` : '', coarse && roomView === 'levels' && !avgOnly ? `lowest in each ${lowWord}` : '']} />
 			</div>
 			<div class="tools">
 				<div class="seg" role="group" aria-label="Headroom view">
