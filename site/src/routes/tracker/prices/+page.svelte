@@ -25,7 +25,7 @@
 	import InfoTip from '#lib/site/InfoTip.svelte';
 	import { fitSelect } from '#lib/site/fitselect.js';
 	import { barHeight } from '#lib/site/sticky.js';
-	import { rangeName, span } from '#lib/site/context.js';
+	import { span } from '#lib/site/context.js';
 	import {
 		NODES, NODE, priceOf, separated, addRevenue, captured, RANGES, INT_LABEL, atInterval, completeDaily, periods,
 		heat, priceScale, niceTicks, CAP, money, signedMoney, clock, dayLabel, dateLabel, monthLabel, shortDate, timeTicks, nzParts
@@ -975,7 +975,7 @@
 			<div class="card-head">
 				<div>
 					<div class="ttl-row"><h2>Price captured by fuel</h2><InfoTip>What each fuel earned over the range: its output × its island's price, divided by its output. Percent is against the average of all fuels. Battery (charging) is what batteries paid to charge, left out of the average. Hover over a bar (or tap it) for its energy in GWh and what it earned or paid. <a href="/methods/prices#derived">How it's worked out</a></InfoTip></div>
-					<Context range={rangeName(R.label, endT, R.days)} items={[win ? span(win.from, win.to) : '']} />
+					<Context range={win ? span(win.from, win.to) : ''} />
 				</div>
 				<PopButton open={popped === 'cap'} name="price captured by fuel chart" onclick={() => (popped = popped === 'cap' ? null : 'cap')} />
 			</div>
@@ -989,7 +989,7 @@
 			<div class="card-head">
 				<div>
 					<div class="ttl-row"><h2>Price by time of day</h2><InfoTip>{heatSeg?.kind === 'months' ? `One row per ${effInt === '1yr' ? 'year' : 'month'}: the average price in each half-hour.` : heatRows.length > 40 ? 'One row per day; scroll for earlier days.' : 'One row per day.'} {heatScaled ? 'Colours fitted to the prices shown.' : 'Colours on fixed price bands, so periods compare.'}</InfoTip></div>
-					<Context range={heatShort ? (endT === null ? 'Last 7 days' : rangeName('7 days', endT, 7)) : rangeName(R.label, endT, R.days)} items={[heatSpan, NODE[heatKey]?.name, heatSeg?.kind === 'months' ? (effInt === '1yr' ? 'yearly' : 'monthly') + ' average of each half-hour' : 'each half-hour']} />
+					<Context range={heatSpan} items={[NODE[heatKey]?.name, heatSeg?.kind === 'months' ? (effInt === '1yr' ? 'yearly' : 'monthly') + ' average of each half-hour' : 'each half-hour']} />
 				</div>
 				<div class="tools">
 				<div class="seg" role="group" aria-label="Node for the heat map">

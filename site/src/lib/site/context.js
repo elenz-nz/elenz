@@ -10,14 +10,6 @@ const clock = (p) => `${p.h % 12 || 12}:${String(p.mi).padStart(2, '0')} ${p.h <
 
 export const REGION_NAME = { NZ: 'New Zealand', NI: 'North Island', SI: 'South Island' };
 
-/** 'Last 30 days', '30 days to 14 Aug 2024', 'All history'. label: the range's name ('24 hours', '1 year' ...). */
-export function rangeName(label, end, days) {
-  if (days == null) return 'All history';
-  if (end == null) return `Last ${label}`;
-  const p = parts(end - 1);
-  return `${label} to ${p.d} ${MON[p.mo]} ${p.y}`;
-}
-
 /** The dates a window covers, [from, to): '18 Sep – 17 Oct 2026', with clock times for windows of a few days. */
 export function span(from, to) {
   const a = parts(from), b = parts(to - 1);
