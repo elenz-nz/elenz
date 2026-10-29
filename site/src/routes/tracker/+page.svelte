@@ -336,7 +336,7 @@
 		</section>
 
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-		<section class="charts" id="charts-more" tabindex="0" aria-label="Price, demand, HVDC, emissions and renewables charts, on the same time axis as generation.">
+		<section class="charts" id="charts-more" tabindex="0" aria-label="Price, renewable share, demand, HVDC and emissions charts, on the same time axis as generation.">
 			<div class="chart folded" class:popped={popped === 'price'}>
 				<div class="ch-head">
 					{@render foldTitle('price', 'Wholesale price')}{@render info('price')}
@@ -348,6 +348,11 @@
 				</div>
 				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
 				<canvas id="cv-price" role="img" aria-label="Line chart of reference node prices"></canvas>
+			</div>
+			<div class="chart folded" class:popped={popped === 'ren'}>
+				<div class="ch-head">{@render foldTitle('ren', 'Renewable share')}{@render info('ren')}<div class="legends"><span class="lg"><i style="--c:var(--accent)"></i>Renewables <b id="v-ren"></b></span></div>{@render popBtn('ren', 'renewable share')}</div>
+				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
+				<canvas id="cv-ren" role="img" aria-label="Line chart of renewable share with the time axis"></canvas>
 			</div>
 			<div class="chart" class:popped={popped === 'demand'}>
 				<div class="ch-head">
@@ -370,11 +375,6 @@
 				<div class="ch-head">{@render foldTitle('co2', 'Emissions intensity')}{@render info('co2')}<div class="legends"><span class="lg"><i class="area" style="--c:var(--co2)"></i>Generation mix <b id="v-co2"></b></span></div>{@render popBtn('co2', 'emissions intensity')}</div>
 				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
 				<canvas id="cv-co2" role="img" aria-label="Area chart of emissions intensity"></canvas>
-			</div>
-			<div class="chart folded" class:popped={popped === 'ren'}>
-				<div class="ch-head">{@render foldTitle('ren', 'Renewable share')}{@render info('ren')}<div class="legends"><span class="lg"><i style="--c:var(--accent)"></i>Renewables <b id="v-ren"></b></span></div>{@render popBtn('ren', 'renewable share')}</div>
-				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
-				<canvas id="cv-ren" role="img" aria-label="Line chart of renewable share with the time axis"></canvas>
 			</div>
 		</section>
 		{#if popped}<button type="button" class="pop-backdrop" aria-label="Close the enlarged chart" onclick={() => (popped = null)}></button>{/if}

@@ -22,7 +22,7 @@ test('an address reads and writes back unchanged', () => {
     'region=SI&unit=pct&price=on',
     'price=on&fold=demand',
     'fold=none',
-    'range=7d&fold=price,hvdc,ren',
+    'range=7d&fold=price,ren,hvdc',
     'range=3d&end=2026-10-19&zoom=2026-10-19T13:05~2026-10-19T15:30',
   ]) {
     const day = /t=\d{4}-\d\d-\d\d(&|$)/.test(qs);
@@ -40,7 +40,7 @@ test('folded charts: the default is left out, any order reads the same, nothing 
   assert.equal(writeQuery({ fold: ['price', 'ren'] }), '');
   assert.equal(writeQuery({ fold: ['ren', 'price'] }), '');
   assert.equal(writeQuery({ fold: [] }), 'fold=none');
-  assert.deepEqual(readQuery('?fold=ren,co2,ren'), { fold: ['co2', 'ren'] });
+  assert.deepEqual(readQuery('?fold=ren,co2,ren'), { fold: ['ren', 'co2'] });
   assert.deepEqual(readQuery('?fold=none'), { fold: [] });
   assert.deepEqual(readQuery('?fold=gen,pie'), {});   // nothing it knows: the default
 });

@@ -38,7 +38,7 @@ const ORDER = [...SHARED, 'by', 'unit', 'chart', 'price', 'fold', 'group', 'fuel
 export const SPANS = [1, 3, 6, 12];
 // the Generation tab's charts under the generation chart that fold to one line, in page order; price and renewable
 // share start folded, as the $ Price button and the share card below show them too (owner's call, 29 Oct 2026)
-export const FOLDABLE = ['price', 'demand', 'hvdc', 'co2', 'ren'];
+export const FOLDABLE = ['price', 'ren', 'demand', 'hvdc', 'co2'];
 export const FOLD_DEFAULT = ['price', 'ren'];
 /** A fold list in page order without repeats (anything else dropped). */
 export const foldList = (xs) => FOLDABLE.filter((k) => xs.includes(k));

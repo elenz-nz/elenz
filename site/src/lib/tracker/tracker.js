@@ -1245,7 +1245,7 @@ export function mountTracker(D, hooks = {}) {
   }
 
   // ---------- orchestration ----------
-  const CHARTS = ['cv-gen', 'cv-price', 'cv-demand', 'cv-hvdc', 'cv-co2', 'cv-ren'];
+  const CHARTS = ['cv-gen', 'cv-price', 'cv-ren', 'cv-demand', 'cv-hvdc', 'cv-co2'];   // page order (the download's too)
   // a folded chart is only its heading (title, ⓘ, the value at the time line), so it isn't drawn or painted until it
   // opens (its ResizeObserver then redraws everything)
   const unfolded = id => id === 'cv-gen' || !state.fold.has(id.slice(3));

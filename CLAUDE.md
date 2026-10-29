@@ -175,8 +175,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   for NZ, the island's own on an island's chart, on a right axis with the Prices tab's spike-proof scale (`priceScale`
   from `#lib/prices/data.js`), thin and dashed (Haywards long dashes, Benmore short) so they don't read as generation lines. While it's on every chart's right margin
   widens (`padR()`) so the time axes stay lined up. Both are kept with the grouping in localStorage `elenz-view`.
-  Folded charts (owner's call, 29 Oct 2026): each chart under generation (price, demand, HVDC, emissions, renewable
-  share) folds to one line from its title (`foldTitle` in the page, a button with aria-expanded; `state.fold`,
+  Folded charts (owner's call, 29 Oct 2026): each chart under generation (price, renewable share, demand, HVDC,
+  emissions: the two folded by default sit together at the top, owner's call) folds to one line from its title (`foldTitle` in the page, a button with aria-expanded; `state.fold`,
   `syncFold` in tracker.js; `.chart.folded` in tracker.css): the heading, ⓘ and legend values stay (they follow the
   time line), the canvas and enlarge button go, and a folded chart isn't drawn (`unfolded` in drawAll/paintAll; its
   ResizeObserver redraws when it opens). Price and renewable share start folded (`FOLD_DEFAULT` in viewurl.js), as
