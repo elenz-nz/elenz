@@ -178,6 +178,20 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 .ch-head .unit { color: var(--muted); font-size: 0.78rem; }
 /* a card's ⓘ sits right after its title (owner's call, Oct 2026): .ch-head's gap pulled in, or the title in .ttl-row */
 .ch-head .info-tip { margin-left: -10px; align-self: center; width: 24px; height: 24px; }
+/* the charts under generation fold to one line from their title (tracker.js syncFold): the heading stays, with its
+   value at the time line; the canvas and the enlarge button go */
+.fold-h { margin: 0; }
+.fold-btn { display: inline-flex; align-items: center; gap: 5px; margin: -3px 0 -3px -4px; padding: 3px 4px; border: 0; border-radius: 4px; background: none; color: inherit; font: inherit; cursor: pointer; }
+.fold-btn:hover { background: var(--grid); }
+.fold-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.fold-btn .chev { flex: none; color: var(--muted); transition: transform 0.15s; }
+.chart.folded .fold-btn .chev { transform: rotate(-90deg); }
+.chart.folded { padding-bottom: 10px; }
+.chart.folded canvas, .chart.folded .pop-btn { display: none; }
+.chart.folded .ch-head h2 { color: var(--ink-2); }
+.chart.popped .fold-btn { pointer-events: none; }
+.chart.popped .fold-btn .chev { display: none; }
+@media (prefers-reduced-motion: reduce) { .fold-btn .chev { transition: none; } }
 .ttl-row { display: flex; align-items: center; gap: 2px; min-width: 0; }
 .ttl-row h2 { min-width: 0; }
 .ch-head .unit-link { color: inherit; text-decoration: underline dotted; text-underline-offset: 2px; }
