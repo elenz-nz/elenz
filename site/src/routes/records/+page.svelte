@@ -114,23 +114,9 @@
 
 	<main class="rec-page">
 		<section class="hero" aria-labelledby="rec-h">
-			<div>
-				<h1 id="rec-h">Records</h1>
-			</div>
-			{#if R?.final_to?.gen}
-				<span class="pill" title="Records rest on the EA's metered data, published 5–6 weeks after each month. Anything newer is provisional.">Official to {dayOf(R.final_to.gen)}</span>
-			{/if}
-		</section>
-
-		<div class="toolbar">
-			<div class="ctl">
-				<label for="rec-region" class="vh">Region</label>
-				<select class="pick" id="rec-region" value={region} onchange={(e) => setRegion((e.currentTarget as HTMLSelectElement).value)}>
-					{#each REGIONS as r}<option value={r.id}>{r.name}</option>{/each}
-				</select>
-			</div>
+			<h1 id="rec-h">Records</h1>
 			<a class="how" href="/methods/records">How records work</a>
-		</div>
+		</section>
 
 		{#if status === 'loading'}
 			<p class="note" role="status">Loading the records…</p>
@@ -142,7 +128,15 @@
 		{:else}
 			{#if paces.length}
 				<section aria-labelledby="pace-h" class="sec">
-					<div class="ttl-row"><h2 id="pace-h">Heading for a record</h2><InfoTip label="About records on pace">This day, week, month or year so far, against its record: listed once half of it has gone, while its average so far beats the record. It uses dispatch data (the live week and the days before it), so it is provisional, and the rest of the period can still change it. <a href="/methods/records">How records work</a></InfoTip></div>
+					<div class="ttl-row"><h2 id="pace-h">Heading for a record</h2><InfoTip label="About records on pace">
+						<ul>
+							<li>A day, week, month or year still running, ahead of its record at the same point.</li>
+							<li>Listed once half of it has gone, and only while it stays ahead.</li>
+							<li>From dispatch data, so provisional: the rest of the period can still change it.</li>
+							<li>One tile per record: New Zealand's where it's on pace, otherwise an island's.</li>
+						</ul>
+						<p><a href="/methods/records#pace">How records work</a></p>
+					</InfoTip></div>
 					<!-- simple tiles, almost buttons: the record's picture and name; the detail is on its page (owner's call, 30 Oct 2026) -->
 					<div class="paces">
 						{#each paceAll ? paces : paces.slice(0, PACE_CARDS) as p}
@@ -160,7 +154,14 @@
 
 			{#if cards.length}
 				<section aria-labelledby="new-h" class="sec">
-					<h2 id="new-h">New and provisional</h2>
+					<div class="ttl-row"><h2 id="new-h">New and provisional</h2><InfoTip label="About new and provisional records">
+						<ul>
+							<li>Records set in the last 30 days, and newer ones still waiting on the metered data, for New Zealand or either island.</li>
+							<li>Dashed border: provisional, from dispatch data.</li>
+							<li>Struck through: a provisional record the metered data didn't confirm.</li>
+						</ul>
+						<p><a href="/methods/records">How records work</a></p>
+					</InfoTip></div>
 					<div class="cards">
 						{#each cards as c}
 							{@const p = c.prov}
@@ -188,14 +189,34 @@
 			{/if}
 
 			<section aria-labelledby="all-h" class="sec">
-				<div class="sec-head">
-					<div class="ttl-row"><h2 id="all-h">All-time records · {regionName}</h2><InfoTip label="About these records">Official records use the EA’s metered data and final prices, which arrive 5–6 weeks after each month (final prices a day or two). Newer records come from dispatch data and stay provisional until the metered month confirms them. Embedded solar is modelled. <a href="/methods/records">How records work</a></InfoTip></div>
-					<span class="unit">{period === 'tp' ? 'Half-hour averages unless stated' : `Averages over each ${periodOf(period).word}; runs are any length`}</span>
+				<!-- the list's title bar: its heading, the region (only the list, milestones and month records follow it) and how
+				     far the official data goes; it sticks while the list scrolls (owner's call, 30 Oct 2026) -->
+				<div class="toolbar list-bar">
+					<div class="ttl-row"><h2 id="all-h">All-time records</h2><InfoTip label="About these records">
+						<ul>
+							<li>Official records use the EA's metered generation and HVDC, and its final prices.</li>
+							<li>Official to: the last day the metered data covers. It arrives 5–6 weeks after each month (final prices a day or two).</li>
+							<li>Anything newer comes from dispatch data and stays provisional (dashed edge) until the metered month confirms it.</li>
+							<li>Day to year records are the period's average MW, with its energy beside it.</li>
+							<li>Embedded solar is modelled, so its records are estimates.</li>
+						</ul>
+						<p><a href="/methods/records">How records work</a></p>
+					</InfoTip></div>
+					<div class="ctl">
+						<label for="rec-region" class="vh">Region</label>
+						<select class="pick" id="rec-region" value={region} onchange={(e) => setRegion((e.currentTarget as HTMLSelectElement).value)}>
+							{#each REGIONS as r}<option value={r.id}>{r.name}</option>{/each}
+						</select>
+					</div>
+					{#if R?.final_to?.gen}<span class="pill official">Official to {dayOf(R.final_to.gen)}</span>{/if}
 				</div>
-				<div class="seg per" role="group" aria-label="Records for each">
-					{#each PERIODS as p}
-						<button type="button" aria-pressed={period === p.k} onclick={() => setPeriod(p.k)}>{p.label}</button>
-					{/each}
+				<div class="sec-head">
+					<div class="seg per" role="group" aria-label="Records for each">
+						{#each PERIODS as p}
+							<button type="button" aria-pressed={period === p.k} onclick={() => setPeriod(p.k)}>{p.label}</button>
+						{/each}
+					</div>
+					<span class="unit">{period === 'tp' ? 'Half-hour averages unless stated' : `Averages over each ${periodOf(period).word}; runs are any length`}</span>
 				</div>
 				<div class="chips" role="group" aria-label="Show records about">
 					{#each ['all', ...shownGroups] as g}
@@ -246,7 +267,12 @@
 			<div class="two">
 				{#if miles.length}
 					<section class="panel" aria-labelledby="mile-h">
-						<h2 id="mile-h">Milestones · {regionName}</h2>
+						<div class="ttl-row"><h2 id="mile-h">Milestones · {regionName}</h2><InfoTip label="About milestones">
+							<ul>
+								<li>The first half-hour each round level was passed: wind, grid and embedded solar, renewable share and peak demand.</li>
+								<li>The six most recent, newest first.</li>
+							</ul>
+						</InfoTip></div>
 						<ul class="miles">
 							{#each miles as m}
 								<li>
@@ -265,7 +291,12 @@
 							<select class="pick" bind:value={moy} aria-label="Month of the year">
 								{#each MONTHS as m, i}<option value={i}>{m}</option>{/each}
 							</select>
-						</h2><InfoTip label="About month records">The best {MONTHS[moy]} on record, so a month can be a record even when the all-time ones hold.</InfoTip></div>
+						</h2><InfoTip label="About month records">
+							<ul>
+								<li>The best {MONTHS[moy]} since 1997 for each record, and the year it was set.</li>
+								<li>A month can set one even when the all-time record holds.</li>
+							</ul>
+						</InfoTip></div>
 						<span class="unit">{regionName}</span>
 					</div>
 					<table class="moy">
@@ -292,10 +323,13 @@
 
 <style>
 	.rec-page { display: grid; gap: 14px; }
-	.hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px 20px; flex-wrap: wrap; padding-block: 6px 2px; }
+	.hero { display: flex; align-items: baseline; justify-content: space-between; gap: 10px 20px; flex-wrap: wrap; padding-block: 6px 2px; }
 	.hero h1 { font-size: 1.6rem; letter-spacing: -0.02em; line-height: 1.15; }
-	.pill::before { display: none; }
-	.how { margin-left: auto; color: var(--accent); font-weight: 600; font-size: 0.86rem; }
+	.how { color: var(--accent); font-weight: 600; font-size: 0.86rem; }
+	/* the main list's title bar: sticks to the top of the window while the list shows (.toolbar in tracker.css) */
+	.list-bar { gap: 6px 14px; }
+	.official { margin-left: auto; white-space: nowrap; }
+	.official::before { display: none; }
 
 	.sec { display: grid; gap: 10px; }
 	.sec h2, .panel h2 { font-size: 1rem; }
@@ -414,6 +448,5 @@
 		.tbl tbody tr > td:nth-child(4), .tbl tbody tr > td:nth-child(5) { display: none; }
 		.tbl .na-note { grid-column: 1 / -1; padding-left: 18px; }
 		.hero h1 { font-size: 1.3rem; }
-		.how { margin-left: 0; }
 	}
 </style>
