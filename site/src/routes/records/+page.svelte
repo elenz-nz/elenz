@@ -9,7 +9,8 @@
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import Spark from '#lib/records/Spark.svelte';
 	import InfoTip from '#lib/site/InfoTip.svelte';
-	import { energy, pace, soFar, toGo, paceAt, periodWhen,
+	import RecordIcon from '#lib/records/RecordIcon.svelte';
+	import { energy, pace, soFar, paceAt, periodWhen,
 		LISTED as DEFS, PERIODS, PERIOD_KEYS, periodOf, periodSub, GROUPS, REGIONS, LIVE_URL, MONTHS, get, notShown, parts, when, step, fmt, recent, milestones, provisional,
 		liveBeats, loadRecords, fullName, dayOf, clock, yearOf
 	} from '#lib/records/records.js';
@@ -23,7 +24,7 @@
 	let cat = $state('all');
 	let liveD = $state.raw<any>(null);   // tracker.json: the live week, for the live check and the pace
 	let paceAll = $state(false);          // the pace cards beyond the first PACE_CARDS
-	const PACE_CARDS = 8;
+	const PACE_CARDS = 12;
 	let moy = $state(new Date(Date.now() + 13 * 36e5).getUTCMonth());   // this month in New Zealand
 
 	onMount(() => {
@@ -142,14 +143,14 @@
 			{#if paces.length}
 				<section aria-labelledby="pace-h" class="sec">
 					<div class="ttl-row"><h2 id="pace-h">Heading for a record</h2><InfoTip label="About records on pace">This day, week, month or year so far, against its record: listed once half of it has gone, while its average so far beats the record. It uses dispatch data (the live week and the days before it), so it is provisional, and the rest of the period can still change it. <a href="/methods/records">How records work</a></InfoTip></div>
-					<div class="cards">
+					<!-- simple tiles, almost buttons: the record's picture and name; the detail is on its page (owner's call, 30 Oct 2026) -->
+					<div class="paces">
 						{#each paceAll ? paces : paces.slice(0, PACE_CARDS) as p}
-							<a class="card pace" href={href(p.d.id, p.region, p.period)}>
-								<span class="c-name"><span class="dot" style="--c:var({p.d.tok})"></span>{fullName(p.d)} · {periodOf(p.period).label} · {p.region}</span>
-								<span>
-									<span class="c-val">{parts(p.d, p.v, p.period).n}<small>{parts(p.d, p.v, p.period).u}</small></span>
-									<span class="c-sub">{soFar(p)}, {paceAt(p)}. The record {periodOf(p.period).word} ({periodWhen(p.bestT, p.period)}{p.provBest ? ', provisional' : ''}) had {fmt(p.d, p.ref, p.period)} then; {toGo(p)}.</span>
-								</span>
+							<a class="pt" href={href(p.d.id, p.region, p.period)} style="--c:var({p.d.tok})"
+								title="{fullName(p.d)}: {soFar(p)}, {paceAt(p)}, ahead of the record {periodOf(p.period).word}">
+								<span class="pt-ic"><RecordIcon id={p.d.id} /></span>
+								<span class="pt-txt"><b>{fullName(p.d)}</b><small>This {periodOf(p.period).word}{p.region === 'NZ' ? '' : ` · ${p.region === 'NI' ? 'North Island' : 'South Island'}`}</small></span>
+								<svg class="pt-go" width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
 							</a>
 						{/each}
 					</div>
@@ -312,7 +313,33 @@
 	.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 10px; }
 	.card { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; display: grid; gap: 8px; align-content: start; color: inherit; text-decoration: none; }
 	.card:hover { border-color: var(--ink-2); }
-	.card.pace { border-left: 3px solid var(--accent); }
+	/* Heading for a record: one small tile each, the record's colour on a tint of it */
+	.paces { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
+	.pt { display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 8px; border-radius: 6px; color: var(--ink); text-decoration: none;
+		background: color-mix(in srgb, var(--c) 16%, var(--surface)); border: 1px solid color-mix(in srgb, var(--c) 45%, var(--line));
+		transition: transform 0.15s, border-color 0.15s, background 0.15s; }
+	.pt:hover, .pt:focus-visible { transform: translateY(-2px); border-color: var(--c); background: color-mix(in srgb, var(--c) 24%, var(--surface)); }
+	.pt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+	.pt-ic { position: relative; display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 50%; color: var(--c); }
+	/* a slow ring: it's still going */
+	.pt-ic::after { content: ""; position: absolute; inset: 0; border-radius: 50%; animation: pt-ring 2.6s ease-out infinite; }
+	@keyframes pt-ring { from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 45%, transparent); } to { box-shadow: 0 0 0 9px color-mix(in srgb, var(--c) 0%, transparent); } }
+	.pt-txt { display: grid; min-width: 0; line-height: 1.25; }
+	.pt-txt b { font-size: 0.88rem; font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.pt-txt small { font-size: 0.74rem; color: var(--ink-2); }
+	.pt-go { margin-left: auto; flex: none; color: var(--muted); transition: transform 0.15s, color 0.15s; }
+	.pt:hover .pt-go { transform: translateX(2px); color: var(--c); }
+	@media (prefers-reduced-motion: reduce) { .pt-ic::after { animation: none; } .pt, .pt-go { transition: none; } .pt:hover { transform: none; } }
+	/* phones: two to a row, the name free to wrap, no arrow */
+	@media (max-width: 560px) {
+		.paces { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+		.pt { gap: 8px; padding: 6px 10px 6px 6px; border-radius: 6px; }
+		.pt-ic { width: 30px; height: 30px; }
+		.pt-ic :global(svg) { width: 18px; height: 18px; }
+		.pt-txt b { font-size: 0.8rem; white-space: normal; }
+		.pt-txt small { font-size: 0.7rem; }
+		.pt-go { display: none; }
+	}
 	.more-btn { justify-self: start; margin-top: 8px; font: inherit; font-size: 0.84rem; font-weight: 600; color: var(--accent); background: none; border: 1px solid var(--line); border-radius: 4px; padding: 6px 12px; min-height: 36px; cursor: pointer; }
 	.more-btn:hover { border-color: var(--accent); }
 	.card.prov { border-style: dashed; border-color: color-mix(in srgb, var(--warn-ink) 55%, var(--line)); }

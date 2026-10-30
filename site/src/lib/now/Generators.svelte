@@ -5,7 +5,7 @@
 	import InfoTip from '#lib/site/InfoTip.svelte';
 	import { onMount } from 'svelte';
 	import { replaceState } from '$app/navigation';
-	import { generatorRows, readSettings, writeSettings, pick } from './generators.js';
+	import { generatorRows, readSettings, writeSettings, pick, SORTS } from './generators.js';
 	import { slug } from '#lib/site/viewurl.js';
 
 	let { D, when }: { D: any; when: string } = $props();
@@ -40,7 +40,7 @@
 	const pctText = (r: { pct: number | null; charging: boolean }) => (r.pct == null ? '–' : r.charging ? `−${Math.round(-r.pct)}%` : `${Math.round(Math.max(0, r.pct))}%`);
 	function sortBy(by: string) {
 		if (s.by === by) s.asc = !s.asc;
-		else { s.by = by; s.asc = by === 'name'; }
+		else { s.by = by; s.asc = ['name', 'fuel', 'island', 'owner'].includes(by); }   // words A to Z first, numbers largest first
 	}
 	const ariaSort = (by: string) => (s.by === by ? (s.asc ? 'ascending' : 'descending') : 'none');
 	function toggle(key: string) {
@@ -81,6 +81,12 @@
 		<label><span class="sr">Owner</span>
 			<select bind:value={s.owner}><option value="">All owners</option>{#each owners as o (o)}<option value={slug(o)}>{o}</option>{/each}</select>
 		</label>
+		<!-- phones hide the fuel, island and owner columns, so their sorts are offered here -->
+		<label class="g-sort"><span class="sr">Sort by</span>
+			<select value={s.by} onchange={(e) => sortBy((e.currentTarget as HTMLSelectElement).value)}>
+				{#each Object.entries(SORTS) as [k, name] (k)}<option value={k}>Sort: {name}</option>{/each}
+			</select>
+		</label>
 		<label class="g-on"><input type="checkbox" bind:checked={s.on} /> Generating only</label>
 		{#if filtered}<button type="button" class="g-reset" onclick={reset}>Clear</button>{/if}
 	</div>
@@ -90,9 +96,9 @@
 			<thead>
 				<tr>
 					<th scope="col" aria-sort={ariaSort('name')}><button type="button" onclick={() => sortBy('name')}>Plant</button></th>
-					<th scope="col" class="c-fuel">Fuel</th>
-					<th scope="col" class="c-isl">Island</th>
-					<th scope="col" class="c-own">Owner</th>
+					<th scope="col" class="c-fuel" aria-sort={ariaSort('fuel')}><button type="button" onclick={() => sortBy('fuel')}>Fuel</button></th>
+					<th scope="col" class="c-isl" aria-sort={ariaSort('island')}><button type="button" onclick={() => sortBy('island')}>Island</button></th>
+					<th scope="col" class="c-own" aria-sort={ariaSort('owner')}><button type="button" onclick={() => sortBy('owner')}>Owner</button></th>
 					<th scope="col" class="n" aria-sort={ariaSort('mw')}><button type="button" onclick={() => sortBy('mw')}>MW</button></th>
 					<th scope="col" class="n c-pct" aria-sort={ariaSort('pct')}><button type="button" onclick={() => sortBy('pct')}>Of capacity</button></th>
 				</tr>
@@ -189,8 +195,10 @@
 	.none { color: var(--muted); padding: 14px 0; }
 	.gtab tfoot th, .gtab tfoot td { padding-top: 8px; border: 0; font-weight: 700; color: var(--ink) !important; text-transform: none !important; letter-spacing: 0 !important; font-size: 0.86rem !important; }
 	/* phones: plant, MW and share of capacity; fuel stays as the dot, island and owner as filters */
+	.g-sort { display: none; }
 	@media (max-width: 640px) {
 		.c-fuel, .c-isl, .c-own { display: none; }
+		.g-sort { display: block; }
 		.g-find { flex: 1 1 100%; }
 		.g-find input { width: 100%; box-sizing: border-box; }
 		.g-ctl select { flex: 1 1 30%; min-width: 0; }

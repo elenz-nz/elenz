@@ -316,17 +316,17 @@
 			<div class="two">
 				{#if per !== 'tp'}
 					<section class="panel" aria-labelledby="day-h">
-						<div class="p-head"><h2 id="day-h">The {periodOf(per).word} it fell</h2><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
+						<!-- the period in the title, the rest in the ⓘ, as on the other charts (owner's report REC-05, 26 Oct 2026) -->
+						<div class="p-head"><div class="ttl-row"><h2 id="day-h">The {periodOf(per).word} it fell <span class="h-when">{periodWhen(rec.t, per, true)}</span></h2><InfoTip label="About this chart">{parts(d, rec.v, per).n} {parts(d, rec.v, per).u}{en ? ` (${en})` : ''}{d.unit === '%' ? ' of its generation renewable' : ''}{rec.prev ? `, beating ${f(rec.prev[1])} (${periodWhen(rec.prev[0], per)})` : ''}. The dashed line is the record’s average. Open it in the tracker to see what happened through it. <a href="/methods/records">How records work</a></InfoTip></div><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
 						{#if ser && serAxis}
 							<DayChart day={ser} t={-1} tok={d.tok} fmt={axisFmt} full={f} xticks={serAxis.ticks} tipAt={serAxis.tip} labAt={serAxis.lab} bind:zoom={dayZoom} avg={rec.v} avgLabel="Average {f(rec.v)}"
 								label="{fullName(d)} through {periodWhen(rec.t, per, true)}, {per === 'day' ? 'half-hourly' : per === 'week' ? 'hourly' : per === 'month' ? 'daily' : 'weekly'}, averaging {f(rec.v)}" />
 						{/if}
-						<p class="note">{periodWhen(rec.t, per, true)}: {parts(d, rec.v, per).n} {parts(d, rec.v, per).u}{en ? ` (${en})` : ''}{d.unit === '%' ? ' of its generation renewable' : ''}{rec.prev ? `, beating ${f(rec.prev[1])} (${periodWhen(rec.prev[0], per)})` : ''}. Open it in the tracker to see what happened through it.</p>
 					</section>
 				{:else if d.kind === 'hh' && rec.ctx}
 					{@const c = rec.ctx}
 					<section class="panel" aria-labelledby="day-h">
-						<div class="p-head"><h2 id="day-h">The day it fell</h2><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
+						<div class="p-head"><div class="ttl-row"><h2 id="day-h">The day it fell <span class="h-when">{dayLong(rec.t)}, {clock(rec.t)}</span></h2><InfoTip label="About this chart">The figures under the chart are for the {clock(rec.t)} half-hour, {regionName === 'New Zealand' ? 'across New Zealand' : `in the ${regionName}`}: metered generation and demand, final prices. <a href="/methods/records">How records work</a></InfoTip></div><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
 						<DayChart day={c.day} t={rec.t} tok={d.tok} fmt={axisFmt} bind:zoom={dayZoom} label="{fullName(d)} through {dayLong(rec.t)}, half-hourly, peaking at {f(rec.v)} at {clock(rec.t)}" />
 						<dl class="facts">
 							<div><dt>Demand</dt><dd>{c.demand.toLocaleString('en-NZ')} MW</dd></div>
@@ -336,7 +336,6 @@
 							{#if c.hvdc != null}<div><dt>HVDC</dt><dd>{Math.abs(c.hvdc).toLocaleString('en-NZ')} MW {c.hvdc > 0 ? 'north' : c.hvdc < 0 ? 'south' : ''}</dd></div>{/if}
 							{#if c.top?.length}<div class="wide"><dt>Biggest {d.id === 'wind_max' ? 'wind farms' : 'solar farms'}</dt><dd>{c.top.map((p: [string, number]) => `${p[0]} ${p[1]} MW`).join(', ')}</dd></div>{/if}
 						</dl>
-						<p class="note">In the {clock(rec.t)} half-hour, {regionName === 'New Zealand' ? 'across New Zealand' : `in the ${regionName}`}: metered generation and demand, final prices.</p>
 					</section>
 				{/if}
 
@@ -402,6 +401,8 @@
 </div>
 
 <style>
+	/* the period a chart shows, after its title (REC-05) */
+	.h-when { font-weight: 500; color: var(--ink-2); margin-left: 4px; }
 	.rec-one { display: grid; gap: 14px; }
 	.head { display: grid; gap: 6px; padding-block: 6px 2px; }
 	.crumb { margin: 0; color: var(--muted); font-size: 0.82rem; }

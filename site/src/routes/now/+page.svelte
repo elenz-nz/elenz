@@ -144,7 +144,8 @@
 			<div class="kpi">
 				<span class="k-lbl">Demand</span>
 				<span class="k-val">{nz ? fmt(nz.demand) : '–'}<small>MW</small></span>
-				<span class="k-sub">{#if nz}{fmt(nz.underlying)} MW with embedded solar <span class="tag">est.</span>{/if}</span>
+				<!-- only while there is embedded solar to add (none at night: NOW-05) -->
+				<span class="k-sub">{#if nz && nz.roof >= 0.5}{fmt(nz.underlying)} MW with embedded solar <span class="tag">est.</span>{/if}</span>
 			</div>
 			<div class="kpi">
 				<span class="k-lbl">Renewable share</span>

@@ -399,27 +399,26 @@
 					</button>
 				</div>
 				<div class="help" id="sum-help" role="note" hidden={!helpOpen}>
+					<!-- one line each; the full descriptions are on /about#controls (owner's report GRP-06) -->
 					<dl>
 						<dt>Read a time</dt>
-						<dd>Hover a chart, or touch and slide on a phone. With a chart focused, ← → move one point (Shift: further), Home and End jump to the ends.</dd>
+						<dd>Hover a chart, or touch and slide on a phone.</dd>
 						<dt>Pin it</dt>
-						<dd>Click a chart to hold the time line there; click it again, Release or Escape to let go. It stays put when you change the grouping, region or chart type. On a phone the line stays where your finger lifts; tap it again to let go. A range that doesn't show the pinned time offers “Go to” it in the bar. Share can then mark that time.</dd>
+						<dd>Click or tap a chart to hold the line; again, or Escape, lets go. Pinned, ← → move it (Shift: further).</dd>
 						<dt>Move through history</dt>
-						<dd>Range, interval and region are in the bar at the top. The ‹ › arrows beside the date, on the generation chart, or Page Up and Page Down step back and forward by the range; the date box opens a calendar (select the month name to jump to another year) and jumps to the day you pick; Latest comes back.</dd>
+						<dd>‹ › step by the range; the date opens a calendar; Latest comes back.</dd>
 						<dt>Zoom in</dt>
-						<dd>Drag across any chart to zoom into that stretch; every chart follows. The arrow beside 1D picks the last 1, 3, 6 or 12 hours. While zoomed, the date box gains a time: pick the date and time the zoomed hours should end (NZ time) to move them there, or the ‹ › arrows step by the zoom’s length; Reset zoom in the bar (or Escape twice) shows the whole range again. Choosing another range while zoomed opens that range around what you zoomed into.</dd>
+						<dd>Drag across a chart, or pick hours from the arrow beside 1D; Reset zoom goes back.</dd>
 						<dt>Break it down</dt>
-						<dd>Select a name in this list to go from a fuel to its plants and their grid connections. ‹ Back above the list, or the browser’s Back, steps out. The menu above the generation chart groups it other ways (owner, site, flexibility…), and MW/% switches to shares.</dd>
-						<dt>Compare sources</dt>
-						<dd>The two chart buttons beside MW/% switch the generation chart between stacked areas and lines, one per source, so plants or fuels can be compared on one scale: drill into a fuel or choose By site, then hide what you don’t need or use “show only this”. Up to eight lines get their own colours. $ Price draws the island prices over the chart on a right axis (spike-proof: linear to about $100, compressed above); select it again to take them off.</dd>
+						<dd>Select a name in this list; ‹ Back steps out. The menu above the chart groups it other ways.</dd>
+						<dt>Compare</dt>
+						<dd>The chart buttons switch to one line per source; $ Price adds the island prices.</dd>
 						<dt>Hide and show</dt>
-						<dd>Select a colour square to hide that layer. Double-click it, Shift+click it or press and hold it to show only that one (again to show everything); All and None above the list do the rest. In long lists, type in Filter, and select a fuel heading to fold its plants.</dd>
-						<dt>Open more charts</dt>
-						<dd>The charts under generation start folded to one line each: its value at the time line, or for the whole range when nothing is selected. Select a title to open that chart, and again to fold it. Price can also go over the generation chart ($ Price), and the share card further down charts the renewable share.</dd>
-						<dt>Enlarge, share, download</dt>
-						<dd>The corner button on each chart enlarges it, and ⓘ beside it says what the chart shows and how it’s made. Share copies a link to this view, live or for the dates shown; Download gives the charts as a picture or the data as a spreadsheet file. The address always holds the whole view, so it can be bookmarked.</dd>
+						<dd>Select a colour square; double-click it to show only that one.</dd>
+						<dt>More charts</dt>
+						<dd>Select a folded chart’s title to open it.</dd>
 					</dl>
-					<p><a href="/methods">How the figures are worked out</a></p>
+					<p><a href="/about#controls">Every control, in detail</a> · <a href="/methods">How the figures are worked out</a></p>
 				</div>
 				<div class="sum-level" id="sum-level" hidden><span id="sum-level-txt"></span><button type="button" class="back" id="sum-back">‹ Back</button></div>
 				<input type="search" class="mix-filter" id="mix-filter" aria-label="Filter the list" placeholder="Filter" hidden />

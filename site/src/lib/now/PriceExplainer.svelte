@@ -65,7 +65,8 @@
 							</li>
 						{/each}
 					</ul>
-					<p class="pe-key"><span class="k-now" aria-hidden="true"></span>now <span class="k-usual" aria-hidden="true"></span>recent level for this half-hour of the week (wind: its four-week median)</p>
+					<!-- each swatch keeps to its words, so a wrapped line doesn't leave a swatch behind (NOW-07) -->
+					<p class="pe-key"><span class="ki"><span class="k-now" aria-hidden="true"></span>now</span><span class="ki"><span class="k-usual" aria-hidden="true"></span><span>recent level for this half-hour of the week (wind: its four-week median)</span></span></p>
 				</div>
 
 				<aside class="pe-side">
@@ -141,9 +142,12 @@
 	.b-now { height: 7px; background: var(--c); }
 	.b-usual { height: 4px; background: color-mix(in srgb, var(--muted) 55%, transparent); }
 	.pe-key { margin: -4px 0 0; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 6px; font-size: 0.78rem; color: var(--muted); }
+	.pe-key { gap: 4px 12px; }
+	.pe-key .ki { display: inline-flex; align-items: baseline; gap: 6px; min-width: 0; }
+	.pe-key .ki > span:first-child { flex: none; align-self: center; }
 	.k-now, .k-usual { display: inline-block; width: 14px; border-radius: 2px; }
 	.k-now { height: 7px; background: var(--ink-2); }
-	.k-usual { height: 4px; margin-left: 8px; background: color-mix(in srgb, var(--muted) 55%, transparent); }
+	.k-usual { height: 4px; background: color-mix(in srgb, var(--muted) 55%, transparent); }
 
 	.pe-side { flex: 2 1 340px; min-width: 0; padding: 16px 18px; background: color-mix(in srgb, var(--bg) 45%, var(--surface)); border-left: 1px solid var(--grid); display: grid; gap: 14px; align-content: start; }
 	.pe-side h3 { margin: 0 0 6px; font-size: 0.86rem; }
