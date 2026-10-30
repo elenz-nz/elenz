@@ -76,14 +76,11 @@
 		return shownGroups.filter((g) => cat === 'all' || g === cat).map((g) => ({
 			name: g,
 			rows: DEFS.filter((d) => d.group === g).map((d): Row => {
-				// a record kept for periods only (lowest hydro, lowest price) shows its day record on the half-hour list
-				const p = d.kind !== 'hh' ? 'tp' : d.periods && period === 'tp' ? 'day' : period;
+				const p = d.kind !== 'hh' ? 'tp' : period;
 				const rec = get(R, d.id, region, p);
 				const na = notShown(d, region, rec, R, p);
 				const prov = na ? null : p === 'tp' ? provisional(R, live, d.id, region) : (rec?.prov ?? null);
-				// its page opens on the day record by itself, so the link leaves the list's period off and Back to Records
-				// returns to the same list
-				const link = na ? null : d.periods && period === 'tp' ? href(d.id, region, 'tp') : href(d.id);
+				const link = na ? null : href(d.id);
 				return { d, rec, na, prov, p, link, isNew: !na && !!rec?.since && Date.now() - rec.since < 30 * 864e5 };
 			}),
 		}));
@@ -96,9 +93,11 @@
 		return pace(R, liveD).sort((a, b) => (a.region === 'NZ' ? 0 : 1) - (b.region === 'NZ' ? 0 : 1))
 			.filter((x) => { const k = x.d.id + x.period; return !seen.has(k) && !!seen.add(k); });
 	});
-	const miles = $derived(R ? milestones(R, region).slice(-6).reverse() : []);
-	const MOY = ['demand_max', 'demand_min', 'ren_max', 'wind_max', 'solar_max', 'roof_max', 'price_max'];
-	const moyRows = $derived(R ? MOY.map((id) => DEFS.find((d) => d.id === id)!).filter((d) => d.regions.includes(region))
+	const miles = $derived(R ? milestones(R, region).reverse() : []);   // newest first
+	let milesAll = $state(false);
+	const MILES = 6;
+	// every half-hour record has a best for each month of the year (records.py by_month_of_year)
+	const moyRows = $derived(R ? DEFS.filter((d) => d.kind === 'hh' && d.regions.includes(region))
 		.map((d) => ({ d, tv: R.moy?.[d.id]?.[region]?.[moy] ?? null })).filter((x) => x.tv && !notShown(x.d, region, get(R, x.d.id, region))) : []);
 
 </script>
@@ -270,11 +269,11 @@
 						<div class="ttl-row"><h2 id="mile-h">Milestones · {regionName}</h2><InfoTip label="About milestones">
 							<ul>
 								<li>The first half-hour each round level was passed: wind, grid and embedded solar, renewable share and peak demand.</li>
-								<li>The six most recent, newest first.</li>
+								<li>Newest first.</li>
 							</ul>
 						</InfoTip></div>
 						<ul class="miles">
-							{#each miles as m}
+							{#each milesAll ? miles : miles.slice(0, MILES) as m}
 								<li>
 									<span class="dot" style="--c:var({m.d.tok})"></span>
 									<span><b>{m.d.unit === '%' ? `${m.level}% renewable` : `${m.level.toLocaleString('en-NZ')} MW of ${m.d.id === 'wind_max' ? 'wind' : m.d.id === 'solar_max' ? 'grid solar' : m.d.id === 'roof_max' ? 'embedded solar' : 'demand'}`}</b>
@@ -282,6 +281,7 @@
 								</li>
 							{/each}
 						</ul>
+						{#if miles.length > MILES}<button type="button" class="more-btn" onclick={() => (milesAll = !milesAll)}>{milesAll ? 'Show fewer' : `Show all ${miles.length}`}</button>{/if}
 					</section>
 				{/if}
 

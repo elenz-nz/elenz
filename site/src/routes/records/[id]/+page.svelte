@@ -27,9 +27,7 @@
 	let region = $state('NZ');
 	// a half-hour record's day, week, month or year record (?period=)
 	let period = $state('tp');
-	// a record kept for periods only (d.periods) has no half-hour record: it opens on its day, as the Records list
-	// shows it on the half-hour list
-	const per = $derived(d.kind === 'hh' ? (d.periods && period === 'tp' ? 'day' : period) : 'tp');
+	const per = $derived(d.kind === 'hh' ? period : 'tp');
 	let liveD = $state.raw<any>(null);
 	let det = $state.raw<any>(null);   // records-detail.json: the best by month behind the progression, the record periods
 	let shareMsg = $state('');   // "Link copied" for a moment after Share copies the link
@@ -248,7 +246,7 @@
 			<p class="sub">{periodSub(d, per)}</p>
 			{#if d.kind === 'hh'}
 				<div class="seg per" role="group" aria-label="Record for each">
-					{#each PERIODS.filter((p) => !d.periods || p.k !== 'tp') as p}
+					{#each PERIODS as p}
 						<button type="button" aria-pressed={per === p.k} onclick={() => setPeriod(p.k)}>{p.label}</button>
 					{/each}
 				</div>
