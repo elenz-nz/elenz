@@ -315,13 +315,12 @@
 	.card:hover { border-color: var(--ink-2); }
 	/* Heading for a record: one small tile each, the record's colour on a tint of it */
 	.paces { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
-	.pt { display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 8px; border-radius: 999px; color: var(--ink); text-decoration: none;
-		background: color-mix(in srgb, var(--c) 9%, var(--surface)); border: 1px solid color-mix(in srgb, var(--c) 30%, var(--line));
+	.pt { display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 8px; border-radius: 6px; color: var(--ink); text-decoration: none;
+		background: color-mix(in srgb, var(--c) 16%, var(--surface)); border: 1px solid color-mix(in srgb, var(--c) 45%, var(--line));
 		transition: transform 0.15s, border-color 0.15s, background 0.15s; }
-	.pt:hover, .pt:focus-visible { transform: translateY(-2px); border-color: var(--c); background: color-mix(in srgb, var(--c) 15%, var(--surface)); }
+	.pt:hover, .pt:focus-visible { transform: translateY(-2px); border-color: var(--c); background: color-mix(in srgb, var(--c) 24%, var(--surface)); }
 	.pt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-	.pt-ic { position: relative; display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 50%; color: var(--c); background: var(--surface);
-		box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--c) 45%, transparent); }
+	.pt-ic { position: relative; display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 50%; color: var(--c); }
 	/* a slow ring: it's still going */
 	.pt-ic::after { content: ""; position: absolute; inset: 0; border-radius: 50%; animation: pt-ring 2.6s ease-out infinite; }
 	@keyframes pt-ring { from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 45%, transparent); } to { box-shadow: 0 0 0 9px color-mix(in srgb, var(--c) 0%, transparent); } }
@@ -334,7 +333,7 @@
 	/* phones: two to a row, the name free to wrap, no arrow */
 	@media (max-width: 560px) {
 		.paces { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
-		.pt { gap: 8px; padding: 6px 10px 6px 6px; border-radius: 18px; }
+		.pt { gap: 8px; padding: 6px 10px 6px 6px; border-radius: 6px; }
 		.pt-ic { width: 30px; height: 30px; }
 		.pt-ic :global(svg) { width: 18px; height: 18px; }
 		.pt-txt b { font-size: 0.8rem; white-space: normal; }
