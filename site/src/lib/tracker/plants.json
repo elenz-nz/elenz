@@ -146,10 +146,16 @@
 "owner":"Contact"
 },
 "Kohirā Solar Farm":{
-"owner":"Other generators"
+"owner":"Other generators",
+"aka":[
+"Kaitaia Solar Farm"
+]
 },
 "Kōwhai Park Solar Farm":{
-"owner":"Contact"
+"owner":"Contact",
+"aka":[
+"Christchurch Airport Solar Farm"
+]
 },
 "Kūmara":{
 "owner":"Contact"
@@ -192,7 +198,10 @@
 "owner":"Contact"
 },
 "Nga Awa Pūrua":{
-"owner":"Mercury"
+"owner":"Mercury",
+"aka":[
+"Rotokawa II"
+]
 },
 "Ngā Tamariki":{
 "owner":"Mercury"
@@ -217,7 +226,10 @@
 ]
 },
 "Papareireiā":{
-"owner":"Other generators"
+"owner":"Other generators",
+"aka":[
+"Ryman Healthcare Solar Farm"
+]
 },
 "Poihipi":{
 "owner":"Contact"
@@ -226,7 +238,10 @@
 "owner":"Other generators"
 },
 "Pāmu Rā ki Whitianga Solar Farm":{
-"owner":"Other generators"
+"owner":"Other generators",
+"aka":[
+"Whitianga Solar Farm"
+]
 },
 "Pātea":{
 "owner":"Contact"
@@ -237,7 +252,10 @@
 "river":1
 },
 "Rangitaiki Solar Farm":{
-"owner":"Other generators"
+"owner":"Other generators",
+"aka":[
+"Edgecumbe Solar Farm"
+]
 },
 "Roaring Meg":{
 "owner":"Other generators"
@@ -309,7 +327,11 @@
 "owner":"Contact"
 },
 "Tauhara":{
-"owner":"Contact"
+"owner":"Contact",
+"aka":[
+"Tauhara 2",
+"Tauhara Stage 2"
+]
 },
 "Tauhei Solar Farm":{
 "owner":"Other generators"
@@ -318,10 +340,17 @@
 "owner":"Other generators"
 },
 "Te Herenga o Te Rā Solar Farm":{
-"owner":"Other generators"
+"owner":"Other generators",
+"aka":[
+"Waiotahe Solar Farm"
+]
 },
 "Te Huka":{
-"owner":"Contact"
+"owner":"Contact",
+"aka":[
+"Tauhara One",
+"Centennial Drive binary"
+]
 },
 "Te Huka 3":{
 "owner":"Contact"
@@ -331,7 +360,11 @@
 "metered":"The metered history has Te Mihi 1 and 2 together, so it shows the station whole. The dispatch data (the live week and the weeks since the newest metered month) shows each unit."
 },
 "Te Puna Mauri ō Omaru at Ruawai":{
-"owner":"Other generators"
+"owner":"Other generators",
+"aka":[
+"Ruawai Solar Farm",
+"Northpower Solar Farm"
+]
 },
 "Te Rapa":{
 "owner":"Contact"
@@ -371,7 +404,10 @@
 "metered":"The metered history has one meter for Tuai, Piripaua and Kaitawa together, so it shows the scheme whole. The dispatch data (the live week and the weeks since the newest metered month) shows each station."
 },
 "Waipipi":{
-"owner":"Genesis"
+"owner":"Genesis",
+"aka":[
+"Waverley Wind Farm"
+]
 },
 "Waipori (2A/3/4)":{
 "owner":"Contact",

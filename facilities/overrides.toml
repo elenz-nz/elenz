@@ -152,6 +152,18 @@ Waipori = ["Deep Stream (Waipori A)", "Waipori (2A/3/4)"]
 "Kaimai" = ["Kaimai 5"]
 "Paerau Gorge" = ["Patearoa"]   # its metered codes count Patearoa with Paerau (PTR0111, then NSY0331)
 "Glenbrook Steel" = ["NZ Steel Glenbrook"]
+# newer plants: the project or town names they were announced or built under (checked 31 Oct 2026)
+"Kohirā Solar Farm" = ["Kaitaia Solar Farm"]                       # Lodestone's Kaitaia project; Kohirā gifted by Te Rarawa
+"Rangitaiki Solar Farm" = ["Edgecumbe Solar Farm"]                  # Lodestone's Edgecumbe project
+"Te Herenga o Te Rā Solar Farm" = ["Waiotahe Solar Farm"]           # Lodestone's Waiotahe project; name gifted by Te Ūpokorehe
+"Pāmu Rā ki Whitianga Solar Farm" = ["Whitianga Solar Farm"]        # Lodestone; name gifted by Ngāti Hei
+"Te Puna Mauri ō Omaru at Ruawai" = ["Ruawai Solar Farm", "Northpower Solar Farm"]
+"Papareireiā" = ["Ryman Healthcare Solar Farm"]                     # first developed by Ryman Healthcare and Solar Bay
+"Kōwhai Park Solar Farm" = ["Christchurch Airport Solar Farm"]
+"Waipipi" = ["Waverley Wind Farm"]                                  # Tilt Renewables, renamed before construction (2019)
+"Tauhara" = ["Tauhara 2", "Tauhara Stage 2"]                        # Contact, opened Nov 2024
+"Te Huka" = ["Tauhara One", "Centennial Drive binary"]
+"Nga Awa Pūrua" = ["Rotokawa II"]
 
 # Site only. What the metered history counts for a plant where it differs from the dispatch data (the live week and
 # the weeks since the newest metered month), shown when the tracker drills into the plant. Evidence in

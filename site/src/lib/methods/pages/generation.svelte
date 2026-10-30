@@ -63,7 +63,7 @@
 	<li><b>Kawerau (Te Ahi O Maui)</b> and <b>Kawerau (TOPP2)</b>: one metered code at <code>KAW2201</code> carries both from December 2025, split 35% and 65% by their dispatch shares.</li>
 	<li><b>Glenbrook</b>: its metered output runs about 1.45 times the dispatch data’s figure.</li>
 </ul>
-<p>When the tracker drills into one of these plants, or a station shown whole, it says what its metered history counts, and lists any other names the plant has had or goes by (Taranaki Combined Cycle for Stratford, Tekapo for Takapō, Tararua Wind Central for Tararua Wind Farm 3). The list’s filter and the search on Now find plants by those names too.</p>
+<p>When the tracker drills into one of these plants, or a station shown whole, it says what its metered history counts, and lists any other names the plant has had or goes by (Taranaki Combined Cycle for Stratford, Tekapo for Takapō, Waverley for Waipipi, and the project names newer solar farms were built under, such as Kaitaia for Kohirā and Waiotahe for Te Herenga o Te Rā). The list’s filter and the search on Now find plants by those names too.</p>
 
 <h2 id="totals">Totals, peaks and capacity</h2>
 <p class="formula">Total generation = Σ every source’s output while positive
