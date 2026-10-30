@@ -321,7 +321,13 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   `analysis/make_points.py`), `rooftop_capacity.json` (capacity snapshot the live job uses until the history job
   has stored `hist/roof_cap.json`).
 - `facilities/overrides.toml`: curated corrections (any change rebuilds history, except the site-only `[owners]`,
-  `[plant_owners]` and `[hydro_schemes]`; the scheme is "Tekapo" (owner's call, 30 Oct 2026), its stations keep the
+  `[plant_owners]`, `[hydro_schemes]`, `[plant_aka]` and `[plant_metering]` (`SITE_ONLY` in history.py; owner's call,
+  31 Oct 2026: `[plant_aka]` other names a plant has had or goes by, matched by the tracker's list filter (the matched
+  name shown beside the row) and /now's search; `[plant_metering]` what the metered history counts where it differs
+  from the dispatch data (stations shown whole, Kaimai and Ngāwhā, the split meters at WPG0331 and KAW2201,
+  Glenbrook); both shown under the summary's heading when the tracker drills into the plant, `#plant-note`; the
+  members of `[plant_groups]` and the register names in `[plant_names]` are added to `aka` automatically, numbered
+  parts of the plant's own name left out); the scheme is "Tekapo" (owner's call, 30 Oct 2026), its stations keep the
   register's "Takapō A/B"), `[plant_groups]` (stations the metered history only sees whole: Huntly
   Rankines, Stratford, Waikaremoana, Te Mihi, Southdown, shown as one plant everywhere with their register plants as
   units), `[solar_farms_in_registry]` (dispatched farms the
@@ -339,7 +345,7 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
 - `facilities/NEXT_REBUILD.md`: changes waiting for the next full history rebuild (they touch fingerprinted files).
   Bundle them into one rebuild; never start one while another is running. While a build is being collected, its items
   go on the branch `next-rebuild` (a draft PR), not on `main`.
-- `ingest/plant_meta.py` writes `site/src/lib/tracker/plants.json` (plant → owner, hydro scheme) from the register and
+- `ingest/plant_meta.py` writes `site/src/lib/tracker/plants.json` (plant → owner, hydro scheme, `aka`, `metered`) from the register and
   those tables. Rerun it and commit the JSON after refreshing the register or editing the tables.
 - `.github/workflows/checks.yml`: on every push, ruff (syntax errors and undefined names only), `ingest/tests/smoke.py`
   (the live and history paths on a committed one-hour sample of real dispatch data and matching final prices, no network)

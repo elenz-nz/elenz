@@ -9,7 +9,7 @@ import PLANT_META from '#lib/tracker/plants.json';
 import { slug } from '#lib/site/viewurl.js';
 
 const FUEL = Object.fromEntries(FUELS.map((f) => [f.k, f]));
-const META = /** @type {Record<string, { owner?: string }>} */ (PLANT_META);
+const META = /** @type {Record<string, { owner?: string, aka?: string[] }>} */ (PLANT_META);
 const CAP_ROWS = new Map(CAPACITY.plants.map((p) => [p.name, p.rows]));
 const TODAY = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Pacific/Auckland' }).format(new Date());
 
@@ -22,7 +22,8 @@ function capacityNow(name, fallback, today) {
 
 /** @typedef {{ name: string, mw: number, cap: number | null }} Unit */
 /** @typedef {{ name: string, key: string, fuel: string, fuelName: string, tok: string, isl: string, owner: string,
- *   mw: number, cap: number | null, pct: number | null, charging: boolean, href: string, units: Unit[], part: string }} Row */
+ *   mw: number, cap: number | null, pct: number | null, charging: boolean, href: string, units: Unit[], part: string,
+ *   aka: string[] }} Row */
 /** @typedef {{ fuel: string, island: string, owner: string, by: string, asc: boolean, text: string, on: boolean }} Settings */
 
 // groups whose members are separate stations rather than units of one (Waikaremoana: Kaitawa, Tuai and Piripaua
@@ -50,6 +51,8 @@ export function generatorRows(D) {
       units: (p.units || []).map((u) => ({ name: u.label || u.name, mw: u.s?.[j] ?? 0, cap: u.cap || null })),
       // a station shown whole lists its register plants (they carry a label); a plant on two buses, its connections
       part: (p.units || []).some((u) => u.label) ? 'units' : 'connections',
+      // other names the search also finds it by (Stratford: Taranaki Combined Cycle), plus a station's units
+      aka: [...(META[p.group || p.name]?.aka || []), ...(p.units || []).map((u) => u.label || u.name)],
     };
   });
 }
@@ -103,7 +106,7 @@ const norm = (x) => String(x).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCa
 export function pick(rows, s) {
   const text = norm(s.text.trim());
   const out = rows.filter((r) => (!s.fuel || r.fuel === s.fuel) && (!s.island || r.isl === s.island) &&
-    (!s.owner || slug(r.owner) === s.owner) && (!text || norm(r.name).includes(text)) && (!s.on || Math.abs(r.mw) >= 0.5));
+    (!s.owner || slug(r.owner) === s.owner) && (!text || [r.name, ...(r.aka || [])].some((n) => norm(n).includes(text))) && (!s.on || Math.abs(r.mw) >= 0.5));
   // fuel, island and owner group the list; within each group the largest MW comes first (owner's report NOW-10)
   const val = (r) => (s.by === 'name' ? norm(r.name) : s.by === 'pct' ? r.pct : s.by === 'fuel' ? norm(r.fuelName)
     : s.by === 'island' ? r.isl : s.by === 'owner' ? (r.owner === 'Other generators' ? '\uffff' : norm(r.owner)) : r.mw);

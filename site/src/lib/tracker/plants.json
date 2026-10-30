@@ -50,7 +50,8 @@
 "Deep Stream (Waipori A)":{
 "owner":"Contact",
 "scheme":"Waipori",
-"river":0
+"river":0,
+"metered":"Since June 2011 one meter (WPG0331) carries Deep Stream and Mahinerangi wind farm together. The metered history splits it 30% Deep Stream, 70% Mahinerangi, their average shares in the dispatch data 2020–26. The dispatch data (the live week and the weeks since the newest metered month) has each plant's own output."
 },
 "Edgecumbe":{
 "owner":"Other generators"
@@ -59,7 +60,11 @@
 "owner":"Nova"
 },
 "Glenbrook Steel":{
-"owner":"Other generators"
+"owner":"Other generators",
+"aka":[
+"NZ Steel Glenbrook"
+],
+"metered":"Its metered output (meter points GLN0111 and GLN0332) runs about 1.45 times the dispatch data's figure, so expect a step where the metered history meets the dispatch weeks."
 },
 "Glenbrook-Ohurua Battery":{
 "owner":"Contact"
@@ -71,22 +76,33 @@
 "owner":"Contact"
 },
 "Huntly 5":{
-"owner":"Genesis"
+"owner":"Genesis",
+"aka":[
+"e3p"
+]
 },
 "Huntly 6":{
-"owner":"Genesis"
+"owner":"Genesis",
+"aka":[
+"P40"
+]
 },
 "Huntly Battery":{
 "owner":"Genesis"
 },
 "Huntly Rankines":{
-"owner":"Genesis"
+"owner":"Genesis",
+"metered":"The metered history has one meter for units 1–4 together, so it shows them as one. The dispatch data (the live week and the weeks since the newest metered month) shows each unit."
 },
 "Junction Road":{
 "owner":"Nova"
 },
 "Kaimai":{
-"owner":"Contact"
+"owner":"Contact",
+"aka":[
+"Kaimai 5"
+],
+"metered":"The metered history counts the whole Kaimai scheme, but the dispatch data has only its one dispatched unit (Kaimai 5), so the live week and the weeks since the newest metered month show less than the scheme's full output."
 },
 "Kaiwaikawe Wind Farm":{
 "owner":"Mercury"
@@ -109,13 +125,19 @@
 "owner":"Mercury"
 },
 "Kawerau (TOPP2)":{
-"owner":"Other generators"
+"owner":"Other generators",
+"metered":"Since December 2025 one metered code at KAW2201 carries TOPP2 and Te Ahi O Maui together. The metered history splits it 65% TOPP2, 35% Te Ahi O Maui, by their shares in the dispatch data. The dispatch data (the live week and the weeks since the newest metered month) has each plant's own output."
 },
 "Kawerau (Te Ahi O Maui)":{
-"owner":"Other generators"
+"owner":"Other generators",
+"metered":"Since December 2025 one metered code at KAW2201 carries Te Ahi O Maui and TOPP2 together. The metered history splits it 35% Te Ahi O Maui, 65% TOPP2, by their shares in the dispatch data. The dispatch data (the live week and the weeks since the newest metered month) has each plant's own output."
 },
 "Kawerau Mill CoGen":{
-"owner":"Other generators"
+"owner":"Other generators",
+"aka":[
+"Norske Skog CoGen",
+"Carter Holt Harvey Energy Ltd CoGen"
+]
 },
 "Kawerau TG1/TG2":{
 "owner":"Other generators"
@@ -124,10 +146,16 @@
 "owner":"Contact"
 },
 "Kohirā Solar Farm":{
-"owner":"Other generators"
+"owner":"Other generators",
+"aka":[
+"Kaitaia Solar Farm"
+]
 },
 "Kōwhai Park Solar Farm":{
-"owner":"Contact"
+"owner":"Contact",
+"aka":[
+"Christchurch Airport Solar Farm"
+]
 },
 "Kūmara":{
 "owner":"Contact"
@@ -136,7 +164,8 @@
 "owner":"Genesis"
 },
 "Mahinerangi (Waipori B)":{
-"owner":"Contact"
+"owner":"Contact",
+"metered":"Since June 2011 one meter (WPG0331) carries Mahinerangi and Deep Stream hydro together. The metered history splits it 70% Mahinerangi, 30% Deep Stream, their average shares in the dispatch data 2020–26. The dispatch data (the live week and the weeks since the newest metered month) has each plant's own output."
 },
 "Manapōuri":{
 "owner":"Meridian",
@@ -169,13 +198,20 @@
 "owner":"Contact"
 },
 "Nga Awa Pūrua":{
-"owner":"Mercury"
+"owner":"Mercury",
+"aka":[
+"Rotokawa II"
+]
 },
 "Ngā Tamariki":{
 "owner":"Mercury"
 },
 "Ngāwhā":{
-"owner":"Other generators"
+"owner":"Other generators",
+"aka":[
+"Ngāwhā B"
+],
+"metered":"The metered history counts the whole station (Ngāwhā A and B), but the dispatch data has only Ngāwhā B (OEC4), so the live week and the weeks since the newest metered month show less than the station's full output."
 },
 "Norske Skog CoGen":{
 "owner":"Other generators"
@@ -184,10 +220,16 @@
 "owner":"Other generators"
 },
 "Paerau Gorge":{
-"owner":"Contact"
+"owner":"Contact",
+"aka":[
+"Patearoa"
+]
 },
 "Papareireiā":{
-"owner":"Other generators"
+"owner":"Other generators",
+"aka":[
+"Ryman Healthcare Solar Farm"
+]
 },
 "Poihipi":{
 "owner":"Contact"
@@ -196,7 +238,10 @@
 "owner":"Other generators"
 },
 "Pāmu Rā ki Whitianga Solar Farm":{
-"owner":"Other generators"
+"owner":"Other generators",
+"aka":[
+"Whitianga Solar Farm"
+]
 },
 "Pātea":{
 "owner":"Contact"
@@ -207,7 +252,10 @@
 "river":1
 },
 "Rangitaiki Solar Farm":{
-"owner":"Other generators"
+"owner":"Other generators",
+"aka":[
+"Edgecumbe Solar Farm"
+]
 },
 "Roaring Meg":{
 "owner":"Other generators"
@@ -230,13 +278,21 @@
 "owner":"Meridian"
 },
 "Southdown":{
-"owner":"Mercury"
+"owner":"Mercury",
+"metered":"The metered history has one meter for the original cogeneration plant and unit 5 together. Southdown closed in January 2016, before the dispatch data starts."
 },
 "Southdown Battery":{
 "owner":"Mercury"
 },
 "Stratford":{
-"owner":"Contact"
+"owner":"Contact",
+"aka":[
+"Taranaki Combined Cycle",
+"Stratford Peaker 1",
+"Stratford Peaker 2",
+"TCC"
+],
+"metered":"The metered history has one meter (SFD2201) for Taranaki Combined Cycle (1998–2025) and the two peakers (from 2011), and until 2001 the old Stratford gas turbines too, so it shows the station whole. The dispatch data (the live week and the weeks since the newest metered month) shows each unit."
 },
 "Taiohi Solar Farm":{
 "owner":"Other generators"
@@ -244,15 +300,25 @@
 "Takapō A":{
 "owner":"Genesis",
 "scheme":"Tekapo",
-"river":0
+"river":0,
+"aka":[
+"Tekapo A"
+]
 },
 "Takapō B":{
 "owner":"Genesis",
 "scheme":"Tekapo",
-"river":1
+"river":1,
+"aka":[
+"Tekapo B"
+]
 },
 "Tararua Wind Farm 3":{
-"owner":"Contact"
+"owner":"Contact",
+"aka":[
+"Tararua Wind Central",
+"Tararua stage III"
+]
 },
 "Tararua stage I":{
 "owner":"Contact"
@@ -261,7 +327,11 @@
 "owner":"Contact"
 },
 "Tauhara":{
-"owner":"Contact"
+"owner":"Contact",
+"aka":[
+"Tauhara 2",
+"Tauhara Stage 2"
+]
 },
 "Tauhei Solar Farm":{
 "owner":"Other generators"
@@ -270,19 +340,31 @@
 "owner":"Other generators"
 },
 "Te Herenga o Te Rā Solar Farm":{
-"owner":"Other generators"
+"owner":"Other generators",
+"aka":[
+"Waiotahe Solar Farm"
+]
 },
 "Te Huka":{
-"owner":"Contact"
+"owner":"Contact",
+"aka":[
+"Tauhara One",
+"Centennial Drive binary"
+]
 },
 "Te Huka 3":{
 "owner":"Contact"
 },
 "Te Mihi":{
-"owner":"Contact"
+"owner":"Contact",
+"metered":"The metered history has Te Mihi 1 and 2 together, so it shows the station whole. The dispatch data (the live week and the weeks since the newest metered month) shows each unit."
 },
 "Te Puna Mauri ō Omaru at Ruawai":{
-"owner":"Other generators"
+"owner":"Other generators",
+"aka":[
+"Ruawai Solar Farm",
+"Northpower Solar Farm"
+]
 },
 "Te Rapa":{
 "owner":"Contact"
@@ -313,10 +395,19 @@
 "Waikaremoana":{
 "owner":"Genesis",
 "scheme":"Waikaremoana",
-"river":0
+"river":0,
+"aka":[
+"Tuai",
+"Piripaua",
+"Kaitawa"
+],
+"metered":"The metered history has one meter for Tuai, Piripaua and Kaitawa together, so it shows the scheme whole. The dispatch data (the live week and the weeks since the newest metered month) shows each station."
 },
 "Waipipi":{
-"owner":"Genesis"
+"owner":"Genesis",
+"aka":[
+"Waverley Wind Farm"
+]
 },
 "Waipori (2A/3/4)":{
 "owner":"Contact",

@@ -421,6 +421,7 @@
 					<p><a href="/about#controls">Every control, in detail</a> · <a href="/methods">How the figures are worked out</a></p>
 				</div>
 				<div class="sum-level" id="sum-level" hidden><span id="sum-level-txt"></span><button type="button" class="back" id="sum-back">‹ Back</button></div>
+				<div class="plant-note" id="plant-note" hidden></div>
 				<input type="search" class="mix-filter" id="mix-filter" aria-label="Filter the list" placeholder="Filter" hidden />
 				<div class="mix-tools" id="mix-tools" role="group" aria-label="Show in the chart" hidden><span>Show</span><button type="button" id="mix-all">All</button><button type="button" id="mix-none">None</button></div>
 				<table class="mix">
