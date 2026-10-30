@@ -65,12 +65,12 @@ HALF_HOURS = {
     'fossil_min': ('min', 'gen', REGIONS, 0),
     'fossil_max': ('max', 'gen', REGIONS, 0),
     'hydro_max': ('max', 'gen', REGIONS, 0),
-    'hydro_min': ('min', 'gen', REGIONS, 0),         # the site shows its periods only (a dry month or year)
+    'hydro_min': ('min', 'gen', REGIONS, 0),
     'wind_max': ('max', 'gen', REGIONS, 0),
     'solar_max': ('max', 'gen', REGIONS, 0),
     'roof_max': ('max', 'gen', REGIONS, 0),
     'price_max': ('max', 'price', REGIONS, 2),
-    'price_min': ('min', 'price', REGIONS, 2),        # the site shows its periods only (half-hours go to zero often)
+    'price_min': ('min', 'price', REGIONS, 2),
     'gap_max': ('max', 'price', ('NZ',), 2),
     'hvdc_n_max': ('max', 'hvdc', ('NZ',), 0),
     'hvdc_s_max': ('max', 'hvdc', ('NZ',), 0),

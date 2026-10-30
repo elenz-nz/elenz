@@ -93,16 +93,17 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   over the chart; Escape lets go of the pin first, then the zoom. The progression's explanation is the ⓘ beside "How the
   record grew" (`growNote`), not a line under the chart. "Has stood for" counts from the end of the record's period
   (`recEnd`: a year record from 1 January after it), not its start.
-  Records added 23 Oct 2026 (records.py VERSION 4): most fossil generation, peak hydro, and, for days/weeks/months/years
-  only (`periods: true` in DEFS), lowest hydro and lowest price: the half-hour list shows their day record (`Average over
-  the day`), and their page opens on its day (owner's report, 25 Oct 2026: the note there looked like a gap). A record
+  Records added 23 Oct 2026 (records.py VERSION 4): most fossil generation, peak hydro, lowest hydro and lowest price.
+  Every record the data holds is shown, half-hours included (owner's rule, 30 Oct 2026: nothing left out for being
+  less interesting; lowest hydro and lowest price had been kept to days and longer). The month-of-year table lists every
+  half-hour record and Milestones all of them (6, then Show all). A record
   page's "Records" breadcrumb returns to the list's own period (`period`, the one asked for), not the page's `per`. A DEFS entry's `v` is the records.json version that first has it; an older file says it is being worked out.
   "Heading for a record" (owner's call, 23 Oct 2026): `pace()` in records.js lists a current day/week/month/year once
   half of it has gone (`PACE_SHARE`) and only while it is ahead of its record period at the same point (whole days, or
   half-hours for a day), from records.json `pace` (records.py `pace_sums`: the current periods' sums in the history,
   and `to`) plus the live week after it, against each record's `curve` (`period_curve`: the record period's running
   figure; on the provisional record when one is beyond); shown as cards on /records (8, then Show all) and a panel on
-  the record's page. The Records index's rows open their record from anywhere on the row. The region picker and the "Official to" pill sit in the main list's own title bar (`.list-bar`, a sticky `.toolbar` inside the list's section, so it sticks only while the list shows), not at the top of the page: Heading for a record and New and provisional cover every region (owner's call, 30 Oct 2026). Every card on the page has an ⓘ in short bullet points.
+  the record's page. The Records index's rows open their record from anywhere on the row. The region picker, the period buttons (Trading period to Year, styled like the tracker's range buttons; their short names on phones) and the "Official to" pill sit in the main list's own title bar (`.list-bar`, a sticky `.toolbar` inside the list's section, so it sticks only while the list shows; two rows up to 900 px, region and periods kept to one row down to 360 px), not at the top of the page: Heading for a record and New and provisional cover every region (owner's call, 30 Oct 2026). Every card on the page has an ⓘ in short bullet points.
   `hist/records-detail.json` (records.py `build_detail`, published with records.json when it changes; served by the
   Worker; loaded only by record pages via `loadDetail`): `bg`, each record's best by month (by year for year records)
   against `months`/`years`, the faint line behind `Progression` (`bgOf`; its hover follows the pointer's date and gives

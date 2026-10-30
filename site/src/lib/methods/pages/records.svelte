@@ -15,7 +15,7 @@
 		gap_max: 'Haywards price against Benmore', low_price_run: 'Half-hours in a row under $5/MWh (New Zealand: both islands)',
 		hvdc_n_max: 'Benmore to Haywards', hvdc_s_max: 'Haywards to Benmore',
 	};
-	const kept = (d: any) => (d.kind === 'run' ? 'Run (any length)' : d.periods ? 'Day, week, month, year' : 'Half-hour, day, week, month, year');
+	const kept = (d: any) => (d.kind === 'run' ? 'Run (any length)' : 'Half-hour, day, week, month, year');
 	const DATA: Record<string, string> = { gen: 'Metered generation and demand', price: 'Final prices', hvdc: 'Metered HVDC' };
 	const dataOf = (d: any) => (d.est ? 'Modelled (embedded solar)' : DATA[d.fam]);
 	const regions = (r: string[]) => (r.length === 3 ? 'New Zealand, each island' : r.map((x) => ({ NZ: 'New Zealand', NI: 'North Island', SI: 'South Island' })[x]).join(', '));
@@ -34,7 +34,7 @@
 	<li><b>Energy alongside.</b> A period record also shows its energy (the average times the period’s hours), but it is ranked by the average.</li>
 	<li><b>Whole periods only.</b> The history’s first part-year (1997) and the period still under way don’t count, and a day needs 90% of its half-hours.</li>
 	<li><b>Official or provisional.</b> A period is official when every day in it is; a newer one beyond the record is provisional.</li>
-	<li><b>Lowest price and lowest hydro</b> are kept for these periods only. Their half-hours say little (prices often fall to a few cents, and hydro is lowest overnight), but a month or a year of them marks a glut of cheap power or a dry spell. The half-hour list shows their lowest day.</li>
+	<li><b>Lowest price and lowest hydro</b> have half-hour records like the rest, but their periods say more: a month or a year of them marks a glut of cheap power or a dry spell. A half-hour of either is usually overnight, and prices often fall to a few cents.</li>
 	<li>These replace the earlier month records for the renewable share and wind, whose pages still work.</li>
 </ul>
 

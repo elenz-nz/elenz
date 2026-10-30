@@ -76,14 +76,11 @@
 		return shownGroups.filter((g) => cat === 'all' || g === cat).map((g) => ({
 			name: g,
 			rows: DEFS.filter((d) => d.group === g).map((d): Row => {
-				// a record kept for periods only (lowest hydro, lowest price) shows its day record on the half-hour list
-				const p = d.kind !== 'hh' ? 'tp' : d.periods && period === 'tp' ? 'day' : period;
+				const p = d.kind !== 'hh' ? 'tp' : period;
 				const rec = get(R, d.id, region, p);
 				const na = notShown(d, region, rec, R, p);
 				const prov = na ? null : p === 'tp' ? provisional(R, live, d.id, region) : (rec?.prov ?? null);
-				// its page opens on the day record by itself, so the link leaves the list's period off and Back to Records
-				// returns to the same list
-				const link = na ? null : d.periods && period === 'tp' ? href(d.id, region, 'tp') : href(d.id);
+				const link = na ? null : href(d.id);
 				return { d, rec, na, prov, p, link, isNew: !na && !!rec?.since && Date.now() - rec.since < 30 * 864e5 };
 			}),
 		}));
@@ -96,9 +93,11 @@
 		return pace(R, liveD).sort((a, b) => (a.region === 'NZ' ? 0 : 1) - (b.region === 'NZ' ? 0 : 1))
 			.filter((x) => { const k = x.d.id + x.period; return !seen.has(k) && !!seen.add(k); });
 	});
-	const miles = $derived(R ? milestones(R, region).slice(-6).reverse() : []);
-	const MOY = ['demand_max', 'demand_min', 'ren_max', 'wind_max', 'solar_max', 'roof_max', 'price_max'];
-	const moyRows = $derived(R ? MOY.map((id) => DEFS.find((d) => d.id === id)!).filter((d) => d.regions.includes(region))
+	const miles = $derived(R ? milestones(R, region).reverse() : []);   // newest first
+	let milesAll = $state(false);
+	const MILES = 6;
+	// every half-hour record has a best for each month of the year (records.py by_month_of_year)
+	const moyRows = $derived(R ? DEFS.filter((d) => d.kind === 'hh' && d.regions.includes(region))
 		.map((d) => ({ d, tv: R.moy?.[d.id]?.[region]?.[moy] ?? null })).filter((x) => x.tv && !notShown(x.d, region, get(R, x.d.id, region))) : []);
 
 </script>
@@ -202,20 +201,22 @@
 						</ul>
 						<p><a href="/methods/records">How records work</a></p>
 					</InfoTip></div>
-					<div class="ctl">
+					<!-- region and period together, like the tracker's region and range; on phones a row of their own, the
+					     periods' short names -->
+					<div class="bar-ctl">
 						<label for="rec-region" class="vh">Region</label>
 						<select class="pick" id="rec-region" value={region} onchange={(e) => setRegion((e.currentTarget as HTMLSelectElement).value)}>
 							{#each REGIONS as r}<option value={r.id}>{r.name}</option>{/each}
 						</select>
+						<div class="seg per" role="group" aria-label="Records for each">
+							{#each PERIODS as p}
+								<button type="button" aria-pressed={period === p.k} title={p.label} onclick={() => setPeriod(p.k)}><span class="lg">{p.label}</span><span class="sh" aria-hidden="true">{p.short}</span></button>
+							{/each}
+						</div>
 					</div>
 					{#if R?.final_to?.gen}<span class="pill official">Official to {dayOf(R.final_to.gen)}</span>{/if}
 				</div>
 				<div class="sec-head">
-					<div class="seg per" role="group" aria-label="Records for each">
-						{#each PERIODS as p}
-							<button type="button" aria-pressed={period === p.k} onclick={() => setPeriod(p.k)}>{p.label}</button>
-						{/each}
-					</div>
 					<span class="unit">{period === 'tp' ? 'Half-hour averages unless stated' : `Averages over each ${periodOf(period).word}; runs are any length`}</span>
 				</div>
 				<div class="chips" role="group" aria-label="Show records about">
@@ -270,11 +271,11 @@
 						<div class="ttl-row"><h2 id="mile-h">Milestones · {regionName}</h2><InfoTip label="About milestones">
 							<ul>
 								<li>The first half-hour each round level was passed: wind, grid and embedded solar, renewable share and peak demand.</li>
-								<li>The six most recent, newest first.</li>
+								<li>Newest first.</li>
 							</ul>
 						</InfoTip></div>
 						<ul class="miles">
-							{#each miles as m}
+							{#each milesAll ? miles : miles.slice(0, MILES) as m}
 								<li>
 									<span class="dot" style="--c:var({m.d.tok})"></span>
 									<span><b>{m.d.unit === '%' ? `${m.level}% renewable` : `${m.level.toLocaleString('en-NZ')} MW of ${m.d.id === 'wind_max' ? 'wind' : m.d.id === 'solar_max' ? 'grid solar' : m.d.id === 'roof_max' ? 'embedded solar' : 'demand'}`}</b>
@@ -282,6 +283,7 @@
 								</li>
 							{/each}
 						</ul>
+						{#if miles.length > MILES}<button type="button" class="more-btn" onclick={() => (milesAll = !milesAll)}>{milesAll ? 'Show fewer' : `Show all ${miles.length}`}</button>{/if}
 					</section>
 				{/if}
 
@@ -328,6 +330,9 @@
 	.how { color: var(--accent); font-weight: 600; font-size: 0.86rem; }
 	/* the main list's title bar: sticks to the top of the window while the list shows (.toolbar in tracker.css) */
 	.list-bar { gap: 6px 14px; }
+	.bar-ctl { display: flex; align-items: center; gap: 8px; min-width: 0; }
+	.bar-ctl .seg { flex: none; }
+	.per .sh { display: none; }
 	.official { margin-left: auto; white-space: nowrap; }
 	.official::before { display: none; }
 
@@ -384,14 +389,12 @@
 	.c-sub { display: block; color: var(--muted); font-size: 0.78rem; margin-top: 4px; }
 	.c-val.gone { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; }
 
-	.per { justify-self: start; flex-wrap: wrap; }
-	.per button { min-height: 32px; padding-inline: 12px; font-size: 0.84rem; }
 	.chips { display: flex; gap: 6px; flex-wrap: wrap; }
 	.chip { font: inherit; font-size: 0.8rem; font-weight: 500; padding: 5px 11px; min-height: 32px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); cursor: pointer; }
 	.chip:hover { color: var(--ink); border-color: var(--ink-2); }
 	.chip[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--surface); }
 
-	.tbl { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; overflow-x: auto; }
+	.tbl { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; overflow-x: auto; }
 	table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
 	.tbl table { min-width: 860px; }
 	thead th { text-align: left; color: var(--muted); font-weight: 600; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 8px 12px; border-bottom: 1px solid var(--line); }
@@ -423,7 +426,7 @@
 	.moy th[scope='row'] { display: flex; align-items: center; padding-left: 0; font-weight: 500; }
 	.moy td.n:last-child { padding-right: 0; width: 4em; }
 	.moy tr:last-child td, .moy tr:last-child th { border-bottom: 0; }
-	select.pick { font-size: 1rem; }
+	#moy-h select.pick { font-size: 1rem; }
 
 	@media (max-width: 860px) {
 		.two { grid-template-columns: minmax(0, 1fr); }
@@ -448,5 +451,30 @@
 		.tbl tbody tr > td:nth-child(4), .tbl tbody tr > td:nth-child(5) { display: none; }
 		.tbl .na-note { grid-column: 1 / -1; padding-left: 18px; }
 		.hero h1 { font-size: 1.3rem; }
+	}
+	/* narrower screens: the bar in two rows, the heading and Official to, then the region and periods */
+	@media (max-width: 900px) {
+		.list-bar .ttl-row { order: 0; }
+		.official { order: 1; }
+		.bar-ctl { order: 2; flex-basis: 100%; }
+	}
+	/* phones: the periods' short names, as the tracker's range buttons */
+	@media (max-width: 560px) {
+		.per .lg { display: none; }
+		.per .sh { display: inline; }
+		.official { font-size: 0.68rem; padding-inline: 7px; letter-spacing: 0.02em; }
+	}
+	/* small phones (360 px): a little tighter so region and periods keep to one row; on the very smallest the periods
+	   wrap under the region */
+	@media (max-width: 400px) {
+		.list-bar { column-gap: 8px; }
+		.bar-ctl { gap: 6px; flex-wrap: wrap; row-gap: 6px; }
+		.list-bar select.pick { font-size: 0.85rem; padding-inline: 7px 22px; background-position: right 11px center, right 7px center; }
+		.list-bar .per button { font-size: 0.74rem; padding-inline: 4px; }
+		.official { text-transform: none; letter-spacing: 0; font-size: 0.72rem; }
+	}
+	@media (max-width: 340px) {
+		.list-bar h2 { font-size: 0.92rem; }
+		.official { font-size: 0.68rem; padding-inline: 6px; }
 	}
 </style>

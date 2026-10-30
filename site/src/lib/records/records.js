@@ -31,15 +31,14 @@ export const DEFS = [
   { id: 'huntly_off_run', kind: 'run', fam: 'gen', group: 'Renewables', name: 'Longest with no Huntly Rankine running', sub: 'The coal and gas units at Huntly', unit: 'h', tok: '--f-coal', regions: ['NZ'],
     na: { NI: 'Shown for New Zealand', SI: 'Huntly is in the North Island' } },
   { id: 'hydro_max', kind: 'hh', v: 4, fam: 'gen', group: 'Hydro', name: 'Peak hydro', sub: 'Half-hour', unit: 'MW', tok: '--f-hydro', regions: ALL },
-  // periods: true, records kept for days, weeks, months and years only (their half-hour lows say little): a dry spell.
   // v: the records.json version that first has a record (records.py VERSION); older files say it is being worked out
-  { id: 'hydro_min', kind: 'hh', v: 4, periods: true, fam: 'gen', group: 'Hydro', name: 'Lowest hydro', sub: 'Hydro generation, a dry spell', unit: 'MW', tok: '--f-hydro', regions: ALL },
+  { id: 'hydro_min', kind: 'hh', v: 4, fam: 'gen', group: 'Hydro', name: 'Lowest hydro', sub: 'Half-hour', unit: 'MW', tok: '--f-hydro', regions: ALL },
   { id: 'wind_max', kind: 'hh', fam: 'gen', group: 'Wind and solar', name: 'Peak wind', sub: 'Half-hour', unit: 'MW', tok: '--f-wind', regions: ALL },
   { id: 'wind_month_max', old: true, kind: 'month', fam: 'gen', group: 'Wind and solar', name: 'Windiest month', sub: 'Wind generation in a calendar month', unit: 'GWh', dp: 1, tok: '--f-wind', regions: ALL },
   { id: 'solar_max', kind: 'hh', fam: 'gen', group: 'Wind and solar', name: 'Peak grid solar', sub: 'Solar farms the market dispatches', unit: 'MW', tok: '--f-solar', regions: ALL },
   { id: 'roof_max', kind: 'hh', fam: 'gen', group: 'Wind and solar', name: 'Peak embedded solar', sub: 'Rooftops and small arrays, modelled', unit: 'MW', tok: '--f-solar', est: true, regions: ALL },
   { id: 'price_max', kind: 'hh', fam: 'price', group: 'Prices', name: 'Highest price', sub: 'Half-hour, final price', unit: '$', dp: 2, tok: '--accent', regions: ALL },
-  { id: 'price_min', kind: 'hh', v: 4, periods: true, fam: 'price', group: 'Prices', name: 'Lowest price', sub: 'Final price, average', unit: '$', dp: 2, tok: '--accent', regions: ALL },
+  { id: 'price_min', kind: 'hh', v: 4, fam: 'price', group: 'Prices', name: 'Lowest price', sub: 'Half-hour, final price', unit: '$', dp: 2, tok: '--accent', regions: ALL },
   { id: 'gap_max', kind: 'hh', fam: 'price', group: 'Prices', name: 'Biggest gap between the islands', sub: 'Haywards against Benmore, half-hour', unit: '$', dp: 2, tok: '--accent', regions: ['NZ'],
     na: { NI: 'Shown for New Zealand', SI: 'Shown for New Zealand' } },
   { id: 'low_price_run', kind: 'run', fam: 'price', group: 'Prices', name: 'Longest run of near-zero prices', sub: 'Under $5/MWh (New Zealand: both islands)', unit: 'h', tok: '--accent', regions: ALL },
@@ -99,7 +98,6 @@ export function get(R, id, region, period = 'tp') {
 /** Why a record isn't shown for a region: the definition's note, or what its data says (always the same value). */
 export function notShown(d, region, rec, R = null, period = 'tp') {
   if (!d.regions.includes(region)) return d.na?.[region] ?? 'Shown for New Zealand';
-  if (d.periods && period === 'tp') return 'Kept for days, weeks, months and years';
   if (!rec && d.v && R && (R.v ?? 0) < d.v) return 'Being worked out from the history; back in a day or so';
   if (!rec && period !== 'tp' && d.kind === 'hh' && R && !R.periods) return 'Being worked out from the history; back in a day or so';
   if (!rec) return 'No data yet';
@@ -267,6 +265,7 @@ function halfHours(D) {
     };
     S.ren_min = S.ren_max;
     S.fossil_max = S.fossil_min;
+    S.hydro_min = S.hydro_max;
     for (const [id, v] of Object.entries(S)) (out[id] ??= {})[r] = v;
   }
   return { T, S: out };
@@ -280,7 +279,7 @@ export function liveBeats(R, D) {
   try { H = halfHours(D); } catch { return {}; }
   const out = {};
   for (const d of DEFS) {
-    if (d.kind !== 'hh' || d.periods || d.fam !== 'gen' || !H.S[d.id]) continue;
+    if (d.kind !== 'hh' || d.fam !== 'gen' || !H.S[d.id]) continue;
     for (const r of d.regions) {
       const rec = get(R, d.id, r), v = H.S[d.id][r];
       if (!rec || !v) continue;
@@ -398,7 +397,7 @@ export function recent(R, live, now = Date.now()) {
   }
   for (const x of R.resolved ?? []) {
     const d = def(x.k);
-    if (d && !x.ok && !d.periods) out.push({ d, region: x.r, rec: get(R, x.k, x.r), settled: x, at: x.at });
+    if (d && !x.ok) out.push({ d, region: x.r, rec: get(R, x.k, x.r), settled: x, at: x.at });
   }
   // one card per record: New Zealand's where it has one, otherwise the newest island's
   out.sort((a, b) => (a.region === 'NZ') - (b.region === 'NZ') || a.at - b.at).reverse();
