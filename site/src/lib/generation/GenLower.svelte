@@ -262,9 +262,15 @@
 	<section class="card" class:popped={popped === 'share'} aria-label="{m.title} share of generation over the range">
 		<div class="card-head">
 			<div>
-				<div class="ttl-row"><h2>{metric === 'ren' ? 'Renewable share' : `${m.title} share`}</h2><InfoTip>{#if canCompare}Dashed: the same dates a year earlier (365 days before){v && v.int === '5m' ? ', half-hourly' : ''}.{:else if v && v.days == null}No comparison on the full history.{:else}The year before is outside the history.{/if}
-			{#if m.note}{m.title}: {m.note}.{/if}
-			<a href="/methods/groupings#renewable">How shares are worked out</a></InfoTip></div>
+				<div class="ttl-row"><h2>{metric === 'ren' ? 'Renewable share' : `${m.title} share`}</h2><InfoTip>
+			<!-- fuller, as bullets like the charts above (owner's report LOW-01) -->
+			<ul>
+				<li>The share of all generation that came from {metric === 'ren' ? 'renewables' : m.title.toLowerCase()} at each point of the range{v ? `, ${RES[v.int]}` : ''}. Embedded solar counts as generation; battery discharge doesn’t.</li>
+				<li>{#if canCompare}Dashed: the same dates a year earlier (365 days before){v && v.int === '5m' ? ', half-hourly' : ''}; the “Same dates” button turns it on and off, and the figures above the chart give both years.{:else if v && v.days == null}No comparison on the full history.{:else}The year before is outside the history, so there’s no comparison.{/if}</li>
+				<li>The buttons pick what’s shared: renewables, wind, solar, inverter-based (wind and solar), hydro, gas or coal/gas.</li>
+				{#if m.note}<li>{m.title}: {m.note}.</li>{/if}
+			</ul>
+			<p><a href="/methods/groupings#renewable">How shares are worked out</a></p></InfoTip></div>
 				<!-- every lower card names only its dates, on both tabs (owner's call, 30 Oct 2026) -->
 				<Context range={dates} items={[v ? `${RES[v.int]}, % of generation` : '']} />
 			</div>

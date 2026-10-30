@@ -68,14 +68,14 @@ export function mountTracker(D, hooks = {}) {
     flex: { groups: [
       { ...one('geo'), name: 'Inflexible', f: ['geo', 'bio', 'waste'] },   // geothermal runs flat out; cogeneration follows its mill or steelworks
       { ...one('coal'), name: 'Slow flexible' },    // Huntly's Rankine units: hours to start, slow to ramp
-      { id: 'fast', name: 'Fast flexible', tok: '--g-fast', f: ['gas', 'diesel', 'hydro'] },
+      { id: 'fast', name: 'Fast flexible', tok: '--g-fast', f: ['gas', 'diesel', 'hydro', 'batt'] },
       VRE('Variable'),
     ] },
     rf: { groups: [REN, FOSSIL('Fossils')] },
     // views built from plants rather than fuels (see plantSets below)
     site: { by: 'site' }, scheme: { by: 'scheme' }, owner: { by: 'owner' },
     // inverter-based generation (wind and solar) against the synchronous machines (hydro, geothermal, thermal)
-    vre: { groups: [{ id: 'resid', name: 'Synchronous', tok: '--g-resid', f: ['geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro'] }, VRE('Inverter-based')] },
+    vre: { groups: [{ id: 'resid', name: 'Synchronous', tok: '--g-resid', f: ['geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro'] }, { ...VRE('Inverter-based'), f: ['wind', 'solar', 'roof', 'batt'] }] },
   };
   const SIGNED = FUELS.filter(f => f.signed).map(f => f.k);
   // what each grouping shows, in a note under the generation chart
@@ -98,7 +98,9 @@ export function mountTracker(D, hooks = {}) {
   const topIsAll = () => level() === 'top' && !hydroOnly();  // shares of all generation (not just the layers shown)
   const ownerOf = p => PLANT_META[p.name]?.owner || 'Other generators';
   const schemeOf = p => PLANT_META[p.name]?.scheme || 'Other hydro';
-  const SITE_SHARE = 0.95, SITE_MAX = 12;  // by site: the plants making up 95% of each fuel (at most 12) get their own layer
+  // by site: every plant its own layer, so the list has every site (owner's report GRP-03, 28 Oct 2026; it was the
+  // plants making up 95% of each fuel, at most 12, and an "Other ..." row)
+  const SITE_SHARE = Infinity, SITE_MAX = Infinity;   // (idle ones too, at the foot of their fuel)
   const energy = p => {  // MWh over the view, cached per view
     const cache = V.energy || (V.energy = new Map());
     if (!cache.has(p)) { const a = V.avg(p.s); let e = 0; for (let j = 0; j < V.n; j++) e += a[j] * V.hrs[j]; cache.set(p, e); }
@@ -116,8 +118,10 @@ export function mountTracker(D, hooks = {}) {
       }
       sets.sort((a, b) => (a.name === 'Other hydro') - (b.name === 'Other hydro') || b.cap - a.cap);
     } else if (by === 'owner') {
+      // batteries count with their owner (discharge only; charging is one layer below zero: owner's call, 30 Oct 2026)
+      const withBatt = M.plants.filter(p => (p.fuel === 'batt' || !FUEL[p.fuel].signed) && (r === 'NZ' || p.isl === r));
       OWNERS.forEach((o, i) => {
-        const ps = regional.filter(p => ownerOf(p) === o);
+        const ps = withBatt.filter(p => ownerOf(p) === o);
         if (ps.length) sets.push({ id: 'o:' + o, name: o, tok: `--o${i + 1}`, plants: ps });
       });
     } else if (by === 'site') {
@@ -390,6 +394,13 @@ export function mountTracker(D, hooks = {}) {
     return { id: k, name: k === 'hvdc' ? 'HVDC transfer' : f.name, tok: f.tok, hatch: f.hatch ? k : null, tag: f.tag,
              signed: !!f.signed, s: V.fuels[k], drill: plantsFor(k).length ? { group, fuel: k, plant: null } : null };
   }
+  // batteries charging (below zero), for groupings that count their discharge inside a group (Flexibility,
+  // Inverter vs synchronous, By owner; owner's call, 30 Oct 2026)
+  function chargingLayer() {
+    const a = V.fuels.batt, s = new Float64Array(V.n);
+    for (let j = 0; j < V.n; j++) s[j] = Math.min(0, a[j]);
+    return { ...fuelLayer('batt', null), id: 'batt-c', name: 'Battery charging', signed: true, s };
+  }
   function relayer() {
     const r = state.region, d = state.drill, L = [], groups = VIEWS[state.view].groups;
     if (d.plant) {
@@ -411,14 +422,14 @@ export function mountTracker(D, hooks = {}) {
         : (a, b) => FUELS.findIndex(f => f.k === a.fuel) - FUELS.findIndex(f => f.k === b.fuel) || bySize(a, b);
       for (const p of [...set.plants].sort(order)) {
         const i = seen[p.fuel] = (seen[p.fuel] ?? -1) + 1;
-        L.push({ id: 'p:' + p.name, name: p.name, tok: FUEL[p.fuel].tok, shade: i, section: set.fuel ? null : p.fuel, s: V.avg(p.s), plant: p,
+        L.push({ id: 'p:' + p.name, name: p.name, tok: FUEL[p.fuel].tok, shade: i, section: set.fuel ? null : p.fuel, s: V.avg(p.s), plant: p, signed: !!FUEL[p.fuel].signed,
                  drill: { group: d.group, fuel: null, plant: p.name } });
       }
     } else if (d.group) {
       for (const k of groupById(d.group).f) if (present[r].includes(k)) L.push(fuelLayer(k, d.group));
     } else if (VIEWS[state.view].by) {
       const by = VIEWS[state.view].by, sets = V.sets || (V.sets = plantSets());
-      const sum = ps => { const o = new Float64Array(V.n); for (const p of ps) { const a = V.avg(p.s); for (let j = 0; j < V.n; j++) o[j] += a[j]; } return o; };
+      const sum = ps => { const o = new Float64Array(V.n); for (const p of ps) { const a = V.avg(p.s), pos = FUEL[p.fuel].signed; for (let j = 0; j < V.n; j++) o[j] += pos ? Math.max(0, a[j]) : a[j]; } return o; };
       const setLayer = (x, shadeIx) => ({ id: x.id, name: x.name, tok: x.tok || FUEL[x.fuel].tok, shade: shadeIx, section: by === 'site' ? x.fuel : null,
                                           s: sum(x.plants), drill: { group: x.id, fuel: null, plant: null }, count: x.plants.length });
       if (by === 'owner') {
@@ -426,13 +437,21 @@ export function mountTracker(D, hooks = {}) {
         if (present[r].includes('roof')) L.push({ ...fuelLayer('roof', null), name: 'Embedded solar (homes, businesses, small farms)' });
       } else {
         for (const f of FUELS) {
-          if (f.signed || !present[r].includes(f.k)) continue;
+          if (!present[r].includes(f.k)) continue;
+          if (f.signed) {
+            // by site, each battery is a row under its fuel like any other plant, charging below zero (GRP-03)
+            if (by === 'site' && f.k === 'batt') plantsFor('batt').forEach((p, i) => L.push({ id: 'p:' + p.name, name: p.name, tok: f.tok, shade: i,
+              signed: true, section: f.k, s: V.avg(p.s), plant: p, drill: { group: null, fuel: null, plant: p.name } }));
+            continue;
+          }
           const mine = sets.filter(x => x.fuel === f.k);
           if (by === 'scheme') { if (f.k === 'hydro') mine.forEach((x, i) => L.push(setLayer(x, i))); continue; }
           if (by === 'site') {
             const small = new Set(mine.flatMap(x => x.plants));
             const ps = plantsFor(f.k).filter(p => !small.has(p));   // largest first (which plants get a row is by output)
-            if (!ps.length || f.k === 'roof') { L.push({ ...fuelLayer(f.k, null), section: f.k }); continue; }
+            if (!ps.length) { L.push({ ...fuelLayer(f.k, null), section: f.k }); continue; }
+            // embedded solar's rows are its islands (as when drilling into it), hatched as an estimate
+            if (f.k === 'roof') { ps.forEach((p, i) => L.push({ id: 'p:' + p.name, name: p.name, tok: f.tok, shade: i, section: f.k, s: V.avg(p.s), plant: p, hatch: 'roof', u: V.avg(p.u), drill: null })); continue; }
             ps.forEach((p, i) => L.push({ id: 'p:' + p.name, name: p.name, tok: f.tok, shade: i, section: f.k, s: V.avg(p.s), plant: p,
                                           drill: { group: null, fuel: null, plant: p.name } }));
             for (const x of mine) L.push({ ...setLayer(x, null), light: true });
@@ -441,7 +460,10 @@ export function mountTracker(D, hooks = {}) {
           L.push(fuelLayer(f.k, null));
         }
       }
-      if (!hydroOnly()) for (const k of SIGNED) if (present[r].includes(k)) L.push(fuelLayer(k, null));
+      if (!hydroOnly()) for (const k of SIGNED) if (present[r].includes(k)) {
+        if (k === 'batt' && by === 'site') continue;
+        L.push(k === 'batt' && by === 'owner' ? chargingLayer() : fuelLayer(k, null));
+      }
     } else if (!groups) {
       for (const k of present[r]) L.push(fuelLayer(k, null));
     } else {
@@ -449,12 +471,14 @@ export function mountTracker(D, hooks = {}) {
         const ks = g.f.filter(k => present[r].includes(k));
         if (!ks.length) continue;
         const s = new Float64Array(V.n);
-        for (const k of ks) { const a = V.fuels[k]; for (let j = 0; j < V.n; j++) s[j] += a[j]; }
+        for (const k of ks) { const a = V.fuels[k], pos = FUEL[k].signed; for (let j = 0; j < V.n; j++) s[j] += pos ? Math.max(0, a[j]) : a[j]; }
         // a group of several fuels opens onto its fuels; a single-fuel group goes straight to its plants
         const drill = g.f.length > 1 ? { group: g.id, fuel: null, plant: null } : plantsFor(ks[0]).length ? { group: null, fuel: ks[0], plant: null } : null;
         L.push({ id: 'g:' + g.id, name: g.name, tok: g.tok, tag: g.f.length > 1 && ks.includes('roof') ? 'incl. est.' : FUEL[ks[0]].tag, hatch: g.f.length === 1 && FUEL[ks[0]].hatch ? ks[0] : null, signed: false, s, drill });
       }
-      for (const k of SIGNED) if (present[r].includes(k)) L.push(fuelLayer(k, null));
+      // a grouping that counts batteries' discharge in a group shows their charging on its own, below zero
+      const battIn = groups.some(g => g.f.includes('batt'));
+      for (const k of SIGNED) if (present[r].includes(k)) L.push(k === 'batt' && battIn ? chargingLayer() : fuelLayer(k, null));
     }
     V.layers = L; V.eu = null;
   }

@@ -15,6 +15,7 @@
 	import RecordsPeek from '#lib/landing/RecordsPeek.svelte';
 	import HeroBackdrop from '#lib/landing/HeroBackdrop.svelte';
 	import Handoff from '#lib/landing/Handoff.svelte';
+	import { peekLink } from '#lib/landing/build.svelte.js';
 	import { Tween } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
 	import { fly } from 'svelte/transition';
@@ -168,7 +169,7 @@
 						<p>{p.blurb}</p>
 						<a class="go" href={p.href}>Open {p.name} →</a>
 					</div>
-					<a class="window" href={p.window?.href ?? p.href} aria-label={p.window?.label ?? `Open ${p.name}`} tabindex="-1">
+					<a class="window" href={p.window?.href ?? (p.href === '/records' && peekLink.rec ? peekLink.rec : p.href)} aria-label={p.window?.label ?? (p.href === '/records' && peekLink.rec ? 'Open the record shown' : `Open ${p.name}`)} tabindex="-1">
 						<span class="view">
 							{#if D && now}<Peek {D} {now} />{:else}<span class="ph">{error ? 'Preview unavailable' : 'Loading…'}</span>{/if}
 						</span>
@@ -250,5 +251,23 @@
 		.sub { font-size: 0.98rem; }
 		.hero { min-height: clamp(480px, calc(100svh - 64px), 760px); }
 		.live-fig { margin-top: 30px; }
+	}
+	/* a phone on its side (a short, wide screen): the compact logo and a figure sized to the height, so the first screen
+	   fits, and previews no taller than the screen (owner's report HOME-06, 29 Oct 2026) */
+	@media (max-height: 520px) and (orientation: landscape) {
+		.hero { min-height: calc(100svh - 56px); gap: 2px; padding-block: 4px 0; }
+		.brand { flex-direction: row; gap: 12px; }
+		.brand :global(svg) { width: 40px; height: 40px; }
+		.word { font-size: 1.8rem; }
+		.tagline { margin-top: 2px; font-size: 0.9rem; }
+		.live-fig { margin-top: 14px; gap: 6px; }
+		.big .fig { font-size: clamp(2.8rem, 16vh, 4.4rem); }
+		.big .u { font-size: 1.2rem; }
+		.sub { font-size: 0.95rem; }
+		.horizon { padding-top: 14px; min-height: 70px; }
+		.pg-text h2 { font-size: 1.6rem; }
+		.pg + .pg { margin-top: 64px; padding-top: 64px; }
+		.view { min-height: 0; }
+		.view :global(svg) { max-height: calc(100svh - 110px); }
 	}
 </style>

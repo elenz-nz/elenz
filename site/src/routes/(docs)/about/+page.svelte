@@ -122,6 +122,40 @@
 			{/each}
 		</div>
 
+		<!-- the tracker's Controls panels are one line each and link here (owner's report GRP-06, 28 Oct 2026); keep both in step -->
+		<h2 id="controls">Using the tracker</h2>
+		<p>Each tracker tab has a Controls panel beside its charts with a line on each of these.</p>
+		<h3>Generation</h3>
+		<dl>
+			<dt>Read a time</dt>
+			<dd>Hover a chart, or touch and slide on a phone. The list beside the charts shows every source at that time.</dd>
+			<dt>Pin it</dt>
+			<dd>Click a chart to hold the time line there; click it again, Release or Escape to let go. On a phone the line stays where your finger lifts; tap it again to let go. While a line is pinned, ← → move it one point (Shift: further), and Home and End jump to the ends. It stays put when you change the grouping, region or chart type, and a range that doesn’t show the pinned time offers “Go to” it in the bar. Share can then mark that time.</dd>
+			<dt>Move through history</dt>
+			<dd>Range, interval and region are in the bar at the top. The ‹ › arrows beside the date, on the generation chart, or Page Up and Page Down step back and forward by the range. The date opens a calendar: select the month name to jump to another year, then pick a day. Latest comes back to now.</dd>
+			<dt>Zoom in</dt>
+			<dd>Drag across any chart to zoom into that stretch; every chart follows. The arrow beside 1D picks the last 1, 3, 6 or 12 hours. While zoomed, the date box gains a time: pick when the zoomed hours should end (NZ time) to move them there, or the ‹ › arrows step by the zoom’s length. Reset zoom in the bar, or Escape twice, shows the whole range again, and choosing another range while zoomed opens that range around what you zoomed into.</dd>
+			<dt>Break it down</dt>
+			<dd>Select a name in the list to go from a fuel to its plants and their grid connections; ‹ Back above the list, or the browser’s Back, steps out. The menu above the generation chart groups it other ways: by site, hydro scheme, owner, flexibility, renewable vs fossil, inverter vs synchronous. MW/% switches to shares.</dd>
+			<dt>Compare sources</dt>
+			<dd>The two chart buttons beside MW/% switch between stacked areas and lines, one per source, so plants or fuels can be compared on one scale: drill into a fuel or choose By site, then hide what you don’t need. Up to eight lines get their own colours. $ Price draws the island prices over the chart on a right axis (spike-proof: linear to about $100, compressed above).</dd>
+			<dt>Hide and show</dt>
+			<dd>Select a colour square to hide that layer. Double-click it, Shift+click it or press and hold it to show only that one (again to show everything); All and None above the list do the rest. In long lists, type in Filter, and select a fuel heading to fold its plants.</dd>
+			<dt>Open more charts</dt>
+			<dd>The charts under generation (price, renewable share, demand, HVDC, emissions) start folded to one line each, showing their value at the time line or for the whole range. Select a title to open that chart, and again to fold it.</dd>
+			<dt>Enlarge, share, download</dt>
+			<dd>The corner button on each chart enlarges it, and ⓘ beside its title says what it shows and how it’s made. Share copies a link to this view, live or for the dates shown; Download gives the charts as a picture or the data as a spreadsheet file. The address always holds the whole view, so it can be bookmarked.</dd>
+		</dl>
+		<h3>Prices</h3>
+		<dl>
+			<dt>Read and pin</dt>
+			<dd>As on Generation: hover or touch to read a time, click to pin it, ← → to move a pinned line.</dd>
+			<dt>Zoom in</dt>
+			<dd>On the live week and 30 days, drag across any chart to zoom into that stretch, or pick the last 1, 3, 6 or 12 hours from the arrow beside 1D. Reset zoom, Escape or a range button goes back.</dd>
+			<dt>Nodes and scales</dt>
+			<dd>Select a node’s colour square in the list to hide or show its line. The menu beside the price chart’s title changes its scale (Spike-proof, Capped or Linear); on long ranges, choose the island whose price range is shown.</dd>
+		</dl>
+
 		<h2 id="data">Where the data comes from</h2>
 		<p>Almost everything comes from the Electricity Authority’s market data, published free under CC BY 4.0: the real-time dispatch feed for the live week, and metered generation, grid flows and final prices for the history. Embedded solar is modelled from installed capacity and satellite sunshine, and the live HVDC transfer is estimated, because neither is in the market data.</p>
 		<p><a href="/methods">Data and methods</a> explains each series in full: every source, every calculation, how it was checked, and what it can’t tell you.</p>

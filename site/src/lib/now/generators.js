@@ -54,7 +54,9 @@ export function generatorRows(D) {
   });
 }
 
-export const SORTS = { mw: 'MW', pct: '% of capacity', name: 'Plant' };
+export const SORTS = { mw: 'MW', pct: '% of capacity', name: 'Plant', fuel: 'Fuel', island: 'Island', owner: 'Owner' };
+// the words sorts: A to Z first (the numbers start largest first)
+const TEXT_SORT = new Set(['name', 'fuel', 'island', 'owner']);
 
 /** The table's settings from /now's address; unknown values fall back to the defaults.
  * @param {string} search
@@ -71,7 +73,7 @@ export function readSettings(search, rows) {
     island: ['NI', 'SI'].includes(get('island').toUpperCase()) ? get('island').toUpperCase() : '',
     owner: owners.has(get('owner')) ? get('owner') : '',
     by: by in SORTS ? by : 'mw',
-    asc: dir === 'asc' ? true : dir === 'desc' ? false : by === 'name',
+    asc: dir === 'asc' ? true : dir === 'desc' ? false : TEXT_SORT.has(by),
     text: get('q').slice(0, 40),
     on: q.get('on') === '1',
   };
@@ -84,7 +86,7 @@ export function writeSettings(s) {
   if (s.fuel) q.set('fuel', s.fuel);
   if (s.island) q.set('island', s.island);
   if (s.owner) q.set('owner', s.owner);
-  const natural = s.by === 'name';
+  const natural = TEXT_SORT.has(s.by);
   if (s.by !== 'mw' || s.asc !== natural) q.set('sort', s.asc === natural ? s.by : `${s.by}-${s.asc ? 'asc' : 'desc'}`);
   if (s.text.trim()) q.set('q', s.text.trim());
   if (s.on) q.set('on', '1');
@@ -102,13 +104,16 @@ export function pick(rows, s) {
   const text = norm(s.text.trim());
   const out = rows.filter((r) => (!s.fuel || r.fuel === s.fuel) && (!s.island || r.isl === s.island) &&
     (!s.owner || slug(r.owner) === s.owner) && (!text || norm(r.name).includes(text)) && (!s.on || Math.abs(r.mw) >= 0.5));
-  const val = (r) => (s.by === 'name' ? norm(r.name) : s.by === 'pct' ? r.pct : r.mw);
+  // fuel, island and owner group the list; within each group the largest MW comes first (owner's report NOW-10)
+  const val = (r) => (s.by === 'name' ? norm(r.name) : s.by === 'pct' ? r.pct : s.by === 'fuel' ? norm(r.fuelName)
+    : s.by === 'island' ? r.isl : s.by === 'owner' ? (r.owner === 'Other generators' ? '\uffff' : norm(r.owner)) : r.mw);
+  const group = s.by === 'fuel' || s.by === 'island' || s.by === 'owner';
   return out.sort((a, b) => {
     const x = val(a), y = val(b);
     if (x == null && y == null) return 0;
     if (x == null) return 1;   // plants with no capacity go last either way
     if (y == null) return -1;
     const c = x < y ? -1 : x > y ? 1 : 0;
-    return (s.asc ? c : -c) || norm(a.name).localeCompare(norm(b.name));
+    return (s.asc ? c : -c) || (group ? b.mw - a.mw : 0) || norm(a.name).localeCompare(norm(b.name));
   });
 }

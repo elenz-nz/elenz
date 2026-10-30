@@ -907,21 +907,20 @@
 					</button>
 				</div>
 				<div class="help" id="p-help" role="note" hidden={!helpOpen}>
+					<!-- one line each; the full descriptions are on /about#controls (owner's report GRP-06) -->
 					<dl>
 						<dt>Read a time</dt>
-						<dd>Hover a chart, or touch and slide on a phone. With a chart focused, ← → move one point (Shift: further).</dd>
+						<dd>Hover a chart, or touch and slide on a phone.</dd>
 						<dt>Pin it</dt>
-						<dd>Click a chart to hold the time line there; click it again, Release or Escape to let go. Share can then mark that time.</dd>
+						<dd>Click or tap a chart to hold the line; again, or Escape, lets go.</dd>
 						<dt>Move through history</dt>
-						<dd>Range, interval and region are in the bar at the top. The ‹ › arrows beside the date or on the price chart step by the range; the date box jumps to a day; Latest comes back.</dd>
+						<dd>‹ › step by the range; the date opens a calendar; Latest comes back.</dd>
 						<dt>Zoom in</dt>
-						<dd>On the live week and 30 days, drag across any chart to zoom into that stretch; every chart follows. The arrow beside 1D picks the last 1, 3, 6 or 12 hours. While zoomed, the date box gains a time: pick the date and time the zoomed hours should end (NZ time) to move them there. Reset zoom in the bar, Escape or a range button goes back.</dd>
+						<dd>On the live week and 30 days, drag across a chart; Reset zoom goes back.</dd>
 						<dt>Nodes and scales</dt>
-						<dd>Select a node's colour square in this list to hide or show its line. The menu beside the price chart's title changes its scale (Spike-proof, Capped or Linear); on long ranges, choose the island whose price range is shown.</dd>
-						<dt>Enlarge, share, download</dt>
-						<dd>The corner button on each chart enlarges it; ⓘ says how it's made. Share copies a link to this view; Download gives the charts as a picture or the data as a spreadsheet file.</dd>
+						<dd>Select a node’s colour square to hide its line; the menu by the title changes the scale.</dd>
 					</dl>
-					<p><a href="/methods/prices">How the figures are worked out</a></p>
+					<p><a href="/about#controls">Every control, in detail</a> · <a href="/methods/prices">How the figures are worked out</a></p>
 				</div>
 				<table class="mix">
 					<thead><tr><th scope="col">{view?.mode === 'time' ? 'Node' : 'Series'}</th><th scope="col" class="n">{at < 0 ? 'Average' : 'Value'}</th></tr></thead>

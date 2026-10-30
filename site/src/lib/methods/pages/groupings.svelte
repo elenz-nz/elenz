@@ -13,7 +13,7 @@
 <p class="note">Official figures, such as MBIE’s, count renewable generation over a year and include plants that aren’t in the market data, so they can differ from the share here.</p>
 
 <h2 id="groupings">Grouping the generation chart</h2>
-<p>The menu beside the generation chart regroups the same data. Batteries and the HVDC link always stay separate layers, because they can be negative (charging, exporting).</p>
+<p>The menu beside the generation chart regroups the same data. The HVDC link is always a layer of its own, because it can be negative (exporting). Batteries are their own layer in Detailed, Simplified and Renewable vs fossil; in Flexibility, Inverter vs synchronous and By owner their discharge counts in its group and their charging is one layer below zero.</p>
 <dl>
 	<dt>Detailed</dt>
 	<dd>Every fuel on its own.</dd>
@@ -22,15 +22,15 @@
 	<dt>Renewable vs fossil</dt>
 	<dd>As in the renewable share above. Waste heat sits with the fossils.</dd>
 	<dt>Flexibility</dt>
-	<dd>By how readily output can follow demand. <b>Inflexible:</b> geothermal, which runs flat out around the clock, and industrial cogeneration (bioenergy and waste heat), which follows its mill or steelworks. <b>Slow flexible:</b> Huntly’s Rankine units, which take hours to start and ramp slowly. <b>Fast flexible:</b> hydro, gas and diesel. <b>Variable:</b> wind and solar, which follow the weather. Grouping is by fuel, so gas cogeneration counts as fast flexible.</dd>
+	<dd>By how readily output can follow demand. <b>Inflexible:</b> geothermal, which runs flat out around the clock, and industrial cogeneration (bioenergy and waste heat), which follows its mill or steelworks. <b>Slow flexible:</b> Huntly’s Rankine units, which take hours to start and ramp slowly. <b>Fast flexible:</b> hydro, gas, diesel and batteries (their discharge). <b>Variable:</b> wind and solar, which follow the weather. Grouping is by fuel, so gas cogeneration counts as fast flexible.</dd>
 	<dt>Inverter vs synchronous</dt>
-	<dd><b>Inverter-based:</b> wind and solar, connected through power electronics. <b>Synchronous:</b> hydro, geothermal and thermal plant (including bioenergy and waste heat), whose spinning generators add inertia and system strength. Batteries are inverter-based too, but shown separately.</dd>
+	<dd><b>Inverter-based:</b> wind, solar and batteries (their discharge), connected through power electronics. <b>Synchronous:</b> hydro, geothermal and thermal plant (including bioenergy and waste heat), whose spinning generators add inertia and system strength.</dd>
 	<dt>By site</dt>
-	<dd>The plants that together make up 95% of each fuel’s output over the range get a layer each, at most 12 per fuel; the rest of that fuel is grouped as “Other”. Plants are listed largest first by installed capacity, here and when a fuel or group is opened, so the order stays the same whatever the range.</dd>
+	<dd>Every plant gets a layer of its own, under its fuel, batteries included (charging below zero); embedded solar is split by island. Plants are listed largest first by installed capacity, here and when a fuel or group is opened, so the order stays the same whatever the range.</dd>
 	<dt>By hydro scheme</dt>
 	<dd>Hydro only, by river system, each listed upstream to downstream: Tekapo (Takapō A, B); Waitaki (Ōhau A, B, C, Benmore, Aviemore, Waitaki); Waikato (Aratiatia to Karāpiro, eight stations); Manapōuri; Clutha (Clyde, Roxburgh); Tongariro (Tokaanu, Rangipo); Waikaremoana; Rangitaiki (Aniwhenua, Wheao and Flaxy, Matahina); Waipori (Deep Stream, Waipori 2A/3/4); and other hydro.</dd>
 	<dt>By owner</dt>
-	<dd>Each plant’s operator in the EA register, grouped as Meridian, Contact (including Manawa Energy, formerly Trustpower, which Contact took over in July 2025), Mercury (including Nga Awa Pūrua, which it operates), Genesis, Nova and other generators. Plants the register doesn’t list yet, and plants seen only in the metered history, have their owner set by hand. Today’s owners apply to the whole history, so earlier sales and transfers aren’t shown.</dd>
+	<dd>Each plant’s operator in the EA register, grouped as Meridian, Contact (including Manawa Energy, formerly Trustpower, which Contact took over in July 2025), Mercury (including Nga Awa Pūrua, which it operates), Genesis, Nova and other generators; batteries count with their owner. Plants the register doesn’t list yet, and plants seen only in the metered history, have their owner set by hand. Today’s owners apply to the whole history, so earlier sales and transfers aren’t shown.</dd>
 </dl>
 
 <p class="note">The lists: <a href={REPO + 'facilities/overrides.toml'}><code>facilities/overrides.toml</code></a> (<code>[owners]</code>, <code>[plant_owners]</code>, <code>[hydro_schemes]</code>). Groupings: <a href={REPO + 'site/src/lib/tracker/tracker.js'}><code>site/src/lib/tracker/tracker.js</code></a>.</p>
