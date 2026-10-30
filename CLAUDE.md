@@ -20,6 +20,11 @@ Auto-merge only works while something is still to wait for: on a PR whose checks
 `gh api -X PUT repos/elenz-nz/elenz/pulls/<n>/merge -f merge_method=squash` (the checks still gate it: GitHub refuses a
 merge while a required check is failing or pending). After a squash merge, `git checkout main && git pull` before the
 next branch; the old local branch has no remote any more, which is expected.
+A merge doesn't always deploy: Cloudflare's production build for #46 (30 Oct 2026) never ran, and the site stayed on the
+previous build. To check what is live, `https://elenz.co.nz/_app/version.json` holds the build time (ms since 1970,
+UTC); it should be just after the merge. If it isn't, retry the build in the Cloudflare dashboard (Workers & Pages →
+elenz → Deployments) or merge the next change. The `Workers Builds` check isn't reported on every main commit, so its
+absence alone proves nothing.
 A Claude session can't push until the repository is attached with push access (`add_repo`, owner `elenz-nz`, repo
 `elenz`, access `push`); a push refused with "not in this session's authorized repository set" (HTTP 403) means that
 step was skipped, not that anything is wrong with the repository or its token.
