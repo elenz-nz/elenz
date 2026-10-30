@@ -6,7 +6,7 @@ import { efAt, plantEf, BY_PLANT } from './emissions.js';
 import { onDateSettled, onTimeSettled } from '../site/datefield.js';
 import '../site/datepick.js';   // <date-pick>: the date box's calendar (TRK-07)
 import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTotal } from './series.js';
-import PLANT_META from './plants.json';  // owner and hydro scheme per plant (ingest/plant_meta.py)
+import PLANT_META from './plants.json';  // owner, hydro scheme, other names and metering note per plant (ingest/plant_meta.py)
 import CAPACITY from './capacity.json';   // installed MW per plant (ingest/capacity.py)
 import { readView, writeView, slug, describe, shareLinks, setTitle } from '#lib/site/view.js';
 import { readQuery, stamp, fromStamp, FOLDABLE, FOLD_DEFAULT, foldList } from '#lib/site/viewurl.js';
@@ -98,6 +98,10 @@ export function mountTracker(D, hooks = {}) {
   const topIsAll = () => level() === 'top' && !hydroOnly();  // shares of all generation (not just the layers shown)
   const ownerOf = p => PLANT_META[p.name]?.owner || 'Other generators';
   const schemeOf = p => PLANT_META[p.name]?.scheme || 'Other hydro';
+  // other names a plant has had or goes by ([plant_aka] and the register names of a station shown whole): the list's
+  // filter finds a plant by them, and its drill-down lists them with what its metered history counts ([plant_metering])
+  const akaOf = name => PLANT_META[name]?.aka || [];
+  const meteredOf = name => PLANT_META[name]?.metered || '';
   // by site: every plant its own layer, so the list has every site (owner's report GRP-03, 28 Oct 2026; it was the
   // plants making up 95% of each fuel, at most 12, and an "Other ..." row)
   const SITE_SHARE = Infinity, SITE_MAX = Infinity;   // (idle ones too, at the foot of their fuel)
@@ -1046,6 +1050,12 @@ export function mountTracker(D, hooks = {}) {
       $('sum-back').textContent = `‹ ${up.label === 'Generation' ? 'All sources' : up.label}`;
       $('sum-back').onclick = () => drillTo(up.to);
     }
+    // a plant's other names, and what its metered history counts where that differs from the dispatch data
+    const aka = lv === 'unit' ? akaOf(d.plant) : [], metered = lv === 'unit' ? meteredOf(d.plant) : '';
+    const pn = $('plant-note');
+    pn.hidden = !aka.length && !metered;
+    pn.innerHTML = (aka.length ? `<p><b>Also known as</b> ${aka.map(esc).join(', ')}</p>` : '')
+      + (metered ? `<p><b>Metered history</b> ${esc(metered)} <a href="/methods/generation#whole">More</a></p>` : '');
   }
   // Long lists (the site view, a fuel's plants) get a filter box; the site view groups its rows under collapsible
   // fuel headings with subtotals. Section headings toggle open; their colour square hides every row in them.
@@ -1098,7 +1108,11 @@ export function mountTracker(D, hooks = {}) {
     const q = norm(state.filter.trim());
     for (const l of V.layers) {
       const sec = V.sections.find(x => x.members.includes(l));
-      l.row.hidden = q ? !norm(l.name).includes(q) : !!(sec && sec.row && !state.open.has(sec.id));
+      // a match on another name shows that name beside the row's ("Stratford (Taranaki Combined Cycle)")
+      const alt = q && !norm(l.name).includes(q) ? akaOf(l.name).find(a => norm(a).includes(q)) : null;
+      l.row.hidden = q ? !norm(l.name).includes(q) && !alt : !!(sec && sec.row && !state.open.has(sec.id));
+      const aka = l.row.querySelector('.aka');
+      if (aka) { aka.hidden = !alt; aka.textContent = alt ? `(${alt})` : ''; }
     }
     for (const x of V.sections) {
       if (!x.row) continue;
@@ -1137,7 +1151,7 @@ export function mountTracker(D, hooks = {}) {
       const tr = document.createElement('tr'); tr.style.setProperty('--c', colourOf(l));
       if (state.hidden.has(l.id)) tr.className = 'off';
       if (cur && cur.row) tr.classList.add('in-sec');
-      const nameHtml = `${esc(l.name)}${l.tag ? ` <span class="tag">${l.tag}</span>` : ''}`;
+      const nameHtml = `${esc(l.name)}${akaOf(l.name).length ? ' <span class="aka" hidden></span>' : ''}${l.tag ? ` <span class="tag">${l.tag}</span>` : ''}`;
       tr.innerHTML = `<td><div class="row-name">${canHide ? `<button type="button" class="sw-btn" aria-pressed="${!state.hidden.has(l.id)}" aria-label="Show ${esc(l.name)} in the chart"><span class="sw${l.hatch ? ' hatch' : ''}"></span></button>` : `<span class="sw-btn"><span class="sw"></span></span>`}${l.drill ? `<button type="button" class="drill">${nameHtml}</button>` : `<span class="nm">${nameHtml}</span>`}</div></td><td class="n" data-q></td><td class="n"><div class="share"><span data-s></span><span class="bar" data-b></span></div></td>`;
       if (canHide) squareButton(tr.querySelector('.sw-btn'), [l.id], () => {
         toggleHidden([l.id]);

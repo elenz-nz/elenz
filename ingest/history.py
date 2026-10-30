@@ -499,7 +499,7 @@ def merge_metered(s, mf):
 
 
 # overrides.toml tables only the website uses (plant_meta.py): editing them doesn't rebuild history
-SITE_ONLY = ('owners', 'plant_owners', 'hydro_schemes')
+SITE_ONLY = ('owners', 'plant_owners', 'hydro_schemes', 'plant_aka', 'plant_metering')
 
 
 def mapping_hash():

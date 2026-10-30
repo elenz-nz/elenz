@@ -140,7 +140,7 @@
 			<dt>Compare sources</dt>
 			<dd>The two chart buttons beside MW/% switch between stacked areas and lines, one per source, so plants or fuels can be compared on one scale: drill into a fuel or choose By site, then hide what you don’t need. Up to eight lines get their own colours. $ Price draws the island prices over the chart on a right axis (spike-proof: linear to about $100, compressed above).</dd>
 			<dt>Hide and show</dt>
-			<dd>Select a colour square to hide that layer. Double-click it, Shift+click it or press and hold it to show only that one (again to show everything); All and None above the list do the rest. In long lists, type in Filter, and select a fuel heading to fold its plants.</dd>
+			<dd>Select a colour square to hide that layer. Double-click it, Shift+click it or press and hold it to show only that one (again to show everything); All and None above the list do the rest. In long lists, type in Filter (it also finds a plant by its other names, such as Taranaki Combined Cycle for Stratford), and select a fuel heading to fold its plants. A plant's own view lists its other names and, where its metered history counts something different from the dispatch data, says what.</dd>
 			<dt>Open more charts</dt>
 			<dd>The charts under generation (price, renewable share, demand, HVDC, emissions) start folded to one line each, showing their value at the time line or for the whole range. Select a title to open that chart, and again to fold it.</dd>
 			<dt>Enlarge, share, download</dt>

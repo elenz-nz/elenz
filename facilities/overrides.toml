@@ -136,3 +136,36 @@ Tongariro = ["Tokaanu", "Rangipo"]
 Waikaremoana = ["Waikaremoana"]
 Rangitaiki = ["Aniwhenua", "Wheao and Flaxy", "Matahina"]
 Waipori = ["Deep Stream (Waipori A)", "Waipori (2A/3/4)"]
+
+# Site only (plant_meta.py -> plants.json; not in the history's rebuild fingerprint). Other names a plant has had or
+# goes by, so the tracker's filter and /now's search find it under them, and its drill-down lists them. The members
+# of [plant_groups] and the register names in [plant_names] are added automatically (numbered parts of the same
+# name, such as "Te Mihi 1" or "Patea unit 2", are left out). Plant (shown name) -> names.
+[plant_aka]
+"Stratford" = ["TCC"]
+"Huntly 5" = ["e3p"]
+"Huntly 6" = ["P40"]
+"Takapō A" = ["Tekapo A"]
+"Takapō B" = ["Tekapo B"]
+"Tararua Wind Farm 3" = ["Tararua Wind Central", "Tararua stage III"]
+"Kawerau Mill CoGen" = ["Norske Skog CoGen", "Carter Holt Harvey Energy Ltd CoGen"]   # the register's names for ONU0
+"Kaimai" = ["Kaimai 5"]
+"Paerau Gorge" = ["Patearoa"]   # its metered codes count Patearoa with Paerau (PTR0111, then NSY0331)
+"Glenbrook Steel" = ["NZ Steel Glenbrook"]
+
+# Site only. What the metered history counts for a plant where it differs from the dispatch data (the live week and
+# the weeks since the newest metered month), shown when the tracker drills into the plant. Evidence in
+# facilities/metered_plants.csv and analysis/README.md. Plant (shown name) -> note.
+[plant_metering]
+"Huntly Rankines" = "The metered history has one meter for units 1–4 together, so it shows them as one. The dispatch data (the live week and the weeks since the newest metered month) shows each unit."
+"Stratford" = "The metered history has one meter (SFD2201) for Taranaki Combined Cycle (1998–2025) and the two peakers (from 2011), and until 2001 the old Stratford gas turbines too, so it shows the station whole. The dispatch data (the live week and the weeks since the newest metered month) shows each unit."
+"Waikaremoana" = "The metered history has one meter for Tuai, Piripaua and Kaitawa together, so it shows the scheme whole. The dispatch data (the live week and the weeks since the newest metered month) shows each station."
+"Te Mihi" = "The metered history has Te Mihi 1 and 2 together, so it shows the station whole. The dispatch data (the live week and the weeks since the newest metered month) shows each unit."
+"Southdown" = "The metered history has one meter for the original cogeneration plant and unit 5 together. Southdown closed in January 2016, before the dispatch data starts."
+"Kaimai" = "The metered history counts the whole Kaimai scheme, but the dispatch data has only its one dispatched unit (Kaimai 5), so the live week and the weeks since the newest metered month show less than the scheme's full output."
+"Ngāwhā" = "The metered history counts the whole station (Ngāwhā A and B), but the dispatch data has only Ngāwhā B (OEC4), so the live week and the weeks since the newest metered month show less than the station's full output."
+"Deep Stream (Waipori A)" = "Since June 2011 one meter (WPG0331) carries Deep Stream and Mahinerangi wind farm together. The metered history splits it 30% Deep Stream, 70% Mahinerangi, their average shares in the dispatch data 2020–26. The dispatch data (the live week and the weeks since the newest metered month) has each plant's own output."
+"Mahinerangi (Waipori B)" = "Since June 2011 one meter (WPG0331) carries Mahinerangi and Deep Stream hydro together. The metered history splits it 70% Mahinerangi, 30% Deep Stream, their average shares in the dispatch data 2020–26. The dispatch data (the live week and the weeks since the newest metered month) has each plant's own output."
+"Kawerau (Te Ahi O Maui)" = "Since December 2025 one metered code at KAW2201 carries Te Ahi O Maui and TOPP2 together. The metered history splits it 35% Te Ahi O Maui, 65% TOPP2, by their shares in the dispatch data. The dispatch data (the live week and the weeks since the newest metered month) has each plant's own output."
+"Kawerau (TOPP2)" = "Since December 2025 one metered code at KAW2201 carries TOPP2 and Te Ahi O Maui together. The metered history splits it 65% TOPP2, 35% Te Ahi O Maui, by their shares in the dispatch data. The dispatch data (the live week and the weeks since the newest metered month) has each plant's own output."
+"Glenbrook Steel" = "Its metered output (meter points GLN0111 and GLN0332) runs about 1.45 times the dispatch data's figure, so expect a step where the metered history meets the dispatch weeks."

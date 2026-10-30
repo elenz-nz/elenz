@@ -56,6 +56,14 @@
 </ul>
 <p>Three plants generate onto two buses and can be split by grid connection: Arapuni (<code>ARI1101</code>, <code>ARI1102</code>), Roxburgh (<code>ROX2201</code>, <code>ROX1101</code>) and West Wind (<code>WWD1102</code>, <code>WWD1103</code>). The metered history has more than one point for some other plants, but those are meters rather than grid connections (an embedded plant’s local network point, a connection that moved), so those plants are shown whole.</p>
 <p>The metered history sees the stations above only whole, so over a range that reaches back into it they show a “Whole station (metered)” row beside their units, which cover only the dispatch data’s weeks.</p>
+<p>A few other plants are counted differently in the metered history than in the dispatch data:</p>
+<ul>
+	<li><b>Kaimai</b> and <b>Ngāwhā</b>: the metered history has the whole scheme or station, but the dispatch data has only one dispatched unit (Kaimai 5; Ngāwhā B), so the live week shows less than their full output.</li>
+	<li><b>Deep Stream</b> and <b>Mahinerangi</b>: one meter (<code>WPG0331</code>) carries both from June 2011, split 30% and 70% by their average shares in the dispatch data, 2020–26.</li>
+	<li><b>Kawerau (Te Ahi O Maui)</b> and <b>Kawerau (TOPP2)</b>: one metered code at <code>KAW2201</code> carries both from December 2025, split 35% and 65% by their dispatch shares.</li>
+	<li><b>Glenbrook</b>: its metered output runs about 1.45 times the dispatch data’s figure.</li>
+</ul>
+<p>When the tracker drills into one of these plants, or a station shown whole, it says what its metered history counts, and lists any other names the plant has had or goes by (Taranaki Combined Cycle for Stratford, Tekapo for Takapō, Tararua Wind Central for Tararua Wind Farm 3). The list’s filter and the search on Now find plants by those names too.</p>
 
 <h2 id="totals">Totals, peaks and capacity</h2>
 <p class="formula">Total generation = Σ every source’s output while positive
