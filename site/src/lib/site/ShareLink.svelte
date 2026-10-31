@@ -14,6 +14,7 @@
 	let mark = $state(true);
 	let done = $state('');       // which link was just copied
 	let manual = $state('');     // a link the browser wouldn't copy: shown to copy by hand
+	let why = $state('');        // why the share sheet didn't open (the browser's error name), for the owner's retests
 	let btn = $state<HTMLButtonElement>(), pop = $state<HTMLDivElement>();
 	let timer: ReturnType<typeof setTimeout> | undefined;
 
@@ -24,7 +25,7 @@
 	async function toggle() {
 		if (open) { open = false; return; }
 		L = links();
-		mark = true; done = ''; manual = '';
+		mark = true; done = ''; manual = ''; why = '';
 		open = true;
 		await tick();
 		pop?.querySelector<HTMLButtonElement>('.sh-go')?.focus();
@@ -34,8 +35,14 @@
 	async function send(url: string, key: string) {
 		manual = '';
 		if (canShare) {
-			try { await navigator.share({ title: document.title, url }); return; }
-			catch (e: any) { if (e?.name === 'AbortError') return; manual = url; return; }
+			// shaped like the record pages' share, which Firefox on Android opens (owner's retest, 31 Oct 2026: there the
+			// tracker's title-and-link share fell back to the link): a line of text, the title and the link
+			const data = { title: document.title, text: document.title.replace(/ · ELENZ$/, ''), url };
+			try {
+				if (navigator.canShare && !navigator.canShare(data)) throw Object.assign(new Error('refused'), { name: 'CanShareFalse' });
+				await navigator.share(data); return;
+			}
+			catch (e: any) { if (e?.name === 'AbortError') return; why = e?.name || 'Error'; manual = url; return; }
 		}
 		try {
 			await navigator.clipboard.writeText(url);
@@ -82,7 +89,7 @@
 			{/if}
 		{/if}
 		{#if manual}
-			<div class="sh-man"><span>Copy this link:</span><CopyLink url={manual} /></div>
+			<div class="sh-man"><span>Copy this link:{#if why} <small class="sh-why">(share sheet: {why})</small>{/if}</span><CopyLink url={manual} /></div>
 		{/if}
 	{/if}
 </div>
@@ -98,5 +105,6 @@
 	.sh-go:hover { background: var(--accent-soft); border-color: var(--accent); }
 	.sh-mark { display: flex; align-items: center; gap: 7px; font-size: 0.8rem; color: var(--ink-2); margin-top: -4px; cursor: pointer; }
 	.sh-mark input { accent-color: var(--accent); margin: 0; }
+	.sh-why { color: var(--muted); font-size: 0.72rem; }
 	.sh-man { display: grid; gap: 4px; font-size: 0.78rem; color: var(--ink-2); }
 </style>
