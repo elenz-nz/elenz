@@ -254,14 +254,22 @@ export function mountTracker(D, hooks = {}) {
     return k === 6 ? ' · interpolated' : k ? ` · ${k} of 6 interpolated` : '';
   }
   // a partial first or last period: what the faded part of the generation chart is
+  // Drawn as the energy it holds, so it steps down, washed out (owner's call TRK-04, 31 Oct 2026: honest rather than
+  // scaled up to a whole period); the tooltip says how much of the period that is.
   function partialNote(j) {
     if (!isLong() || !V.n) return '';
     const word = { '1d': 'day', '1w': 'week', '1mo': 'month', '1yr': 'year' }[state.int] || 'period';
-    const rate = energyMode() ? `, drawn at its rate ${j === V.n - 1 && V.partialCut ? 'over the days shown' : 'so far'} for a whole ${word}` : '';
-    if (j === V.n - 1 && V.partial) return `Partial ${word}: ${partialTo()}${rate}`;
-    if (j === 0 && V.partialFirst) { const p = lp(V.t[0]); return `Partial ${word}: from ${p.dom} ${MON[p.mon]} ${p.y}${rate}`; }
+    const p = lp(V.t[j]);
+    const whole = { '1w': 7, '1mo': new Date(Date.UTC(p.y, p.mon + 1, 0)).getUTCDate(), '1yr': (p.y % 4 === 0 && p.y % 100 !== 0) || p.y % 400 === 0 ? 366 : 365 }[state.int];
+    const have = Math.round(V.hrs[j] / 24);
+    const share = whole && have < whole ? ` (${have} of ${whole} days)` : '';
+    const what = energyMode() ? ` · energy ${j === V.n - 1 && !V.partialCut ? 'so far' : 'for those days only'}` : '';
+    if (j === V.n - 1 && V.partial) return `Part ${word}: ${partialFrom(j)}${partialTo()}${share}${what}`;
+    if (j === 0 && V.partialFirst) return `Part ${word}: from ${p.dom} ${MON[p.mon]} ${p.y}${share}${what}`;
     return '';
   }
+  // where a partial last period's data starts: its own start, or the window's for a cut first period
+  const partialFrom = j => { const p = lp(V.t[j]); return `${p.dom} ${MON[p.mon]} `; };
   // where the last period's data stops: the newest data, or the end of a past window
   const partialTo = () => { const p = lp(V.partialTo); return `to ${p.dom} ${MON[p.mon]}${V.partialCut ? ' ' + p.y : ''}`; };
   function heading(j) {
@@ -776,8 +784,8 @@ export function mountTracker(D, hooks = {}) {
     assignLines(layers); syncSwatches();
     const pos = new Float64Array(n), neg = new Float64Array(n), tops = [];
     // HVDC is signed like the batteries: arriving is stacked on top of the island's generation, leaving goes below zero
-    // a partial first or last period, drawn at its rate so far for a period as long as its neighbour's
-    const whole = j => energy && n > 1 && ((j === n - 1 && V.partial) ? V.hrs[n - 2] / V.hrs[j] : (j === 0 && V.partialFirst) ? V.hrs[1] / V.hrs[0] : 1);
+    // a partial first or last period is drawn as the energy it holds (washed out below; TRK-04, 31 Oct 2026)
+    const whole = () => 1;
     let mx = 0, mn = 0;
     for (const l of layers) {
       let a = pct ? Float64Array.from(l.s, pctOf) : energy ? Float64Array.from(l.s, (v, j) => en(v, j) * whole(j)) : l.s;
@@ -837,8 +845,10 @@ export function mountTracker(D, hooks = {}) {
         ctx.save(); ctx.globalAlpha = 0.6; ctx.fillStyle = C['--surface'];
         ctx.fillRect(xa, F.top, xb - xa, F.bottom - F.top); ctx.restore();
       };
-      if (V.partial) wash(X(n - 2), F.x1);
-      if (V.partialFirst) wash(F.x0, X(1));
+      // a dashed edge where the whole periods end, so the washed part reads as different, not as a fall
+      const edge = x => { ctx.save(); ctx.setLineDash([3, 3]); ctx.strokeStyle = C['--ink-2']; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(Math.round(x) + 0.5, F.top); ctx.lineTo(Math.round(x) + 0.5, F.bottom); ctx.stroke(); ctx.restore(); };
+      if (V.partial) { wash(X(n - 2), F.x1); edge(X(n - 2)); }
+      if (V.partialFirst) { wash(F.x0, X(1)); edge(X(1)); }
     }
     if (dom.lo < 0) { ctx.strokeStyle = C['--ink-2']; ctx.lineWidth = 1; const y = Math.round(Y(0)) + 0.5; ctx.beginPath(); ctx.moveTo(F.x0, y); ctx.lineTo(F.x1, y); ctx.stroke(); }
     if (cap) {
@@ -1295,7 +1305,7 @@ export function mountTracker(D, hooks = {}) {
   function drawAll() { for (const id of CHARTS) if (unfolded(id)) DRAW[id](); }
   const paintAll = () => { for (const id of CHARTS) if (unfolded(id)) paint(id); };
   function schedule() {
-    $('sum-pin').hidden = state.hoverBy !== 'pin' || state.hover == null;
+    syncPinChip();
     cancelAnimationFrame(raf);
     raf = requestAnimationFrame(() => { if (stale) { drawAll(); stale = false; } paintAll(); updateSummary(); });
   }
@@ -1318,14 +1328,17 @@ export function mountTracker(D, hooks = {}) {
     end = Math.max(end, addDays(midnightOf(firstDay()), R.days));
     return end >= endOfToday() ? null : end;
   }
-  // a range change that drops a pin offers it back: "Go to 9:25 pm Mon 12 Oct" in the bar
-  let offerPin = null, pinAfter = null, shownOffer = null;
-  const pinLabel = j => chip(j);
-  function showPinGo(o) {
-    shownOffer = o;
-    const b = $('pin-go');
-    b.hidden = !o;
-    if (o) { $('pin-go-txt').textContent = o.label; b.title = `Show ${RANGES[state.range].label} around ${o.label}, pinned there`; }
+  // The pin is the anchor (owner's call ZM-02, 31 Oct 2026): a range button opens the new range around the pinned
+  // moment and keeps it pinned (a finer view, a pinned day opened on 5-minute data, shows that day and lets go);
+  // the arrows step freely and let go once it leaves the window. One chip in the bar says what is pinned and lets
+  // go of it, the only place the pin is named (it was under the summary's heading, and a Go to chip in the bar).
+  let pinAfter = null;   // { t, h } for the next rebuild: the moment to pin, and how long its point was
+  function syncPinChip() {
+    const on = state.hoverBy === 'pin' && state.hover != null && V && state.hover < V.n;
+    const b = $('pin-chip');
+    if (!b) return;
+    b.hidden = !on;
+    if (on) $('pin-chip-txt').textContent = chip(state.hover);
   }
   // a zoom's length and span in words: "2 h 25 min", "1:05 pm – 3:30 pm Mon 19 Oct", "3 Feb – 18 Mar 2026"
   function zoomWord(ms) {
@@ -1578,9 +1591,8 @@ export function mountTracker(D, hooks = {}) {
     // phone); anything else that rebuilds starts afresh
     const want = pinAfter; pinAfter = null;
     const keepBy = want != null ? 'pin' : ['pin', 'touch', 'key'].includes(state.hoverBy) ? state.hoverBy : null;
-    const pinT = want ?? (keepBy && state.hover != null && V?.t ? V.t[state.hover] : null);
-    const pinH = want != null ? 0 : keepBy && state.hover != null && V?.hrs ? V.hrs[state.hover] : 0;
-    const offer = offerPin; offerPin = null;
+    const pinT = want ? want.t : (keepBy && state.hover != null && V?.t ? V.t[state.hover] : null);
+    const pinH = want ? want.h : keepBy && state.hover != null && V?.hrs ? V.hrs[state.hover] : 0;
     V = buildView();  // first: the drill-down checks below look at this view's plant sets
     const link = linked && !waiting ? linked : null;
     if (link) state.drill = fromLink(link);
@@ -1592,10 +1604,9 @@ export function mountTracker(D, hooks = {}) {
     const pinJ = pinT != null ? pointAt(pinT) : null;
     // kept when the moment is still on screen as the same point or within a longer one (a day, a week); a finer view
     // (a pinned day opened on 5-minute data) drops it rather than pin its first minutes
-    if (pinJ != null && (V.t[pinJ] === pinT || V.hrs[pinJ] >= pinH)) { state.hover = pinJ; state.hoverBy = keepBy; }
+    // (a half-hour or finer pin stays on a finer view: 7:30 pm on 30 days is 7:30 pm on 1D)
+    if (pinJ != null && (V.hrs[pinJ] >= pinH - 1e-9 || pinH <= 1)) { state.hover = pinJ; state.hoverBy = keepBy; }
     else if (keepBy) state.hoverBy = null;
-    // a pin a range change didn't keep: offer to go there instead (owner's call ZM-02, 30 Oct 2026)
-    showPinGo(offer && state.hoverBy !== 'pin' ? offer : null);
     if (link) {
       linked = null;
       const j = link.t != null ? pointAt(link.t) : null;
@@ -1646,23 +1657,18 @@ export function mountTracker(D, hooks = {}) {
     for (const x of $('seg-range').querySelectorAll('button')) x.setAttribute('aria-pressed', String(x === b));
     stepEnd = undefined;
     const r = b.dataset.v;
-    // a dragged zoom carries over: the new range is centred on what was zoomed (owner's call ZM-02, 30 Oct 2026);
-    // a pinned moment stays pinned if the new range shows it, and otherwise is offered (Go to ...)
+    // the pin is the anchor: the new range opens around the pinned moment (its point's middle, so a pinned year opens
+    // that year), still pinned; without one, a dragged zoom carries over the same way (owner's calls ZM-02, 30-31 Oct)
     const z = state.zoom && !state.zoom.span && V?.zoomed ? state.zoom : null;
-    const pin = !z && state.hoverBy === 'pin' && state.hover != null && V ? { t: V.t[state.hover], label: pinLabel(state.hover) } : null;
+    const pin = state.hoverBy === 'pin' && state.hover != null && V ? { t: V.t[state.hover], h: V.hrs[state.hover] } : null;
     soon(() => {
       state.zoom = null;
+      if (pin) { pinAfter = pin; setView(r, RANGES[r].fixed ? null : endAround(pin.t + (pin.h * 36e5) / 2, r)); return; }
       if (z && !RANGES[r].fixed) { setView(r, endAround((z.from + z.to) / 2, r)); return; }
-      offerPin = pin; setView(r);
+      setView(r);
     });
   });
-  // Go to the pinned moment the last range change left out: that range around it, pinned there
-  $('pin-go').addEventListener('click', () => {
-    const o = shownOffer;
-    if (!o) return;
-    showPinGo(null);
-    pinAfter = o.t; setView(state.range, RANGES[state.range].fixed ? null : endAround(o.t, state.range));
-  });
+  $('pin-chip').addEventListener('click', () => { state.hover = null; state.hoverBy = null; hover(); });
   // the menu on 1D: the last hour, 3, 6 or 12 hours of the day (5-minute points), or the whole 24 hours
   const spanMenu = $('span-menu'), spanBtn = $('btn-span');
   const closeSpans = () => { spanMenu.hidden = true; spanBtn.setAttribute('aria-expanded', 'false'); };
@@ -1868,7 +1874,6 @@ export function mountTracker(D, hooks = {}) {
   }
   let downBy = '', tap = null;
   const TAP_PX = 18;   // how near the time line a tap must land to let it go
-  $('sum-unpin').addEventListener('click', () => { state.hover = null; state.hoverBy = null; hover(); });
   for (const box of boxes) {
     box.addEventListener('pointerleave', e => { hideTip(); if (e.pointerType === 'mouse' && state.hoverBy !== 'pin') { state.hover = null; hover(); } });
     box.addEventListener('keydown', e => {
@@ -1975,7 +1980,7 @@ export function mountTracker(D, hooks = {}) {
       const L = this.links(), layers = V.layers.filter(l => !state.hidden.has(l.id)), u = isLong() ? 'MW average' : 'MW';
       const f1 = v => Math.round(v * 10) / 10, f2 = v => Math.round(v * 100) / 100;
       // generation in the chart's own unit: energy (MWh, GWh or TWh) for days and longer, as the chart shows it; a
-      // partial period's energy is what it generated so far (the chart draws it at its rate for a whole period)
+      // partial period's energy is what it generated so far, as the chart draws it
       const energy = isLong(), gu = energy ? eu().unit : 'MW', g = (v, j) => energy ? +en(v, j).toPrecision(6) : f1(v);
       const header = ['start_nz', 'start_utc', ...(energy ? ['hours'] : []), ...layers.map(l => `${l.name} (${gu})`), `${totalLabel()} (${gu})`,
         'Price, North Island, Haywards ($/MWh)', 'Price, South Island, Benmore ($/MWh)', `Demand, metered (${u})`, `Demand with embedded solar (${u})`,

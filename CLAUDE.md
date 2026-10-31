@@ -103,7 +103,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   (`recEnd`: a year record from 1 January after it), not its start.
   Records added 23 Oct 2026 (records.py VERSION 4): most fossil generation, peak hydro, lowest hydro and lowest price.
   Every record the data holds is shown, half-hours included (owner's rule, 30 Oct 2026: nothing left out for being
-  less interesting; lowest hydro and lowest price had been kept to days and longer). The month-of-year table lists every
+  less interesting; lowest hydro and lowest price had been kept to days and longer). Under Heading for a record and New and provisional, three tabs (`TABS`, `?tab=milestones|months`;
+  owner's call REC-01, 31 Oct 2026): All-time records, Milestones and By month, each with its own region picker. The month-of-year table lists every
   half-hour record (labelled as trading periods, REC-13) and Milestones all of them (6, then Show all). "New" (`isNew` in
   records.js, `_since_ok` in records.py) is a record first seen in the last 30 days whose period ended within `NEW_LAG`
   (120) days of that (metered data runs 5-6 weeks behind each month), so a rebuild that moves an old record isn't new (REC-02, 31 Oct 2026); New and provisional shows 4
@@ -158,8 +159,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   (`onPop` in tracker.js). The tab links carry the shared settings plus the other tab's own from its last visit in this
   browser tab (sessionStorage, `tabHref`). The Share button (`src/lib/site/ShareLink.svelte`, beside About this data)
   copies a link to the live view or to the dates shown (`shareLinks`), optionally marking the pinned point; on phones
-  it opens the share sheet. A click on any chart pins the time line there (accent line, "Pinned · Release" under the
-  summary's heading; another click on it, Release or Escape lets go); drilling down is from the summary list only (the
+  it opens the share sheet. A click on any chart pins the time line there (accent line, and a "Pinned <time> ×" chip in the sticky
+  bar, `#pin-chip`/`syncPinChip`, the one place the pin is named; another click on it, the chip or Escape lets go); drilling down is from the summary list only (the
   generation chart no longer drills on click). Touch keeps its point without pinning, so it can still scrub; a tap on
   the line a touch left (within `TAP_PX`, without sliding) lets it go (owner's report CHT-02, 30 Oct 2026). A pin, or
   a touch's point, survives a rebuild whose view still shows that moment (`pinT`/`keepBy` in `rebuild()`: grouping, region, drill-down, a range
@@ -185,15 +186,19 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   moving between months or years changes nothing until a day is picked, which closes it; the month name opens a year
   list, then months. On 1D a past day is labelled "Day" (it shows that whole day). A past window counts whole local
   days back (`addDays` in `buildView` and `spanFor`), so a clock change inside it no longer adds an hour of the day
-  before (CHT-10). A range button while a dragged zoom is shown opens that range around the zoom (`endAround`); one
-  that leaves a pinned moment out offers it back as a chip in the bar, "Pinned: Go to ..." (`#pin-go`, `showPinGo`,
-  `offerPin`/`pinAfter` in `rebuild()`), which opens that range around it, pinned (owner's call ZM-02, 30 Oct 2026). The 1D menu
+  before (CHT-10). The pin is the anchor (owner's call ZM-02, 31 Oct 2026): a range button opens the new range around
+  the pinned point's middle (`endAround`; a pinned year on All opens that year on 1Y), still pinned (`pinAfter` in
+  `rebuild()`), unless the new view is finer than the pin and the pin is longer than an hour (a pinned day opened on 1D
+  shows that whole day and lets go; 7:30 pm on 30 days stays 7:30 pm on 1D); without a pin, a dragged zoom carries over
+  the same way. The ‹ › arrows step freely and let go of a pin once it leaves the window. The Prices tab does the same
+  (`pickRange`, `setView` keeps a pin by its time, not its place in the list). The 1D menu
   (`#span-menu`) lives outside the sticky bar because the bar's clip-path clips anything hanging below it. Share's link
   to the dates shown turns a span into fixed times (`zoomAt`). On an island's chart, HVDC is signed like the batteries
   (23 Oct 2026): arriving is stacked on top of the island's generation, leaving is drawn below zero (`drawGen`). Both are
   drawn light so the generation behind reads through, and High/Low sit on the generation, never on HVDC. In the energy
-  view a partial first or last period (week so far ...) is drawn at its rate so far for a whole period, faded; its note
-  is in the tooltip (`partialNote`), not on the chart, and the summary's sub-line says where the data stops (for
+  view a partial first or last period (week so far ...) is drawn as the energy it holds, so it steps down, washed out
+  behind a dashed edge (owner's call TRK-04, 31 Oct 2026: honest rather than scaled to a whole period); its note
+  ("Part month: 1 Oct to 16 Oct (16 of 31 days) · energy so far") is in the tooltip (`partialNote`), and the summary's sub-line says where the data stops (for
   touch). The last period is partial when it runs up to the newest data or when a past window ends part way through
   it (`partialCut`, e.g. 1 year by weeks ending on a Thursday; TRK-04, 30 Oct 2026). Chart type (owner's call, 29 Oct 2026): Stacked (default) or Lines (`#seg-chart`,
   `state.chart`, address `chart=lines`), each visible layer as its own line from zero in the same unit (MW, energy, %),
@@ -221,7 +226,9 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   `.ttl-row` wraps a title and its ⓘ where the heading isn't a `.ch-head`). On the Generation tab each chart's unit (MW/GWh/TWh, %, $/MWh, g/kWh) is drawn in small type under its top axis label (`axisUnit` in tracker.js; the price overlay's under the right axis's), not beside the title (owner's call, 29 Oct 2026, tidier on phones); the full description is in the canvas's aria-label. The grouping menu is sized to the choice it shows (`fitSelect`), and under 560 px the generation chart's header is two rows (title, ⓘ and grouping; then MW/%, chart type, $ Price and the total: `.chart.gen .legends { display: contents }` with `order`); the ⓘ notes on this tab are short bullet points (owner's call, 29 Oct 2026). The Prices tab follows suit: the scale is a fitted dropdown (`fitSelect` action, `#lib/site/fitselect.js`, shared with tracker.js), `TimeChart`'s `unit` puts each chart's unit under its top label, the ⓘ notes are bullets, and under 560 px the price chart's header is two rows (title, ⓘ, scale; then Haywards/Benmore on long ranges) with its key (`priceKey`) moved under the chart on both tracker tabs, Now, Records and
   article figures (`Figure`'s source). Region and month pickers are boxed dropdowns (`select.pick`), the same everywhere; the page-level "About this data" is a labelled
   pill, and both summaries have a labelled "Controls" panel, one line per feature, linking to the full descriptions in "Using the tracker" on /about (`#controls`; owner's report GRP-06): keep both up to date.
-  Tracker and Now use the full width of big screens (`.wrap.wide`; reading pages keep 1,260 px). The browser tab's title says what the view shows (`describe`, set through `setTitle` in `#lib/site/view.js`, which sets it again when the page comes back into view or from the back/forward cache: phones sometimes showed the address instead, SITE-06), and the
+  Tracker and Now use the full width of big screens (`.wrap.wide`; reading pages keep 1,260 px); the masthead spans
+  the window on every page (`.wrap:not(.wide) > .mast-wrap`, with `--gutter` and `--sbw`, the scrollbar's width set by
+  the root layout), so its logo and links don't move between them (owner's call HOME-01, 31 Oct 2026). The browser tab's title says what the view shows (`describe`, set through `setTitle` in `#lib/site/view.js`, which sets it again when the page comes back into view or from the back/forward cache: phones sometimes showed the address instead, SITE-06), and the
   Worker puts the same title into the page title, og:title and og:url of `/tracker` and `/tracker/prices` for a linked view. The tracker page markup
   is in `src/routes/tracker/+page.svelte` (About and Data and methods share one layout with a contents sidebar (a "Contents" dropdown naming the page under
   860 px, DOC-04), the route group `src/routes/(docs)/`; About page: `src/routes/(docs)/about/+page.svelte`, short: what each page shows, where the data comes from in brief, support, contact; links to its old `#m-*` sections forward to the method pages. Data and methods: `/methods` overview, `/methods/sources` every dataset, `/methods/<slug>` one page per series (generation, embedded-solar, demand, hvdc, prices, price-explainer, emissions, groupings, history); topics and datasets in `src/lib/methods/registry.ts` (each page's header and "Data used" box come from it, so a dataset is described once), bodies in `src/lib/methods/pages/<slug>.svelte`, styles in `methods.css`. The emissions and price explainer pages import their factors and rules from `emissions.js` and `explain.js`, so they stay in step; the other pages are prose: when a method changes, update its page and its `updated` date; shared

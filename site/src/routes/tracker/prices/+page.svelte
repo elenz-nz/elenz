@@ -176,10 +176,25 @@
 		return shareLinks('/tracker/prices', { ...sharedNow(), ...ownNow() }, { point: lastT, pointLabel: label, tDay, days: R.days, latestEnd: endOfToday });
 	}
 
+	// The pin is the anchor, as on the Generation tab (owner's call ZM-02, 31 Oct 2026): a range button opens the new
+	// range around the pinned moment (its point's middle), still pinned (a pinned day opened on 1D shows that
+	// whole day and lets go); without a pin, a dragged zoom carries over.
+	let pinAfter: { t: number; h: number } | null = null;
+	const hoursAt = (v: any, i: number) => (v.mode === 'long' ? v.P.h[i] : v.S.h[i]);
+	function endAround(t: number, k: string) {
+		const d = (RANGES as any)[k].days;
+		if (!d) return null;
+		const end = Math.max(addDays(midnightOf(t), Math.ceil(d / 2)), addDays(FIRST, d));
+		return end >= endOfToday ? null : end;
+	}
 	function pickRange(k: string) {
+		const pin = pinned && view && hover >= 0 && hover < view.n ? { t: view.t[hover], h: hoursAt(view, hover) } : null;
+		const z = !pin && zoom && !zoom.span && zoomEnds ? zoomEnds : null;
 		zoom = null;
 		range = k;
 		intPicked = false;   // a new range starts on its default interval, as on the Generation tab
+		if (pin) { pinAfter = pin; endT = endAround(pin.t + (pin.h * 36e5) / 2, k); }
+		else if (z) endT = endAround((z.from + z.to) / 2, k);
 		save();
 	}
 	const setEnd = (t: number | null) => { if (zoom && !zoom.span) zoom = null; endT = t; save(); };
@@ -306,9 +321,22 @@
 	}
 	function setView(v: any, isZoomed = false) {
 		v.zoomed = isZoomed;
-		const keep = view && view.mode === v.mode && hover >= 0 && hover < v.n && view.n === v.n;
+		// a pin (or a touch's or the keys' point) is kept by its time, not its place in the list: on the same moment when
+		// the new view shows it at the same or a coarser step (a half-hour or finer pin also on a finer one), otherwise
+		// let go (the arrows step away from it); no cursor otherwise, the summary shows the whole range
+		const was = view && hover >= 0 && hover < view.n && (pinned || hoverBy === 'touch' || hoverBy === 'key')
+			? { t: view.t[hover], h: hoursAt(view, hover), pin: pinned } : null;
+		const want = pinAfter ? { ...pinAfter, pin: true } : was;
+		pinAfter = null;
 		view = v;
-		if (!keep) { hover = -1; pinned = false; }   // no cursor: the summary shows the whole range, as on the Generation tab
+		hover = -1; pinned = false;
+		if (want) {
+			let j = -1;
+			for (let i = v.n - 1; i >= 0; i--) if (v.t[i] <= want.t) { j = i; break; }
+			if (j >= 0 && want.t < v.t[j] + hoursAt(v, j) * 36e5 + 1 && (hoursAt(v, j) >= want.h - 1e-9 || want.h <= 1)) {
+				hover = j; pinned = want.pin; if (want.pin) hoverBy = 'pin';
+			}
+		}
 		if (linkedT != null) {
 			// a link's point: the period that contains it
 			let j = -1;
@@ -740,6 +768,13 @@
 				</div>
 			</div>
 		{/if}
+		{#if pinned && at >= 0 && view}
+			<!-- the pinned time, the one place it's named; a tap lets it go (ZM-02) -->
+			<button type="button" class="zoom-chip pin-chip" title="Let go of the pinned time (Escape)" onclick={unpin}>
+				<svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8v12.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /><circle cx="8" cy="5" r="2.4" fill="currentColor" /></svg>
+				<span>Pinned</span><b>{chip(at)}</b><span class="pin-x" aria-hidden="true">×</span><span class="vh">: let go</span>
+			</button>
+		{/if}
 		{#if zoomed}
 			<button type="button" class="zoom-chip" title="Back to the whole range (Escape)" onclick={() => { zoom = null; save(); }}>
 				<svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="m10.5 10.5 3.5 3.5M5 7h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
@@ -916,7 +951,6 @@
 					<div>
 						<div class="sum-when">{head[0]}</div>
 						<div class="sum-sub">{head[1]}</div>
-						{#if pinned && at >= 0}<div class="sum-pin">Pinned <button type="button" onclick={unpin}>Release</button></div>{/if}
 					</div>
 					<button type="button" class="ctl-btn" bind:this={helpBtn} aria-expanded={helpOpen} aria-controls="p-help" title="Everything the charts and this list can do" onclick={() => (helpOpen = !helpOpen)}>
 						<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h7M12 4h2M2 12h3M8 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /><circle cx="10.5" cy="4" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /><circle cx="6.5" cy="12" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>Controls
@@ -928,7 +962,7 @@
 						<dt>Read a time</dt>
 						<dd>Hover a chart, or touch and slide on a phone.</dd>
 						<dt>Pin it</dt>
-						<dd>Click or tap a chart to hold the line; again, or Escape, lets go.</dd>
+						<dd>Click or tap a chart to hold the line; the Pinned chip in the bar, another click or Escape lets go. A range button opens around it.</dd>
 						<dt>Move through history</dt>
 						<dd>‹ › step by the range; the date opens a calendar; Latest comes back.</dd>
 						<dt>Zoom in</dt>

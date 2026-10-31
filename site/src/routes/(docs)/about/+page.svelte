@@ -130,7 +130,7 @@
 			<dt>Read a time</dt>
 			<dd>Hover a chart, or touch and slide on a phone. The list beside the charts shows every source at that time.</dd>
 			<dt>Pin it</dt>
-			<dd>Click a chart to hold the time line there; click it again, Release or Escape to let go. On a phone the line stays where your finger lifts; tap it again to let go. While a line is pinned, ← → move it one point (Shift: further), and Home and End jump to the ends. It stays put when you change the grouping, region or chart type, and a range that doesn’t show the pinned time offers “Go to” it in the bar. Share can then mark that time.</dd>
+			<dd>Click a chart to hold the time line there. The bar then shows “Pinned” and the time; select it, click the line again or press Escape to let go. On a phone the line stays where your finger lifts; tap it again to let go. While a line is pinned, ← → move it one point (Shift: further), and Home and End jump to the ends. The pin is the anchor: it stays when you change the grouping, region or chart type, and a range button opens the new range around it, still pinned (a pinned day opened on 1D shows that whole day instead). The ‹ › arrows step away from it, and it lets go once it leaves the chart. Share can mark the pinned time.</dd>
 			<dt>Move through history</dt>
 			<dd>Range, interval and region are in the bar at the top. The ‹ › arrows beside the date, on the generation chart, or Page Up and Page Down step back and forward by the range. The date opens a calendar: select the month name to jump to another year, then pick a day. Latest comes back to now.</dd>
 			<dt>Zoom in</dt>

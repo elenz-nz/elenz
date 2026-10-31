@@ -22,6 +22,10 @@
 	// the period the table lists: each half-hour record's highest trading period, day, week, month or year (?period=)
 	let period = $state('tp');
 	let cat = $state('all');
+	// the page's three lists as tabs under Heading for a record and New and provisional (owner's call REC-01, 31 Oct
+	// 2026: the page had too many lines; ?tab=milestones|months in the address)
+	const TABS = [{ k: 'all', label: 'All-time records' }, { k: 'milestones', label: 'Milestones' }, { k: 'months', label: 'By month' }];
+	let tab = $state('all');
 	let liveD = $state.raw<any>(null);   // tracker.json: the live week, for the live check and the pace
 	let paceAll = $state(false);          // the pace cards beyond the first PACE_CARDS
 	const PACE_CARDS = 8;   // owner's call, 31 Oct 2026
@@ -31,6 +35,8 @@
 		const qs = new URLSearchParams(location.search), q = qs.get('region'), qp = qs.get('period');
 		if (q && ['NZ', 'NI', 'SI'].includes(q)) region = q;
 		if (qp && PERIOD_KEYS.includes(qp)) period = qp;
+		const qt = qs.get('tab');
+		if (qt && TABS.some((x) => x.k === qt)) tab = qt;
 		(async () => {
 			R = await loadRecords();
 			status = R ? 'ok' : 'none';
@@ -44,10 +50,12 @@
 
 	function setRegion(r: string) { region = r; syncUrl(); }
 	function setPeriod(p: string) { period = p; syncUrl(); }
+	function setTab(k: string) { tab = k; syncUrl(); }
 	function syncUrl() {
 		const u = new URL(location.href);
 		if (region === 'NZ') u.searchParams.delete('region'); else u.searchParams.set('region', region);
 		if (period === 'tp') u.searchParams.delete('period'); else u.searchParams.set('period', period);
+		if (tab === 'all') u.searchParams.delete('tab'); else u.searchParams.set('tab', tab);
 		replaceState(u, {});
 	}
 	// the whole row opens its record (the name and description are the link itself, for keyboards and new tabs; a click
@@ -108,6 +116,13 @@
 		.map((d) => ({ d, tv: R.moy?.[d.id]?.[region]?.[moy] ?? null })).filter((x) => x.tv && !notShown(x.d, region, get(R, x.d.id, region))) : []);
 
 </script>
+
+{#snippet regionPick(id: string)}
+	<label for={id} class="vh">Region</label>
+	<select class="pick" {id} value={region} onchange={(e) => setRegion((e.currentTarget as HTMLSelectElement).value)}>
+		{#each REGIONS as r}<option value={r.id}>{r.name}</option>{/each}
+	</select>
+{/snippet}
 
 <svelte:head>
 	<title>Records · ELENZ</title>
@@ -195,7 +210,14 @@
 				</section>
 			{/if}
 
-			<section aria-labelledby="all-h" class="sec">
+			<div class="rec-tabs" role="tablist" aria-label="Records">
+				{#each TABS as t}
+					<button type="button" role="tab" id="tab-{t.k}" aria-selected={tab === t.k} aria-controls="panel-{t.k}" onclick={() => setTab(t.k)}>{t.label}</button>
+				{/each}
+			</div>
+
+			{#if tab === 'all'}
+			<section aria-labelledby="all-h" class="sec" id="panel-all">
 				<!-- the list's title bar: its heading, the region (only the list, milestones and month records follow it) and how
 				     far the official data goes; it sticks while the list scrolls (owner's call, 30 Oct 2026) -->
 				<div class="toolbar list-bar">
@@ -273,15 +295,20 @@
 				</div>
 			</section>
 
-			<div class="two">
-				{#if miles.length}
-					<section class="panel" aria-labelledby="mile-h">
-						<div class="ttl-row"><h2 id="mile-h">Milestones · {regionName}</h2><InfoTip label="About milestones">
+			{/if}
+
+			{#if tab === 'milestones'}
+				<section class="panel" id="panel-milestones" aria-labelledby="mile-h">
+					<div class="sec-head">
+						<div class="ttl-row"><h2 id="mile-h">Milestones</h2><InfoTip label="About milestones">
 							<ul>
 								<li>The first half-hour each round level was passed: wind, grid and embedded solar, renewable share and peak demand.</li>
 								<li>Newest first.</li>
 							</ul>
 						</InfoTip></div>
+						{@render regionPick('mile-region')}
+					</div>
+					{#if miles.length}
 						<ul class="miles">
 							{#each milesAll ? miles : miles.slice(0, MILES) as m}
 								<li>
@@ -292,10 +319,14 @@
 							{/each}
 						</ul>
 						{#if miles.length > MILES}<button type="button" class="more-btn" onclick={() => (milesAll = !milesAll)}>{milesAll ? 'Show fewer' : `Show all ${miles.length}`}</button>{/if}
-					</section>
-				{/if}
+					{:else}
+						<p class="note">No milestones for the {regionName} yet.</p>
+					{/if}
+				</section>
+			{/if}
 
-				<section class="panel" aria-labelledby="moy-h">
+			{#if tab === 'months'}
+				<section class="panel" id="panel-months" aria-labelledby="moy-h">
 					<div class="sec-head">
 						<div class="ttl-row"><h2 id="moy-h">Records for
 							<select class="pick" bind:value={moy} aria-label="Month of the year">
@@ -307,8 +338,9 @@
 								<li>A month can set one even when the all-time record holds.</li>
 							</ul>
 						</InfoTip></div>
-						<span class="unit">{regionName} · trading periods</span>
+						{@render regionPick('moy-region')}
 					</div>
+					<p class="unit">Trading periods, {regionName}</p>
 					<table class="moy">
 						<tbody>
 							{#each moyRows as x}
@@ -323,7 +355,7 @@
 						</tbody>
 					</table>
 				</section>
-			</div>
+			{/if}
 
 		{/if}
 	</main>
@@ -345,6 +377,13 @@
 	.official::before { display: none; }
 
 	.sec { display: grid; gap: 10px; }
+	/* the three lists' tabs: underlined like the tracker's Generation and Prices tabs */
+	.rec-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; margin-top: 6px; }
+	.rec-tabs button { font: inherit; font-size: 0.95rem; font-weight: 600; color: var(--muted); background: none; border: 0; border-bottom: 2px solid transparent; padding: 8px 12px; margin-bottom: -1px; min-height: 40px; white-space: nowrap; cursor: pointer; }
+	.rec-tabs button:hover { color: var(--ink); }
+	.rec-tabs button[aria-selected='true'] { color: var(--ink); border-bottom-color: var(--accent); }
+	.rec-tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+	@media (max-width: 420px) { .rec-tabs button { font-size: 0.86rem; padding-inline: 9px; } }
 	.sec h2, .panel h2 { font-size: 1rem; }
 	.sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 	.unit { color: var(--muted); font-size: 0.8rem; }
@@ -426,7 +465,8 @@
 	/* a record with a provisional one beyond it: a dashed edge, like the provisional cards (its page says more) */
 	tr.prov > th[scope='row'] { border-left: 2px dashed color-mix(in srgb, var(--warn-ink) 65%, var(--line)); padding-left: 10px; }
 
-	.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+	/* Milestones and By month: a readable column rather than the page's width */
+	#panel-milestones, #panel-months { max-width: 760px; }
 	.miles { list-style: none; margin: 0; padding: 0; display: grid; }
 	.miles li { display: flex; align-items: baseline; gap: 2px; padding: 7px 0; border-bottom: 1px solid var(--grid); font-size: 0.86rem; color: var(--ink-2); }
 	.miles li:last-child { border-bottom: 0; }
@@ -436,9 +476,6 @@
 	.moy tr:last-child td, .moy tr:last-child th { border-bottom: 0; }
 	#moy-h select.pick { font-size: 1rem; }
 
-	@media (max-width: 860px) {
-		.two { grid-template-columns: minmax(0, 1fr); }
-	}
 	@media (max-width: 640px) {
 		/* phones: each record a short block (name and value, then when) instead of a wide table */
 		.tbl { overflow: visible; }
