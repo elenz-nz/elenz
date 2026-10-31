@@ -108,27 +108,29 @@
 		return pace(R, liveD).sort((a, b) => (a.region === 'NZ' ? 0 : 1) - (b.region === 'NZ' ? 0 : 1))
 			.filter((x) => { const k = x.d.id + x.period; return !seen.has(k) && !!seen.add(k); });
 	});
-	const miles = $derived(R ? milestones(R, region).reverse() : []);   // newest first
-	let milesAll = $state(false);
-	const MILES = 6;
-	// every half-hour record has a best for each month of the year (records.py by_month_of_year)
-	const moyRows = $derived(R ? DEFS.filter((d) => d.kind === 'hh' && d.regions.includes(region))
-		.map((d) => ({ d, tv: R.moy?.[d.id]?.[region]?.[moy] ?? null })).filter((x) => x.tv && !notShown(x.d, region, get(R, x.d.id, region))) : []);
+	// every half-hour record has a best for each month of the year (records.py by_month_of_year), for each region
+	const moyFor = (r: string) => (R ? DEFS.filter((d) => d.kind === 'hh' && d.regions.includes(r))
+		.map((d) => ({ d, tv: R.moy?.[d.id]?.[r]?.[moy] ?? null })).filter((x) => x.tv && !notShown(x.d, r, get(R, x.d.id, r))) : []);
+	// Milestones and By month: pointing at a row lights the same milestone or record in the other regions' cards; a
+	// click (or tap) pins it there and another click on it lets go (owner's call, 31 Oct 2026). Rows carry data-k: the
+	// record's id, plus the level for a milestone. Changing tab or month lets go.
+	let hov = $state<string | null>(null);
+	let pinned = $state<string | null>(null);
+	const lit = $derived(pinned ?? hov);
+	const keyAt = (e: Event) => (e.target as Element | null)?.closest<HTMLElement>('[data-k]')?.dataset.k ?? null;
+	function rowOver(e: PointerEvent) { if (e.pointerType === 'mouse') hov = keyAt(e); }
+	function rowLeave(e: PointerEvent) { if (e.pointerType === 'mouse') hov = null; }
+	function pinClick(e: MouseEvent) { const k = keyAt(e); if (k) pinned = pinned === k ? null : k; }
+	$effect(() => { void tab; void moy; pinned = null; hov = null; });
 
 </script>
-
-{#snippet regionPick(id: string)}
-	<label for={id} class="vh">Region</label>
-	<select class="pick" {id} value={region} onchange={(e) => setRegion((e.currentTarget as HTMLSelectElement).value)}>
-		{#each REGIONS as r}<option value={r.id}>{r.name}</option>{/each}
-	</select>
-{/snippet}
 
 <svelte:head>
 	<title>Records · ELENZ</title>
 	<meta name="description" content="New Zealand's electricity records since 1997: peak demand, renewable share, wind and solar, prices and the HVDC link, for New Zealand and each island, from the Electricity Authority's metered data." />
 	<Preview title="New Zealand's electricity records since 1997 · ELENZ" description="New Zealand's electricity records since 1997: peak demand, renewable share, wind and solar, prices and the HVDC link, for New Zealand and each island, from the Electricity Authority's metered data." path="/records" />
 </svelte:head>
+<svelte:window onkeydown={(e) => { if (e.key === 'Escape' && pinned) pinned = null; }} />
 
 <div class="wrap">
 	<Masthead />
@@ -297,36 +299,44 @@
 
 			{/if}
 
+			<!-- Milestones and By month: a card for each region side by side (owner's call, 31 Oct 2026), the full lists -->
 			{#if tab === 'milestones'}
-				<section class="panel" id="panel-milestones" aria-labelledby="mile-h">
-					<div class="sec-head">
-						<div class="ttl-row"><h2 id="mile-h">Milestones</h2><InfoTip label="About milestones">
-							<ul>
-								<li>The first half-hour each round level was passed: wind, grid and embedded solar, renewable share and peak demand.</li>
-								<li>Newest first.</li>
-							</ul>
-						</InfoTip></div>
-						{@render regionPick('mile-region')}
-					</div>
-					{#if miles.length}
-						<ul class="miles">
-							{#each milesAll ? miles : miles.slice(0, MILES) as m}
-								<li>
-									<span class="dot" style="--c:var({m.d.tok})"></span>
-									<span><b>{m.d.unit === '%' ? `${m.level}% renewable` : `${m.level.toLocaleString('en-NZ')} MW of ${m.d.id === 'wind_max' ? 'wind' : m.d.id === 'solar_max' ? 'grid solar' : m.d.id === 'roof_max' ? 'embedded solar' : 'demand'}`}</b>
-										first passed {clock(m.t)}, {dayOf(m.t)}{#if m.d.est} <span class="tag est">Estimate</span>{/if}</span>
-								</li>
-							{/each}
+				<section class="sec" id="panel-milestones" aria-labelledby="mile-h">
+					<div class="ttl-row"><h2 id="mile-h">Milestones</h2><InfoTip label="About milestones">
+						<ul>
+							<li>The first half-hour each round level was passed: wind, grid and embedded solar, renewable share and peak demand.</li>
+							<li>Newest first, for New Zealand and each island.</li>
+							<li>Point at one to light it in every region; click or tap to pin it there, again to let go.</li>
 						</ul>
-						{#if miles.length > MILES}<button type="button" class="more-btn" onclick={() => (milesAll = !milesAll)}>{milesAll ? 'Show fewer' : `Show all ${miles.length}`}</button>{/if}
-					{:else}
-						<p class="note">No milestones for the {regionName} yet.</p>
-					{/if}
+					</InfoTip></div>
+					<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+					<div class="regions" onpointerover={rowOver} onpointerleave={rowLeave} onclick={pinClick}>
+						{#each REGIONS as rg}
+							{@const ms = milestones(R, rg.id).reverse()}
+							<section class="panel" aria-label="Milestones, {rg.name}">
+								<h3>{rg.name}</h3>
+								{#if ms.length}
+									<ul class="miles">
+										{#each ms as m}
+											{@const k = `${m.d.id}:${m.level}`}
+											<li data-k={k} class:lit={lit === k} class:pinned={pinned === k} title={pinned === k ? 'Pinned · click to let go' : 'Click to pin'}>
+												<span class="dot" style="--c:var({m.d.tok})"></span>
+												<span><b>{m.d.unit === '%' ? `${m.level}% renewable` : `${m.level.toLocaleString('en-NZ')} MW of ${m.d.id === 'wind_max' ? 'wind' : m.d.id === 'solar_max' ? 'grid solar' : m.d.id === 'roof_max' ? 'embedded solar' : 'demand'}`}</b>
+													first passed {clock(m.t)}, {dayOf(m.t)}{#if m.d.est} <span class="tag est">Estimate</span>{/if}</span>
+											</li>
+										{/each}
+									</ul>
+								{:else}
+									<p class="note">None yet.</p>
+								{/if}
+							</section>
+						{/each}
+					</div>
 				</section>
 			{/if}
 
 			{#if tab === 'months'}
-				<section class="panel" id="panel-months" aria-labelledby="moy-h">
+				<section class="sec" id="panel-months" aria-labelledby="moy-h">
 					<div class="sec-head">
 						<div class="ttl-row"><h2 id="moy-h">Records for
 							<select class="pick" bind:value={moy} aria-label="Month of the year">
@@ -336,24 +346,33 @@
 							<ul>
 								<li>Trading period records: the highest or lowest half-hour of any {MONTHS[moy]} since 1997, and the year it was set.</li>
 								<li>A month can set one even when the all-time record holds.</li>
+								<li>Point at one to light it in every region; click or tap to pin it there, again to let go.</li>
 							</ul>
 						</InfoTip></div>
-						{@render regionPick('moy-region')}
+						<span class="unit">Trading periods</span>
 					</div>
-					<p class="unit">Trading periods, {regionName}</p>
-					<table class="moy">
-						<tbody>
-							{#each moyRows as x}
-								<tr>
-									<th scope="row"><span class="dot" style="--c:var({x.d.tok})"></span>{fullName(x.d)}{#if x.d.est} <span class="tag est">Est.</span>{/if}</th>
-									<td class="n val">{parts(x.d, x.tv[1]).n}<small>{parts(x.d, x.tv[1]).u}</small></td>
-									<td class="n muted">{yearOf(x.tv[0])}</td>
-								</tr>
-							{:else}
-								<tr><td class="muted">No records for this month yet.</td></tr>
-							{/each}
-						</tbody>
-					</table>
+					<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+					<div class="regions" onpointerover={rowOver} onpointerleave={rowLeave} onclick={pinClick}>
+						{#each REGIONS as rg}
+							{@const rows = moyFor(rg.id)}
+							<section class="panel" aria-label="{MONTHS[moy]} records, {rg.name}">
+								<h3>{rg.name}</h3>
+								<table class="moy">
+									<tbody>
+										{#each rows as x}
+											<tr data-k={x.d.id} class:lit={lit === x.d.id} class:pinned={pinned === x.d.id} title={pinned === x.d.id ? 'Pinned · click to let go' : 'Click to pin'}>
+												<th scope="row"><span class="dot" style="--c:var({x.d.tok})"></span>{fullName(x.d)}{#if x.d.est} <span class="tag est">Est.</span>{/if}</th>
+												<td class="n val">{parts(x.d, x.tv[1]).n}<small>{parts(x.d, x.tv[1]).u}</small></td>
+												<td class="n muted">{yearOf(x.tv[0])}</td>
+											</tr>
+										{:else}
+											<tr><td class="muted">No records for this month yet.</td></tr>
+										{/each}
+									</tbody>
+								</table>
+							</section>
+						{/each}
+					</div>
 				</section>
 			{/if}
 
@@ -465,15 +484,24 @@
 	/* a record with a provisional one beyond it: a dashed edge, like the provisional cards (its page says more) */
 	tr.prov > th[scope='row'] { border-left: 2px dashed color-mix(in srgb, var(--warn-ink) 65%, var(--line)); padding-left: 10px; }
 
-	/* Milestones and By month: a readable column rather than the page's width */
-	#panel-milestones, #panel-months { max-width: 760px; }
+	/* Milestones and By month: a card per region, three across; one under another below 900 px */
+	.regions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: start; }
+	.regions h3 { margin: 0; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+	@media (max-width: 900px) { .regions { grid-template-columns: minmax(0, 1fr); } }
 	.miles { list-style: none; margin: 0; padding: 0; display: grid; }
-	.miles li { display: flex; align-items: baseline; gap: 2px; padding: 7px 0; border-bottom: 1px solid var(--grid); font-size: 0.86rem; color: var(--ink-2); }
+	.miles li { display: flex; align-items: baseline; gap: 2px; padding: 7px 6px; border-bottom: 1px solid var(--grid); font-size: 0.86rem; color: var(--ink-2); }
 	.miles li:last-child { border-bottom: 0; }
 	.miles b { color: var(--ink); font-weight: 600; }
 	.moy th[scope='row'] { display: flex; align-items: center; padding-left: 0; font-weight: 500; }
 	.moy td.n:last-child { padding-right: 0; width: 4em; }
 	.moy tr:last-child td, .moy tr:last-child th { border-bottom: 0; }
+	/* the same milestone or record lit in every region's card; a pinned one keeps an accent edge */
+	.miles li[data-k], .moy tr[data-k] { cursor: pointer; }
+	.moy tr[data-k] th[scope='row'] { padding-left: 6px; }
+	.moy tr[data-k] td.n:last-child { padding-right: 6px; }
+	.miles li.lit, .moy tr.lit > * { background: var(--accent-soft); }
+	.miles li.pinned { box-shadow: inset 3px 0 0 var(--accent); }
+	.moy tr.pinned th[scope='row'] { box-shadow: inset 3px 0 0 var(--accent); }
 	#moy-h select.pick { font-size: 1rem; }
 
 	@media (max-width: 640px) {

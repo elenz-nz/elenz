@@ -94,7 +94,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   link; computers: copies the link) and Download (the 1200 x 630 PNG from `shareImage.js`, in the page's light or dark
   colours, `pageIsDark`; REC-05/06) beside the region picker, and again at its foot. The image is drawn ahead
   (`prepared`), because phones refuse a share that waits on drawing; when a browser refuses to share or copy (Firefox on
-  Android, SHR-03) the link is shown with its own Copy button (`src/lib/site/CopyLink.svelte`, also in the tracker
+  Android, SHR-03; a second share there is refused with InvalidStateError, a share it never settled, so the link
+  is copied instead) the link is shown with its own Copy button (`src/lib/site/CopyLink.svelte`, also in the tracker
   tabs' Share panel). Its two charts (`Progression`, `DayChart`) pin a point on click, tap or drag (it stays after
   the finger lifts; another click, a tap outside or Escape lets go), and on touch the tooltip sits above the chart.
   A mouse drag across either zooms into that span (owner's call, 25 Oct 2026; the y axis fits what is shown, the
@@ -106,8 +107,9 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   Records added 23 Oct 2026 (records.py VERSION 4): most fossil generation, peak hydro, lowest hydro and lowest price.
   Every record the data holds is shown, half-hours included (owner's rule, 30 Oct 2026: nothing left out for being
   less interesting; lowest hydro and lowest price had been kept to days and longer). Under Heading for a record and New and provisional, three tabs (`TABS`, `?tab=milestones|months`;
-  owner's call REC-01, 31 Oct 2026): All-time records, Milestones and By month, each with its own region picker. The month-of-year table lists every
-  half-hour record (labelled as trading periods, REC-13) and Milestones all of them (6, then Show all). "New" (`isNew` in
+  owner's call REC-01, 31 Oct 2026): All-time records (with the region picker), Milestones and By month (each a card for New Zealand and each island side by side,
+  three across from 900 px, full lists; owner's call, 31 Oct 2026; pointing at a row lights the same milestone or record in every region's card, a click pins it and another lets go, `data-k`/`lit`/`pinned`). The month-of-year table lists every
+  half-hour record (labelled as trading periods, REC-13) and Milestones all of them. "New" (`isNew` in
   records.js, `_since_ok` in records.py) is a record first seen in the last 30 days whose period ended within `NEW_LAG`
   (120) days of that (metered data runs 5-6 weeks behind each month), so a rebuild that moves an old record isn't new (REC-02, 31 Oct 2026); New and provisional shows 4
   cards, then Show all (REC-09). An island's list leaves out records that can't apply there (always 100% renewable, no
@@ -233,8 +235,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   the root layout), so its logo and links don't move between them (owner's call HOME-01, 31 Oct 2026); from 1,340 px a reading page draws a faint
   funnel under it, narrowing from the window's width to the column's (`::after`, `--inset`). The browser tab's title says what the view shows (`describe`, set through `setTitle` in `#lib/site/view.js`, which sets it again when the page comes back into view or from the back/forward cache: phones sometimes showed the address instead, SITE-06), and the
   Worker puts the same title into the page title, og:title and og:url of `/tracker` and `/tracker/prices` for a linked view. The tracker page markup
-  is in `src/routes/tracker/+page.svelte` (About and Data and methods share one layout with a contents sidebar (a "Contents" dropdown naming the page under
-  860 px, DOC-04), the route group `src/routes/(docs)/`; About page: `src/routes/(docs)/about/+page.svelte`, short: what each page shows, where the data comes from in brief, support, contact; links to its old `#m-*` sections forward to the method pages. Data and methods: `/methods` overview, `/methods/sources` every dataset, `/methods/<slug>` one page per series (generation, embedded-solar, demand, hvdc, prices, price-explainer, emissions, groupings, history); topics and datasets in `src/lib/methods/registry.ts` (each page's header and "Data used" box come from it, so a dataset is described once), bodies in `src/lib/methods/pages/<slug>.svelte`, styles in `methods.css`. The emissions and price explainer pages import their factors and rules from `emissions.js` and `explain.js`, so they stay in step; the other pages are prose: when a method changes, update its page and its `updated` date; shared
+  is in `src/routes/tracker/+page.svelte` (About and Data and methods share one layout with a contents sidebar (sticky; a "Contents" dropdown naming the page under
+  860 px, DOC-04, sticky too), the route group `src/routes/(docs)/`; About page: `src/routes/(docs)/about/+page.svelte`, short: what each page shows, where the data comes from in brief, support, contact; links to its old `#m-*` sections forward to the method pages. Data and methods: `/methods` overview, `/methods/sources` every dataset, `/methods/<slug>` one page per series (generation, embedded-solar, demand, hvdc, prices, price-explainer, emissions, groupings, history); topics and datasets in `src/lib/methods/registry.ts` (each page's header and "Data used" box come from it, so a dataset is described once), bodies in `src/lib/methods/pages/<slug>.svelte`, styles in `methods.css`. The emissions and price explainer pages import their factors and rules from `emissions.js` and `explain.js`, so they stay in step; the other pages are prose: when a method changes, update its page and its `updated` date; shared
   masthead, footer (© line, data credits, link icons: fill in a `href` in its `LINKS` to show a social account), logo mark and the "Support Elenz" link to Buy Me a Coffee in `src/lib/site/`; site copy speaks as "we", never "I" or "me"); the canvas chart code is `src/lib/tracker/tracker.js` (vanilla JS, driven by
   element ids in the page; each chart is drawn once per view into an off-screen base, and moving the time line only
   copies the base back and draws the line, dots and time chip over it (`paint`), so scrubbing stays smooth on phones:

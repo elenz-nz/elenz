@@ -206,9 +206,13 @@
 			const data = file && navigator.canShare?.({ files: [file] })
 				? { files: [file], title: document.title, text: `${shareText} ${url}` }
 				: { title: document.title, text: shareText, url };
-			try { await navigator.share(data); }
-			catch (e: any) { if (e?.name !== 'AbortError') manual = url; }   // cancelled, or refused: offer the link
-			return;
+			try { await navigator.share(data); return; }
+			catch (e: any) {
+				if (e?.name === 'AbortError') return;   // cancelled
+				// refused: offer the link, except Firefox on Android's stuck share (a second share is refused as "already
+				// in progress", see ShareLink.svelte), where the tap still counts and the link is copied as on a computer
+				if (e?.name !== 'InvalidStateError') { manual = url; return; }
+			}
 		}
 		try { await navigator.clipboard.writeText(url); shareMsg = 'Link copied'; setTimeout(() => (shareMsg = ''), 2000); }
 		catch { manual = url; }
