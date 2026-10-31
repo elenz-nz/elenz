@@ -283,10 +283,10 @@
 			<svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="m10.5 10.5 3.5 3.5M5 7h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
 			<span id="zoom-txt"></span><b>Reset zoom</b>
 		</button>
-		<!-- after a range change that left a pinned moment out: go to it (tracker.js showPinGo, ZM-02) -->
-		<button type="button" class="zoom-chip" id="pin-go" hidden>
+		<!-- the pinned time, the one place it's named; a tap lets it go (tracker.js syncPinChip, ZM-02) -->
+		<button type="button" class="zoom-chip pin-chip" id="pin-chip" title="Let go of the pinned time (Escape)" hidden>
 			<svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8v12.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /><circle cx="8" cy="5" r="2.4" fill="currentColor" /></svg>
-			<span>Pinned:</span><b>Go to <span id="pin-go-txt"></span></b>
+			<span>Pinned</span><b id="pin-chip-txt"></b><span class="pin-x" aria-hidden="true">×</span><span class="vh">: let go</span>
 		</button>
 	</nav>
 	<!-- the 1D menu sits outside the sticky bar, which clips anything hanging below it; placed by tracker.js -->
@@ -392,8 +392,7 @@
 					<div>
 						<div class="sum-when" id="sum-when"></div>
 						<div class="sum-sub" id="sum-sub"></div>
-						<div class="sum-pin" id="sum-pin" hidden>Pinned <button type="button" id="sum-unpin">Release</button></div>
-					</div>
+						</div>
 					<button type="button" class="ctl-btn" bind:this={helpBtn} aria-expanded={helpOpen} aria-controls="sum-help" title="Everything the charts and this list can do" onclick={() => (helpOpen = !helpOpen)}>
 						<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h7M12 4h2M2 12h3M8 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /><circle cx="10.5" cy="4" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /><circle cx="6.5" cy="12" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>Controls
 					</button>
@@ -404,7 +403,7 @@
 						<dt>Read a time</dt>
 						<dd>Hover a chart, or touch and slide on a phone.</dd>
 						<dt>Pin it</dt>
-						<dd>Click or tap a chart to hold the line; again, or Escape, lets go. Pinned, ← → move it (Shift: further).</dd>
+						<dd>Click or tap a chart to hold the line; the Pinned chip in the bar, another click or Escape lets go. A range button opens around it. Pinned, ← → move it (Shift: further).</dd>
 						<dt>Move through history</dt>
 						<dd>‹ › step by the range; the date opens a calendar; Latest comes back.</dd>
 						<dt>Zoom in</dt>

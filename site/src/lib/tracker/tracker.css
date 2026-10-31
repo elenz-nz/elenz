@@ -39,9 +39,22 @@
    pale grey on white in dark mode, unless the options are given colours too */
 select option, select optgroup { background-color: var(--surface); color: var(--ink); }
 body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-ui); font-size: 14px; line-height: 1.45; }
+:root { --gutter: clamp(20px, 2.2vw, 44px); }
 .wrap { max-width: 1260px; margin: 0 auto; padding-inline: 20px; padding-block: 18px 40px; display: grid; gap: 14px; }
 /* Tracker and Now use the whole width of a big screen (reading pages keep .wrap's 1,260 px) */
-.wrap.wide { max-width: none; padding-inline: clamp(20px, 2.2vw, 44px); }
+.wrap.wide { max-width: none; padding-inline: var(--gutter); }
+/* the masthead spans the window on every page, as on the wide ones, so the logo and links don't move when going
+   between them (owner's call HOME-01, 31 Oct 2026); --sbw is the scrollbar's width (root layout) */
+.wrap:not(.wide) > .mast-wrap { width: calc(100vw - var(--sbw, 0px) - 2 * var(--gutter)); margin-left: calc(50% - (100vw - var(--sbw, 0px)) / 2 + var(--gutter)); }
+/* on a reading page wider than its column, a faint funnel under the masthead narrows from the window's width to the
+   column's, so the full-width header leads into the page (owner's idea, 31 Oct 2026); --inset: the column's edge */
+@media (min-width: 1340px) {
+  .wrap:not(.wide) > .mast-wrap { position: relative; padding-bottom: 14px;
+    --inset: calc((100vw - var(--sbw, 0px) - 2 * var(--gutter) - 1220px) / 2); }
+  .wrap:not(.wide) > .mast-wrap::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 14px; pointer-events: none;
+    background: linear-gradient(to bottom, color-mix(in srgb, var(--line) 70%, transparent), transparent);
+    clip-path: polygon(0 0, 100% 0, calc(100% - var(--inset)) 100%, var(--inset) 100%); }
+}
 h1, h2, h3 { margin: 0; text-wrap: balance; }
 .num, td.n, .v { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
 
@@ -377,6 +390,7 @@ a { color: var(--accent); }
 
 }
 @media (max-width: 560px) {
+  :root { --gutter: 16px; }
   .wrap { padding-inline: 16px; }
   .masthead { flex-wrap: nowrap; gap: 8px; }
   .brand { gap: 8px; }
@@ -479,6 +493,10 @@ a { color: var(--accent); }
 .zoom-chip[hidden] { display: none; }
 .zoom-chip b { color: var(--accent); font-weight: 600; }
 .zoom-chip:hover b { text-decoration: underline; }
+/* the pinned time: the accent's pin, the time, and a × that lets it go */
+.pin-chip b { font-family: var(--font-data); font-weight: 500; }
+.pin-chip .pin-x { font-size: 1rem; line-height: 1; color: var(--muted); margin-left: 1px; }
+.pin-chip:hover .pin-x { color: var(--accent); }
 .zoom-sel { position: absolute; pointer-events: none; background: color-mix(in srgb, var(--accent) 16%, transparent); border-inline: 1px solid var(--accent); z-index: 2; }
 .zoom-sel[hidden] { display: none; }
 .charts canvas { cursor: crosshair; }
