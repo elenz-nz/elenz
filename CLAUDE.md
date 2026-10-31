@@ -18,7 +18,9 @@ the owner. Merged branches are deleted automatically.
 Auto-merge only works while something is still to wait for: on a PR whose checks have all passed GitHub refuses it
 (HTTP 422 "Pull request is in clean status"). Then merge it directly:
 `gh api -X PUT repos/elenz-nz/elenz/pulls/<n>/merge -f merge_method=squash` (the checks still gate it: GitHub refuses a
-merge while a required check is failing or pending). After a squash merge, `git checkout main && git pull` before the
+merge while a required check is failing or pending). It also refuses (HTTP 405 "Protected branch update failed", the PR's `mergeable_state`
+"unstable") while any check is still running, the preview's `Workers Builds` included, and auto-merge is refused
+then too: wait until the PR reads "clean" and merge directly (31 Oct 2026, PR #49). After a squash merge, `git checkout main && git pull` before the
 next branch; the old local branch has no remote any more, which is expected.
 A merge doesn't always deploy: Cloudflare's production build for #46 (30 Oct 2026) never ran, and the site stayed on the
 previous build. To check what is live, `https://elenz.co.nz/_app/version.json` holds the build time (ms since 1970,
