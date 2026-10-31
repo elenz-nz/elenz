@@ -266,9 +266,9 @@ def _month_start(month):
 
 
 # A record is "new" (records.js isNew) only when it was set in data that had just arrived: its period ended within
-# NEW_LAG days of the day it first appeared. A rebuild that changes old data can move a record to a half-hour years
+# NEW_LAG days of the day it first appeared (metered data runs 5-6 weeks behind the month, so a record early in a month first appears 70-80 days after it). A rebuild that changes old data can move a record to a half-hour years
 # back, which isn't new (owner's report REC-02, 31 Oct 2026). `since` is dropped otherwise, and after a year.
-NEW_LAG = 75
+NEW_LAG = 120
 PERIOD_DAYS = {'day': 1, 'week': 7, 'month': 31, 'year': 366}
 
 

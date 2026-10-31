@@ -23,6 +23,7 @@
 	import Context from '#lib/site/Context.svelte';
 	import PopButton from '#lib/site/PopButton.svelte';
 	import InfoTip from '#lib/site/InfoTip.svelte';
+	import { swatch, SWATCH_TITLE } from '#lib/site/swatch.js';
 	import { fitSelect } from '#lib/site/fitselect.js';
 	import { barHeight } from '#lib/site/sticky.js';
 	import { span } from '#lib/site/context.js';
@@ -47,8 +48,8 @@
 	let range = $state('1d');
 	let int = $state('5m');
 	let scale = $state('spike');
-	const CHART_KEYS = ['spread', 'hvdc'];   // charts the list can hide (PRC-01)
-	let off = $state<string[]>([]); // nodes hidden from the price chart, and 'spread' or 'hvdc' for those charts hidden
+	const CHART_KEYS = ['spread'];   // 'spread' in off: the price chart's priced-apart shading turned off (PRC-01)
+	let off = $state<string[]>([]); // nodes hidden from the price chart, and 'spread' for its shading off
 	let bandKey = $state('HAY');
 	// an island's region shows its own reference node's price range (owner's report PRC-04, 31 Oct 2026: choosing an
 	// island didn't change the range bars); for New Zealand the Haywards/Benmore buttons choose
@@ -439,14 +440,13 @@
 		if (view.mode === 'time') {
 			const rows: any[] = view.series.filter((s: any) => regionNodes.some((r) => r.k === s.k)).map((s: any) => ({ k: s.k, tok: s.tok, label: NODE[s.k].name, value: money(valOf(s.values)) }));
 			rows.push({ k: 'spread', tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(valOf(view.spread)) });
-			rows.push({ k: 'hvdc', tok: '--f-hvdc', label: 'HVDC', value: mw(valOf(view.hvdc)) });
 			return rows;
 		}
 		const P = view.P, own = bandKey === 'BEN' ? 'SI' : 'NI', I = P[own];
 		if (at < 0) return [
 			{ tok: '--p-ni', label: 'Haywards', value: money(valOf(P.NI.price)) },
 			{ tok: '--p-si', label: 'Benmore', value: money(valOf(P.SI.price)) },
-			{ k: 'spread', tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(valOf(P.spread)) }
+			{ tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(valOf(P.spread)) }
 		];
 		return [
 			{ tok: '--p-ni', label: 'Haywards', value: money(P.NI.price[at]) },
@@ -455,7 +455,7 @@
 			{ label: `${NODE[bandKey].name}, low`, value: money(I.pmin[at]) },
 			{ label: `${NODE[bandKey].name}, high`, value: money(I.pmax[at]) },
 			{ label: 'Half-hours over $500', value: String(I.n500[at]) },
-			{ k: 'spread', tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(P.spread[at]) }
+			{ tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(P.spread[at]) }
 		];
 	});
 	// the high point of the range on the price chart: the highest of the lines drawn (live week and 30 days: the nodes
@@ -547,7 +547,7 @@
 		const cap = captured(S, region);
 		let sepH = 0, h = 0;
 		if (view.mode === 'time') for (let i = 0; i < S.n; i++) { h += S.h[i]; if (view.sep[i]) sepH += S.h[i]; }
-		// HVDC's net average over the range, in the stats card (12 months and All have no HVDC chart)
+		// HVDC's net average over the range, in the stats card (its value at the time line is on its own chart)
 		const hv = view.mode === 'time' ? view.hvdc : view.P.hvdc;
 		return { rows, cap, sepShare: h ? sepH / h : null, spread: wavg(S.NI.price) - wavg(S.SI.price), hvdc: hv ? wavgOf(view.mode === 'long' ? view.P : view.S, hv) : NaN };
 	});
@@ -617,12 +617,11 @@
 	}
 	const popH = $derived(Math.min(560, Math.round(winH * 0.62)));
 	const toggleNode = (k: string) => { off = off.includes(k) ? off.filter((x) => x !== k) : [...off, k]; save(); };
-	// the list works like the Generation tab's (owner's report PRC-01, 31 Oct 2026): a colour square shows or hides its
-	// line, Shift shows that node alone (again shows them all), All and None for the nodes; the spread and HVDC rows
-	// hide or show their own charts
+	// the list works like the Generation tab's (owner's report PRC-01, 31 Oct 2026), with the same colour squares
+	// (#lib/site/swatch.js: a click hides or shows, double-click, Shift or a long press shows one alone), All and
+	// None for the nodes; the spread row turns the price chart's priced-apart shading off and on
 	const nodeKeys = () => regionNodes.map((r) => r.k);
-	function swatch(e: MouseEvent, k: string) {
-		if (!e.shiftKey || !(k in NODE)) { toggleNode(k); return; }
+	function onlyNode(k: string) {
 		const others = nodeKeys().filter((x) => x !== k);
 		const alone = !off.includes(k) && others.every((x) => off.includes(x));
 		off = [...off.filter((x) => !(x in NODE)), ...(alone ? [] : others)];
@@ -846,7 +845,7 @@
 					</div>
 					<div class="plot">
 						<TimeChart onzoom={view.mode === 'time' ? (a, b) => setZoom({ from: a, to: b }) : undefined} t={view.t} t0={view.t0} t1={view.t1} height={popped === 'price' ? popH : 266} showX {xTicks} y={priceY} fmt={fmtTick} layers={priceLayers} note={highNote} stamp={at >= 0 && hoverBy !== 'mouse' ? chip(at) : null}
-							shade={view.mode === 'time' ? view.shade : []} marks={capMarks} bind:hover onpoint={point('price')} onleave={leave} onpin={pin} onunpin={unpin} {pinned}
+							shade={view.mode === 'time' && !off.includes('spread') ? view.shade : []} marks={capMarks} bind:hover onpoint={point('price')} onleave={leave} onpin={pin} onunpin={unpin} {pinned}
 							label="Prices at the grid nodes over the range, $/MWh" zero unit="$/MWh" />
 						{#if canMove}
 							<button type="button" class="nav prev" aria-label="Previous {R.label}" title="Previous {R.label}" onclick={() => step(-1)}>
@@ -867,7 +866,6 @@
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -->
 		<section class="charts" id="charts-more" tabindex="0" onkeydown={keys} aria-label="Island spread and {view?.mode === 'long' ? 'price spike' : 'HVDC'} charts, on the same time axis as the prices.">
 			{#if view && priceY}
-				{#if !off.includes('spread')}
 				<div class="chart" class:popped={popped === 'spread'}>
 					<div class="ch-head">
 						<h2>Island spread</h2>{@render info('spread')}
@@ -881,9 +879,8 @@
 						layers={view.mode === 'time' ? [{ kind: 'posneg', values: view.spread, pos: '--o1', neg: '--o2' }] : [{ kind: 'bars', values: view.P.spread, tok: '--o1', neg: '--o2', opacity: 0.85 }]}
 						shade={view.mode === 'time' ? view.shade : []} bind:hover onpoint={point('spread')} onleave={leave} onpin={pin} onunpin={unpin} {pinned} label="The price gap between Haywards and Benmore" />
 				</div>
-				{/if}
 
-				{#if view.mode === 'time' && !off.includes('hvdc')}
+				{#if view.mode === 'time'}
 					<div class="chart" class:popped={popped === 'hvdc'}>
 						<div class="ch-head">
 							<h2>HVDC transfer</h2>{@render info('hvdc')}
@@ -937,7 +934,7 @@
 						<dt>Zoom in</dt>
 						<dd>On the live week and 30 days, drag across a chart; Reset zoom goes back.</dd>
 						<dt>Nodes and scales</dt>
-						<dd>A colour square hides its line or chart; Shift shows that node alone; All and None for the nodes. The menu by the title changes the scale.</dd>
+						<dd>A colour square hides its line (double-click, Shift or press and hold: only that one); All and None; the spread's square turns the priced-apart shading off. The menu by the title changes the scale.</dd>
 					</dl>
 					<p><a href="/about#controls">Every control, in detail</a> · <a href="/methods/prices">How the figures are worked out</a></p>
 				</div>
@@ -951,8 +948,9 @@
 							<tr class:off={r.k && off.includes(r.k)}>
 								<td><div class="row-name">
 									{#if r.k}
-										<button type="button" class="sw-btn" aria-pressed={!off.includes(r.k)} aria-label={r.k in NODE ? `Show ${r.label} in the chart` : `Show the ${r.k === 'hvdc' ? 'HVDC' : 'island spread'} chart`}
-												title={r.k in NODE ? `Show or hide ${r.label} (${NODE[r.k].node}, ${NODE[r.k].place}); Shift: only this` : `Show or hide the ${r.k === 'hvdc' ? 'HVDC transfer' : 'island spread'} chart`} onclick={(e) => swatch(e, r.k)}><span class="sw" style="--c: var({r.tok})"></span></button>
+										<button type="button" class="sw-btn" aria-pressed={!off.includes(r.k)} aria-label={r.k in NODE ? `Show ${r.label} in the chart` : 'Shade the times the islands were priced apart'}
+												title={r.k in NODE ? `${r.label} (${NODE[r.k].node}, ${NODE[r.k].place}): ${SWATCH_TITLE}` : 'Show or hide the shading for times the islands were priced apart'}
+												use:swatch={{ toggle: () => toggleNode(r.k), only: r.k in NODE ? () => onlyNode(r.k) : undefined }}><span class="sw" style="--c: var({r.tok})"></span></button>
 									{:else}
 										<span class="sw-btn">{#if r.tok}<span class="sw" style="--c: var({r.tok})"></span>{/if}</span>
 									{/if}

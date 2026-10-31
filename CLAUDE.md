@@ -106,9 +106,9 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   less interesting; lowest hydro and lowest price had been kept to days and longer). The month-of-year table lists every
   half-hour record (labelled as trading periods, REC-13) and Milestones all of them (6, then Show all). "New" (`isNew` in
   records.js, `_since_ok` in records.py) is a record first seen in the last 30 days whose period ended within `NEW_LAG`
-  (75) days of that, so a rebuild that moves an old record isn't new (REC-02, 31 Oct 2026); New and provisional shows 4
+  (120) days of that (metered data runs 5-6 weeks behind each month), so a rebuild that moves an old record isn't new (REC-02, 31 Oct 2026); New and provisional shows 4
   cards, then Show all (REC-09). An island's list leaves out records that can't apply there (always 100% renewable, no
-  fossil plant, never a net southward period) and groups left empty (REC-03). A record
+  fossil plant, never a net southward period; a period record that never moved shows as one step) and groups left empty (REC-03). A record
   page's "Records" breadcrumb returns to the list's own period (`period`, the one asked for), not the page's `per`. A DEFS entry's `v` is the records.json version that first has it; an older file says it is being worked out.
   "Heading for a record" (owner's call, 23 Oct 2026): `pace()` in records.js lists a current day/week/month/year once
   half of it has gone (`PACE_SHARE`) and only while it is ahead of its record period at the same point (whole days, or
@@ -150,8 +150,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   shared with the Worker and the tests in `site/tests/` (`npm test`); the browser side in `src/lib/site/view.js`):
   `region`, `range`, `int`, `end=YYYY-MM-DD` shared by both tabs; the Generation tab's `by` (grouping), `unit=pct`, `chart=lines`, `price=on`, `fold` and
   drill-down `group`, `fuel`, `plant` (plants and plant sets by `slug()`: "manapouri", "branch-river-arnold"; old slugs
-  can be mapped in `PLANT_ALIASES`); the Prices tab's `scale`, `hide` (nodes, and `spread`/`hvdc` for those charts hidden: PRC-01, where the list
-  has All/None for the nodes and Shift-click shows one alone) and `band` (an island's region uses its own node, PRC-04); and in links only, `t`, the
+  can be mapped in `PLANT_ALIASES`); the Prices tab's `scale`, `hide` (nodes, and `spread` for the price chart's priced-apart shading off: PRC-01, where the list
+  has All/None and the Generation list's colour squares, `#lib/site/swatch.js`: double-click, Shift or a long press shows one alone; HVDC's net average is in the stats card) and `band` (an island's region uses its own node, PRC-04); and in links only, `t`, the
   point the summary opens on. An address with a query is a link and opens exactly that; a plain visit opens on this
   browser's last region, range and interval (localStorage `elenz-view`, plus the grouping and MW/%) and `elenz-prices`,
   never the date or drill-down. Settings replace the address; each drill-down step pushes one, so Back steps out of it

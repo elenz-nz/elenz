@@ -9,6 +9,7 @@ import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTot
 import PLANT_META from './plants.json';  // owner, hydro scheme, other names and metering note per plant (ingest/plant_meta.py)
 import CAPACITY from './capacity.json';   // installed MW per plant (ingest/capacity.py)
 import { readView, writeView, slug, describe, shareLinks, setTitle } from '#lib/site/view.js';
+import { squareButton as squareWire, SWATCH_TITLE } from '#lib/site/swatch.js';
 import { readQuery, stamp, fromStamp, FOLDABLE, FOLD_DEFAULT, foldList } from '#lib/site/viewurl.js';
 import { priceScale } from '#lib/prices/data.js';
 import { fit } from '#lib/site/fitselect.js';
@@ -1088,21 +1089,11 @@ export function mountTracker(D, hooks = {}) {
     $('mix-all').disabled = !V.layers.some(l => state.hidden.has(l.id));
     $('mix-none').disabled = V.layers.every(l => state.hidden.has(l.id));
   }
-  // a colour square: click hides or shows; double-click, Shift+click or a long press shows only that row (or section)
+  // a colour square: click hides or shows; double-click, Shift+click or a long press shows only that row (or section);
+  // the same on the Prices tab (#lib/site/swatch.js)
   function squareButton(btn, ids, toggle) {
-    let held = null, longPressed = false;
-    btn.title = 'Hide or show · double-click or press and hold: show only this';
-    btn.addEventListener('click', e => {
-      if (longPressed) { longPressed = false; return; }
-      if (e.shiftKey) onlyThis(ids); else toggle();
-    });
-    btn.addEventListener('dblclick', e => { e.preventDefault(); onlyThis(ids); });
-    btn.addEventListener('pointerdown', e => {
-      if (e.pointerType === 'mouse') return;
-      clearTimeout(held); held = setTimeout(() => { longPressed = true; onlyThis(ids); navigator.vibrate?.(15); }, 500);
-    });
-    for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) btn.addEventListener(ev, () => clearTimeout(held));
-    btn.addEventListener('contextmenu', e => { if (longPressed) e.preventDefault(); });
+    btn.title = SWATCH_TITLE;
+    squareWire(btn, toggle, () => onlyThis(ids));
   }
   function applyFilter() {
     const q = norm(state.filter.trim());

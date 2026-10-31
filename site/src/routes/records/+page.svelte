@@ -24,7 +24,7 @@
 	let cat = $state('all');
 	let liveD = $state.raw<any>(null);   // tracker.json: the live week, for the live check and the pace
 	let paceAll = $state(false);          // the pace cards beyond the first PACE_CARDS
-	const PACE_CARDS = 12;
+	const PACE_CARDS = 8;   // owner's call, 31 Oct 2026
 	let moy = $state(new Date(Date.now() + 13 * 36e5).getUTCMonth());   // this month in New Zealand
 
 	onMount(() => {

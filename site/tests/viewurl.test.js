@@ -133,7 +133,7 @@ test('zoom: the menu spans and a dragged span', () => {
   assert.equal(L.fixed(false).url, 'https://elenz.co.nz/tracker?end=2026-10-18&zoom=2026-10-19T13:05~2026-10-19T15:30');
 });
 
-test('the Prices tab can hide its spread and HVDC charts (PRC-01)', () => {
-  assert.deepEqual(readQuery('?hide=OTA,spread,hvdc,bogus').hide, ['OTA', 'spread', 'hvdc']);
+test('the Prices tab can turn its priced-apart shading off (PRC-01)', () => {
+  assert.deepEqual(readQuery('?hide=OTA,spread,hvdc,bogus').hide, ['OTA', 'spread']);
   assert.equal(writeQuery({ hide: ['spread'] }), 'hide=spread');
 });
