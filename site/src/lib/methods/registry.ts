@@ -88,7 +88,7 @@ export const TOPICS: Topic[] = [
 		title: 'History since 1997',
 		summary: 'How the record back to August 1997 is put together from metered data, the daily dispatch files and the live feed, where the sources hand over, and the known gaps.',
 		shownOn: [['Tracker', '/tracker'], ['Prices', '/tracker/prices']],
-		updated: '2026-10-21',
+		updated: '2026-10-31',
 	},
 	{
 		slug: 'records',

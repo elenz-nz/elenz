@@ -265,6 +265,20 @@ def _month_start(month):
     return int(pd.Timestamp(month + '-01', tz=NZ).tz_convert('UTC').timestamp() * 1000)
 
 
+# A record is "new" (records.js isNew) only when it was set in data that had just arrived: its period ended within
+# NEW_LAG days of the day it first appeared. A rebuild that changes old data can move a record to a half-hour years
+# back, which isn't new (owner's report REC-02, 31 Oct 2026). `since` is dropped otherwise, and after a year.
+NEW_LAG = 75
+PERIOD_DAYS = {'day': 1, 'week': 7, 'month': 31, 'year': 366}
+
+
+def _since_ok(rec, period_days, now_ms):
+    since = rec.get('since')
+    if since and (now_ms - since > 365 * 864e5 or since - rec['t'] > (NEW_LAG + period_days) * 864e5):
+        rec['since'] = None
+    return rec
+
+
 def _better(kind, a, b):
     return a > b if kind == 'max' else a < b
 
@@ -620,9 +634,7 @@ def build(sums, old=None, read_month=None, now_ms=None):
             rec['since'] = now_ms
         elif first_pub and recent_from[fam] is not None and rec['t'] >= recent_from[fam]:
             rec['since'] = now_ms
-        if rec.get('since') and now_ms - rec['since'] > 365 * 864e5:
-            rec['since'] = None   # only "new" matters; old dates are noise
-        return rec
+        return _since_ok(rec, 31 if group == 'months' else 0, now_ms)
 
     out = {'v': VERSION, 'built': now_ms, 'first': sums[0]['t0'] if sums else None, 'final_to': last_ok,
            'end': sums[-1]['end'] if sums else None, 'records': {}, 'months': {}, 'runs': {}, 'moy': {}, 'resolved': []}
@@ -669,8 +681,7 @@ def build(sums, old=None, read_month=None, now_ms=None):
                         rec['since'] = prev['since']
                     elif prev:
                         rec['since'] = now_ms
-                    if rec.get('since') and now_ms - rec['since'] > 365 * 864e5:
-                        rec['since'] = None
+                    _since_ok(rec, PERIOD_DAYS.get(p, 0), now_ms)
                     # the target's figure through its period, for "on record pace" (the provisional one if it is beyond)
                     tgt = rec.get('prov') or rec
                     curve = period_curve(all_days, read_m, p, k, r, tgt['t'])

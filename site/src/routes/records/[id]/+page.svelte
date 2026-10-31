@@ -10,11 +10,12 @@
 	import InfoTip from '#lib/site/InfoTip.svelte';
 	import ChartControls from '#lib/records/ChartControls.svelte';
 	import DayChart from '#lib/records/DayChart.svelte';
-	import { drawRecord } from '#lib/records/shareImage.js';
+	import { drawRecord, pageIsDark } from '#lib/records/shareImage.js';
+	import CopyLink from '#lib/site/CopyLink.svelte';
 	import { stamp } from '#lib/site/viewurl.js';
 	import {
 		LISTED, PERIODS, PERIOD_KEYS, periodOf, periodSub, periodWhen, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats, energy, pace, soFar, toGo, needText, paceAt, periodNow, figureSoFar, loadDetail, bgOf, udemOf, periodSeries, periodAxis,
-		loadRecords, trimZeros, periodHours, meteredDue, clock, dayOf, dayLong, monthOf, yearOf, daysBetween, runLength, NEW_DAYS
+		loadRecords, trimZeros, periodHours, meteredDue, clock, dayOf, dayLong, monthOf, yearOf, daysBetween, runLength, isNew as isNewRec
 	} from '#lib/records/records.js';
 	import type { PageProps } from './$types';
 
@@ -109,7 +110,7 @@
 	const onPace = $derived(R && liveD && per !== 'tp' ? pace(R, liveD).find((x) => x.d.id === d.id && x.region === region && x.period === per) ?? null : null);
 	const na = $derived(R ? notShown(d, region, rec, R, per) : null);
 	const prov = $derived(R && !na ? (per === 'tp' ? provisional(R, live, d.id, region) : (rec?.prov ?? null)) : null);
-	const isNew = $derived(!!rec?.since && Date.now() - rec.since < NEW_DAYS * 864e5);
+	const isNew = $derived(isNewRec(rec, per));
 	const regionName = $derived(REGIONS.find((x) => x.id === region)!.name);
 	const f = (v: number) => fmt(d, v, per);
 	const axisFmt = (v: number) => (d.unit === '$' ? '$' + Math.round(v).toLocaleString('en-NZ') : d.unit === '%' ? `${+v.toFixed(1)}%` : Math.round(v).toLocaleString('en-NZ'));
@@ -177,24 +178,40 @@
 		await drawRecord(c, { d, region, rec, end: R.end, isNew, period: per });
 		return await new Promise((ok) => c.toBlob(ok, 'image/png'));
 	}
-	async function share() {
+	// The image is drawn ahead (a moment after the record shows), so the share sheet opens straight from the tap:
+	// phones refuse a share that waits on drawing first (owner's report SHR-03, 31 Oct 2026). If it isn't ready, or
+	// the theme changed, the line and link go without it.
+	let prepared = $state.raw<{ key: string; file: File } | null>(null);
+	const imageKey = () => `${fileName}|${rec?.t}|${rec?.v}|${isNew}|${pageIsDark()}`;
+	$effect(() => {
+		if (!canShare || !rec || !R) return;
+		const key = imageKey();
+		if (prepared?.key === key) return;
+		const timer = setTimeout(async () => {
+			const b = await image();
+			if (b && key === imageKey()) prepared = { key, file: new File([b], fileName, { type: 'image/png' }) };
+		}, 500);
+		return () => clearTimeout(timer);
+	});
+	let manual = $state('');   // a link the browser wouldn't share or copy: shown with a Copy button, by the button used
+	let manualAt = $state<'top' | 'foot'>('top');
+	async function share(at: 'top' | 'foot' = 'top') {
+		manualAt = at;
 		if (busy) return;
 		const url = location.href;
+		manual = '';
 		if (canShare) {
-			busy = true;
-			try {
-				const b = await image();
-				const file = b ? new File([b], fileName, { type: 'image/png' }) : null;
-				// the link goes in the text too: some apps drop the url when a file is shared
-				if (file && navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], title: document.title, text: `${shareText} ${url}` });
-				else await navigator.share({ title: document.title, text: shareText, url });
-				return;
-			} catch (e: any) { if (e?.name === 'AbortError') return; }   // cancelled; otherwise copy the link
-			finally { busy = false; }
+			const file = prepared?.key === imageKey() ? prepared.file : null;
+			// the link goes in the text too: some apps drop the url when a file is shared
+			const data = file && navigator.canShare?.({ files: [file] })
+				? { files: [file], title: document.title, text: `${shareText} ${url}` }
+				: { title: document.title, text: shareText, url };
+			try { await navigator.share(data); }
+			catch (e: any) { if (e?.name !== 'AbortError') manual = url; }   // cancelled, or refused: offer the link
+			return;
 		}
-		try { await navigator.clipboard.writeText(url); shareMsg = 'Link copied'; }
-		catch { shareMsg = 'Copy the address bar'; }
-		setTimeout(() => (shareMsg = ''), 2000);
+		try { await navigator.clipboard.writeText(url); shareMsg = 'Link copied'; setTimeout(() => (shareMsg = ''), 2000); }
+		catch { manual = url; }
 	}
 	async function download() {
 		if (busy) return;
@@ -232,7 +249,7 @@
 						</select>
 					{/if}
 					{#if rec && !na}
-						<button type="button" class="pill-btn" onclick={share} disabled={busy} title={canShare ? 'Share this record' : 'Copy a link to this record'} aria-label={canShare ? 'Share this record' : 'Copy a link to this record'}>
+						<button type="button" class="pill-btn" onclick={() => share('top')} disabled={busy} title={canShare ? 'Share this record' : 'Copy a link to this record'} aria-label={canShare ? 'Share this record' : 'Copy a link to this record'}>
 							<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M8.5 11.5a3.2 3.2 0 0 0 4.6 0l2.6-2.6a3.2 3.2 0 0 0-4.6-4.6l-1 1M11.5 8.5a3.2 3.2 0 0 0-4.6 0l-2.6 2.6a3.2 3.2 0 0 0 4.6 4.6l1-1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
 							<span class="pill-word">{shareMsg || 'Share'}</span>
 						</button>
@@ -243,6 +260,7 @@
 					{/if}
 				</div>
 			</div>
+			{#if manual && manualAt === 'top'}<div class="manual"><CopyLink url={manual} onclose={() => (manual = '')} /></div>{/if}
 			<p class="sub">{periodSub(d, per)}</p>
 			{#if d.kind === 'hh'}
 				<div class="seg per" role="group" aria-label="Record for each">
@@ -377,9 +395,10 @@
 
 			<div class="share">
 				<div class="btns">
-					<button type="button" class="btn" onclick={share} disabled={busy}>{shareMsg || (canShare ? 'Share' : 'Copy link')}</button>
+					<button type="button" class="btn" onclick={() => share('foot')} disabled={busy}>{shareMsg || (canShare ? 'Share' : 'Copy link')}</button>
 					<button type="button" class="btn" onclick={download} disabled={busy}>Download image</button>
 				</div>
+				{#if manual && manualAt === 'foot'}<div class="manual"><CopyLink url={manual} onclose={() => (manual = '')} /></div>{/if}
 				<span class="note">{per === 'tp' ? 'Half-hour averages' : `Averages over each ${periodOf(per).word}${en ? ', ranked by average so periods of different lengths compare; energy is the average times the hours in the period' : ''}`} from the EA’s metered data and final prices. <a href="/methods/records">How records work</a></span>
 			</div>
 		{/if}
@@ -475,6 +494,7 @@
 	.mcell .v { font-family: var(--font-data); font-size: 0.86rem; font-weight: 600; }
 	.mcell .y { font-size: 0.72rem; color: var(--muted); }
 
+	.manual { max-width: 520px; flex-basis: 100%; }
 	.share { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 14px; }
 	.btns { display: flex; gap: 8px; }
 	.btn { font: inherit; font-size: 0.86rem; font-weight: 600; padding: 9px 14px; min-height: 40px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 4px; cursor: pointer; }

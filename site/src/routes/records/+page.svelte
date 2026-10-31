@@ -12,7 +12,7 @@
 	import RecordIcon from '#lib/records/RecordIcon.svelte';
 	import { energy, pace, soFar, paceAt, periodWhen,
 		LISTED as DEFS, PERIODS, PERIOD_KEYS, periodOf, periodSub, GROUPS, REGIONS, LIVE_URL, MONTHS, get, notShown, parts, when, step, fmt, recent, milestones, provisional,
-		liveBeats, loadRecords, fullName, dayOf, clock, yearOf
+		liveBeats, loadRecords, fullName, dayOf, clock, yearOf, isNew
 	} from '#lib/records/records.js';
 
 	let R = $state<any>(null);
@@ -68,12 +68,12 @@
 
 	// link: the record's page
 	type Row = { d: any; rec: any; na: string | null; prov: any; isNew: boolean; p: string; link: string | null };
-	// groups with no record for this region (HVDC for an island) are left out rather than listed as not shown
-	const shownGroups = $derived(GROUPS.filter((g) => DEFS.some((d) => d.group === g && d.regions.includes(region))));
-	$effect(() => { if (cat !== 'all' && !shownGroups.includes(cat)) cat = 'all'; });
-	const groups = $derived.by(() => {
+	// every row for this region and period; records that can't apply here (a South Island renewable share that is always
+	// 100%, fossil records where there's no fossil plant, a "most sent south" year when no year was) are left out, and
+	// so are groups left empty (owner's report REC-03, 31 Oct 2026); a record still being worked out keeps its row
+	const allGroups = $derived.by(() => {
 		if (!R) return [];
-		return shownGroups.filter((g) => cat === 'all' || g === cat).map((g) => ({
+		return GROUPS.map((g) => ({
 			name: g,
 			rows: DEFS.filter((d) => d.group === g).map((d): Row => {
 				const p = d.kind !== 'hh' ? 'tp' : period;
@@ -81,11 +81,18 @@
 				const na = notShown(d, region, rec, R, p);
 				const prov = na ? null : p === 'tp' ? provisional(R, live, d.id, region) : (rec?.prov ?? null);
 				const link = na ? null : href(d.id);
-				return { d, rec, na, prov, p, link, isNew: !na && !!rec?.since && Date.now() - rec.since < 30 * 864e5 };
-			}),
-		}));
+				return { d, rec, na, prov, p, link, isNew: !na && isNew(rec, p) };
+			}).filter((row) => !row.na || /^Being worked out/.test(row.na)),
+		})).filter((g) => g.rows.length);
 	});
-	const cards = $derived(R ? recent(R, live).slice(0, 6) : []);
+	const shownGroups = $derived(allGroups.map((g) => g.name));
+	$effect(() => { if (cat !== 'all' && R && !shownGroups.includes(cat)) cat = 'all'; });
+	const groups = $derived(allGroups.filter((g) => cat === 'all' || g.name === cat));
+	// new and provisional: four, a row of them at full width, then Show all (owner's call REC-09, 31 Oct 2026)
+	const CARDS = 4;
+	let cardsAll = $state(false);
+	const allCards = $derived(R ? recent(R, live) : []);
+	const cards = $derived(cardsAll ? allCards : allCards.slice(0, CARDS));
 	// heading for a record: one card per record and period, New Zealand's where it is on pace, otherwise an island's
 	const paces = $derived.by(() => {
 		if (!R || !liveD) return [];
@@ -184,6 +191,7 @@
 							</a>
 						{/each}
 					</div>
+					{#if allCards.length > CARDS}<button type="button" class="more-btn" onclick={() => (cardsAll = !cardsAll)}>{cardsAll ? 'Show fewer' : `Show all ${allCards.length}`}</button>{/if}
 				</section>
 			{/if}
 
@@ -295,11 +303,11 @@
 							</select>
 						</h2><InfoTip label="About month records">
 							<ul>
-								<li>The best {MONTHS[moy]} since 1997 for each record, and the year it was set.</li>
+								<li>Trading period records: the highest or lowest half-hour of any {MONTHS[moy]} since 1997, and the year it was set.</li>
 								<li>A month can set one even when the all-time record holds.</li>
 							</ul>
 						</InfoTip></div>
-						<span class="unit">{regionName}</span>
+						<span class="unit">{regionName} · trading periods</span>
 					</div>
 					<table class="moy">
 						<tbody>

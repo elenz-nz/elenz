@@ -242,7 +242,7 @@ export function mountTracker(D, hooks = {}) {
       || `${DOW[p.dow]} ${p.dom} ${MON[p.mon]}${state.end != null && p.y !== lp(models.live.END).y ? ' ' + p.y : ''}, ${clock(p)}`;
   }
   // the live week's interpolated intervals, named in the summary heading: " · interpolated" for a 5-minute point,
-  // " · 2 of 6 intervals interpolated" for a half-hour of the live week (history's half-hours average what was published)
+  // " · 2 of 6 interpolated" (5-minute intervals) for a half-hour of the live week (history's half-hours average what was published)
   function filledNote(t) {
     const F = models.live.filled;
     if (!F || !F.size) return '';
@@ -250,7 +250,7 @@ export function mountTracker(D, hooks = {}) {
     if (state.kind !== 'live' && !(t >= models.live.t[0])) return '';
     let k = 0;
     for (let i = 0; i < 6; i++) if (F.has(t + i * 3e5)) k++;
-    return k === 6 ? ' · interpolated' : k ? ` · ${k} of 6 intervals interpolated` : '';
+    return k === 6 ? ' · interpolated' : k ? ` · ${k} of 6 interpolated` : '';
   }
   // a partial first or last period: what the faded part of the generation chart is
   function partialNote(j) {
@@ -948,7 +948,7 @@ export function mountTracker(D, hooks = {}) {
     const c = setup($('cv-price')), { ctx } = c;
     let mx = 0; for (let j = 0; j < V.n; j++) mx = Math.max(mx, V.pNI[j], V.pSI[j]);
     const dom = nice(0, mx * 1.08, ticksFor('cv-price', 3));
-    const F = frame(c, dom, v => '$' + fmt(v), { unit: '$/MWh' }), { X, Y } = F;
+    const F = frame(c, dom, v => '$' + fmt(v), { axis: true, unit: '$/MWh' }), { X, Y } = F;
     const r = state.region, aNI = r === 'SI' ? 0.35 : 1, aSI = r === 'NI' ? 0.35 : 1;
     line(ctx, X, Y, V.pSI, alpha(C['--p-si'], aSI));
     line(ctx, X, Y, V.pNI, alpha(C['--p-ni'], aNI));
@@ -967,7 +967,7 @@ export function mountTracker(D, hooks = {}) {
     let mn = Infinity, mx = 0;
     for (let j = 0; j < V.n; j++) { mx = Math.max(mx, V.underlying[j], V.metered[j]); mn = Math.min(mn, V.metered[j]); }
     const dom = nice(mn * 0.95, mx * 1.02, ticksFor('cv-demand', 3));
-    const F = frame(c, dom, v => fmt(v), { unit: 'MW' }), { X, Y } = F;
+    const F = frame(c, dom, v => fmt(v), { axis: true, unit: 'MW' }), { X, Y } = F;
     // the embedded solar estimate's uncertainty (± one standard deviation) as a band around the dashed line
     if (V.roofU.some(u => u > 0.5)) band(ctx, X, Y, V.underlying.map((v, j) => v - V.roofU[j]), V.underlying.map((v, j) => v + V.roofU[j]), alpha(C['--ink-2'], 0.22));
     line(ctx, X, Y, V.underlying, C['--ink-2'], 1.5, [4, 3]);
@@ -978,7 +978,7 @@ export function mountTracker(D, hooks = {}) {
     const c = setup($('cv-hvdc')), { ctx } = c;
     let mn = 0, mx = 0; for (let j = 0; j < V.n; j++) { mn = Math.min(mn, V.hvdc[j]); mx = Math.max(mx, V.hvdc[j]); }
     const dom = nice(mn, mx, ticksFor('cv-hvdc', 2));
-    const F = frame(c, dom, v => fmt(v), { unit: 'MW' }), { X, Y } = F;
+    const F = frame(c, dom, v => fmt(v), { axis: true, unit: 'MW' }), { X, Y } = F;
     area(ctx, X, Y, V.hvdc, 0, alpha(C['--f-hvdc'], 0.35));
     line(ctx, X, Y, V.hvdc, C['--f-hvdc'], 1.5);
     ctx.font = FONT; ctx.fillStyle = C['--muted']; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
@@ -990,7 +990,7 @@ export function mountTracker(D, hooks = {}) {
     const c = setup($('cv-co2')), { ctx } = c;
     let mx = 0; for (let j = 0; j < V.n; j++) mx = Math.max(mx, V.co2[j]);
     const dom = nice(0, Math.max(mx, 10) * 1.1, ticksFor('cv-co2', 2));
-    const F = frame(c, dom, v => fmt(v), { unit: 'g/kWh' }), { X, Y } = F;
+    const F = frame(c, dom, v => fmt(v), { axis: true, unit: 'g/kWh' }), { X, Y } = F;
     area(ctx, X, Y, V.co2, 0, alpha(C['--co2'], 0.28));
     line(ctx, X, Y, V.co2, C['--co2'], 1.5);
     c.base.F = F; c.base.over = (ctx, j) => dot(ctx, X(j), Y(V.co2[j]), C['--co2']);

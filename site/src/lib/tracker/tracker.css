@@ -287,6 +287,9 @@ canvas { display: block; width: 100%; }
 .ctl-btn:hover, .ctl-btn[aria-expanded="true"] { color: var(--ink); border-color: var(--ink-2); }
 .sum-when { font-size: 1.12rem; font-weight: 700; letter-spacing: -0.01em; }
 .sum-sub { color: var(--muted); font-size: 0.8rem; }
+/* phones: room for the sub-line's two lines whether or not a note (interpolated, partial) wraps it, so scrubbing
+   doesn't make the summary jump (owner's report ZM-01, 31 Oct 2026) */
+@media (max-width: 560px) { .sum-sub { min-height: calc(2 * 1.4em); line-height: 1.4; } }
 table { border-collapse: collapse; width: 100%; }
 .mix th { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-weight: 600; padding: 0 0 6px; border-bottom: 1px solid var(--line); }
 .mix th.n, .mix td.n { text-align: right; }

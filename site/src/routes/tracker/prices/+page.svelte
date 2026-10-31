@@ -47,8 +47,12 @@
 	let range = $state('1d');
 	let int = $state('5m');
 	let scale = $state('spike');
-	let off = $state<string[]>([]); // nodes hidden from the price chart
+	const CHART_KEYS = ['spread', 'hvdc'];   // charts the list can hide (PRC-01)
+	let off = $state<string[]>([]); // nodes hidden from the price chart, and 'spread' or 'hvdc' for those charts hidden
 	let bandKey = $state('HAY');
+	// an island's region shows its own reference node's price range (owner's report PRC-04, 31 Oct 2026: choosing an
+	// island didn't change the range bars); for New Zealand the Haywards/Benmore buttons choose
+	const islandBand = (r: string) => (r === 'SI' ? 'BEN' : 'HAY');
 	let heatKey = $state('HAY');
 	let hover = $state(-1);
 	let hoverBy = $state<'mouse' | 'touch' | 'key' | 'pin' | null>(null); // touch, keys and a pin get the time chip, the mouse its tooltip
@@ -94,10 +98,11 @@
 		if (v.link) p = { scale: v.q.scale, off: v.q.hide, band: v.q.band, heat: p?.heat };
 		if (p) {
 			if (SCALES.some((s) => s.k === p.scale)) scale = p.scale;
-			if (Array.isArray(p.off)) off = p.off.filter((k: string) => k in NODE);
+			if (Array.isArray(p.off)) off = p.off.filter((k: string) => k in NODE || CHART_KEYS.includes(k));
 			if (p.band in NODE) bandKey = p.band;
 			if (p.heat in NODE) heatKey = p.heat;
 		}
+		if (region !== 'NZ') bandKey = islandBand(region);
 	}
 	// ---------- downloads (#lib/site/DownloadMenu.svelte, #lib/site/download.js) ----------
 	const EACH: Record<string, string> = { '5m': '5-minute', '30m': 'half-hourly', '1d': 'daily', '1w': 'weekly', '1mo': 'monthly' };
@@ -433,16 +438,15 @@
 		if (!view) return [];
 		if (view.mode === 'time') {
 			const rows: any[] = view.series.filter((s: any) => regionNodes.some((r) => r.k === s.k)).map((s: any) => ({ k: s.k, tok: s.tok, label: NODE[s.k].name, value: money(valOf(s.values)) }));
-			rows.push({ tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(valOf(view.spread)) });
-			rows.push({ tok: '--f-hvdc', label: 'HVDC', value: mw(valOf(view.hvdc)) });
+			rows.push({ k: 'spread', tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(valOf(view.spread)) });
+			rows.push({ k: 'hvdc', tok: '--f-hvdc', label: 'HVDC', value: mw(valOf(view.hvdc)) });
 			return rows;
 		}
 		const P = view.P, own = bandKey === 'BEN' ? 'SI' : 'NI', I = P[own];
 		if (at < 0) return [
 			{ tok: '--p-ni', label: 'Haywards', value: money(valOf(P.NI.price)) },
 			{ tok: '--p-si', label: 'Benmore', value: money(valOf(P.SI.price)) },
-			{ tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(valOf(P.spread)) },
-			{ tok: '--f-hvdc', label: 'HVDC', value: mw(valOf(P.hvdc)) }
+			{ k: 'spread', tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(valOf(P.spread)) }
 		];
 		return [
 			{ tok: '--p-ni', label: 'Haywards', value: money(P.NI.price[at]) },
@@ -451,8 +455,7 @@
 			{ label: `${NODE[bandKey].name}, low`, value: money(I.pmin[at]) },
 			{ label: `${NODE[bandKey].name}, high`, value: money(I.pmax[at]) },
 			{ label: 'Half-hours over $500', value: String(I.n500[at]) },
-			{ tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(P.spread[at]) },
-			{ tok: '--f-hvdc', label: 'HVDC', value: mw(P.hvdc[at]) }
+			{ k: 'spread', tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(P.spread[at]) }
 		];
 	});
 	// the high point of the range on the price chart: the highest of the lines drawn (live week and 30 days: the nodes
@@ -544,7 +547,9 @@
 		const cap = captured(S, region);
 		let sepH = 0, h = 0;
 		if (view.mode === 'time') for (let i = 0; i < S.n; i++) { h += S.h[i]; if (view.sep[i]) sepH += S.h[i]; }
-		return { rows, cap, sepShare: h ? sepH / h : null, spread: wavg(S.NI.price) - wavg(S.SI.price) };
+		// HVDC's net average over the range, in the stats card (12 months and All have no HVDC chart)
+		const hv = view.mode === 'time' ? view.hvdc : view.P.hvdc;
+		return { rows, cap, sepShare: h ? sepH / h : null, spread: wavg(S.NI.price) - wavg(S.SI.price), hvdc: hv ? wavgOf(view.mode === 'long' ? view.P : view.S, hv) : NaN };
 	});
 
 	// ---------- the heat map: follows the range (#lib/site/heat.js): by day up to a year, by month on All ----------
@@ -612,6 +617,18 @@
 	}
 	const popH = $derived(Math.min(560, Math.round(winH * 0.62)));
 	const toggleNode = (k: string) => { off = off.includes(k) ? off.filter((x) => x !== k) : [...off, k]; save(); };
+	// the list works like the Generation tab's (owner's report PRC-01, 31 Oct 2026): a colour square shows or hides its
+	// line, Shift shows that node alone (again shows them all), All and None for the nodes; the spread and HVDC rows
+	// hide or show their own charts
+	const nodeKeys = () => regionNodes.map((r) => r.k);
+	function swatch(e: MouseEvent, k: string) {
+		if (!e.shiftKey || !(k in NODE)) { toggleNode(k); return; }
+		const others = nodeKeys().filter((x) => x !== k);
+		const alone = !off.includes(k) && others.every((x) => off.includes(x));
+		off = [...off.filter((x) => !(x in NODE)), ...(alone ? [] : others)];
+		save();
+	}
+	const showNodes = (on: boolean) => { off = [...off.filter((x) => !(x in NODE)), ...(on ? [] : nodeKeys())]; save(); };
 
 	onMount(() => {
 		restore();
@@ -681,7 +698,7 @@
 	<nav class="toolbar" aria-label="View controls" use:barHeight>
 		<div class="ctl">
 			<label for="p-region" class="vh">Region</label>
-			<select class="pick" id="p-region" bind:value={region} onchange={save}>
+			<select class="pick" id="p-region" bind:value={region} onchange={() => { if (region !== 'NZ') bandKey = islandBand(region); save(); }}>
 				<option value="NZ">New Zealand</option>
 				<option value="NI">North Island</option>
 				<option value="SI">South Island</option>
@@ -813,7 +830,7 @@
 						<div class="legends">
 							<!-- the key: here on wider screens, under the chart on phones (so the header keeps to two rows) -->
 							<span class="lg-set">{@render priceKey()}</span>
-							{#if view.mode !== 'time'}
+							{#if view.mode !== 'time' && region === 'NZ'}
 								<div class="seg node-seg" role="group" aria-label="Node for the price range">
 									{#each ['HAY', 'BEN'] as k}
 										<button type="button" aria-pressed={bandKey === k} onclick={() => { bandKey = k; save(); }}>{NODE[k].name}</button>
@@ -829,7 +846,7 @@
 					</div>
 					<div class="plot">
 						<TimeChart onzoom={view.mode === 'time' ? (a, b) => setZoom({ from: a, to: b }) : undefined} t={view.t} t0={view.t0} t1={view.t1} height={popped === 'price' ? popH : 266} showX {xTicks} y={priceY} fmt={fmtTick} layers={priceLayers} note={highNote} stamp={at >= 0 && hoverBy !== 'mouse' ? chip(at) : null}
-							shade={view.mode === 'time' ? view.shade : []} marks={capMarks} bind:hover onpoint={point('price')} onleave={leave} onpin={pin} {pinned}
+							shade={view.mode === 'time' ? view.shade : []} marks={capMarks} bind:hover onpoint={point('price')} onleave={leave} onpin={pin} onunpin={unpin} {pinned}
 							label="Prices at the grid nodes over the range, $/MWh" zero unit="$/MWh" />
 						{#if canMove}
 							<button type="button" class="nav prev" aria-label="Previous {R.label}" title="Previous {R.label}" onclick={() => step(-1)}>
@@ -850,6 +867,7 @@
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -->
 		<section class="charts" id="charts-more" tabindex="0" onkeydown={keys} aria-label="Island spread and {view?.mode === 'long' ? 'price spike' : 'HVDC'} charts, on the same time axis as the prices.">
 			{#if view && priceY}
+				{#if !off.includes('spread')}
 				<div class="chart" class:popped={popped === 'spread'}>
 					<div class="ch-head">
 						<h2>Island spread</h2>{@render info('spread')}
@@ -859,12 +877,13 @@
 						</div>
 						{@render popBtn('spread', 'island spread')}
 					</div>
-					<TimeChart onzoom={view.mode === 'time' ? (a, b) => setZoom({ from: a, to: b }) : undefined} t={view.t} t0={view.t0} t1={view.t1} height={popped === 'spread' ? popH : 120} y={spreadY} fmt={fmtSpread} zero showX={popped === 'spread'} {xTicks} unit="$/MWh"
+					<TimeChart onzoom={view.mode === 'time' ? (a, b) => setZoom({ from: a, to: b }) : undefined} t={view.t} t0={view.t0} t1={view.t1} height={popped === 'spread' ? popH : 120} y={spreadY} fmt={fmtSpread} zero showX {xTicks} unit="$/MWh"
 						layers={view.mode === 'time' ? [{ kind: 'posneg', values: view.spread, pos: '--o1', neg: '--o2' }] : [{ kind: 'bars', values: view.P.spread, tok: '--o1', neg: '--o2', opacity: 0.85 }]}
-						shade={view.mode === 'time' ? view.shade : []} bind:hover onpoint={point('spread')} onleave={leave} onpin={pin} {pinned} label="The price gap between Haywards and Benmore" />
+						shade={view.mode === 'time' ? view.shade : []} bind:hover onpoint={point('spread')} onleave={leave} onpin={pin} onunpin={unpin} {pinned} label="The price gap between Haywards and Benmore" />
 				</div>
+				{/if}
 
-				{#if view.mode === 'time'}
+				{#if view.mode === 'time' && !off.includes('hvdc')}
 					<div class="chart" class:popped={popped === 'hvdc'}>
 						<div class="ch-head">
 							<h2>HVDC transfer</h2>{@render info('hvdc')}
@@ -873,7 +892,7 @@
 						</div>
 						<TimeChart onzoom={view.mode === 'time' ? (a, b) => setZoom({ from: a, to: b }) : undefined} t={view.t} t0={view.t0} t1={view.t1} height={popped === 'hvdc' ? popH : 140} y={hvdcY} fmt={fmtMW} zero showX {xTicks} unit="MW"
 							layers={[{ kind: 'area', values: view.hvdc, tok: '--f-hvdc', opacity: 0.5 }, { kind: 'line', values: view.hvdc, tok: '--f-hvdc', width: 1.3, dot: false }]}
-							shade={view.shade} bind:hover onpoint={point('hvdc')} onleave={leave} onpin={pin} {pinned} label="HVDC transfer between the islands" />
+							shade={view.shade} bind:hover onpoint={point('hvdc')} onleave={leave} onpin={pin} onunpin={unpin} {pinned} label="HVDC transfer between the islands" />
 					</div>
 				{:else if spikeY}
 					<div class="chart" class:popped={popped === 'spikes'}>
@@ -887,7 +906,7 @@
 						</div>
 						<TimeChart onzoom={view.mode === 'time' ? (a, b) => setZoom({ from: a, to: b }) : undefined} t={view.t} t0={view.t0} t1={view.t1} height={popped === 'spikes' ? popH : 140} y={spikeY} fmt={(v) => String(v)} showX {xTicks} unit="½-hours"
 							layers={[{ kind: 'bars', values: view.P[bandKey === 'BEN' ? 'SI' : 'NI'].n500, tok: '--o1', opacity: 0.45 }, { kind: 'bars', values: view.P[bandKey === 'BEN' ? 'SI' : 'NI'].n1000, tok: '--o1' }]}
-							bind:hover onpoint={point('spikes')} onleave={leave} onpin={pin} {pinned} label="Half-hours with prices over $500 and $1,000 in each period" />
+							bind:hover onpoint={point('spikes')} onleave={leave} onpin={pin} onunpin={unpin} {pinned} label="Half-hours with prices over $500 and $1,000 in each period" />
 					</div>
 				{/if}
 			{/if}
@@ -918,10 +937,13 @@
 						<dt>Zoom in</dt>
 						<dd>On the live week and 30 days, drag across a chart; Reset zoom goes back.</dd>
 						<dt>Nodes and scales</dt>
-						<dd>Select a node’s colour square to hide its line; the menu by the title changes the scale.</dd>
+						<dd>A colour square hides its line or chart; Shift shows that node alone; All and None for the nodes. The menu by the title changes the scale.</dd>
 					</dl>
 					<p><a href="/about#controls">Every control, in detail</a> · <a href="/methods/prices">How the figures are worked out</a></p>
 				</div>
+				{#if view?.mode === 'time'}
+					<div class="mix-tools" role="group" aria-label="Nodes shown in the price chart"><span>Nodes</span><button type="button" onclick={() => showNodes(true)} disabled={!nodeKeys().some((k) => off.includes(k))}>All</button><button type="button" onclick={() => showNodes(false)} disabled={nodeKeys().every((k) => off.includes(k))}>None</button></div>
+				{/if}
 				<table class="mix">
 					<thead><tr><th scope="col">{view?.mode === 'time' ? 'Node' : 'Series'}</th><th scope="col" class="n">{at < 0 ? 'Average' : 'Value'}</th></tr></thead>
 					<tbody>
@@ -929,7 +951,8 @@
 							<tr class:off={r.k && off.includes(r.k)}>
 								<td><div class="row-name">
 									{#if r.k}
-										<button type="button" class="sw-btn" aria-pressed={!off.includes(r.k)} aria-label="Show {r.label} in the chart" title="Show or hide {r.label} ({NODE[r.k].node}, {NODE[r.k].place})" onclick={() => toggleNode(r.k)}><span class="sw" style="--c: var({r.tok})"></span></button>
+										<button type="button" class="sw-btn" aria-pressed={!off.includes(r.k)} aria-label={r.k in NODE ? `Show ${r.label} in the chart` : `Show the ${r.k === 'hvdc' ? 'HVDC' : 'island spread'} chart`}
+												title={r.k in NODE ? `Show or hide ${r.label} (${NODE[r.k].node}, ${NODE[r.k].place}); Shift: only this` : `Show or hide the ${r.k === 'hvdc' ? 'HVDC transfer' : 'island spread'} chart`} onclick={(e) => swatch(e, r.k)}><span class="sw" style="--c: var({r.tok})"></span></button>
 									{:else}
 										<span class="sw-btn">{#if r.tok}<span class="sw" style="--c: var({r.tok})"></span>{/if}</span>
 									{/if}
@@ -954,6 +977,7 @@
 						{/each}
 						<dt>Generation-weighted average</dt><dd>{money(rangeStats.cap.avg)}<small>/MWh</small></dd>
 						{#if rangeStats.sepShare !== null}<dt>Islands priced apart</dt><dd>{Math.round(rangeStats.sepShare * 100)}%<small>of the time</small></dd>{/if}
+						{#if rangeStats.hvdc === rangeStats.hvdc}<dt>HVDC, net</dt><dd>{mw(rangeStats.hvdc)}<small>average</small></dd>{/if}
 					</dl>
 				</section>
 			{/if}

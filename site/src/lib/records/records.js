@@ -8,6 +8,16 @@
 export const RECORDS_URL = '/data/history/records.json';
 export const LIVE_URL = '/data/tracker.json';
 export const NEW_DAYS = 30;        // as records.py: a record is "new" this long after it first appears
+// A record is new only when it was set in recently arrived data: its period ended within NEW_LAG days (plus the
+// period's own length) of the day it first appeared. A rebuild that changes old data can move a record to another
+// half-hour years back; that isn't new (owner's report REC-02, 31 Oct 2026: 2009 records shown as New after BUILD 7).
+export const NEW_LAG = 75;
+const PERIOD_DAYS = { tp: 0, day: 1, week: 7, month: 31, year: 366 };
+/** Is this record new: first seen in the last NEW_DAYS, and set in data that had just arrived then? */
+export function isNew(rec, period = 'tp', now = Date.now()) {
+  if (!rec?.since || now - rec.since >= NEW_DAYS * 864e5) return false;
+  return rec.since - rec.t < (NEW_LAG + (PERIOD_DAYS[period] ?? 0)) * 864e5;
+}
 export const GROUPS = ['Demand', 'Renewables', 'Hydro', 'Wind and solar', 'Prices', 'HVDC'];
 export const REGIONS = [
   { id: 'NZ', name: 'New Zealand', short: 'NZ' },
@@ -391,8 +401,8 @@ export function recent(R, live, now = Date.now()) {
       const rec = get(R, d.id, r);
       if (!rec || notShown(d, r, rec)) continue;
       const prov = provisional(R, live, d.id, r);
-      const isNew = rec.since && now - rec.since < NEW_DAYS * 864e5;
-      if (isNew || prov) out.push({ d, region: r, rec, prov, isNew, at: Math.max(prov?.t ?? 0, rec.since ?? 0) });
+      const fresh = isNew(rec, 'tp', now);
+      if (fresh || prov) out.push({ d, region: r, rec, prov, isNew: fresh, at: Math.max(prov?.t ?? 0, fresh ? rec.since : 0) });
     }
   }
   for (const x of R.resolved ?? []) {

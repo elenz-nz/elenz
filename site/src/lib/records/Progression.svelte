@@ -32,6 +32,10 @@
 
 	// drawn at the width it is shown, so labels stay readable on phones
 	let cw = $state(1000);
+	// on touch the tooltip sits above the chart, kept wholly inside it (owner's report REC-08, 31 Oct 2026: near the right
+	// edge it ran off the page, which then zoomed out oddly)
+	let tipW = $state(0);
+	const touchLeft = (fx: number, w: number, tw: number) => (w ? Math.min(Math.max(fx * w, tw / 2 + 2), w - tw / 2 - 2) : 0);
 	const W = $derived(Math.max(320, Math.min(1000, cw)));
 	const H = $derived(W < 600 ? 220 : 300);
 	const L = 64, Rm = 18, T = 16, B = 30;
@@ -269,7 +273,7 @@
 		{@const p = pts[hover]}
 		{@const fx = x(hoverT) / W}
 		{@const ty = ahead && bgAt ? y(bgAt.v as number) : y(p[1])}
-		<div class="tip" style={touch ? `left:${Math.min(80, Math.max(20, fx * 100))}%` : `left:${fx * 100}%;top:${(ty / H) * 100}%`} class:flip={!touch && fx > 0.7} class:above={touch} aria-hidden="true">
+		<div class="tip" bind:clientWidth={tipW} style={touch ? `left:${touchLeft(fx, cw, tipW)}px` : `left:${fx * 100}%;top:${(ty / H) * 100}%`} class:flip={!touch && fx > 0.7} class:above={touch} aria-hidden="true">
 			<b>{val(p[1])}</b><span>{prov && hover === pts.length - 1 ? 'Provisional, ' : 'Record from '}{whenOf(p[0])}</span>
 			{#if bgAt}<span class="bgl">{bgWhen ? bgWhen(bgAt.t) : ''}{left ? ' so far' : ''}: {val(bgAt.v as number)}</span>{/if}
 			{#if infoAt}<span class="bgl">{infoLabel}{left ? ' so far' : ''}: {val(infoAt.v as number)} <i>(estimate, not a record)</i></span>{/if}

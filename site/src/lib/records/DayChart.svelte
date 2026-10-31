@@ -14,6 +14,14 @@
 	const val = (v: number) => (full ?? fmt)(v);
 
 	let cw = $state(640);
+
+	// on touch the tooltip sits above the chart, kept wholly inside it (owner's report REC-08, 31 Oct 2026: near the right
+
+	// edge it ran off the page, which then zoomed out oddly)
+
+	let tipW = $state(0);
+
+	const touchLeft = (fx: number, w: number, tw: number) => (w ? Math.min(Math.max(fx * w, tw / 2 + 2), w - tw / 2 - 2) : 0);
 	const W = $derived(Math.max(300, Math.min(760, cw)));
 	const H = 210, L = 58, R = 10, T = 12, B = 26;
 	const n = $derived(day.v.length);
@@ -153,7 +161,7 @@
 </svg>
 {#if hover !== null && !drag && hover >= i0 && hover <= i1}
 	{@const fx = x(hover) / W}
-	<div class="tip" class:flip={!touch && fx > 0.7} class:above={touch} style={touch ? `left:${Math.min(80, Math.max(20, fx * 100))}%` : `left:${fx * 100}%;top:${(y(day.v[hover] as number) / H) * 100}%`} aria-hidden="true">
+	<div class="tip" class:flip={!touch && fx > 0.7} class:above={touch} bind:clientWidth={tipW} style={touch ? `left:${touchLeft(fx, cw, tipW)}px` : `left:${fx * 100}%;top:${(y(day.v[hover] as number) / H) * 100}%`} aria-hidden="true">
 		<b>{val(day.v[hover] as number)}</b><span>{tipAt ? tipAt(hover) : clock(day.t0 + hover * day.step)}{hover === at ? ' · the record' : ''}</span>
 	</div>
 {/if}
