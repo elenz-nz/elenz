@@ -42,7 +42,13 @@
 				if (navigator.canShare && !navigator.canShare(data)) throw Object.assign(new Error('refused'), { name: 'CanShareFalse' });
 				await navigator.share(data); return;
 			}
-			catch (e: any) { if (e?.name === 'AbortError') return; why = e?.name || 'Error'; manual = url; return; }
+			catch (e: any) {
+				if (e?.name === 'AbortError') return;
+				// Firefox on Android never settles a share sent to an app, so every later share is refused as "already
+				// in progress" until the page reloads (owner's retest, 31 Oct 2026). It refuses before using up the tap,
+				// so the link can still be copied: do that, as on a computer
+				if (e?.name !== 'InvalidStateError') { why = e?.name || 'Error'; manual = url; return; }
+			}
 		}
 		try {
 			await navigator.clipboard.writeText(url);
