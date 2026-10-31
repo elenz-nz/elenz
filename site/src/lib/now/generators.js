@@ -24,7 +24,8 @@ function capacityNow(name, fallback, today) {
 /** @typedef {{ name: string, key: string, fuel: string, fuelName: string, tok: string, isl: string, owner: string,
  *   mw: number, cap: number | null, pct: number | null, charging: boolean, href: string, units: Unit[], part: string,
  *   aka: string[] }} Row */
-/** @typedef {{ fuel: string, island: string, owner: string, by: string, asc: boolean, text: string, on: boolean }} Settings */
+/** @typedef {{ by: string, asc: boolean }} SortKey */
+/** @typedef {{ fuel: string, island: string, owner: string, by: string, asc: boolean, then?: SortKey[], text: string, on: boolean }} Settings */
 
 // groups whose members are separate stations rather than units of one (Waikaremoana: Kaitawa, Tuai and Piripaua
 // on one river chain): listed here as one row per station, each linking to the group in the tracker
@@ -69,14 +70,17 @@ export function readSettings(search, rows) {
   const q = new URLSearchParams(search || '');
   const get = (/** @type {string} */ k) => q.get(k) || '';
   const fuels = new Set(rows.map((r) => r.fuel)), owners = new Set(rows.map((r) => slug(r.owner)));
-  const sort = get('sort');
-  const [by, dir] = sort.split('-');
+  // sort=island,mw-asc: the first key sorts, the rest break its ties in turn (Shift-click, owner's report NOW-10)
+  const keys = get('sort').split(',').map((x) => { const [by, dir] = x.split('-'); return by in SORTS ? { by, asc: dir === 'asc' ? true : dir === 'desc' ? false : TEXT_SORT.has(by) } : null; })
+    .filter((k, i, a) => k && a.findIndex((x) => x?.by === k.by) === i);
+  const first = keys[0] ?? { by: 'mw', asc: false };
   return {
     fuel: fuels.has(get('fuel')) ? get('fuel') : '',
     island: ['NI', 'SI'].includes(get('island').toUpperCase()) ? get('island').toUpperCase() : '',
     owner: owners.has(get('owner')) ? get('owner') : '',
-    by: by in SORTS ? by : 'mw',
-    asc: dir === 'asc' ? true : dir === 'desc' ? false : TEXT_SORT.has(by),
+    by: first.by,
+    asc: first.asc,
+    then: /** @type {SortKey[]} */ (keys.slice(1)),
     text: get('q').slice(0, 40),
     on: q.get('on') === '1',
   };
@@ -89,8 +93,9 @@ export function writeSettings(s) {
   if (s.fuel) q.set('fuel', s.fuel);
   if (s.island) q.set('island', s.island);
   if (s.owner) q.set('owner', s.owner);
-  const natural = TEXT_SORT.has(s.by);
-  if (s.by !== 'mw' || s.asc !== natural) q.set('sort', s.asc === natural ? s.by : `${s.by}-${s.asc ? 'asc' : 'desc'}`);
+  const key = (/** @type {SortKey} */ k) => (k.asc === TEXT_SORT.has(k.by) ? k.by : `${k.by}-${k.asc ? 'asc' : 'desc'}`);
+  const keys = [{ by: s.by, asc: s.asc }, ...(s.then ?? [])];
+  if (keys.length > 1 || s.by !== 'mw' || s.asc) q.set('sort', keys.map(key).join(','));
   if (s.text.trim()) q.set('q', s.text.trim());
   if (s.on) q.set('on', '1');
   const out = q.toString();
@@ -107,16 +112,23 @@ export function pick(rows, s) {
   const text = norm(s.text.trim());
   const out = rows.filter((r) => (!s.fuel || r.fuel === s.fuel) && (!s.island || r.isl === s.island) &&
     (!s.owner || slug(r.owner) === s.owner) && (!text || [r.name, ...(r.aka || [])].some((n) => norm(n).includes(text))) && (!s.on || Math.abs(r.mw) >= 0.5));
-  // fuel, island and owner group the list; within each group the largest MW comes first (owner's report NOW-10)
-  const val = (r) => (s.by === 'name' ? norm(r.name) : s.by === 'pct' ? r.pct : s.by === 'fuel' ? norm(r.fuelName)
-    : s.by === 'island' ? r.isl : s.by === 'owner' ? (r.owner === 'Other generators' ? '\uffff' : norm(r.owner)) : r.mw);
-  const group = s.by === 'fuel' || s.by === 'island' || s.by === 'owner';
-  return out.sort((a, b) => {
-    const x = val(a), y = val(b);
+  // the sort keys in turn (Shift-click adds one); fuel, island and owner group the list, and within the last group
+  // the largest MW comes first (owner's report NOW-10)
+  const val = (by, r) => (by === 'name' ? norm(r.name) : by === 'pct' ? r.pct : by === 'fuel' ? norm(r.fuelName)
+    : by === 'island' ? r.isl : by === 'owner' ? (r.owner === 'Other generators' ? '\uffff' : norm(r.owner)) : r.mw);
+  const keys = [{ by: s.by, asc: s.asc }, ...(s.then ?? [])];
+  const last = keys[keys.length - 1].by;
+  const group = last === 'fuel' || last === 'island' || last === 'owner';
+  const cmp = (k, a, b) => {
+    const x = val(k.by, a), y = val(k.by, b);
     if (x == null && y == null) return 0;
     if (x == null) return 1;   // plants with no capacity go last either way
     if (y == null) return -1;
     const c = x < y ? -1 : x > y ? 1 : 0;
-    return (s.asc ? c : -c) || (group ? b.mw - a.mw : 0) || norm(a.name).localeCompare(norm(b.name));
+    return k.asc ? c : -c;
+  };
+  return out.sort((a, b) => {
+    for (const k of keys) { const c = cmp(k, a, b); if (c) return c; }
+    return (group ? b.mw - a.mw : 0) || norm(a.name).localeCompare(norm(b.name));
   });
 }

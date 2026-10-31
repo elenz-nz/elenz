@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tapAway, leaveFor } from './tap.js';
 	// Scatter plot: one dot per point, coloured by group, with a readout for the dot nearest the pointer.
 	// The data table summarises the points (pass `table` rows); a table of every point would be too long to read.
 	import Tip from './Tip.svelte';
@@ -42,7 +43,7 @@
 	}
 </script>
 
-<div class="ch" bind:clientWidth={w}>
+<div class="ch" bind:clientWidth={w} use:tapAway={() => (hi = -1)}>
 	<Legend items={groups.map((g) => ({ ...g, kind: 'dot' as const }))} />
 	<div class="ch-plot">
 		<svg width={w} {height} role="img" aria-label={groups.map((g) => g.name).join(', ')}>
@@ -62,7 +63,7 @@
 					{@const p = pts[hi]}
 					<circle class="sc-ring" cx={x(p[0])} cy={y(p[1])} r="7" style="stroke: var({groups[p[2]].tok})" />
 				{/if}
-				<rect class="ch-hit" x="0" y="0" width={pw} height={ph} onpointermove={move} onpointerleave={() => (hi = -1)} role="presentation" />
+				<rect class="ch-hit" x="0" y="0" width={pw} height={ph} onpointermove={move} onpointerdown={move} onpointerleave={leaveFor(() => (hi = -1))} role="presentation" />
 			</g>
 		</svg>
 		{#if hi >= 0}

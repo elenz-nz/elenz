@@ -89,8 +89,11 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   23/25-hour clock-change days); their energy is shown beside it (`energy`, `periodHours` in records.js: average x the
   period's hours from its NZ local midnights) on the record page, the index table and the share image (owner's call,
   23 Oct 2026). Each record page has Share (phones: the share sheet with the record's image, a line about it and the
-  link; computers: copies the link) and Download (the 1200 x 630 PNG from `shareImage.js`) beside the region picker,
-  and again at its foot. Its two charts (`Progression`, `DayChart`) pin a point on click, tap or drag (it stays after
+  link; computers: copies the link) and Download (the 1200 x 630 PNG from `shareImage.js`, in the page's light or dark
+  colours, `pageIsDark`; REC-05/06) beside the region picker, and again at its foot. The image is drawn ahead
+  (`prepared`), because phones refuse a share that waits on drawing; when a browser refuses to share or copy (Firefox on
+  Android, SHR-03) the link is shown with its own Copy button (`src/lib/site/CopyLink.svelte`, also in the tracker
+  tabs' Share panel). Its two charts (`Progression`, `DayChart`) pin a point on click, tap or drag (it stays after
   the finger lifts; another click, a tap outside or Escape lets go), and on touch the tooltip sits above the chart.
   A mouse drag across either zooms into that span (owner's call, 25 Oct 2026; the y axis fits what is shown, the
   progression's x axis turns to months, `DayChart` labels with `periodAxis`'s `lab` past its usual ticks). Zoom and pin
@@ -101,7 +104,11 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   Records added 23 Oct 2026 (records.py VERSION 4): most fossil generation, peak hydro, lowest hydro and lowest price.
   Every record the data holds is shown, half-hours included (owner's rule, 30 Oct 2026: nothing left out for being
   less interesting; lowest hydro and lowest price had been kept to days and longer). The month-of-year table lists every
-  half-hour record and Milestones all of them (6, then Show all). A record
+  half-hour record (labelled as trading periods, REC-13) and Milestones all of them (6, then Show all). "New" (`isNew` in
+  records.js, `_since_ok` in records.py) is a record first seen in the last 30 days whose period ended within `NEW_LAG`
+  (120) days of that (metered data runs 5-6 weeks behind each month), so a rebuild that moves an old record isn't new (REC-02, 31 Oct 2026); New and provisional shows 4
+  cards, then Show all (REC-09). An island's list leaves out records that can't apply there (always 100% renewable, no
+  fossil plant, never a net southward period; a period record that never moved shows as one step) and groups left empty (REC-03). A record
   page's "Records" breadcrumb returns to the list's own period (`period`, the one asked for), not the page's `per`. A DEFS entry's `v` is the records.json version that first has it; an older file says it is being worked out.
   "Heading for a record" (owner's call, 23 Oct 2026): `pace()` in records.js lists a current day/week/month/year once
   half of it has gone (`PACE_SHARE`) and only while it is ahead of its record period at the same point (whole days, or
@@ -143,7 +150,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   shared with the Worker and the tests in `site/tests/` (`npm test`); the browser side in `src/lib/site/view.js`):
   `region`, `range`, `int`, `end=YYYY-MM-DD` shared by both tabs; the Generation tab's `by` (grouping), `unit=pct`, `chart=lines`, `price=on`, `fold` and
   drill-down `group`, `fuel`, `plant` (plants and plant sets by `slug()`: "manapouri", "branch-river-arnold"; old slugs
-  can be mapped in `PLANT_ALIASES`); the Prices tab's `scale`, `hide` (nodes) and `band`; and in links only, `t`, the
+  can be mapped in `PLANT_ALIASES`); the Prices tab's `scale`, `hide` (nodes, and `spread` for the price chart's priced-apart shading off: PRC-01, where the list
+  has All/None and the Generation list's colour squares, `#lib/site/swatch.js`: double-click, Shift or a long press shows one alone; HVDC's net average is in the stats card) and `band` (an island's region uses its own node, PRC-04); and in links only, `t`, the
   point the summary opens on. An address with a query is a link and opens exactly that; a plain visit opens on this
   browser's last region, range and interval (localStorage `elenz-view`, plus the grouping and MW/%) and `elenz-prices`,
   never the date or drill-down. Settings replace the address; each drill-down step pushes one, so Back steps out of it
@@ -155,7 +163,10 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   generation chart no longer drills on click). Touch keeps its point without pinning, so it can still scrub; a tap on
   the line a touch left (within `TAP_PX`, without sliding) lets it go (owner's report CHT-02, 30 Oct 2026). A pin, or
   a touch's point, survives a rebuild whose view still shows that moment (`pinT`/`keepBy` in `rebuild()`: grouping, region, drill-down, a range
-  with the same points; GRP-01). Charts allow pinch-zoom of the page (`touch-action: pan-y pinch-zoom`, PHN-03).
+  with the same points; GRP-01). Charts allow pinch-zoom of the page (`touch-action: pan-y pinch-zoom`, PHN-03). Every chart under generation has
+  its time labels (ZM-01, 31 Oct 2026), and on phones the summary's sub-line keeps room for two lines so a note
+  (interpolated, partial) doesn't make it jump. On Prices a tap on the line (pinned, even from a link, or left by a
+  touch) lets it go (`onunpin` on `TimeChart`, SHR-07).
   The Prices tab zooms the same way on its 5-minute and half-hourly views (`zoom` state in its page, the same address
   key; `onzoom` on `TimeChart`; its 1D menu sits outside the sticky bar). Downloads on daily and longer intervals give
   generation as energy in the chart's unit, with an `hours` column (a partial period: energy so far).
@@ -212,7 +223,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   pill, and both summaries have a labelled "Controls" panel, one line per feature, linking to the full descriptions in "Using the tracker" on /about (`#controls`; owner's report GRP-06): keep both up to date.
   Tracker and Now use the full width of big screens (`.wrap.wide`; reading pages keep 1,260 px). The browser tab's title says what the view shows (`describe`, set through `setTitle` in `#lib/site/view.js`, which sets it again when the page comes back into view or from the back/forward cache: phones sometimes showed the address instead, SITE-06), and the
   Worker puts the same title into the page title, og:title and og:url of `/tracker` and `/tracker/prices` for a linked view. The tracker page markup
-  is in `src/routes/tracker/+page.svelte` (About and Data and methods share one layout with a contents sidebar, the route group `src/routes/(docs)/`; About page: `src/routes/(docs)/about/+page.svelte`, short: what each page shows, where the data comes from in brief, support, contact; links to its old `#m-*` sections forward to the method pages. Data and methods: `/methods` overview, `/methods/sources` every dataset, `/methods/<slug>` one page per series (generation, embedded-solar, demand, hvdc, prices, price-explainer, emissions, groupings, history); topics and datasets in `src/lib/methods/registry.ts` (each page's header and "Data used" box come from it, so a dataset is described once), bodies in `src/lib/methods/pages/<slug>.svelte`, styles in `methods.css`. The emissions and price explainer pages import their factors and rules from `emissions.js` and `explain.js`, so they stay in step; the other pages are prose: when a method changes, update its page and its `updated` date; shared
+  is in `src/routes/tracker/+page.svelte` (About and Data and methods share one layout with a contents sidebar (a "Contents" dropdown naming the page under
+  860 px, DOC-04), the route group `src/routes/(docs)/`; About page: `src/routes/(docs)/about/+page.svelte`, short: what each page shows, where the data comes from in brief, support, contact; links to its old `#m-*` sections forward to the method pages. Data and methods: `/methods` overview, `/methods/sources` every dataset, `/methods/<slug>` one page per series (generation, embedded-solar, demand, hvdc, prices, price-explainer, emissions, groupings, history); topics and datasets in `src/lib/methods/registry.ts` (each page's header and "Data used" box come from it, so a dataset is described once), bodies in `src/lib/methods/pages/<slug>.svelte`, styles in `methods.css`. The emissions and price explainer pages import their factors and rules from `emissions.js` and `explain.js`, so they stay in step; the other pages are prose: when a method changes, update its page and its `updated` date; shared
   masthead, footer (© line, data credits, link icons: fill in a `href` in its `LINKS` to show a social account), logo mark and the "Support Elenz" link to Buy Me a Coffee in `src/lib/site/`; site copy speaks as "we", never "I" or "me"); the canvas chart code is `src/lib/tracker/tracker.js` (vanilla JS, driven by
   element ids in the page; each chart is drawn once per view into an off-screen base, and moving the time line only
   copies the base back and draws the line, dots and time chip over it (`paint`), so scrubbing stays smooth on phones:
@@ -227,7 +239,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   (`capacity.json`, else the register nameplate), fuel, island and owner (`plants.json`); stations shown whole and
   two-bus plants expand into their `units`; groups whose members are separate stations (`STATION_GROUPS`: Waikaremoana's
   Kaitawa, Tuai and Piripaua) are listed one row per station. A charging battery shows a negative % of its MW rating. Sort, filters and search live in /now's address (`fuel`, `island`, `owner`
-  as a slug, `sort` = mw | pct | name | fuel | island | owner with `-asc`/`-desc`; the word sorts group the list, largest MW first within each, and phones get a Sort menu since those columns are hidden there (NOW-10); `q`, `on=1` generating only); 20 rows until "Show all".
+  as a slug, `sort` = mw | pct | name | fuel | island | owner with `-asc`/`-desc`, comma-separated for Shift-click's
+  further keys (`sort=island,mw`, NOW-10); the word sorts group the list, largest MW first within each, and phones get a Sort menu since those columns are hidden there (NOW-10); `q`, `on=1` generating only); 20 rows until "Show all".
   Each plant links to `/tracker?fuel=<fuel>&plant=<slug>`. Later the index of plant pages (/plants).
 - Not found (SITE-07, 30 Oct 2026): `src/routes/404/+page.svelte` prerenders `build/404.html` (noindex, not in the
   sitemap), which Cloudflare serves with status 404 for any address with no file (`assets.not_found_handling:

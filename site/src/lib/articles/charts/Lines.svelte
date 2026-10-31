@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tapAway, leaveFor } from './tap.js';
 	// Line chart over a numeric x, with a crosshair that reads out every series at the pointer.
 	import Tip from './Tip.svelte';
 	import Legend, { type LegendItem } from './Legend.svelte';
@@ -45,7 +46,7 @@
 	}
 </script>
 
-<div class="ch" bind:clientWidth={w}>
+<div class="ch" bind:clientWidth={w} use:tapAway={() => (hi = -1)}>
 	{#if legend.length}<Legend items={legend} />{/if}
 	<div class="ch-plot">
 		<svg width={w} {height} role="img" aria-label={series.map((s) => s.name).join(', ')}>
@@ -67,7 +68,7 @@
 					<line class="ch-cross" x1={x(xs[hi])} x2={x(xs[hi])} y1="0" y2={ph} />
 					{#each series as s}{#if !s.faint}<circle class="ch-dot" cx={x(xs[hi])} cy={y(s.values[hi])} r="4" style="fill: var({s.tok})" />{/if}{/each}
 				{/if}
-				<rect class="ch-hit" x="0" y="0" width={pw} height={ph} onpointermove={move} onpointerleave={() => (hi = -1)} role="presentation" />
+				<rect class="ch-hit" x="0" y="0" width={pw} height={ph} onpointermove={move} onpointerdown={move} onpointerleave={leaveFor(() => (hi = -1))} role="presentation" />
 			</g>
 		</svg>
 		{#if hi >= 0}

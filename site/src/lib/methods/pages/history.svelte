@@ -46,7 +46,7 @@
 
 <h2 id="checks">Checks</h2>
 <ul>
-	<li>Against MBIE’s annual net generation, which also counts industrial cogeneration and small embedded plants the EA’s metering doesn’t see: the total is 1.4–3.2% below MBIE in 2000–08 and 3.9–5.7% below in 2009–19; hydro is 1.3–2.9% below throughout; geothermal within ±5% from 2001.</li>
+	<li>Against <a href="https://www.mbie.govt.nz/building-and-energy/energy-and-natural-resources/energy-statistics-and-modelling/energy-statistics/electricity-statistics">MBIE’s annual net generation</a> (how MBIE compiles it: <a href="https://www.mbie.govt.nz/assets/Energy-statistics-sources-and-methods.pdf">Energy statistics: sources and methods</a>), which also counts industrial cogeneration and small embedded plants the EA’s metering doesn’t see: the total is 1.4–3.2% below MBIE in 2000–08 and 3.9–5.7% below in 2009–19; hydro is 1.3–2.9% below throughout; geothermal within ±5% from 2001.</li>
 	<li>Emissions follow the national inventory year to year (see <a href="/methods/emissions#checks">emissions</a>).</li>
 	<li>Metered demand matches the dispatch data’s island load within 1–2% where both exist.</li>
 </ul>

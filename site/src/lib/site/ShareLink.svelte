@@ -4,6 +4,7 @@
 	// links(): from the page (#lib/site/view.js shareLinks), read when the panel opens. On phones the system share
 	// sheet opens; elsewhere the link is copied, or shown to copy by hand if the browser won't allow that.
 	import { tick } from 'svelte';
+	import CopyLink from './CopyLink.svelte';
 
 	type Links = { live: string | null; point: number | null; pointLabel: string | null; fixed: (mark?: boolean) => { url: string; span: string | null } | null };
 	let { links }: { links: () => Links | null } = $props();
@@ -28,19 +29,20 @@
 		await tick();
 		pop?.querySelector<HTMLButtonElement>('.sh-go')?.focus();
 	}
+	// the share sheet, else the clipboard; when the browser refuses either (Firefox on Android, SHR-03), the link is
+	// shown with its own Copy button: the share's failure used up the tap, and a new tap may write the clipboard
 	async function send(url: string, key: string) {
+		manual = '';
 		if (canShare) {
 			try { await navigator.share({ title: document.title, url }); return; }
-			catch (e: any) { if (e?.name === 'AbortError') return; }   // cancelled; otherwise fall back to copying
+			catch (e: any) { if (e?.name === 'AbortError') return; manual = url; return; }
 		}
 		try {
 			await navigator.clipboard.writeText(url);
-			done = key; manual = '';
+			done = key;
 			clearTimeout(timer); timer = setTimeout(() => (done = ''), 2000);
 		} catch {
 			manual = url;
-			await tick();
-			pop?.querySelector<HTMLInputElement>('.sh-manual')?.select();
 		}
 	}
 	function outside(e: Event) {
@@ -80,7 +82,7 @@
 			{/if}
 		{/if}
 		{#if manual}
-			<label class="sh-man">Copy this link:<input class="sh-manual" readonly value={manual} onfocus={(e) => e.currentTarget.select()} /></label>
+			<div class="sh-man"><span>Copy this link:</span><CopyLink url={manual} /></div>
 		{/if}
 	{/if}
 </div>
@@ -97,5 +99,4 @@
 	.sh-mark { display: flex; align-items: center; gap: 7px; font-size: 0.8rem; color: var(--ink-2); margin-top: -4px; cursor: pointer; }
 	.sh-mark input { accent-color: var(--accent); margin: 0; }
 	.sh-man { display: grid; gap: 4px; font-size: 0.78rem; color: var(--ink-2); }
-	.sh-man input { font: 0.76rem var(--font-data); padding: 5px 6px; border: 1px solid var(--line); border-radius: 3px; background: var(--bg); color: var(--ink); width: 100%; box-sizing: border-box; }
 </style>

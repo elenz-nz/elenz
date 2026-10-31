@@ -64,7 +64,16 @@ export function writeView({ region, range, int, end }, { query = {}, store = {},
   if (url === location.pathname + location.search + location.hash) return;
   const go = push ? pushState : replaceState;
   // before the router has started (the first moments after loading) SvelteKit refuses: use the browser's own
-  Promise.resolve().then(() => go(url, {})).catch(() => history[push ? 'pushState' : 'replaceState'](history.state, '', url));
+  Promise.resolve().then(() => go(url, {})).catch(() => history[push ? 'pushState' : 'replaceState'](history.state, '', url))
+    .then(retitle);
+}
+// After the address changes, phones' tab lists can show the address in place of the title until the title changes
+// (owner's report SITE-06, 31 Oct 2026: still seen after changing range on a phone). Setting the same title again does
+// nothing, so it is nudged: an invisible zero-width space for a frame, then the title itself.
+function retitle() {
+  if (typeof document === 'undefined' || !titled.title || location.pathname !== titled.path) return;
+  document.title = titled.title + '\u200b';
+  requestAnimationFrame(() => { if (location.pathname === titled.path) document.title = titled.title; });
 }
 
 /** The address for another tab: this page's shared settings with that tab's own from its last visit in this browser

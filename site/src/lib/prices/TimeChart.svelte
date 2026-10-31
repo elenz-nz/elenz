@@ -20,12 +20,12 @@
 
 	let {
 		t, t0, t1, height = 200, y, fmt = (v: number) => String(v), layers = [], shade = [], marks = [], hover = $bindable(-1),
-		xTicks = [], showX = false, label = '', zero = false, note = null, stamp = null, pinned = false, onpoint, onleave, onpin, onzoom, unit = ''
+		xTicks = [], showX = false, label = '', zero = false, note = null, stamp = null, pinned = false, onpoint, onleave, onpin, onunpin, onzoom, unit = ''
 	}: {
 		t: ArrayLike<number>; t0: number; t1: number; height?: number; y: Scale; fmt?: (v: number) => string; layers?: Layer[];
 		shade?: [number, number][]; marks?: { i: number; label: string }[]; hover?: number; xTicks?: { t: number; label: string; minor?: boolean }[];
 		showX?: boolean; label?: string; zero?: boolean; note?: { i: number; v: number; text: string; tok?: string } | null; stamp?: string | null;
-		onpoint?: (e: PointerEvent, i: number) => void; onleave?: (e: PointerEvent) => void; pinned?: boolean; onpin?: (i: number) => void;
+		onpoint?: (e: PointerEvent, i: number) => void; onleave?: (e: PointerEvent) => void; pinned?: boolean; onpin?: (i: number) => void; onunpin?: () => void;
 		onzoom?: (from: number, to: number) => void; unit?: string;
 	} = $props();
 
@@ -88,7 +88,10 @@
 	let drag = $state<{ a: number; b: number; i: number } | null>(null);
 	let dragged = false;
 	const pxOf = (e: MouseEvent) => { const r = (e.currentTarget as SVGSVGElement).getBoundingClientRect(); return Math.max(x0, Math.min(x1, ((e.clientX - r.left) / r.width) * W)); };
+	// where a touch went down, so a tap (no slide) can be told from a scrub, and where the line was before it
+	let downX = 0, downHx: number | null = null;
 	function down(e: PointerEvent) {
+		downX = e.clientX; downHx = hx;
 		if (onzoom && e.pointerType === 'mouse' && e.button === 0) { const px = pxOf(e); drag = { a: px, b: px, i: indexAt(e) }; dragged = false; }
 		move(e);
 	}
@@ -110,9 +113,18 @@
 		if (i >= 0 && i !== hover) hover = i;
 		if (i >= 0) onpoint?.(e, i);
 	}
+	// a tap on the line, pinned or left by a touch, lets it go, as on the Generation tab (owner's report SHR-07,
+	// 31 Oct 2026: on a phone a pin, even one opened from a shared link, couldn't be released)
+	const TAP_PX = 24;
 	function click(e: MouseEvent) {
 		if (dragged) { dragged = false; return; }   // the end of a zoom drag, not a click
-		if (downBy === 'touch' || !onpin) return;
+		if (downBy === 'touch') {
+			const r = (e.currentTarget as SVGSVGElement).getBoundingClientRect();
+			const px = ((e.clientX - r.left) / r.width) * W;
+			if (downHx != null && Math.abs(e.clientX - downX) < 8 && Math.abs(px - downHx) <= TAP_PX) onunpin?.();
+			return;
+		}
+		if (!onpin) return;
 		const i = indexAt(e);
 		if (i >= 0) onpin(i);
 	}

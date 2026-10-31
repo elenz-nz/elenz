@@ -17,7 +17,7 @@
 //                       zoom    1h | 3h | 6h | 12h: the last hours of the window (the menu on 1D), or
 //                               YYYY-MM-DDTHH:MM~YYYY-MM-DDTHH:MM: a span dragged on the chart (NZ time, end exclusive)
 // Prices tab:           scale   capped | linear (absent: spike-proof)
-//                       hide    nodes hidden from the price chart, e.g. OTA,ISL
+//                       hide    nodes hidden from the price chart, e.g. OTA,ISL, and 'spread' for the price chart's priced-apart shading off
 //                       band    BEN (absent: HAY), the island whose price range the long view shows
 
 import { nzOffset, KEY } from '#lib/tracker/series.js';
@@ -118,7 +118,7 @@ export function readQuery(search) {
   const z = readZoom(q.get('zoom'));
   if (z) v.zoom = z;
   one('scale', (x) => SCALES.includes(x));
-  const hide = (q.get('hide') || '').split(',').filter((x) => NODE.test(x));
+  const hide = (q.get('hide') || '').split(',').filter((x) => NODE.test(x) || x === 'spread');
   if (hide.length) v.hide = [...new Set(hide)];
   one('band', (x) => x === 'HAY' || x === 'BEN');
   return v;

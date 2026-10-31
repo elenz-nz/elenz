@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tapAway, leaveFor } from './tap.js';
 	// A supply curve for one trading period: every generator offer, cheapest first, as blocks whose width is the MW
 	// offered and whose height is the offer price, coloured by fuel. A vertical line marks the generation that was
 	// needed and a horizontal one the price that cleared. Offers above `ymax` are drawn to the top with a marker.
@@ -54,7 +55,7 @@
 	})));
 </script>
 
-<div class="ch os" bind:clientWidth={w}>
+<div class="ch os" bind:clientWidth={w} use:tapAway={() => (hi = -1)}>
 	{#if title}<p class="os-title">{title}</p>{/if}
 	<div class="ch-plot">
 		<svg width={w} {height} role="img" aria-label="{title}: offers by price and fuel; {num(load)} MW needed, price {dollars(price)}">
@@ -78,7 +79,7 @@
 				<text class="os-lab" x={x(load) - 6} y={10} text-anchor="end">Needed {num(load)} MW</text>
 				<line class="os-price" x1="0" x2={pw} y1={y(Math.min(price, ymax))} y2={y(Math.min(price, ymax))} />
 				<text class="os-lab" x="6" y={y(Math.min(price, ymax)) - 6}>{priceName} {dollars(price)}</text>
-				<rect class="ch-hit" x="0" y="-8" width={pw} height={ph + RIB + 12} onpointermove={move} onpointerleave={() => (hi = -1)} role="presentation" />
+				<rect class="ch-hit" x="0" y="-8" width={pw} height={ph + RIB + 12} onpointermove={move} onpointerdown={move} onpointerleave={leaveFor(() => (hi = -1))} role="presentation" />
 			</g>
 		</svg>
 		{#if hi >= 0}

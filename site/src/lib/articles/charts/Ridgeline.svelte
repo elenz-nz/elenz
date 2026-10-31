@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tapAway, leaveFor } from './tap.js';
 	// One row per series (a year, say), each row a line across the same x axis drawn on its own level, so their shapes
 	// can be compared down the page. Each row is shown as a % of its own average, centred on its label (100% = the
 	// label's level), all on one scale, so a row whose line swings further really did swing further. An optional band
@@ -54,7 +55,7 @@
 	}
 </script>
 
-<div class="ch" bind:clientWidth={w}>
+<div class="ch" bind:clientWidth={w} use:tapAway={() => { hr = -1; hc = -1; }}>
 	<div class="ch-plot">
 		<svg width={w} {height} role="img" aria-label="Average price by time of day, one row per {label.toLowerCase()}">
 			<g transform="translate({m.l},0)">
@@ -73,7 +74,7 @@
 				{#if band}<rect class="rl-band" x={x(band[0])} y={6} width={x(band[1]) - x(band[0])} height={pb - 6} />{/if}
 				{#if hc >= 0}<line class="ch-cross" x1={x(xs[hc])} x2={x(xs[hc])} y1={6} y2={pb} />{/if}
 				{#if hr >= 0 && hc >= 0}<circle class="ch-dot" cx={x(xs[hc])} cy={yv(hr, idx[hr][hc])} r="4" style="fill: var({rows[hr].tok ?? '--f-hvdc'})" />{/if}
-				<rect class="ch-hit" x="0" y="0" width={pw} height={pb} onpointermove={move} onpointerleave={() => { hr = -1; hc = -1; }} role="presentation" />
+				<rect class="ch-hit" x="0" y="0" width={pw} height={pb} onpointermove={move} onpointerdown={move} onpointerleave={leaveFor(() => { hr = -1; hc = -1; })} role="presentation" />
 			</g>
 		</svg>
 		{#if hr >= 0 && hc >= 0}

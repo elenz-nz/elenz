@@ -12,12 +12,12 @@
 
 	const SHOW = 20;   // rows before "Show all", while no filter is set
 	const rows = $derived(generatorRows(D));
-	let s = $state({ fuel: '', island: '', owner: '', by: 'mw', asc: false, text: '', on: false });
+	let s = $state<{ fuel: string; island: string; owner: string; by: string; asc: boolean; then: { by: string; asc: boolean }[]; text: string; on: boolean }>({ fuel: '', island: '', owner: '', by: 'mw', asc: false, then: [], text: '', on: false });
 	let ready = false;
 	let all = $state(false);
 	let open = $state(new Set<string>());
 
-	onMount(() => { s = readSettings(location.search, rows); ready = true; });
+	onMount(() => { const r = readSettings(location.search, rows); s = { ...r, then: r.then ?? [] }; ready = true; });
 	// keep the address in step with the settings (replace, so Back leaves the page rather than undoing filters)
 	$effect(() => {
 		const qs = writeSettings(s);
@@ -38,17 +38,32 @@
 	const fmt = (v: number) => Math.round(v).toLocaleString('en-NZ').replace('-', '−');
 	// a charging battery shows how hard it is charging, as a share of its MW rating, below zero
 	const pctText = (r: { pct: number | null; charging: boolean }) => (r.pct == null ? '–' : r.charging ? `−${Math.round(-r.pct)}%` : `${Math.round(Math.max(0, r.pct))}%`);
-	function sortBy(by: string) {
+	// a click sorts by that column (again: the other way); Shift-click adds it as the next key, or turns an added one
+	// round, e.g. island then MW (owner's report NOW-10, 31 Oct 2026)
+	const natural = (by: string) => ['name', 'fuel', 'island', 'owner'].includes(by);   // words A to Z first, numbers largest first
+	function sortBy(by: string, add = false) {
+		const then = s.then ?? [];
+		if (add && s.by !== by) {
+			const k = then.find((x) => x.by === by);
+			s.then = k ? then.map((x) => (x.by === by ? { by, asc: !x.asc } : x)) : [...then, { by, asc: natural(by) }];
+			return;
+		}
+		s.then = add ? then : [];
 		if (s.by === by) s.asc = !s.asc;
-		else { s.by = by; s.asc = ['name', 'fuel', 'island', 'owner'].includes(by); }   // words A to Z first, numbers largest first
+		else { s.by = by; s.asc = natural(by); }
 	}
 	const ariaSort = (by: string) => (s.by === by ? (s.asc ? 'ascending' : 'descending') : 'none');
+	// the column's place among several sort keys, and its direction, for its arrow
+	const sortMark = (by: string) => {
+		const keys = [{ by: s.by, asc: s.asc }, ...(s.then ?? [])], i = keys.findIndex((k) => k.by === by);
+		return i < 0 ? '' : `${keys[i].asc ? '↑' : '↓'}${keys.length > 1 ? i + 1 : ''}`;
+	};
 	function toggle(key: string) {
 		const n = new Set(open);
 		n.has(key) ? n.delete(key) : n.add(key);
 		open = n;
 	}
-	const reset = () => { s = { fuel: '', island: '', owner: '', by: 'mw', asc: false, text: '', on: false }; };
+	const reset = () => { s = { fuel: '', island: '', owner: '', by: 'mw', asc: false, then: [], text: '', on: false }; };
 </script>
 
 <section class="gens" aria-labelledby="gens-h">
@@ -61,6 +76,7 @@
 				<li>% is that MW against the plant's installed capacity. A plant that always runs above its listed capacity counts what it runs at.</li>
 				<li>Batteries show negative while charging.</li>
 				<li>Embedded solar isn't listed.</li>
+				<li>A column heading sorts by it; Shift-click another to sort by that within it (island, then MW).</li>
 				<li>Tap a plant for its history.</li>
 			</ul>
 			<p><a href="/methods/capacity">How capacity is counted</a></p>
@@ -95,12 +111,12 @@
 		<table class="gtab">
 			<thead>
 				<tr>
-					<th scope="col" aria-sort={ariaSort('name')}><button type="button" onclick={() => sortBy('name')}>Plant</button></th>
-					<th scope="col" class="c-fuel" aria-sort={ariaSort('fuel')}><button type="button" onclick={() => sortBy('fuel')}>Fuel</button></th>
-					<th scope="col" class="c-isl" aria-sort={ariaSort('island')}><button type="button" onclick={() => sortBy('island')}>Island</button></th>
-					<th scope="col" class="c-own" aria-sort={ariaSort('owner')}><button type="button" onclick={() => sortBy('owner')}>Owner</button></th>
-					<th scope="col" class="n" aria-sort={ariaSort('mw')}><button type="button" onclick={() => sortBy('mw')}>MW</button></th>
-					<th scope="col" class="n c-pct" aria-sort={ariaSort('pct')}><button type="button" onclick={() => sortBy('pct')}>Of capacity</button></th>
+					<th scope="col" aria-sort={ariaSort('name')}><button type="button" onclick={(e) => sortBy('name', e.shiftKey)} data-sort={sortMark('name')}>Plant</button></th>
+					<th scope="col" class="c-fuel" aria-sort={ariaSort('fuel')}><button type="button" onclick={(e) => sortBy('fuel', e.shiftKey)} data-sort={sortMark('fuel')}>Fuel</button></th>
+					<th scope="col" class="c-isl" aria-sort={ariaSort('island')}><button type="button" onclick={(e) => sortBy('island', e.shiftKey)} data-sort={sortMark('island')}>Island</button></th>
+					<th scope="col" class="c-own" aria-sort={ariaSort('owner')}><button type="button" onclick={(e) => sortBy('owner', e.shiftKey)} data-sort={sortMark('owner')}>Owner</button></th>
+					<th scope="col" class="n" aria-sort={ariaSort('mw')}><button type="button" onclick={(e) => sortBy('mw', e.shiftKey)} data-sort={sortMark('mw')}>MW</button></th>
+					<th scope="col" class="n c-pct" aria-sort={ariaSort('pct')}><button type="button" onclick={(e) => sortBy('pct', e.shiftKey)} data-sort={sortMark('pct')}>Of capacity</button></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -171,8 +187,7 @@
 	.gtab th button { all: unset; cursor: pointer; }
 	.gtab th button:hover { color: var(--ink); }
 	.gtab th button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-	.gtab th[aria-sort='ascending'] button::after { content: ' ↑'; color: var(--accent); }
-	.gtab th[aria-sort='descending'] button::after { content: ' ↓'; color: var(--accent); }
+	.gtab th button[data-sort]:not([data-sort=''])::after { content: ' ' attr(data-sort); color: var(--accent); }
 	.gtab td { padding: 6px 8px 6px 0; border-bottom: 1px solid var(--grid); }
 	.gtab .n { text-align: right; font-family: var(--font-data); padding-right: 0; padding-left: 8px; }
 	.gtab th.n { font-family: var(--font-ui); }
