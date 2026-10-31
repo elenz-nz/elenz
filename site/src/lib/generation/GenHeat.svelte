@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { portal } from '#lib/site/portal.js';
 	// By time of day: one row per NZ day (or month, or year, on All), one cell per half-hour. Renewable share in bands
 	// (brown where generation leaned on thermal plant, green where it was close to all renewable); a fuel's MW in its
 	// own colour, darker for more: on a fixed scale (hi, its installed capacity now, so years can be compared) or scaled
@@ -31,6 +32,10 @@
 	const value = (v: number) => (v !== v ? 'no data' : ren ? `${v.toFixed(1)}% renewable` : `${fmt(v)} MW`);
 
 	let tip = $state<{ text: string; x: number; y: number } | null>(null);
+	// the tooltip follows the pointer, on its left in the right half of the window and above it near the foot, so it
+	// never runs off the screen; hung from <body> so an enlarged card's transform doesn't move it (portal.js)
+	const tipAt = (text: string, e: PointerEvent) => (tip = { text, x: e.clientX, y: e.clientY });
+	const tipStyle = (t: { x: number; y: number }) => `left: ${t.x}px; top: ${t.y}px; transform: translate(${t.x > innerWidth / 2 ? 'calc(-100% - 14px)' : '14px'}, ${t.y > innerHeight - 70 ? 'calc(-100% - 14px)' : '14px'})`;
 </script>
 
 <div class="hm" class:ren style="--fc: var({tok})">
@@ -42,7 +47,7 @@
 					<div class="cells">
 						{#each r.v as v, c}
 							<!-- svelte-ignore a11y_no_static_element_interactions (pointer readout only; the legend describes the colours) -->
-							<span class="c b{bin(v)}" onpointermove={(e) => (tip = { text: `${r.long ?? long(r.day)}${r.month ? ' average' : ''}, ${hh(c)}–${hh(c + 1)}: ${value(v)}`, x: e.clientX, y: e.clientY })}></span>
+							<span class="c b{bin(v)}" onpointermove={(e) => tipAt(`${r.long ?? long(r.day)}${r.month ? ' average' : ''}, ${hh(c)}–${hh(c + 1)}: ${value(v)}`, e)}></span>
 						{/each}
 					</div>
 				</div>
@@ -50,7 +55,7 @@
 			<div class="r ax"><span class="d"></span><div class="hrs"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div></div>
 		</div>
 	</div>
-	{#if tip}<div class="hm-tip" style="left: {tip.x + 14}px; top: {tip.y + 14}px">{tip.text}</div>{/if}
+	{#if tip}<div class="hm-tip" use:portal style={tipStyle(tip)}>{tip.text}</div>{/if}
 	<div class="leg">
 		{#each legend as l, i}<span><i class="b{i}"></i>{l}</span>{/each}
 	</div>

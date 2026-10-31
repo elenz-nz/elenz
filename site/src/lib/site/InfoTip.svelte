@@ -1,9 +1,11 @@
 <script lang="ts">
 	// The ⓘ beside a chart's heading: the note that used to sit under the chart, in a small popover (one style for
 	// every chart on the Tracker, Prices, Now and article pages). Opens on click or tap; Escape, a click outside or
-	// scrolling closes it. Fixed to the window so a card's overflow never clips it.
+	// scrolling closes it. Fixed to the window, and hung from <body> (portal.js), so neither a card's overflow nor an
+	// enlarged card's transform moves or clips it.
 	//   <InfoTip label="About this chart">Dashed: the same dates a year earlier. <a href="/methods/…">How</a></InfoTip>
 	import type { Snippet } from 'svelte';
+	import { portal } from './portal.js';
 	let { label = 'About this chart', children }: { label?: string; children: Snippet } = $props();
 
 	let open = $state(false);
@@ -27,7 +29,7 @@
 <button type="button" class="info-tip" bind:this={btn} aria-expanded={open} aria-controls={id} aria-label={label} title={label} onclick={toggle}>
 	<svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.15" fill="currentColor" /></svg>
 </button>
-<div class="info-pop-tip" {id} role="note" bind:this={pop} hidden={!open} style="top: {pos.top}px; left: {pos.left}px">
+<div class="info-pop-tip" {id} role="note" bind:this={pop} use:portal hidden={!open} style="top: {pos.top}px; left: {pos.left}px">
 	{@render children()}
 </div>
 
