@@ -301,3 +301,35 @@ before a plant's start (Huntly 5 testing in 2006, Ōtāhuhu B Nov 1998, traces a
 **Uncertain:** New Plymouth's units were run down before Dec 2007 (output ~300-400 MW 2002-07; dates not found);
 Ōtāhuhu A's two Olympus units (MW not found); Ōhaaki's derating date; Kawerau Mill (register 53, output peaks ~40,
 Wikipedia 37); the Stratford peakers (register 2 × 106, Wikipedia 200).
+
+## Other embedded generation (`embedded_other.py`, 1 Nov 2026)
+
+Non-solar generation on local networks that isn't dispatched, so the live week sees it only as lower demand (raised on
+r/nzsolar, 1 Nov 2026: Teviot, Hau Nui). Measured per month as reconciled injection (`Volumes/Reconciliation`, every
+trader at every connection point) less the dispatch data's non-solar generation at the same point, leaving out
+solar-shaped injection series (under 5% of their energy 9 pm-5 am), points whose injection is all on a generator's own
+network (grid stations: block dispatch and terminal-vs-connection differences) and Glenbrook (metered ~1.45 x dispatch).
+
+| Month | GWh | Average MW | Share of dispatched non-solar generation | At points with no dispatched unit |
+| --- | --- | --- | --- | --- |
+| Jan 2026 | 88 | 119 | 2.8% | 64 GWh |
+| Jun 2026 | 102 | 142 | 2.8% | 72 GWh |
+| Sep 2026 | 117 | 163 | 3.3% | 87 GWh |
+
+- **Flat through the day:** Sep 153-173 MW by hour of day, Jan 111-125, so no solar leaks in, and a profile from the
+  latest reconciliation month would estimate it well.
+- **By fuel** (Sep; known plants by point, the rest by the point's GUEHMT registry capacity less dispatched plant,
+  weighted by typical capacity factors): hydro ~57%, geothermal ~16%, landfill gas ~14%, wind ~6%, gas, diesel and
+  unclassified ~7%. About 95% renewable. Jan and Jun are similar (hydro 46-45%, less from Teviot).
+- **Largest:** Ngāwhā's original units at `KOE1101` (16-18 GWh a month, ~22-25 MW: only Ngāwhā B, `NGB0`, is
+  dispatched); Teviot and other Pioneer hydro at `CYD0331` (8-21 GWh); flat output sold through Contact at Silverdale
+  `SVL0331`, Takapu Road `TAK0331` and Bombay `BOB1101` (~20 MW together, landfill gas; the registry files Bombay as
+  natural gas); Hokitika `HKK0661` hydro (6-8 GWh); ~60 small points, mostly hydro (West Coast, Otago, Southland).
+- **Wind is small** (~9 MW average). Hau Nui (`GYT0331`, 8.8 MW in the registry) injected only ~0.1 GWh in Sep 2026.
+- **Effect on shares:** a 24% solar share in the live week is ~23.3% of all generation; the renewable share reads
+  slightly low, the fossil share slightly high.
+- **History vs live:** `Generation_MD` already carries all of Ngāwhā (29-40 GWh a month) and Teviot's own meter
+  (1-13 GWh), so those step down where the history hands over to dispatch data. The rest is missing from the history
+  too: ~2.2-2.4% of generation. Together with industrial cogeneration used on site (in neither dataset), this is the
+  gap to MBIE's totals (`metered_check.py`).
+- **Glenbrook:** metered 44-48 GWh against 32 GWh dispatched in Jan and Jun 2026 (Sep: 6.5 against 9.0).

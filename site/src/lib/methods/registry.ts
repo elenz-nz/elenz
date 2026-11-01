@@ -38,7 +38,7 @@ export const TOPICS: Topic[] = [
 		title: 'Demand',
 		summary: 'Electricity taken from the grid in each island, and with embedded solar added back for underlying demand.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
-		updated: '2026-10-22',
+		updated: '2026-11-01',
 	},
 	{
 		slug: 'hvdc',
@@ -237,9 +237,9 @@ export const SOURCES: Source[] = [
 		id: 'reconciliation', name: 'Reconciled injection and offtake', publisher: EA, dataset: 'Volumes/Reconciliation',
 		url: EMI + 'Volumes/Reconciliation',
 		what: 'Monthly files of metered injection and offtake by connection point, network, trader and half-hour.',
-		use: 'Checking the embedded solar model against metered exports, and the output of embedded solar farms.',
+		use: 'Checking the embedded solar model against metered exports, and the output of embedded solar farms; measuring the other embedded generation the dispatch data doesn’t see.',
 		period: 'Monthly', fresh: 'About a week after each month', licence: CCBY, check: true,
-		topics: ['embedded-solar'],
+		topics: ['embedded-solar', 'generation', 'demand'],
 	},
 	{
 		id: 'guehmt', name: 'Installed distributed generation', publisher: EA, dataset: 'Report GUEHMT',
