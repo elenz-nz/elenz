@@ -465,6 +465,76 @@ export function recent(R, live, now = Date.now(), near = null) {
   return out.filter((x) => !seen.has(x.d.id) && seen.add(x.d.id)).sort((a, b) => b.at - a.at);
 }
 
+// ---------- every new, provisional and close record, ranked (the New and provisional cards) ----------
+// Owner's call, 1 Nov 2026: every record, region and period goes in; the four cards shown first are the most notable,
+// and Show all lists them all by period. Notable: a new official record before a provisional one, before one close to
+// the record; a bigger jump (against the record's usual step) before a small one; New Zealand before an island; a
+// half-hour, month or year before a week or day. The first four take one card per record and at most two per group.
+const STATUS_W = { new: 3, prov: 2, near: 1, settled: 0.8 };
+const PERIOD_W = { tp: 1, year: 1, month: 0.9, week: 0.75, day: 0.65 };
+export const CARD_GROUPS = [...PERIOD_KEYS, 'run'];
+/** A card group's heading: "Trading period", "Day" ... "Runs". */
+export const cardGroupLabel = (k) => (k === 'run' ? 'Runs' : periodOf(k).label);
+
+/** The record's usual step: the median change over its last ten new records (null with fewer than two). */
+function usualStep(steps) {
+  const xs = (steps ?? []).slice(-11);
+  const d = [];
+  for (let i = 1; i < xs.length; i++) if (xs[i - 1][1] !== 0) d.push(Math.abs(xs[i][1] - xs[i - 1][1]));
+  if (d.length < 2) return null;
+  d.sort((a, b) => a - b);
+  return d[Math.floor(d.length / 2)] || null;
+}
+
+/** Every new, provisional and close record across regions and periods: [{ d, region, period, group, rec, prov, near,
+ *  settled, isNew, status, score, at }], most notable first. near: liveNear's (the live week's close figures). */
+export function recentAll(R, live, near = null, now = Date.now()) {
+  if (!R) return [];
+  const out = [];
+  const push = (x) => {
+    const typ = usualStep(x.rec?.steps);
+    const jump = x.status === 'new' && x.rec?.prev ? Math.abs(x.rec.v - x.rec.prev[1])
+      : x.status === 'prov' ? Math.abs(x.prov.v - x.rec.v) : 0;
+    const ratio = typ ? Math.min(jump / typ, 3) : 1;
+    x.score = STATUS_W[x.status] * (x.region === 'NZ' ? 1 : 0.75) * (PERIOD_W[x.period] ?? 1) * (1 + ratio / 3);
+    out.push(x);
+  };
+  for (const d of LISTED) {
+    const periods = d.kind === 'hh' ? PERIOD_KEYS : ['tp'];
+    for (const r of d.regions) {
+      for (const p of periods) {
+        const rec = get(R, d.id, r, p);
+        if (!rec || notShown(d, r, rec, R, p)) continue;
+        const prov = p === 'tp' ? provisional(R, live, d.id, r) : rec.prov ?? null;
+        const nr = prov ? null : close(R, live, near, d.id, r, p);
+        const fresh = isNew(rec, p, now);
+        const status = prov ? 'prov' : fresh ? 'new' : nr ? 'near' : null;
+        if (!status && !fresh) continue;
+        push({ d, region: r, period: p, group: d.kind === 'run' ? 'run' : p, rec, prov, near: nr, isNew: fresh,
+               status: fresh && !prov ? 'new' : status, at: Math.max(prov?.t ?? 0, nr?.t ?? 0, fresh ? rec.since : 0) });
+      }
+    }
+  }
+  for (const x of R.resolved ?? []) {
+    const d = def(x.k);
+    if (d && !x.ok) push({ d, region: x.r, period: 'tp', group: d.kind === 'run' ? 'run' : 'tp', rec: get(R, x.k, x.r), settled: x, status: 'settled', at: x.at });
+  }
+  return out.sort((a, b) => b.score - a.score || b.at - a.at);
+}
+
+/** The cards shown before Show all: the most notable `n`, one per record and at most two per group (Demand, Wind and
+ *  solar ...), topped up from the rest if that leaves fewer than n. */
+export function topCards(all, n = 4) {
+  const picked = [], ids = new Set(), groups = {};
+  for (const x of all) {
+    if (picked.length >= n) break;
+    if (ids.has(x.d.id) || (groups[x.d.group] ?? 0) >= 2) continue;
+    picked.push(x); ids.add(x.d.id); groups[x.d.group] = (groups[x.d.group] ?? 0) + 1;
+  }
+  for (const x of all) { if (picked.length >= n) break; if (!picked.includes(x) && !ids.has(x.d.id)) { picked.push(x); ids.add(x.d.id); } }
+  return picked;
+}
+
 /** The first time each milestone was passed, for a region: [{ d, level, t, v }], oldest first. */
 export function milestones(R, region) {
   const out = [];

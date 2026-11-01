@@ -139,8 +139,13 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   three across from 900 px, full lists; owner's call, 31 Oct 2026; pointing at a row lights the same milestone or record in every region's card, a click pins it and another lets go, `data-k`/`lit`/`pinned`). The month-of-year table lists every
   half-hour record (labelled as trading periods, REC-13) and Milestones all of them. "New" (`isNew` in
   records.js, `_since_ok` in records.py) is a record first seen in the last 30 days whose period ended within `NEW_LAG`
-  (120) days of that (metered data runs 5-6 weeks behind each month), so a rebuild that moves an old record isn't new (REC-02, 31 Oct 2026); New and provisional shows 4
-  cards, then Show all (REC-09). An island's list leaves out records that can't apply there (always 100% renewable, no
+  (120) days of that (metered data runs 5-6 weeks behind each month), so a rebuild that moves an old record isn't new (REC-02, 31 Oct 2026); New and provisional (owner's
+  call, 1 Nov 2026; `recentAll`, `topCards` in records.js) holds every new, provisional and close record for every region
+  and period, ranked: new official before provisional before close, a bigger jump against the record's usual step, NZ
+  before an island, a half-hour, month or year before a week or day. The first 4 cards are the most notable (one per
+  record, at most two per group) and give only the period; Show all lists every card for one region (the page's
+  `region`, shared with the All-time list and its picker) under its period (Trading period, Day, Week, Month, Year,
+  Runs) with its date (REC-09). Both Show all buttons sit in their section titles. An island's list leaves out records that can't apply there (always 100% renewable, no
   fossil plant, never a net southward period; a period record that never moved shows as one step) and groups left empty (REC-03). A record
   page's "Records" breadcrumb returns to the list's own period (`period`, the one asked for), not the page's `per`. A DEFS entry's `v` is the records.json version that first has it; an older file says it is being worked out.
   "Heading for a record" (owner's call, 23 Oct 2026): `pace()` in records.js lists a current day/week/month/year once

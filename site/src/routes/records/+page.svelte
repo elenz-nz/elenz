@@ -11,7 +11,7 @@
 	import InfoTip from '#lib/site/InfoTip.svelte';
 	import RecordIcon from '#lib/records/RecordIcon.svelte';
 	import { energy, pace, soFar, paceAt, periodWhen,
-		LISTED as DEFS, PERIODS, PERIOD_KEYS, periodOf, periodSub, GROUPS, REGIONS, LIVE_URL, MONTHS, get, notShown, parts, when, step, fmt, recent, milestones, provisional,
+		LISTED as DEFS, PERIODS, PERIOD_KEYS, periodOf, periodSub, GROUPS, REGIONS, LIVE_URL, MONTHS, get, notShown, parts, when, step, fmt, recentAll, topCards, CARD_GROUPS, cardGroupLabel, milestones, provisional,
 		liveBeats, liveNear, loadRecords, fullName, dayOf, clock, yearOf, isNew
 	} from '#lib/records/records.js';
 
@@ -100,8 +100,13 @@
 	// new and provisional: four, a row of them at full width, then Show all (owner's call REC-09, 31 Oct 2026)
 	const CARDS = 4;
 	let cardsAll = $state(false);
-	const allCards = $derived(R ? recent(R, live, Date.now(), near) : []);
-	const cards = $derived(cardsAll ? allCards : allCards.slice(0, CARDS));
+	// every new, provisional and close record (each region and period), most notable first (records.js recentAll); the
+	// first CARDS are the most notable, compact (the period, not the date); Show all lists every one by period, in full
+	const allCards = $derived(R ? recentAll(R, live, near) : []);
+	const topCardList = $derived(topCards(allCards, CARDS));
+	// Show all: one region at a time (owner's call, 1 Nov 2026: every region together was too many), the same region as
+	// the All-time records list: picking it in either place changes both (and the address)
+	const cardGroups = $derived(CARD_GROUPS.map((k) => ({ k, label: cardGroupLabel(k), cards: allCards.filter((c) => c.group === k && c.region === region) })).filter((g) => g.cards.length));
 	// heading for a record: one card per record and period, New Zealand's where it is on pace, otherwise an island's
 	const paces = $derived.by(() => {
 		if (!R || !liveD) return [];
@@ -152,7 +157,7 @@
 		{:else}
 			{#if paces.length}
 				<section aria-labelledby="pace-h" class="sec">
-					<div class="ttl-row"><h2 id="pace-h">Heading for a record</h2><InfoTip label="About records on pace">
+					<div class="sec-head"><div class="ttl-row"><h2 id="pace-h">Heading for a record</h2><InfoTip label="About records on pace">
 						<p>These are records that could fall soon: a day, week, month or year still running that is ahead of its record's pace.</p>
 						<ul>
 							<li>Listed once half the period has gone, for as long as it stays ahead.</li>
@@ -161,6 +166,7 @@
 						</ul>
 						<p><a href="/methods/records#pace">How records work</a></p>
 					</InfoTip></div>
+					{#if paces.length > PACE_CARDS}<button type="button" class="more-btn" aria-expanded={paceAll} onclick={() => (paceAll = !paceAll)}>{paceAll ? 'Show fewer' : `Show all ${paces.length}`}</button>{/if}</div>
 					<!-- simple tiles, almost buttons: the record's picture and name; the detail is on its page (owner's call, 30 Oct 2026) -->
 					<div class="paces">
 						{#each paceAll ? paces : paces.slice(0, PACE_CARDS) as p}
@@ -172,46 +178,59 @@
 							</a>
 						{/each}
 					</div>
-					{#if paces.length > PACE_CARDS}<button type="button" class="more-btn" onclick={() => (paceAll = !paceAll)}>{paceAll ? 'Show fewer' : `Show all ${paces.length}`}</button>{/if}
 				</section>
 			{/if}
 
-			{#if cards.length}
+			{#if allCards.length}
 				<section aria-labelledby="new-h" class="sec">
-					<div class="ttl-row"><h2 id="new-h">New and provisional</h2><InfoTip label="About new and provisional records">
+					<div class="sec-head"><div class="ttl-row"><h2 id="new-h">New and provisional</h2><InfoTip label="About new and provisional records">
 						<p>These are records set in the last 30 days for New Zealand or either island, newer ones waiting on the metered data, and recent dispatch figures close to a record.</p>
 						<ul>
+							<li>First four: the most notable, one per record, each saying its period (trading period, day, week, month or year).</li>
+							<li>“Show all”: every one for the region picked beside it, under its period with its date. It’s the same region as the All-time records list below; changing either changes both.</li>
 							<li>Dashed border: provisional, from dispatch data, until the EA's metered data confirms it. It beats the record by more than dispatch data usually strays from the meters.</li>
 							<li>Dotted border: close to the record, too close for dispatch data to call either way.</li>
 							<li>Struck through: a provisional record the metered data didn't confirm.</li>
 						</ul>
 						<p><a href="/methods/records#official">How records work</a></p>
 					</InfoTip></div>
-					<div class="cards">
-						{#each cards as c}
-							{@const p = c.prov}
-							{@const nr = c.near}
-							{@const shown = p ?? nr ?? c.rec}
-							<!-- kept bare: name, value, when and the progression; the dashed border marks a provisional record, and the
-							     record's own page explains it -->
-							<a class="card" class:prov={!!p} class:near={!!nr} href={href(c.d.id, c.region, 'tp')} title={p ? 'Provisional: not yet confirmed by the metered data' : nr ? 'Close to the record: too close for dispatch data to call' : undefined}>
-								<span class="c-name"><span class="dot" style="--c:var({c.d.tok})"></span>{fullName(c.d)} · {c.region}</span>
-								<span class="c-row">
-									<span>
-										{#if c.settled}
-											<span class="c-val gone">{parts(c.d, c.settled.pv).n}<small>{parts(c.d, c.settled.pv).u}</small></span>
-											<span class="c-sub">Not confirmed</span>
-										{:else}
-											<span class="c-val">{parts(c.d, shown.v).n}<small>{parts(c.d, shown.v).u}</small></span>
-											<span class="c-sub">{nr ? `Close to the record · ${when(c.d, shown)}` : when(c.d, shown)}</span>
-										{/if}
-									</span>
-									{#if c.rec}<Spark steps={p ? [...c.rec.steps, [p.t, p.v]] : c.rec.steps} end={R.end} tok={c.d.tok} w={110} h={40} dashed={!!c.d.est} hollow={!!p} />{/if}
+					<div class="sec-ctl">
+						{#if cardsAll}<label for="card-region" class="vh">Region</label>
+						<select class="pick" id="card-region" value={region} onchange={(e) => setRegion((e.currentTarget as HTMLSelectElement).value)}>{#each REGIONS as r}<option value={r.id}>{r.name}</option>{/each}</select>{/if}
+						{#if allCards.length > CARDS}<button type="button" class="more-btn" aria-expanded={cardsAll} onclick={() => (cardsAll = !cardsAll)}>{cardsAll ? 'Show fewer' : 'Show all'}</button>{/if}
+					</div></div>
+					{#snippet card(c: any, full: boolean)}
+						{@const p = c.prov}
+						{@const nr = c.near}
+						{@const shown = p ?? nr ?? c.rec}
+						{@const label = c.d.kind === 'run' ? 'Run' : periodOf(c.period).label}
+						<!-- kept bare: name, value, the period (or when, in the full list) and the progression; the dashed border marks
+						     a provisional record, the dotted one a close call, and the record's own page explains them -->
+						<a class="card" class:prov={!!p} class:near={!!nr} href={href(c.d.id, c.region, c.period)} title={p ? 'Provisional: not yet confirmed by the metered data' : nr ? 'Close to the record: too close for dispatch data to call' : undefined}>
+							<span class="c-name"><span class="dot" style="--c:var({c.d.tok})"></span>{fullName(c.d)} · {c.region}</span>
+							<span class="c-row">
+								<span>
+									{#if c.settled}
+										<span class="c-val gone">{parts(c.d, c.settled.pv).n}<small>{parts(c.d, c.settled.pv).u}</small></span>
+										<span class="c-sub">Not confirmed{full ? '' : ` · ${label}`}</span>
+									{:else}
+										<span class="c-val">{parts(c.d, shown.v, c.period).n}<small>{parts(c.d, shown.v, c.period).u}</small></span>
+										<span class="c-sub">{nr ? 'Close to the record · ' : ''}{full ? when(c.d, shown, false, c.period) : label}</span>
+									{/if}
 								</span>
-							</a>
+								{#if c.rec}<Spark steps={p ? [...c.rec.steps, [p.t, p.v]] : c.rec.steps} end={R.end} tok={c.d.tok} w={110} h={40} dashed={!!c.d.est} hollow={!!p} />{/if}
+							</span>
+						</a>
+					{/snippet}
+					{#if cardsAll}
+						{#if !cardGroups.length}<p class="none-here">Nothing new or provisional for {REGIONS.find((r) => r.id === region)?.name} just now.</p>{/if}
+						{#each cardGroups as g}
+							<h3 class="card-group">{g.label} <span>{g.cards.length}</span></h3>
+							<div class="cards">{#each g.cards as c}{@render card(c, true)}{/each}</div>
 						{/each}
-					</div>
-					{#if allCards.length > CARDS}<button type="button" class="more-btn" onclick={() => (cardsAll = !cardsAll)}>{cardsAll ? 'Show fewer' : `Show all ${allCards.length}`}</button>{/if}
+					{:else}
+						<div class="cards">{#each topCardList as c}{@render card(c, false)}{/each}</div>
+					{/if}
 				</section>
 			{/if}
 
@@ -414,6 +433,10 @@
 	@media (max-width: 420px) { .rec-tabs button { font-size: 0.86rem; padding-inline: 9px; } }
 	.sec h2, .panel h2 { font-size: 1rem; }
 	.sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+	.sec > .sec-head { align-items: center; }
+	.sec-head .more-btn { margin-top: 0; }
+	.sec-ctl { display: flex; align-items: center; gap: 8px; }
+	.none-here { margin: 4px 0 0; color: var(--muted); font-size: 0.86rem; }
 	.unit { color: var(--muted); font-size: 0.8rem; }
 	.note { color: var(--muted); font-size: 0.8rem; margin: 0; }
 	.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px; min-width: 0; display: grid; gap: 10px; align-content: start; }
@@ -454,6 +477,9 @@
 		.pt-txt small { font-size: 0.7rem; }
 		.pt-go { display: none; }
 	}
+	.card-group { margin: 14px 0 8px; font-size: 0.86rem; font-weight: 600; color: var(--ink-2); }
+	.card-group:first-of-type { margin-top: 2px; }
+	.card-group span { color: var(--muted); font-weight: 400; margin-left: 4px; }
 	.more-btn { justify-self: start; margin-top: 8px; font: inherit; font-size: 0.84rem; font-weight: 600; color: var(--accent); background: none; border: 1px solid var(--line); border-radius: 4px; padding: 6px 12px; min-height: 36px; cursor: pointer; }
 	.more-btn:hover { border-color: var(--accent); }
 	.card.prov { border-style: dashed; border-color: color-mix(in srgb, var(--warn-ink) 55%, var(--line)); }
