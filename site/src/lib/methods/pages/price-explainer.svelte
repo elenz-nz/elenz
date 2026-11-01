@@ -7,18 +7,27 @@
 </script>
 
 <h2 id="what">What it does</h2>
-<p>Under the price tiles on the <a href="/now">Now</a> page, one line says how the price compares with recent prices at this time, for example “$38/MWh is about what prices have been recently around this time on weekends”. Opened, it lists what is different from usual (wind, solar, hydro, gas and coal, peaking plants, demand, the HVDC link and the gap between the islands), each against its usual value, a 24-hour price chart against the usual range (which can be enlarged), and a possible price setter. It has three states:</p>
+<p>A button in the wholesale price tile on the <a href="/now">Now</a> page opens a card under the tiles. The card asks a question (“Why is the price up?”, “Why is the price high?”, “Why is the North (or South) Island dearer?”, “Why is the price so low?”, or just “Why this price?”), then says how the price compares with recent prices at this time, for example “$38/MWh is about what prices have been recently around this time on weekends”. Below that come two short paragraphs, how prices get like this and then what is going on now (“Currently, …”), and:</p>
+<ul>
+	<li>what is different from usual (wind, solar, hydro, gas and coal, peaking plants, demand, the HVDC link and the gap between the islands), each against its usual value;</li>
+	<li>a 24-hour price chart against the usual range, which can be enlarged;</li>
+	<li>plants running well below the past week;</li>
+	<li>a possible price setter.</li>
+</ul>
+<p>The button has three states:</p>
 <dl>
 	<dt>Quiet</dt>
-	<dd>Just the line and a “Why this price?” button.</dd>
+	<dd>It reads “Why this price?”, and the card opens only when asked.</dd>
 	<dt>Highlighted</dt>
-	<dd>The line is outlined and asks to be opened: prices are well up, the islands have split, or a new low has begun.</dd>
+	<dd>The button lights up and says why: “Prices up”, “Islands split”, or when prices fall away “New low”, “Low” or “Near zero”.</dd>
 	<dt>Open</dt>
-	<dd>The panel opens by itself, at extremes only. Low prices never open it.</dd>
+	<dd>At extremes only, the card opens by itself and the button reads “High price”. Low prices never open it. Folded by hand, it stays folded until the state changes.</dd>
 </dl>
 
 <h2 id="usual">What counts as usual</h2>
-<p>The history job keeps, for each of the week’s 336 half-hours (Monday 12:00 am = the first), the median and the 25th and 75th percentiles of the higher of the Haywards and Benmore prices, and the median of each factor, over the last 28 days of half-hourly history. For the price, each half-hour pools every half-hour on the same kind of day (weekday or weekend) within an hour of that time of day: 40 prices for a weekend half-hour, 100 for a weekday one. The same half-hour of the week alone gives only four prices, and two spill nights at a few cents among them made an ordinary $72 look six times usual (Saturday 11:30 pm, 17 October 2026: the four Saturdays were $0.02, $3.00, $20.76 and $66.55; pooled, the usual was $28). The panel doesn’t quote a multiple of usual for the same reason: it says prices are higher, or far above, what they have been recently around this time. It also keeps the median price over the past year, the <i>year median</i>, as a floor: when spilling hydro makes the usual price tiny, $20 against a usual $5 would otherwise count as four times usual.</p>
+<p>The history job keeps, for each of the week’s 336 half-hours (Monday 12:00 am = the first), the median and the 25th and 75th percentiles of the higher of the Haywards and Benmore prices, and the median of each factor, over the last 28 days of half-hourly history.</p>
+<p>For the price, each half-hour pools every half-hour on the same kind of day (weekday or weekend) within an hour of that time of day: 40 prices for a weekend half-hour, 100 for a weekday one. The same half-hour of the week alone gives only four prices, and two spill nights at a few cents among them made an ordinary $72 look six times usual (Saturday 11:30 pm, 17 October 2026: the four Saturdays were $0.02, $3.00, $20.76 and $66.55; pooled, the usual was $28).</p>
+<p>The panel doesn’t quote a multiple of usual for the same reason: it says prices are higher, or far above, what they have been recently around this time. It also keeps the median price over the past year, the <i>year median</i>, as a floor: when spilling hydro makes the usual price tiny, $20 against a usual $5 would otherwise count as four times usual.</p>
 <p class="formula">Typical = median of max(Haywards, Benmore) on the same kind of day (weekday or weekend), within an hour of this time of day, last four weeks</p>
 <p>Wind is the exception. It follows the weather, not the clock, so its usual value is its median over the whole four weeks, not at this half-hour. The panel then says how long it has been since wind was this low (or this high) before the current calm or windy spell, for example “Wind is lower than it has been for 5 days”, once that is at least {R.windDays} days; otherwise it says whether wind is above or below its four-week median. Wind now is its {R.avgMin}-minute average here.</p>
 
