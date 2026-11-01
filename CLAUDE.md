@@ -52,6 +52,34 @@ Until the site is announced every page shows a thin "Beta" line above the masthe
 `.beta-note` in `site/src/lib/tracker/tracker.css`). It has no end date: the owner decides when to announce. Then
 delete the markup, the styles (keeping `.mast-wrap` is harmless) and this section.
 
+## ⓘ notes: how to write them (owner's rules, 1 Nov 2026)
+
+Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike across the site (rewritten to it in PR #52):
+
+1. **One plain opening sentence** (`<p>`) saying what the chart or card shows, in layman's terms. Don't repeat the title
+   word for word (it sits right beside the note): "This shows…", "This lists…", "These are…".
+2. **Then 2–5 short bullets** (`<ul>`), one idea each, saying what you can see or do. Say what it can do, not what it
+   can't (no "not on All", "no comparison"): drop a bullet that doesn't apply rather than explain its absence.
+3. **Same order everywhere:** how to read it (lines, colours, units), then what you can do (buttons, hover, drag), then
+   where the numbers come from.
+4. **Start a bullet with the thing on screen**: "Dashed line:", "Shading:", a button's name in quotes ("Scale to this
+   view"), so readers can match it to what they see.
+5. **Fit the view.** Name the region, interval and choice shown ("New Zealand's", "the North Island", "each week",
+   "wind"), and show bullets only when they apply (`{#if}` on island views, daily and longer intervals, a metric).
+6. **End with a link to the method page section** (`<p><a href="/methods/…#…">How … is worked out</a></p>`); a second
+   link only when two methods matter. A new kind of chart gets a method section to link to.
+7. **Plain words and NZ English.** Explain a term the first time a note uses it (dispatch, node, capacity factor,
+   inverter-based); keep the same words everywhere (North Island, South Island, embedded solar, the live week, final
+   prices, metered). Give prices a feel: $100/MWh is 10c a kWh, before lines and retail charges.
+8. **Same chart, same note** (HVDC transfer reads the same on both tracker tabs).
+9. **Phone-sized:** about 70 words in any one view.
+10. **Estimates and provisional figures stated as plain facts** ("estimated", "provisional"), not apologies.
+11. **Lowercase for ordinary things** (wholesale price, generation), capitals only for names (Haywards, the EA, Huntly).
+12. **Works in light and dark mode:** no "paler" or "darker" for colour scales; "fainter colour" reads right in both.
+13. A data state (no offers yet, not built yet) belongs on the chart itself (a banner, shading, a legend key), not in
+    the ⓘ. The Generation chart's ⓘ ends with the grouping's own note (`NOTES` in tracker.js, one for every grouping,
+    the grouping's name in bold, not capitals).
+
 ## Layout
 
 - `site/`: SvelteKit 3 + Svelte 5, `adapter-static`, every page prerendered. Hosted on Cloudflare Workers as static
@@ -226,7 +254,7 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   ones, e.g. `fold=price,ren`, `fold=none` for all open; absent: the default, all), kept in `elenz-view`. "All charts shown" in
   Downloads leaves folded charts out; the CSV keeps every column.
   Chart notes are ⓘ buttons (`src/lib/site/InfoTip.svelte`, fixed-position popover) right after each card's title (owner's
-  rule, Oct 2026: a card is a title with its ⓘ beside it, holding a short description and a link to the method page;
+  rule, Oct 2026: a card is a title with its ⓘ beside it, written to the rules in "ⓘ notes" above;
   `.ttl-row` wraps a title and its ⓘ where the heading isn't a `.ch-head`). On the Generation tab each chart's unit (MW/GWh/TWh, %, $/MWh, g/kWh) is drawn in small type under its top axis label (`axisUnit` in tracker.js; the price overlay's under the right axis's), not beside the title (owner's call, 29 Oct 2026, tidier on phones); the full description is in the canvas's aria-label. The grouping menu is sized to the choice it shows (`fitSelect`), and under 560 px the generation chart's header is two rows (title, ⓘ and grouping; then MW/%, chart type, $ Price and the total: `.chart.gen .legends { display: contents }` with `order`); the ⓘ notes on this tab are short bullet points (owner's call, 29 Oct 2026). The Prices tab follows suit: the scale is a fitted dropdown (`fitSelect` action, `#lib/site/fitselect.js`, shared with tracker.js), `TimeChart`'s `unit` puts each chart's unit under its top label, the ⓘ notes are bullets, and under 560 px the price chart's header is two rows (title, ⓘ, scale; then Haywards/Benmore on long ranges) with its key (`priceKey`) moved under the chart on both tracker tabs, Now, Records and
   article figures (`Figure`'s source). Region and month pickers are boxed dropdowns (`select.pick`), the same everywhere; the page-level "About this data" is a labelled
   pill, and both summaries have a labelled "Controls" panel, one line per feature, linking to the full descriptions in "Using the tracker" on /about (`#controls`; owner's report GRP-06): keep both up to date.
