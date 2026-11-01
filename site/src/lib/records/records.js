@@ -336,7 +336,7 @@ function liveCheck(R, D) {
       const v = Math.round((best.v - shift) * f) / f, gap = min ? rec.v - v : v - rec.v;
       const better = (a, b) => (min ? a < b : a > b);
       if (gap > m && (!rec.prov || better(v, rec.prov.v))) (beats[d.id] ??= {})[r] = { t: best.t, v, m, src: 'live' };
-      else if (Math.abs(gap) <= m && !rec.prov) (near[d.id] ??= {})[r] = { t: best.t, v, m, src: 'live' };
+      else if (m > 0 && Math.abs(gap) <= m && !rec.prov) (near[d.id] ??= {})[r] = { t: best.t, v, m, src: 'live' };
     }
   }
   return { beats, near };

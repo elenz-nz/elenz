@@ -249,6 +249,7 @@ Rn = rc.build([s_off, rc.summarise(m_near)], R, lambda m: m_off, now_ms=2)
 dn = Rn['records']['demand_max']['NZ']
 check('prov' not in dn and dn.get('near') and dn['near']['m'] == mg, 'records: within the margin is close to the record, not provisional')
 check(all('prov' not in x and 'near' not in x for x in Rn['records']['price_max'].values()), 'records: dispatch prices never set a provisional record')
+check(rc._beyond('max', 100.0, 100.0, 0.0) is None and rc._beyond('max', 100.1, 100.0, 0.0) == 'prov', 'records: no margin, no close: a tie is not close')
 check(Rn['adj']['plants'] and Rn['adj']['hh']['wind_max']['NZ']['m'] > 0, 'records: corrections published for the site')
 m_new['meta']['source'] = 'metered'
 R3 = rc.build([s_off, rc.summarise(m_new)], R2, lambda m: m_new if m == '2026-11' else m_off, now_ms=3)

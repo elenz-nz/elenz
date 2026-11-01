@@ -40,3 +40,9 @@ test('plants dispatch reads off are scaled to their meters', () => {
   assert.equal(adjustLive(D, R.adj).NI.waste[0], 60);
   assert.equal(D.NI.waste[0], 40, 'the original is left alone');
 });
+
+test('a record with no margin is beaten or not: a tie is not close', () => {
+  const R0 = { ...R, adj: { plants: {}, hh: {}, period: {} } };
+  assert.deepEqual(liveNear(R0, live(900)), {});
+  assert.equal(liveBeats(R0, live(901)).wind_max.NI.v, 901);
+});

@@ -339,6 +339,8 @@ def _beyond(kind, cand, best, m):
     if cand is None or best is None:
         return None
     gap = cand - best if kind == 'max' else best - cand
+    if m <= 0:   # nothing to judge it by (prices, HVDC, modelled solar; a record that never moves): beaten or not
+        return 'prov' if gap > 0 else None
     return 'prov' if gap > m else 'near' if gap >= -m else None
 
 
