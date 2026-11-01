@@ -164,7 +164,7 @@ burned for generation, and generation emissions. 25 quarters, FY21 Q1 (Jul–Sep
 - Check: Rankines, Huntly 5 and 6 modelled from the dispatch data reproduce Genesis's reported generation emissions
   within ±5% in 20 of 23 quarters, −0.4% overall. FY22 Q3 emissions were revised in a later report from 404 to 611 kt.
 - Geothermal: each station's operational emissions by year (NZGA emissions working group, McLean et al.: CY2020,
-  CY2022 published as lifecycle less 10 g/kWh, CY2023), the latest carried forward; Tauhara 32, Te Huka 3 and TOPP2 0
+  CY2022 published as lifecycle less 10 g/kWh, CY2023), the latest carried forward; Tauhara 32 until 2 Nov 2026, now 80 from Contact via em6, Ngāwhā 0 from 2024 (Top Energy); Te Huka 3 and TOPP2 0
   (TIMES-NZ assumptions) until published. Generation-weighted over the dispatch data: 2021 70, 2022 69, 2023 60,
   2025 54 g/kWh (NZGA MW-weighted fleet including undispatched stations: 2020 69, 2023 57). Dispatched stations only:
   Ngāwhā B (OEC4) is the only dispatched Ngāwhā plant; TOPP1, GDL and Ngāwhā A are on local networks; 'Wairakei' is

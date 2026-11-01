@@ -72,7 +72,7 @@ export const TOPICS: Topic[] = [
 		title: 'Emissions intensity',
 		summary: 'Greenhouse gas per kilowatt-hour generated, from each fuel’s output and emission factor. Every factor the site uses is listed here, with where it comes from.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
-		updated: '2026-11-01',
+		updated: '2026-11-02',
 	},
 	{
 		slug: 'groupings',
@@ -349,6 +349,12 @@ export const REFERENCES: Reference[] = [
 		topics: ['emissions'],
 	},
 	{
+		id: 'topenergy', title: 'Sustainability Report 2025', by: 'Top Energy', date: '2025',
+		url: 'https://topenergy.co.nz/assets/Sustainability-Report-2025_Final_Online.pdf',
+		use: 'Ngāwhā: 2024 the first year all its geothermal emissions were avoided, with a Unique Emission Factor from the EPA.',
+		topics: ['emissions'],
+	},
+	{
 		id: 'nzga2025', title: 'New Zealand’s Geothermal Carbon Emissions: Mitigations and Emerging Opportunities', by: 'New Zealand Geothermal Association', date: 'July 2025',
 		url: 'https://www.nzgeothermal.org.nz/downloads/2025-07-29-co2-group.pdf',
 		use: 'Ngāwhā reinjecting all its gas, with an emission factor of zero since 2024.',
@@ -357,7 +363,7 @@ export const REFERENCES: Reference[] = [
 	{
 		id: 'times', title: 'TIMES-NZ documentation: emission factors', by: 'Energy Efficiency and Conservation Authority',
 		url: 'https://times-nz-dev.readthedocs.io/en/stable/model_methodology/electricity/emission_factors.html',
-		use: 'The assumed factors for Tauhara (32 g/kWh), Te Huka 3 and Kawerau’s TOPP2 (0).',
+		use: 'The assumed factors for Te Huka 3 and Kawerau’s TOPP2 (0), and Ngāwhā’s OEC4 falling to 0 in 2024.',
 		topics: ['emissions'],
 	},
 	{
@@ -387,7 +393,7 @@ export const REFERENCES: Reference[] = [
 	{
 		id: 'em6', title: 'em6: Carbon Methodology, version 1.6', by: 'Energy Market Services', date: 'November 2025',
 		url: 'https://www.ems.co.nz/documents/817/em6_carbon_intensity_1.6.pdf',
-		use: 'Battery discharge left out of carbon intensity and the renewable share; em6’s emission factor for each generator.',
+		use: 'Battery discharge left out of carbon intensity and the renewable share; em6’s emission factor for each generator, Tauhara’s among them.',
 		topics: ['emissions', 'groupings'],
 	},
 	// ---------- plants ----------
@@ -420,6 +426,12 @@ export const REFERENCES: Reference[] = [
 		url: 'https://www.ea.govt.nz/documents/7239/Part_1_-_Preliminary_provisions.pdf',
 		use: 'Defines a block dispatch group: generating stations on one continuous water course under an agreement with the system operator. No public list names the groups; the Waikato chain’s shows in the data, where its stations’ dispatch follows their meters poorly but the chain’s total agrees.',
 		topics: ['generation', 'history'],
+	},
+	{
+		id: 'dispatch', title: 'Dispatch Policy and Guideline', by: 'Transpower, system operator', date: 'July 2019',
+		url: 'https://www.transpower.co.nz/media/15187',
+		use: 'Offered assets are “blocks” in the market system, which may be block dispatch groups or station dispatch groups (section 2.3).',
+		topics: ['generation'],
 	},
 	{
 		id: 'wikipedia', title: 'List of power stations in New Zealand', by: 'Wikipedia',

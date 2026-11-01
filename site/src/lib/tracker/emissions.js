@@ -105,8 +105,13 @@ export const GEO_YEARS = {
   ngawha_oec4:   [ 313,  313,   95],   // commissioned 2021; until 2023 the field's pre-reinjection figure (2020, OEC1–3)
 };
 export const GEO_YEAR_COLS = [2020, 2022, 2023];
-// stations without published figures yet: estimates (TIMES-NZ assumptions), until the NZGA publishes them
-export const GEO_ASSUMED = { tauhara: 32, te_huka_3: 0, topp2: 0,
+// A station's own figure, used from the year given in place of the table above, until the NZGA's tables cover it (owner's
+// call, 2 Nov 2026: a generator's figure beats an assumption). Tauhara: from Contact, as listed in em6's Carbon Methodology
+// v1.6 (TAB2201 TAB0, 0.080 t/MWh). Ngāwhā: Top Energy's Sustainability Report 2025: 2024 was the first year all its
+// geothermal emissions were avoided, with a Unique Emission Factor from the EPA; em6 has 0 from the generator too.
+export const GEO_REPORTED = { tauhara: { from: 0, g: 80 }, ngawha_oec4: { from: 2024, g: 0 } };
+// stations without published figures yet: estimates (TIMES-NZ assumptions, and em6's), until the NZGA publishes them
+export const GEO_ASSUMED = { te_huka_3: 0, topp2: 0,
   // Kawerau pulp mill cogeneration (KAW0112 ONU0): bioenergy since BUILD 5 (Oct 2026); kept at zero in case a file
   // built before then still lists it as geothermal
   kawerau_mill: 0 };
@@ -132,8 +137,9 @@ export function geoEf(name, t) {
   const key = name + '|' + year;
   let ef = geoCache.get(key);
   if (ef === undefined) {
-    const st = GEO_PLANT[name], row = st && GEO_YEARS[st];
-    if (row) {
+    const st = GEO_PLANT[name], row = st && GEO_YEARS[st], own = st && GEO_REPORTED[st];
+    if (own && year >= own.from) ef = own.g / 1000;
+    else if (row) {
       let i = 0;
       while (i + 1 < GEO_YEAR_COLS.length && year >= GEO_YEAR_COLS[i + 1]) i++;
       ef = row[i] / 1000;
