@@ -178,6 +178,13 @@ burned for generation, and generation emissions. 25 quarters, FY21 Q1 (Jul–Sep
   furnace in Aug 2026) as zero-emission waste heat (UN CDM ACM0004 counts waste-gas generation as zero; the
   ironmaking emissions sit in industrial processes). Both are 'gas' in the EA register.
 
+Against em6's factors (Carbon Methodology v1.6, Nov 2025, checked 2 Nov 2026): close on the Rankines (1.01 coal, 0.589 gas), Huntly 5 (0.40), the
+Taranaki Combined Cycle (0.40) and most geothermal; apart on Tauhara (0.080 from the generator, 0.032 here), Kinleith (0.364 from the generator, 0 here;
+the 2020 stack report has it on black liquor, wood waste and some natural gas), the Kawerau mill (0.060 as geothermal, 0 here), Ngāwhā OEC4 (0, 0.095
+carried forward here), Whareroa and Kapuni (0.683, the 0.46 fleet average here), Junction Road (0.548, ~0.51 here), diesel (0.76, 0.80 here).
+MBIE doesn't document that its coal generation includes Glenbrook (Energy in New Zealand 2025 lists 0.68 PJ of waste heat separately and puts the mill's
+coal under other transformation); the case for it is that subtracting Glenbrook reproduces Genesis's figures.
+
 ## Metered history (`metered_check.py`, BUILD 6, 16 Oct 2026)
 
 History back to Aug 1997 comes from the EA's metering (`ingest/metered.py`, `facilities/metered_plants.csv`); the daily

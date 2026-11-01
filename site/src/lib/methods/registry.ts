@@ -337,8 +337,21 @@ export const REFERENCES: Reference[] = [
 	{
 		id: 'mclean2024', title: 'Reducing greenhouse gas emissions from NZ geothermal power stations',
 		by: 'McLean, Richardson, Hanik, Siega and Gibson, New Zealand Geothermal Workshop', date: '2024',
-		url: 'https://www.worldgeothermal.org/pdf/IGAstandard/NZGW/2024//044.pdf',
-		use: 'Each geothermal station’s operational emissions for 2023.',
+		url: 'https://www.worldgeothermal.org/pdf/IGAstandard/NZGW/2024/044.pdf',
+		use: 'Each geothermal station’s operational emissions for 2023 (table 2), and how reinjection is changing them.',
+		topics: ['emissions'],
+	},
+	{
+		id: 'mclean2021', title: 'Geothermal Greenhouse Gas Emissions in New Zealand in 2020: Lifecycle and Operational Emissions',
+		by: 'McLean and Richardson, New Zealand Geothermal Workshop', date: '2021',
+		url: 'https://worldgeothermal.org/pdf/IGAstandard/NZGW/2021/111.pdf',
+		use: 'Each geothermal station’s operational emissions for 2020 (table 3).',
+		topics: ['emissions'],
+	},
+	{
+		id: 'nzga2025', title: 'New Zealand’s Geothermal Carbon Emissions: Mitigations and Emerging Opportunities', by: 'New Zealand Geothermal Association', date: 'July 2025',
+		url: 'https://www.nzgeothermal.org.nz/downloads/2025-07-29-co2-group.pdf',
+		use: 'Ngāwhā reinjecting all its gas, with an emission factor of zero since 2024.',
 		topics: ['emissions'],
 	},
 	{
@@ -350,8 +363,8 @@ export const REFERENCES: Reference[] = [
 	{
 		id: 'stack2020', title: '2020 Thermal Generation Stack Update Report', by: 'WSP for MBIE', date: 'October 2020',
 		url: 'https://www.mbie.govt.nz/assets/2020-thermal-generation-stack-update-report.pdf',
-		use: 'Heat rates for Huntly 5 and 6, Stratford’s peakers and Whirinaki (table 3-3).',
-		topics: ['emissions'],
+		use: 'Heat rates for Huntly 5 and 6, Stratford’s peakers and Whirinaki (table 3-3); Kinleith’s fuels (section 3.1.3).',
+		topics: ['emissions', 'generation'],
 	},
 	{
 		id: 'stack2011', title: '2011 NZ Generation Data Update', by: 'Parsons Brinckerhoff for the Ministry of Economic Development', date: 'January 2012',
@@ -372,9 +385,9 @@ export const REFERENCES: Reference[] = [
 		topics: ['emissions'],
 	},
 	{
-		id: 'em6', title: 'New Transpower tool unlocks electricity emissions tracking for all', by: 'Transpower', date: 'November 2021',
-		url: 'https://transpower.co.nz/news/new-transpower-tool-unlocks-electricity-emissions-tracking-all',
-		use: 'What em6’s emissions tracker is and how it works.',
+		id: 'em6', title: 'em6: Carbon Methodology, version 1.6', by: 'Energy Market Services', date: 'November 2025',
+		url: 'https://www.ems.co.nz/documents/817/em6_carbon_intensity_1.6.pdf',
+		use: 'Battery discharge left out of carbon intensity and the renewable share; em6’s emission factor for each generator.',
 		topics: ['emissions', 'groupings'],
 	},
 	// ---------- plants ----------
@@ -403,6 +416,12 @@ export const REFERENCES: Reference[] = [
 		topics: ['groupings'],
 	},
 	{
+		id: 'block', title: 'Electricity Industry Participation Code 2010, Part 1', by: 'Electricity Authority', date: '15 May 2025',
+		url: 'https://www.ea.govt.nz/documents/7239/Part_1_-_Preliminary_provisions.pdf',
+		use: 'Defines a block dispatch group: generating stations on one continuous water course under an agreement with the system operator. No public list names the groups; the Waikato chain’s shows in the data, where its stations’ dispatch follows their meters poorly but the chain’s total agrees.',
+		topics: ['generation', 'history'],
+	},
+	{
 		id: 'wikipedia', title: 'List of power stations in New Zealand', by: 'Wikipedia',
 		url: 'https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand',
 		use: 'Many of the capacity table’s dates and sizes, with each station’s own article. Every row of the table names its source.',
@@ -422,6 +441,18 @@ export const REFERENCES: Reference[] = [
 		topics: ['capacity'],
 	},
 	// ---------- solar ----------
+	{
+		id: 'dg-capacity', title: 'Batteries in Installed distributed generation trends', by: 'EMI forum, Electricity Authority',
+		url: 'https://forum.emi.ea.govt.nz/thread/batteries-in-installed-distributed-generation-trends/',
+		use: 'The registry’s capacity field is meant to hold the lesser of summed generation capacity and the inverter or injection limit.',
+		topics: ['embedded-solar'],
+	},
+	{
+		id: 'eeca-dcac', title: 'Solar PV and Battery Capacities and Costs', by: 'Miller, for the Energy Efficiency and Conservation Authority', date: 'January 2025',
+		url: 'https://www.eeca.govt.nz/assets/EECA-Resources/Research-papers-guides/Appendix-Five-Solar-PV-capacities-and-costs.pdf',
+		use: 'DC:AC ratios of 1.0 and 1.2 for New Zealand homes.',
+		topics: ['embedded-solar'],
+	},
 	{
 		id: 'niwa', title: 'Mean daily global radiation across selected New Zealand locations', by: 'NIWA climate averages 1991–2020, on Figure.NZ',
 		url: 'https://figure.nz/chart/72IvcxUqOYF0xjMa',

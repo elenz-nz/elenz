@@ -73,7 +73,7 @@
 		<tbody>
 			<tr><td>Coal/gas, Rankine (Huntly 1, 2, 4)</td><td class="n">{f2(rankineFactor(0))}–{f2(rankineFactor(1))}</td><td>By quarter, from the share of their fuel that was coal (<a href="#rankine">below</a>)</td></tr>
 			<tr><td>Gas</td><td class="n">{f2(GAS_FLEET)}</td><td>Today’s fleet average; closed plants their own (<a href="#gas">below</a>)</td></tr>
-			<tr><td>Diesel (Whirinaki)</td><td class="n">{f2(diesel)}</td><td>Assumed, a typical factor for diesel turbines: Whirinaki’s heat rate is about 10.9 GJ/MWh (<a href={ref('stack2020')}>2020 stack report</a>). It runs rarely</td></tr>
+			<tr><td>Diesel (Whirinaki)</td><td class="n">{f2(diesel)}</td><td>Assumed, a typical factor for diesel turbines: Whirinaki’s heat rate is about 10.9 GJ/MWh (<a href={ref('stack2020')}>2020 stack report</a>), and <a href={ref('em6')}>em6</a> uses 0.76. It runs rarely</td></tr>
 			<tr><td>Geothermal</td><td class="n">{geoRange}</td><td>Each station by year (<a href="#geothermal">below</a>)</td></tr>
 			<tr><td>Bioenergy (Kinleith, Kawerau mill)</td><td class="n">0</td><td>Wood waste and black liquor: biogenic CO₂, counted as zero, as in national inventories (<a href={ref('ipcc')}>IPCC guidelines</a>; the <a href={sourceHref('mfe')}>Ministry for the Environment</a> reports it separately)</td></tr>
 			<tr><td>Waste heat (Glenbrook)</td><td class="n">0</td><td><a href={ref('nzsteel')}>NZ Steel’s ironmaking gases</a>; the emissions are counted with the ironmaking (industrial processes). UN CDM methodology <a href={ref('acm0004')}>ACM0004</a> (since replaced by ACM0012) also counted waste-gas generation as zero</td></tr>
@@ -97,7 +97,7 @@
 	<dt>From {firstGenesis} (Jul 2020)</dt>
 	<dd><a href={sourceHref('genesis')}>Genesis’s quarterly performance reports</a>. Each new quarter is added as Genesis reports it, about three weeks after the quarter ends; until then the latest ({latest[0]}, {Math.round(latest[1] * 100)}% coal) is carried forward.</dd>
 	<dt>Before that</dt>
-	<dd><a href={sourceHref('mbie')}>MBIE’s quarterly electricity generation</a> from coal, less Glenbrook’s metered output (MBIE counts Glenbrook as coal), divided by the Rankines’ metered output. Over FY21–FY25, where both exist, this reproduces Genesis’s own figures to within a few points in most quarters. A quarter with under 100 GWh of Rankine output keeps the quarter before’s share.</dd>
+	<dd><a href={sourceHref('mbie')}>MBIE’s quarterly electricity generation</a> from coal, less Glenbrook’s metered output, divided by the Rankines’ metered output. MBIE doesn’t say its coal figure includes Glenbrook, but taking Glenbrook off is what reproduces Genesis’s figures. Over FY21–FY25, where both exist, this reproduces Genesis’s own figures to within a few points in most quarters. A quarter with under 100 GWh of Rankine output keeps the quarter before’s share.</dd>
 </dl>
 <div class="tbl">
 	<table class="grid">
@@ -120,7 +120,7 @@
 <p>All gas plant uses <b>{f2(GAS_FLEET)} t/MWh</b>, the generation-weighted average of today’s fleet over the dispatch history (by quarter 0.44–0.52, depending on how much Huntly 5 ran):</p>
 <ul>
 	<li>Huntly 5 (combined cycle): 7.6 GJ/MWh, from Genesis’s gas burned less the Rankines’ gas, so 0.41 t/MWh.</li>
-	<li>Assumed heat rates for the rest: Huntly 6 and McKee 10.5 GJ/MWh; Stratford’s peakers 9.0; Junction Road and cogeneration 9.5 (0.49–0.57 t/MWh). The <a href={ref('stack2020')}>2020 thermal generation stack update</a> has Huntly 5 at 7.4, Huntly 6 at 10.5 and Stratford’s peakers at 8.9; it gives no figure for McKee or Junction Road.</li>
+	<li>Assumed heat rates for the rest: Huntly 6 and McKee 10.5 GJ/MWh; Stratford’s peakers 9.0; Junction Road and cogeneration 9.5 (0.49–0.57 t/MWh). The <a href={ref('stack2020')}>2020 thermal generation stack update</a> has Huntly 5 at 7.4, Huntly 6 at 10.5 and Stratford’s peakers at 8.9; it gives no figure for McKee or Junction Road, where <a href={ref('em6')}>em6’s</a> factors, from the generators, are 0.569 and 0.548 t/MWh.</li>
 </ul>
 <p>Plants that have closed appear in the metered history, and were much more or less efficient than today’s fleet, so they get their own factor from typical heat rates at {GAS} kg/GJ (estimates, not reported figures). The <a href={ref('stack2011')}>2011 generation data update</a> has Ōtāhuhu B and the Taranaki Combined Cycle at 7.4 GJ/MWh, and Southdown’s combined cycle at 7.4 and its E105 turbine at 10.6.</p>
 <div class="tbl">
@@ -136,7 +136,7 @@
 </div>
 
 <h2 id="geothermal">Geothermal</h2>
-<p>Geothermal fluid carries CO₂ and some methane from underground, and how much varies widely between fields; stations increasingly reinject it. Each station’s own operational emissions come from the <a href={sourceHref('nzga')}>NZ Geothermal Association’s emissions working group</a> (<a href={ref('mclean2024')}>McLean et al. 2024</a>), for 2020, 2022 (published as lifecycle, less its 10 g/kWh allowance for the plant itself) and 2023. Each year uses the newest figure published for that year or before it; years before 2020 use 2020’s, which probably understates them, as reinjection was less common.</p>
+<p>Geothermal fluid carries CO₂ and some methane from underground, and how much varies widely between fields; stations increasingly reinject it. Each station’s own operational emissions come from the <a href={sourceHref('nzga')}>NZ Geothermal Association’s emissions working group</a> for <a href={ref('mclean2021')}>2020</a>, 2022 (published as lifecycle, less its 10 g/kWh allowance for the plant itself) and <a href={ref('mclean2024')}>2023</a>. Each year uses the newest figure published for that year or before it; years before 2020 use 2020’s, which probably understates them, as reinjection was less common.</p>
 <div class="tbl">
 	<table>
 		<thead><tr><th>Station</th>{#each GEO_YEAR_COLS as y (y)}<th class="n">{y}</th>{/each}</tr></thead>
@@ -155,12 +155,16 @@
 
 <h2 id="checks">Checks against national figures</h2>
 <p>Coal, gas and diesel emissions in the history follow the <a href={sourceHref('inventory')}>national inventory’s</a> “energy industries” series year to year, after taking out its roughly 1.2 Mt of refining and gas processing: 4.4 Mt against 4.4 in 1998, 6.8 against 6.8 in 2001, 8.8 against 9.1 in 2005, 8.2 against 8.5 in 2008, 5.3 against 5.7 in 2010. The pattern matches too: the 2001 and 2005–06 peaks, the 2007 dip and the 2011 low.</p>
+<p><a href={ref('em6')}>em6’s</a> factors are close where they cover the same plant: the Rankines 1.01 t/MWh on coal and 0.589 on gas (here {f2(rankineFactor(1))} and {f2(rankineFactor(0))}), Huntly 5 0.40 (here 0.41) and the Taranaki Combined Cycle 0.40.</p>
 
 <h2 id="limits">Known limits</h2>
 <ul>
 	<li>The Rankines’ coal share is for the three units together and for a whole quarter: within a quarter, a coal-heavy week and a gas-heavy week get the same factor.</li>
 	<li>Gas plants other than the closed ones share one average factor, so a peaker running alone reads cleaner than it is, and Huntly 5 dirtier.</li>
 	<li>Geothermal before 2020 likely reads low.</li>
+	<li>Geothermal since 2023 carries 2023’s figures forward until newer ones are published, so stations reinjecting more now read high: <a href={ref('nzga2025')}>Ngāwhā has reinjected all its gas since 2024</a>, and <a href={ref('mclean2024')}>Te Huka’s system</a> was offline for about half of 2023.</li>
+	<li>Tauhara’s assumed 32 g/kWh is TIMES-NZ’s; <a href={ref('em6')}>em6</a> uses 80, from the generator.</li>
+	<li>Kinleith counts as zero, though natural gas is its <a href={ref('stack2020')}>secondary fuel</a>; <a href={ref('em6')}>em6</a> uses 0.364 t/MWh, from the generator, and 0.06 for the Kawerau mill, which it treats as geothermal.</li>
 	<li>Industrial cogeneration that isn’t dispatched isn’t included.</li>
 </ul>
 
