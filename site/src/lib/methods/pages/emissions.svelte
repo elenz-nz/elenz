@@ -178,7 +178,7 @@
 	<li>Geothermal before 2020 likely reads low.</li>
 	<li>Geothermal stations other than Contact’s and Ngāwhā carry 2023’s figures forward until newer ones are published.</li>
 	<li>Kinleith counts as zero, as bioenergy, which leaves out the gas it burns. Oji calls its generation <a href={ref('oji-ea')}>biomass cogeneration</a>, but natural gas is <a href={ref('stack2020')}>cofired in the power boiler</a> to manage steam demand, and fossil fuels were 2.1 of the 12.2 PJ of fuel the mill burned in <a href={ref('ojifs2025')}>2025</a>. Nobody publishes how much of that is behind its electricity. <a href={ref('em6')}>em6</a> uses 0.364 t/MWh, from the generator, with no year or basis given; at that rate Kinleith would have added about 2 g/kWh to New Zealand’s intensity in 2024.</li>
-	<li>The Kawerau mill also counts as zero; <a href={ref('em6')}>em6</a> uses 0.06 t/MWh and treats it as geothermal.</li>
+	<li>The Kawerau mill also counts as zero, but <a href="/methods/generation#mapping">what its meter covers isn’t confirmed</a>; <a href={ref('em6')}>em6</a> uses 0.06 t/MWh and treats it as geothermal.</li>
 	<li>Industrial cogeneration that isn’t dispatched isn’t included.</li>
 </ul>
 

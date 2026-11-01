@@ -577,7 +577,7 @@ programmatically is likely to change, with plenty of warning. Everything that re
 `EMI_KEY`), `common.py` `BLOB` (the emidatasets blob container: dispatch, final prices, metered files, offers, the
 register) and `rooftop.py` (`GUEHMT` report). Watch for the EA's notice and plan the switch as one change.
 
-Open questions: farm mounting is settled for most farms by the clear days of 18-19 Oct 2026 (analysis/README.md); Lauriston,
+Open questions: what KAW0112 ONU0 covers (asked of the EA, Nov 2026; shown as bioenergy, the register says geothermal; no fuel change until it's answered; analysis/README.md); farm mounting is settled for most farms by the clear days of 18-19 Oct 2026 (analysis/README.md); Lauriston,
 Pukenui and Omeheu stay uncertain; Kōwhai Park is single-axis tracking (east to west, from photos; owner, 22 Oct 2026),
 not fitted (it tripped and has been off since 20 Oct). Battery discharge is left out of the renewable share and
 emissions intensity (as em6, owner's call 22 Oct 2026): tracker.js `genR`, now.js, generation/data.js `shares`,

@@ -357,8 +357,8 @@ export const REFERENCES: Reference[] = [
 	{
 		id: 'ojifs2025', title: 'Sustainability Report 2025', by: 'Oji Fibre Solutions', date: '2026',
 		url: 'https://cdn.sanity.io/files/gz4vq3tx/production/b0136366ad00459a2e07e8a88f74fa366f5bf146.pdf',
-		use: 'Kinleith’s fuels in 2025: 10.1 PJ of biomass and 2.1 PJ of fossil fuels. Biomass CO₂ reported separately, as the GHG Protocol sets out.',
-		topics: ['emissions'],
+		use: 'Kinleith’s fuels in 2025: 10.1 PJ of biomass and 2.1 PJ of fossil fuels. Electricity generated at each mill. Biomass CO₂ reported separately, as the GHG Protocol sets out.',
+		topics: ['emissions', 'generation'],
 	},
 	{
 		id: 'oji-ea', title: 'Submission on strengthening price discovery in the forward electricity markets', by: 'Oji Fibre Solutions, to the Electricity Authority', date: 'December 2024',
@@ -424,7 +424,7 @@ export const REFERENCES: Reference[] = [
 	{
 		id: 'tasman', title: 'Carbon reduction case study: Tasman Mill', by: 'Oji Fibre Solutions, Climate Leaders Coalition', date: '2022',
 		url: 'https://climateleaderscoalition.org.nz/wp-content/uploads/2022/06/OjiFS-carbon-reduction-case-study_Tasman-Mill.pdf',
-		use: 'The Kawerau mill’s boilers: black liquor in the recovery boiler, wood residues in the power boiler, and geothermal steam.',
+		use: 'The Tasman mill’s 2019 changes: black liquor burned in the recovery boiler, a power boiler closed, and more geothermal steam.',
 		topics: ['generation'],
 	},
 	{

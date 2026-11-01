@@ -10,8 +10,8 @@
 "ISL0661 KPS0" = { fuel = "solar", plant = "Kōwhai Park Solar Farm" }
 "BRB0331 RUS0" = { fuel = "solar", plant = "Ruakākā Solar Farm" }
 # Fuel corrections (Oct 2026). Kinleith is Oji Fibre Solutions' wood-waste cogeneration, not gas (the register says
-# Gas). KAW0112 ONU0 is the Kawerau pulp mill's cogeneration (recovery and bark boilers: black liquor and wood, some
-# geothermal steam), not a geothermal station (the register says Geothermal). Glenbrook runs on waste gas and heat
+# Gas). KAW0112 ONU0 is shown as bioenergy for now, but what this meter
+# covers isn't confirmed (register: geothermal, 53 MW; the site has biomass and geothermal generation; see analysis/README.md). Glenbrook runs on waste gas and heat
 # from NZ Steel's ironmaking, not pipeline gas: "waste" (waste heat), zero emissions by convention (UN CDM
 # ACM0004; the ironmaking emissions are counted in industrial processes), not renewable.
 "KIN0112 KIN0" = { fuel = "bio", plant = "Kinleith" }

@@ -37,7 +37,7 @@
 		<tbody>
 			<tr><td>Added</td><td>Kaiwaikawe wind (<code>MPE1101 KWK0</code>), Kōwhai Park solar (<code>ISL0661 KPS0</code>), Ruakākā solar (<code>BRB0331 RUS0</code>)</td><td>Dispatching, but not in the register yet</td></tr>
 			<tr><td>Bioenergy</td><td>Kinleith (<code>KIN0112</code>)</td><td>Oji Fibre Solutions’ cogeneration, on <a href={ref('kinleith')}>wood waste</a> and black liquor, with <a href={ref('stack2020')}>natural gas as a secondary fuel</a>; the register says gas</td></tr>
-			<tr><td>Bioenergy</td><td>Kawerau pulp mill cogeneration (<code>KAW0112 ONU0</code>)</td><td>Most likely steam from the mill’s <a href={ref('tasman')}>recovery and power boilers</a> (black liquor and wood residues), with some geothermal; the register says geothermal</td></tr>
+			<tr><td>Bioenergy</td><td>Kawerau mill site (<code>KAW0112 ONU0</code>)</td><td>The register says geothermal. The site has <a href={ref('tasman')}>biomass</a> and geothermal generation, and what this meter covers isn’t confirmed, so it is shown as bioenergy for now. Oji reports 96 GWh generated at its Tasman mill in <a href={ref('ojifs2025')}>2025</a>, against about 240 GWh here</td></tr>
 			<tr><td>Waste heat</td><td>Glenbrook (<code>GLN0332</code>)</td><td>Runs on <a href={ref('nzsteel')}>waste gas and heat from NZ Steel’s ironmaking</a>, not pipeline gas</td></tr>
 			<tr><td>Island</td><td><code>OHG1101</code>, <code>OHG2201</code></td><td>Pātea moved to OHG1101 in June 2026, and the feed gives it no island</td></tr>
 			<tr><td>Battery charging</td><td><code>RUK99</code>, <code>GLB99</code>, <code>RHO99</code>, <code>HLY91</code></td><td>Charging is dispatched as load on a separate unit; it is netted against its battery (Ruakākā, Glenbrook-Ohurua, Rotohiko, Huntly)</td></tr>

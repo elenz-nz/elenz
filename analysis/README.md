@@ -172,7 +172,7 @@ burned for generation, and generation emissions. 25 quarters, FY21 Q1 (Jul–Sep
 - Kawerau pulp mill cogeneration (KAW0112 ONU0, 'Carter Holt Harvey Energy Ltd CoGen' / 'Norske Skog CoGen', 53 MW,
   Oji): listed as geothermal, but runs ~35–45 MW steady, far more than the 10 MW geothermal mill turbine in the ISK
   Kawerau field study, and geothermal once supplied only ~6% of the mill's electricity (OSTI). Most likely the kraft
-  mill's recovery and bark boilers (black liquor and wood), so counted as zero (bioenergy) for now.
+  mill's recovery and bark boilers (black liquor and wood), so counted as zero (bioenergy) for now. Not confirmed (2 Nov 2026): the mill's cogeneration was about 13.5 MW in 2012 (ISK study), a power boiler closed in 2019 (Oji), and Oji reports 96 GWh at Tasman in 2025 against about 240 GWh here. The site also has the 8 MW TA3a geothermal turbine (NZGA, Bloomer 2015; the ISK study says 10 MW) and GDL/KA24 (57 GWh in 2023) connected to the mill complex. What ONU0 covers is an open question to the EA; no fuel change until it's answered.
 - To reclassify at the next history rebuild: Kinleith (wood-waste cogeneration; turbine failed 2025) and the Kawerau
   mill as Bioenergy; Glenbrook (NZ Steel, waste gas from the ironmaking kilns; two of four kilns replaced by the arc
   furnace in Aug 2026) as zero-emission waste heat (UN CDM ACM0004 counts waste-gas generation as zero; the
