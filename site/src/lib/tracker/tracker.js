@@ -82,11 +82,15 @@ export function mountTracker(D, hooks = {}) {
   // what each grouping shows, in a note under the generation chart
   // one line under the generation chart for the groupings that need it; the full definitions are on /methods/groupings
   const NOTES = {
+    // every grouping has one (owner's call, 1 Nov 2026)
+    detailed: "Each fuel on its own: geothermal, bioenergy, waste heat, coal/gas (Huntly's Rankine units), gas, diesel, hydro, wind, grid solar, embedded solar and batteries.",
+    site: 'Every plant as its own layer, largest first; batteries by site and embedded solar by island.',
+    scheme: 'Hydro only, by river scheme (Waikato, Waitaki, Clutha, Manapōuri and the rest), the largest at the base.',
     simple: 'Five groups: geothermal, thermal, hydro, wind, and solar (grid-scale and embedded together).',
     flex: 'Grouped by how readily each fuel can follow demand: inflexible, slow, fast and variable.',
     rf: 'Renewables against fossil fuels. Geothermal counts as renewable, although it emits some CO₂.',
-    vre: 'Wind and solar, connected through inverters, against spinning hydro, geothermal and thermal plant.',
-    owner: "Today's owners, applied to the whole history.",
+    vre: 'Wind, solar and batteries, connected through inverters, against spinning hydro, geothermal and thermal plant.',
+    owner: "Today's owners, applied to the whole history. Batteries count with their owner, with charging as one layer below zero.",
   };
   const groupById = id => (VIEWS[state.view].groups || []).find(g => g.id === id) || setById(id);
 
@@ -1049,10 +1053,10 @@ export function mountTracker(D, hooks = {}) {
     const note = $('gen-note'), txt = NOTES[state.view] || '';
     note.hidden = !txt;
     note.textContent = '';
-    // the grouping's name first, in bold capitals (owner's call, 1 Nov 2026): "SIMPLIFIED – Five groups: ..."
+    // the grouping's name first, in bold (owner's call, 1 Nov 2026): "Simplified – Five groups: ..."
     if (txt) {
       const b = document.createElement('b');
-      b.textContent = ($('sel-view').querySelector(`option[value="${state.view}"]`)?.textContent || state.view).toUpperCase();
+      b.textContent = $('sel-view').querySelector(`option[value="${state.view}"]`)?.textContent || state.view;
       note.append(b, ` – ${txt} `);
     }
     if (txt) { const a = document.createElement('a'); a.href = '/methods/groupings#groupings'; a.textContent = 'How the groups are made'; note.append(a); }
