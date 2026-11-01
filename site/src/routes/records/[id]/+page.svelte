@@ -135,18 +135,21 @@
 	// a new record, region or period starts both charts afresh
 	$effect(() => { void d.id; void region; void per; growZoom = null; growPin = null; dayZoom = null; });
 
-	// the progression's ⓘ: how many times it has been broken, what the faint line is
+	// the progression's ⓘ: a sentence, then short points that fit the record (owner's rules for notes, 1 Nov 2026)
 	const growNote = $derived.by(() => {
-		if (!rec) return '';
+		if (!rec) return null;
 		const tr = trimZeros(rec.steps) !== rec.steps, n = rec.steps.length - 1 - (tr ? rec.steps.findIndex((s: [number, number]) => s[1] !== 0) : 0);
 		const since = tr ? `the first above zero in ${yearOf(trimZeros(rec.steps)[0][0])}` : monthOf(R.first);
-		const unit = per === 'year' ? 'year' : 'month', hi = d.id.endsWith('_min') ? 'lowest' : 'highest';
+		const unit = per === 'year' ? 'year' : 'month', low = d.id.endsWith('_min'), hi = low ? 'lowest' : 'highest';
 		const what = per === 'year' || per === 'month' ? `each ${per}’s figure` : `the ${hi} ${per === 'tp' ? 'half-hour' : per} in each month`;
-		return `${n === 0 ? (tr ? `First above zero in ${yearOf(trimZeros(rec.steps)[0][0])}` : 'Not broken since the data began') : `Broken ${n} ${n === 1 ? 'time' : 'times'} since ${since}`}.`
-			+ (bg ? ` The faint line is ${what}; the ${unit} still running sits in a hatched band, its line dotted, because it isn’t finished; hovering there gives its figure so far and how long is left.` : '')
-			+ (udem ? ` The dashed line is the same with embedded solar added back: what ${region === 'NZ' ? 'the country' : 'the island'} used, met partly by rooftops and small arrays behind the meter. It is there for information only, not a record, because embedded solar is modelled (from August 2013; zero before).` : '')
-			+ (prov ? ' Dashed step: provisional, from dispatch data.' : '')
-			+ ' Hover or tap for the record at any date; click to pin it. Drag across the chart to zoom in; Reset zoom or Escape goes back.';
+		const items = [
+			`${n === 0 ? (tr ? `First above zero in ${yearOf(trimZeros(rec.steps)[0][0])}` : 'Not broken since the data began') : `Broken ${n} ${n === 1 ? 'time' : 'times'} since ${since}`}.`,
+			...(bg ? [`Faint line: ${what}. The ${unit} still running sits in a hatched band with a dotted line; hover there for its figure so far and how long is left.`] : []),
+			...(udem ? [`Dashed line: the same with estimated embedded solar added back, showing what ${region === 'NZ' ? 'the country' : 'the island'} used including rooftops and small arrays. It’s for information, not a record (from August 2013; zero before).`] : []),
+			...(prov ? ['Dashed step: provisional, from dispatch data.'] : []),
+			'Hover or tap for the record at any date; click to pin it. Drag to zoom; “Reset zoom” or Escape goes back.',
+		];
+		return { lead: `This shows how the record has ${low ? 'fallen' : 'climbed'} over time; each step is a new record.`, items };
 	});
 
 	// one more figure from the record's half-hour, the one that says most about it
@@ -322,7 +325,7 @@
 			{/if}
 
 			<section class="panel" aria-labelledby="grow-h">
-				<div class="p-head"><div class="ttl-row"><h2 id="grow-h">How the record grew</h2><InfoTip label="About this chart">{growNote} <a href="/methods/records">How records work</a></InfoTip></div><div class="ctls">{#if growZoom || growPin !== null}<ChartControls zoomed={!!growZoom} pinned={growPin !== null} text={growZoom ? `${monYr(growZoom[0])} – ${monYr(growZoom[1])}` : ''} onreset={() => (growZoom = null)} onrelease={() => (growPin = null)} />{/if}</div></div>
+				<div class="p-head"><div class="ttl-row"><h2 id="grow-h">How the record grew</h2><InfoTip label="About this chart">{#if growNote}<p>{growNote.lead}</p><ul>{#each growNote.items as it}<li>{it}</li>{/each}</ul>{/if}<p><a href="/methods/records">How records work</a></p></InfoTip></div><div class="ctls">{#if growZoom || growPin !== null}<ChartControls zoomed={!!growZoom} pinned={growPin !== null} text={growZoom ? `${monYr(growZoom[0])} – ${monYr(growZoom[1])}` : ''} onreset={() => (growZoom = null)} onrelease={() => (growPin = null)} />{/if}</div></div>
 				<ul class="key" aria-label="Key">
 					<li><svg width="22" height="8" aria-hidden="true"><line x1="0" x2="22" y1="4" y2="4" style="stroke:var({d.tok})" stroke-width="2.4" /></svg>Record</li>
 					{#if bg}<li><svg width="22" height="8" aria-hidden="true"><line x1="0" x2="22" y1="4" y2="4" style="stroke:var({d.tok})" stroke-width="1.2" opacity="0.35" /></svg>{bgKey}</li>{/if}
@@ -337,7 +340,7 @@
 				{#if per !== 'tp'}
 					<section class="panel" aria-labelledby="day-h">
 						<!-- the period in the title, the rest in the ⓘ, as on the other charts (owner's report REC-05, 26 Oct 2026) -->
-						<div class="p-head"><div class="ttl-row"><h2 id="day-h">The {periodOf(per).word} it fell <span class="h-when">{periodWhen(rec.t, per, true)}</span></h2><InfoTip label="About this chart">{parts(d, rec.v, per).n} {parts(d, rec.v, per).u}{en ? ` (${en})` : ''}{d.unit === '%' ? ' of its generation renewable' : ''}{rec.prev ? `, beating ${f(rec.prev[1])} (${periodWhen(rec.prev[0], per)})` : ''}. The dashed line is the record’s average. Open it in the tracker to see what happened through it. <a href="/methods/records">How records work</a></InfoTip></div><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
+						<div class="p-head"><div class="ttl-row"><h2 id="day-h">The {periodOf(per).word} it fell <span class="h-when">{periodWhen(rec.t, per, true)}</span></h2><InfoTip label="About this chart"><p>This shows the {periodOf(per).word} the record was set: {parts(d, rec.v, per).n} {parts(d, rec.v, per).u}{en ? ` (${en})` : ''}{d.unit === '%' ? ' of its generation renewable' : ''}{rec.prev ? `, beating ${f(rec.prev[1])} (${periodWhen(rec.prev[0], per)})` : ''}.</p><ul><li>Dashed line: the record’s average.</li><li>“Open in the tracker” shows what happened through it.</li></ul><p><a href="/methods/records#periods">How records work</a></p></InfoTip></div><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
 						{#if ser && serAxis}
 							<DayChart day={ser} t={-1} tok={d.tok} fmt={axisFmt} full={f} xticks={serAxis.ticks} tipAt={serAxis.tip} labAt={serAxis.lab} bind:zoom={dayZoom} avg={rec.v} avgLabel="Average {f(rec.v)}"
 								label="{fullName(d)} through {periodWhen(rec.t, per, true)}, {per === 'day' ? 'half-hourly' : per === 'week' ? 'hourly' : per === 'month' ? 'daily' : 'weekly'}, averaging {f(rec.v)}" />
@@ -346,7 +349,7 @@
 				{:else if d.kind === 'hh' && rec.ctx}
 					{@const c = rec.ctx}
 					<section class="panel" aria-labelledby="day-h">
-						<div class="p-head"><div class="ttl-row"><h2 id="day-h">The day it fell <span class="h-when">{dayLong(rec.t)}, {clock(rec.t)}</span></h2><InfoTip label="About this chart">The figures under the chart are for the {clock(rec.t)} half-hour, {regionName === 'New Zealand' ? 'across New Zealand' : `in the ${regionName}`}: metered generation and demand, final prices. <a href="/methods/records">How records work</a></InfoTip></div><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
+						<div class="p-head"><div class="ttl-row"><h2 id="day-h">The day it fell <span class="h-when">{dayLong(rec.t)}, {clock(rec.t)}</span></h2><InfoTip label="About this chart"><p>This shows the day the record half-hour was set, {regionName === 'New Zealand' ? 'across New Zealand' : `in the ${regionName}`}.</p><ul><li>The figures under the chart are for the {clock(rec.t)} half-hour.</li><li>Metered generation and demand, and final prices.</li><li>“Open in the tracker” shows the whole day there.</li></ul><p><a href="/methods/records#half-hours">How records work</a></p></InfoTip></div><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
 						<DayChart day={c.day} t={rec.t} tok={d.tok} fmt={axisFmt} bind:zoom={dayZoom} label="{fullName(d)} through {dayLong(rec.t)}, half-hourly, peaking at {f(rec.v)} at {clock(rec.t)}" />
 						<dl class="facts">
 							<div><dt>Demand</dt><dd>{c.demand.toLocaleString('en-NZ')} MW</dd></div>

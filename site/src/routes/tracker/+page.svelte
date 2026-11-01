@@ -49,6 +49,12 @@
 		return `${p.day} ${'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ')[+p.month - 1]} ${p.year}`;
 	};
 
+	// the chart notes (ⓘ) name the region and interval shown (owner's rules for notes, 1 Nov 2026)
+	const regionOf = $derived(({ NI: 'the North Island', SI: 'the South Island' } as Record<string, string>)[lower?.region] ?? 'New Zealand');
+	const regionPos = $derived(regionOf === 'New Zealand' ? "New Zealand's" : `${regionOf}'s`);
+	const island = $derived(lower?.region === 'NI' || lower?.region === 'SI');
+	const periodWord = $derived(({ '1d': 'day', '1w': 'week', '1mo': 'month', '1yr': 'year' } as Record<string, string>)[lower?.int] ?? '');
+
 	const age = $derived(meta ? (now - meta.end) / 60000 : 0);
 	const live = $derived(meta !== null && age < LIVE_MINUTES);
 	// The info button says only where the data comes from; how each series is built is on the About page.
@@ -133,47 +139,57 @@
 <!-- each chart's ⓘ: what it shows and how it's made (the notes that used to sit under the charts) -->
 {#snippet chartInfo(id: string)}
 	{#if id === 'gen'}
+		<p>This shows where {regionPos} electricity came from over the dates chosen.</p>
 		<ul>
-			<li>Each source's output, stacked, or one line each with the chart buttons (to compare plants or fuels).</li>
-			<li>The live week is the market's 5-minute dispatch; history is metered output wherever the EA has published it (about six weeks behind).</li>
-			<li>Embedded solar (hatched) is estimated.</li>
-			<li>On one island's chart, HVDC arriving is stacked on top and HVDC leaving goes below zero, like battery charging.</li>
-			<li>$ Price adds the island reference prices on a right axis, spike-proof like the Prices tab.</li>
+			<li>Choose dates in the bar above or drag across the chart to zoom. Hover to read every source; click to pin the time line.</li>
+			<li>The menu beside the title changes the grouping. Click a name in the summary to drill down to its fuels and plants; Back steps out.</li>
+			<li>Chart buttons switch between MW and share, and between stacked and lines. “$ Price” adds the island price on a right-hand axis.</li>
+			{#if periodWord}<li>Each {periodWord} shows the energy produced, not average MW; a faded end is only partly covered.</li>{/if}
+			{#if island}<li>HVDC arriving sits on top. HVDC leaving and battery charging go below zero.</li>{/if}
+			<li>Embedded solar (yellow, hatched) is estimated. The live week is the market's 5-minute dispatch; earlier dates are metered output, which the EA publishes about six weeks behind.</li>
 		</ul>
 		<p id="gen-note" hidden></p>
 		<p><a href="/methods/generation">How generation is built</a></p>
 	{:else if id === 'price'}
+		<p>This shows the wholesale price of electricity at each island's reference point: Haywards for the North Island and Benmore for the South.</p>
 		<ul>
-			<li>Spot prices at the island reference nodes, Haywards (North Island) and Benmore (South Island).</li>
-			<li>Dispatch prices for the live week, the EA's final prices for history.</li>
-			<li>Long ranges show averages; the Prices tab has the spread and the spikes.</li>
+			<li>Prices are in $/MWh. $100/MWh is 10c a kWh, before lines and retail charges.</li>
+			{#if periodWord}<li>Each point is the {periodWord}'s average.</li>{/if}
+			<li>The live week uses 5-minute dispatch prices; earlier dates use the EA's final prices, published the next day.</li>
+			<li>The Prices tab has six nodes, the island spread, price spikes and prices by time of day.</li>
 		</ul>
 		<p><a href="/methods/prices">How prices are shown</a></p>
 	{:else if id === 'demand'}
+		<p>This shows how much electricity {regionOf} used over the dates chosen.</p>
 		<ul>
-			<li>Solid: electricity taken from the grid.</li>
-			<li>Dashed: with estimated embedded solar added back, closer to what was actually used (the band is its uncertainty).</li>
-			<li>Long ranges show averages; the summary gives each day's peak.</li>
+			<li>Solid line: electricity taken from the national grid, Tiwai smelter included.</li>
+			<li>Dashed line: with estimated embedded solar added back, closer to what homes and businesses actually used. The band around it is its uncertainty.</li>
+			{#if periodWord}<li>The summary gives each day's peak half-hour.</li>{/if}
 		</ul>
 		<p><a href="/methods/demand">How demand is worked out</a></p>
 	{:else if id === 'hvdc'}
+		<p>This shows power flowing between the islands on the HVDC link, which runs from Benmore to Haywards.</p>
 		<ul>
-			<li>Transfer between Benmore and Haywards, northward positive.</li>
-			<li>Metered once the EA publishes it, about two weeks after each month.</li>
-			<li>Before that, estimated from each island's generation and demand (about 10 MW out on average).</li>
+			<li>Above zero: flowing north. Below zero: flowing south.</li>
+			<li>Metered once the EA publishes it, about two weeks after each month ends.</li>
+			<li>Newer dates are estimated from each island's generation and demand, usually within about 10 MW.</li>
 		</ul>
 		<p><a href="/methods/hvdc">How HVDC is worked out</a></p>
 	{:else if id === 'co2'}
+		<p>This shows how much greenhouse gas {regionPos} electricity released for each unit generated. Lower is cleaner.</p>
 		<ul>
-			<li>Grams of CO₂-equivalent for each kWh generated: each plant's output times its fuel's emission factor.</li>
-			<li>Huntly's Rankine units at Genesis's quarterly coal share.</li>
-			<li>Each geothermal station at its own factor.</li>
+			<li>Grams of CO₂-equivalent per kWh: each plant's output times its fuel's emission factor, divided by all generation.</li>
+			<li>Huntly's Rankine units can burn coal or gas, so they use Genesis's quarterly coal share.</li>
+			<li>Each geothermal station has its own factor.</li>
+			<li>Battery output is left out, as it stores power made elsewhere.</li>
 		</ul>
 		<p><a href="/methods/emissions">How emissions are worked out</a></p>
 	{:else}
+		<p>This shows how much of {regionPos} electricity came from renewable sources such as hydro, geothermal, wind and solar.</p>
 		<ul>
-			<li>Renewable output as a share of all generation, embedded solar included.</li>
-			<li>Geothermal counts as renewable, although it emits some CO₂.</li>
+			<li>Embedded solar is included.</li>
+			<li>Geothermal counts as renewable, although it releases some CO₂.</li>
+			<li>Battery output is left out, as it stores power made elsewhere.</li>
 		</ul>
 		<p><a href="/methods/groupings#renewable">How shares are worked out</a></p>
 	{/if}

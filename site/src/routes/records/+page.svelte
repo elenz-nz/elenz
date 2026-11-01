@@ -152,11 +152,11 @@
 			{#if paces.length}
 				<section aria-labelledby="pace-h" class="sec">
 					<div class="ttl-row"><h2 id="pace-h">Heading for a record</h2><InfoTip label="About records on pace">
+						<p>These are records that could fall soon: a day, week, month or year still running that is ahead of its record's pace.</p>
 						<ul>
-							<li>A day, week, month or year still running, ahead of its record at the same point.</li>
-							<li>Listed once half of it has gone, and only while it stays ahead.</li>
-							<li>From dispatch data, so provisional: the rest of the period can still change it.</li>
+							<li>Listed once half the period has gone, for as long as it stays ahead.</li>
 							<li>One tile per record: New Zealand's where it's on pace, otherwise an island's.</li>
+							<li>From live dispatch data, so provisional until the period ends and the metered data confirms it.</li>
 						</ul>
 						<p><a href="/methods/records#pace">How records work</a></p>
 					</InfoTip></div>
@@ -178,12 +178,12 @@
 			{#if cards.length}
 				<section aria-labelledby="new-h" class="sec">
 					<div class="ttl-row"><h2 id="new-h">New and provisional</h2><InfoTip label="About new and provisional records">
+						<p>These are records set in the last 30 days for New Zealand or either island, plus newer ones waiting on the metered data.</p>
 						<ul>
-							<li>Records set in the last 30 days, and newer ones still waiting on the metered data, for New Zealand or either island.</li>
-							<li>Dashed border: provisional, from dispatch data.</li>
+							<li>Dashed border: provisional, from dispatch data, until the EA's metered data confirms it.</li>
 							<li>Struck through: a provisional record the metered data didn't confirm.</li>
 						</ul>
-						<p><a href="/methods/records">How records work</a></p>
+						<p><a href="/methods/records#official">How records work</a></p>
 					</InfoTip></div>
 					<div class="cards">
 						{#each cards as c}
@@ -224,12 +224,14 @@
 				     far the official data goes; it sticks while the list scrolls (owner's call, 30 Oct 2026) -->
 				<div class="toolbar list-bar">
 					<div class="ttl-row"><h2 id="all-h">All-time records</h2><InfoTip label="About these records">
+						<p>These are the highest and lowest figures since August 1997 for {region === 'NI' ? 'the North Island' : region === 'SI' ? 'the South Island' : 'New Zealand'}, from a single half-hour up to a whole year.</p>
 						<ul>
-							<li>Official records use the EA's metered generation and HVDC, and its final prices.</li>
-							<li>Official to: the last day the metered data covers. It arrives 5–6 weeks after each month (final prices a day or two).</li>
-							<li>Anything newer comes from dispatch data and stays provisional (dashed edge) until the metered month confirms it.</li>
+							<li>The region menu and the period buttons pick the list.</li>
 							<li>Day to year records are the period's average MW, with its energy beside it.</li>
-							<li>Embedded solar is modelled, so its records are estimates.</li>
+							<li>Official to: the last day the EA's metered data covers. It arrives 5–6 weeks after each month; final prices arrive a day or two after.</li>
+							<li>Dashed edge: a newer record from dispatch data, provisional until the metered month confirms it.</li>
+							<li>Embedded solar records are estimates, as embedded solar is modelled.</li>
+							<li>Open a record for its history and the period it fell in.</li>
 						</ul>
 						<p><a href="/methods/records">How records work</a></p>
 					</InfoTip></div>
@@ -303,11 +305,13 @@
 			{#if tab === 'milestones'}
 				<section class="sec" id="panel-milestones" aria-labelledby="mile-h">
 					<div class="ttl-row"><h2 id="mile-h">Milestones</h2><InfoTip label="About milestones">
+						<p>These are the first times each round level was passed, newest first, for New Zealand and each island.</p>
 						<ul>
-							<li>The first half-hour each round level was passed: wind, grid and embedded solar, renewable share and peak demand.</li>
-							<li>Newest first, for New Zealand and each island.</li>
+							<li>Covers wind, grid and embedded solar, renewable share and peak demand.</li>
+							<li>Each milestone is the first half-hour over the level.</li>
 							<li>Point at one to light it in every region; click or tap to pin it there, again to let go.</li>
 						</ul>
+						<p><a href="/methods/records#milestones">How milestones work</a></p>
 					</InfoTip></div>
 					<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 					<div class="regions" onpointerover={rowOver} onpointerleave={rowLeave} onclick={pinClick}>
@@ -343,11 +347,13 @@
 								{#each MONTHS as m, i}<option value={i}>{m}</option>{/each}
 							</select>
 						</h2><InfoTip label="About month records">
+							<p>These are the highest and lowest half-hours of any {MONTHS[moy]} since 1997, with the year each was set, for New Zealand and each island.</p>
 							<ul>
-								<li>Trading period records: the highest or lowest half-hour of any {MONTHS[moy]} since 1997, and the year it was set.</li>
-								<li>A month can set one even when the all-time record holds.</li>
+								<li>The month menu picks the month.</li>
+								<li>A month can set one of these even when the all-time record holds.</li>
 								<li>Point at one to light it in every region; click or tap to pin it there, again to let go.</li>
 							</ul>
+							<p><a href="/methods/records#half-hours">How records work</a></p>
 						</InfoTip></div>
 						<span class="unit">Trading periods</span>
 					</div>

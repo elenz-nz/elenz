@@ -282,6 +282,8 @@
 	}
 	const intChoices = $derived(pastLive && R.past ? R.past : R.ints);
 	const effInt = $derived(intPicked && intChoices.includes(int) ? int : R.def && intChoices.includes(R.def) ? R.def : intChoices[0]);
+	// the ⓘ notes name the period shown (owner's rules for notes, 1 Nov 2026)
+	const perWord = $derived(({ '1d': 'day', '1w': 'week', '1mo': 'month', '1yr': 'year' } as Record<string, string>)[effInt] ?? '');
 
 	let token = 0;
 	async function build() {
@@ -798,29 +800,39 @@
 	<!-- each chart's ⓘ: what it shows and how it's made -->
 {#snippet chartInfo(id: string)}
 	{#if id === 'price'}
+		<p>This shows the wholesale price of electricity at six points on the grid across both islands.</p>
 		<ul>
-			<li>Spot prices at six grid nodes, in $/MWh: dispatch prices for the live week, the EA's final prices for history.</li>
-			<li>Shading marks the times the islands were priced apart (Haywards and Benmore more than $10 and 10% apart).</li>
-			<li>On 12 months and All: each day's, week's or month's half-hours at the chosen node, lowest to highest and the middle 80%, with the average as a line and the other island's average dashed.</li>
-			<li>Scales: Spike-proof is linear to about $100 and compressed above, so spikes don't flatten everything else; Capped cuts at $600; Linear shows it straight.</li>
+			<li>Prices are in $/MWh. $100/MWh is 10c a kWh, before lines and retail charges.</li>
+			{#if view?.mode === 'long'}
+				<li>Each {perWord} shows the spread of half-hour prices at {NODE[bandKey].name}: lowest to highest, with the middle 80% darker and the average as a line. The other island's average is dashed.{region === 'NZ' ? ' The Haywards and Benmore buttons pick the island.' : ''}</li>
+			{:else}
+				<li>Shading: times the islands were priced apart, with Haywards and Benmore more than $10 and 10% apart.</li>
+			{/if}
+			<li>Scale menu: “Spike-proof” is straight up to about $100 and squeezed above, so spikes don't flatten everything else. “Capped” cuts at $600, and “Linear” shows prices as they are.</li>
+			<li>Drag across the chart to zoom. The live week uses 5-minute dispatch prices; earlier dates use the EA's final prices.</li>
 		</ul>
 		<p><a href="/methods/prices#scales">Price scales</a> · <a href="/methods/prices#dispatch">Dispatch and final prices</a></p>
 	{:else if id === 'spread'}
+		<p>This shows the price gap between the islands: Haywards (North Island) minus Benmore (South Island).</p>
 		<ul>
-			<li>Haywards less Benmore, in $/MWh (on long ranges, each period's average).</li>
-			<li>Above zero the North Island is dearer, often when the HVDC link can’t carry any more north.</li>
+			<li>Above zero: the North Island is dearer, often when the HVDC link is carrying all it can north.</li>
+			<li>Below zero: the South Island is dearer.</li>
+			{#if view?.mode === 'long'}<li>Each point is the {perWord}'s average.</li>{/if}
 		</ul>
 		<p><a href="/methods/prices#derived">How the spread is worked out</a></p>
 	{:else if id === 'hvdc'}
+		<p>This shows power flowing between the islands on the HVDC link, which runs from Benmore to Haywards.</p>
 		<ul>
-			<li>Transfer between Benmore and Haywards in MW, northward positive.</li>
-			<li>Metered once the EA publishes it, estimated before that.</li>
+			<li>Above zero: flowing north. Below zero: flowing south.</li>
+			<li>Metered once the EA publishes it, about two weeks after each month ends.</li>
+			<li>Newer dates are estimated from each island's generation and demand, usually within about 10 MW.</li>
 		</ul>
 		<p><a href="/methods/hvdc">How HVDC is worked out</a></p>
 	{:else}
+		<p>This counts the half-hours in each {perWord || 'period'} when the wholesale price went over $500 and over $1,000/MWh.</p>
 		<ul>
-			<li>How many half-hours in each period were over $500 and over $1,000/MWh.</li>
-			<li>At the node chosen for the price range above.</li>
+			<li>$1,000/MWh is $1 a kWh, about ten times a usual price.</li>
+			<li>Counted at {NODE[bandKey].name}, the island shown in the Prices chart above.</li>
 		</ul>
 		<p><a href="/methods/prices#derived">How it's counted</a></p>
 	{/if}
@@ -1029,7 +1041,15 @@
 		<section class="card" class:popped={popped === 'cap'}>
 			<div class="card-head">
 				<div>
-					<div class="ttl-row"><h2>Price captured by fuel</h2><InfoTip>What each fuel earned over the range: its output × its island's price, divided by its output. Percent is against the average of all fuels. Battery (charging) is what batteries paid to charge, left out of the average. Hover over a bar (or tap it) for its energy in GWh and what it earned or paid. <a href="/methods/prices#derived">How it's worked out</a></InfoTip></div>
+					<div class="ttl-row"><h2>Price captured by fuel</h2><InfoTip>
+						<p>This shows the average price each fuel was paid for its electricity over the dates chosen.</p>
+						<ul>
+							<li>Each fuel's output times its island's price, divided by its output, so busier times count for more.</li>
+							<li>%: against the average of all fuels. Higher means the fuel tended to run when prices were high.</li>
+							<li>Battery (charging): what batteries paid to charge, left out of the average.</li>
+							<li>Hover or tap a bar for its energy in GWh and what it earned or paid.</li>
+						</ul>
+						<p><a href="/methods/prices#derived">How it's worked out</a></p></InfoTip></div>
 					<Context range={win ? span(win.from, win.to) : ''} />
 				</div>
 				<PopButton open={popped === 'cap'} name="price captured by fuel chart" onclick={() => (popped = popped === 'cap' ? null : 'cap')} />
@@ -1043,7 +1063,14 @@
 		<section class="card" class:popped={popped === 'heat'} style={popped === 'heat' ? '--rh: 15px' : ''}>
 			<div class="card-head">
 				<div>
-					<div class="ttl-row"><h2>Price by time of day</h2><InfoTip>{heatSeg?.kind === 'months' ? `One row per ${effInt === '1yr' ? 'year' : 'month'}: the average price in each half-hour.` : heatRows.length > 40 ? 'One row per day; scroll for earlier days.' : 'One row per day.'} {heatScaled ? 'Colours fitted to the prices shown.' : 'Colours on fixed price bands, so periods compare.'}</InfoTip></div>
+					<div class="ttl-row"><h2>Price by time of day</h2><InfoTip>
+						<p>This maps the wholesale price at {NODE[heatKey]?.name ?? 'the chosen node'} for every half-hour of the day, so daily and seasonal patterns stand out.</p>
+						<ul>
+							<li>{heatSeg?.kind === 'months' ? `One row per ${effInt === '1yr' ? 'year' : 'month'}, averaging each half-hour.` : heatRows.length > 40 ? 'One row per day; scroll for earlier days.' : 'One row per day.'}</li>
+							<li>The node buttons pick where the price is from, separately from the charts above.</li>
+							<li>{heatScaled ? 'Colours are fitted to the prices shown; turn off “Scale to this view” to compare periods.' : 'Colours use fixed price bands so periods compare. “Scale to this view” fits them to the prices shown.'}</li>
+						</ul>
+						<p><a href="/methods/prices#derived">How it's worked out</a></p></InfoTip></div>
 					<Context range={heatSpan} items={[NODE[heatKey]?.name, heatSeg?.kind === 'months' ? (effInt === '1yr' ? 'yearly' : 'monthly') + ' average of each half-hour' : 'each half-hour']} />
 				</div>
 				<div class="tools">

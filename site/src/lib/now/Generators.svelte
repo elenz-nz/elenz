@@ -70,14 +70,13 @@
 	<div class="p-head">
 		<h2 id="gens-h">Every generator right now</h2>
 		<span class="p-info"><InfoTip label="About this list">
+			<p>This lists every power station that has generated in the past 7 days and what each is doing right now.</p>
 			<ul>
-				<li>Every plant that has generated in the past 7 days. One that hasn't run all week, like a peaker on standby, isn't listed.</li>
-				<li>MW is the plant's 5-minute dispatch target.</li>
-				<li>% is that MW against the plant's installed capacity. A plant that always runs above its listed capacity counts what it runs at.</li>
-				<li>Batteries show negative while charging.</li>
-				<li>Embedded solar isn't listed.</li>
-				<li>A column heading sorts by it; Shift-click another to sort by that within it (island, then MW).</li>
-				<li>Tap a plant for its history.</li>
+				<li>MW: the plant's 5-minute dispatch target. Some hydro stations are dispatched together as a block, so one station's actual output can differ.</li>
+				<li>% of capacity: current MW against the plant's installed capacity.</li>
+				<li>Batteries show negative MW while charging.</li>
+				<li>Click a column heading to sort by it; Shift-click another to sort within it (island, then MW).</li>
+				<li>Tap a plant to see its history in the Tracker.</li>
 			</ul>
 			<p><a href="/methods/capacity">How capacity is counted</a></p>
 		</InfoTip></span>

@@ -245,7 +245,7 @@
 			<div class="now-side">
 			{#if recNew.length}<RecordLine items={recNew} />{/if}
 			<section class="panel mix-panel" aria-labelledby="mix-h">
-				<div class="p-head"><h2 id="mix-h">Generation now</h2><span class="p-info"><InfoTip label="About this table">Generation is dispatch, the market's 5-minute targets for each plant; embedded solar is estimated. <a href="/methods/generation">How generation is built</a></InfoTip></span></div>
+				<div class="p-head"><h2 id="mix-h">Generation now</h2><span class="p-info"><InfoTip label="About this table"><p>This shows how much electricity each type of generation is supplying to New Zealand right now.</p><ul><li>Figures are the market's dispatch: the output each power station is told to run at, updated every 5 minutes.</li><li>Embedded solar (rooftops and small solar farms) is estimated from satellite cloud data.</li></ul><p><a href="/methods/generation">How generation is built</a></p></InfoTip></span></div>
 				{#if now && nz}
 					<div class="stack" aria-hidden="true">
 						{#each now.mix as f}<span class:hatch={f.hatch} style="--c:var({f.tok});width:{(f.mw / nz.gen) * 100}%" title="{f.name} {fmt(f.mw)} MW"></span>{/each}

@@ -41,6 +41,16 @@
 <h3 id="runs">Runs</h3>
 <p>The longest unbroken run of half-hours meeting a condition, joined across month boundaries: at least 90% renewable, prices under $5/MWh, or no Huntly Rankine running.</p>
 
+<h2 id="milestones">Milestones</h2>
+<p>The Milestones tab lists the first half-hour each record passed a round level, newest first, for New Zealand and each island side by side. They come from the records’ own progressions, so a milestone is the first record step at or over its level.</p>
+<ul>
+	<li><b>Wind:</b> 100, 250, 500, 750, 1,000, 1,250 and 1,500 MW.</li>
+	<li><b>Grid solar</b> and <b>embedded solar</b> (estimated): 100, 250, 500, 750 and 1,000 MW.</li>
+	<li><b>Renewable share:</b> 90%, 95%, 98% and 99%.</li>
+	<li><b>Peak demand:</b> 6,000, 6,500, 7,000 and 7,500 MW.</li>
+	<li>A level not reached yet isn’t listed, and an island lists only those that can apply there.</li>
+</ul>
+
 <h2 id="pages">A record’s page</h2>
 <ul>
 	<li><b>How the record grew</b> shows every time the record was broken since 1997, worked out from the half-hours that beat everything before them. A key above the chart names each line.</li>
