@@ -32,6 +32,9 @@
 		tauhara: 'Tauhara', te_huka_3: 'Te Huka 3', topp2: 'Kawerau (TOPP2)',
 	};
 	const geoRows = Object.entries(GEO_YEARS as Record<string, number[]>);
+	// the published station factors' range, g/kWh → t/MWh (assumed figures left out)
+	const geoAll = geoRows.flatMap(([, v]) => v);
+	const geoRange = `${f2(Math.min(...geoAll) / 1000)}–${f2(Math.max(...geoAll) / 1000)}`;
 	const assumed = Object.entries(GEO_ASSUMED as Record<string, number>).filter(([k]) => k in GEO_NAMES);
 	const GAS_NOTES: Record<string, string> = {
 		'Ōtāhuhu B': 'Combined cycle, 1999–2015', 'New Plymouth': 'Steam, gas and some oil, to 2008',
@@ -55,7 +58,7 @@
 
 <h2 id="calc">The calculation</h2>
 <p class="formula">Intensity (g/kWh) = Σ (each source’s MW × its emission factor in t/MWh) ÷ generation less battery discharge in MW × 1,000
-<small>total generation as on the <a href="/methods/generation#totals">generation page</a> (every source while positive, including embedded solar), less battery discharge: that energy was generated, and its emissions counted, when the battery charged, so counting it again would dilute the intensity. em6 does the same (from October 2026).</small></p>
+<small>total generation as on the <a href="/methods/generation#totals">generation page</a> (every source while positive, including embedded solar), less battery discharge: that energy was generated, and its emissions counted, when the battery charged, so counting it again would dilute the intensity. em6 does the same, and so has Elenz since October 2026.</small></p>
 <ul>
 	<li>Factors count the emissions at the power station only (operational, not lifecycle: building the plant and extracting the fuel aren’t included).</li>
 	<li>Geothermal and gas use each station’s own factor, weighted by its output; the other fuels use one factor each.</li>
@@ -71,7 +74,7 @@
 			<tr><td>Coal/gas, Rankine (Huntly 1, 2, 4)</td><td class="n">{f2(rankineFactor(0))}–{f2(rankineFactor(1))}</td><td>By quarter, from the share of their fuel that was coal (<a href="#rankine">below</a>)</td></tr>
 			<tr><td>Gas</td><td class="n">{f2(GAS_FLEET)}</td><td>Today’s fleet average; closed plants their own (<a href="#gas">below</a>)</td></tr>
 			<tr><td>Diesel (Whirinaki)</td><td class="n">{f2(diesel)}</td><td>A typical factor for diesel turbines; it runs rarely</td></tr>
-			<tr><td>Geothermal</td><td class="n">0.02–0.30</td><td>Each station by year (<a href="#geothermal">below</a>)</td></tr>
+			<tr><td>Geothermal</td><td class="n">{geoRange}</td><td>Each station by year (<a href="#geothermal">below</a>)</td></tr>
 			<tr><td>Bioenergy (Kinleith, Kawerau mill)</td><td class="n">0</td><td>Wood waste and black liquor: biogenic CO₂, counted as zero, as in national inventories</td></tr>
 			<tr><td>Waste heat (Glenbrook)</td><td class="n">0</td><td>NZ Steel’s ironmaking gases; the emissions are counted with the ironmaking (industrial processes). UN CDM methodology ACM0004 also counts waste-gas generation as zero</td></tr>
 			<tr><td>Hydro, wind, solar, embedded solar</td><td class="n">0</td><td>Nothing burned</td></tr>
