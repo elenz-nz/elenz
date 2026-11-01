@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { REPO } from '../registry.js';
+	import { REPO, ref, sourceHref } from '../registry.js';
 	import GoodFor from '../GoodFor.svelte';
 </script>
 
@@ -20,7 +20,7 @@
 <p class="formula">Embedded solar = Σ over 35 points and 3 system types: installed MW × modelled output per MW (from satellite sunshine) × calibration</p>
 
 <h2 id="capacity">1. How much is installed</h2>
-<p>The EA’s monthly record of installed distributed generation (EMI report GUEHMT, from the registry) gives solar capacity at each grid exit point (Root NSP), for systems of 10 kW or less and over 10 kW. Registry capacity is the lesser of the panels’ total and the inverter or injection limit, so it is roughly the AC rating.</p>
+<p>The EA’s monthly record of installed distributed generation (<a href={sourceHref('guehmt')}>EMI report GUEHMT</a>, from the registry) gives solar capacity at each grid exit point (Root NSP), for systems of 10 kW or less and over 10 kW. Registry capacity is the lesser of the panels’ total and the inverter or injection limit, so it is roughly the AC rating.</p>
 <ul>
 	<li><b>About 1,270 MW</b> was registered in September 2026.</li>
 	<li><b>Less about 410 MW</b> for the dispatched solar farms the registry also counts. Fifteen solar farms are dispatched (about 636 MW), and all fifteen are shown as grid solar, measured. Eleven of them are in the registry too, so they’d be counted twice if left in: Kohirā, Lauriston, Te Puna Mauri ō Omaru (Ruawai), Pukenui, Rangitaiki, Twin Rivers, Taiohi, Pāmu Rā ki Whitianga, Papareireiā, Omeheu and Kōwhai Park. Each is removed at its own grid exit point, in the month the registry added it. The other four, Tauhei, Clandeboye, Dannevirke and Te Herenga o Te Rā (about 227 MW), aren’t in the registry, so there’s nothing to take off. A data build warns when the registry jumps 5 MW or more at a point where a solar farm dispatches, so a farm can be added to the list when it appears.</li>
@@ -59,13 +59,13 @@
 </dl>
 
 <h2 id="model">4. From sunshine to output</h2>
-<p>A photovoltaic model, written for the site and checked against the standard pvlib library (sun position within 0.02°, irradiance on the panels within 0.5%, AC output within 1%), runs for each point and system type:</p>
+<p>A photovoltaic model, written for the site and checked against the standard <a href={ref('pvlib')}>pvlib</a> library (sun position within 0.02°, irradiance on the panels within 0.5%, AC output within 1%), runs for each point and system type:</p>
 <ol>
-	<li><b>Sun position</b>: the NOAA solar position algorithm, at each interval’s midpoint.</li>
-	<li><b>Sunshine on the panels</b>: the Hay–Davies model, splitting sunshine into direct, diffuse and ground-reflected light for each tilt and direction.</li>
-	<li><b>Reflection losses</b> at low sun angles (ASHRAE incidence angle model).</li>
-	<li><b>Panel temperature</b> from the Sandia model (close roof mount for rooftops, open rack for ground arrays), with air temperature from a latitude and season climatology; hot panels produce less.</li>
-	<li><b>DC output and inverter limit</b> (PVWatts-style), with fixed losses for soiling, shading, wiring, ageing and downtime.</li>
+	<li><b>Sun position</b>: the <a href={ref('noaa')}>NOAA solar position algorithm</a>, at each interval’s midpoint.</li>
+	<li><b>Sunshine on the panels</b>: the <a href={ref('pvlib')}>Hay–Davies model</a>, splitting sunshine into direct, diffuse and ground-reflected light for each tilt and direction.</li>
+	<li><b>Reflection losses</b> at low sun angles (<a href={ref('ashrae')}>ASHRAE incidence angle model</a>).</li>
+	<li><b>Panel temperature</b> from the <a href={ref('sandia')}>Sandia model</a> (close roof mount for rooftops, open rack for ground arrays), with air temperature from a latitude and season climatology; hot panels produce less.</li>
+	<li><b>DC output and inverter limit</b> (<a href={ref('pvwatts')}>PVWatts-style</a>), with fixed losses for soiling, shading, wiring, ageing and downtime.</li>
 </ol>
 <div class="tbl">
 	<table>
@@ -84,8 +84,8 @@
 <dl>
 	<dt>Rooftops × 0.95</dt>
 	<dd>
-		<p>The same satellite-and-model chain, run for dispatched solar farms whose output is measured, says how much the satellite and model over- or under-state. Once established, the farms produced between 88% and 98% of what the chain predicted for them (Lauriston, Omeheu, Rangitaiki, Kohirā, Te Herenga o Te Rā, Dannevirke), and the satellite’s yearly sunshine runs up to about 5% above NIWA’s long-term figures in places.</p>
-		<p>So rooftop output is multiplied by 0.95, the middle of that evidence. The “about 6%” is how uncertain that factor is: the right figure could plausibly be anywhere from about 0.89 to 1.01 (one standard deviation). It isn’t applied on top of the 0.95; it is one of the parts of the uncertainty band below.</p>
+		<p>The same satellite-and-model chain, run for dispatched solar farms whose output is measured, says how much the satellite and model over- or under-state. Once established, the farms produced between 88% and 98% of what the chain predicted for them (Lauriston, Omeheu, Rangitaiki, Kohirā, Te Herenga o Te Rā, Dannevirke), and the satellite’s 2025 sunshine ran 6–9% above <a href={ref('niwa')}>NIWA’s 1991–2020 averages</a> at the four main centres.</p>
+		<p>So rooftop output is multiplied by 0.95, within that evidence. The “about 6%” is how uncertain that factor is: the right figure could plausibly be anywhere from about 0.89 to 1.01 (one standard deviation). It isn’t applied on top of the 0.95; it is one of the parts of the uncertainty band below.</p>
 	</dd>
 	<dt id="ground">Small solar farms</dt>
 	<dd>
@@ -98,13 +98,13 @@
 	<dd>The EA’s reconciliation data has the metered energy that embedded systems export to local networks, by half-hour. In September 2026, solar exports were 46.6 GWh (peak 363 MW), against 95 GWh of modelled generation: about half of rooftop output is exported, the rest used on site. Daily totals follow the model closely (correlation 0.985–0.991), the exported share is steady, and exports never exceed modelled generation nationally.</dd>
 	<dt>Clear-day peaks</dt>
 	<dd>
-		<p>At its highest so far, at 1 pm on 18 October 2026, the estimate was 748 MW, about 87% of the registered capacity then (744 MW the next day). The registry’s figure is roughly the inverter (AC) rating, and panels usually exceed it by 10–30%, so a clear spring noon can come close to it. For comparison, South Australia’s rooftop fleet peaked at 2,070 MW on 7 October 2026, about 73% of its installed panel capacity, which on an inverter basis would be about 85–95%.</p>
+		<p>At its highest so far, at 1 pm on 18 October 2026, the estimate was 748 MW, about 87% of the registered capacity then (744 MW the next day). The registry’s figure is roughly the inverter (AC) rating, and panels usually exceed it by 10–30%, so a clear spring noon can come close to it. For comparison, South Australia’s rooftop fleet <a href={ref('sa-peak')}>peaked at 2,070 MW</a> on 7 October 2026, about 73% of its <a href={ref('cec')}>installed panel capacity</a> at the end of 2025, which on an inverter basis would be about 85–95%.</p>
 		<p>The metered exports give a second check. On September’s clearest days (peak estimate 560–680 MW), exports peaked at 290–363 MW, and through each day every extra modelled MW turned up as 0.57–0.63 MW of extra exports. That is consistent with roughly 40% of extra output used on site, but it can’t rule out the estimate being somewhat high on clear days. October’s metered data (published early November) will allow the same check on 18–19 October.</p>
 	</dd>
 	<dt>Growth</dt>
 	<dd>September exports per registered MW rose from 0.039 GWh in 2021 to 0.056 GWh in 2026, so the registry’s growth looks real, not inflated.</dd>
 	<dt>Sunshine</dt>
-	<dd>2025 totals at the points are close to NIWA’s long-term figures: Christchurch 1,468, Wellington 1,467, Dunedin 1,277 kWh/m²; Auckland’s 1,623 may be about 5% high.</dd>
+	<dd>2025 totals at the points ran 6–9% above <a href={ref('niwa')}>NIWA’s 1991–2020 averages</a>: Christchurch 1,468 against about 1,370 kWh/m², Wellington 1,467 against 1,385, Dunedin 1,277 against 1,200 and Auckland 1,623 against 1,490. This is one year against a 30-year average, at network points rather than NIWA’s stations, so it is a rough check.</dd>
 </dl>
 
 <h2 id="uncertainty">6. Uncertainty</h2>

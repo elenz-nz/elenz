@@ -6,6 +6,11 @@
 // SOURCES, so a dataset is described once and every page that uses it lists it the same way.
 //
 // When a method changes: update its page, set `updated` on its topic, and keep the dataset entries in step.
+//
+// REFERENCES holds what isn't a dataset: reports, papers and announcements behind a claim on a method page. The page
+// links the claim with `ref('<id>')` (a mistyped id fails the build), and its "References" box lists every entry with
+// that page's slug in `topics`, so a reference is also described once. Only add one that was opened and says what the
+// page says it does.
 import type { Component } from 'svelte';
 
 export type Topic = {
@@ -317,9 +322,165 @@ export const SOURCES: Source[] = [
 	},
 ];
 
+export type Reference = {
+	id: string;
+	title: string;
+	by: string; // author or publisher
+	date?: string;
+	url: string;
+	use: string; // what it backs up, in a line
+	topics: string[]; // slugs of the topic pages that cite it
+};
+
+export const REFERENCES: Reference[] = [
+	// ---------- emission factors ----------
+	{
+		id: 'mclean2024', title: 'Reducing greenhouse gas emissions from NZ geothermal power stations',
+		by: 'McLean, Richardson, Hanik, Siega and Gibson, New Zealand Geothermal Workshop', date: '2024',
+		url: 'https://www.worldgeothermal.org/pdf/IGAstandard/NZGW/2024//044.pdf',
+		use: 'Each geothermal station’s operational emissions for 2023.',
+		topics: ['emissions'],
+	},
+	{
+		id: 'times', title: 'TIMES-NZ documentation: emission factors', by: 'Energy Efficiency and Conservation Authority',
+		url: 'https://times-nz-dev.readthedocs.io/en/stable/model_methodology/electricity/emission_factors.html',
+		use: 'The assumed factors for Tauhara (32 g/kWh), Te Huka 3 and Kawerau’s TOPP2 (0).',
+		topics: ['emissions'],
+	},
+	{
+		id: 'stack2020', title: '2020 Thermal Generation Stack Update Report', by: 'WSP for MBIE', date: 'October 2020',
+		url: 'https://www.mbie.govt.nz/assets/2020-thermal-generation-stack-update-report.pdf',
+		use: 'Heat rates for Huntly 5 and 6, Stratford’s peakers and Whirinaki (table 3-3).',
+		topics: ['emissions'],
+	},
+	{
+		id: 'stack2011', title: '2011 NZ Generation Data Update', by: 'Parsons Brinckerhoff for the Ministry of Economic Development', date: 'January 2012',
+		url: 'https://www.mbie.govt.nz/dmsdocument/127-2011-nz-generation-data-update-v006a-pdf',
+		use: 'Heat rates for Ōtāhuhu B, Southdown and the Taranaki Combined Cycle (table 3-1).',
+		topics: ['emissions'],
+	},
+	{
+		id: 'ipcc', title: '2019 Refinement to the 2006 IPCC Guidelines: Stationary Combustion', by: 'Intergovernmental Panel on Climate Change', date: '2019',
+		url: 'https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/2_Volume2/19R_V2_2_Ch02_Stationary_Combustion.pdf',
+		use: 'CO₂ from burning biomass is an information item, left out of the energy sector’s total (section 2.3.3.4).',
+		topics: ['emissions'],
+	},
+	{
+		id: 'acm0004', title: 'ACM0004: Consolidated methodology for waste gas and/or heat for power generation', by: 'UNFCCC Clean Development Mechanism',
+		url: 'https://cdm.unfccc.int/methodologies/DB/3NL6ELY805NDZHF4YZRPK94MAPALUB/view.html',
+		use: 'Project emissions only from auxiliary fuel, so none from the waste gas itself. Since replaced by ACM0012.',
+		topics: ['emissions'],
+	},
+	{
+		id: 'em6', title: 'New Transpower tool unlocks electricity emissions tracking for all', by: 'Transpower', date: 'November 2021',
+		url: 'https://transpower.co.nz/news/new-transpower-tool-unlocks-electricity-emissions-tracking-all',
+		use: 'What em6’s emissions tracker is and how it works.',
+		topics: ['emissions', 'groupings'],
+	},
+	// ---------- plants ----------
+	{
+		id: 'nzsteel', title: 'Energy resources and recovery', by: 'New Zealand Steel',
+		url: 'https://www.nzsteel.co.nz/sustainability/our-environment/energy-resources-and-recovery/',
+		use: 'Glenbrook’s two cogeneration plants, on waste gas from the multi-hearth furnaces and waste heat from the rotary kilns.',
+		topics: ['generation', 'emissions'],
+	},
+	{
+		id: 'kinleith', title: 'CHH Kinleith Cogeneration Plant', by: 'Bioenergy Association of New Zealand',
+		url: 'https://www.bioenergy.org.nz/facility/chh-kinleith-cogeneration-plant',
+		use: 'Kinleith’s boiler burns wood waste.',
+		topics: ['generation'],
+	},
+	{
+		id: 'tasman', title: 'Carbon reduction case study: Tasman Mill', by: 'Oji Fibre Solutions, Climate Leaders Coalition', date: '2022',
+		url: 'https://climateleaderscoalition.org.nz/wp-content/uploads/2022/06/OjiFS-carbon-reduction-case-study_Tasman-Mill.pdf',
+		use: 'The Kawerau mill’s boilers: black liquor in the recovery boiler, wood residues in the power boiler, and geothermal steam.',
+		topics: ['generation'],
+	},
+	{
+		id: 'manawa', title: 'Contact Energy completes Manawa Energy acquisition', by: 'Contact Energy, NZX announcement', date: '11 July 2025',
+		url: 'https://announcements.nzx.com/announcement/454948',
+		use: 'The date Contact took over Manawa Energy.',
+		topics: ['groupings'],
+	},
+	{
+		id: 'wikipedia', title: 'List of power stations in New Zealand', by: 'Wikipedia',
+		url: 'https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand',
+		use: 'Many of the capacity table’s dates and sizes, with each station’s own article. Every row of the table names its source.',
+		topics: ['capacity'],
+	},
+	// ---------- offers and security of supply ----------
+	{
+		id: 'ea-offers', title: 'Current bids and offers data to be decommissioned and replaced on 28 Aug 2017', by: 'EMI forum, Electricity Authority', date: 'August 2017',
+		url: 'https://forum.emi.ea.govt.nz/thread/bids-and-offers-data-current-files-to-be-decommissioned-and-replaced-on-28-august-2017/',
+		use: 'Bids and offers before 13 December 2012 left out of the published files because of their poor quality.',
+		topics: ['capacity'],
+	},
+	{
+		id: 'sos', title: 'Security of supply', by: 'Transpower, system operator',
+		url: 'https://transpower.co.nz/system-operator/security-supply',
+		use: 'The system operator’s reports on whether there is enough generation, including the New Zealand Generation Balance.',
+		topics: ['capacity'],
+	},
+	// ---------- solar ----------
+	{
+		id: 'niwa', title: 'Mean daily global radiation across selected New Zealand locations', by: 'NIWA climate averages 1991–2020, on Figure.NZ',
+		url: 'https://figure.nz/chart/72IvcxUqOYF0xjMa',
+		use: 'Long-term sunshine at Auckland, Wellington, Christchurch and Dunedin, to compare with the satellite.',
+		topics: ['embedded-solar'],
+	},
+	{
+		id: 'sa-peak', title: 'Rooftop solar smashes output records in two states, as home batteries dull grid impact in sunny Spring', by: 'RenewEconomy', date: '8 October 2026',
+		url: 'https://reneweconomy.com.au/rooftop-solar-smashes-output-records-in-two-states-as-home-batteries-dull-grid-impact-in-sunny-spring/',
+		use: 'South Australia’s 2,070 MW rooftop solar peak.',
+		topics: ['embedded-solar'],
+	},
+	{
+		id: 'cec', title: 'Rooftop solar and storage report, July–December 2025', by: 'Clean Energy Council', date: '2026',
+		url: 'https://cleanenergycouncil.org.au/getmedia/16ed1cff-8ddb-423a-b3ad-3f9fa8e4d594/rooftop-solar-and-storage-biannual-report_july-december-2025.pdf',
+		use: 'South Australia’s installed rooftop solar, 2.85 GW at the end of 2025 (figure 4).',
+		topics: ['embedded-solar'],
+	},
+	{
+		id: 'pvlib', title: 'pvlib python', by: 'pvlib project',
+		url: 'https://pvlib-python.readthedocs.io/',
+		use: 'The library the site’s PV model is checked against; its documentation gives the published reference for each model, Hay–Davies among them.',
+		topics: ['embedded-solar'],
+	},
+	{
+		id: 'noaa', title: 'Solar calculation details', by: 'NOAA Global Monitoring Laboratory',
+		url: 'https://gml.noaa.gov/grad/solcalc/calcdetails.html',
+		use: 'The sun position equations.',
+		topics: ['embedded-solar'],
+	},
+	{
+		id: 'ashrae', title: 'ASHRAE IAM model', by: 'PV Performance Modeling Collaborative, Sandia National Laboratories',
+		url: 'https://pvpmc.sandia.gov/modeling-guide/1-weather-design-inputs/shading-soiling-and-reflection-losses/incident-angle-reflection-losses/ashrae-iam-model/',
+		use: 'The reflection losses at low sun angles.',
+		topics: ['embedded-solar'],
+	},
+	{
+		id: 'sandia', title: 'Sandia cell temperature model', by: 'PV Performance Modeling Collaborative, Sandia National Laboratories',
+		url: 'https://pvpmc.sandia.gov/modeling-guide/2-dc-module-iv/cell-temperature/sandia-cell-temperature-model/',
+		use: 'Panel temperature.',
+		topics: ['embedded-solar'],
+	},
+	{
+		id: 'pvwatts', title: 'PVWatts Version 5 Manual', by: 'Dobos, National Renewable Energy Laboratory', date: '2014',
+		url: 'https://www.osti.gov/biblio/1158421',
+		use: 'DC output, the inverter limit and fixed losses.',
+		topics: ['embedded-solar'],
+	},
+];
+
 export const topic = (slug: string) => TOPICS.find((t) => t.slug === slug);
 export const sourcesFor = (slug: string) => SOURCES.filter((s) => s.topics.includes(slug));
 export const sourceHref = (id: string) => `/methods/sources#${id}`;
+export const refsFor = (slug: string) => REFERENCES.filter((r) => r.topics.includes(slug));
+export const ref = (id: string) => {
+	const r = REFERENCES.find((x) => x.id === id);
+	if (!r) throw new Error(`no reference called ${id}`);
+	return r.url;
+};
 
 // each topic page's body, by slug
 const bodies = import.meta.glob<{ default: Component }>('./pages/*.svelte', { eager: true });

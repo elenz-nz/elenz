@@ -49,8 +49,8 @@ DC_AC = {'small': 1.2, 'large': 1.2, 'ground': 1.35}
 LOSSES = {'small': 0.115, 'large': 0.115, 'ground': 0.08}
 MOUNT = {'small': 'roof', 'large': 'roof', 'ground': 'rack'}   # cell temperature: close roof mount or open rack
 # Calibration (analysis/README.md, Oct 2026): established dispatched farms produce 88-98% of what this chain
-# predicts from satellite irradiance, and satellite sunshine totals run up to ~5% above NIWA's long-term figures in
-# places, so rooftops are scaled by 0.95 (about ±6%). Ground arrays are fitted directly to metered output.
+# predicts from satellite irradiance, and 2025's satellite sunshine ran 6-9% above NIWA's 1991-2020 means at the main
+# centres, so rooftops are scaled by 0.95 (about ±6%). Ground arrays are fitted directly to metered output.
 CAL = {'small': 0.95, 'large': 0.95, 'ground': 1.0}
 UNCERTAINTY = {'capacity': 0.04, 'calibration': 0.06, 'clear': 0.05, 'cloudy': 0.18, 'nowcast': 0.12}   # one std dev
 EXTRAPOLATE_DAYS = 120    # carry the recent growth beyond the latest report for at most this long

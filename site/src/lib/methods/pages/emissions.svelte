@@ -6,7 +6,7 @@
 		RANKINE_COAL_SHARE_MBIE, RANKINE_HEAT_RATE, STRATFORD_TCC, rankineFactor,
 	} from '#lib/tracker/emissions.js';
 	import { FUELS } from '#lib/tracker/fuels.js';
-	import { REPO } from '../registry.js';
+	import { REPO, ref, sourceHref } from '../registry.js';
 
 	const diesel = FUELS.find((f: { k: string }) => f.k === 'diesel')?.ef ?? 0.8;
 	const f2 = (v: number) => v.toFixed(2);
@@ -58,7 +58,7 @@
 
 <h2 id="calc">The calculation</h2>
 <p class="formula">Intensity (g/kWh) = Σ (each source’s MW × its emission factor in t/MWh) ÷ generation less battery discharge in MW × 1,000
-<small>total generation as on the <a href="/methods/generation#totals">generation page</a> (every source while positive, including embedded solar), less battery discharge: that energy was generated, and its emissions counted, when the battery charged, so counting it again would dilute the intensity. em6 does the same, and so has Elenz since October 2026.</small></p>
+<small>total generation as on the <a href="/methods/generation#totals">generation page</a> (every source while positive, including embedded solar), less battery discharge: that energy was generated, and its emissions counted, when the battery charged, so counting it again would dilute the intensity. <a href={ref('em6')}>em6</a> does the same, and so has Elenz since October 2026.</small></p>
 <ul>
 	<li>Factors count the emissions at the power station only (operational, not lifecycle: building the plant and extracting the fuel aren’t included).</li>
 	<li>Geothermal and gas use each station’s own factor, weighted by its output; the other fuels use one factor each.</li>
@@ -73,10 +73,10 @@
 		<tbody>
 			<tr><td>Coal/gas, Rankine (Huntly 1, 2, 4)</td><td class="n">{f2(rankineFactor(0))}–{f2(rankineFactor(1))}</td><td>By quarter, from the share of their fuel that was coal (<a href="#rankine">below</a>)</td></tr>
 			<tr><td>Gas</td><td class="n">{f2(GAS_FLEET)}</td><td>Today’s fleet average; closed plants their own (<a href="#gas">below</a>)</td></tr>
-			<tr><td>Diesel (Whirinaki)</td><td class="n">{f2(diesel)}</td><td>A typical factor for diesel turbines; it runs rarely</td></tr>
+			<tr><td>Diesel (Whirinaki)</td><td class="n">{f2(diesel)}</td><td>Assumed, a typical factor for diesel turbines: Whirinaki’s heat rate is about 10.9 GJ/MWh (<a href={ref('stack2020')}>2020 stack report</a>). It runs rarely</td></tr>
 			<tr><td>Geothermal</td><td class="n">{geoRange}</td><td>Each station by year (<a href="#geothermal">below</a>)</td></tr>
-			<tr><td>Bioenergy (Kinleith, Kawerau mill)</td><td class="n">0</td><td>Wood waste and black liquor: biogenic CO₂, counted as zero, as in national inventories</td></tr>
-			<tr><td>Waste heat (Glenbrook)</td><td class="n">0</td><td>NZ Steel’s ironmaking gases; the emissions are counted with the ironmaking (industrial processes). UN CDM methodology ACM0004 also counts waste-gas generation as zero</td></tr>
+			<tr><td>Bioenergy (Kinleith, Kawerau mill)</td><td class="n">0</td><td>Wood waste and black liquor: biogenic CO₂, counted as zero, as in national inventories (<a href={ref('ipcc')}>IPCC guidelines</a>; the <a href={sourceHref('mfe')}>Ministry for the Environment</a> reports it separately)</td></tr>
+			<tr><td>Waste heat (Glenbrook)</td><td class="n">0</td><td><a href={ref('nzsteel')}>NZ Steel’s ironmaking gases</a>; the emissions are counted with the ironmaking (industrial processes). UN CDM methodology <a href={ref('acm0004')}>ACM0004</a> (since replaced by ACM0012) also counted waste-gas generation as zero</td></tr>
 			<tr><td>Hydro, wind, solar, embedded solar</td><td class="n">0</td><td>Nothing burned</td></tr>
 			<tr><td>Batteries</td><td class="n">0</td><td>Discharge only; the energy that charged them was counted when it was generated</td></tr>
 		</tbody>
@@ -89,15 +89,15 @@
 <small>{f2(rankineFactor(0))} t/MWh all on gas, {f2(rankineFactor(1))} all on coal</small></p>
 <dl>
 	<dt>Gas, {GAS} kg/GJ</dt>
-	<dd>The Ministry for the Environment’s factor for natural gas burned in stationary plant.</dd>
+	<dd>The <a href={sourceHref('mfe')}>Ministry for the Environment’s</a> factor for natural gas burned in stationary plant. Its 2026 edition gives 54.19 for industrial use.</dd>
 	<dt>Coal, {COAL} kg/GJ</dt>
 	<dd>Fitted to Genesis’s quarterly fuel burned and reported generation emissions, with the gas factor fixed. (Fitting both gives coal 89.7 and gas 57.1.)</dd>
 	<dt>Heat rate, {RANKINE_HEAT_RATE} GJ/MWh</dt>
 	<dd>Genesis’s coal burned per coal-fired MWh, the median over quarters at least 85% on coal (range 10.8–11.9).</dd>
 	<dt>From {firstGenesis} (Jul 2020)</dt>
-	<dd>Genesis’s quarterly performance reports. Each new quarter is added as Genesis reports it, about three weeks after the quarter ends; until then the latest ({latest[0]}, {Math.round(latest[1] * 100)}% coal) is carried forward.</dd>
+	<dd><a href={sourceHref('genesis')}>Genesis’s quarterly performance reports</a>. Each new quarter is added as Genesis reports it, about three weeks after the quarter ends; until then the latest ({latest[0]}, {Math.round(latest[1] * 100)}% coal) is carried forward.</dd>
 	<dt>Before that</dt>
-	<dd>MBIE’s quarterly electricity generation from coal, less Glenbrook’s metered output (MBIE counts Glenbrook as coal), divided by the Rankines’ metered output. Over FY21–FY25, where both exist, this reproduces Genesis’s own figures to within a few points in most quarters. A quarter with under 100 GWh of Rankine output keeps the quarter before’s share.</dd>
+	<dd><a href={sourceHref('mbie')}>MBIE’s quarterly electricity generation</a> from coal, less Glenbrook’s metered output (MBIE counts Glenbrook as coal), divided by the Rankines’ metered output. Over FY21–FY25, where both exist, this reproduces Genesis’s own figures to within a few points in most quarters. A quarter with under 100 GWh of Rankine output keeps the quarter before’s share.</dd>
 </dl>
 <div class="tbl">
 	<table class="grid">
@@ -120,9 +120,9 @@
 <p>All gas plant uses <b>{f2(GAS_FLEET)} t/MWh</b>, the generation-weighted average of today’s fleet over the dispatch history (by quarter 0.44–0.52, depending on how much Huntly 5 ran):</p>
 <ul>
 	<li>Huntly 5 (combined cycle): 7.6 GJ/MWh, from Genesis’s gas burned less the Rankines’ gas, so 0.41 t/MWh.</li>
-	<li>Assumed heat rates for the rest: Huntly 6 and McKee 10.5 GJ/MWh; Stratford’s peakers 9.0; Junction Road and cogeneration 9.5 (0.49–0.57 t/MWh).</li>
+	<li>Assumed heat rates for the rest: Huntly 6 and McKee 10.5 GJ/MWh; Stratford’s peakers 9.0; Junction Road and cogeneration 9.5 (0.49–0.57 t/MWh). The <a href={ref('stack2020')}>2020 thermal generation stack update</a> has Huntly 5 at 7.4, Huntly 6 at 10.5 and Stratford’s peakers at 8.9; it gives no figure for McKee or Junction Road.</li>
 </ul>
-<p>Plants that have closed appear in the metered history, and were much more or less efficient than today’s fleet, so they get their own factor from typical heat rates at {GAS} kg/GJ (estimates, not reported figures):</p>
+<p>Plants that have closed appear in the metered history, and were much more or less efficient than today’s fleet, so they get their own factor from typical heat rates at {GAS} kg/GJ (estimates, not reported figures). The <a href={ref('stack2011')}>2011 generation data update</a> has Ōtāhuhu B and the Taranaki Combined Cycle at 7.4 GJ/MWh, and Southdown’s combined cycle at 7.4 and its E105 turbine at 10.6.</p>
 <div class="tbl">
 	<table>
 		<thead><tr><th>Plant</th><th class="n">t/MWh</th><th>Notes</th></tr></thead>
@@ -136,7 +136,7 @@
 </div>
 
 <h2 id="geothermal">Geothermal</h2>
-<p>Geothermal fluid carries CO₂ and some methane from underground, and how much varies widely between fields; stations increasingly reinject it. Each station’s own operational emissions come from the NZ Geothermal Association’s emissions working group (McLean et al.), for 2020, 2022 (published as lifecycle, less its 10 g/kWh allowance for the plant itself) and 2023. Each year uses the newest figure published for that year or before it; years before 2020 use 2020’s, which probably understates them, as reinjection was less common.</p>
+<p>Geothermal fluid carries CO₂ and some methane from underground, and how much varies widely between fields; stations increasingly reinject it. Each station’s own operational emissions come from the <a href={sourceHref('nzga')}>NZ Geothermal Association’s emissions working group</a> (<a href={ref('mclean2024')}>McLean et al. 2024</a>), for 2020, 2022 (published as lifecycle, less its 10 g/kWh allowance for the plant itself) and 2023. Each year uses the newest figure published for that year or before it; years before 2020 use 2020’s, which probably understates them, as reinjection was less common.</p>
 <div class="tbl">
 	<table>
 		<thead><tr><th>Station</th>{#each GEO_YEAR_COLS as y (y)}<th class="n">{y}</th>{/each}</tr></thead>
@@ -148,13 +148,13 @@
 				<tr class="sub"><td>{GEO_NAMES[k]} (assumed)</td><td class="n" colspan={GEO_YEAR_COLS.length}>{v}</td></tr>
 			{/each}
 		</tbody>
-		<caption>g CO₂e/kWh (= kg/MWh). Assumed figures are TIMES-NZ’s, until the NZGA publishes them. Ngāwhā’s OEC4 opened in 2021; until 2023 it uses the field’s figure before reinjection. Any other station: {GEO_DEFAULT}, the 2023 fleet average.</caption>
+		<caption>g CO₂e/kWh (= kg/MWh). Assumed figures are <a href={ref('times')}>TIMES-NZ’s</a>, until the NZGA publishes them. Ngāwhā’s OEC4 opened in 2021; until 2023 it uses the field’s figure before reinjection. Any other station: {GEO_DEFAULT}, the 2023 fleet average.</caption>
 	</table>
 </div>
 <p>Weighted by output, dispatched geothermal came to about 70 g/kWh in 2021, 60 in 2023 and 54 in 2025. New years are added as the NZGA publishes them (each November).</p>
 
 <h2 id="checks">Checks against national figures</h2>
-<p>Coal, gas and diesel emissions in the history follow the national inventory’s “energy industries” series year to year, after taking out its roughly 1.2 Mt of refining and gas processing: 4.4 Mt against 4.4 in 1998, 6.8 against 6.8 in 2001, 8.8 against 9.1 in 2005, 8.2 against 8.5 in 2008, 5.3 against 5.7 in 2010. The pattern matches too: the 2001 and 2005–06 peaks, the 2007 dip and the 2011 low.</p>
+<p>Coal, gas and diesel emissions in the history follow the <a href={sourceHref('inventory')}>national inventory’s</a> “energy industries” series year to year, after taking out its roughly 1.2 Mt of refining and gas processing: 4.4 Mt against 4.4 in 1998, 6.8 against 6.8 in 2001, 8.8 against 9.1 in 2005, 8.2 against 8.5 in 2008, 5.3 against 5.7 in 2010. The pattern matches too: the 2001 and 2005–06 peaks, the 2007 dip and the 2011 low.</p>
 
 <h2 id="limits">Known limits</h2>
 <ul>

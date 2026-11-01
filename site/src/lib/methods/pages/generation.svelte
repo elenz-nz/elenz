@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { REPO } from '../registry.js';
+	import { REPO, ref } from '../registry.js';
 </script>
 
 <h2 id="shows">What the chart shows</h2>
@@ -36,9 +36,9 @@
 		<thead><tr><th>Correction</th><th>Units</th><th>Why</th></tr></thead>
 		<tbody>
 			<tr><td>Added</td><td>Kaiwaikawe wind (<code>MPE1101 KWK0</code>), Kōwhai Park solar (<code>ISL0661 KPS0</code>), Ruakākā solar (<code>BRB0331 RUS0</code>)</td><td>Dispatching, but not in the register yet</td></tr>
-			<tr><td>Bioenergy</td><td>Kinleith (<code>KIN0112</code>)</td><td>Oji Fibre Solutions’ wood-waste cogeneration; the register says gas</td></tr>
-			<tr><td>Bioenergy</td><td>Kawerau pulp mill cogeneration (<code>KAW0112 ONU0</code>)</td><td>The mill’s recovery and bark boilers (black liquor and wood); the register says geothermal</td></tr>
-			<tr><td>Waste heat</td><td>Glenbrook (<code>GLN0332</code>)</td><td>Runs on waste gas and heat from NZ Steel’s ironmaking, not pipeline gas</td></tr>
+			<tr><td>Bioenergy</td><td>Kinleith (<code>KIN0112</code>)</td><td>Oji Fibre Solutions’ <a href={ref('kinleith')}>wood-waste cogeneration</a>; the register says gas</td></tr>
+			<tr><td>Bioenergy</td><td>Kawerau pulp mill cogeneration (<code>KAW0112 ONU0</code>)</td><td>Most likely steam from the mill’s <a href={ref('tasman')}>recovery and power boilers</a> (black liquor and wood residues), with some geothermal; the register says geothermal</td></tr>
+			<tr><td>Waste heat</td><td>Glenbrook (<code>GLN0332</code>)</td><td>Runs on <a href={ref('nzsteel')}>waste gas and heat from NZ Steel’s ironmaking</a>, not pipeline gas</td></tr>
 			<tr><td>Island</td><td><code>OHG1101</code>, <code>OHG2201</code></td><td>Pātea moved to OHG1101 in June 2026, and the feed gives it no island</td></tr>
 			<tr><td>Battery charging</td><td><code>RUK99</code>, <code>GLB99</code>, <code>RHO99</code>, <code>HLY91</code></td><td>Charging is dispatched as load on a separate unit; it is netted against its battery (Ruakākā, Glenbrook-Ohurua, Rotohiko, Huntly)</td></tr>
 			<tr><td>One name</td><td>Pātea units 1–3; Kaimai 5; Ngāwhā B; West Wind 1 and 2</td><td>Shown as Pātea, Kaimai, Ngāwhā and West Wind: the names the metered history uses, and one farm for West Wind’s two connections</td></tr>

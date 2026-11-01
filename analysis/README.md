@@ -38,8 +38,10 @@ Open-Meteo Satellite Radiation API (`satellite-api.open-meteo.com/v1/archive`, `
 at least 2016, about 40–50 minutes behind real time. Values are blank while the sun is under ~10° and for a couple
 of housekeeping slots a day: `rooftop.fill_gaps` fills them from the nearest valid clear-sky index.
 
-Annual 2025 sunshine (kWh/m²) at the points is close to NIWA's long-term figures: Christchurch 1,468, Wellington
-1,467, Dunedin 1,277, Nelson/Tasman 1,600; Auckland 1,623 may be ~5% high.
+Annual 2025 sunshine (kWh/m²) at the points runs 6-9% above NIWA's 1991-2020 means (https://figure.nz/chart/72IvcxUqOYF0xjMa,
+MJ/m²/day × 365.25 / 3.6; checked 2 Nov 2026): Christchurch 1,468 against 1,371, Wellington 1,467 against 1,385, Dunedin 1,277
+against 1,200, Auckland 1,623 against 1,491; Nelson/Tasman 1,600 isn't in that list. One year against a 30-year mean, at
+network points rather than NIWA's stations. An earlier note here said "close to NIWA, Auckland ~5% high", with no source.
 
 ## PV model (`ingest/pv.py`, `check_pv.py`)
 
