@@ -104,9 +104,9 @@
 	// first CARDS are the most notable, compact (the period, not the date); Show all lists every one by period, in full
 	const allCards = $derived(R ? recentAll(R, live, near) : []);
 	const topCardList = $derived(topCards(allCards, CARDS));
-	// Show all: one region at a time (owner's call, 1 Nov 2026: every region together was too many), New Zealand first
-	let cardRegion = $state('NZ');
-	const cardGroups = $derived(CARD_GROUPS.map((k) => ({ k, label: cardGroupLabel(k), cards: allCards.filter((c) => c.group === k && c.region === cardRegion) })).filter((g) => g.cards.length));
+	// Show all: one region at a time (owner's call, 1 Nov 2026: every region together was too many), the same region as
+	// the All-time records list: picking it in either place changes both (and the address)
+	const cardGroups = $derived(CARD_GROUPS.map((k) => ({ k, label: cardGroupLabel(k), cards: allCards.filter((c) => c.group === k && c.region === region) })).filter((g) => g.cards.length));
 	// heading for a record: one card per record and period, New Zealand's where it is on pace, otherwise an island's
 	const paces = $derived.by(() => {
 		if (!R || !liveD) return [];
@@ -187,7 +187,7 @@
 						<p>These are records set in the last 30 days for New Zealand or either island, newer ones waiting on the metered data, and recent dispatch figures close to a record.</p>
 						<ul>
 							<li>First four: the most notable, one per record, each saying its period (trading period, day, week, month or year).</li>
-							<li>“Show all”: every one for the region picked beside it (New Zealand to start), under its period with its date.</li>
+							<li>“Show all”: every one for the region picked beside it, under its period with its date. It’s the same region as the All-time records list below; changing either changes both.</li>
 							<li>Dashed border: provisional, from dispatch data, until the EA's metered data confirms it. It beats the record by more than dispatch data usually strays from the meters.</li>
 							<li>Dotted border: close to the record, too close for dispatch data to call either way.</li>
 							<li>Struck through: a provisional record the metered data didn't confirm.</li>
@@ -196,7 +196,7 @@
 					</InfoTip></div>
 					<div class="sec-ctl">
 						{#if cardsAll}<label for="card-region" class="vh">Region</label>
-						<select class="pick" id="card-region" bind:value={cardRegion}>{#each REGIONS as r}<option value={r.id}>{r.name}</option>{/each}</select>{/if}
+						<select class="pick" id="card-region" value={region} onchange={(e) => setRegion((e.currentTarget as HTMLSelectElement).value)}>{#each REGIONS as r}<option value={r.id}>{r.name}</option>{/each}</select>{/if}
 						{#if allCards.length > CARDS}<button type="button" class="more-btn" aria-expanded={cardsAll} onclick={() => (cardsAll = !cardsAll)}>{cardsAll ? 'Show fewer' : 'Show all'}</button>{/if}
 					</div></div>
 					{#snippet card(c: any, full: boolean)}
@@ -223,7 +223,7 @@
 						</a>
 					{/snippet}
 					{#if cardsAll}
-						{#if !cardGroups.length}<p class="none-here">Nothing new or provisional for {REGIONS.find((r) => r.id === cardRegion)?.name} just now.</p>{/if}
+						{#if !cardGroups.length}<p class="none-here">Nothing new or provisional for {REGIONS.find((r) => r.id === region)?.name} just now.</p>{/if}
 						{#each cardGroups as g}
 							<h3 class="card-group">{g.label} <span>{g.cards.length}</span></h3>
 							<div class="cards">{#each g.cards as c}{@render card(c, true)}{/each}</div>
