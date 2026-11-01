@@ -33,7 +33,7 @@
 <p>Geothermal runs close to flat out, so its capacity factor is high; wind and solar follow the weather; peaking gas plant and Huntly’s Rankine units run when they are needed, so theirs are low.</p>
 
 <h2 id="sources">Where the figures come from</h2>
-<p>Every plant the tracker shows has a row in <a href={REPO + 'facilities/plant_capacity.csv'}><code>facilities/plant_capacity.csv</code></a>, with its MW, the dates each figure applies, and where it comes from. Most come straight from the EA’s plant register. The register gives each plant’s capacity today, though, not its history, and it misses some plants, so about a third of the rows are corrections:</p>
+<p>Every plant the tracker shows has a row in <a href={REPO + 'facilities/plant_capacity.csv'}><code>facilities/plant_capacity.csv</code></a>, with its MW, the dates each figure applies, and where it comes from. Most come straight from the EA’s plant register. The register gives each plant’s capacity today, though, not its history, and it misses some plants, so nearly half the rows are corrections:</p>
 <ul>
 	<li><b>Upgrades and derating:</b> Manapōuri, Clyde, Arapuni, Whakamaru, Karāpiro, Benmore and Ōhau B and C; Wairakei, Mokai, Ngāwhā, Ngā Tamariki and Ōhaaki. The register shows today’s figure for the whole history.</li>
 	<li><b>Closures and retired plant:</b> New Plymouth, Ōtāhuhu A and B, the old Stratford gas turbines, Te Awamutu, Edgecumbe, Te Rapa, and the Taranaki Combined Cycle (closed March 2026).</li>
@@ -61,11 +61,12 @@
 	<li><b>Offered:</b> capacity is what generators offered for each half-hour in their final energy offers (the EA’s daily offers files, from January 2013). The EA holds no reliable offer records before December 2012, apart from the offers used in final pricing, so on ranges that reach back further the offered levels start in 2013 and the chart says so. Plant that is off and slow to start isn’t offered, so most days Huntly’s Rankine units drop out, as do units out for maintenance or faults and plant short of fuel. On 16 October 2026 the lowest headroom was about 3,500 MW installed but 1,150 MW offered: Huntly 1, 2, 4 and 5 offered nothing, and Manapōuri offered 620 of its 800 MW.</li>
 	<li><b>Under $1,000:</b> only the part offered under $1,000/MWh. Generators offer water they want to keep, and peaking plant, at high prices, so this is what was there at a price the market usually pays. Whirinaki’s diesel units are usually offered above it.</li>
 </ul>
-<p>Geothermal, bioenergy and waste heat are left out because they run close to flat out as a rule, and wind and solar because they follow the weather. An island on its own counts only its own plant, not what the HVDC link could bring. Thermal plant and batteries sit at the bottom of the By fuel view and hydro on top; <b>Include hydro</b> takes hydro out.</p>
+<p>Geothermal, bioenergy and waste heat are left out because they run close to flat out as a rule, and wind and solar because they follow the weather. An island on its own counts only its own plant, not what the HVDC link could bring.</p>
+<p><b>Levels</b> draws the three as nested areas; <b>By fuel</b> stacks one of them by fuel, thermal plant and batteries at the bottom and hydro on top. Turning off <b>Include hydro</b> leaves hydro out of both.</p>
 <p>The chart follows the range and interval. Where a point covers more data than it shows (days built from half-hours, or weeks and months), each level is its lowest within the point. The offers job (<a href={REPO + 'ingest/offered.py'}><code>ingest/offered.py</code></a>) keeps each day’s lowest offered headroom; daily history keeps each day’s highest half-hour of dispatchable output, so installed headroom’s lowest reaches back to 1997.</p>
 <p>Even offered headroom overstates the margin a little:</p>
 <ul>
-	<li>offers are published the day after, so the newest day has none (shaded);</li>
+	<li>offers are published the day after, and now and then a day comes later, so recent days without them are shaded “Offers not published yet”;</li>
 	<li>capacity held as reserve on running plant is still counted;</li>
 	<li>a unit offered but needing hours to reach full output, or a river chain that can’t run every station at once, counts in full;</li>
 	<li>output the grid can’t carry, and transmission outages, aren’t considered.</li>

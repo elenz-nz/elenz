@@ -1,6 +1,6 @@
 <script lang="ts">
 	// The list of records comes from the Records pages' own definitions, so this page can't drift from them.
-	import { LISTED as DEFS, GROUPS, NEW_DAYS } from '#lib/records/records.js';
+	import { LISTED as DEFS, GROUPS, NEW_DAYS, NEW_LAG } from '#lib/records/records.js';
 	import { REPO } from '../registry.js';
 	// what each record measures, in a line (the definitions' own `sub` is written for the Records list, where some say
 	// only "Half-hour")
@@ -28,7 +28,7 @@
 <p>The highest or lowest half-hour: each trading period’s average, as the history holds it.</p>
 
 <h3 id="periods">Days, weeks, months and years</h3>
-<p>Each half-hour record also has its highest or lowest day, week (Monday to Sunday), calendar month and calendar year, in New Zealand time. Pick the period at the top of the records table or on a record’s page.</p>
+<p>Each half-hour record also has its highest or lowest day, week (Monday to Sunday), calendar month and calendar year, in New Zealand time. Pick the period with the buttons in the records list’s title bar, or on a record’s page.</p>
 <ul>
 	<li><b>Averages, not totals.</b> A period’s figure is its average over its half-hours (MW, or $/MWh for prices), so periods of different lengths compare fairly: a February isn’t the lowest-demand month just for being short. The renewable share is renewable energy over all the period’s generation.</li>
 	<li><b>Energy alongside.</b> A period record also shows its energy (the average times the period’s hours), but it is ranked by the average.</li>
@@ -70,12 +70,12 @@
 </ul>
 <p>See <a href="/methods/history">History since 1997</a>.</p>
 <p>Anything newer comes from dispatch data, the market’s 5-minute targets. Records set there are <b>provisional</b>: shown as such, with when the metered data is due, and confirmed or dropped when it arrives. Dispatch runs 1–2% above metered generation (wind about 3.5%), so a provisional record that only just beats the old one often doesn’t survive. The page says which way it went for {NEW_DAYS} days.</p>
-<p>The Now page checks the live week itself: when a half-hour of the live data beats a record for generation or demand, a line under the price tiles says so. Prices and HVDC are left to the history:</p>
+<p>The Now page checks the live week itself: when a half-hour of the live data beats a record for generation or demand, a “New record today” link above Generation now says so, on the day it was set. Prices and HVDC are left to the history:</p>
 <ul>
 	<li>live prices are dispatch prices, which can be far from the final ones (on 9 August 2021 dispatch prices peaked at $356,621/MWh, final prices at $2,698);</li>
 	<li>live HVDC is an estimate.</li>
 </ul>
-<p>A record is marked <b>New</b> for {NEW_DAYS} days after it first appears in the official records.</p>
+<p>A record is marked <b>New</b> for {NEW_DAYS} days after it first appears in the official records, as long as its period ended recently: within about {NEW_LAG} days, since metered data runs weeks behind. A rebuild of the history that moves an old record doesn’t make it new.</p>
 
 <h2 id="pace">On record pace</h2>
 <p>Once half of the current day, week, month or year has gone, the records page lists any record it is on pace to break: where its average so far is ahead of where the record period was at the same point, as in a race.</p>
@@ -126,7 +126,7 @@
 	<li><b>Days the clocks change.</b> The EA’s metered generation files before 2009 number those days’ half-hours by the clock and leave out one hour (the last hour of the day when the clocks go forward, one of the two 2–3 am hours when they go back). The history puts each half-hour at its right time and fills the missing hour from the half-hour next to it, so those days count like any other, but the filled hour is an estimate.</li>
 	<li><b>Embedded solar is modelled</b> (<a href="/methods/embedded-solar">Embedded solar</a>), so its records are estimates, and it counts towards the renewable share as it does everywhere on the site.</li>
 	<li><b>Coverage.</b> The history has gaps (a few stations missing for some months; see <a href="/methods/history">History since 1997</a>). Totals before 2009 leave out embedded stations the tracker doesn’t show later.</li>
-	<li><b>The South Island</b> has no fossil plant, so its renewable share is always 100%; those records are shown as a note, not a date.</li>
+	<li><b>The South Island</b> has no fossil plant, so its renewable share has been 100% in every half-hour since 1997. Its list leaves out the records that can’t apply there, and Milestones shows its 100% instead.</li>
 	<li><b>Huntly’s Rankines</b> can burn coal or gas without the market seeing which, so the run counts the units being off, not coal being unused.</li>
 </ul>
 
@@ -138,4 +138,4 @@
 	<li>the runs at the month’s start and end, and the longest inside it.</li>
 </ul>
 <p>It publishes the records whenever the history is complete, with the time and a day’s worth of context for each half-hour record (that day’s series, demand, prices, HVDC and the biggest wind or solar farms).</p>
-<p>Code: <a href="{REPO}ingest/records.py">ingest/records.py</a> (the records), <a href="{REPO}site/src/lib/records/records.js">site/src/lib/records/records.js</a> (names, wording and the live check).</p>
+<p class="note">Code: <a href={REPO + 'ingest/records.py'}><code>ingest/records.py</code></a> (the records), <a href={REPO + 'site/src/lib/records/records.js'}><code>site/src/lib/records/records.js</code></a> (names, wording and the live check).</p>

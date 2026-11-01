@@ -6,7 +6,7 @@
 <p>Each stretch of time uses the best data published for it. Going back from now:</p>
 <ol>
 	<li><b>The last seven days</b>: the real-time dispatch feed, every 5 minutes (missed intervals are asked for again; ones with no case are interpolated).</li>
-	<li><b>Back to the latest metered month</b> (about five to six weeks): the EA’s daily dispatch files, the same dispatch cases, arriving 1–4 days late.</li>
+	<li><b>Back to the latest metered month</b> (usually five to ten weeks, as each month’s metering arrives five to six weeks after it ends): the EA’s daily dispatch files, the same dispatch cases, arriving 1–4 days late.</li>
 	<li><b>Every month the EA has published metering for, back to August 1997</b>: metered data, what each station actually delivered to the grid, as the market settles it.</li>
 </ol>
 <p>Prices are the EA’s final prices throughout the history, and HVDC is metered wherever published (about two weeks behind). The history job runs every six hours, adds months as the EA publishes them, and rebuilds every month whenever the plant register, the corrections or the metered plant table change.</p>
@@ -34,13 +34,13 @@
 <p>Plants that have closed are included: New Plymouth, Ōtāhuhu A and B, Southdown, Te Awamutu, and Taranaki Combined Cycle (within Stratford).</p>
 
 <h2 id="seam">Where the sources hand over</h2>
-<p>Over September 2020 to September 2026, where both exist, dispatch and metered figures agree closely (half-hourly national correlation 0.999 every month), but dispatch totals run 1–2% above metered ones every year: wind 3–4%, hydro 1–2%, geothermal, gas and coal within 2%. That is most likely because dispatch measures output at the generator and metering at the grid connection. The site uses each as published rather than scaling one to the other, so where the history switches from metered to dispatch data, about six weeks back, totals can step up slightly.</p>
+<p>Over September 2020 to September 2026, where both exist, dispatch and metered figures agree closely (half-hourly national correlation 0.999 every month), but dispatch totals run 1–2% above metered ones every year: wind 3–4%, hydro 1–2%, geothermal, gas and coal within 2%. That is most likely because dispatch measures output at the generator and metering at the grid connection. The site uses each as published rather than scaling one to the other, so where the history switches from metered to dispatch data, at the start of the month after the latest metered one, totals can step up slightly.</p>
 <p>Plant by plant, the two can differ more. The Waikato stations are dispatched as one block, so their dispatch figures are the chain’s total split between stations, not each station’s output (correlation only 0.4–0.7 by half-hour); the metered figures are the real ones. Glenbrook’s metered output is about 1.45 times its dispatch, which sees only part of the plant.</p>
 
 <h2 id="resolution">Resolution</h2>
 <ul>
 	<li>The 30-day view shows half-hours.</li>
-	<li>1 year and All show days, or weeks, months and years. Each is the average over its half-hours, with peak demand and peak generation from each day’s highest half-hour.</li>
+	<li>1 year and All show days, or weeks, months and years. Generation is shown as each period’s energy; demand, HVDC and prices as its average. Peak demand and peak generation come from each day’s highest half-hour.</li>
 	<li>Energy figures add up the half-hours, so they are the same at any interval.</li>
 </ul>
 
