@@ -237,9 +237,9 @@ export const SOURCES: Source[] = [
 		id: 'reconciliation', name: 'Reconciled injection and offtake', publisher: EA, dataset: 'Volumes/Reconciliation',
 		url: EMI + 'Volumes/Reconciliation',
 		what: 'Monthly files of metered injection and offtake by connection point, network, trader and half-hour.',
-		use: 'Mill Creek wind farm’s first 16 months (May 2014 to August 2015), which no other metered file has; checking the embedded solar model against metered exports, and the output of embedded solar farms.',
+		use: 'Mill Creek wind farm’s first 16 months (May 2014 to August 2015), which no other metered file has; checking the embedded solar model against metered exports, and the output of embedded solar farms; measuring the other embedded generation the dispatch data doesn’t see.',
 		period: 'Monthly', fresh: 'About a week after each month; revised at 7 and 14 months', licence: CCBY,
-		topics: ['embedded-solar', 'history'],
+		topics: ['embedded-solar', 'history', 'generation', 'demand'],
 	},
 	{
 		id: 'guehmt', name: 'Installed distributed generation', publisher: EA, dataset: 'Report GUEHMT',
