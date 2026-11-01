@@ -81,7 +81,7 @@
 <ul>
 	<li><b>Rows.</b> It follows the range: one row per day (at least the last seven days, up to 400 days, from the half-hourly history and the live week), scrolling once there are more than 40, newest at the foot. On All it has one row per month (or per year, on the yearly interval), each the average of that half-hour across the month, from a file the history job keeps of every month’s time-of-day averages.</li>
 	<li><b>Renewable share colours.</b> Fixed bands, so different periods compare: under 80% (brown, half-hours that leaned on thermal plant), 80–88%, 88–93%, 93–96%, 96–98%, and 98% and over (green). “Scale to this view” sets the bands at the sixths of the shares shown instead, which the early years need: most of their half-hours are under 80%.</li>
-	<li><b>A fuel’s colours.</b> Six steps on a fixed scale set by today’s installed capacity of that fuel in the region shown, the top step starting at 80% of it for half-hours (60% for monthly averages, which smooth out the peaks). Earlier years look paler where less was built. “Scale to this view” fits the steps to the output shown.</li>
+	<li><b>A fuel’s colours.</b> Six steps on a fixed scale set by today’s installed capacity of that fuel in the region shown, the top step starting at 80% of it for half-hours (60% for monthly averages, which smooth out the peaks). Earlier years show fainter colour where less was built, in light and dark mode alike. “Scale to this view” fits the steps to the output shown.</li>
 	<li>The renewable share is worked out as on the <a href="/methods/groupings#renewable">groupings page</a>; embedded solar counts, battery discharge doesn’t.</li>
 </ul>
 

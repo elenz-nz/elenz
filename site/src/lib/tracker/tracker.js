@@ -1048,7 +1048,13 @@ export function mountTracker(D, hooks = {}) {
     $('cv-gen').closest('.chart').classList.toggle('priced', state.price);
     const note = $('gen-note'), txt = NOTES[state.view] || '';
     note.hidden = !txt;
-    note.textContent = txt ? txt + ' ' : '';
+    note.textContent = '';
+    // the grouping's name first, in bold capitals (owner's call, 1 Nov 2026): "SIMPLIFIED – Five groups: ..."
+    if (txt) {
+      const b = document.createElement('b');
+      b.textContent = ($('sel-view').querySelector(`option[value="${state.view}"]`)?.textContent || state.view).toUpperCase();
+      note.append(b, ` – ${txt} `);
+    }
     if (txt) { const a = document.createElement('a'); a.href = '/methods/groupings#groupings'; a.textContent = 'How the groups are made'; note.append(a); }
     const up = lv !== 'top' ? parts[parts.length - 2] : null;
     $('sum-level').hidden = !up;

@@ -46,8 +46,8 @@
 <ul>
 	<li><b>Wind:</b> 100, 250, 500, 750, 1,000, 1,250 and 1,500 MW.</li>
 	<li><b>Grid solar</b> and <b>embedded solar</b> (estimated): 100, 250, 500, 750 and 1,000 MW.</li>
-	<li><b>Renewable share:</b> 90%, 95%, 98% and 99%.</li>
-	<li><b>Peak demand:</b> 6,000, 6,500, 7,000 and 7,500 MW.</li>
+	<li><b>Renewable share:</b> 90%, 95%, 98% and 99%. The South Island, which has no fossil plant, has one milestone instead: 100% renewable in every half-hour since the data began in August 1997.</li>
+	<li><b>Peak demand:</b> 6,000, 6,500, 7,000 and 7,500 MW for New Zealand; 4,500 and 5,000 MW for the North Island; 2,000 and 2,500 MW for the South Island.</li>
 	<li>A level not reached yet isn’t listed, and an island lists only those that can apply there.</li>
 </ul>
 

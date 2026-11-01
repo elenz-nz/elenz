@@ -307,8 +307,8 @@
 					<div class="ttl-row"><h2 id="mile-h">Milestones</h2><InfoTip label="About milestones">
 						<p>These are the first times each round level was passed, newest first, for New Zealand and each island.</p>
 						<ul>
-							<li>Covers wind, grid and embedded solar, renewable share and peak demand.</li>
-							<li>Each milestone is the first half-hour over the level.</li>
+							<li>Covers wind, grid and embedded solar, renewable share and peak demand, with the islands' own demand levels.</li>
+							<li>Each milestone is the first half-hour over the level. The South Island has been 100% renewable since the data began.</li>
 							<li>Point at one to light it in every region; click or tap to pin it there, again to let go.</li>
 						</ul>
 						<p><a href="/methods/records#milestones">How milestones work</a></p>
@@ -326,7 +326,7 @@
 											<li data-k={k} class:lit={lit === k} class:pinned={pinned === k} title={pinned === k ? 'Pinned · click to let go' : 'Click to pin'}>
 												<span class="dot" style="--c:var({m.d.tok})"></span>
 												<span><b>{m.d.unit === '%' ? `${m.level}% renewable` : `${m.level.toLocaleString('en-NZ')} MW of ${m.d.id === 'wind_max' ? 'wind' : m.d.id === 'solar_max' ? 'grid solar' : m.d.id === 'roof_max' ? 'embedded solar' : 'demand'}`}</b>
-													first passed {clock(m.t)}, {dayOf(m.t)}{#if m.d.est} <span class="tag est">Estimate</span>{/if}</span>
+													{m.always ? `every half-hour since the data began, ${dayOf(m.t)}` : `first passed ${clock(m.t)}, ${dayOf(m.t)}`}{#if m.d.est} <span class="tag est">Estimate</span>{/if}</span>
 											</li>
 										{/each}
 									</ul>
@@ -498,16 +498,20 @@
 	.miles li { display: flex; align-items: baseline; gap: 2px; padding: 7px 6px; border-bottom: 1px solid var(--grid); font-size: 0.86rem; color: var(--ink-2); }
 	.miles li:last-child { border-bottom: 0; }
 	.miles b { color: var(--ink); font-weight: 600; }
-	.moy th[scope='row'] { display: flex; align-items: center; padding-left: 0; font-weight: 500; }
-	.moy td.n:last-child { padding-right: 0; width: 4em; }
-	.moy tr:last-child td, .moy tr:last-child th { border-bottom: 0; }
+	/* each row a grid, so name, figure and year always fit inside the card: the name wraps, the year keeps a fixed
+	   column (owner's report, 1 Nov 2026: years spilled out of the cards at some widths; a flex th broke the table) */
+	.moy, .moy tbody { display: block; }
+	.moy tr { display: grid; grid-template-columns: minmax(0, 1fr) auto 2.6em; align-items: center; column-gap: 10px; border-bottom: 1px solid var(--grid); }
+	.moy tr:last-child { border-bottom: 0; }
+	.moy th[scope='row'], .moy td { padding: 9px 0; border-bottom: 0; min-width: 0; }
+	.moy th[scope='row'] { display: flex; align-items: center; font-weight: 500; overflow-wrap: anywhere; }
+	.moy td.n:last-child { text-align: right; }
 	/* the same milestone or record lit in every region's card; a pinned one keeps an accent edge */
 	.miles li[data-k], .moy tr[data-k] { cursor: pointer; }
-	.moy tr[data-k] th[scope='row'] { padding-left: 6px; }
-	.moy tr[data-k] td.n:last-child { padding-right: 6px; }
-	.miles li.lit, .moy tr.lit > * { background: var(--accent-soft); }
+	.moy tr[data-k] { padding-inline: 6px; }
+	.miles li.lit, .moy tr.lit { background: var(--accent-soft); }
 	.miles li.pinned { box-shadow: inset 3px 0 0 var(--accent); }
-	.moy tr.pinned th[scope='row'] { box-shadow: inset 3px 0 0 var(--accent); }
+	.moy tr.pinned { box-shadow: inset 3px 0 0 var(--accent); }
 	#moy-h select.pick { font-size: 1rem; }
 
 	@media (max-width: 640px) {

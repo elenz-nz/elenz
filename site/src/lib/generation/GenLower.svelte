@@ -145,7 +145,7 @@
 	// offered data comes in two shapes (days.json for daily views, month files otherwise) and arrives after the view
 	// changes, so it's tagged with the shape it was loaded for and used only while the view still wants that shape
 	// (switching 1Y/All to a shorter range otherwise handed daily data to the half-hourly code, which threw)
-	let offLoaded = $state.raw<{ daily: boolean; data: any } | null>(null), offFor = '';
+	let offLoaded = $state.raw<{ daily: boolean; key: string; data: any } | null>(null), offFor = '';
 	$effect(() => {
 		const w = v, ok = near;
 		untrack(() => {
@@ -153,10 +153,12 @@
 			const daily = w.kind === 'day', key = `${daily}|${daily ? '' : `${w.from}|${w.to}`}`;
 			if (key === offFor) return;
 			offFor = key;
-			loadOffered(daily, w.from, w.to).then((d) => { if (offFor === key) offLoaded = { daily, data: d }; });
+			loadOffered(daily, w.from, w.to).then((d) => { if (offFor === key) offLoaded = { daily, key, data: d }; });
 		});
 	});
 	const offData = $derived(v && offLoaded && offLoaded.daily === (v.kind === 'day') ? offLoaded.data : null);
+	// the offers for this view have finished loading (with or without any: a new month has no file until its first day is published)
+	const offDone = $derived(!!v && !!offLoaded && offLoaded.key === `${v.kind === 'day'}|${v.kind === 'day' ? '' : `${v.from}|${v.to}`}`);
 	type Level = { by: Record<string, Float64Array>; tot: Float64Array; low: Float64Array; any?: boolean };
 	const roomRaw = $derived<Record<string, Level> | null>(cur && v ? headroom(cur, v.region, v.kind === 'day', roomFuels, offData) : null);
 	const roomAt = $derived<Record<string, Level> | null>(roomRaw && cur && curI ? Object.fromEntries(LEVELS.map((L: string) => [L, headroomAt(roomRaw[L], cur, curI)])) : null);
@@ -177,7 +179,7 @@
 		if (!o) return [];
 		// a recent range with no offers at all yet (a 24-hour view before yesterday's offers arrive): all of it is waiting
 		// for them, once the offers have loaded (owner's call, 1 Nov 2026; the ⓘ no longer says "no offers loaded")
-		if (!hasOffers) return offData && !offLate && v && v.to > Date.now() - 4 * DAY ? [[0, o.length]] : [];
+		if (!hasOffers) return offDone && !offLate && v && v.to > Date.now() - 4 * DAY ? [[0, o.length]] : [];
 		let last = -1;
 		for (let i = 0; i < o.length; i++) if (o[i] === o[i]) last = i;
 		return last >= 0 && last < o.length - 1 ? [[last + 1, o.length]] : [];
@@ -317,7 +319,7 @@
 				<div class="ttl-row"><h2>Spare dispatchable capacity</h2><InfoTip>
 				<p>This shows how much more generation {regionIn} could have called on beyond what was running at the time.</p>
 				<ul>
-					<li>Dispatchable plant can be turned up when needed: hydro, gas, coal/gas, diesel and batteries, unlike wind and solar.</li>
+					<li>Dispatchable plants’ output can be increased if required: hydro, gas, coal/gas, diesel and batteries, unlike wind and solar.</li>
 					<li>“Levels”: three lines showing spare installed capacity, spare capacity offered into the market, and spare capacity offered under $1,000/MWh.</li>
 					<li>“By fuel”: one of those levels split by fuel. “Include hydro” takes hydro in or out.</li>
 					{#if coarse && !avgOnly}<li>Each point is the lowest spare capacity in that {lowWord}: the tightest moment, not the average.</li>{/if}
@@ -411,7 +413,7 @@
 				<ul>
 					<li>{heatByMonth ? 'One row per ' + (v?.int === '1yr' ? 'year' : 'month') + ', averaging each half-hour.' : rows.length > 40 ? 'One row per day; scroll for earlier days.' : 'One row per day.'}</li>
 					{#if heatMetric === 'ren'}<li>Brown marks the half-hours that leaned on thermal plant, usually still evenings at the peak.</li>{/if}
-					<li>{heatScaled ? 'Colours are fitted to the values shown; turn off “Scale to this view” to compare periods.' : heatMetric === 'ren' ? 'Colours use fixed bands from 80% to 98% so periods compare. “Scale to this view” fits them to what’s shown.' : `Colours use a fixed scale set by today’s installed ${SHARE_OF[heatMetric]} capacity${heatCap ? ` (${Math.round(heatCap).toLocaleString('en-NZ')} MW)` : ''}, so years with less built look paler. “Scale to this view” fits them to what’s shown.`}</li>
+					<li>{heatScaled ? 'Colours are fitted to the values shown; turn off “Scale to this view” to compare periods.' : heatMetric === 'ren' ? 'Colours use fixed bands from 80% to 98% so periods compare. “Scale to this view” fits them to what’s shown.' : `Colours use a fixed scale set by today’s installed ${SHARE_OF[heatMetric]} capacity${heatCap ? ` (${Math.round(heatCap).toLocaleString('en-NZ')} MW)` : ''}, so years with less built show fainter colour. “Scale to this view” fits them to what’s shown.`}</li>
 					<li>The buttons switch between Renewables, Wind, Solar, Inverter-based, Hydro, Gas and Coal/gas.</li>
 				</ul>
 				<p><a href="/methods/generation#time-of-day">How it's worked out</a></p></InfoTip></div>
