@@ -152,11 +152,11 @@
 			{#if paces.length}
 				<section aria-labelledby="pace-h" class="sec">
 					<div class="ttl-row"><h2 id="pace-h">Heading for a record</h2><InfoTip label="About records on pace">
+						<p>These are records that could fall soon: a day, week, month or year still running that is ahead of its record's pace.</p>
 						<ul>
-							<li>A day, week, month or year still running, ahead of its record at the same point.</li>
-							<li>Listed once half of it has gone, and only while it stays ahead.</li>
-							<li>From dispatch data, so provisional: the rest of the period can still change it.</li>
+							<li>Listed once half the period has gone, for as long as it stays ahead.</li>
 							<li>One tile per record: New Zealand's where it's on pace, otherwise an island's.</li>
+							<li>From live dispatch data, so provisional until the period ends and the metered data confirms it.</li>
 						</ul>
 						<p><a href="/methods/records#pace">How records work</a></p>
 					</InfoTip></div>
@@ -178,12 +178,12 @@
 			{#if cards.length}
 				<section aria-labelledby="new-h" class="sec">
 					<div class="ttl-row"><h2 id="new-h">New and provisional</h2><InfoTip label="About new and provisional records">
+						<p>These are records set in the last 30 days for New Zealand or either island, plus newer ones waiting on the metered data.</p>
 						<ul>
-							<li>Records set in the last 30 days, and newer ones still waiting on the metered data, for New Zealand or either island.</li>
-							<li>Dashed border: provisional, from dispatch data.</li>
+							<li>Dashed border: provisional, from dispatch data, until the EA's metered data confirms it.</li>
 							<li>Struck through: a provisional record the metered data didn't confirm.</li>
 						</ul>
-						<p><a href="/methods/records">How records work</a></p>
+						<p><a href="/methods/records#official">How records work</a></p>
 					</InfoTip></div>
 					<div class="cards">
 						{#each cards as c}
@@ -224,12 +224,14 @@
 				     far the official data goes; it sticks while the list scrolls (owner's call, 30 Oct 2026) -->
 				<div class="toolbar list-bar">
 					<div class="ttl-row"><h2 id="all-h">All-time records</h2><InfoTip label="About these records">
+						<p>These are the highest and lowest figures since August 1997 for {region === 'NI' ? 'the North Island' : region === 'SI' ? 'the South Island' : 'New Zealand'}, from a single half-hour up to a whole year.</p>
 						<ul>
-							<li>Official records use the EA's metered generation and HVDC, and its final prices.</li>
-							<li>Official to: the last day the metered data covers. It arrives 5–6 weeks after each month (final prices a day or two).</li>
-							<li>Anything newer comes from dispatch data and stays provisional (dashed edge) until the metered month confirms it.</li>
+							<li>The region menu and the period buttons pick the list.</li>
 							<li>Day to year records are the period's average MW, with its energy beside it.</li>
-							<li>Embedded solar is modelled, so its records are estimates.</li>
+							<li>Official to: the last day the EA's metered data covers. It arrives 5–6 weeks after each month; final prices arrive a day or two after.</li>
+							<li>Dashed edge: a newer record from dispatch data, provisional until the metered month confirms it.</li>
+							<li>Embedded solar records are estimates, as embedded solar is modelled.</li>
+							<li>Open a record for its history and the period it fell in.</li>
 						</ul>
 						<p><a href="/methods/records">How records work</a></p>
 					</InfoTip></div>
@@ -303,11 +305,13 @@
 			{#if tab === 'milestones'}
 				<section class="sec" id="panel-milestones" aria-labelledby="mile-h">
 					<div class="ttl-row"><h2 id="mile-h">Milestones</h2><InfoTip label="About milestones">
+						<p>These are the first times each round level was passed, newest first, for New Zealand and each island.</p>
 						<ul>
-							<li>The first half-hour each round level was passed: wind, grid and embedded solar, renewable share and peak demand.</li>
-							<li>Newest first, for New Zealand and each island.</li>
+							<li>Covers wind, grid and embedded solar, renewable share and peak demand, with the islands' own demand levels.</li>
+							<li>Each milestone is the first half-hour over the level. The South Island has been 100% renewable since the data began.</li>
 							<li>Point at one to light it in every region; click or tap to pin it there, again to let go.</li>
 						</ul>
+						<p><a href="/methods/records#milestones">How milestones work</a></p>
 					</InfoTip></div>
 					<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 					<div class="regions" onpointerover={rowOver} onpointerleave={rowLeave} onclick={pinClick}>
@@ -322,7 +326,7 @@
 											<li data-k={k} class:lit={lit === k} class:pinned={pinned === k} title={pinned === k ? 'Pinned · click to let go' : 'Click to pin'}>
 												<span class="dot" style="--c:var({m.d.tok})"></span>
 												<span><b>{m.d.unit === '%' ? `${m.level}% renewable` : `${m.level.toLocaleString('en-NZ')} MW of ${m.d.id === 'wind_max' ? 'wind' : m.d.id === 'solar_max' ? 'grid solar' : m.d.id === 'roof_max' ? 'embedded solar' : 'demand'}`}</b>
-													first passed {clock(m.t)}, {dayOf(m.t)}{#if m.d.est} <span class="tag est">Estimate</span>{/if}</span>
+													{m.always ? `every half-hour since the data began, ${dayOf(m.t)}` : `first passed ${clock(m.t)}, ${dayOf(m.t)}`}{#if m.d.est} <span class="tag est">Estimate</span>{/if}</span>
 											</li>
 										{/each}
 									</ul>
@@ -343,11 +347,13 @@
 								{#each MONTHS as m, i}<option value={i}>{m}</option>{/each}
 							</select>
 						</h2><InfoTip label="About month records">
+							<p>These are the highest and lowest half-hours of any {MONTHS[moy]} since 1997, with the year each was set, for New Zealand and each island.</p>
 							<ul>
-								<li>Trading period records: the highest or lowest half-hour of any {MONTHS[moy]} since 1997, and the year it was set.</li>
-								<li>A month can set one even when the all-time record holds.</li>
+								<li>The month menu picks the month.</li>
+								<li>A month can set one of these even when the all-time record holds.</li>
 								<li>Point at one to light it in every region; click or tap to pin it there, again to let go.</li>
 							</ul>
+							<p><a href="/methods/records#half-hours">How records work</a></p>
 						</InfoTip></div>
 						<span class="unit">Trading periods</span>
 					</div>
@@ -492,16 +498,20 @@
 	.miles li { display: flex; align-items: baseline; gap: 2px; padding: 7px 6px; border-bottom: 1px solid var(--grid); font-size: 0.86rem; color: var(--ink-2); }
 	.miles li:last-child { border-bottom: 0; }
 	.miles b { color: var(--ink); font-weight: 600; }
-	.moy th[scope='row'] { display: flex; align-items: center; padding-left: 0; font-weight: 500; }
-	.moy td.n:last-child { padding-right: 0; width: 4em; }
-	.moy tr:last-child td, .moy tr:last-child th { border-bottom: 0; }
+	/* each row a grid, so name, figure and year always fit inside the card: the name wraps, the year keeps a fixed
+	   column (owner's report, 1 Nov 2026: years spilled out of the cards at some widths; a flex th broke the table) */
+	.moy, .moy tbody { display: block; }
+	.moy tr { display: grid; grid-template-columns: minmax(0, 1fr) auto 2.6em; align-items: center; column-gap: 10px; border-bottom: 1px solid var(--grid); }
+	.moy tr:last-child { border-bottom: 0; }
+	.moy th[scope='row'], .moy td { padding: 9px 0; border-bottom: 0; min-width: 0; }
+	.moy th[scope='row'] { display: flex; align-items: center; font-weight: 500; overflow-wrap: anywhere; }
+	.moy td.n:last-child { text-align: right; }
 	/* the same milestone or record lit in every region's card; a pinned one keeps an accent edge */
 	.miles li[data-k], .moy tr[data-k] { cursor: pointer; }
-	.moy tr[data-k] th[scope='row'] { padding-left: 6px; }
-	.moy tr[data-k] td.n:last-child { padding-right: 6px; }
-	.miles li.lit, .moy tr.lit > * { background: var(--accent-soft); }
+	.moy tr[data-k] { padding-inline: 6px; }
+	.miles li.lit, .moy tr.lit { background: var(--accent-soft); }
 	.miles li.pinned { box-shadow: inset 3px 0 0 var(--accent); }
-	.moy tr.pinned th[scope='row'] { box-shadow: inset 3px 0 0 var(--accent); }
+	.moy tr.pinned { box-shadow: inset 3px 0 0 var(--accent); }
 	#moy-h select.pick { font-size: 1rem; }
 
 	@media (max-width: 640px) {

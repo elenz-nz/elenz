@@ -47,7 +47,7 @@
 				<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
 			</button>
 			<div class="pe-head">
-				<div class="pe-eye">Price explainer <InfoTip label="About the price explainer">Each reason is compared with its recent level for the same half-hour of the week over the last four weeks (wind with its four-week median). The possible price setter is an estimate from the latest generator offers the EA has published. <a href="/methods/price-explainer">How the explainer works</a></InfoTip></div>
+				<div class="pe-eye">Price explainer <InfoTip label="About the price explainer"><p>This explains, in plain terms, why the wholesale price is where it is right now.</p><ul><li>Each reason is a pair of bars: now, against its usual level for the same half-hour of the week over the past four weeks (wind against its four-week median).</li><li>“Prices, last 24 hours” compares today's prices with their usual range over the past four weeks.</li><li>“Plants below the past week” lists plants running well under their past week, which may be out or held back.</li><li>The possible price setter is an estimate from the latest generator offers the EA has published.</li><li>The button lights up when prices are well above usual, the islands split, or prices hit a new low. The card opens by itself when prices spike.</li></ul><p><a href="/methods/price-explainer">How the explainer works</a></p></InfoTip></div>
 				<h2>{x.headline}</h2>
 				<p class="pe-sub">{x.line}{sub ? ` ${sub}` : ''}</p>
 			</div>

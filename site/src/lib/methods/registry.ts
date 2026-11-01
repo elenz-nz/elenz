@@ -23,7 +23,7 @@ export const TOPICS: Topic[] = [
 		title: 'Generation',
 		summary: 'What each plant and fuel is generating: the dispatch data for the live week, metered output for history, each unit mapped to its plant and fuel.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
-		updated: '2026-10-31',
+		updated: '2026-11-01',
 	},
 	{
 		slug: 'embedded-solar',
@@ -95,7 +95,7 @@ export const TOPICS: Topic[] = [
 		title: 'Records',
 		summary: 'The highest and lowest half-hours, days, weeks, months, years and runs since 1997: which data they rest on, when a record is official or provisional, when a period is on record pace, and what is left out.',
 		shownOn: [['Records', '/records'], ['Now', '/now']],
-		updated: '2026-10-30',
+		updated: '2026-11-01',
 	},
 ];
 

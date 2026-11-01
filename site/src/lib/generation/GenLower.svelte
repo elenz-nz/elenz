@@ -121,6 +121,10 @@
 			default: return `${day}, ${p.h % 12 || 12}:${String(p.mi).padStart(2, '0')} ${p.h < 12 ? 'am' : 'pm'}`;
 		}
 	}
+	// the ⓘ notes name the region shown and what's being shared (owner's rules for notes, 1 Nov 2026)
+	const regionPos = $derived(({ NI: "the North Island's", SI: "the South Island's" } as Record<string, string>)[v?.region ?? ''] ?? "New Zealand's");
+	const regionIn = $derived(({ NI: 'the North Island', SI: 'the South Island' } as Record<string, string>)[v?.region ?? ''] ?? 'New Zealand');
+	const SHARE_OF: Record<string, string> = { ren: 'renewables', wind: 'wind', sun: 'solar', ibr: 'inverter-based plant', hydro: 'hydro', gas: 'gas', coal: 'coal/gas' };
 	const pc = (x: number) => (x === x ? `${x.toFixed(1)}%` : '–');
 
 	// ---------- dispatchable headroom ----------
@@ -141,7 +145,7 @@
 	// offered data comes in two shapes (days.json for daily views, month files otherwise) and arrives after the view
 	// changes, so it's tagged with the shape it was loaded for and used only while the view still wants that shape
 	// (switching 1Y/All to a shorter range otherwise handed daily data to the half-hourly code, which threw)
-	let offLoaded = $state.raw<{ daily: boolean; data: any } | null>(null), offFor = '';
+	let offLoaded = $state.raw<{ daily: boolean; key: string; data: any } | null>(null), offFor = '';
 	$effect(() => {
 		const w = v, ok = near;
 		untrack(() => {
@@ -149,10 +153,12 @@
 			const daily = w.kind === 'day', key = `${daily}|${daily ? '' : `${w.from}|${w.to}`}`;
 			if (key === offFor) return;
 			offFor = key;
-			loadOffered(daily, w.from, w.to).then((d) => { if (offFor === key) offLoaded = { daily, data: d }; });
+			loadOffered(daily, w.from, w.to).then((d) => { if (offFor === key) offLoaded = { daily, key, data: d }; });
 		});
 	});
 	const offData = $derived(v && offLoaded && offLoaded.daily === (v.kind === 'day') ? offLoaded.data : null);
+	// the offers for this view have finished loading (with or without any: a new month has no file until its first day is published)
+	const offDone = $derived(!!v && !!offLoaded && offLoaded.key === `${v.kind === 'day'}|${v.kind === 'day' ? '' : `${v.from}|${v.to}`}`);
 	type Level = { by: Record<string, Float64Array>; tot: Float64Array; low: Float64Array; any?: boolean };
 	const roomRaw = $derived<Record<string, Level> | null>(cur && v ? headroom(cur, v.region, v.kind === 'day', roomFuels, offData) : null);
 	const roomAt = $derived<Record<string, Level> | null>(roomRaw && cur && curI ? Object.fromEntries(LEVELS.map((L: string) => [L, headroomAt(roomRaw[L], cur, curI)])) : null);
@@ -170,7 +176,10 @@
 	const offLate = $derived(!!v && v.from < OFF_FIRST - 864e5 && (roomView === 'levels' || roomBasis !== 'I'));
 	const offGap = $derived.by((): [number, number][] => {
 		const o = levelVals.O;
-		if (!o || !hasOffers) return [];
+		if (!o) return [];
+		// a recent range with no offers at all yet (a 24-hour view before yesterday's offers arrive): all of it is waiting
+		// for them, once the offers have loaded (owner's call, 1 Nov 2026; the ⓘ no longer says "no offers loaded")
+		if (!hasOffers) return offDone && !offLate && v && v.to > Date.now() - 4 * DAY ? [[0, o.length]] : [];
 		let last = -1;
 		for (let i = 0; i < o.length; i++) if (o[i] === o[i]) last = i;
 		return last >= 0 && last < o.length - 1 ? [[last + 1, o.length]] : [];
@@ -250,6 +259,7 @@
 
 	// ---------- mix table ----------
 	const mix = $derived(cur && v ? mixRows(cur, v.region, v.from, v.to, canCompare ? prev : null, v.kind !== 'day') : null);
+	const mixUnit = $derived(mix && mix.tot >= 1e7 ? 'TWh' : 'GWh');   // as MixTable picks it
 
 	// ---------- what each card covers ----------
 	const dates = $derived(v ? span(v.from, v.to) : '');
@@ -263,12 +273,14 @@
 		<div class="card-head">
 			<div>
 				<div class="ttl-row"><h2>{metric === 'ren' ? 'Renewable share' : `${m.title} share`}</h2><InfoTip>
-			<!-- fuller, as bullets like the charts above (owner's report LOW-01) -->
+			<!-- every ⓘ: a sentence, then short points that fit the view, then the method link (owner's rules, 1 Nov 2026) -->
+			<p>This shows the share of {regionPos} generation that came from {SHARE_OF[metric]} over the dates chosen.</p>
 			<ul>
-				<li>The share of all generation that came from {metric === 'ren' ? 'renewables' : m.title.toLowerCase()} at each point of the range{v ? `, ${RES[v.int]}` : ''}. Embedded solar counts as generation; battery discharge doesn’t.</li>
-				<li>{#if canCompare}Dashed: the same dates a year earlier (365 days before){v && v.int === '5m' ? ', half-hourly' : ''}; the “Same dates” button turns it on and off, and the figures above the chart give both years.{:else if v && v.days == null}No comparison on the full history.{:else}The year before is outside the history, so there’s no comparison.{/if}</li>
-				<li>The buttons pick what’s shared: renewables, wind, solar, inverter-based (wind and solar), hydro, gas or coal/gas.</li>
-				{#if m.note}<li>{m.title}: {m.note}.</li>{/if}
+				<li>The buttons switch between Renewables, Wind, Solar, Inverter-based, Hydro, Gas and Coal/gas.</li>
+				{#if canCompare}<li>Dashed line: the same dates a year earlier (365 days before){v && v.int === '5m' ? ', half-hourly' : ''}. “{prevYear ? `Same dates in ${prevYear}` : 'The year before'}” turns it on and off, and the figures above the chart give both years.</li>{/if}
+				{#if metric === 'sun'}<li>Solar: grid-scale farms plus estimated embedded solar.</li>{/if}
+				{#if metric === 'ibr'}<li>Inverter-based: wind and solar, grid and embedded. These connect through power electronics rather than spinning machines.</li>{/if}
+				{#if metric === 'coal'}<li>Coal/gas: Huntly's Rankine units, which can burn either.</li>{/if}
 			</ul>
 			<p><a href="/methods/groupings#renewable">How shares are worked out</a></p></InfoTip></div>
 				<!-- every lower card names only its dates, on both tabs (owner's call, 30 Oct 2026) -->
@@ -304,8 +316,18 @@
 	<section class="card" class:popped={popped === 'room'} aria-label="Spare dispatchable capacity over the range">
 		<div class="card-head">
 			<div>
-				<div class="ttl-row"><h2>Spare dispatchable capacity</h2><InfoTip>Dispatchable capacity not generating{withHydro ? '' : ', hydro left out'}: installed, offered, and offered under $1,000/MWh.
-			{v && v.region !== 'NZ' ? 'One island only: the HVDC link isn’t counted. ' : ''}{avgOnly ? 'Daily averages where history doesn’t yet keep each day’s lowest. ' : ''}{!hasOffers ? 'No offers loaded for these dates yet. ' : ''}<a href="/methods/capacity#headroom">How it's worked out</a></InfoTip></div>
+				<div class="ttl-row"><h2>Spare dispatchable capacity</h2><InfoTip>
+				<p>This shows how much more generation {regionIn} could have called on beyond what was running at the time.</p>
+				<ul>
+					<li>Dispatchable plants’ output can be increased if required: hydro, gas, coal/gas, diesel and batteries, unlike wind and solar.</li>
+					<li>“Levels”: three lines showing spare installed capacity, spare capacity offered into the market, and spare capacity offered under $1,000/MWh.</li>
+					<li>“By fuel”: one of those levels split by fuel. “Include hydro” takes hydro in or out.</li>
+					{#if coarse && !avgOnly}<li>Each point is the lowest spare capacity in that {lowWord}: the tightest moment, not the average.</li>{/if}
+					<li>The figure above the chart is the tightest moment in the whole range, marked on the chart.</li>
+					{#if v && v.region !== 'NZ'}<li>Only {regionIn}'s plant is counted, not the HVDC link.</li>{/if}
+					{#if avgOnly}<li>Some of these dates show daily averages rather than each day's lowest.</li>{/if}
+				</ul>
+				<p><a href="/methods/capacity#headroom">How it's worked out</a></p></InfoTip></div>
 				<Context range={dates} items={[v ? `${RES[v.int]}, MW not generating` : '', coarse && roomView === 'levels' && !avgOnly ? `lowest in each ${lowWord}` : '']} />
 			</div>
 			<div class="tools">
@@ -322,7 +344,7 @@
 			</div>
 		</div>
 		{#if offLate}
-			<p class="off-note" role="note"><b>Offers start in January 2013.</b> The EA’s records of what generators offered begin on 1 January 2013, so {roomView === 'levels' ? 'the Offered and Under $1,000 lines start' : 'this level starts'} there, partway through this range. Installed capacity covers the whole range.</p>
+			<p class="off-note" role="note"><b>Offers start in January 2013.</b> The EA’s records of what generators offered begin on 1 January 2013, so {roomView === 'levels' ? 'the Offered and Under $1,000 lines cover' : 'this level covers'} only dates from then on. Installed capacity is tracked back to August 1997.</p>
 		{/if}
 		<p class="readout" aria-live="polite">
 			{#if roomHover >= 0 && roomAt && curI && roomHover < curI.n}
@@ -363,8 +385,15 @@
 		<section class="card" class:popped={popped === 'mix'} aria-label="Generation by fuel over the range">
 			<div class="card-head">
 				<div>
-					<div class="ttl-row"><h2>Mix by fuel</h2><InfoTip>Energy over the range{v && v.kind === 'day' ? ' (peaks need half-hourly data, so long ranges leave them out)' : ''}{canCompare && prev ? '; “vs” is the change in energy on the same dates a year earlier' : ''}.
-				<a href="/methods/capacity#use">How capacity factors are worked out</a></InfoTip></div>
+					<div class="ttl-row"><h2>Mix by fuel</h2><InfoTip>
+				<p>This table shows how much energy each fuel produced in {regionIn} over the dates chosen.</p>
+				<ul>
+					<li>{mixUnit} and Share: the fuel's energy and its part of the total.</li>
+					{#if canCompare && prev}<li>vs {prevYear ?? 'year before'}: how much more or less energy the fuel produced than on the same dates a year earlier. The Renewable row gives the change in its share, in percentage points.</li>{/if}
+					<li>Avg MW: average output.{v && v.kind !== 'day' ? ' Peak MW: the highest single interval.' : ''}</li>
+					<li>Cap. factor: average output as a share of installed capacity, which shows how hard that fleet was working.</li>
+				</ul>
+				<p><a href="/methods/capacity#use">How capacity factors are worked out</a></p></InfoTip></div>
 					<Context range={dates} items={[canCompare && prev ? `against ${prevYear ? 'the ' : ''}${prevPhrase}` : '']} />
 				</div>
 				<PopButton open={popped === 'mix'} name="mix table" onclick={() => pop('mix')} />
@@ -379,8 +408,15 @@
 		<section class="card" class:popped={popped === 'heat'} style={popped === 'heat' ? '--rh: 15px' : ''} aria-label="{hm.title} by time of day over the range">
 			<div class="card-head">
 				<div>
-					<div class="ttl-row"><h2>{heatMetric === 'ren' ? 'Renewable share' : hm.title} by time of day</h2><InfoTip>{heatByMonth ? 'One row per ' + (v?.int === '1yr' ? 'year' : 'month') + ': the average of each half-hour.' : rows.length > 40 ? 'One row per day; scroll for earlier days.' : 'One row per day.'}
-				{heatMetric === 'ren' ? 'Brown marks the half-hours that leaned on thermal plant, usually still evenings at the peak.' + (heatScaled ? ' Colours fitted to the shares shown, so the bands move with the view.' : ' Fixed bands from 80% to 98%, so periods compare; Scale to this view fits them to what’s shown.') : heatScaled ? 'Colours fitted to what’s shown: darker means more.' : `Colours on a fixed scale set by today’s installed ${hm.title.toLowerCase()} capacity${heatCap ? ` (${Math.round(heatCap).toLocaleString('en-NZ')} MW)` : ''}, so earlier years look paler where less was built.`}</InfoTip></div>
+					<div class="ttl-row"><h2>{heatMetric === 'ren' ? 'Renewable share' : hm.title} by time of day</h2><InfoTip>
+				<p>This maps {heatMetric === 'ren' ? 'the renewable share' : SHARE_OF[heatMetric] + ' output'} in {regionIn} for every half-hour of the day, so daily and seasonal patterns stand out.</p>
+				<ul>
+					<li>{heatByMonth ? 'One row per ' + (v?.int === '1yr' ? 'year' : 'month') + ', averaging each half-hour.' : rows.length > 40 ? 'One row per day; scroll for earlier days.' : 'One row per day.'}</li>
+					{#if heatMetric === 'ren'}<li>Brown marks the half-hours that leaned on thermal plant, usually still evenings at the peak.</li>{/if}
+					<li>{heatScaled ? 'Colours are fitted to the values shown; turn off “Scale to this view” to compare periods.' : heatMetric === 'ren' ? 'Colours use fixed bands from 80% to 98% so periods compare. “Scale to this view” fits them to what’s shown.' : `Colours use a fixed scale set by today’s installed ${SHARE_OF[heatMetric]} capacity${heatCap ? ` (${Math.round(heatCap).toLocaleString('en-NZ')} MW)` : ''}, so years with less built show fainter colour. “Scale to this view” fits them to what’s shown.`}</li>
+					<li>The buttons switch between Renewables, Wind, Solar, Inverter-based, Hydro, Gas and Coal/gas.</li>
+				</ul>
+				<p><a href="/methods/generation#time-of-day">How it's worked out</a></p></InfoTip></div>
 					<Context range={heatSrc ? span(heatSrc.kind === 'days' && heatSrc.seg?.n ? heatSrc.seg.t[0] : heatSrc.from, heatSrc.to) : ''} items={[
 						(heatByMonth ? (v?.int === '1yr' ? 'yearly' : 'monthly') + ' average of each half-hour' : 'each half-hour') + (heatMetric === 'ren' ? ', % of generation' : ', MW')]} />
 				</div>

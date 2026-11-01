@@ -89,8 +89,10 @@ export const MILESTONES = [
   { id: 'wind_max', at: [100, 250, 500, 750, 1000, 1250, 1500] },
   { id: 'solar_max', at: [100, 250, 500, 750, 1000] },
   { id: 'roof_max', at: [100, 250, 500, 750, 1000] },
-  { id: 'ren_max', at: [90, 95, 98, 99] },
-  { id: 'demand_max', at: [6000, 6500, 7000, 7500] },
+  // an island can have its own levels (owner's UAT note REC-13, 1 Nov 2026): the South Island has been 100% renewable
+  // since the data began, and island demand is far below the country's
+  { id: 'ren_max', at: [90, 95, 98, 99], SI: [100] },
+  { id: 'demand_max', at: [6000, 6500, 7000, 7500], NI: [4500, 5000], SI: [2000, 2500] },
 ];
 
 // ---------- the file ----------
@@ -421,11 +423,12 @@ export function recent(R, live, now = Date.now()) {
 export function milestones(R, region) {
   const out = [];
   for (const m of MILESTONES) {
-    const d = def(m.id), rec = get(R, m.id, region);
-    if (!d || !rec || notShown(d, region, rec)) continue;
-    for (const level of m.at) {
+    const d = def(m.id), rec = get(R, m.id, region), own = m[region];
+    // an island's own levels count even where its record never moved (the South Island's 100% from Aug 1997)
+    if (!d || !rec?.steps?.length || (!own && notShown(d, region, rec))) continue;
+    for (const level of own ?? m.at) {
       const s = rec.steps.find((x) => x[1] >= level);
-      if (s) out.push({ d, level, t: s[0], v: s[1] });
+      if (s) out.push({ d, level, t: s[0], v: s[1], always: !!rec.constant && s === rec.steps[0] });   // always: at that level since the data began
     }
   }
   return out.sort((a, b) => a.t - b.t);
