@@ -12,11 +12,12 @@
 	import RecordIcon from '#lib/records/RecordIcon.svelte';
 	import { energy, pace, soFar, paceAt, periodWhen,
 		LISTED as DEFS, PERIODS, PERIOD_KEYS, periodOf, periodSub, GROUPS, REGIONS, LIVE_URL, MONTHS, get, notShown, parts, when, step, fmt, recent, milestones, provisional,
-		liveBeats, loadRecords, fullName, dayOf, clock, yearOf, isNew
+		liveBeats, liveNear, loadRecords, fullName, dayOf, clock, yearOf, isNew
 	} from '#lib/records/records.js';
 
 	let R = $state<any>(null);
 	let live = $state<any>({});
+	let near = $state<any>({});
 	let status = $state<'loading' | 'none' | 'ok'>('loading');
 	let region = $state('NZ');
 	// the period the table lists: each half-hour record's highest trading period, day, week, month or year (?period=)
@@ -43,7 +44,7 @@
 			if (!R) return;
 			try {
 				const r = await fetch(LIVE_URL, { cache: 'no-cache' });
-				if (r.ok) { liveD = await r.json(); live = liveBeats(R, liveD); }
+				if (r.ok) { liveD = await r.json(); live = liveBeats(R, liveD); near = liveNear(R, liveD); }
 			} catch { /* the live check is extra; the records stand without it */ }
 		})();
 	});
@@ -99,7 +100,7 @@
 	// new and provisional: four, a row of them at full width, then Show all (owner's call REC-09, 31 Oct 2026)
 	const CARDS = 4;
 	let cardsAll = $state(false);
-	const allCards = $derived(R ? recent(R, live) : []);
+	const allCards = $derived(R ? recent(R, live, Date.now(), near) : []);
 	const cards = $derived(cardsAll ? allCards : allCards.slice(0, CARDS));
 	// heading for a record: one card per record and period, New Zealand's where it is on pace, otherwise an island's
 	const paces = $derived.by(() => {
@@ -178,9 +179,10 @@
 			{#if cards.length}
 				<section aria-labelledby="new-h" class="sec">
 					<div class="ttl-row"><h2 id="new-h">New and provisional</h2><InfoTip label="About new and provisional records">
-						<p>These are records set in the last 30 days for New Zealand or either island, plus newer ones waiting on the metered data.</p>
+						<p>These are records set in the last 30 days for New Zealand or either island, newer ones waiting on the metered data, and recent dispatch figures close to a record.</p>
 						<ul>
-							<li>Dashed border: provisional, from dispatch data, until the EA's metered data confirms it.</li>
+							<li>Dashed border: provisional, from dispatch data, until the EA's metered data confirms it. It beats the record by more than dispatch data usually strays from the meters.</li>
+							<li>Dotted border: close to the record, too close for dispatch data to call either way.</li>
 							<li>Struck through: a provisional record the metered data didn't confirm.</li>
 						</ul>
 						<p><a href="/methods/records#official">How records work</a></p>
@@ -188,10 +190,11 @@
 					<div class="cards">
 						{#each cards as c}
 							{@const p = c.prov}
-							{@const shown = p ?? c.rec}
+							{@const nr = c.near}
+							{@const shown = p ?? nr ?? c.rec}
 							<!-- kept bare: name, value, when and the progression; the dashed border marks a provisional record, and the
 							     record's own page explains it -->
-							<a class="card" class:prov={!!p} href={href(c.d.id, c.region, 'tp')} title={p ? 'Provisional: not yet confirmed by the metered data' : undefined}>
+							<a class="card" class:prov={!!p} class:near={!!nr} href={href(c.d.id, c.region, 'tp')} title={p ? 'Provisional: not yet confirmed by the metered data' : nr ? 'Close to the record: too close for dispatch data to call' : undefined}>
 								<span class="c-name"><span class="dot" style="--c:var({c.d.tok})"></span>{fullName(c.d)} · {c.region}</span>
 								<span class="c-row">
 									<span>
@@ -200,7 +203,7 @@
 											<span class="c-sub">Not confirmed</span>
 										{:else}
 											<span class="c-val">{parts(c.d, shown.v).n}<small>{parts(c.d, shown.v).u}</small></span>
-											<span class="c-sub">{when(c.d, shown)}</span>
+											<span class="c-sub">{nr ? `Close to the record · ${when(c.d, shown)}` : when(c.d, shown)}</span>
 										{/if}
 									</span>
 									{#if c.rec}<Spark steps={p ? [...c.rec.steps, [p.t, p.v]] : c.rec.steps} end={R.end} tok={c.d.tok} w={110} h={40} dashed={!!c.d.est} hollow={!!p} />{/if}
@@ -454,6 +457,7 @@
 	.more-btn { justify-self: start; margin-top: 8px; font: inherit; font-size: 0.84rem; font-weight: 600; color: var(--accent); background: none; border: 1px solid var(--line); border-radius: 4px; padding: 6px 12px; min-height: 36px; cursor: pointer; }
 	.more-btn:hover { border-color: var(--accent); }
 	.card.prov { border-style: dashed; border-color: color-mix(in srgb, var(--warn-ink) 55%, var(--line)); }
+	.card.near { border-style: dotted; border-color: color-mix(in srgb, var(--warn-ink) 55%, var(--line)); }
 	.c-name { display: flex; align-items: center; font-size: 0.82rem; color: var(--ink-2); font-weight: 600; }
 	.c-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; }
 	.c-val { display: block; font-family: var(--font-data); font-size: 1.6rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; }

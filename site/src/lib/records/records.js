@@ -238,6 +238,31 @@ export const daysBetween = (a, b) => Math.floor((b - a) / 864e5);
 // The live 5-minute data (tracker.json, dispatch) averaged to half-hours, checked against the official records for
 // generation and demand, as records.py's series() works them out. Prices and HVDC are left to the history job: live
 // prices are dispatch prices (final prices arrive a day later and often differ), and live HVDC is an estimate.
+// Dispatch data is corrected first, as records.py does (records.json `adj`, from facilities/dispatch_adjust.json):
+// the plants dispatch reads systematically off (Ngāwhā, Glenbrook, Kawerau Mill) scaled to their meters, then each
+// record's usual shift taken off. It is a provisional record only beyond the record by more than the margin `m`; within
+// it, either side, it is close to the record (liveNear).
+
+/** tracker.json with the plants dispatch reads systematically off scaled to their meters (a copy; only the islands'
+ *  fuel series change). */
+export function adjustLive(D, adj) {
+  const fac = adj?.plants;
+  if (!D?.N || !fac || !D.plants) return D;
+  const out = { ...D, NI: { ...D.NI }, SI: { ...D.SI } };
+  for (const p of D.plants) {
+    const k = fac[p.name];
+    if (!k || !out[p.isl] || !GEN.includes(p.fuel) || p.fuel === 'batt' || !p.s) continue;
+    const base = out[p.isl][p.fuel] ?? new Array(D.N).fill(0);
+    out[p.isl][p.fuel] = base.map((x, j) => (x ?? 0) + (k - 1) * Math.max(0, p.s[j] ?? 0));
+  }
+  return out;
+}
+
+/** A record's [shift, margin] for dispatch data (records.json adj): the shift is taken off the dispatch figure. */
+export function adjOf(R, id, region, period = 'tp') {
+  const e = (period === 'tp' ? R?.adj?.hh : R?.adj?.period?.[period])?.[id]?.[region];
+  return e ? [e.shift, e.m] : [0, 0];
+}
 
 const GEN = ['geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt'];
 const REN = ['geo', 'bio', 'hydro', 'wind', 'solar', 'roof'];
@@ -285,34 +310,53 @@ function halfHours(D) {
   return { T, S: out };
 }
 
-/** Records the live week beats: { id: { region: { t, v, src: 'live' } } }, against the official record and any
- *  provisional one the history already has. */
-export function liveBeats(R, D) {
-  if (!R || !D || !D.N) return {};
+/** The live week against the records: { beats, near }, each { id: { region: { t, v, m, src: 'live' } } }. beats: past
+ *  the official record (and any provisional one the history has) by more than the margin, on corrected figures; near:
+ *  within the margin of it, either side, where nothing has beaten it. */
+function liveCheck(R, D) {
+  const beats = {}, near = {};
+  if (!R || !D || !D.N) return { beats, near };
   let H;
-  try { H = halfHours(D); } catch { return {}; }
-  const out = {};
+  try { H = halfHours(adjustLive(D, R.adj)); } catch { return { beats, near }; }
   for (const d of DEFS) {
     if (d.kind !== 'hh' || d.fam !== 'gen' || !H.S[d.id]) continue;
     for (const r of d.regions) {
-      const rec = get(R, d.id, r), v = H.S[d.id][r];
-      if (!rec || !v) continue;
+      const rec = get(R, d.id, r), ser = H.S[d.id][r];
+      if (!rec || !ser) continue;
       const min = d.id.endsWith('_min');
       const dp = d.dp ?? 0, f = 10 ** dp;
       let best = null;
-      for (let i = 0; i < v.length; i++) {
-        const x = Math.round(v[i] * f) / f;
+      for (let i = 0; i < ser.length; i++) {
+        const x = Math.round(ser[i] * f) / f;
         if (!Number.isFinite(x)) continue;
         if (best === null || (min ? x < best.v : x > best.v)) best = { t: H.T[i], v: x };
       }
-      if (!best) continue;
-      const beats = (a, b) => (min ? a < b : a > b);
-      if (beats(best.v, rec.v) && (!rec.prov || beats(best.v, rec.prov.v)) && best.t > (R.final_to?.gen ?? 0)) {
-        (out[d.id] ??= {})[r] = { ...best, src: 'live' };
-      }
+      if (!best || best.t <= (R.final_to?.gen ?? 0)) continue;
+      const [shift, m] = adjOf(R, d.id, r);
+      const v = Math.round((best.v - shift) * f) / f, gap = min ? rec.v - v : v - rec.v;
+      const better = (a, b) => (min ? a < b : a > b);
+      if (gap > m && (!rec.prov || better(v, rec.prov.v))) (beats[d.id] ??= {})[r] = { t: best.t, v, m, src: 'live' };
+      else if (Math.abs(gap) <= m && !rec.prov) (near[d.id] ??= {})[r] = { t: best.t, v, m, src: 'live' };
     }
   }
-  return out;
+  return { beats, near };
+}
+
+/** Records the live week beats: { id: { region: { t, v, m, src: 'live' } } } (liveCheck). */
+export function liveBeats(R, D) {
+  return liveCheck(R, D).beats;
+}
+
+/** Records the live week comes close to, within the margin dispatch data can't settle (liveCheck). */
+export function liveNear(R, D) {
+  return liveCheck(R, D).near;
+}
+
+/** A dispatch figure close to the record (the live week's, else the history's), when there's no provisional one. */
+export function close(R, live, near, id, region, period = 'tp') {
+  if (period !== 'tp') { const rec = get(R, id, region, period); return rec?.prov ? null : rec?.near ?? null; }
+  if (provisional(R, live, id, region)) return null;
+  return near?.[id]?.[region] ?? get(R, id, region)?.near ?? null;
 }
 
 /** The provisional record for an id and region: the live week's if it beats the history's, else the history's. */
@@ -396,8 +440,9 @@ export function periodAxis(period, ser) {
   return { ticks: ticks.filter((x) => x.i < n), tip: (i) => `Week of ${F2.dm.format(at(i) + 6 * 36e5)}`, lab: (i) => F2.dm.format(at(i) + 6 * 36e5) };
 }
 
-/** New and provisional records for the "recent" cards: newest first. Each { d, region, rec, prov, settled }. */
-export function recent(R, live, now = Date.now()) {
+/** New and provisional records for the "recent" cards: newest first. Each { d, region, rec, prov, near, settled };
+ *  near: a dispatch figure close to the record (only when `near`, liveNear's, is given). */
+export function recent(R, live, now = Date.now(), near = null) {
   if (!R) return [];
   const out = [];
   for (const d of LISTED) {
@@ -406,7 +451,8 @@ export function recent(R, live, now = Date.now()) {
       if (!rec || notShown(d, r, rec)) continue;
       const prov = provisional(R, live, d.id, r);
       const fresh = isNew(rec, 'tp', now);
-      if (fresh || prov) out.push({ d, region: r, rec, prov, isNew: fresh, at: Math.max(prov?.t ?? 0, fresh ? rec.since : 0) });
+      const cl = near && !prov ? close(R, live, near, d.id, r) : null;
+      if (fresh || prov || cl) out.push({ d, region: r, rec, prov, near: cl, isNew: fresh, at: Math.max(prov?.t ?? 0, cl?.t ?? 0, fresh ? rec.since : 0) });
     }
   }
   for (const x of R.resolved ?? []) {
@@ -573,7 +619,7 @@ export function periodNow(R, D, period) {
   const elapsed = (upTo - start) / 36e5;
   // the history's sums count only if they are for this same period and end by `upTo`; the live week fills the rest
   const hist = P[period]?.start === start && P.to <= upTo ? P[period].sums : null;
-  const live = liveSums(D, hist ? P.to : start, upTo);
+  const live = liveSums(adjustLive(D, R.adj), hist ? P.to : start, upTo);
   const sum = (r, k) => {
     const h = hist?.[r]?.[k] ?? [0, 0], l = live[r]?.[k] ?? [0, 0];
     return [h[0] + l[0], h[1] + l[1]];

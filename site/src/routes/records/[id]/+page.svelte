@@ -14,7 +14,7 @@
 	import CopyLink from '#lib/site/CopyLink.svelte';
 	import { stamp } from '#lib/site/viewurl.js';
 	import {
-		LISTED, PERIODS, PERIOD_KEYS, periodOf, periodSub, periodWhen, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats, energy, pace, soFar, toGo, needText, paceAt, periodNow, figureSoFar, loadDetail, bgOf, udemOf, periodSeries, periodAxis,
+		LISTED, PERIODS, PERIOD_KEYS, periodOf, periodSub, periodWhen, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats, energy, pace, soFar, toGo, needText, paceAt, periodNow, figureSoFar, loadDetail, liveNear, close, bgOf, udemOf, periodSeries, periodAxis,
 		loadRecords, trimZeros, periodHours, meteredDue, clock, dayOf, dayLong, monthOf, yearOf, daysBetween, runLength, isNew as isNewRec
 	} from '#lib/records/records.js';
 	import type { PageProps } from './$types';
@@ -24,6 +24,7 @@
 
 	let R = $state<any>(null);
 	let live = $state<any>({});
+	let near = $state<any>({});
 	let status = $state<'loading' | 'none' | 'ok'>('loading');
 	let region = $state('NZ');
 	// a half-hour record's day, week, month or year record (?period=)
@@ -46,7 +47,7 @@
 			loadDetail().then((x) => (det = x));
 			try {
 				const r = await fetch(LIVE_URL, { cache: 'no-cache' });
-				if (r.ok) { liveD = await r.json(); live = liveBeats(R, liveD); }
+				if (r.ok) { liveD = await r.json(); live = liveBeats(R, liveD); near = liveNear(R, liveD); }
 			} catch { /* the live check is extra */ }
 		})();
 	});
@@ -110,6 +111,8 @@
 	const onPace = $derived(R && liveD && per !== 'tp' ? pace(R, liveD).find((x) => x.d.id === d.id && x.region === region && x.period === per) ?? null : null);
 	const na = $derived(R ? notShown(d, region, rec, R, per) : null);
 	const prov = $derived(R && !na ? (per === 'tp' ? provisional(R, live, d.id, region) : (rec?.prov ?? null)) : null);
+	// a dispatch figure within the margin of the record, either side: too close for dispatch data to call
+	const near_ = $derived(R && !na && !prov ? close(R, live, near, d.id, region, per) : null);
 	const isNew = $derived(isNewRec(rec, per));
 	const regionName = $derived(REGIONS.find((x) => x.id === region)!.name);
 	const f = (v: number) => fmt(d, v, per);
@@ -320,7 +323,15 @@
 					<p>{prov.src === 'live' ? 'Live data shows' : 'Dispatch data shows'} <b>{f(prov.v)}</b>
 						{per === 'day' ? `on ${dayOf(prov.t)}` : per === 'week' ? `in the week of ${dayOf(prov.t)}` : per === 'month' ? `in ${monthOf(prov.t)}` : per === 'year' ? `in ${yearOf(prov.t)}`
 							: d.kind === 'hh' ? `in the ${clock(prov.t)} half-hour on ${dayOf(prov.t)}` : d.kind === 'run' ? `from ${dayOf(prov.t)}` : `in ${monthOf(prov.t)}`},
-						beyond the record. Dispatch data runs a little above the metered data, so it is confirmed or dropped when the EA publishes the metered data, around {meteredDue(per === 'week' ? prov.t + 6.5 * 864e5 : per === 'year' ? Date.UTC(+yearOf(prov.t), 11, 15) : prov.t)}.</p>
+						beyond the record by more than dispatch data usually strays from the meters (corrected for how it compares with them). Since 2020 every such record has been confirmed; the EA’s metered data settles it around {meteredDue(per === 'week' ? prov.t + 6.5 * 864e5 : per === 'year' ? Date.UTC(+yearOf(prov.t), 11, 15) : prov.t)}.</p>
+				</section>
+			{:else if near_}
+				<section class="prov near" aria-label="Close to the record">
+					<span class="tag provtag">Close</span>
+					<p>{near_.src === 'live' ? 'Live data shows' : 'Dispatch data shows'} <b>{f(near_.v)}</b>
+						{per === 'day' ? `on ${dayOf(near_.t)}` : per === 'week' ? `in the week of ${dayOf(near_.t)}` : per === 'month' ? `in ${monthOf(near_.t)}` : per === 'year' ? `in ${yearOf(near_.t)}`
+							: `in the ${clock(near_.t)} half-hour on ${dayOf(near_.t)}`},
+						within {f(near_.m)} of the record (corrected for how dispatch data compares with the meters). That is too close for dispatch data to call; the EA’s metered data settles it around {meteredDue(per === 'week' ? near_.t + 6.5 * 864e5 : per === 'year' ? Date.UTC(+yearOf(near_.t), 11, 15) : near_.t)}.</p>
 				</section>
 			{/if}
 
@@ -472,6 +483,7 @@
 
 	.prov { display: flex; align-items: baseline; gap: 10px; padding: 10px 14px; border: 1px dashed color-mix(in srgb, var(--warn-ink) 55%, var(--line)); background: color-mix(in srgb, var(--warn-bg) 45%, var(--surface)); border-radius: 4px; }
 	.prov p { margin: 0; color: var(--ink-2); font-size: 0.86rem; }
+	.prov.near { border-style: dotted; }
 	.pace { display: flex; align-items: baseline; gap: 10px; padding: 10px 14px; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); border-left: 3px solid var(--accent); background: color-mix(in srgb, var(--accent-soft) 60%, var(--surface)); border-radius: 4px; }
 	.pace p { margin: 0; color: var(--ink-2); font-size: 0.86rem; }
 	.pace b { color: var(--ink); }

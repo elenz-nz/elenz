@@ -69,7 +69,15 @@
 	<li>metered HVDC flows, about two weeks after the month.</li>
 </ul>
 <p>See <a href="/methods/history">History since 1997</a>.</p>
-<p>Anything newer comes from dispatch data, the market’s 5-minute targets. Records set there are <b>provisional</b>: shown as such, with when the metered data is due, and confirmed or dropped when it arrives. Dispatch runs 1–2% above metered generation (wind about 3.5%), so a provisional record that only just beats the old one often doesn’t survive. The page says which way it went for {NEW_DAYS} days.</p>
+<p>Anything newer comes from dispatch data, the market’s 5-minute targets. Dispatch and metered figures agree closely on average, but not quite at the extremes that records are made of, so dispatch data is corrected before it is compared with a record:</p>
+<ul>
+	<li>the plants dispatch reads systematically off are scaled to their meters: Ngāwhā (only Ngāwhā B is dispatched), Glenbrook and Kawerau Mill;</li>
+	<li>each record’s usual shift is taken off: how far a month’s highest (or lowest) half-hour, day, week or month in dispatch data usually sits from the metered one. Wind’s highest half-hour, for example, reads about 10 MW high nationally;</li>
+	<li>what is left still strays a little from month to month. The <b>margin</b> is how far that goes nine months in ten: about 10 MW for peak wind, 25–35 MW for demand, 0.3–0.6 points for the renewable share.</li>
+</ul>
+<p>A corrected figure beyond the record by more than the margin is a <b>provisional</b> record: shown as such, with when the metered data is due, and confirmed or dropped when it arrives. One within the margin, either side, is <b>close to the record</b>: too close for dispatch data to call. The page says which way a provisional record went for {NEW_DAYS} days.</p>
+<p>Tested on September 2020 to September 2026, month by month: uncorrected, dispatch data would have claimed 24 records the metered data didn’t confirm (30 counting New Zealand and an island separately), mostly wind and the renewable share missing by a few MW or a fraction of a point. Corrected (each month’s corrections worked out without that month), none would have been: of the 161 records the meters later confirmed, 113 would have shown as provisional records, 46 as close to the record and 2 not at all. The corrections are worked out from that comparison (<a href={REPO + 'analysis/dispatch_metered_fit.py'}><code>analysis/dispatch_metered_fit.py</code></a>, kept in <a href={REPO + 'facilities/dispatch_adjust.json'}><code>facilities/dispatch_adjust.json</code></a>) and refreshed about once a year.</p>
+<p>Prices never set provisional records: dispatch prices can be many times the final ones, which arrive the next day.</p>
 <p>The Now page checks the live week itself: when a half-hour of the live data beats a record for generation or demand, a “New record today” link above Generation now says so, on the day it was set. Prices and HVDC are left to the history:</p>
 <ul>
 	<li>live prices are dispatch prices, which can be far from the final ones (on 9 August 2021 dispatch prices peaked at $356,621/MWh, final prices at $2,698);</li>

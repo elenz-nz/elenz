@@ -90,7 +90,7 @@
 <ul>
 	<li>Plants on local networks that aren’t dispatched don’t appear as generation in the live week: their output shows up as lower demand at the grid. Embedded solar is the exception, and is modelled. The rest came to about 120–165 MW on average in January, June and September 2026, close to 3% of generation and steady day and night: mostly small hydro, Ngāwhā’s older units (about 25 MW) and landfill gas (about 20 MW), with a little wind, gas and diesel. So a 24% solar share in the live week is about 23% of all generation, and the renewable share reads slightly low. (Measured from the EA’s <a href="/methods/sources#reconciliation">reconciled injection</a> less the dispatch data, grid point by grid point.)</li>
 	<li>The metered history already counts all of Ngāwhā and Teviot’s own meter, so both step down where the history hands over to the dispatch data. The other plants are missing from the history too, about 2% of generation.</li>
-	<li>Dispatch runs 1–2% above metered generation overall (wind 3–4%, hydro 1–2%), probably because dispatch measures at the generator and metering at the grid connection. See <a href="/methods/history#seam">where the sources hand over</a>.</li>
+	<li>Dispatch and metered generation agree within a fraction of a percent for most plants, but not for Ngāwhā, Glenbrook, Kawerau Mill or the stations of block-dispatched river chains, and dispatch half-hours reach slightly further at their extremes. See <a href="/methods/history#seam">where the sources hand over</a>.</li>
 	<li>Huntly’s Rankine units are shown as coal/gas, because the market data doesn’t say which fuel they burned. Their emissions use Genesis’s reported coal share each quarter (see <a href="/methods/emissions">emissions</a>).</li>
 </ul>
 
