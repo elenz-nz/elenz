@@ -355,12 +355,6 @@ export const REFERENCES: Reference[] = [
 		topics: ['emissions'],
 	},
 	{
-		id: 'nzga2025', title: 'New Zealand’s Geothermal Carbon Emissions: Mitigations and Emerging Opportunities', by: 'New Zealand Geothermal Association', date: 'July 2025',
-		url: 'https://www.nzgeothermal.org.nz/downloads/2025-07-29-co2-group.pdf',
-		use: 'Ngāwhā reinjecting all its gas, with an emission factor of zero since 2024.',
-		topics: ['emissions'],
-	},
-	{
 		id: 'times', title: 'TIMES-NZ documentation: emission factors', by: 'Energy Efficiency and Conservation Authority',
 		url: 'https://times-nz-dev.readthedocs.io/en/stable/model_methodology/electricity/emission_factors.html',
 		use: 'The assumed factors for Te Huka 3 and Kawerau’s TOPP2 (0), and Ngāwhā’s OEC4 falling to 0 in 2024.',

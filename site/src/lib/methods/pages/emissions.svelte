@@ -2,7 +2,7 @@
 	// Every factor on this page is read from the code that applies it (src/lib/tracker/emissions.js and fuels.js).
 	import GoodFor from '../GoodFor.svelte';
 	import {
-		COAL, GAS, GAS_FLEET, GAS_PLANT, GEO_ASSUMED, GEO_DEFAULT, GEO_YEAR_COLS, GEO_YEARS, RANKINE_COAL_SHARE_GENESIS,
+		COAL, GAS, GAS_FLEET, GAS_PLANT, GEO_ASSUMED, GEO_DEFAULT, GEO_REPORTED, GEO_YEAR_COLS, GEO_YEARS, RANKINE_COAL_SHARE_GENESIS,
 		RANKINE_COAL_SHARE_MBIE, RANKINE_HEAT_RATE, STRATFORD_TCC, rankineFactor,
 	} from '#lib/tracker/emissions.js';
 	import { FUELS } from '#lib/tracker/fuels.js';
@@ -33,7 +33,7 @@
 	};
 	const geoRows = Object.entries(GEO_YEARS as Record<string, number[]>);
 	// the published station factors' range, g/kWh → t/MWh (assumed figures left out)
-	const geoAll = geoRows.flatMap(([, v]) => v);
+	const geoAll = [...geoRows.flatMap(([, v]) => v), ...Object.values(GEO_REPORTED).map((r) => r.g)];
 	const geoRange = `${f2(Math.min(...geoAll) / 1000)}–${f2(Math.max(...geoAll) / 1000)}`;
 	const assumed = Object.entries(GEO_ASSUMED as Record<string, number>).filter(([k]) => k in GEO_NAMES);
 	const GAS_NOTES: Record<string, string> = {
@@ -147,11 +147,13 @@
 			{#each assumed as [k, v] (k)}
 				<tr class="sub"><td>{GEO_NAMES[k]} (assumed)</td><td class="n" colspan={GEO_YEAR_COLS.length}>{v}</td></tr>
 			{/each}
+			<tr class="sub"><td>Tauhara (from the generator)</td><td class="n" colspan={GEO_YEAR_COLS.length}>{GEO_REPORTED.tauhara.g}</td></tr>
+			<tr class="sub"><td>Ngāwhā, from {GEO_REPORTED.ngawha_oec4.from}</td><td class="n" colspan={GEO_YEAR_COLS.length}>{GEO_REPORTED.ngawha_oec4.g}</td></tr>
 		</tbody>
-		<caption>g CO₂e/kWh (= kg/MWh). Assumed figures are <a href={ref('times')}>TIMES-NZ’s</a>, until the NZGA publishes them. Ngāwhā’s OEC4 opened in 2021; until 2023 it uses the field’s figure before reinjection. Any other station: {GEO_DEFAULT}, the 2023 fleet average.</caption>
+		<caption>g CO₂e/kWh (= kg/MWh). Assumed figures are <a href={ref('times')}>TIMES-NZ’s</a>, until the NZGA publishes them. Tauhara’s is Contact’s, as listed by <a href={ref('em6')}>em6</a>. <a href={ref('topenergy')}>Top Energy</a> reports 2024 as the first year all of Ngāwhā’s geothermal emissions were avoided. Ngāwhā’s OEC4 opened in 2021; until 2023 it uses the field’s figure before reinjection. Any other station: {GEO_DEFAULT}, the 2023 fleet average.</caption>
 	</table>
 </div>
-<p>Weighted by output, dispatched geothermal came to about 70 g/kWh in 2021, 60 in 2023 and 54 in 2025. New years are added as the NZGA publishes them (each November).</p>
+<p>Weighted by output, dispatched geothermal came to about 70 g/kWh in 2021, 60 in 2023 and 55 in 2025. New years are added as the NZGA publishes them (each November).</p>
 
 <h2 id="checks">Checks against national figures</h2>
 <p>Coal, gas and diesel emissions in the history follow the <a href={sourceHref('inventory')}>national inventory’s</a> “energy industries” series year to year, after taking out its roughly 1.2 Mt of refining and gas processing: 4.4 Mt against 4.4 in 1998, 6.8 against 6.8 in 2001, 8.8 against 9.1 in 2005, 8.2 against 8.5 in 2008, 5.3 against 5.7 in 2010. The pattern matches too: the 2001 and 2005–06 peaks, the 2007 dip and the 2011 low.</p>
@@ -162,8 +164,7 @@
 	<li>The Rankines’ coal share is for the three units together and for a whole quarter: within a quarter, a coal-heavy week and a gas-heavy week get the same factor.</li>
 	<li>Gas plants other than the closed ones share one average factor, so a peaker running alone reads cleaner than it is, and Huntly 5 dirtier.</li>
 	<li>Geothermal before 2020 likely reads low.</li>
-	<li>Geothermal since 2023 carries 2023’s figures forward until newer ones are published, so stations reinjecting more now read high: <a href={ref('nzga2025')}>Ngāwhā has reinjected all its gas since 2024</a>, and <a href={ref('mclean2024')}>Te Huka’s system</a> was offline for about half of 2023.</li>
-	<li>Tauhara’s assumed 32 g/kWh is TIMES-NZ’s; <a href={ref('em6')}>em6</a> uses 80, from the generator.</li>
+	<li>Geothermal since 2023 carries 2023’s figures forward until newer ones are published, so stations reinjecting more now read high: <a href={ref('mclean2024')}>Te Huka’s system</a> was offline for about half of 2023.</li>
 	<li>Kinleith counts as zero, though natural gas is its <a href={ref('stack2020')}>secondary fuel</a>; <a href={ref('em6')}>em6</a> uses 0.364 t/MWh, from the generator, and 0.06 for the Kawerau mill, which it treats as geothermal.</li>
 	<li>Industrial cogeneration that isn’t dispatched isn’t included.</li>
 </ul>
