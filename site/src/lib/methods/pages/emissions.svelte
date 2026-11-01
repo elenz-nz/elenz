@@ -2,7 +2,7 @@
 	// Every factor on this page is read from the code that applies it (src/lib/tracker/emissions.js and fuels.js).
 	import GoodFor from '../GoodFor.svelte';
 	import {
-		COAL, GAS, GAS_FLEET, GAS_PLANT, GEO_ASSUMED, GEO_DEFAULT, GEO_REPORTED, GEO_YEAR_COLS, GEO_YEARS, RANKINE_COAL_SHARE_GENESIS,
+		COAL, GAS, GAS_FLEET, GAS_PLANT, GEO_ASSUMED, GEO_CONTACT, GEO_CONTACT_FY, GEO_DEFAULT, GEO_REPORTED, GEO_YEAR_COLS, GEO_YEARS, RANKINE_COAL_SHARE_GENESIS,
 		RANKINE_COAL_SHARE_MBIE, RANKINE_HEAT_RATE, STRATFORD_TCC, rankineFactor,
 	} from '#lib/tracker/emissions.js';
 	import { FUELS } from '#lib/tracker/fuels.js';
@@ -33,7 +33,8 @@
 	};
 	const geoRows = Object.entries(GEO_YEARS as Record<string, number[]>);
 	// the published station factors' range, g/kWh → t/MWh (assumed figures left out)
-	const geoAll = [...geoRows.flatMap(([, v]) => v), ...Object.values(GEO_REPORTED).map((r) => r.g)];
+	const contactRows = Object.entries(GEO_CONTACT as Record<string, (number | null)[]>);
+	const geoAll = [...geoRows.flatMap(([, v]) => v), ...contactRows.flatMap(([, v]) => v.filter((x) => x !== null) as number[])];
 	const geoRange = `${f2(Math.min(...geoAll) / 1000)}–${f2(Math.max(...geoAll) / 1000)}`;
 	const assumed = Object.entries(GEO_ASSUMED as Record<string, number>).filter(([k]) => k in GEO_NAMES);
 	const GAS_NOTES: Record<string, string> = {
@@ -75,7 +76,7 @@
 			<tr><td>Gas</td><td class="n">{f2(GAS_FLEET)}</td><td>Today’s fleet average; closed plants their own (<a href="#gas">below</a>)</td></tr>
 			<tr><td>Diesel (Whirinaki)</td><td class="n">{f2(diesel)}</td><td>Assumed, a typical factor for diesel turbines: Whirinaki’s heat rate is about 10.9 GJ/MWh (<a href={ref('stack2020')}>2020 stack report</a>), and <a href={ref('em6')}>em6</a> uses 0.76. It runs rarely</td></tr>
 			<tr><td>Geothermal</td><td class="n">{geoRange}</td><td>Each station by year (<a href="#geothermal">below</a>)</td></tr>
-			<tr><td>Bioenergy (Kinleith, Kawerau mill)</td><td class="n">0</td><td>Wood waste and black liquor: biogenic CO₂, counted as zero, as in national inventories (<a href={ref('ipcc')}>IPCC guidelines</a>; the <a href={sourceHref('mfe')}>Ministry for the Environment</a> reports it separately)</td></tr>
+			<tr><td>Bioenergy (Kinleith, Kawerau mill)</td><td class="n">0</td><td>Wood waste and black liquor: biogenic CO₂, counted as zero, as in national inventories (<a href={ref('ipcc')}>IPCC guidelines</a>; the <a href={sourceHref('mfe')}>Ministry for the Environment</a> and <a href={ref('ojifs2025')}>Oji</a> report it separately). Any gas burned with them isn’t counted (<a href="#limits">known limits</a>)</td></tr>
 			<tr><td>Waste heat (Glenbrook)</td><td class="n">0</td><td><a href={ref('nzsteel')}>NZ Steel’s ironmaking gases</a>; the emissions are counted with the ironmaking (industrial processes). UN CDM methodology <a href={ref('acm0004')}>ACM0004</a> (since replaced by ACM0012) also counted waste-gas generation as zero</td></tr>
 			<tr><td>Hydro, wind, solar, embedded solar</td><td class="n">0</td><td>Nothing burned</td></tr>
 			<tr><td>Batteries</td><td class="n">0</td><td>Discharge only; the energy that charged them was counted when it was generated</td></tr>
@@ -147,13 +148,24 @@
 			{#each assumed as [k, v] (k)}
 				<tr class="sub"><td>{GEO_NAMES[k]} (assumed)</td><td class="n" colspan={GEO_YEAR_COLS.length}>{v}</td></tr>
 			{/each}
-			<tr class="sub"><td>Tauhara (from the generator)</td><td class="n" colspan={GEO_YEAR_COLS.length}>{GEO_REPORTED.tauhara.g}</td></tr>
 			<tr class="sub"><td>Ngāwhā, from {GEO_REPORTED.ngawha_oec4.from}</td><td class="n" colspan={GEO_YEAR_COLS.length}>{GEO_REPORTED.ngawha_oec4.g}</td></tr>
 		</tbody>
-		<caption>g CO₂e/kWh (= kg/MWh). Assumed figures are <a href={ref('times')}>TIMES-NZ’s</a>, until the NZGA publishes them. Tauhara’s is Contact’s, as listed by <a href={ref('em6')}>em6</a>. <a href={ref('topenergy')}>Top Energy</a> reports 2024 as the first year all of Ngāwhā’s geothermal emissions were avoided. Ngāwhā’s OEC4 opened in 2021; until 2023 it uses the field’s figure before reinjection. Any other station: {GEO_DEFAULT}, the 2023 fleet average.</caption>
+		<caption>g CO₂e/kWh (= kg/MWh). Assumed figures are <a href={ref('times')}>TIMES-NZ’s</a>, until the NZGA publishes them. <a href={ref('topenergy')}>Top Energy</a> reports 2024 as the first year all of Ngāwhā’s geothermal emissions were avoided. Ngāwhā’s OEC4 opened in 2021; until 2023 it uses the field’s figure before reinjection. Any other station: {GEO_DEFAULT}, the 2023 fleet average.</caption>
 	</table>
 </div>
-<p>Weighted by output, dispatched geothermal came to about 70 g/kWh in 2021, 60 in 2023 and 55 in 2025. New years are added as the NZGA publishes them (each November).</p>
+<p>From July 2022 Contact’s stations use Contact’s own figures, which it publishes each year in its <a href={ref('contact-gbp')}>green borrowing reports</a>, in place of the table above. They cover every Contact station but Ōhaaki, and show reinjection taking effect at Te Huka. <a href={ref('em6')}>em6</a> lists Tauhara at 80, close to its figure while commissioning.</p>
+<div class="tbl">
+	<table>
+		<thead><tr><th>Station</th>{#each GEO_CONTACT_FY as y (y)}<th class="n">{y}</th>{/each}</tr></thead>
+		<tbody>
+			{#each contactRows as [k, v] (k)}
+				<tr><td>{GEO_NAMES[k] ?? k}</td>{#each v as x, i (i)}<td class="n">{x === null ? '–' : x.toFixed(x % 1 ? 1 : 0)}</td>{/each}</tr>
+			{/each}
+		</tbody>
+		<caption>g CO₂e/kWh by year to June, rounded here. Each new year is added as Contact reports it; until then the latest carries forward.</caption>
+	</table>
+</div>
+<p>Weighted by output, dispatched geothermal came to about 70 g/kWh in 2021, 60 in 2023 and 50 in 2025. New years are added as the NZGA publishes them (each November).</p>
 
 <h2 id="checks">Checks against national figures</h2>
 <p>Coal, gas and diesel emissions in the history follow the <a href={sourceHref('inventory')}>national inventory’s</a> “energy industries” series year to year, after taking out its roughly 1.2 Mt of refining and gas processing: 4.4 Mt against 4.4 in 1998, 6.8 against 6.8 in 2001, 8.8 against 9.1 in 2005, 8.2 against 8.5 in 2008, 5.3 against 5.7 in 2010. The pattern matches too: the 2001 and 2005–06 peaks, the 2007 dip and the 2011 low.</p>
@@ -164,8 +176,9 @@
 	<li>The Rankines’ coal share is for the three units together and for a whole quarter: within a quarter, a coal-heavy week and a gas-heavy week get the same factor.</li>
 	<li>Gas plants other than the closed ones share one average factor, so a peaker running alone reads cleaner than it is, and Huntly 5 dirtier.</li>
 	<li>Geothermal before 2020 likely reads low.</li>
-	<li>Geothermal since 2023 carries 2023’s figures forward until newer ones are published, so stations reinjecting more now read high: <a href={ref('mclean2024')}>Te Huka’s system</a> was offline for about half of 2023.</li>
-	<li>Kinleith counts as zero, though natural gas is its <a href={ref('stack2020')}>secondary fuel</a>; <a href={ref('em6')}>em6</a> uses 0.364 t/MWh, from the generator, and 0.06 for the Kawerau mill, which it treats as geothermal.</li>
+	<li>Geothermal stations other than Contact’s and Ngāwhā carry 2023’s figures forward until newer ones are published.</li>
+	<li>Kinleith counts as zero, as bioenergy, which leaves out the gas it burns. Oji calls its generation <a href={ref('oji-ea')}>biomass cogeneration</a>, but natural gas is <a href={ref('stack2020')}>cofired in the power boiler</a> to manage steam demand, and fossil fuels were 2.1 of the 12.2 PJ of fuel the mill burned in <a href={ref('ojifs2025')}>2025</a>. Nobody publishes how much of that is behind its electricity. <a href={ref('em6')}>em6</a> uses 0.364 t/MWh, from the generator, with no year or basis given; at that rate Kinleith would have added about 2 g/kWh to New Zealand’s intensity in 2024.</li>
+	<li>The Kawerau mill also counts as zero; <a href={ref('em6')}>em6</a> uses 0.06 t/MWh and treats it as geothermal.</li>
 	<li>Industrial cogeneration that isn’t dispatched isn’t included.</li>
 </ul>
 

@@ -101,7 +101,7 @@ export function mountTracker(D, hooks = {}) {
   const OWNERS = ['Genesis', 'Meridian', 'Contact', 'Mercury', 'Nova', 'Other generators'];
   const hydroOnly = () => VIEWS[state.view].by === 'scheme';
   const topIsAll = () => level() === 'top' && !hydroOnly();  // shares of all generation (not just the layers shown)
-  const ownerOf = p => PLANT_META[p.name]?.owner || 'Other generators';
+  const ownerOf = p => { const o = PLANT_META[p.name]?.owner; return OWNERS.includes(o) ? o : 'Other generators'; };
   const schemeOf = p => PLANT_META[p.name]?.scheme || 'Other hydro';
   // other names a plant has had or goes by ([plant_aka] and the register names of a station shown whole): the list's
   // filter finds a plant by them, and its drill-down lists them with what its metered history counts ([plant_metering])

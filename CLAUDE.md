@@ -566,7 +566,7 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
 
 Recurring upkeep: add Genesis's Rankine coal share to `emissions.js` each quarter (performance report ~3 weeks
 after quarter end; FY27 Q1 due late Oct 2026); add each year's NZGA geothermal figures (NZ Geothermal Workshop,
-November); renew the Worker's `GITHUB_TOKEN` before it expires (~Oct 2027).
+November) and Contact's station figures (`GEO_CONTACT`, green borrowing update report, about September); renew the Worker's `GITHUB_TOKEN` before it expires (~Oct 2027).
 
 Terms: the EA confirmed by email (21 Oct 2026) that the EMI datasets and the API are CC BY 4.0, covering republishing,
 derived data and a possible paid API for commercial users; attribution is still required (the footer credit).

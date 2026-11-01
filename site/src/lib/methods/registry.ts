@@ -79,7 +79,7 @@ export const TOPICS: Topic[] = [
 		title: 'Renewable share and groupings',
 		summary: 'How fuels are counted as renewable or fossil, flexible or variable, and how plants are grouped by site, hydro scheme and owner.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
-		updated: '2026-11-01',
+		updated: '2026-11-02',
 	},
 	{
 		slug: 'capacity',
@@ -349,6 +349,24 @@ export const REFERENCES: Reference[] = [
 		topics: ['emissions'],
 	},
 	{
+		id: 'contact-gbp', title: 'Green Borrowing Programme update reports, FY23 to FY26', by: 'Contact Energy',
+		url: 'https://contact.co.nz/greenborrowing',
+		use: 'Each Contact geothermal station’s emissions intensity by year to June.',
+		topics: ['emissions'],
+	},
+	{
+		id: 'ojifs2025', title: 'Sustainability Report 2025', by: 'Oji Fibre Solutions', date: '2026',
+		url: 'https://cdn.sanity.io/files/gz4vq3tx/production/b0136366ad00459a2e07e8a88f74fa366f5bf146.pdf',
+		use: 'Kinleith’s fuels in 2025: 10.1 PJ of biomass and 2.1 PJ of fossil fuels. Biomass CO₂ reported separately, as the GHG Protocol sets out.',
+		topics: ['emissions'],
+	},
+	{
+		id: 'oji-ea', title: 'Submission on strengthening price discovery in the forward electricity markets', by: 'Oji Fibre Solutions, to the Electricity Authority', date: 'December 2024',
+		url: 'https://www.ea.govt.nz/documents/9188/Oji_Fibre_Solutions.pdf',
+		use: 'Oji describes its generation as biomass cogeneration.',
+		topics: ['emissions'],
+	},
+	{
 		id: 'topenergy', title: 'Sustainability Report 2025', by: 'Top Energy', date: '2025',
 		url: 'https://topenergy.co.nz/assets/Sustainability-Report-2025_Final_Online.pdf',
 		use: 'Ngāwhā: 2024 the first year all its geothermal emissions were avoided, with a Unique Emission Factor from the EPA.',
@@ -357,7 +375,7 @@ export const REFERENCES: Reference[] = [
 	{
 		id: 'times', title: 'TIMES-NZ documentation: emission factors', by: 'Energy Efficiency and Conservation Authority',
 		url: 'https://times-nz-dev.readthedocs.io/en/stable/model_methodology/electricity/emission_factors.html',
-		use: 'The assumed factors for Te Huka 3 and Kawerau’s TOPP2 (0), and Ngāwhā’s OEC4 falling to 0 in 2024.',
+		use: 'The assumed factor for Kawerau’s TOPP2 (0), and Ngāwhā’s OEC4 falling to 0 in 2024.',
 		topics: ['emissions'],
 	},
 	{
@@ -387,7 +405,7 @@ export const REFERENCES: Reference[] = [
 	{
 		id: 'em6', title: 'em6: Carbon Methodology, version 1.6', by: 'Energy Market Services', date: 'November 2025',
 		url: 'https://www.ems.co.nz/documents/817/em6_carbon_intensity_1.6.pdf',
-		use: 'Battery discharge left out of carbon intensity and the renewable share; em6’s emission factor for each generator, Tauhara’s among them.',
+		use: 'Battery discharge left out of carbon intensity and the renewable share; em6’s emission factor for each generator.',
 		topics: ['emissions', 'groupings'],
 	},
 	// ---------- plants ----------

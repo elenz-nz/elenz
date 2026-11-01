@@ -164,7 +164,7 @@ burned for generation, and generation emissions. 25 quarters, FY21 Q1 (Jul–Sep
 - Check: Rankines, Huntly 5 and 6 modelled from the dispatch data reproduce Genesis's reported generation emissions
   within ±5% in 20 of 23 quarters, −0.4% overall. FY22 Q3 emissions were revised in a later report from 404 to 611 kt.
 - Geothermal: each station's operational emissions by year (NZGA emissions working group, McLean et al.: CY2020,
-  CY2022 published as lifecycle less 10 g/kWh, CY2023), the latest carried forward; Tauhara 32 until 2 Nov 2026, now 80 from Contact via em6, Ngāwhā 0 from 2024 (Top Energy); Te Huka 3 and TOPP2 0
+  CY2022 published as lifecycle less 10 g/kWh, CY2023), the latest carried forward; Contact's stations use Contact's own figures from FY23 (GEO_CONTACT, green borrowing update reports; Tauhara was TIMES-NZ's assumed 32 until 2 Nov 2026), Ngāwhā 0 from 2024 (Top Energy); TOPP2 0
   (TIMES-NZ assumptions) until published. Generation-weighted over the dispatch data: 2021 70, 2022 69, 2023 60,
   2025 54 g/kWh (NZGA MW-weighted fleet including undispatched stations: 2020 69, 2023 57). Dispatched stations only:
   Ngāwhā B (OEC4) is the only dispatched Ngāwhā plant; TOPP1, GDL and Ngāwhā A are on local networks; 'Wairakei' is
@@ -179,9 +179,9 @@ burned for generation, and generation emissions. 25 quarters, FY21 Q1 (Jul–Sep
   ironmaking emissions sit in industrial processes). Both are 'gas' in the EA register.
 
 Against em6's factors (Carbon Methodology v1.6, Nov 2025, checked 2 Nov 2026): close on the Rankines (1.01 coal, 0.589 gas), Huntly 5 (0.40), the
-Taranaki Combined Cycle (0.40) and most geothermal; apart on Tauhara (0.080 from the generator, 0.032 here), Kinleith (0.364 from the generator, 0 here;
-the 2020 stack report has it on black liquor, wood waste and some natural gas), the Kawerau mill (0.060 as geothermal, 0 here), Ngāwhā OEC4 (0, 0.095
-carried forward here), Whareroa and Kapuni (0.683, the 0.46 fleet average here), Junction Road (0.548, ~0.51 here), diesel (0.76, 0.80 here).
+Taranaki Combined Cycle (0.40) and most geothermal; apart on Tauhara (0.080 from the generator, close to Contact's commissioning-year 86.53; Contact's FY26 is 22.8), Kinleith (0.364 from the generator, 0 here by
+the owner's call, 2 Nov 2026: Oji calls it biomass cogeneration, and the limit is stated on the method page; 2.1 PJ of fossil fuels against 10.1 PJ of biomass at
+the mill in 2025), the Kawerau mill (0.060 as geothermal, 0 here), Whareroa and Kapuni (0.683, the 0.46 fleet average here), Junction Road (0.548, ~0.51 here), diesel (0.76, 0.80 here).
 MBIE doesn't document that its coal generation includes Glenbrook (Energy in New Zealand 2025 lists 0.68 PJ of waste heat separately and puts the mill's
 coal under other transformation); the case for it is that subtracting Glenbrook reproduces Genesis's figures.
 

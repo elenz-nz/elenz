@@ -117,6 +117,7 @@ tiwai = "TWI2201"
 "Kaiwaikawe Wind Farm" = "Mercury"
 "Kōwhai Park Solar Farm" = "Contact"
 "Mangahao" = "Contact"                    # King Country Energy, part of Manawa
+"Kinleith" = "Oji Fibre Solutions"        # the register says Manawa; Oji owns it (MBIE 2020 stack report). Counts under Other generators in By owner
 # plants only in the metered history (retired, or never dispatched)
 "Ōtāhuhu A" = "Contact"
 "Ōtāhuhu B" = "Contact"

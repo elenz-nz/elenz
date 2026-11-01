@@ -9,7 +9,7 @@
 	<li><b>Not renewable:</b> Huntly’s coal/gas Rankine units, gas, diesel and waste heat (Glenbrook).</li>
 	<li><b>Neither:</b> batteries store energy rather than make it; their discharge counts towards total generation, but is left out of the renewable share altogether (as <a href={ref('em6')}>em6</a> does): that energy was generated, and counted, when the battery charged. The HVDC link isn’t generation.</li>
 </ul>
-<p>Total generation is as on the <a href="/methods/generation#totals">generation page</a>, including embedded solar. Geothermal counts as renewable although it emits some CO₂ (about 0.06 t/MWh across the fleet now; see <a href="/methods/emissions#geothermal">emissions</a>). Glenbrook counts as zero emissions but not renewable: its fuel is the off-gas of coal-fed ironmaking. Over a range, the share is weighted by generation.</p>
+<p>Total generation is as on the <a href="/methods/generation#totals">generation page</a>, including embedded solar. Geothermal counts as renewable although it emits some CO₂ (about 0.05 t/MWh across the fleet now; see <a href="/methods/emissions#geothermal">emissions</a>). Glenbrook counts as zero emissions but not renewable: its fuel is the off-gas of coal-fed ironmaking. Over a range, the share is weighted by generation.</p>
 <p class="note">Official figures, such as MBIE’s, count renewable generation over a year and include plants that aren’t in the market data, so they can differ from the share here.</p>
 
 <h2 id="groupings">Grouping the generation chart</h2>
@@ -30,7 +30,7 @@
 	<dt>By hydro scheme</dt>
 	<dd>Hydro only, by river system, each listed upstream to downstream: Tekapo (Takapō A, B); Waitaki (Ōhau A, B, C, Benmore, Aviemore, Waitaki); Waikato (Aratiatia to Karāpiro, eight stations); Manapōuri; Clutha (Clyde, Roxburgh); Tongariro (Tokaanu, Rangipo); Waikaremoana; Rangitaiki (Aniwhenua, Wheao and Flaxy, Matahina); Waipori (Deep Stream, Waipori 2A/3/4); and other hydro.</dd>
 	<dt>By owner</dt>
-	<dd>Each plant’s operator in the EA register, grouped as Meridian, Contact (including Manawa Energy, formerly Trustpower, which <a href={ref('manawa')}>Contact took over in July 2025</a>), Mercury (including Nga Awa Pūrua, which it operates), Genesis, Nova and other generators; batteries count with their owner. Plants the register doesn’t list yet, and plants seen only in the metered history, have their owner set by hand. Today’s owners apply to the whole history, so earlier sales and transfers aren’t shown.</dd>
+	<dd>Each plant’s operator in the EA register, grouped as Meridian, Contact (including Manawa Energy, formerly Trustpower, which <a href={ref('manawa')}>Contact took over in July 2025</a>), Mercury (including Nga Awa Pūrua, which it operates), Genesis, Nova and other generators; batteries count with their owner. Plants the register doesn’t list yet, and plants seen only in the metered history, have their owner set by hand. So does Kinleith: the register’s operator is Manawa, but Oji Fibre Solutions owns it, so it counts under other generators. Today’s owners apply to the whole history, so earlier sales and transfers aren’t shown.</dd>
 </dl>
 
 <p class="note">The lists: <a href={REPO + 'facilities/overrides.toml'}><code>facilities/overrides.toml</code></a> (<code>[owners]</code>, <code>[plant_owners]</code>, <code>[hydro_schemes]</code>). Groupings: <a href={REPO + 'site/src/lib/tracker/tracker.js'}><code>site/src/lib/tracker/tracker.js</code></a>.</p>
