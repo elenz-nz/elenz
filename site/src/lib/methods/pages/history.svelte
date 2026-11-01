@@ -34,7 +34,15 @@
 <p>Plants that have closed are included: New Plymouth, Ōtāhuhu A and B, Southdown, Te Awamutu, and Taranaki Combined Cycle (within Stratford).</p>
 
 <h2 id="seam">Where the sources hand over</h2>
-<p>Over September 2020 to September 2026, where both exist, dispatch and metered figures agree closely (half-hourly national correlation 0.999 every month), but dispatch totals run 1–2% above metered ones every year: wind 3–4%, hydro 1–2%, geothermal, gas and coal within 2%. That is most likely because dispatch measures output at the generator and metering at the grid connection. The site uses each as published rather than scaling one to the other, so where the history switches from metered to dispatch data, at the start of the month after the latest metered one, totals can step up slightly.</p>
+<p>Over September 2020 to September 2026, where both exist, the site’s dispatch and metered figures agree closely: national wind and hydro within 0.2% over the period, demand within 1% in each island, and a half-hourly national correlation of 0.999 every month. The differences are in a few plants:</p>
+<ul>
+	<li><b>Ngāwhā</b>: only Ngāwhā B is dispatched, so dispatch shows about 45% less than the whole station’s meter (about 25 MW).</li>
+	<li><b>Glenbrook</b>: dispatch sees part of the plant, about 30% less than its meter.</li>
+	<li><b>Kawerau Mill</b>: its meter is net of the mill’s own load, so dispatch reads about 45% more.</li>
+	<li><b>Teviot</b>: in the metered history, not dispatched.</li>
+	<li><b>River chains</b> dispatched as a block, the Waikato above all: each station differs (Arapuni about 11% more metered, Maraetai about 11% less) while the chain agrees.</li>
+</ul>
+<p>Dispatch half-hours, being 5-minute targets averaged, also reach slightly further at their extremes: a month’s highest half-hour of wind reads about 10 MW above the metered one nationally, hydro and demand about 20–25 MW. The site shows each as published rather than scaling one to the other, so where the history switches from metered to dispatch data, at the start of the month after the latest metered one, Ngāwhā steps down and Teviot drops out. <a href="/methods/records#official">Records</a> set in dispatch data are corrected for all of this before they count as provisional.</p>
 <p>Plant by plant, the two can differ more. The Waikato stations are dispatched as one block, so their dispatch figures are the chain’s total split between stations, not each station’s output (correlation only 0.4–0.7 by half-hour); the metered figures are the real ones. Glenbrook’s metered output is about 1.45 times its dispatch, which sees only part of the plant.</p>
 
 <h2 id="resolution">Resolution</h2>

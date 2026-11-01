@@ -88,7 +88,7 @@
 <h2 id="limits">Known limits</h2>
 <ul>
 	<li><b>Uncertain rows.</b> New Plymouth counts its full 600 MW until it was mothballed in December 2007, though its output says units were run down earlier. Ōtāhuhu A counts its four 45 MW turbines, without two later units whose size wasn’t found. Ōhaaki’s derating from 104 MW to about 65 MW isn’t dated. Clyde’s rise to 464 MW is dated from its output (November 2015), not the consent change (2005). Each is marked in the file.</li>
-	<li><b>Dispatch and metered output differ:</b> dispatch figures run 1–2% above metered (see <a href="/methods/history#seam">history</a>), so capacity factors for the latest weeks, which use dispatch data, read slightly high.</li>
+	<li><b>Dispatch and metered output differ for a few plants:</b> most agree within a fraction of a percent, but Ngāwhā, Glenbrook, Kawerau Mill and stations on block-dispatched river chains read differently (see <a href="/methods/history#seam">history</a>), so their capacity factors for the latest weeks, which use dispatch data, differ from the metered ones.</li>
 	<li>Plants not in the market data, such as small embedded hydro and industrial cogeneration that isn’t metered, aren’t counted in either the output or the capacity.</li>
 </ul>
 

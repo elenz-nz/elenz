@@ -344,7 +344,10 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   (missing months are read back from `hist/hh`; bump its `VERSION` to remake all); `hist/records.json` (each record by
   region, its progression, context for its half-hour, the best for each month of the year, provisional records from
   dispatch months and which ones were settled) is published while the history is complete, only when it changes. Official
-  means metered generation (meta.source), final prices, metered HVDC. Clock-change days count like any other
+  means metered generation (meta.source), final prices, metered HVDC. Dispatch months are corrected before they are
+  compared (`facilities/dispatch_adjust.json`, published in records.json as `adj` for the live check in records.js):
+  Ngāwhā, Glenbrook and Kawerau Mill scaled to their meters, each record's usual shift taken off; `prov` only beyond the
+  record by more than the margin `m`, `near` within it ("close to the record"). Prices set no provisional records. Clock-change days count like any other
   (since BUILD 7; before it, Generation_MD's clock-numbered days before 2009 were left out).
   Try it on downloaded months: `python3 ingest/records.py <folder of YYYY-MM.json> [out.json]`.
   `offered.py` (its own workflow, `offers.yml`, started by the Worker with the history job every 6 hours): final
@@ -514,8 +517,11 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   (Oct 1998 on) under old codes (RKA0111 Rotokawa, NGA0331 Ngāwhā, KMI0331 Kaimai, TRC0331 Te Rapa, TWF0331/2
   Tararua ...). Only embedded stations the tracker shows later are included, so totals don't jump in 2009.
   Generation_MD is net of local load at some embedded points (Mangahao ~10% of gross, Cobb ~35%); the embedded meter
-  there has the gross figure. Over Sep 2020-Sep 2026 dispatch MW ran 1-2% above metered (wind ~3.5%, hydro 1-2%), with
-  half-hourly national correlation 0.999. Plant-level differences: river chains are block dispatched (Waikato above
+  there has the gross figure. Over Sep 2020-Sep 2026, on the site's own series, dispatch and metered agree within 0.2% for
+  national wind and hydro (half-hourly national correlation 0.999); the plants that differ are Ngāwhā (dispatch ~45% low),
+  Glenbrook (~30% low), Kawerau Mill (~45% high) and block-dispatched river chains, and dispatch extremes run a little
+  further (wind's monthly peak ~10 MW high). Records correct for this (records.py, facilities/dispatch_adjust.json,
+  analysis/dispatch_vs_metered.py and dispatch_metered_fit.py; refresh the corrections about once a year). Plant-level differences: river chains are block dispatched (Waikato above
   all: Mercury only has to meet the chain's total), so per-station dispatch there isn't what each station did.
   `Grid_import` starts Oct 2000 and until ~2003 covered only local networks' injections, so Generation_MD stands in
   for connection points it lacks (J| columns). HVDC_Flows changed layout three times (HVDC_BN/BS/HN/HS to ~1999,

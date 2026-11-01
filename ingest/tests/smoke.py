@@ -236,11 +236,25 @@ for isl in ('NI', 'SI'):
 s_new = rc.summarise(m_new)
 R2 = rc.build([s_off, s_new], R, lambda m: m_new if m == '2026-11' else m_off, now_ms=2)
 p2 = R2['records']['demand_max']['NZ'].get('prov')
-check(p2 is not None and p2['v'] > dm['v'] and R2['records']['demand_max']['NZ']['v'] == dm['v'], 'records: dispatch month sets a provisional record only')
+sh, mg = rc._adj('demand_max', 'NZ')
+check(p2 is not None and p2['v'] == dm['v'] + 1000 - round(sh) and R2['records']['demand_max']['NZ']['v'] == dm['v'],
+      'records: dispatch month sets a provisional record only, its usual shift taken off')
+# a dispatch month only just above the record: within the margin, so close to it, not a provisional record
+m_near = copy.deepcopy(m_off)
+m_near['t0'], m_near['meta'] = m_new['t0'], {**m_new['meta']}
+for isl in ('NI', 'SI'):
+    m_near[isl]['metered'] = [v + 5 for v in m_near[isl]['metered']]
+    m_near[isl]['price'] = [v * 50 for v in m_near[isl]['price']]   # dispatch prices far above anything final
+Rn = rc.build([s_off, rc.summarise(m_near)], R, lambda m: m_off, now_ms=2)
+dn = Rn['records']['demand_max']['NZ']
+check('prov' not in dn and dn.get('near') and dn['near']['m'] == mg, 'records: within the margin is close to the record, not provisional')
+check(all('prov' not in x and 'near' not in x for x in Rn['records']['price_max'].values()), 'records: dispatch prices never set a provisional record')
+check(rc._beyond('max', 100.0, 100.0, 0.0) is None and rc._beyond('max', 100.1, 100.0, 0.0) == 'prov', 'records: no margin, no close: a tie is not close')
+check(Rn['adj']['plants'] and Rn['adj']['hh']['wind_max']['NZ']['m'] > 0, 'records: corrections published for the site')
 m_new['meta']['source'] = 'metered'
 R3 = rc.build([s_off, rc.summarise(m_new)], R2, lambda m: m_new if m == '2026-11' else m_off, now_ms=3)
 d3 = R3['records']['demand_max']['NZ']
-check(d3['v'] == p2['v'] and d3.get('since') == 3 and any(x['k'] == 'demand_max' and x['r'] == 'NZ' and x['ok'] for x in R3['resolved']),
+check(d3['v'] == dm['v'] + 1000 and d3.get('since') == 3 and any(x['k'] == 'demand_max' and x['r'] == 'NZ' and x['ok'] for x in R3['resolved']),
       'records: confirmed when the metered month arrives (new, and listed as settled)')
 check(not rc.same(R2, R3) and rc.same(R3, {**R3, 'built': 0}), 'records: republished only when something changed')
 # the current period so far (records.js pace): the newest day's period, each series' sum and count in half-hours

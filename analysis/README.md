@@ -182,9 +182,8 @@ History back to Aug 1997 comes from the EA's metering (`ingest/metered.py`, `fac
 dispatch files (from 10 Sep 2020) cover the weeks since the latest published month and fill what the metering lacks.
 
 **Overlap, Sep 2020 - Sep 2026 (73 months).** Generation_MD against the site's dispatch history, matched by connection
-point: half-hourly national correlation 0.999 every month; dispatch energy 1-2% above metered every year (by fuel:
-wind +3-4%, hydro +1-2%, geothermal within ±2%, gas and coal within 2%), most likely dispatch MW at the generator
-against metering at the grid connection. Plant level: some embedded points are metered net of local load in
+point: half-hourly national correlation 0.999 every month. (The by-fuel figures first given here, dispatch 1-2% above
+metered and wind +3-4%, don't hold on the site's own series: see "Dispatch against metered, and records" below.) Plant level: some embedded points are metered net of local load in
 Generation_MD (Mangahao ~10% of dispatch, Cobb ~35%, Whareroa ~50%); `Embedded_generation` at those points matches
 dispatch within ~1% (Mangahao 12.4 vs 12.3 GWh, Sep 2026; Te Huka 3 26.7 vs 27.2; Omeheu + Rangitaiki 8.6 vs 8.7), so
 where an embedded meter reads more than Generation_MD at a listed point the difference goes to that point's plant.
@@ -333,3 +332,26 @@ network (grid stations: block dispatch and terminal-vs-connection differences) a
   too: ~2.2-2.4% of generation. Together with industrial cogeneration used on site (in neither dataset), this is the
   gap to MBIE's totals (`metered_check.py`).
 - **Glenbrook:** metered 44-48 GWh against 32 GWh dispatched in Jan and Jun 2026 (Sep: 6.5 against 9.0).
+
+## Dispatch against metered, and records (`dispatch_vs_metered.py`, `dispatch_metered_fit.py`, 1 Nov 2026)
+
+`dispatch_vs_metered.py` builds every month from Sep 2020 twice from the stored history states, with the site's own
+code: as published (metered generation and demand, final prices, metered HVDC) and dispatch-only (as the site had it
+before any of that arrived). Run read-only in GitHub Actions against KV (a one-off workflow on its own branch).
+
+- **Averages agree closely:** over the 73 months, national wind +0.2%, hydro -0.1%, NZ demand 0.0% (NI -0.6%, SI
+  +1.0%). The plants that differ: Ngāwhā -45% (only Ngāwhā B dispatched), Glenbrook -31%, Kawerau Mill +43% (meter
+  net of the mill's load), Te Rapa +36% (closed 2023), Teviot (metered only), and the Waikato chain station by station
+  (Maraetai +11%, Arapuni -11%, Karāpiro -9%; the chain agrees). Fossil generation reads 3% low in dispatch.
+- **Extremes don't:** a month's highest half-hour in dispatch data runs above the metered one: wind +10 MW nationally
+  (NI 0, SI +10), hydro +21 MW, NZ demand +25 MW, the NI renewable share +0.6 points (Glenbrook and Ngāwhā).
+  Dispatch prices: monthly highest up to $357,000/MWh against final prices of a few thousand.
+- **Provisional records replayed** (each month's figure against the official record before it): uncorrected, 30
+  provisional records the metered data didn't confirm (24 events: wind 12, renewable share 5, demand 4, fossil 2,
+  hydro 1), plus 16 from dispatch prices; 4 real records missed. Missed by small amounts: wind 0-11 MW, the renewable
+  share 0.0-0.7 points.
+- **Corrections** (`dispatch_metered_fit.py` -> `facilities/dispatch_adjust.json`): Ngāwhā x1.80, Glenbrook x1.47,
+  Kawerau Mill x0.68 (latest 24 months); then each record's median shift at the month's extreme, and a margin, the 90th
+  percentile of what is left. The same for whole days, weeks and months. Leave-one-month-out: no provisional record
+  clear of the margin went unconfirmed; of 161 real records, 113 provisional, 46 close (within the margin), 2 missed.
+  Prices set no provisional records (final prices arrive the next day).
