@@ -379,7 +379,7 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   (Workers KV Storage: Edit). KV namespace id lives in `wrangler.jsonc`. A run with no new data saves nothing.
 - `.github/workflows/history.yml`: runs `history.py`, triggered every 6 hours by the Worker's second cron. The first
   run backfills ~2,200 daily files (resumes next run if it hits its time budget). KV writes: ~3 per changed month,
-  so a full rebuild of all ~351 months needs ~800 writes and, at the ~4 seconds a month BUILD 7's runs took, under an hour;
+  so a full rebuild of every month needs ~750 writes and takes one run (BUILD 8: 352 months in 13 minutes);
   it starts with the next history run (or by hand, Actions → History); never start one while another is running. The Worker starts the Offers workflow (`offers.yml`) with it.
 - `worker/index.js`: serves static assets, `/data/tracker.json` from KV (binding `DATA`), falling back to the
   bundled snapshot, and `/data/history/{index,day,hh/YYYY-MM}.json` from KV keys `hist/*`; rewrites the title,
@@ -528,7 +528,7 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   checked 15 Oct 2026), so they don't protect against the Worker's cron stopping: nothing outside Cloudflare alerts
   if it does. `/data/health` (Worker) covers that: 200 while live data is under 45 minutes old and history under 5
   days behind, 503 with the reasons otherwise; an outside uptime monitor checks it every 5 minutes and emails the Elenz team.
-  During a full rebuild the index is republished only at the end (a few days for BUILD 6), so both checks allow up to
+  During a full rebuild the index is republished only at the end, so both checks allow up to
   12 days while `hist/progress.json` shows months left and was saved in the last two days.
 - Metered history (BUILD 6, Oct 2026; analysis/metered_check.py, analysis/README.md): `Generation_MD` from Aug 1997
   covers grid stations, and embedded stations only from Jan 2009; before that they are in `Embedded_generation`
@@ -570,8 +570,8 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
    BUILD 7 (Mill Creek 2014-15, Kawerau TG1/TG2, West Wind as one plant, Ōtāhuhu names, clock-change days before
    2009, daily peak dispatchable output, Ashburton's small solar farms) ran 23-27 Oct 2026 (commit 9709b43); every
    item checked out on the published files on 27 Oct, the Offers workflow was rerun with "resummarise", and the old
-   plant names were cleaned up. BUILD 8 is being collected on the branch `next-rebuild` (draft PR), held until the
-   Elenz team says go; see `facilities/NEXT_REBUILD.md`.
+   plant names were cleaned up. BUILD 8 (Tekapo A and B's names, Huntly in September 2020) ran on 3 Nov 2026 in one 13-minute
+   run, and its items checked out on the published data; see `facilities/NEXT_REBUILD.md` for how a next build is collected.
 4. Pages: landing (`/`), live (`/now`, with the price explainer and Every generator right now), tracker (Generation and
    Prices tabs), Records (`/records`), Articles (`/articles`, published 15 Oct 2026 with the Winter 2026 review), About,
    Data and methods (`/methods`) and Privacy. Stale-data watchdog, uptime monitor, Cloudflare Web Analytics and a Buy
