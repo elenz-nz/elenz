@@ -11,6 +11,7 @@
 //                       unit    pct (absent: MW)
 //                       chart   lines (absent: stacked): each source as its own line, to compare them
 //                       price   on (absent: off): the island prices drawn over the generation chart, on a right axis
+//                       off     layers switched off in the list, by name, e.g. wind,solar or manapouri
 //                       fold    the charts under it folded to one line, e.g. price,ren (absent: FOLD_DEFAULT,
 //                               all of them; none: all open)
 //                       group, fuel, plant   the drill-down (plant and set names as slugs, see slug())
@@ -33,7 +34,7 @@ export const INTS = ['5m', '30m', '1d', '1w', '1mo', '1yr'];
 export const GROUPINGS = ['detailed', 'simple', 'site', 'scheme', 'owner', 'flex', 'rf', 'vre'];
 export const SCALES = ['spike', 'capped', 'linear'];
 export const SHARED = ['region', 'range', 'int', 'end', 't'];
-const ORDER = [...SHARED, 'by', 'unit', 'chart', 'price', 'fold', 'group', 'fuel', 'plant', 'zoom', 'scale', 'hide', 'band'];
+const ORDER = [...SHARED, 'by', 'unit', 'chart', 'price', 'fold', 'off', 'group', 'fuel', 'plant', 'zoom', 'scale', 'hide', 'band'];
 /** The spans the 1D menu offers, in hours. */
 export const SPANS = [1, 3, 6, 12];
 // the Generation tab's charts under the generation chart that fold to one line, in page order; all start folded
@@ -64,6 +65,8 @@ const DAY = 864e5;
 export const midnightOf = (t) => { const k = KEY.day(t) * DAY; return k - nzOffset(k - nzOffset(k)); };
 /** Whole days later or earlier (a day is 23-25 hours at the clock changes). */
 export const addDays = (m, k) => midnightOf(m + k * DAY + 3 * 36e5);
+/** The same date k years on or back, from a local midnight, so a year steps 31 Dec to 31 Dec through leap years (CHT-11). */
+export const addYears = (m, k) => { const d = new Date(m + 3 * 36e5 + nzOffset(m + 3 * 36e5)), u = Date.UTC(d.getUTCFullYear() + k, d.getUTCMonth(), d.getUTCDate()); return u - nzOffset(u - nzOffset(u)); };
 const pad = (n) => String(n).padStart(2, '0');
 const parts = (t) => { const d = new Date(t + nzOffset(t)); return { y: d.getUTCFullYear(), mo: d.getUTCMonth() + 1, d: d.getUTCDate(), h: d.getUTCHours(), mi: d.getUTCMinutes() }; };
 /** 'YYYY-MM-DD' of the NZ day containing t. */
@@ -118,6 +121,8 @@ export function readQuery(search) {
   const z = readZoom(q.get('zoom'));
   if (z) v.zoom = z;
   one('scale', (x) => SCALES.includes(x));
+  const off = (q.get('off') || '').split(',').filter((x) => /^[a-z0-9-]{1,60}$/.test(x));
+  if (off.length) v.off = [...new Set(off)];
   const hide = (q.get('hide') || '').split(',').filter((x) => NODE.test(x) || x === 'spread');
   if (hide.length) v.hide = [...new Set(hide)];
   one('band', (x) => x === 'HAY' || x === 'BEN');
@@ -153,7 +158,7 @@ export function writeQuery(v, { tDay = false } = {}) {
     if (k === 'band' && x === 'HAY') continue;
     if (k === 'end') add(k, ymd(x - 1));
     else if (k === 't') add(k, stamp(x, !tDay));
-    else if (k === 'hide') add(k, x.join(','));
+    else if (k === 'hide' || k === 'off') { if (x.length) add(k, x.join(',')); }
     else if (k === 'zoom') add(k, writeZoom(x));
     else add(k, x);
   }

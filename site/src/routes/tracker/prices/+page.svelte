@@ -8,11 +8,12 @@
 	import { fromLayout, historyStore, firstAtOrAfter, slice, nzOffset } from '#lib/tracker/series.js';
 	import Masthead from '#lib/site/Masthead.svelte';
 	import TrackerTabs from '#lib/site/TrackerTabs.svelte';
-	import { readView, writeView, midnightOf, addDays, ymd, endOfDay, describe, shareLinks, setTitle } from '#lib/site/view.js';
+	import { readView, writeView, resetView, midnightOf, addDays, addYears, ymd, endOfDay, describe, shareLinks, setTitle } from '#lib/site/view.js';
 	import ShareLink from '#lib/site/ShareLink.svelte';
 	import { heatWindow, heatSource, monthRows } from '#lib/site/heat.js';
 	import { dateSettled, timeSettled } from '#lib/site/datefield.js';
 	import '#lib/site/datepick.js';   // <date-pick>, the date box's calendar
+	import '#lib/site/timepick.js';   // <time-pick>, the time box while zoomed (ZM-03)
 	import { stamp, fromStamp } from '#lib/site/viewurl.js';
 	import DownloadMenu from '#lib/site/DownloadMenu.svelte';
 	import { composeImage, svgImage, legendOf, csvText, nzTime, utcTime, fileName, CREDIT, LICENCE } from '#lib/site/download.js';
@@ -274,10 +275,12 @@
 	// a window ending before the live week reaches back past it: the live ranges then come from half-hourly history
 	const pastLive = $derived(R.src === 'live' && endT !== null && !!live && !liveCovers(windowAt(R).from));
 	/** The window a range shows: [from, to), ending at the chosen date or the latest data. */
+	// a year on or back is the same date, so 1 year shows whole years and steps 31 Dec to 31 Dec (CHT-11); as on the Generation tab
+	const moveBy = (m: number, r: { days: number | null }, dir: number) => (r.days === 365 ? addYears(m, dir) : addDays(m, dir * (r.days ?? 0)));
 	function windowAt(r: { days: number | null }) {
 		const latest = live.t[live.n - 1];
 		const to = r.days == null || endT === null ? latest + 1 : Math.min(endT, latest + 1);
-		const from = r.days == null ? 0 : endT !== null && to === endT ? addDays(to, -r.days) : to - r.days * 864e5;   // whole local days, like the Generation tab
+		const from = r.days == null ? 0 : endT !== null && to === endT ? moveBy(to, r, -1) : to - r.days * 864e5;   // whole local days, like the Generation tab
 		return { from, to };
 	}
 	const intChoices = $derived(pastLive && R.past ? R.past : R.ints);
@@ -478,15 +481,15 @@
 			{ tok: '--p-si', label: 'Benmore', value: money(valOf(P.SI.price)) },
 			{ tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(valOf(P.spread)) }
 		];
-		return [
-			{ tok: '--p-ni', label: 'Haywards', value: money(P.NI.price[at]) },
-			{ tok: '--p-si', label: 'Benmore', value: money(P.SI.price[at]) },
+		// the range's figures sit straight under the node they're for (owner's report PRC-04, 2 Nov 2026)
+		const band = [
 			{ label: `${NODE[bandKey].name}, middle 80%`, value: `${money(I.p10[at])} – ${money(I.p90[at])}` },
 			{ label: `${NODE[bandKey].name}, low`, value: money(I.pmin[at]) },
 			{ label: `${NODE[bandKey].name}, high`, value: money(I.pmax[at]) },
-			{ label: 'Half-hours over $500', value: String(I.n500[at]) },
-			{ tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(P.spread[at]) }
+			{ label: 'Half-hours over $500', value: String(I.n500[at]) }
 		];
+		const hay = { tok: '--p-ni', label: 'Haywards', value: money(P.NI.price[at]) }, ben = { tok: '--p-si', label: 'Benmore', value: money(P.SI.price[at]) };
+		return [...(own === 'NI' ? [hay, ...band, ben] : [hay, ben, ...band]), { tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(P.spread[at]) }];
 	});
 	// the high point of the range on the price chart: the highest of the lines drawn (live week and 30 days: the nodes
 	// switched on, named when there's more than one, as the clipped marks are; 12 months and All: the island's band)
@@ -611,9 +614,11 @@
 	const atLatest = $derived(endT === null || endT >= endOfToday);
 	function step(dir: number) {
 		if (!R.days || !live) return;
-		const next = addDays(endT ?? endOfToday, dir * R.days);
+		const next = moveBy(endT ?? endOfToday, R, dir);
 		setEnd(next >= endOfToday ? null : Math.max(next, addDays(FIRST, R.days)));
 	}
+	// zoomed, Latest moves the stretch to the newest data and keeps its length (owner's report ZM-03, 1 Nov 2026)
+	const toLatest = () => (zoomEnds && live ? zoomEndAt(live.t[live.n - 1] + 3e5) : setEnd(null));
 	const isoDay = ymd;
 	const dateValue = $derived(zoomStamp ? zoomStamp[0] : live ? ymd((endT ?? latestT) - 1) : '');
 	function pickDate(v: string) {
@@ -696,6 +701,8 @@
 	<title>Prices · Tracker · ELENZ</title>
 	<meta name="description" content="New Zealand wholesale electricity prices at six grid nodes, every 5 minutes: the gap between the islands, HVDC transfer, the price each fuel earned, and price ranges and spikes back to 1997." />
 	<Preview title="Wholesale electricity prices · ELENZ Tracker" description="New Zealand wholesale electricity prices at six grid nodes, every 5 minutes: the gap between the islands, HVDC transfer, the price each fuel earned, and price ranges and spikes back to 1997." path="/tracker/prices" />
+	<!-- with JavaScript off, a plain line instead of empty charts and "Loading" (owner's report RES-04, 2 Nov 2026) -->
+	{@html '<noscript><style>.toolbar, .layout, .status, .lower { display: none !important; }</style></noscript>'}
 </svelte:head>
 
 <div class="wrap wide">
@@ -762,11 +769,11 @@
 					<date-pick id="p-date" aria-labelledby="lb-p-date" value={dateValue} min="1997-08-01" max={live ? isoDay(latestT + 3e5) : ''}
 						title="Shows the selected range ending on this date" use:dateSettled={pickDate}></date-pick>
 					{#if zoomStamp}
-						<input type="time" id="p-time" step="300" value={zoomStamp[1]} aria-label="Ending at (NZ time)" title="Shows the zoomed hours ending at this time (NZ time)"
-							use:timeSettled={(v: string) => zoomEndAt(fromStamp(`${zoomStamp ? zoomStamp[0] : ''}T${v}`))} />
+						<time-pick id="p-time" value={zoomStamp[1]} aria-label="Ending at (NZ time)" title="Shows the zoomed hours ending at this time (NZ time)"
+							use:timeSettled={(v: string) => zoomEndAt(fromStamp(`${zoomStamp ? zoomStamp[0] : ''}T${v}`))}></time-pick>
 					{/if}
 					<button type="button" class="step" aria-label="Next {R.label}" title={atLatest ? 'Showing the latest data' : `Next ${R.label}`} disabled={atLatest} onclick={() => step(1)}><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
-					{#if !atLatest}<button type="button" class="latest" title="Back to the latest data" onclick={() => setEnd(null)}><svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 3 5 5-5 5M12 3v10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>Latest</button>{/if}
+					{#if !atLatest}<button type="button" class="latest" title="Back to the latest data" onclick={toLatest}><svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 3 5 5-5 5M12 3v10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>Latest</button>{/if}
 				</div>
 			</div>
 		{/if}
@@ -795,7 +802,7 @@
 			</div>
 		{/if}
 
-	<noscript><p class="notice">The charts need JavaScript turned on.</p></noscript>
+	<noscript><p class="notice">The charts need JavaScript turned on. <a href="/methods">Data and methods</a> and <a href="/about">About</a> work without it.</p></noscript>
 
 	<!-- each chart's ⓘ: what it shows and how it's made -->
 {#snippet chartInfo(id: string)}
@@ -805,11 +812,14 @@
 			<li>Prices are in $/MWh. $100/MWh is 10c a kWh, before lines and retail charges.</li>
 			{#if view?.mode === 'long'}
 				<li>Each {perWord} shows the spread of half-hour prices at {NODE[bandKey].name}: lowest to highest, with the middle 80% darker and the average as a line. The other island's average is dashed.{region === 'NZ' ? ' The Haywards and Benmore buttons pick the island.' : ''}</li>
+				<li>1Y and ALL show each period's range, to bring out long patterns. 1D to 30D show the prices themselves, and those can be dragged to zoom.</li>
 			{:else}
 				<li>Shading: times the islands were priced apart, with Haywards and Benmore more than $10 and 10% apart.</li>
+				<li>Drag across the chart to zoom.</li>
+				<li>1Y and ALL show each period's range of prices instead of every half-hour, to bring out long patterns.</li>
 			{/if}
 			<li>Scale menu: “Spike-proof” is straight up to about $100 and squeezed above, so spikes don't flatten everything else. “Capped” cuts at $600, and “Linear” shows prices as they are.</li>
-			<li>Drag across the chart to zoom. The live week uses 5-minute dispatch prices; earlier dates use the EA's final prices.</li>
+			<li>The live week uses 5-minute dispatch prices; earlier dates use the EA's final prices.</li>
 		</ul>
 		<p><a href="/methods/prices#scales">Price scales</a> · <a href="/methods/prices#dispatch">Dispatch and final prices</a></p>
 	{:else if id === 'spread'}
@@ -879,7 +889,7 @@
 							{#if view.mode !== 'time' && region === 'NZ'}
 								<div class="seg node-seg" role="group" aria-label="Node for the price range">
 									{#each ['HAY', 'BEN'] as k}
-										<button type="button" aria-pressed={bandKey === k} onclick={() => { bandKey = k; save(); }}>{NODE[k].name}</button>
+										<button type="button" aria-pressed={bandKey === k} aria-label={NODE[k].name} onclick={() => { bandKey = k; save(); }}><span class="long-name">{NODE[k].name}</span><span class="short-name">{k}</span></button>
 									{/each}
 								</div>
 							{/if}
@@ -969,20 +979,20 @@
 					</button>
 				</div>
 				<div class="help" id="p-help" role="note" hidden={!helpOpen}>
-					<!-- one line each; the full descriptions are on /about#controls (owner's report GRP-06) -->
-					<dl>
-						<dt>Read a time</dt>
-						<dd>Hover a chart, or touch and slide on a phone.</dd>
-						<dt>Pin it</dt>
-						<dd>Click or tap a chart to hold the line; the Pinned chip in the bar, another click or Escape lets go. A range button opens around it.</dd>
-						<dt>Move through history</dt>
-						<dd>‹ › step by the range; the date opens a calendar; Latest comes back.</dd>
-						<dt>Zoom in</dt>
-						<dd>On the live week and 30 days, drag across a chart; Reset zoom goes back.</dd>
-						<dt>Nodes and scales</dt>
-						<dd>A colour square hides its line (double-click, Shift or press and hold: only that one); All and None; the spread's square turns the priced-apart shading off. The menu by the title changes the scale.</dd>
-					</dl>
-					<p><a href="/about#controls">Every control, in detail</a> · <a href="/methods/prices">How the figures are worked out</a></p>
+					<button type="button" class="reset-view" title="Forget this browser's saved views and go back to the default charts on both tracker tabs" onclick={resetView}>Reset charts to default</button>
+					<!-- what works across the tab, one line each; each chart's own ⓘ says what it shows, and /guide#prices has the
+					     full descriptions (owner's reports GRP-06, CHT-13) -->
+					<p>These work across every chart on this tab. The ⓘ beside a chart's title says what that chart shows.</p>
+					<ul>
+						<li><b>Hover or touch a chart:</b> this list shows that time.</li>
+						<li><b>Click or tap a chart:</b> pins the time. ← → move it. Click it again, or use the Pinned chip or Escape, to let go.</li>
+						<li><b>Range buttons:</b> open around a pinned time.</li>
+						<li><b>‹ › and the date:</b> move through history. Latest comes back to now.</li>
+						<li><b>Drag across a chart:</b> zooms in, from 1D to 30D. Reset zoom goes back.</li>
+						<li><b>Colour squares:</b> hide a node. Double-click, Shift-click or press and hold shows only that one. The spread's square turns the priced-apart shading on and off.</li>
+						<li><b>Menu beside the title:</b> changes the price scale.</li>
+					</ul>
+					<p><a href="/guide#prices">Every control in detail</a> · <a href="/methods/prices">How the figures are worked out</a></p>
 				</div>
 				{#if view?.mode === 'time'}
 					<div class="mix-tools" role="group" aria-label="Nodes shown in the price chart"><span>Nodes</span><button type="button" onclick={() => showNodes(true)} disabled={!nodeKeys().some((k) => off.includes(k))}>All</button><button type="button" onclick={() => showNodes(false)} disabled={nodeKeys().every((k) => off.includes(k))}>None</button></div>
@@ -1132,4 +1142,7 @@
 	@media (max-width: 900px) {
 		.p-row { grid-template-columns: minmax(0, 1fr); }
 	}
+	/* phones: the island buttons by their codes, so the price chart's header stays on two rows (PRC-04) */
+	.short-name { display: none; }
+	@media (max-width: 560px) { .long-name { display: none; } .short-name { display: inline; } }
 </style>

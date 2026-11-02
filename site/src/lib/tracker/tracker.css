@@ -129,7 +129,8 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 .datebox input:disabled { color: var(--muted); }
 .ctl > .ctl-lbl { font-size: 0.72rem; white-space: nowrap; }
 /* the date box's own calendar (#lib/site/datepick.js): the button in the bar, and the calendar hung from <body> */
-date-pick { display: inline-block; }
+date-pick, time-pick { display: inline-block; }
+time-pick[hidden] { display: none; }
 .dp-btn { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 0.8rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2px 8px; min-height: 28px; cursor: pointer; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .dp-btn svg { color: var(--muted); flex: none; }
 .dp-btn:hover:not(:disabled) { border-color: var(--accent); }
@@ -165,6 +166,12 @@ date-pick { display: inline-block; }
 .dp-years button, .dp-months button { height: 38px; font-variant-numeric: tabular-nums; }
 .dp-years button:hover:not(:disabled):not(.sel), .dp-months button:hover:not(:disabled):not(.sel) { background: var(--grid); }
 @media (pointer: coarse) { .dp-day { height: 40px; } .dp-pop { width: 300px; } }
+/* the time box's panel (#lib/site/timepick.js) */
+.tp-pop { display: grid; gap: 6px; }
+.tp-hours, .tp-mins { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; }
+.tp-hours button, .tp-mins button { height: 34px; padding: 0; font-size: 0.78rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tp-hours button:hover:not(.sel), .tp-mins button:hover:not(.sel) { background: var(--grid); }
+@media (pointer: coarse) { .tp-hours button, .tp-mins button { height: 40px; } }
 .datebox input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .datebox button { font: inherit; font-size: 0.78rem; border: 1px solid var(--line); background: var(--surface); color: var(--accent); border-radius: 4px; padding: 3px 9px; min-height: 28px; cursor: pointer; }
 .datebox button:hover { background: var(--grid); }
@@ -295,6 +302,18 @@ canvas { display: block; width: 100%; }
 .help dt:first-child { margin-top: 0; }
 .help dd { margin: 0; color: var(--ink-2); font-size: 0.8rem; line-height: 1.45; }
 .help a { color: var(--accent); }
+.help p { margin: 0; color: var(--ink-2); font-size: 0.8rem; line-height: 1.45; }
+.help ul { margin: 6px 0; padding-left: 16px; display: grid; gap: 3px; color: var(--ink-2); font-size: 0.8rem; line-height: 1.45; }
+.help li b { color: var(--ink); font-weight: 600; }
+.help .reset-view { display: block; justify-self: start; font: inherit; font-size: 0.78rem; font-weight: 600; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 3px 10px; min-height: 28px; margin-bottom: 8px; cursor: pointer; }
+.help .reset-view:hover { border-color: var(--accent); color: var(--accent); }
+/* "Scale to this view" draws the eye to the key it changes, like the About page's Contact (PRC-06) */
+.scale-flash { border-radius: 6px; animation: scale-flash 2.2s ease-out; }
+@keyframes scale-flash {
+  0%, 35% { background: var(--accent-soft); box-shadow: 0 0 0 2px var(--accent); }
+  100% { background: transparent; box-shadow: 0 0 0 2px transparent; }
+}
+@media (prefers-reduced-motion: reduce) { .scale-flash { animation: none; } }
 /* the summary's Controls button: labelled, so it reads as the place to find what the charts can do */
 .ctl-btn { display: inline-flex; align-items: center; gap: 6px; flex: none; margin: -2px 0 0; font: inherit; font-size: 0.76rem; font-weight: 500; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px 3px 8px; min-height: 28px; cursor: pointer; }
 .ctl-btn:hover, .ctl-btn[aria-expanded="true"] { color: var(--ink); border-color: var(--ink-2); }
@@ -302,7 +321,7 @@ canvas { display: block; width: 100%; }
 .sum-sub { color: var(--muted); font-size: 0.8rem; }
 /* phones: room for the sub-line's two lines whether or not a note (interpolated, partial) wraps it, so scrubbing
    doesn't make the summary jump (owner's report ZM-01, 31 Oct 2026) */
-@media (max-width: 560px) { .sum-sub { min-height: calc(2 * 1.4em); line-height: 1.4; } }
+.sum-sub { min-height: calc(2 * 1.4em); line-height: 1.4; }
 table { border-collapse: collapse; width: 100%; }
 .mix th { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-weight: 600; padding: 0 0 6px; border-bottom: 1px solid var(--line); }
 .mix th.n, .mix td.n { text-align: right; }
@@ -319,6 +338,7 @@ table { border-collapse: collapse; width: 100%; }
 .plant-note { font-size: 0.78rem; line-height: 1.45; color: var(--muted); margin: 6px 0 2px; padding: 0 10px; }
 .plant-note[hidden] { display: none; }
 .plant-note p { margin: 0 0 4px; }
+.plant-note ul { margin: 0 0 4px; padding-left: 16px; display: grid; gap: 3px; }
 .plant-note b { color: var(--ink); font-weight: 600; }
 .mix .aka { color: var(--muted); font-weight: 400; font-size: 0.92em; }
 .mix .aka[hidden] { display: none; }

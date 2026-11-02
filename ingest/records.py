@@ -468,6 +468,19 @@ def by_month_of_year(sums, k, r, kind, fam, monthly=False):
     return best
 
 
+def best_day_by_month(rows, kind):
+    """The best whole day for each calendar month (1-12): [[t, value] or None] x 12. rows: period_figures' days,
+    [[start, value, official]]; official days only, as by_month_of_year keeps to official months."""
+    best = [None] * 12
+    for t, v, ok in rows:
+        if not ok:
+            continue
+        i = pd.Timestamp(t, unit='ms', tz='UTC').tz_convert(NZ).month - 1
+        if best[i] is None or _better(kind, v, best[i][1]):
+            best[i] = [t, v]
+    return best
+
+
 def _period_start(t, period):
     """The start (ms) of the day, week (Monday), month or year that contains NZ day t."""
     d = pd.Timestamp(t, unit='ms', tz='UTC').tz_convert(NZ).normalize()
@@ -739,6 +752,9 @@ def build(sums, old=None, read_month=None, now_ms=None):
         if m not in cache and read_month:
             cache[m] = read_month(m)
         return cache.get(m)
+    # the best day of each month of the year, beside the half-hours in moy (By month's Day button)
+    out['moy_day'] = {k: {r: best_day_by_month(rows, kind) for r, rows in figs.get('day', {}).get(k, {}).items()}
+                      for k, (kind, _, _, _) in HALF_HOURS.items()}
     out['periods'] = {}
     for p in PERIODS:
         out['periods'][p] = {}

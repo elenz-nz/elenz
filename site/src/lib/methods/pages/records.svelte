@@ -38,6 +38,8 @@
 	<li>These replace the earlier month records for the renewable share and wind, whose pages still work.</li>
 </ul>
 
+<p>By month, on the Records page, lists the best half-hour and the best whole day of each calendar month since 1997, so a month can show its own best even when the all-time record holds. It uses official figures only.</p>
+
 <h3 id="runs">Runs</h3>
 <p>The longest unbroken run of half-hours meeting a condition, joined across month boundaries: at least 90% renewable, prices under $5/MWh, or no Huntly Rankine running.</p>
 

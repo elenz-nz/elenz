@@ -170,7 +170,9 @@ Waipori = ["Deep Stream (Waipori A)", "Waipori (2A/3/4)"]
 # the weeks since the newest metered month), shown when the tracker drills into the plant. Evidence in
 # facilities/metered_plants.csv and analysis/README.md. Plant (shown name) -> note.
 [plant_metering]
-"Huntly Rankines" = "The metered history has one meter for units 1–4 together, so it shows them as one. The dispatch data (the live week and the weeks since the newest metered month) shows each unit."
+"Huntly Rankines" = "The metered history has one meter for units 1–4 together, so it shows them as one. The dispatch data (the live week and the weeks since the newest metered month) shows each unit.\nSeptember 2020: the metered data has no Rankines that month. 1–9 September shows nothing, and from 10 September the dispatch data fills in, so that stretch shows each unit."
+"Huntly 5" = "September 2020: the metered data has no unit 5 that month. 1–9 September shows nothing, and from 10 September the dispatch data fills in."
+"Arapuni" = "Before April 2011 the metered history has one figure for the whole station, under ARI1101. ARI1102 has its own figure from then, so the split by grid connection starts there."
 "Stratford" = "The metered history has one meter (SFD2201) for Taranaki Combined Cycle (1998–2025) and the two peakers (from 2011), and until 2001 the old Stratford gas turbines too, so it shows the station whole. The dispatch data (the live week and the weeks since the newest metered month) shows each unit."
 "Waikaremoana" = "The metered history has one meter for Tuai, Piripaua and Kaitawa together, so it shows the scheme whole. The dispatch data (the live week and the weeks since the newest metered month) shows each station."
 "Te Mihi" = "The metered history has Te Mihi 1 and 2 together, so it shows the station whole. The dispatch data (the live week and the weeks since the newest metered month) shows each unit."

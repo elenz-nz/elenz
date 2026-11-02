@@ -7,7 +7,8 @@
 "Arapuni":{
 "owner":"Mercury",
 "scheme":"Waikato",
-"river":6
+"river":6,
+"metered":"Before April 2011 the metered history has one figure for the whole station, under ARI1101. ARI1102 has its own figure from then, so the split by grid connection starts there."
 },
 "Aratiatia":{
 "owner":"Mercury",
@@ -79,7 +80,8 @@
 "owner":"Genesis",
 "aka":[
 "e3p"
-]
+],
+"metered":"September 2020: the metered data has no unit 5 that month. 1–9 September shows nothing, and from 10 September the dispatch data fills in."
 },
 "Huntly 6":{
 "owner":"Genesis",
@@ -92,7 +94,7 @@
 },
 "Huntly Rankines":{
 "owner":"Genesis",
-"metered":"The metered history has one meter for units 1–4 together, so it shows them as one. The dispatch data (the live week and the weeks since the newest metered month) shows each unit."
+"metered":"The metered history has one meter for units 1–4 together, so it shows them as one. The dispatch data (the live week and the weeks since the newest metered month) shows each unit.\nSeptember 2020: the metered data has no Rankines that month. 1–9 September shows nothing, and from 10 September the dispatch data fills in, so that stretch shows each unit."
 },
 "Junction Road":{
 "owner":"Nova"

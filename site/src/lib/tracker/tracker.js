@@ -5,10 +5,11 @@ import { FUELS } from './fuels.js';
 import { efAt, plantEf, BY_PLANT } from './emissions.js';
 import { onDateSettled, onTimeSettled } from '../site/datefield.js';
 import '../site/datepick.js';   // <date-pick>: the date box's calendar (TRK-07)
+import '../site/timepick.js';   // <time-pick>: the time box while zoomed (ZM-03)
 import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTotal } from './series.js';
 import PLANT_META from './plants.json';  // owner, hydro scheme, other names and metering note per plant (ingest/plant_meta.py)
 import CAPACITY from './capacity.json';   // installed MW per plant (ingest/capacity.py)
-import { readView, writeView, slug, describe, shareLinks, setTitle } from '#lib/site/view.js';
+import { readView, writeView, slug, describe, shareLinks, setTitle, addYears } from '#lib/site/view.js';
 import { squareButton as squareWire, SWATCH_TITLE } from '#lib/site/swatch.js';
 import { readQuery, stamp, fromStamp, FOLDABLE, FOLD_DEFAULT, foldList } from '#lib/site/viewurl.js';
 import { priceScale } from '#lib/prices/data.js';
@@ -211,12 +212,16 @@ export function mountTracker(D, hooks = {}) {
   // a link's drill-down and point wait for the window they belong to: a long range or past date loads its history
   // first (a retired plant is only in the history), so they're applied by the rebuild after that (waiting: until then)
   let linked = init.link && (q.group || q.fuel || q.plant || init.t != null) ? { group: q.group, fuel: q.fuel, plant: q.plant, t: init.t } : null;
+  // a link's hidden layers (off=wind,solar), applied by the first rebuild whose list has them (owner's report SHR-07, 1 Nov 2026)
+  let linkedOff = init.link && q.off ? new Set(q.off) : null;
   let waiting = !!saved;
   // the drill-down in the address: plants and plant sets (scheme, owner, other plants of a fuel) by slug
   const groupKey = id => id == null ? null : /^[sox]:/.test(id) ? slug(id.slice(2)) : id;
+  // the layers switched off, by name, while their list is built; a link's own until then
+  const offNow = () => linkedOff ? [...linkedOff] : V?.layers ? V.layers.filter(x => state.hidden.has(x.id)).map(x => slug(x.name)) : [];
   const ownQuery = () => {
     const d = state.drill, l = linked;
-    return { by: state.view, unit: state.unit, chart: state.chart, price: state.price ? 'on' : null, fold: foldList([...state.fold]), zoom: state.zoom, ...(l ? { group: l.group, fuel: l.fuel, plant: l.plant }
+    return { by: state.view, unit: state.unit, chart: state.chart, price: state.price ? 'on' : null, fold: foldList([...state.fold]), zoom: state.zoom, off: offNow(), ...(l ? { group: l.group, fuel: l.fuel, plant: l.plant }
       : { group: groupKey(d.group), fuel: d.fuel, plant: d.plant ? slug(d.plant) : null }) };
   };
   const shared = () => ({ region: state.region, range: state.range, int: state.intPicked ? state.int : null, end: state.end });
@@ -340,7 +345,7 @@ export function mountTracker(D, hooks = {}) {
       // [end − range, end); daily points sit at local midnight, which moves an hour at the clock changes
       stop = firstAtOrAfter(M.t, state.end);
       // whole local days back, so a clock change inside the window doesn't add an hour of the day before (CHT-10)
-      start = firstAtOrAfter(M.t, addDays(state.end, -R.days) - (daily ? 2 * 36e5 : 0));
+      start = firstAtOrAfter(M.t, moveBack(state.end, R) - (daily ? 2 * 36e5 : 0));
     } else if (state.kind === 'live') start = Math.max(0, M.N - R.n);
     else if (R.days) start = firstAtOrAfter(M.t, M.END - R.days * DAY + (daily ? 36e5 : 0));
     // the zoom: part of the window ([zf, zt), times); ignored if it would leave fewer than two points
@@ -525,6 +530,14 @@ export function mountTracker(D, hooks = {}) {
   const level = () => state.drill.plant ? 'unit' : state.drill.fuel ? 'plant' : state.drill.group ? 'fuel' : 'top';
   function drillTo(d) {
     linked = null; state.drill = d; state.hidden.clear(); state.filter = ''; relayer(); buildSummary(); render(); save(true);
+  }
+  // a row of the mix table opens that fuel's plants in the list and chart above (owner's report LOW-03, 1 Nov 2026)
+  const canOpen = k => !!FUEL[k] && plantsFor(k).length > 0;
+  function openFuel(k) {
+    if (!canOpen(k)) return;
+    linked = null; state.view = 'detailed'; state.drill = { ...TOP_LEVEL, fuel: k }; state.hidden.clear(); state.filter = ''; state.open.clear();
+    rebuild(); save(true);
+    $('charts').scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   }
   // a link's drill-down, once its window is built (rebuild); anything that no longer exists is dropped there
   function fromLink(l) {
@@ -1076,7 +1089,7 @@ export function mountTracker(D, hooks = {}) {
     const pn = $('plant-note');
     pn.hidden = !aka.length && !metered;
     pn.innerHTML = (aka.length ? `<p><b>Also known as</b> ${aka.map(esc).join(', ')}</p>` : '')
-      + (metered ? `<p><b>Metered history</b> ${esc(metered)} <a href="/methods/generation#whole">More</a></p>` : '');
+      + (metered ? `<p><b>Metered history</b></p><ul>${metered.split('\n').map(x => `<li>${esc(x)}</li>`).join('')}</ul><p><a href="/methods/generation#whole">More</a></p>` : '');
   }
   // Long lists (the site view, a fuel's plants) get a filter box; the site view groups its rows under collapsible
   // fuel headings with subtotals. Section headings toggle open; their colour square hides every row in them.
@@ -1086,14 +1099,14 @@ export function mountTracker(D, hooks = {}) {
     for (const id of ids) off ? state.hidden.add(id) : state.hidden.delete(id);
     for (const l of V.layers) if (ids.includes(l.id)) { l.row.classList.toggle('off', off); l.row.querySelector('.sw-btn')?.setAttribute('aria-pressed', String(!off)); }
     if (tr) { tr.classList.toggle('off', off); tr.querySelector('.sw-btn').setAttribute('aria-pressed', String(!off)); }
-    render();
+    render(); save();
   }
   // every row's and heading's on/off look from state.hidden (after All, None or Only this)
   function syncHidden() {
     for (const l of V.layers) if (l.row) { const off = state.hidden.has(l.id); l.row.classList.toggle('off', off); l.row.querySelector('button.sw-btn')?.setAttribute('aria-pressed', String(!off)); }
     for (const x of V.sections) if (x.row) { const all = x.members.every(m => state.hidden.has(m.id)); x.row.classList.toggle('off', all); x.row.querySelector('.sw-btn').setAttribute('aria-pressed', String(!all)); }
     syncMixTools();
-    render();
+    render(); save();
   }
   // Only this: hide every other layer; on the layers already shown alone, show everything again
   function onlyThis(ids) {
@@ -1327,6 +1340,10 @@ export function mountTracker(D, hooks = {}) {
   // local midnight at or before t; whole days later or earlier (a day is 23-25 hours at the clock changes)
   const midnightOf = t => { const k = KEY.day(t) * DAY; return k - nzOffset(k - nzOffset(k)); };
   const addDays = (m, k) => midnightOf(m + k * DAY + 3 * 36e5);
+  // a year on or back from a local midnight: the same date, so 1 year steps 31 Dec to 31 Dec through leap years and
+  // shows the whole year, 366 days in a leap year (owner's report CHT-11, 1 Nov 2026)
+  const moveBy = (m, R, dir) => R.days === 365 ? addYears(m, dir) : addDays(m, dir * R.days);
+  const moveBack = (end, R) => moveBy(end, R, -1);
   const endOfToday = () => addDays(midnightOf(models.live.END), 1);
   const ymd = t => { const p = lp(t); return `${p.y}-${String(p.mon + 1).padStart(2, '0')}-${String(p.dom).padStart(2, '0')}`; };
   const firstDay = () => history.index?.first ?? Date.UTC(1997, 6, 31, 12);
@@ -1387,7 +1404,8 @@ export function mountTracker(D, hooks = {}) {
       inp.value = d; tin.value = hm;
       inp.max = ymd(models.live.END + 3e5);
     }
-    $('btn-latest').hidden = state.end == null;
+    // Latest also shows when a dragged stretch sits behind the newest data (ZM-03)
+    $('btn-latest').hidden = state.end == null && !(state.zoom && !state.zoom.span && V?.zoomed && zoomSpan().to < models.live.END);
     // the arrows on the chart and beside the date step by the range
     for (const [p, n] of [['nav-prev', 'nav-next'], ['tb-prev', 'tb-next']]) {
       const prev = $(p), next = $(n);
@@ -1438,7 +1456,7 @@ export function mountTracker(D, hooks = {}) {
   // hv: the store's version it was merged from; a model older than the files loaded since is merged again (setView)
   const merge = kind => Object.assign(toModel(history.merged(kind, models.live), models.live.END), { hv: history.version(kind) });
   // the span of history a window [end − range, end) needs (the latest 31 days when end is null)
-  const spanFor = (r, end) => { const to = end ?? models.live.END; return [end == null ? to - 31 * DAY : addDays(end, -RANGES[r].days) - DAY, to]; };
+  const spanFor = (r, end) => { const to = end ?? models.live.END; return [end == null ? to - 31 * DAY : moveBack(end, RANGES[r]) - DAY, to]; };
   function useModel() {
     const m = models[state.kind];
     if (m !== M) { M = m; derive(); }
@@ -1506,7 +1524,7 @@ export function mountTracker(D, hooks = {}) {
     if (R.fixed) return;
     const from = stepEnd !== undefined ? stepEnd : state.end;
     if (dir > 0 && from == null) return;
-    let end = addDays(from ?? endOfToday(), dir * R.days);
+    let end = moveBy(from ?? endOfToday(), R, dir);
     if (end >= endOfToday()) end = null;
     stepEnd = end;
     $('in-date').value = ymd((end ?? endOfToday()) - 1);
@@ -1526,7 +1544,7 @@ export function mountTracker(D, hooks = {}) {
     }
     if (from < firstDay()) return;
     state.zoom = { from, to };
-    const R = RANGES[state.range], wFrom = M.t[0], wEnd = state.end ?? endOfToday(), wStart = R.days ? addDays(wEnd, -R.days) : wFrom;
+    const R = RANGES[state.range], wFrom = M.t[0], wEnd = state.end ?? endOfToday(), wStart = R.days ? moveBack(wEnd, R) : wFrom;
     if (from >= wStart && to <= wEnd) rebuild();
     else setView(state.range, addDays(midnightOf(to - 1), 1), true);
   }
@@ -1611,6 +1629,7 @@ export function mountTracker(D, hooks = {}) {
     if (d.fuel && !plantsFor(d.fuel).length) { d.fuel = null; d.plant = null; }
     if (d.group && !(setById(d.group)?.plants.length || groupById(d.group)?.f?.some(k => present[state.region].includes(k)))) { d.group = null; d.plant = null; }
     relayer(); keepPicks(prev); state.hover = null;
+    if (linkedOff && !waiting) { for (const x of V.layers) if (linkedOff.has(slug(x.name))) state.hidden.add(x.id); linkedOff = null; }
     const pinJ = pinT != null ? pointAt(pinT) : null;
     // kept when the moment is still on screen as the same point or within a longer one (a day, a week); a finer view
     // (a pinned day opened on 5-minute data) drops it rather than pin its first minutes
@@ -1636,6 +1655,7 @@ export function mountTracker(D, hooks = {}) {
     state.fold = new Set(a.fold ?? FOLD_DEFAULT);
     state.hidden.clear(); state.filter = ''; state.open.clear();
     linked = { group: a.group, fuel: a.fuel, plant: a.plant, t: null }; waiting = false;
+    linkedOff = a.off ? new Set(a.off) : null;
     state.zoom = a.zoom || null;
     const range = a.range || '1d', end = a.end ?? null;
     if (range !== state.range || end !== state.end || (a.int && a.int !== state.int)) setView(range, end, !!a.int, a.int || null);
@@ -1653,7 +1673,7 @@ export function mountTracker(D, hooks = {}) {
     const key = [state.region, state.range, state.int, state.kind, state.end, from, to, M.END].join('|');
     if (key === lastShared) return;   // grouping, drill-down and hidden layers don't change it
     lastShared = key;
-    const w = { region: state.region, range: state.range, label: R.label, days: R.days ?? null, int: state.int, kind: state.kind,
+    const w = { openFuel, canOpen, region: state.region, range: state.range, label: R.label, days: R.days ?? null, int: state.int, kind: state.kind,
                 end: state.end, from, to, M, live: models.live, history };
     clearTimeout(shareTimer);
     requestAnimationFrame(() => { clearTimeout(shareTimer); shareTimer = setTimeout(() => { if (lastShared === key) hooks.view(w); }, 0); });
@@ -1713,7 +1733,14 @@ export function mountTracker(D, hooks = {}) {
     state.zoom = null; setView(state.range, addDays(day, 1));
   });
   onTimeSettled($('in-time'), v => zoomEndAt(fromStamp(`${$('in-date').value}T${v}`)));
-  $('btn-latest').addEventListener('click', () => { if (state.zoom && !state.zoom.span) state.zoom = null; setView(state.range, null); });
+  // zoomed, Latest moves the stretch to the newest data and keeps its length (owner's report ZM-03, 1 Nov 2026)
+  $('btn-latest').addEventListener('click', () => {
+    if (!state.zoom || !V?.zoomed) return setView(state.range, null);
+    const latest = models.live.END + 3e5, z = zoomSpan();
+    if (zoomedHours()) return zoomEndAt(latest);
+    state.zoom = { from: latest - (z.to - z.from), to: latest };
+    setView(state.range, null, true);
+  });
   for (const id of ['nav-prev', 'tb-prev']) $(id)?.addEventListener('click', () => step(-1));
   for (const id of ['nav-next', 'tb-next']) $(id)?.addEventListener('click', () => step(1));
   $('sel-view').addEventListener('change', e => {

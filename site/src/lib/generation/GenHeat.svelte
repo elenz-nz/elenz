@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { portal } from '#lib/site/portal.js';
 	// By time of day: one row per NZ day (or month, or year, on All), one cell per half-hour. Renewable share in bands
 	// (brown where generation leaned on thermal plant, green where it was close to all renewable); a fuel's MW in its
@@ -11,6 +12,9 @@
 
 	type Row = { day: number; t: number; v: number[]; lab?: string; long?: string; month?: boolean };
 	let { rows, metric, tok, label, hi = null, scaled = false }: { rows: Row[]; metric: string; tok: string; label: string; hi?: number | null; scaled?: boolean } = $props();
+	// counts each change of `scaled`, restarting the key's flash; not on the first draw
+	let flash = $state(0), wasScaled: boolean | undefined;
+	$effect(() => { const on = scaled; if (wasScaled !== undefined && on !== wasScaled) flash = untrack(() => flash) + 1; wasScaled = on; });
 	let scroller = $state<HTMLDivElement>();
 	// open on the latest rows
 	$effect(() => { void rows; if (scroller) scroller.scrollTop = scroller.scrollHeight; });
@@ -56,9 +60,9 @@
 		</div>
 	</div>
 	{#if tip}<div class="hm-tip" use:portal style={tipStyle(tip)}>{tip.text}</div>{/if}
-	<div class="leg">
+	{#key flash}<div class="leg" class:scale-flash={flash > 0}>
 		{#each legend as l, i}<span><i class="b{i}"></i>{l}</span>{/each}
-	</div>
+	</div>{/key}
 </div>
 
 <style>

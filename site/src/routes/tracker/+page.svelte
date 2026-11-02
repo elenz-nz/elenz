@@ -11,6 +11,7 @@
 	import ShareLink from '#lib/site/ShareLink.svelte';
 	import DownloadMenu from '#lib/site/DownloadMenu.svelte';
 	import { barHeight } from '#lib/site/sticky.js';
+	import { resetView } from '#lib/site/view.js';
 	import { FOLD_DEFAULT } from '#lib/site/viewurl.js';
 
 	type Meta = { intervals: number; expected: number; end: number; api_from: number | null; built: number };
@@ -222,6 +223,8 @@
 	<title>Tracker · ELENZ</title>
 	<meta name="description" content="New Zealand's electricity generation by fuel, plant, owner or hydro scheme, with wholesale prices, demand, HVDC transfer and emissions, from the last 24 hours back to 1997." />
 	<Preview title="Electricity generation, prices and demand · ELENZ Tracker" description="New Zealand's electricity generation by fuel, plant, owner or hydro scheme, with wholesale prices, demand, HVDC transfer and emissions, from the last 24 hours back to 1997." path="/tracker" />
+	<!-- with JavaScript off, a plain line instead of empty charts and "Loading" (owner's report RES-04, 2 Nov 2026) -->
+	{@html '<noscript><style>.toolbar, .layout, .status, .lower { display: none !important; }</style></noscript>'}
 </svelte:head>
 
 <div class="wrap wide">
@@ -290,7 +293,7 @@
 				<button type="button" class="step" id="tb-prev" aria-label="Previous 24 hours"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 				<!-- the site's own calendar (#lib/site/datepick.js, TRK-07), not the browser's -->
 				<date-pick id="in-date" aria-labelledby="lb-date" title="Shows the selected range ending on this date"></date-pick>
-				<input type="time" id="in-time" step="300" aria-label="Ending at (NZ time)" title="Shows the zoomed hours ending at this time (NZ time)" hidden />
+				<time-pick id="in-time" aria-label="Ending at (NZ time)" title="Shows the zoomed hours ending at this time (NZ time)" hidden></time-pick>
 				<button type="button" class="step" id="tb-next" aria-label="Next 24 hours"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 				<button type="button" class="latest" id="btn-latest" title="Back to the latest data" hidden><svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 3 5 5-5 5M12 3v10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>Latest</button>
 			</div>
@@ -316,7 +319,7 @@
 		<span class="span-tip">Or drag across any chart to zoom</span>
 	</div>
 
-	<noscript><p class="notice">The charts need JavaScript turned on.</p></noscript>
+	<noscript><p class="notice">The charts need JavaScript turned on. <a href="/methods">Data and methods</a> and <a href="/about">About</a> work without it.</p></noscript>
 
 	<div class="layout">
 		<!-- The chart panel takes arrow keys to move the time cursor, so it needs to be focusable. -->
@@ -414,26 +417,21 @@
 					</button>
 				</div>
 				<div class="help" id="sum-help" role="note" hidden={!helpOpen}>
-					<!-- one line each; the full descriptions are on /about#controls (owner's report GRP-06) -->
-					<dl>
-						<dt>Read a time</dt>
-						<dd>Hover a chart, or touch and slide on a phone.</dd>
-						<dt>Pin it</dt>
-						<dd>Click or tap a chart to hold the line; the Pinned chip in the bar, another click or Escape lets go. A range button opens around it. Pinned, ← → move it (Shift: further).</dd>
-						<dt>Move through history</dt>
-						<dd>‹ › step by the range; the date opens a calendar; Latest comes back.</dd>
-						<dt>Zoom in</dt>
-						<dd>Drag across a chart, or pick hours from the arrow beside 1D; Reset zoom goes back.</dd>
-						<dt>Break it down</dt>
-						<dd>Select a name in this list; ‹ Back steps out. The menu above the chart groups it other ways.</dd>
-						<dt>Compare</dt>
-						<dd>The chart buttons switch to one line per source; $ Price adds the island prices.</dd>
-						<dt>Hide and show</dt>
-						<dd>Select a colour square; double-click it to show only that one.</dd>
-						<dt>More charts</dt>
-						<dd>Select a folded chart’s title to open it.</dd>
-					</dl>
-					<p><a href="/about#controls">Every control, in detail</a> · <a href="/methods">How the figures are worked out</a></p>
+					<button type="button" class="reset-view" title="Forget this browser's saved views and go back to the default charts on both tracker tabs" onclick={resetView}>Reset charts to default</button>
+					<!-- what works across the tab, one line each; each chart's own ⓘ says what it shows, and /guide#generation has the
+					     full descriptions (owner's reports GRP-06, CHT-13) -->
+					<p>These work across every chart on this tab. The ⓘ beside a chart's title says what that chart shows.</p>
+					<ul>
+						<li><b>Hover or touch a chart:</b> this list shows that time.</li>
+						<li><b>Click or tap a chart:</b> pins the time. ← → move it, with Shift to go further. Click it again, or use the Pinned chip or Escape, to let go.</li>
+						<li><b>Range buttons:</b> open around a pinned or zoomed time.</li>
+						<li><b>‹ › and the date:</b> move through history. Latest comes back to now.</li>
+						<li><b>Drag across a chart:</b> zooms in. The arrow beside 1D picks recent hours, and Reset zoom goes back.</li>
+						<li><b>A name in this list:</b> breaks it down into plants and units. ‹ Back steps out.</li>
+						<li><b>Colour squares:</b> hide a layer. Double-click, Shift-click or press and hold shows only that one.</li>
+						<li><b>Chart titles:</b> open or fold the charts under generation.</li>
+					</ul>
+					<p><a href="/guide#generation">Every control in detail</a> · <a href="/methods">How the figures are worked out</a></p>
 				</div>
 				<div class="sum-level" id="sum-level" hidden><span id="sum-level-txt"></span><button type="button" class="back" id="sum-back">‹ Back</button></div>
 				<div class="plant-note" id="plant-note" hidden></div>

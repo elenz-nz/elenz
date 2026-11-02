@@ -14,7 +14,7 @@
 import { replaceState, pushState } from '$app/navigation';
 import { readQuery, writeQuery, sharedOnly, REGIONS, RANGES, INTS, OLD_RANGE } from './viewurl.js';
 
-export { midnightOf, addDays, ymd, endOfDay, slug, describe, shareUrl, shareLinks, SITE_URL } from './viewurl.js';
+export { midnightOf, addDays, addYears, ymd, endOfDay, slug, describe, shareUrl, shareLinks, SITE_URL } from './viewurl.js';
 
 const TAB_KEY = 'elenz-tab:';
 
@@ -78,6 +78,16 @@ function retitle() {
 
 /** The address for another tab: this page's shared settings with that tab's own from its last visit in this browser
  *  tab (its drill-down, grouping or chart options). */
+/** Back to the default charts on both tracker tabs: forgets this browser's saved views, then opens the plain address
+ *  (owner's report CHT-16, 1 Nov 2026). */
+export function resetView() {
+  try {
+    for (const k of ['elenz-view', 'elenz-prices', 'elenz-gen-lower']) localStorage.removeItem(k);
+    for (const k of Object.keys(sessionStorage)) if (k.startsWith(TAB_KEY)) sessionStorage.removeItem(k);
+  } catch { /* storage blocked: the plain address still opens the defaults */ }
+  location.assign(location.pathname);
+}
+
 export function tabHref(path) {
   const shared = sharedOnly(readQuery(location.search));
   let own = {};
