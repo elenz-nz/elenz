@@ -1,7 +1,7 @@
 # Build the history (half-hourly since 1 Aug 1997) from the EA's metered data and daily dispatch files and save it
 # to Cloudflare Workers KV, where the site reads it. The site's Worker triggers this every 6 hours through the API
 # (workflow_dispatch); each run adds whatever has been published since the last run. A full build or rebuild (351
-# months) goes oldest first and stops at the time budget or the day's KV write allowance (~90 months a day); later
+# months) goes oldest first and stops at the time budget or the day's KV write allowance; a later
 # runs carry on, and the site keeps the previous history until it is complete. Run it by hand from the Actions tab ("History" → "Run workflow"), ticking "rebuild" to rebuild every
 # month's JSON from the stored data.
 #

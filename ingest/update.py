@@ -168,7 +168,7 @@ def main(log=print):
     log(f'latest {t_latest}, fetched {len(todo)} intervals, {max(0, len(missing) - BUDGET)} older gaps left for later runs')
 
     if before == sig(s):
-        # nothing new (e.g. two triggers fired close together): skip the writes to stay inside KV's free daily limit
+        # nothing new (e.g. two triggers fired close together): skip the writes
         log(f'no new intervals since the last run (latest {t_latest}); nothing saved')
         return
     js = build(s, irradiance(store, log), capacity(store), log)

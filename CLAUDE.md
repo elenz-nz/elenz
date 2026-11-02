@@ -365,7 +365,7 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   `hist/off/YYYY-MM.json` (each island's offered MW by dispatchable fuel on the hist/hh grid, plus `sum`, each day's
   lowest offered headroom and mean offered MW), `hist/offp/YYYY-MM.json.gz` (every plant, for plant pages' capacity
   not offered), `hist/off/days.json` (the summaries joined), `hist/off/progress.json`. Newest months first; its own
-  `WRITE_BUDGET` (100 KV writes a day). Months in the last 100 days are summarised again as output changes; after a
+  `WRITE_BUDGET` (1,000 KV writes a day). Months in the last 100 days are summarised again as output changes; after a
   history rebuild run it with `--resummarise` (the workflow's tick box). Units the register lacks are logged and skipped.
   `rooftop.py` (embedded solar, shown on the site as "Embedded solar", data key `roof`: rooftops and ground-mounted
   arrays up to ~10 MW on local networks; registry capacity by Root NSP less dispatched farms, three types (small,
@@ -379,8 +379,8 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   (Workers KV Storage: Edit). KV namespace id lives in `wrangler.jsonc`. A run with no new data saves nothing.
 - `.github/workflows/history.yml`: runs `history.py`, triggered every 6 hours by the Worker's second cron. The first
   run backfills ~2,200 daily files (resumes next run if it hits its time budget). KV writes: ~3 per changed month,
-  so a full rebuild of all ~351 months takes about 3-4 days at `WRITE_BUDGET` (280 a day, on top of the live job's
-  ~600/day); never start one while another is running. The Worker starts the Offers workflow (`offers.yml`) with it.
+  so a full rebuild of all ~351 months needs ~800 writes and, at the ~4 seconds a month BUILD 7's runs took, under an hour;
+  it starts with the next history run (or by hand, Actions → History); never start one while another is running. The Worker starts the Offers workflow (`offers.yml`) with it.
 - `worker/index.js`: serves static assets, `/data/tracker.json` from KV (binding `DATA`), falling back to the
   bundled snapshot, and `/data/history/{index,day,hh/YYYY-MM}.json` from KV keys `hist/*`; rewrites the title,
   og:title and og:url of the tracker's two pages for a linked view (from its address), which `run_worker_first` in
@@ -391,7 +391,7 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   the only CSP rule, so scripts and styles aren't restricted; Permissions-Policy must leave `screen-wake-lock` and
   `web-share` alone for Keep screen on and Share). Its `scheduled` handler
   dispatches the GitHub jobs (live every 5 minutes, history every 6 hours, watchdog every 15 minutes) (Worker secret `GITHUB_TOKEN`: fine-grained,
-  elenz only, Actions read/write; it expires, so renew it yearly). KV free plan: 1,000 writes/day (the job uses ~600), 100,000 reads/day.
+  elenz only, Actions read/write; it expires, so renew it yearly). Workers Paid since 3 Nov 2026 (US$5 a month: 10 million requests, 10 million KV reads and 1 million KV writes a month included; static files free). Back on the free plan (100,000 requests and KV reads a day, 1,000 KV writes a day; the live job uses ~600), `WRITE_BUDGET` must return to 280 in `history.py` and 100 in `offered.py`.
 - `facilities/rooftop_points.csv`, `rooftop_nsp.csv` (irradiance points and NSP → point; regenerate with
   `analysis/make_points.py`), `rooftop_capacity.json` (capacity snapshot the live job uses until the history job
   has stored `hist/roof_cap.json`).
@@ -515,7 +515,7 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   occasionally days under review, e.g. 31 Aug and 1 Sep 2026). Trading period k starts (k−1) half-hours after local
   midnight. History uses final prices; dispatch prices can be wildly different under scarcity pricing (9 Aug 2021:
   dispatch peak $356,621/MWh, final peak $2,698).
-- `history.py` keeps to `WRITE_BUDGET` (280) KV writes per UTC day, counted in `hist/progress.json` (saved by every
+- `history.py` keeps to `WRITE_BUDGET` (3,000) KV writes per UTC day, counted in `hist/progress.json` (saved by every
   run that writes anything, including runs that rebuild no month); a rebuild that hits it resumes next run
   (`rebuild_left`), and `hist/index.json`/`day.json` are only republished when complete.
 - `ingest/requirements.txt` locks every Python package to an exact version and hash, because the live job installs them

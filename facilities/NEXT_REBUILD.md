@@ -2,7 +2,7 @@
 
 These changes touch files in the history's rebuild fingerprint (`mapping_hash()` in `ingest/history.py`:
 `metered_plants.csv`, `overrides.toml` except its site-only tables, the register, the BUILD number), so pushing any of
-them starts a rebuild of every month (~4 days at the KV write budget). Bundle them and push them together, and never
+them starts a rebuild of every month (under an hour, in the next history run). Bundle them and push them together, and never
 while a rebuild is still running (check `/data/history/progress.json`: `rebuild_left` empty).
 
 The last rebuild (BUILD 7, 23-27 Oct 2026: Mill Creek 2014-15, Kawerau TG1/TG2, West Wind as one plant, Ōtāhuhu
