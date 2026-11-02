@@ -13,4 +13,10 @@ if (bad.length) {
   console.error(`Width rules older Safari can't read, in: ${bad.join(', ')}`);
   process.exit(1);
 }
-console.log(`${files.length} CSS files checked, width rules all readable by older Safari`);
+// a huge shadow held in by clip-path blanked the whole page on older iPhones when the clip was lost while scrolling
+const huge = files.filter((f) => /box-shadow:[^;}]*\d+vmax/.test(readFileSync(join(DIR, f), 'utf8')));
+if (huge.length) {
+  console.error(`A box-shadow sized in vmax, which can cover the whole page, in: ${huge.join(', ')}`);
+  process.exit(1);
+}
+console.log(`${files.length} CSS files checked: width rules readable by older Safari, no page-sized shadows`);
