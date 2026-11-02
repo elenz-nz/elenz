@@ -237,7 +237,7 @@
 				{:else if live}
 					<span class="pill live" title="Data to {when(meta.end)}. Updated from the EMI real-time dispatch feed every 5 minutes"><span class="pword">Live · </span>{clockOnly(meta.end)}</span>
 				{:else}
-					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {clockOnly(meta.end)}<span class="pday">{when(meta.end).slice(clockOnly(meta.end).length)}</span></span>
+					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed<span class="ptime"> · {clockOnly(meta.end)}</span><span class="pday">{when(meta.end).slice(clockOnly(meta.end).length)}</span></span>
 				{/if}
 			{/if}
 			<DownloadMenu items={downloads} />

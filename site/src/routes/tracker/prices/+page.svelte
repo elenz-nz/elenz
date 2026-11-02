@@ -714,7 +714,7 @@
 				{:else if isLive}
 					<span class="pill live" title="Dispatch prices from the EMI real-time feed, every 5 minutes"><span class="pword">Live · </span>{clock(meta.end)}</span>
 				{:else}
-					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {clock(meta.end)}<span class="pday"> {dayLabel(meta.end)}</span></span>
+					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed<span class="ptime"> · {clock(meta.end)}</span><span class="pday"> {dayLabel(meta.end)}</span></span>
 				{/if}
 			{/if}
 			<DownloadMenu items={downloads} />
