@@ -66,6 +66,8 @@ HLY91 = "HLY11"  # Huntly battery
 "Ngāwhā B" = "Ngāwhā"     # OEC4; the metered history has the whole station (Ngāwhā A and B) as one
 "West Wind 1" = "West Wind"   # one farm on two connections (WWD1102, WWD1103), each sometimes carrying most of it
 "West Wind 2" = "West Wind"
+"Takapō A" = "Tekapo A"   # the register's spelling; the site keeps Tekapo (design decision, 30 Oct 2026)
+"Takapō B" = "Tekapo B"
 
 # Stations the metered history (Generation_MD, before Sep 2020 and for every month it covers) sees only as a whole:
 # shown as one plant everywhere, with the register's plants as its units where the dispatch data has them.
@@ -128,7 +130,7 @@ tiwai = "TWI2201"
 # Hydro schemes for the "By hydro scheme" view, each listed upstream to downstream. Hydro stations not listed
 # here are shown as "Other hydro".
 [hydro_schemes]
-Tekapo = ["Takapō A", "Takapō B"]
+Tekapo = ["Tekapo A", "Tekapo B"]
 Waitaki = ["Ōhau A", "Ōhau B", "Ōhau C", "Benmore", "Aviemore", "Waitaki"]
 Waikato = ["Aratiatia", "Ōhakuri", "Ātiamuri", "Whakamaru", "Maraetai", "Waipāpa", "Arapuni", "Karāpiro"]
 "Manapōuri" = ["Manapōuri"]
@@ -146,8 +148,8 @@ Waipori = ["Deep Stream (Waipori A)", "Waipori (2A/3/4)"]
 "Stratford" = ["TCC"]
 "Huntly 5" = ["e3p"]
 "Huntly 6" = ["P40"]
-"Takapō A" = ["Tekapo A"]
-"Takapō B" = ["Tekapo B"]
+"Tekapo A" = ["Takapō A", "Tekapo A"]
+"Tekapo B" = ["Takapō B", "Tekapo B"]
 "Tararua Wind Farm 3" = ["Tararua Wind Central", "Tararua stage III"]
 "Kawerau Mill CoGen" = ["Norske Skog CoGen", "Carter Holt Harvey Energy Ltd CoGen"]   # the register's names for ONU0
 "Kaimai" = ["Kaimai 5"]
@@ -170,8 +172,9 @@ Waipori = ["Deep Stream (Waipori A)", "Waipori (2A/3/4)"]
 # the weeks since the newest metered month), shown when the tracker drills into the plant. Evidence in
 # facilities/metered_plants.csv and analysis/README.md. Plant (shown name) -> note.
 [plant_metering]
-"Huntly Rankines" = "The metered history has one meter for units 1–4 together, so it shows them as one. The dispatch data (the live week and the weeks since the newest metered month) shows each unit.\nSeptember 2020: the metered data has no Rankines that month. 1–9 September shows nothing, and from 10 September the dispatch data fills in, so that stretch shows each unit."
-"Huntly 5" = "September 2020: the metered data has no unit 5 that month. 1–9 September shows nothing, and from 10 September the dispatch data fills in."
+"Huntly Rankines" = "The metered history has one meter for units 1–4 together, so it shows them as one. The dispatch data (the live week and the weeks since the newest metered month) shows each unit.\nSeptember 2020: Generation_MD has no Huntly that month, so the history uses the grid meter for the whole station, split between units by their offers."
+"Huntly 5" = "September 2020: Generation_MD has no Huntly that month, so the history uses the grid meter for the whole station, split between units by their offers."
+"Huntly 6" = "September 2020: Generation_MD has no Huntly that month, so the history uses the grid meter for the whole station, split between units by their offers."
 "Arapuni" = "Before April 2011 the metered history has one figure for the whole station, under ARI1101. ARI1102 has its own figure from then, so the split by grid connection starts there."
 "Stratford" = "The metered history has one meter (SFD2201) for Taranaki Combined Cycle (1998–2025) and the two peakers (from 2011), and until 2001 the old Stratford gas turbines too, so it shows the station whole. The dispatch data (the live week and the weeks since the newest metered month) shows each unit."
 "Waikaremoana" = "The metered history has one meter for Tuai, Piripaua and Kaitawa together, so it shows the scheme whole. The dispatch data (the live week and the weeks since the newest metered month) shows each station."

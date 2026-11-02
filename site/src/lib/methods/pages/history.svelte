@@ -61,7 +61,7 @@
 
 <h2 id="gaps">Known gaps</h2>
 <ul>
-	<li><b>1–9 September 2020</b>: no Huntly. <code>Generation_MD</code> has no rows for the Rankines or unit 5 that month, and the dispatch files start on 10 September.</li>
+	<li><b>Huntly, September 2020</b>: <code>Generation_MD</code> has no Huntly rows that month. The month uses the grid meter at <code>HLY2201</code> (<code>Grid_import</code>), which reads a few MW under the generators’ own meters because it is net of the station’s load, split between the Rankines, unit 5 and unit 6 by clearing it through their offers. Tested on the week before, where <code>Generation_MD</code> gives each unit, that split comes within about 13 MW for the Rankines and 5 MW for unit 5 on average (<a href={REPO + 'analysis/huntly_sep2020.py'}><code>analysis/huntly_sep2020.py</code></a>).</li>
 	<li><b>Matahina from October 2021</b>: no metered rows; the dispatch figures stand in.</li>
 	<li><b>Before April 1999</b>: <code>Embedded_generation</code> doesn’t yet have Rotokawa, Ngāwhā, Kaimai and Tararua, about 1–2% of generation in 1997–99. Geothermal in 1998–2000 is up to 15% below MBIE’s for that reason.</li>
 	<li><b>Highbank before October 2001</b>: no metered rows for it at all; it appears in <code>Embedded_generation</code> from then (25 MW).</li>

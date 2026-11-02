@@ -83,11 +83,12 @@ warnings.simplefilter("ignore", pd.errors.PerformanceWarning)  # wide monthly fr
 FINAL = 'Datasets/Wholesale/DispatchAndPricing/FinalEnergyPrices'
 HVDC_FLOWS = 'Datasets/Wholesale/Metered_data/HVDC_Flows'
 
-BUILD = 7                    # bump to rebuild every month's JSON after changing how it is built (2: final prices, 3: peak generation,
+BUILD = 8                    # bump to rebuild every month's JSON after changing how it is built (2: final prices, 3: peak generation,
                              # 4: satellite rooftop solar model by point, metered HVDC; 5: more price nodes, daily price
                              # spread and revenue by fuel, bioenergy and waste heat; 6: metered history back to Aug 1997,
                              # metered generation wherever published, plant groups; 7: Generation_MD's clock-numbered
                              # change days before 2009 renumbered (metered.straighten()), Mill Creek 2014-15, peak.disp)
+                             # 8: (being collected, see facilities/NEXT_REBUILD.md)
 GEN_FUELS = ('geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
 DISPATCHABLE = ('hydro', 'gas', 'coal', 'diesel', 'batt')   # as DISPATCHABLE in site/src/lib/tracker/series.js
 WRITE_BUDGET = 3000          # KV writes a day (UTC) for this job; a full rebuild needs ~800. Free plan: 280 (see above)
@@ -508,6 +509,9 @@ def mapping_hash():
     h = hashlib.sha256(f'build {BUILD}'.encode())
     for f in ('plant_register.csv', 'connection_points.csv', 'rooftop_points.csv', 'rooftop_nsp.csv',
               'metered_plants.csv', 'metered_islands.csv'):
+        with open(os.path.join(FACILITIES, f), 'rb') as fh:
+            h.update(fh.read())
+    for f in sorted(x for x in os.listdir(FACILITIES) if x.startswith('metered_fill_')):
         with open(os.path.join(FACILITIES, f), 'rb') as fh:
             h.update(fh.read())
     o = {k: v for k, v in overrides().items() if k not in SITE_ONLY}

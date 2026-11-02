@@ -28,7 +28,7 @@
 	<dt>By site</dt>
 	<dd>Every plant gets a layer of its own, under its fuel, batteries included (charging below zero); embedded solar is split by island. Plants are listed largest first by installed capacity, here and when a fuel or group is opened, so the order stays the same whatever the range.</dd>
 	<dt>By hydro scheme</dt>
-	<dd>Hydro only, by river system, each listed upstream to downstream: Tekapo (Takapō A, B); Waitaki (Ōhau A, B, C, Benmore, Aviemore, Waitaki); Waikato (Aratiatia to Karāpiro, eight stations); Manapōuri; Clutha (Clyde, Roxburgh); Tongariro (Tokaanu, Rangipo); Waikaremoana; Rangitaiki (Aniwhenua, Wheao and Flaxy, Matahina); Waipori (Deep Stream, Waipori 2A/3/4); and other hydro.</dd>
+	<dd>Hydro only, by river system, each listed upstream to downstream: Tekapo (Tekapo A, B); Waitaki (Ōhau A, B, C, Benmore, Aviemore, Waitaki); Waikato (Aratiatia to Karāpiro, eight stations); Manapōuri; Clutha (Clyde, Roxburgh); Tongariro (Tokaanu, Rangipo); Waikaremoana; Rangitaiki (Aniwhenua, Wheao and Flaxy, Matahina); Waipori (Deep Stream, Waipori 2A/3/4); and other hydro.</dd>
 	<dt>By owner</dt>
 	<dd>Each plant’s operator in the EA register, grouped as Meridian, Contact (including Manawa Energy, formerly Trustpower, which <a href={ref('manawa')}>Contact took over in July 2025</a>), Mercury (including Nga Awa Pūrua, which it operates), Genesis, Nova and other generators; batteries count with their owner. Plants the register doesn’t list yet, and plants seen only in the metered history, have their owner set by hand. So does Kinleith: the register’s operator is Manawa, but Oji Fibre Solutions owns it, so it counts under other generators. Today’s owners apply to the whole history, so earlier sales and transfers aren’t shown.</dd>
 </dl>
