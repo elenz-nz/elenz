@@ -39,9 +39,22 @@
    pale grey on white in dark mode, unless the options are given colours too */
 select option, select optgroup { background-color: var(--surface); color: var(--ink); }
 body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-ui); font-size: 14px; line-height: 1.45; }
+:root { --gutter: clamp(20px, 2.2vw, 44px); }
 .wrap { max-width: 1260px; margin: 0 auto; padding-inline: 20px; padding-block: 18px 40px; display: grid; gap: 14px; }
 /* Tracker and Now use the whole width of a big screen (reading pages keep .wrap's 1,260 px) */
-.wrap.wide { max-width: none; padding-inline: clamp(20px, 2.2vw, 44px); }
+.wrap.wide { max-width: none; padding-inline: var(--gutter); }
+/* the masthead spans the window on every page, as on the wide ones, so the logo and links don't move when going
+   between them (owner's call HOME-01, 31 Oct 2026); --sbw is the scrollbar's width (root layout) */
+.wrap:not(.wide) > .mast-wrap { width: calc(100vw - var(--sbw, 0px) - 2 * var(--gutter)); margin-left: calc(50% - (100vw - var(--sbw, 0px)) / 2 + var(--gutter)); }
+/* on a reading page wider than its column, a faint funnel under the masthead narrows from the window's width to the
+   column's, so the full-width header leads into the page (owner's idea, 31 Oct 2026); --inset: the column's edge */
+@media (min-width: 1340px) {
+  .wrap:not(.wide) > .mast-wrap { position: relative; padding-bottom: 14px;
+    --inset: calc((100vw - var(--sbw, 0px) - 2 * var(--gutter) - 1220px) / 2); }
+  .wrap:not(.wide) > .mast-wrap::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 14px; pointer-events: none;
+    background: linear-gradient(to bottom, color-mix(in srgb, var(--line) 70%, transparent), transparent);
+    clip-path: polygon(0 0, 100% 0, calc(100% - var(--inset)) 100%, var(--inset) 100%); }
+}
 h1, h2, h3 { margin: 0; text-wrap: balance; }
 .num, td.n, .v { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
 
@@ -114,6 +127,51 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 .datebox { display: inline-flex; align-items: center; gap: 4px; }
 .datebox input { font: inherit; font-size: 0.8rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2px 6px; min-height: 28px; color-scheme: inherit; }
 .datebox input:disabled { color: var(--muted); }
+.ctl > .ctl-lbl { font-size: 0.72rem; white-space: nowrap; }
+/* the date box's own calendar (#lib/site/datepick.js): the button in the bar, and the calendar hung from <body> */
+date-pick, time-pick { display: inline-block; }
+time-pick[hidden] { display: none; }
+.dp-btn { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 0.8rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2px 8px; min-height: 28px; cursor: pointer; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dp-btn svg { color: var(--muted); flex: none; }
+.dp-btn:hover:not(:disabled) { border-color: var(--accent); }
+.dp-btn:hover:not(:disabled) svg, .dp-btn[aria-expanded="true"] svg { color: var(--accent); }
+.dp-btn[aria-expanded="true"] { border-color: var(--accent); }
+.dp-btn:disabled { color: var(--muted); cursor: default; }
+.dp-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.datebox button.dp-btn { color: var(--ink); padding: 2px 8px; font-size: 0.8rem; }
+.datebox button.dp-btn:hover { background: var(--surface); }
+.dp-pop { position: fixed; z-index: 40; width: 272px; max-width: calc(100vw - 16px); box-sizing: border-box; padding: 10px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 28px rgb(0 0 0 / 0.18); font-family: var(--font-ui); font-size: 0.86rem; }
+.dp-pop button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; border-radius: 6px; }
+.dp-pop button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.dp-pop button:disabled { color: var(--line); cursor: default; }
+.dp-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 6px; min-height: 32px; }
+.dp-nav { display: grid; place-items: center; width: 32px; height: 32px; color: var(--ink-2); }
+.dp-nav:hover:not(:disabled) { background: var(--grid); color: var(--ink); }
+.dp-title { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; font-weight: 650; }
+.dp-title svg { color: var(--muted); }
+.dp-title:hover { background: var(--grid); }
+.dp-cap { font-weight: 650; padding-left: 4px; }
+.dp-back { padding: 5px 10px; color: var(--accent); font-weight: 600; }
+.dp-back:hover { background: var(--accent-soft); }
+.dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.dp-dow { text-align: center; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em; color: var(--muted); padding: 2px 0 4px; }
+.dp-day { height: 34px; font-variant-numeric: tabular-nums; }
+.dp-day.out { color: var(--muted); }
+.dp-day:hover:not(:disabled) { background: var(--grid); }
+.dp-day.today { box-shadow: inset 0 0 0 1px var(--accent); }
+.dp-day.sel, .dp-pop .sel { background: var(--accent); color: var(--surface); font-weight: 650; }
+.dp-day.sel:hover, .dp-pop .sel:hover { background: color-mix(in srgb, var(--accent) 85%, var(--ink)); }
+.dp-years { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; max-height: 236px; overflow-y: auto; overscroll-behavior: contain; }
+.dp-months { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.dp-years button, .dp-months button { height: 38px; font-variant-numeric: tabular-nums; }
+.dp-years button:hover:not(:disabled):not(.sel), .dp-months button:hover:not(:disabled):not(.sel) { background: var(--grid); }
+@media (pointer: coarse) { .dp-day { height: 40px; } .dp-pop { width: 300px; } }
+/* the time box's panel (#lib/site/timepick.js) */
+.tp-pop { display: grid; gap: 6px; }
+.tp-hours, .tp-mins { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; }
+.tp-hours button, .tp-mins button { height: 34px; padding: 0; font-size: 0.78rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tp-hours button:hover:not(.sel), .tp-mins button:hover:not(.sel) { background: var(--grid); }
+@media (pointer: coarse) { .tp-hours button, .tp-mins button { height: 40px; } }
 .datebox input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .datebox button { font: inherit; font-size: 0.78rem; border: 1px solid var(--line); background: var(--surface); color: var(--accent); border-radius: 4px; padding: 3px 9px; min-height: 28px; cursor: pointer; }
 .datebox button:hover { background: var(--grid); }
@@ -244,11 +302,26 @@ canvas { display: block; width: 100%; }
 .help dt:first-child { margin-top: 0; }
 .help dd { margin: 0; color: var(--ink-2); font-size: 0.8rem; line-height: 1.45; }
 .help a { color: var(--accent); }
+.help p { margin: 0; color: var(--ink-2); font-size: 0.8rem; line-height: 1.45; }
+.help ul { margin: 6px 0; padding-left: 16px; display: grid; gap: 3px; color: var(--ink-2); font-size: 0.8rem; line-height: 1.45; }
+.help li b { color: var(--ink); font-weight: 600; }
+.help .reset-view { display: block; justify-self: start; font: inherit; font-size: 0.78rem; font-weight: 600; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 3px 10px; min-height: 28px; margin-bottom: 8px; cursor: pointer; }
+.help .reset-view:hover { border-color: var(--accent); color: var(--accent); }
+/* "Scale to this view" draws the eye to the key it changes, like the About page's Contact (PRC-06) */
+.scale-flash { border-radius: 6px; animation: scale-flash 2.2s ease-out; }
+@keyframes scale-flash {
+  0%, 35% { background: var(--accent-soft); box-shadow: 0 0 0 2px var(--accent); }
+  100% { background: transparent; box-shadow: 0 0 0 2px transparent; }
+}
+@media (prefers-reduced-motion: reduce) { .scale-flash { animation: none; } }
 /* the summary's Controls button: labelled, so it reads as the place to find what the charts can do */
 .ctl-btn { display: inline-flex; align-items: center; gap: 6px; flex: none; margin: -2px 0 0; font: inherit; font-size: 0.76rem; font-weight: 500; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px 3px 8px; min-height: 28px; cursor: pointer; }
 .ctl-btn:hover, .ctl-btn[aria-expanded="true"] { color: var(--ink); border-color: var(--ink-2); }
 .sum-when { font-size: 1.12rem; font-weight: 700; letter-spacing: -0.01em; }
 .sum-sub { color: var(--muted); font-size: 0.8rem; }
+/* phones: room for the sub-line's two lines whether or not a note (interpolated, partial) wraps it, so scrubbing
+   doesn't make the summary jump (owner's report ZM-01, 31 Oct 2026) */
+.sum-sub { min-height: calc(2 * 1.4em); line-height: 1.4; }
 table { border-collapse: collapse; width: 100%; }
 .mix th { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-weight: 600; padding: 0 0 6px; border-bottom: 1px solid var(--line); }
 .mix th.n, .mix td.n { text-align: right; }
@@ -262,6 +335,13 @@ table { border-collapse: collapse; width: 100%; }
 .sum-level { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 0.82rem; font-weight: 600; padding: 7px 10px; border-radius: 4px; background: var(--accent-soft); }
 .sum-level[hidden] { display: none; }
 .sum-level .back { font-size: 0.8rem; font-weight: 500; white-space: nowrap; }
+.plant-note { font-size: 0.78rem; line-height: 1.45; color: var(--muted); margin: 6px 0 2px; padding: 0 10px; }
+.plant-note[hidden] { display: none; }
+.plant-note p { margin: 0 0 4px; }
+.plant-note ul { margin: 0 0 4px; padding-left: 16px; display: grid; gap: 3px; }
+.plant-note b { color: var(--ink); font-weight: 600; }
+.mix .aka { color: var(--muted); font-weight: 400; font-size: 0.92em; }
+.mix .aka[hidden] { display: none; }
 .row-name { display: flex; align-items: center; gap: 4px; min-width: 0; }
 .sw-btn { flex: none; display: grid; place-items: center; width: 22px; height: 22px; border: 0; background: none; padding: 0; border-radius: 4px; cursor: pointer; }
 span.sw-btn { cursor: default; }
@@ -330,6 +410,7 @@ a { color: var(--accent); }
 
 }
 @media (max-width: 560px) {
+  :root { --gutter: 16px; }
   .wrap { padding-inline: 16px; }
   .masthead { flex-wrap: nowrap; gap: 8px; }
   .brand { gap: 8px; }
@@ -432,6 +513,10 @@ a { color: var(--accent); }
 .zoom-chip[hidden] { display: none; }
 .zoom-chip b { color: var(--accent); font-weight: 600; }
 .zoom-chip:hover b { text-decoration: underline; }
+/* the pinned time: the accent's pin, the time, and a × that lets it go */
+.pin-chip b { font-family: var(--font-data); font-weight: 500; }
+.pin-chip .pin-x { font-size: 1rem; line-height: 1; color: var(--muted); margin-left: 1px; }
+.pin-chip:hover .pin-x { color: var(--accent); }
 .zoom-sel { position: absolute; pointer-events: none; background: color-mix(in srgb, var(--accent) 16%, transparent); border-inline: 1px solid var(--accent); z-index: 2; }
 .zoom-sel[hidden] { display: none; }
 .charts canvas { cursor: crosshair; }

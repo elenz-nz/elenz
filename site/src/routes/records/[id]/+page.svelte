@@ -10,11 +10,12 @@
 	import InfoTip from '#lib/site/InfoTip.svelte';
 	import ChartControls from '#lib/records/ChartControls.svelte';
 	import DayChart from '#lib/records/DayChart.svelte';
-	import { drawRecord } from '#lib/records/shareImage.js';
+	import { drawRecord, pageIsDark } from '#lib/records/shareImage.js';
+	import CopyLink from '#lib/site/CopyLink.svelte';
 	import { stamp } from '#lib/site/viewurl.js';
 	import {
-		LISTED, PERIODS, PERIOD_KEYS, periodOf, periodSub, periodWhen, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats, energy, pace, soFar, toGo, needText, paceAt, periodNow, figureSoFar, loadDetail, bgOf, udemOf, periodSeries, periodAxis,
-		loadRecords, trimZeros, periodHours, meteredDue, clock, dayOf, dayLong, monthOf, yearOf, daysBetween, runLength, NEW_DAYS
+		LISTED, PERIODS, PERIOD_KEYS, periodOf, periodSub, periodWhen, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats, energy, pace, soFar, toGo, needText, paceAt, periodNow, figureSoFar, loadDetail, liveNear, close, bgOf, udemOf, periodSeries, periodAxis,
+		loadRecords, trimZeros, periodHours, meteredDue, clock, dayOf, dayLong, monthOf, yearOf, daysBetween, runLength, isNew as isNewRec
 	} from '#lib/records/records.js';
 	import type { PageProps } from './$types';
 
@@ -23,13 +24,12 @@
 
 	let R = $state<any>(null);
 	let live = $state<any>({});
+	let near = $state<any>({});
 	let status = $state<'loading' | 'none' | 'ok'>('loading');
 	let region = $state('NZ');
 	// a half-hour record's day, week, month or year record (?period=)
 	let period = $state('tp');
-	// a record kept for periods only (d.periods) has no half-hour record: it opens on its day, as the Records list
-	// shows it on the half-hour list
-	const per = $derived(d.kind === 'hh' ? (d.periods && period === 'tp' ? 'day' : period) : 'tp');
+	const per = $derived(d.kind === 'hh' ? period : 'tp');
 	let liveD = $state.raw<any>(null);
 	let det = $state.raw<any>(null);   // records-detail.json: the best by month behind the progression, the record periods
 	let shareMsg = $state('');   // "Link copied" for a moment after Share copies the link
@@ -47,7 +47,7 @@
 			loadDetail().then((x) => (det = x));
 			try {
 				const r = await fetch(LIVE_URL, { cache: 'no-cache' });
-				if (r.ok) { liveD = await r.json(); live = liveBeats(R, liveD); }
+				if (r.ok) { liveD = await r.json(); live = liveBeats(R, liveD); near = liveNear(R, liveD); }
 			} catch { /* the live check is extra */ }
 		})();
 	});
@@ -111,7 +111,9 @@
 	const onPace = $derived(R && liveD && per !== 'tp' ? pace(R, liveD).find((x) => x.d.id === d.id && x.region === region && x.period === per) ?? null : null);
 	const na = $derived(R ? notShown(d, region, rec, R, per) : null);
 	const prov = $derived(R && !na ? (per === 'tp' ? provisional(R, live, d.id, region) : (rec?.prov ?? null)) : null);
-	const isNew = $derived(!!rec?.since && Date.now() - rec.since < NEW_DAYS * 864e5);
+	// a dispatch figure within the margin of the record, either side: too close for dispatch data to call
+	const near_ = $derived(R && !na && !prov ? close(R, live, near, d.id, region, per) : null);
+	const isNew = $derived(isNewRec(rec, per));
 	const regionName = $derived(REGIONS.find((x) => x.id === region)!.name);
 	const f = (v: number) => fmt(d, v, per);
 	const axisFmt = (v: number) => (d.unit === '$' ? '$' + Math.round(v).toLocaleString('en-NZ') : d.unit === '%' ? `${+v.toFixed(1)}%` : Math.round(v).toLocaleString('en-NZ'));
@@ -136,18 +138,21 @@
 	// a new record, region or period starts both charts afresh
 	$effect(() => { void d.id; void region; void per; growZoom = null; growPin = null; dayZoom = null; });
 
-	// the progression's ⓘ: how many times it has been broken, what the faint line is
+	// the progression's ⓘ: a sentence, then short points that fit the record (owner's rules for notes, 1 Nov 2026)
 	const growNote = $derived.by(() => {
-		if (!rec) return '';
+		if (!rec) return null;
 		const tr = trimZeros(rec.steps) !== rec.steps, n = rec.steps.length - 1 - (tr ? rec.steps.findIndex((s: [number, number]) => s[1] !== 0) : 0);
 		const since = tr ? `the first above zero in ${yearOf(trimZeros(rec.steps)[0][0])}` : monthOf(R.first);
-		const unit = per === 'year' ? 'year' : 'month', hi = d.id.endsWith('_min') ? 'lowest' : 'highest';
+		const unit = per === 'year' ? 'year' : 'month', low = d.id.endsWith('_min'), hi = low ? 'lowest' : 'highest';
 		const what = per === 'year' || per === 'month' ? `each ${per}’s figure` : `the ${hi} ${per === 'tp' ? 'half-hour' : per} in each month`;
-		return `${n === 0 ? (tr ? `First above zero in ${yearOf(trimZeros(rec.steps)[0][0])}` : 'Not broken since the data began') : `Broken ${n} ${n === 1 ? 'time' : 'times'} since ${since}`}.`
-			+ (bg ? ` The faint line is ${what}; the ${unit} still running sits in a hatched band, its line dotted, because it isn’t finished; hovering there gives its figure so far and how long is left.` : '')
-			+ (udem ? ` The dashed line is the same with embedded solar added back: what ${region === 'NZ' ? 'the country' : 'the island'} used, met partly by rooftops and small arrays behind the meter. It is there for information only, not a record, because embedded solar is modelled (from August 2013; zero before).` : '')
-			+ (prov ? ' Dashed step: provisional, from dispatch data.' : '')
-			+ ' Hover or tap for the record at any date; click to pin it. Drag across the chart to zoom in; Reset zoom or Escape goes back.';
+		const items = [
+			`${n === 0 ? (tr ? `First above zero in ${yearOf(trimZeros(rec.steps)[0][0])}` : 'Not broken since the data began') : `Broken ${n} ${n === 1 ? 'time' : 'times'} since ${since}`}.`,
+			...(bg ? [`Faint line: ${what}. The ${unit} still running sits in a hatched band with a dotted line; hover there for its figure so far and how long is left.`] : []),
+			...(udem ? [`Dashed line: the same with estimated embedded solar added back, showing what ${region === 'NZ' ? 'the country' : 'the island'} used including rooftops and small arrays. It’s for information, not a record (from August 2013; zero before).`] : []),
+			...(prov ? ['Dashed step: provisional, from dispatch data.'] : []),
+			'Hover or tap for the record at any date; click to pin it. Drag to zoom; “Reset zoom” or Escape goes back.',
+		];
+		return { lead: `This shows how the record has ${low ? 'fallen' : 'climbed'} over time; each step is a new record.`, items };
 	});
 
 	// one more figure from the record's half-hour, the one that says most about it
@@ -179,24 +184,44 @@
 		await drawRecord(c, { d, region, rec, end: R.end, isNew, period: per });
 		return await new Promise((ok) => c.toBlob(ok, 'image/png'));
 	}
-	async function share() {
+	// The image is drawn ahead (a moment after the record shows), so the share sheet opens straight from the tap:
+	// phones refuse a share that waits on drawing first (owner's report SHR-03, 31 Oct 2026). If it isn't ready, or
+	// the theme changed, the line and link go without it.
+	let prepared = $state.raw<{ key: string; file: File } | null>(null);
+	const imageKey = () => `${fileName}|${rec?.t}|${rec?.v}|${isNew}|${pageIsDark()}`;
+	$effect(() => {
+		if (!canShare || !rec || !R) return;
+		const key = imageKey();
+		if (prepared?.key === key) return;
+		const timer = setTimeout(async () => {
+			const b = await image();
+			if (b && key === imageKey()) prepared = { key, file: new File([b], fileName, { type: 'image/png' }) };
+		}, 500);
+		return () => clearTimeout(timer);
+	});
+	let manual = $state('');   // a link the browser wouldn't share or copy: shown with a Copy button, by the button used
+	let manualAt = $state<'top' | 'foot'>('top');
+	async function share(at: 'top' | 'foot' = 'top') {
+		manualAt = at;
 		if (busy) return;
 		const url = location.href;
+		manual = '';
 		if (canShare) {
-			busy = true;
-			try {
-				const b = await image();
-				const file = b ? new File([b], fileName, { type: 'image/png' }) : null;
-				// the link goes in the text too: some apps drop the url when a file is shared
-				if (file && navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], title: document.title, text: `${shareText} ${url}` });
-				else await navigator.share({ title: document.title, text: shareText, url });
-				return;
-			} catch (e: any) { if (e?.name === 'AbortError') return; }   // cancelled; otherwise copy the link
-			finally { busy = false; }
+			const file = prepared?.key === imageKey() ? prepared.file : null;
+			// the link goes in the text too: some apps drop the url when a file is shared
+			const data = file && navigator.canShare?.({ files: [file] })
+				? { files: [file], title: document.title, text: `${shareText} ${url}` }
+				: { title: document.title, text: shareText, url };
+			try { await navigator.share(data); return; }
+			catch (e: any) {
+				if (e?.name === 'AbortError') return;   // cancelled
+				// refused: offer the link, except Firefox on Android's stuck share (a second share is refused as "already
+				// in progress", see ShareLink.svelte), where the tap still counts and the link is copied as on a computer
+				if (e?.name !== 'InvalidStateError') { manual = url; return; }
+			}
 		}
-		try { await navigator.clipboard.writeText(url); shareMsg = 'Link copied'; }
-		catch { shareMsg = 'Copy the address bar'; }
-		setTimeout(() => (shareMsg = ''), 2000);
+		try { await navigator.clipboard.writeText(url); shareMsg = 'Link copied'; setTimeout(() => (shareMsg = ''), 2000); }
+		catch { manual = url; }
 	}
 	async function download() {
 		if (busy) return;
@@ -217,6 +242,8 @@
 	<title>{fullName(d)} · Records · ELENZ</title>
 	<meta name="description" content="New Zealand's electricity record for {fullName(d).toLowerCase()} since 1997, for New Zealand and each island: the record, how it grew, and the day it fell." />
 	<Preview title="{fullName(d)} · New Zealand electricity records" description="New Zealand's electricity record for {fullName(d).toLowerCase()} since 1997, for New Zealand and each island: the record, how it grew, and the day it fell." path="/records/{data.id}" />
+	<!-- with JavaScript off, a plain line instead of "Loading" (owner's report RES-04, 2 Nov 2026) -->
+	{@html '<noscript><style>.js-only { display: none !important; }</style></noscript>'}
 </svelte:head>
 
 <div class="wrap">
@@ -234,7 +261,7 @@
 						</select>
 					{/if}
 					{#if rec && !na}
-						<button type="button" class="pill-btn" onclick={share} disabled={busy} title={canShare ? 'Share this record' : 'Copy a link to this record'} aria-label={canShare ? 'Share this record' : 'Copy a link to this record'}>
+						<button type="button" class="pill-btn" onclick={() => share('top')} disabled={busy} title={canShare ? 'Share this record' : 'Copy a link to this record'} aria-label={canShare ? 'Share this record' : 'Copy a link to this record'}>
 							<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M8.5 11.5a3.2 3.2 0 0 0 4.6 0l2.6-2.6a3.2 3.2 0 0 0-4.6-4.6l-1 1M11.5 8.5a3.2 3.2 0 0 0-4.6 0l-2.6 2.6a3.2 3.2 0 0 0 4.6 4.6l1-1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
 							<span class="pill-word">{shareMsg || 'Share'}</span>
 						</button>
@@ -245,10 +272,11 @@
 					{/if}
 				</div>
 			</div>
+			{#if manual && manualAt === 'top'}<div class="manual"><CopyLink url={manual} onclose={() => (manual = '')} /></div>{/if}
 			<p class="sub">{periodSub(d, per)}</p>
 			{#if d.kind === 'hh'}
 				<div class="seg per" role="group" aria-label="Record for each">
-					{#each PERIODS.filter((p) => !d.periods || p.k !== 'tp') as p}
+					{#each PERIODS as p}
 						<button type="button" aria-pressed={per === p.k} onclick={() => setPeriod(p.k)}>{p.label}</button>
 					{/each}
 				</div>
@@ -256,7 +284,8 @@
 		</div>
 
 		{#if status === 'loading'}
-			<p class="note" role="status">Loading the record…</p>
+			<p class="note js-only" role="status">Loading the record…</p>
+			<noscript><p class="note">This record needs JavaScript turned on. <a href="/methods/records">How records work</a> and <a href="/about">About</a> work without it.</p></noscript>
 		{:else if status === 'none'}
 			<section class="panel"><p>The records will appear once the history rebuild finishes, in the next few days.</p></section>
 		{:else if na || !rec}
@@ -297,12 +326,20 @@
 					<p>{prov.src === 'live' ? 'Live data shows' : 'Dispatch data shows'} <b>{f(prov.v)}</b>
 						{per === 'day' ? `on ${dayOf(prov.t)}` : per === 'week' ? `in the week of ${dayOf(prov.t)}` : per === 'month' ? `in ${monthOf(prov.t)}` : per === 'year' ? `in ${yearOf(prov.t)}`
 							: d.kind === 'hh' ? `in the ${clock(prov.t)} half-hour on ${dayOf(prov.t)}` : d.kind === 'run' ? `from ${dayOf(prov.t)}` : `in ${monthOf(prov.t)}`},
-						beyond the record. Dispatch data runs a little above the metered data, so it is confirmed or dropped when the EA publishes the metered data, around {meteredDue(per === 'week' ? prov.t + 6.5 * 864e5 : per === 'year' ? Date.UTC(+yearOf(prov.t), 11, 15) : prov.t)}.</p>
+						beyond the record by more than dispatch data usually strays from the meters (corrected for how it compares with them). Since 2020 every such record has been confirmed; the EA’s metered data settles it around {meteredDue(per === 'week' ? prov.t + 6.5 * 864e5 : per === 'year' ? Date.UTC(+yearOf(prov.t), 11, 15) : prov.t)}.</p>
+				</section>
+			{:else if near_}
+				<section class="prov near" aria-label="Close to the record">
+					<span class="tag provtag">Close</span>
+					<p>{near_.src === 'live' ? 'Live data shows' : 'Dispatch data shows'} <b>{f(near_.v)}</b>
+						{per === 'day' ? `on ${dayOf(near_.t)}` : per === 'week' ? `in the week of ${dayOf(near_.t)}` : per === 'month' ? `in ${monthOf(near_.t)}` : per === 'year' ? `in ${yearOf(near_.t)}`
+							: `in the ${clock(near_.t)} half-hour on ${dayOf(near_.t)}`},
+						within {f(near_.m)} of the record (corrected for how dispatch data compares with the meters). That is too close for dispatch data to call; the EA’s metered data settles it around {meteredDue(per === 'week' ? near_.t + 6.5 * 864e5 : per === 'year' ? Date.UTC(+yearOf(near_.t), 11, 15) : near_.t)}.</p>
 				</section>
 			{/if}
 
 			<section class="panel" aria-labelledby="grow-h">
-				<div class="p-head"><div class="ttl-row"><h2 id="grow-h">How the record grew</h2><InfoTip label="About this chart">{growNote} <a href="/methods/records">How records work</a></InfoTip></div><div class="ctls">{#if growZoom || growPin !== null}<ChartControls zoomed={!!growZoom} pinned={growPin !== null} text={growZoom ? `${monYr(growZoom[0])} – ${monYr(growZoom[1])}` : ''} onreset={() => (growZoom = null)} onrelease={() => (growPin = null)} />{/if}</div></div>
+				<div class="p-head"><div class="ttl-row"><h2 id="grow-h">How the record grew</h2><InfoTip label="About this chart">{#if growNote}<p>{growNote.lead}</p><ul>{#each growNote.items as it}<li>{it}</li>{/each}</ul>{/if}<p><a href="/methods/records">How records work</a></p></InfoTip></div><div class="ctls">{#if growZoom || growPin !== null}<ChartControls zoomed={!!growZoom} pinned={growPin !== null} text={growZoom ? `${monYr(growZoom[0])} – ${monYr(growZoom[1])}` : ''} onreset={() => (growZoom = null)} onrelease={() => (growPin = null)} />{/if}</div></div>
 				<ul class="key" aria-label="Key">
 					<li><svg width="22" height="8" aria-hidden="true"><line x1="0" x2="22" y1="4" y2="4" style="stroke:var({d.tok})" stroke-width="2.4" /></svg>Record</li>
 					{#if bg}<li><svg width="22" height="8" aria-hidden="true"><line x1="0" x2="22" y1="4" y2="4" style="stroke:var({d.tok})" stroke-width="1.2" opacity="0.35" /></svg>{bgKey}</li>{/if}
@@ -316,17 +353,17 @@
 			<div class="two">
 				{#if per !== 'tp'}
 					<section class="panel" aria-labelledby="day-h">
-						<div class="p-head"><h2 id="day-h">The {periodOf(per).word} it fell</h2><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
+						<!-- the period in the title, the rest in the ⓘ, as on the other charts (owner's report REC-05, 26 Oct 2026) -->
+						<div class="p-head"><div class="ttl-row"><h2 id="day-h">The {periodOf(per).word} it fell <span class="h-when">{periodWhen(rec.t, per, true)}</span></h2><InfoTip label="About this chart"><p>This shows the {periodOf(per).word} the record was set: {parts(d, rec.v, per).n} {parts(d, rec.v, per).u}{en ? ` (${en})` : ''}{d.unit === '%' ? ' of its generation renewable' : ''}{rec.prev ? `, beating ${f(rec.prev[1])} (${periodWhen(rec.prev[0], per)})` : ''}.</p><ul><li>Dashed line: the record’s average.</li><li>“Open in the tracker” shows what happened through it.</li></ul><p><a href="/methods/records#periods">How records work</a></p></InfoTip></div><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
 						{#if ser && serAxis}
 							<DayChart day={ser} t={-1} tok={d.tok} fmt={axisFmt} full={f} xticks={serAxis.ticks} tipAt={serAxis.tip} labAt={serAxis.lab} bind:zoom={dayZoom} avg={rec.v} avgLabel="Average {f(rec.v)}"
 								label="{fullName(d)} through {periodWhen(rec.t, per, true)}, {per === 'day' ? 'half-hourly' : per === 'week' ? 'hourly' : per === 'month' ? 'daily' : 'weekly'}, averaging {f(rec.v)}" />
 						{/if}
-						<p class="note">{periodWhen(rec.t, per, true)}: {parts(d, rec.v, per).n} {parts(d, rec.v, per).u}{en ? ` (${en})` : ''}{d.unit === '%' ? ' of its generation renewable' : ''}{rec.prev ? `, beating ${f(rec.prev[1])} (${periodWhen(rec.prev[0], per)})` : ''}. Open it in the tracker to see what happened through it.</p>
 					</section>
 				{:else if d.kind === 'hh' && rec.ctx}
 					{@const c = rec.ctx}
 					<section class="panel" aria-labelledby="day-h">
-						<div class="p-head"><h2 id="day-h">The day it fell</h2><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
+						<div class="p-head"><div class="ttl-row"><h2 id="day-h">The day it fell <span class="h-when">{dayLong(rec.t)}, {clock(rec.t)}</span></h2><InfoTip label="About this chart"><p>This shows the day the record half-hour was set, {regionName === 'New Zealand' ? 'across New Zealand' : `in the ${regionName}`}.</p><ul><li>The figures under the chart are for the {clock(rec.t)} half-hour.</li><li>Metered generation and demand, and final prices.</li><li>“Open in the tracker” shows the whole day there.</li></ul><p><a href="/methods/records#half-hours">How records work</a></p></InfoTip></div><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
 						<DayChart day={c.day} t={rec.t} tok={d.tok} fmt={axisFmt} bind:zoom={dayZoom} label="{fullName(d)} through {dayLong(rec.t)}, half-hourly, peaking at {f(rec.v)} at {clock(rec.t)}" />
 						<dl class="facts">
 							<div><dt>Demand</dt><dd>{c.demand.toLocaleString('en-NZ')} MW</dd></div>
@@ -336,7 +373,6 @@
 							{#if c.hvdc != null}<div><dt>HVDC</dt><dd>{Math.abs(c.hvdc).toLocaleString('en-NZ')} MW {c.hvdc > 0 ? 'north' : c.hvdc < 0 ? 'south' : ''}</dd></div>{/if}
 							{#if c.top?.length}<div class="wide"><dt>Biggest {d.id === 'wind_max' ? 'wind farms' : 'solar farms'}</dt><dd>{c.top.map((p: [string, number]) => `${p[0]} ${p[1]} MW`).join(', ')}</dd></div>{/if}
 						</dl>
-						<p class="note">In the {clock(rec.t)} half-hour, {regionName === 'New Zealand' ? 'across New Zealand' : `in the ${regionName}`}: metered generation and demand, final prices.</p>
 					</section>
 				{/if}
 
@@ -380,9 +416,10 @@
 
 			<div class="share">
 				<div class="btns">
-					<button type="button" class="btn" onclick={share} disabled={busy}>{shareMsg || (canShare ? 'Share' : 'Copy link')}</button>
+					<button type="button" class="btn" onclick={() => share('foot')} disabled={busy}>{shareMsg || (canShare ? 'Share' : 'Copy link')}</button>
 					<button type="button" class="btn" onclick={download} disabled={busy}>Download image</button>
 				</div>
+				{#if manual && manualAt === 'foot'}<div class="manual"><CopyLink url={manual} onclose={() => (manual = '')} /></div>{/if}
 				<span class="note">{per === 'tp' ? 'Half-hour averages' : `Averages over each ${periodOf(per).word}${en ? ', ranked by average so periods of different lengths compare; energy is the average times the hours in the period' : ''}`} from the EA’s metered data and final prices. <a href="/methods/records">How records work</a></span>
 			</div>
 		{/if}
@@ -402,6 +439,8 @@
 </div>
 
 <style>
+	/* the period a chart shows, after its title (REC-05) */
+	.h-when { font-weight: 500; color: var(--ink-2); margin-left: 4px; }
 	.rec-one { display: grid; gap: 14px; }
 	.head { display: grid; gap: 6px; padding-block: 6px 2px; }
 	.crumb { margin: 0; color: var(--muted); font-size: 0.82rem; }
@@ -447,6 +486,7 @@
 
 	.prov { display: flex; align-items: baseline; gap: 10px; padding: 10px 14px; border: 1px dashed color-mix(in srgb, var(--warn-ink) 55%, var(--line)); background: color-mix(in srgb, var(--warn-bg) 45%, var(--surface)); border-radius: 4px; }
 	.prov p { margin: 0; color: var(--ink-2); font-size: 0.86rem; }
+	.prov.near { border-style: dotted; }
 	.pace { display: flex; align-items: baseline; gap: 10px; padding: 10px 14px; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); border-left: 3px solid var(--accent); background: color-mix(in srgb, var(--accent-soft) 60%, var(--surface)); border-radius: 4px; }
 	.pace p { margin: 0; color: var(--ink-2); font-size: 0.86rem; }
 	.pace b { color: var(--ink); }
@@ -476,6 +516,7 @@
 	.mcell .v { font-family: var(--font-data); font-size: 0.86rem; font-weight: 600; }
 	.mcell .y { font-size: 0.72rem; color: var(--muted); }
 
+	.manual { max-width: 520px; flex-basis: 100%; }
 	.share { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 14px; }
 	.btns { display: flex; gap: 8px; }
 	.btn { font: inherit; font-size: 0.86rem; font-weight: 600; padding: 9px 14px; min-height: 40px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 4px; cursor: pointer; }

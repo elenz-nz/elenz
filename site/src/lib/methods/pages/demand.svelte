@@ -44,7 +44,7 @@
 
 <h2 id="limits">Known limits</h2>
 <ul>
-	<li>Embedded generation other than solar (small hydro, wind and cogeneration on local networks that isn’t dispatched) still shows as lower grid demand; it isn’t added back yet.</li>
+	<li>Embedded generation other than solar (small hydro, geothermal, landfill gas and a little wind on local networks that isn’t dispatched) still shows as lower grid demand; it isn’t added back yet. It was about 120–165 MW on average in 2026, close to 3% of demand (see <a href="/methods/generation#limits">generation</a>).</li>
 	<li>Demand with embedded solar is only as good as the solar estimate: about ±9% of the solar on clear days and ±19% under cloud.</li>
 </ul>
 

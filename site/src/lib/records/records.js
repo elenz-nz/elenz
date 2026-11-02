@@ -8,6 +8,16 @@
 export const RECORDS_URL = '/data/history/records.json';
 export const LIVE_URL = '/data/tracker.json';
 export const NEW_DAYS = 30;        // as records.py: a record is "new" this long after it first appears
+// A record is new only when it was set in recently arrived data: its period ended within NEW_LAG days (plus the
+// period's own length) of the day it first appeared. A rebuild that changes old data can move a record to another
+// half-hour years back; that isn't new (owner's report REC-02, 31 Oct 2026: 2009 records shown as New after BUILD 7).
+export const NEW_LAG = 120;   // metered data runs 5-6 weeks behind each month: a record early in a month appears 70-80 days on
+const PERIOD_DAYS = { tp: 0, day: 1, week: 7, month: 31, year: 366 };
+/** Is this record new: first seen in the last NEW_DAYS, and set in data that had just arrived then? */
+export function isNew(rec, period = 'tp', now = Date.now()) {
+  if (!rec?.since || now - rec.since >= NEW_DAYS * 864e5) return false;
+  return rec.since - rec.t < (NEW_LAG + (PERIOD_DAYS[period] ?? 0)) * 864e5;
+}
 export const GROUPS = ['Demand', 'Renewables', 'Hydro', 'Wind and solar', 'Prices', 'HVDC'];
 export const REGIONS = [
   { id: 'NZ', name: 'New Zealand', short: 'NZ' },
@@ -31,15 +41,14 @@ export const DEFS = [
   { id: 'huntly_off_run', kind: 'run', fam: 'gen', group: 'Renewables', name: 'Longest with no Huntly Rankine running', sub: 'The coal and gas units at Huntly', unit: 'h', tok: '--f-coal', regions: ['NZ'],
     na: { NI: 'Shown for New Zealand', SI: 'Huntly is in the North Island' } },
   { id: 'hydro_max', kind: 'hh', v: 4, fam: 'gen', group: 'Hydro', name: 'Peak hydro', sub: 'Half-hour', unit: 'MW', tok: '--f-hydro', regions: ALL },
-  // periods: true, records kept for days, weeks, months and years only (their half-hour lows say little): a dry spell.
   // v: the records.json version that first has a record (records.py VERSION); older files say it is being worked out
-  { id: 'hydro_min', kind: 'hh', v: 4, periods: true, fam: 'gen', group: 'Hydro', name: 'Lowest hydro', sub: 'Hydro generation, a dry spell', unit: 'MW', tok: '--f-hydro', regions: ALL },
+  { id: 'hydro_min', kind: 'hh', v: 4, fam: 'gen', group: 'Hydro', name: 'Lowest hydro', sub: 'Half-hour', unit: 'MW', tok: '--f-hydro', regions: ALL },
   { id: 'wind_max', kind: 'hh', fam: 'gen', group: 'Wind and solar', name: 'Peak wind', sub: 'Half-hour', unit: 'MW', tok: '--f-wind', regions: ALL },
   { id: 'wind_month_max', old: true, kind: 'month', fam: 'gen', group: 'Wind and solar', name: 'Windiest month', sub: 'Wind generation in a calendar month', unit: 'GWh', dp: 1, tok: '--f-wind', regions: ALL },
   { id: 'solar_max', kind: 'hh', fam: 'gen', group: 'Wind and solar', name: 'Peak grid solar', sub: 'Solar farms the market dispatches', unit: 'MW', tok: '--f-solar', regions: ALL },
   { id: 'roof_max', kind: 'hh', fam: 'gen', group: 'Wind and solar', name: 'Peak embedded solar', sub: 'Rooftops and small arrays, modelled', unit: 'MW', tok: '--f-solar', est: true, regions: ALL },
   { id: 'price_max', kind: 'hh', fam: 'price', group: 'Prices', name: 'Highest price', sub: 'Half-hour, final price', unit: '$', dp: 2, tok: '--accent', regions: ALL },
-  { id: 'price_min', kind: 'hh', v: 4, periods: true, fam: 'price', group: 'Prices', name: 'Lowest price', sub: 'Final price, average', unit: '$', dp: 2, tok: '--accent', regions: ALL },
+  { id: 'price_min', kind: 'hh', v: 4, fam: 'price', group: 'Prices', name: 'Lowest price', sub: 'Half-hour, final price', unit: '$', dp: 2, tok: '--accent', regions: ALL },
   { id: 'gap_max', kind: 'hh', fam: 'price', group: 'Prices', name: 'Biggest gap between the islands', sub: 'Haywards against Benmore, half-hour', unit: '$', dp: 2, tok: '--accent', regions: ['NZ'],
     na: { NI: 'Shown for New Zealand', SI: 'Shown for New Zealand' } },
   { id: 'low_price_run', kind: 'run', fam: 'price', group: 'Prices', name: 'Longest run of near-zero prices', sub: 'Under $5/MWh (New Zealand: both islands)', unit: 'h', tok: '--accent', regions: ALL },
@@ -80,8 +89,10 @@ export const MILESTONES = [
   { id: 'wind_max', at: [100, 250, 500, 750, 1000, 1250, 1500] },
   { id: 'solar_max', at: [100, 250, 500, 750, 1000] },
   { id: 'roof_max', at: [100, 250, 500, 750, 1000] },
-  { id: 'ren_max', at: [90, 95, 98, 99] },
-  { id: 'demand_max', at: [6000, 6500, 7000, 7500] },
+  // an island can have its own levels (owner's UAT note REC-13, 1 Nov 2026): the South Island has been 100% renewable
+  // since the data began, and island demand is far below the country's
+  { id: 'ren_max', at: [90, 95, 98, 99], SI: [100] },
+  { id: 'demand_max', at: [6000, 6500, 7000, 7500], NI: [4500, 5000], SI: [2000, 2500] },
 ];
 
 // ---------- the file ----------
@@ -99,13 +110,14 @@ export function get(R, id, region, period = 'tp') {
 /** Why a record isn't shown for a region: the definition's note, or what its data says (always the same value). */
 export function notShown(d, region, rec, R = null, period = 'tp') {
   if (!d.regions.includes(region)) return d.na?.[region] ?? 'Shown for New Zealand';
-  if (d.periods && period === 'tp') return 'Kept for days, weeks, months and years';
   if (!rec && d.v && R && (R.v ?? 0) < d.v) return 'Being worked out from the history; back in a day or so';
   if (!rec && period !== 'tp' && d.kind === 'hh' && R && !R.periods) return 'Being worked out from the history; back in a day or so';
   if (!rec) return 'No data yet';
   // a period's net transfer: "most sent south" is only a record if some period's net flow was south at all
   if (period !== 'tp' && d.id.startsWith('hvdc_') && rec.v <= 0) return `Never a net ${d.id === 'hvdc_s_max' ? 'south' : 'north'}ward ${periodOf(period).word}`;
-  if (rec.constant) {
+  // never moved since 1997: the half-hour list says so (`constant`); a period record shows it as a single step
+  // (owner's report, 31 Oct 2026: the South Island's renewable and lowest-fossil days to years were flat lines)
+  if (rec.constant || (period !== 'tp' && (rec.steps?.length ?? 0) <= 1)) {
     if (d.id.startsWith('ren') && rec.v === 100) return 'Always 100%: no fossil plant in the South Island';
     if (d.id === 'fossil_min' && rec.v === 0) return 'No fossil plant in the South Island';
     if (rec.v === 0) return 'None in the official data yet';
@@ -226,6 +238,31 @@ export const daysBetween = (a, b) => Math.floor((b - a) / 864e5);
 // The live 5-minute data (tracker.json, dispatch) averaged to half-hours, checked against the official records for
 // generation and demand, as records.py's series() works them out. Prices and HVDC are left to the history job: live
 // prices are dispatch prices (final prices arrive a day later and often differ), and live HVDC is an estimate.
+// Dispatch data is corrected first, as records.py does (records.json `adj`, from facilities/dispatch_adjust.json):
+// the plants dispatch reads systematically off (Ngāwhā, Glenbrook, Kawerau Mill) scaled to their meters, then each
+// record's usual shift taken off. It is a provisional record only beyond the record by more than the margin `m`; within
+// it, either side, it is close to the record (liveNear).
+
+/** tracker.json with the plants dispatch reads systematically off scaled to their meters (a copy; only the islands'
+ *  fuel series change). */
+export function adjustLive(D, adj) {
+  const fac = adj?.plants;
+  if (!D?.N || !fac || !D.plants) return D;
+  const out = { ...D, NI: { ...D.NI }, SI: { ...D.SI } };
+  for (const p of D.plants) {
+    const k = fac[p.name];
+    if (!k || !out[p.isl] || !GEN.includes(p.fuel) || p.fuel === 'batt' || !p.s) continue;
+    const base = out[p.isl][p.fuel] ?? new Array(D.N).fill(0);
+    out[p.isl][p.fuel] = base.map((x, j) => (x ?? 0) + (k - 1) * Math.max(0, p.s[j] ?? 0));
+  }
+  return out;
+}
+
+/** A record's [shift, margin] for dispatch data (records.json adj): the shift is taken off the dispatch figure. */
+export function adjOf(R, id, region, period = 'tp') {
+  const e = (period === 'tp' ? R?.adj?.hh : R?.adj?.period?.[period])?.[id]?.[region];
+  return e ? [e.shift, e.m] : [0, 0];
+}
 
 const GEN = ['geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt'];
 const REN = ['geo', 'bio', 'hydro', 'wind', 'solar', 'roof'];
@@ -267,39 +304,59 @@ function halfHours(D) {
     };
     S.ren_min = S.ren_max;
     S.fossil_max = S.fossil_min;
+    S.hydro_min = S.hydro_max;
     for (const [id, v] of Object.entries(S)) (out[id] ??= {})[r] = v;
   }
   return { T, S: out };
 }
 
-/** Records the live week beats: { id: { region: { t, v, src: 'live' } } }, against the official record and any
- *  provisional one the history already has. */
-export function liveBeats(R, D) {
-  if (!R || !D || !D.N) return {};
+/** The live week against the records: { beats, near }, each { id: { region: { t, v, m, src: 'live' } } }. beats: past
+ *  the official record (and any provisional one the history has) by more than the margin, on corrected figures; near:
+ *  within the margin of it, either side, where nothing has beaten it. */
+function liveCheck(R, D) {
+  const beats = {}, near = {};
+  if (!R || !D || !D.N) return { beats, near };
   let H;
-  try { H = halfHours(D); } catch { return {}; }
-  const out = {};
+  try { H = halfHours(adjustLive(D, R.adj)); } catch { return { beats, near }; }
   for (const d of DEFS) {
-    if (d.kind !== 'hh' || d.periods || d.fam !== 'gen' || !H.S[d.id]) continue;
+    if (d.kind !== 'hh' || d.fam !== 'gen' || !H.S[d.id]) continue;
     for (const r of d.regions) {
-      const rec = get(R, d.id, r), v = H.S[d.id][r];
-      if (!rec || !v) continue;
+      const rec = get(R, d.id, r), ser = H.S[d.id][r];
+      if (!rec || !ser) continue;
       const min = d.id.endsWith('_min');
       const dp = d.dp ?? 0, f = 10 ** dp;
       let best = null;
-      for (let i = 0; i < v.length; i++) {
-        const x = Math.round(v[i] * f) / f;
+      for (let i = 0; i < ser.length; i++) {
+        const x = Math.round(ser[i] * f) / f;
         if (!Number.isFinite(x)) continue;
         if (best === null || (min ? x < best.v : x > best.v)) best = { t: H.T[i], v: x };
       }
-      if (!best) continue;
-      const beats = (a, b) => (min ? a < b : a > b);
-      if (beats(best.v, rec.v) && (!rec.prov || beats(best.v, rec.prov.v)) && best.t > (R.final_to?.gen ?? 0)) {
-        (out[d.id] ??= {})[r] = { ...best, src: 'live' };
-      }
+      if (!best || best.t <= (R.final_to?.gen ?? 0)) continue;
+      const [shift, m] = adjOf(R, d.id, r);
+      const v = Math.round((best.v - shift) * f) / f, gap = min ? rec.v - v : v - rec.v;
+      const better = (a, b) => (min ? a < b : a > b);
+      if (gap > m && (!rec.prov || better(v, rec.prov.v))) (beats[d.id] ??= {})[r] = { t: best.t, v, m, src: 'live' };
+      else if (m > 0 && Math.abs(gap) <= m && !rec.prov) (near[d.id] ??= {})[r] = { t: best.t, v, m, src: 'live' };
     }
   }
-  return out;
+  return { beats, near };
+}
+
+/** Records the live week beats: { id: { region: { t, v, m, src: 'live' } } } (liveCheck). */
+export function liveBeats(R, D) {
+  return liveCheck(R, D).beats;
+}
+
+/** Records the live week comes close to, within the margin dispatch data can't settle (liveCheck). */
+export function liveNear(R, D) {
+  return liveCheck(R, D).near;
+}
+
+/** A dispatch figure close to the record (the live week's, else the history's), when there's no provisional one. */
+export function close(R, live, near, id, region, period = 'tp') {
+  if (period !== 'tp') { const rec = get(R, id, region, period); return rec?.prov ? null : rec?.near ?? null; }
+  if (provisional(R, live, id, region)) return null;
+  return near?.[id]?.[region] ?? get(R, id, region)?.near ?? null;
 }
 
 /** The provisional record for an id and region: the live week's if it beats the history's, else the history's. */
@@ -383,8 +440,9 @@ export function periodAxis(period, ser) {
   return { ticks: ticks.filter((x) => x.i < n), tip: (i) => `Week of ${F2.dm.format(at(i) + 6 * 36e5)}`, lab: (i) => F2.dm.format(at(i) + 6 * 36e5) };
 }
 
-/** New and provisional records for the "recent" cards: newest first. Each { d, region, rec, prov, settled }. */
-export function recent(R, live, now = Date.now()) {
+/** New and provisional records for the "recent" cards: newest first. Each { d, region, rec, prov, near, settled };
+ *  near: a dispatch figure close to the record (only when `near`, liveNear's, is given). */
+export function recent(R, live, now = Date.now(), near = null) {
   if (!R) return [];
   const out = [];
   for (const d of LISTED) {
@@ -392,13 +450,14 @@ export function recent(R, live, now = Date.now()) {
       const rec = get(R, d.id, r);
       if (!rec || notShown(d, r, rec)) continue;
       const prov = provisional(R, live, d.id, r);
-      const isNew = rec.since && now - rec.since < NEW_DAYS * 864e5;
-      if (isNew || prov) out.push({ d, region: r, rec, prov, isNew, at: Math.max(prov?.t ?? 0, rec.since ?? 0) });
+      const fresh = isNew(rec, 'tp', now);
+      const cl = near && !prov ? close(R, live, near, d.id, r) : null;
+      if (fresh || prov || cl) out.push({ d, region: r, rec, prov, near: cl, isNew: fresh, at: Math.max(prov?.t ?? 0, cl?.t ?? 0, fresh ? rec.since : 0) });
     }
   }
   for (const x of R.resolved ?? []) {
     const d = def(x.k);
-    if (d && !x.ok && !d.periods) out.push({ d, region: x.r, rec: get(R, x.k, x.r), settled: x, at: x.at });
+    if (d && !x.ok) out.push({ d, region: x.r, rec: get(R, x.k, x.r), settled: x, at: x.at });
   }
   // one card per record: New Zealand's where it has one, otherwise the newest island's
   out.sort((a, b) => (a.region === 'NZ') - (b.region === 'NZ') || a.at - b.at).reverse();
@@ -406,15 +465,86 @@ export function recent(R, live, now = Date.now()) {
   return out.filter((x) => !seen.has(x.d.id) && seen.add(x.d.id)).sort((a, b) => b.at - a.at);
 }
 
+// ---------- every new, provisional and close record, ranked (the New and provisional cards) ----------
+// Owner's call, 1 Nov 2026: every record, region and period goes in; the four cards shown first are the most notable,
+// and Show all lists them all by period. Notable: a new official record before a provisional one, before one close to
+// the record; a bigger jump (against the record's usual step) before a small one; New Zealand before an island; a
+// half-hour, month or year before a week or day. The first four take one card per record and at most two per group.
+const STATUS_W = { new: 3, prov: 2, near: 1, settled: 0.8 };
+const PERIOD_W = { tp: 1, year: 1, month: 0.9, week: 0.75, day: 0.65 };
+export const CARD_GROUPS = [...PERIOD_KEYS, 'run'];
+/** A card group's heading: "Trading period", "Day" ... "Runs". */
+export const cardGroupLabel = (k) => (k === 'run' ? 'Runs' : periodOf(k).label);
+
+/** The record's usual step: the median change over its last ten new records (null with fewer than two). */
+function usualStep(steps) {
+  const xs = (steps ?? []).slice(-11);
+  const d = [];
+  for (let i = 1; i < xs.length; i++) if (xs[i - 1][1] !== 0) d.push(Math.abs(xs[i][1] - xs[i - 1][1]));
+  if (d.length < 2) return null;
+  d.sort((a, b) => a - b);
+  return d[Math.floor(d.length / 2)] || null;
+}
+
+/** Every new, provisional and close record across regions and periods: [{ d, region, period, group, rec, prov, near,
+ *  settled, isNew, status, score, at }], most notable first. near: liveNear's (the live week's close figures). */
+export function recentAll(R, live, near = null, now = Date.now()) {
+  if (!R) return [];
+  const out = [];
+  const push = (x) => {
+    const typ = usualStep(x.rec?.steps);
+    const jump = x.status === 'new' && x.rec?.prev ? Math.abs(x.rec.v - x.rec.prev[1])
+      : x.status === 'prov' ? Math.abs(x.prov.v - x.rec.v) : 0;
+    const ratio = typ ? Math.min(jump / typ, 3) : 1;
+    x.score = STATUS_W[x.status] * (x.region === 'NZ' ? 1 : 0.75) * (PERIOD_W[x.period] ?? 1) * (1 + ratio / 3);
+    out.push(x);
+  };
+  for (const d of LISTED) {
+    const periods = d.kind === 'hh' ? PERIOD_KEYS : ['tp'];
+    for (const r of d.regions) {
+      for (const p of periods) {
+        const rec = get(R, d.id, r, p);
+        if (!rec || notShown(d, r, rec, R, p)) continue;
+        const prov = p === 'tp' ? provisional(R, live, d.id, r) : rec.prov ?? null;
+        const nr = prov ? null : close(R, live, near, d.id, r, p);
+        const fresh = isNew(rec, p, now);
+        const status = prov ? 'prov' : fresh ? 'new' : nr ? 'near' : null;
+        if (!status && !fresh) continue;
+        push({ d, region: r, period: p, group: d.kind === 'run' ? 'run' : p, rec, prov, near: nr, isNew: fresh,
+               status: fresh && !prov ? 'new' : status, at: Math.max(prov?.t ?? 0, nr?.t ?? 0, fresh ? rec.since : 0) });
+      }
+    }
+  }
+  for (const x of R.resolved ?? []) {
+    const d = def(x.k);
+    if (d && !x.ok) push({ d, region: x.r, period: 'tp', group: d.kind === 'run' ? 'run' : 'tp', rec: get(R, x.k, x.r), settled: x, status: 'settled', at: x.at });
+  }
+  return out.sort((a, b) => b.score - a.score || b.at - a.at);
+}
+
+/** The cards shown before Show all: the most notable `n`, one per record and at most two per group (Demand, Wind and
+ *  solar ...), topped up from the rest if that leaves fewer than n. */
+export function topCards(all, n = 4) {
+  const picked = [], ids = new Set(), groups = {};
+  for (const x of all) {
+    if (picked.length >= n) break;
+    if (ids.has(x.d.id) || (groups[x.d.group] ?? 0) >= 2) continue;
+    picked.push(x); ids.add(x.d.id); groups[x.d.group] = (groups[x.d.group] ?? 0) + 1;
+  }
+  for (const x of all) { if (picked.length >= n) break; if (!picked.includes(x) && !ids.has(x.d.id)) { picked.push(x); ids.add(x.d.id); } }
+  return picked;
+}
+
 /** The first time each milestone was passed, for a region: [{ d, level, t, v }], oldest first. */
 export function milestones(R, region) {
   const out = [];
   for (const m of MILESTONES) {
-    const d = def(m.id), rec = get(R, m.id, region);
-    if (!d || !rec || notShown(d, region, rec)) continue;
-    for (const level of m.at) {
+    const d = def(m.id), rec = get(R, m.id, region), own = m[region];
+    // an island's own levels count even where its record never moved (the South Island's 100% from Aug 1997)
+    if (!d || !rec?.steps?.length || (!own && notShown(d, region, rec))) continue;
+    for (const level of own ?? m.at) {
       const s = rec.steps.find((x) => x[1] >= level);
-      if (s) out.push({ d, level, t: s[0], v: s[1] });
+      if (s) out.push({ d, level, t: s[0], v: s[1], always: !!rec.constant && s === rec.steps[0] });   // always: at that level since the data began
     }
   }
   return out.sort((a, b) => a.t - b.t);
@@ -559,7 +689,7 @@ export function periodNow(R, D, period) {
   const elapsed = (upTo - start) / 36e5;
   // the history's sums count only if they are for this same period and end by `upTo`; the live week fills the rest
   const hist = P[period]?.start === start && P.to <= upTo ? P[period].sums : null;
-  const live = liveSums(D, hist ? P.to : start, upTo);
+  const live = liveSums(adjustLive(D, R.adj), hist ? P.to : start, upTo);
   const sum = (r, k) => {
     const h = hist?.[r]?.[k] ?? [0, 0], l = live[r]?.[k] ?? [0, 0];
     return [h[0] + l[0], h[1] + l[1]];

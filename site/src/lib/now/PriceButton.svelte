@@ -11,7 +11,7 @@
 </script>
 
 <button type="button" class="why" class:lit class:low={x.variant === 'low'} aria-expanded={open} aria-controls="pe-body" {onclick}>
-	{#if label}<span class="dot" aria-hidden="true"></span>{label}<span aria-hidden="true">&nbsp;·&nbsp;</span>{/if}{open ? 'Hide' : label ? 'Why?' : 'Why this price?'}
+	{#if label}<span class="dot" aria-hidden="true"></span>{label}<span class="w" aria-hidden="true">&nbsp;·&nbsp;</span>{/if}<span class:w={!!label && !open}>{open ? 'Hide' : label ? 'Why?' : 'Why this price?'}</span>
 	<svg width="12" height="12" viewBox="0 0 14 14" aria-hidden="true" class:up={open}><path d="M3 5l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /></svg>
 </button>
 
@@ -27,4 +27,7 @@
 	.why.lit { color: var(--surface); background: var(--warn-ink); border-color: var(--warn-ink); }
 	.why.lit:hover { filter: brightness(1.1); }
 	.why.lit.low { background: var(--accent); border-color: var(--accent); }
+	.why { max-width: 100%; box-sizing: border-box; }
+	/* narrow phones: the label and the arrow only, so "Islands split" fits its tile (owner's report NOW-08) */
+	@media (max-width: 420px) { .why .w { display: none; } }
 </style>

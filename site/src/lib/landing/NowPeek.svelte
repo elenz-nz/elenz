@@ -17,7 +17,8 @@
 	const hv = $derived(now.hvdc.mid as number);
 	const dir = $derived(Math.abs(hv) < 1 ? '' : hv > 0 ? 'north' : 'south');
 
-	// how far each part has built (driven by the hand-off's flying dot, Handoff.svelte; complete otherwise)
+	// how far each part has built (driven by the hand-off's flying dot, Handoff.svelte; complete otherwise). The rings
+	// and the link draw as it goes; the figures show in full from the start, never counting up (owner's call HOME-02)
 	const fill = $derived({ NI: build.ni, SI: build.si });
 	const link = $derived(build.link);
 	// a segment shows the part of it the sweep has reached
@@ -48,7 +49,7 @@
 						style="stroke:{f.hatch ? 'url(#pk-hatch-now)' : `var(${f.tok})`};stroke-dasharray:{shown(f, kf)} {C};stroke-dashoffset:{-f.start}" />
 				{/each}
 				<g style="opacity:{Math.min(1, kf * 5)}">
-					<text class="v" y="3" text-anchor="middle">{fmt(reg.gen * kf)}</text>
+					<text class="v" y="3" text-anchor="middle">{fmt(reg.gen)}</text>
 					<text class="u" y="18" text-anchor="middle">MW</text>
 				</g>
 			</g>
@@ -57,7 +58,7 @@
 	<dl>
 		<div><dt>Demand</dt><dd>{fmt(now.regions.NZ.demand)}<small>MW</small></dd></div>
 		<div><dt>Price</dt><dd class="pr"><span><b>HAY</b>{money(now.regions.NI.price ?? 0)}</span><span><b>BEN</b>{money(now.regions.SI.price ?? 0)}</span></dd></div>
-		<div><dt>HVDC</dt><dd>{fmt(Math.abs(hv) * link)}<small>MW {dir}</small></dd></div>
+		<div><dt>HVDC</dt><dd>{fmt(Math.abs(hv))}<small>MW {dir}</small></dd></div>
 	</dl>
 </div>
 

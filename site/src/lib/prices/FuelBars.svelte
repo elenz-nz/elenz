@@ -20,6 +20,8 @@
 
 <div class="fb">
 	<div class="rows">
+		<!-- a solid zero line where every bar starts, so the dashed average isn't read as zero (owner's report PRC-05) -->
+		<div class="zero" aria-hidden="true">{#if avg / top > 0.15}<span>$0</span>{/if}</div>
 		<div class="avg" style="left: calc(var(--lw) + (100% - var(--lw) - var(--rw)) * {Math.min(1, avg / top)})">
 			<span>Average {money(avg)}</span>
 		</div>
@@ -57,6 +59,8 @@
 	.chg .bar { background: repeating-linear-gradient(135deg, var(--c) 0 2px, transparent 2px 5px); box-shadow: inset 0 0 0 1px var(--c); }
 	.v, .p { text-align: right; font-family: var(--font-data); font-variant-numeric: tabular-nums; }
 	.p { color: var(--muted); font-size: 0.78rem; }
+	.zero { position: absolute; left: var(--lw); top: 18px; bottom: 0; width: 0; border-left: 1px solid var(--ink-2); z-index: 1; pointer-events: none; }
+	.zero span { position: absolute; top: -19px; transform: translateX(-50%); font-size: 0.72rem; font-family: var(--font-data); color: var(--muted); }
 	.avg { position: absolute; top: 18px; bottom: 0; width: 0; border-left: 1.5px dashed var(--ink-2); z-index: 1; pointer-events: none; }
 	.avg span { position: absolute; top: -19px; transform: translateX(-50%); white-space: nowrap; font-size: 0.72rem; font-family: var(--font-data); color: var(--ink-2); }
 	.row.on .nm { color: var(--ink); }

@@ -1,13 +1,14 @@
 <script lang="ts">
 	// One series' method: header and "Data used" from the registry, then the page's own body (#lib/methods/pages).
 	import Preview from '#lib/site/Preview.svelte';
-	import { TOPICS, body, longDate, reportHref, sourceHref, sourcesFor, topic } from '#lib/methods/registry.js';
+	import { TOPICS, body, longDate, refsFor, reportHref, sourceHref, sourcesFor, topic } from '#lib/methods/registry.js';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 	const t = $derived(topic(data.slug)!);
 	const Body = $derived(body(data.slug));
 	const used = $derived(sourcesFor(data.slug));
+	const refs = $derived(refsFor(data.slug));
 	const i = $derived(TOPICS.findIndex((x) => x.slug === data.slug));
 	const prev = $derived(i > 0 ? TOPICS[i - 1] : null);
 	const next = $derived(i < TOPICS.length - 1 ? TOPICS[i + 1] : null);
@@ -47,6 +48,20 @@
 	<div class="mt-body">
 		{#if Body}<Body />{/if}
 	</div>
+
+	{#if refs.length}
+		<section class="mt-data" aria-labelledby="mt-refs-h">
+			<h2 id="mt-refs-h">References</h2>
+			<ul>
+				{#each refs as r (r.id)}
+					<li>
+						<span class="nm"><a href={r.url} target="_blank" rel="noopener">{r.title}</a><small>{r.by}{r.date ? `, ${r.date}` : ''}</small></span>
+						<span class="use">{r.use}</span>
+					</li>
+				{/each}
+			</ul>
+		</section>
+	{/if}
 
 	<p class="mt-report">Spotted a problem with this page, or know a better source? <a href={reportHref(t.title, `/methods/${t.slug}`)}>Email us about it</a></p>
 

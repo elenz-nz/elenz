@@ -11,6 +11,7 @@
 	import ShareLink from '#lib/site/ShareLink.svelte';
 	import DownloadMenu from '#lib/site/DownloadMenu.svelte';
 	import { barHeight } from '#lib/site/sticky.js';
+	import { resetView } from '#lib/site/view.js';
 	import { FOLD_DEFAULT } from '#lib/site/viewurl.js';
 
 	type Meta = { intervals: number; expected: number; end: number; api_from: number | null; built: number };
@@ -48,6 +49,12 @@
 		const p = Object.fromEntries(new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', day: 'numeric', month: 'numeric', year: 'numeric' }).formatToParts(new Date(t)).map((x) => [x.type, x.value]));
 		return `${p.day} ${'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ')[+p.month - 1]} ${p.year}`;
 	};
+
+	// the chart notes (ⓘ) name the region and interval shown (owner's rules for notes, 1 Nov 2026)
+	const regionOf = $derived(({ NI: 'the North Island', SI: 'the South Island' } as Record<string, string>)[lower?.region] ?? 'New Zealand');
+	const regionPos = $derived(regionOf === 'New Zealand' ? "New Zealand's" : `${regionOf}'s`);
+	const island = $derived(lower?.region === 'NI' || lower?.region === 'SI');
+	const periodWord = $derived(({ '1d': 'day', '1w': 'week', '1mo': 'month', '1yr': 'year' } as Record<string, string>)[lower?.int] ?? '');
 
 	const age = $derived(meta ? (now - meta.end) / 60000 : 0);
 	const live = $derived(meta !== null && age < LIVE_MINUTES);
@@ -133,47 +140,57 @@
 <!-- each chart's ⓘ: what it shows and how it's made (the notes that used to sit under the charts) -->
 {#snippet chartInfo(id: string)}
 	{#if id === 'gen'}
+		<p>This shows where {regionPos} electricity came from over the dates chosen.</p>
 		<ul>
-			<li>Each source's output, stacked, or one line each with the chart buttons (to compare plants or fuels).</li>
-			<li>The live week is the market's 5-minute dispatch; history is metered output wherever the EA has published it (about six weeks behind).</li>
-			<li>Embedded solar (hatched) is estimated.</li>
-			<li>On one island's chart, HVDC arriving is stacked on top and HVDC leaving goes below zero, like battery charging.</li>
-			<li>$ Price adds the island reference prices on a right axis, spike-proof like the Prices tab.</li>
+			<li>Choose dates in the bar above or drag across the chart to zoom. Hover to read every source; click to pin the time line.</li>
+			<li>The menu beside the title changes the grouping. Click a name in the summary to drill down to its fuels and plants; Back steps out.</li>
+			<li>Chart buttons switch between MW and share, and between stacked and lines. “$ Price” adds the island price on a right-hand axis.</li>
+			{#if periodWord}<li>Each {periodWord} shows the energy produced, not average MW; a faded end is only partly covered.</li>{/if}
+			{#if island}<li>HVDC arriving sits on top. HVDC leaving and battery charging go below zero.</li>{/if}
+			<li>Embedded solar (yellow, hatched) is estimated. The live week is the market's 5-minute dispatch; earlier dates are metered output, which the EA publishes about six weeks behind.</li>
 		</ul>
 		<p id="gen-note" hidden></p>
 		<p><a href="/methods/generation">How generation is built</a></p>
 	{:else if id === 'price'}
+		<p>This shows the wholesale price of electricity at each island's reference point: Haywards for the North Island and Benmore for the South.</p>
 		<ul>
-			<li>Spot prices at the island reference nodes, Haywards (North Island) and Benmore (South Island).</li>
-			<li>Dispatch prices for the live week, the EA's final prices for history.</li>
-			<li>Long ranges show averages; the Prices tab has the spread and the spikes.</li>
+			<li>Prices are in $/MWh. $100/MWh is 10c a kWh, before lines and retail charges.</li>
+			{#if periodWord}<li>Each point is the {periodWord}'s average.</li>{/if}
+			<li>The live week uses 5-minute dispatch prices; earlier dates use the EA's final prices, published the next day.</li>
+			<li>The Prices tab has six nodes, the island spread, price spikes and prices by time of day.</li>
 		</ul>
 		<p><a href="/methods/prices">How prices are shown</a></p>
 	{:else if id === 'demand'}
+		<p>This shows how much electricity {regionOf} used over the dates chosen.</p>
 		<ul>
-			<li>Solid: electricity taken from the grid.</li>
-			<li>Dashed: with estimated embedded solar added back, closer to what was actually used (the band is its uncertainty).</li>
-			<li>Long ranges show averages; the summary gives each day's peak.</li>
+			<li>Solid line: electricity taken from the national grid, Tiwai smelter included.</li>
+			<li>Dashed line: with estimated embedded solar added back, closer to what homes and businesses actually used. The band around it is its uncertainty.</li>
+			{#if periodWord}<li>The summary gives each day's peak half-hour.</li>{/if}
 		</ul>
 		<p><a href="/methods/demand">How demand is worked out</a></p>
 	{:else if id === 'hvdc'}
+		<p>This shows power flowing between the islands on the HVDC link, which runs from Benmore to Haywards.</p>
 		<ul>
-			<li>Transfer between Benmore and Haywards, northward positive.</li>
-			<li>Metered once the EA publishes it, about two weeks after each month.</li>
-			<li>Before that, estimated from each island's generation and demand (about 10 MW out on average).</li>
+			<li>Above zero: flowing north. Below zero: flowing south.</li>
+			<li>Metered once the EA publishes it, about two weeks after each month ends.</li>
+			<li>Newer dates are estimated from each island's generation and demand, usually within about 10 MW.</li>
 		</ul>
 		<p><a href="/methods/hvdc">How HVDC is worked out</a></p>
 	{:else if id === 'co2'}
+		<p>This shows how much greenhouse gas {regionPos} electricity released for each unit generated. Lower is cleaner.</p>
 		<ul>
-			<li>Grams of CO₂-equivalent for each kWh generated: each plant's output times its fuel's emission factor.</li>
-			<li>Huntly's Rankine units at Genesis's quarterly coal share.</li>
-			<li>Each geothermal station at its own factor.</li>
+			<li>Grams of CO₂-equivalent per kWh: each plant's output times its fuel's emission factor, divided by all generation.</li>
+			<li>Huntly's Rankine units can burn coal or gas, so they use Genesis's quarterly coal share.</li>
+			<li>Each geothermal station has its own factor.</li>
+			<li>Battery output is left out, as it stores power made elsewhere.</li>
 		</ul>
 		<p><a href="/methods/emissions">How emissions are worked out</a></p>
 	{:else}
+		<p>This shows how much of {regionPos} electricity came from renewable sources such as hydro, geothermal, wind and solar.</p>
 		<ul>
-			<li>Renewable output as a share of all generation, embedded solar included.</li>
-			<li>Geothermal counts as renewable, although it emits some CO₂.</li>
+			<li>Embedded solar is included.</li>
+			<li>Geothermal counts as renewable, although it releases some CO₂.</li>
+			<li>Battery output is left out, as it stores power made elsewhere.</li>
 		</ul>
 		<p><a href="/methods/groupings#renewable">How shares are worked out</a></p>
 	{/if}
@@ -206,6 +223,8 @@
 	<title>Tracker · ELENZ</title>
 	<meta name="description" content="New Zealand's electricity generation by fuel, plant, owner or hydro scheme, with wholesale prices, demand, HVDC transfer and emissions, from the last 24 hours back to 1997." />
 	<Preview title="Electricity generation, prices and demand · ELENZ Tracker" description="New Zealand's electricity generation by fuel, plant, owner or hydro scheme, with wholesale prices, demand, HVDC transfer and emissions, from the last 24 hours back to 1997." path="/tracker" />
+	<!-- with JavaScript off, a plain line instead of empty charts and "Loading" (owner's report RES-04, 2 Nov 2026) -->
+	{@html '<noscript><style>.toolbar, .layout, .status, .lower { display: none !important; }</style></noscript>'}
 </svelte:head>
 
 <div class="wrap wide">
@@ -269,11 +288,12 @@
 			</div>
 		</div>
 		<div class="ctl">
-			<label for="in-date" id="lb-date">24 hours ending</label>
+			<span id="lb-date" class="ctl-lbl">24 hours ending</span>
 			<div class="datebox">
 				<button type="button" class="step" id="tb-prev" aria-label="Previous 24 hours"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
-				<input type="date" id="in-date" title="Shows the selected range ending on this date" />
-				<input type="time" id="in-time" step="300" aria-label="Ending at (NZ time)" title="Shows the zoomed hours ending at this time (NZ time)" hidden />
+				<!-- the site's own calendar (#lib/site/datepick.js, TRK-07), not the browser's -->
+				<date-pick id="in-date" aria-labelledby="lb-date" title="Shows the selected range ending on this date"></date-pick>
+				<time-pick id="in-time" aria-label="Ending at (NZ time)" title="Shows the zoomed hours ending at this time (NZ time)" hidden></time-pick>
 				<button type="button" class="step" id="tb-next" aria-label="Next 24 hours"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 				<button type="button" class="latest" id="btn-latest" title="Back to the latest data" hidden><svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 3 5 5-5 5M12 3v10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>Latest</button>
 			</div>
@@ -281,6 +301,11 @@
 		<button type="button" class="zoom-chip" id="zoom-reset" title="Back to the whole range (Escape)" hidden>
 			<svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="m10.5 10.5 3.5 3.5M5 7h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
 			<span id="zoom-txt"></span><b>Reset zoom</b>
+		</button>
+		<!-- the pinned time, the one place it's named; a tap lets it go (tracker.js syncPinChip, ZM-02) -->
+		<button type="button" class="zoom-chip pin-chip" id="pin-chip" title="Let go of the pinned time (Escape)" hidden>
+			<svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8v12.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /><circle cx="8" cy="5" r="2.4" fill="currentColor" /></svg>
+			<span>Pinned</span><b id="pin-chip-txt"></b><span class="pin-x" aria-hidden="true">×</span><span class="vh">: let go</span>
 		</button>
 	</nav>
 	<!-- the 1D menu sits outside the sticky bar, which clips anything hanging below it; placed by tracker.js -->
@@ -294,7 +319,7 @@
 		<span class="span-tip">Or drag across any chart to zoom</span>
 	</div>
 
-	<noscript><p class="notice">The charts need JavaScript turned on.</p></noscript>
+	<noscript><p class="notice">The charts need JavaScript turned on. <a href="/methods">Data and methods</a> and <a href="/about">About</a> work without it.</p></noscript>
 
 	<div class="layout">
 		<!-- The chart panel takes arrow keys to move the time cursor, so it needs to be focusable. -->
@@ -386,36 +411,30 @@
 					<div>
 						<div class="sum-when" id="sum-when"></div>
 						<div class="sum-sub" id="sum-sub"></div>
-						<div class="sum-pin" id="sum-pin" hidden>Pinned <button type="button" id="sum-unpin">Release</button></div>
-					</div>
+						</div>
 					<button type="button" class="ctl-btn" bind:this={helpBtn} aria-expanded={helpOpen} aria-controls="sum-help" title="Everything the charts and this list can do" onclick={() => (helpOpen = !helpOpen)}>
 						<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h7M12 4h2M2 12h3M8 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /><circle cx="10.5" cy="4" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /><circle cx="6.5" cy="12" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>Controls
 					</button>
 				</div>
 				<div class="help" id="sum-help" role="note" hidden={!helpOpen}>
-					<dl>
-						<dt>Read a time</dt>
-						<dd>Hover a chart, or touch and slide on a phone. With a chart focused, ← → move one point (Shift: further), Home and End jump to the ends.</dd>
-						<dt>Pin it</dt>
-						<dd>Click a chart to hold the time line there; click it again, Release or Escape to let go. It stays put when you change the grouping, region or chart type. On a phone the line stays where your finger lifts; tap it again to let go. Share can then mark that time.</dd>
-						<dt>Move through history</dt>
-						<dd>Range, interval and region are in the bar at the top. The ‹ › arrows beside the date, on the generation chart, or Page Up and Page Down step back and forward by the range; the date box jumps to a day; Latest comes back.</dd>
-						<dt>Zoom in</dt>
-						<dd>Drag across any chart to zoom into that stretch; every chart follows. The arrow beside 1D picks the last 1, 3, 6 or 12 hours. While zoomed, the date box gains a time: pick the date and time the zoomed hours should end (NZ time) to move them there, or the ‹ › arrows step by the zoom’s length; Reset zoom in the bar (or Escape twice) shows the whole range again.</dd>
-						<dt>Break it down</dt>
-						<dd>Select a name in this list to go from a fuel to its plants and their grid connections. ‹ Back above the list, or the browser’s Back, steps out. The menu above the generation chart groups it other ways (owner, site, flexibility…), and MW/% switches to shares.</dd>
-						<dt>Compare sources</dt>
-						<dd>The two chart buttons beside MW/% switch the generation chart between stacked areas and lines, one per source, so plants or fuels can be compared on one scale: drill into a fuel or choose By site, then hide what you don’t need or use “show only this”. Up to eight lines get their own colours. $ Price draws the island prices over the chart on a right axis (spike-proof: linear to about $100, compressed above); select it again to take them off.</dd>
-						<dt>Hide and show</dt>
-						<dd>Select a colour square to hide that layer. Double-click it, Shift+click it or press and hold it to show only that one (again to show everything); All and None above the list do the rest. In long lists, type in Filter, and select a fuel heading to fold its plants.</dd>
-						<dt>Open more charts</dt>
-						<dd>The charts under generation start folded to one line each: its value at the time line, or for the whole range when nothing is selected. Select a title to open that chart, and again to fold it. Price can also go over the generation chart ($ Price), and the share card further down charts the renewable share.</dd>
-						<dt>Enlarge, share, download</dt>
-						<dd>The corner button on each chart enlarges it, and ⓘ beside it says what the chart shows and how it’s made. Share copies a link to this view, live or for the dates shown; Download gives the charts as a picture or the data as a spreadsheet file. The address always holds the whole view, so it can be bookmarked.</dd>
-					</dl>
-					<p><a href="/methods">How the figures are worked out</a></p>
+					<button type="button" class="reset-view" title="Forget this browser's saved views and go back to the default charts on both tracker tabs" onclick={resetView}>Reset charts to default</button>
+					<!-- what works across the tab, one line each; each chart's own ⓘ says what it shows, and /guide#generation has the
+					     full descriptions (owner's reports GRP-06, CHT-13) -->
+					<p>These work across every chart on this tab. The ⓘ beside a chart's title says what that chart shows.</p>
+					<ul>
+						<li><b>Hover or touch a chart:</b> this list shows that time.</li>
+						<li><b>Click or tap a chart:</b> pins the time. ← → move it, with Shift to go further. Click it again, or use the Pinned chip or Escape, to let go.</li>
+						<li><b>Range buttons:</b> open around a pinned or zoomed time.</li>
+						<li><b>‹ › and the date:</b> move through history. Latest comes back to now.</li>
+						<li><b>Drag across a chart:</b> zooms in. The arrow beside 1D picks recent hours, and Reset zoom goes back.</li>
+						<li><b>A name in this list:</b> breaks it down into plants and units. ‹ Back steps out.</li>
+						<li><b>Colour squares:</b> hide a layer. Double-click, Shift-click or press and hold shows only that one.</li>
+						<li><b>Chart titles:</b> open or fold the charts under generation.</li>
+					</ul>
+					<p><a href="/guide#generation">Every control in detail</a> · <a href="/methods">How the figures are worked out</a></p>
 				</div>
 				<div class="sum-level" id="sum-level" hidden><span id="sum-level-txt"></span><button type="button" class="back" id="sum-back">‹ Back</button></div>
+				<div class="plant-note" id="plant-note" hidden></div>
 				<input type="search" class="mix-filter" id="mix-filter" aria-label="Filter the list" placeholder="Filter" hidden />
 				<div class="mix-tools" id="mix-tools" role="group" aria-label="Show in the chart" hidden><span>Show</span><button type="button" id="mix-all">All</button><button type="button" id="mix-none">None</button></div>
 				<table class="mix">

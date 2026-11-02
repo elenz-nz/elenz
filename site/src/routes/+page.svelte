@@ -15,6 +15,7 @@
 	import RecordsPeek from '#lib/landing/RecordsPeek.svelte';
 	import HeroBackdrop from '#lib/landing/HeroBackdrop.svelte';
 	import Handoff from '#lib/landing/Handoff.svelte';
+	import { peekLink } from '#lib/landing/build.svelte.js';
 	import { Tween } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
 	import { fly } from 'svelte/transition';
@@ -116,6 +117,8 @@
 	<title>ELENZ · New Zealand's electricity</title>
 	<meta name="description" content="New Zealand's electricity, live: the generation mix and renewable share now, and a tracker of generation, prices, demand and the HVDC link back to 1997." />
 	<Preview title="ELENZ · New Zealand's electricity, live" description="New Zealand's electricity, live: the generation mix and renewable share now, and a tracker of generation, prices, demand and the HVDC link back to 1997." path="/" />
+	<!-- with JavaScript off, a plain line instead of "Loading", and no empty previews (owner's report RES-04, 2 Nov 2026) -->
+	{@html '<noscript><style>.js-only, .pages-list .window { display: none !important; }</style></noscript>'}
 </svelte:head>
 
 <div class="wrap">
@@ -152,7 +155,8 @@
 						<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {when(now.end)}</span>
 					{/if}
 				{:else}
-					<p class="sub" role="status">{error || 'Loading the latest data…'}</p>
+					<p class="sub js-only" role="status">{error || 'Loading the latest data…'}</p>
+					<noscript><p class="sub">The live figures need JavaScript turned on. <a href="/methods">Data and methods</a> and <a href="/about">About</a> work without it.</p></noscript>
 				{/if}
 			</div>
 
@@ -168,7 +172,7 @@
 						<p>{p.blurb}</p>
 						<a class="go" href={p.href}>Open {p.name} →</a>
 					</div>
-					<a class="window" href={p.window?.href ?? p.href} aria-label={p.window?.label ?? `Open ${p.name}`} tabindex="-1">
+					<a class="window" href={p.window?.href ?? (p.href === '/records' && peekLink.rec ? peekLink.rec : p.href)} aria-label={p.window?.label ?? (p.href === '/records' && peekLink.rec ? 'Open the record shown' : `Open ${p.name}`)} tabindex="-1">
 						<span class="view">
 							{#if D && now}<Peek {D} {now} />{:else}<span class="ph">{error ? 'Preview unavailable' : 'Loading…'}</span>{/if}
 						</span>
@@ -250,5 +254,23 @@
 		.sub { font-size: 0.98rem; }
 		.hero { min-height: clamp(480px, calc(100svh - 64px), 760px); }
 		.live-fig { margin-top: 30px; }
+	}
+	/* a phone on its side (a short, wide screen): the compact logo and a figure sized to the height, so the first screen
+	   fits, and previews no taller than the screen (owner's report HOME-06, 29 Oct 2026) */
+	@media (max-height: 520px) and (orientation: landscape) {
+		.hero { min-height: calc(100svh - 56px); gap: 2px; padding-block: 4px 0; }
+		.brand { flex-direction: row; gap: 12px; }
+		.brand :global(svg) { width: 40px; height: 40px; }
+		.word { font-size: 1.8rem; }
+		.tagline { margin-top: 2px; font-size: 0.9rem; }
+		.live-fig { margin-top: 14px; gap: 6px; }
+		.big .fig { font-size: clamp(2.8rem, 16vh, 4.4rem); }
+		.big .u { font-size: 1.2rem; }
+		.sub { font-size: 0.95rem; }
+		.horizon { padding-top: 14px; min-height: 70px; }
+		.pg-text h2 { font-size: 1.6rem; }
+		.pg + .pg { margin-top: 64px; padding-top: 64px; }
+		.view { min-height: 0; }
+		.view :global(svg) { max-height: calc(100svh - 110px); }
 	}
 </style>

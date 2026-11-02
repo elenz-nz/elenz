@@ -4,6 +4,7 @@
 	// links(): from the page (#lib/site/view.js shareLinks), read when the panel opens. On phones the system share
 	// sheet opens; elsewhere the link is copied, or shown to copy by hand if the browser won't allow that.
 	import { tick } from 'svelte';
+	import CopyLink from './CopyLink.svelte';
 
 	type Links = { live: string | null; point: number | null; pointLabel: string | null; fixed: (mark?: boolean) => { url: string; span: string | null } | null };
 	let { links }: { links: () => Links | null } = $props();
@@ -13,6 +14,7 @@
 	let mark = $state(true);
 	let done = $state('');       // which link was just copied
 	let manual = $state('');     // a link the browser wouldn't copy: shown to copy by hand
+	let why = $state('');        // why the share sheet didn't open (the browser's error name), for the owner's retests
 	let btn = $state<HTMLButtonElement>(), pop = $state<HTMLDivElement>();
 	let timer: ReturnType<typeof setTimeout> | undefined;
 
@@ -23,24 +25,37 @@
 	async function toggle() {
 		if (open) { open = false; return; }
 		L = links();
-		mark = true; done = ''; manual = '';
+		mark = true; done = ''; manual = ''; why = '';
 		open = true;
 		await tick();
 		pop?.querySelector<HTMLButtonElement>('.sh-go')?.focus();
 	}
+	// the share sheet, else the clipboard; when the browser refuses either (Firefox on Android, SHR-03), the link is
+	// shown with its own Copy button: the share's failure used up the tap, and a new tap may write the clipboard
 	async function send(url: string, key: string) {
+		manual = '';
 		if (canShare) {
-			try { await navigator.share({ title: document.title, url }); return; }
-			catch (e: any) { if (e?.name === 'AbortError') return; }   // cancelled; otherwise fall back to copying
+			// shaped like the record pages' share, which Firefox on Android opens (owner's retest, 31 Oct 2026: there the
+			// tracker's title-and-link share fell back to the link): a line of text, the title and the link
+			const data = { title: document.title, text: document.title.replace(/ · ELENZ$/, ''), url };
+			try {
+				if (navigator.canShare && !navigator.canShare(data)) throw Object.assign(new Error('refused'), { name: 'CanShareFalse' });
+				await navigator.share(data); return;
+			}
+			catch (e: any) {
+				if (e?.name === 'AbortError') return;
+				// Firefox on Android never settles a share sent to an app, so every later share is refused as "already
+				// in progress" until the page reloads (owner's retest, 31 Oct 2026). It refuses before using up the tap,
+				// so the link can still be copied: do that, as on a computer
+				if (e?.name !== 'InvalidStateError') { why = e?.name || 'Error'; manual = url; return; }
+			}
 		}
 		try {
 			await navigator.clipboard.writeText(url);
-			done = key; manual = '';
+			done = key;
 			clearTimeout(timer); timer = setTimeout(() => (done = ''), 2000);
 		} catch {
 			manual = url;
-			await tick();
-			pop?.querySelector<HTMLInputElement>('.sh-manual')?.select();
 		}
 	}
 	function outside(e: Event) {
@@ -80,7 +95,7 @@
 			{/if}
 		{/if}
 		{#if manual}
-			<label class="sh-man">Copy this link:<input class="sh-manual" readonly value={manual} onfocus={(e) => e.currentTarget.select()} /></label>
+			<div class="sh-man"><span>Copy this link:{#if why} <small class="sh-why">(share sheet: {why})</small>{/if}</span><CopyLink url={manual} /></div>
 		{/if}
 	{/if}
 </div>
@@ -96,6 +111,6 @@
 	.sh-go:hover { background: var(--accent-soft); border-color: var(--accent); }
 	.sh-mark { display: flex; align-items: center; gap: 7px; font-size: 0.8rem; color: var(--ink-2); margin-top: -4px; cursor: pointer; }
 	.sh-mark input { accent-color: var(--accent); margin: 0; }
+	.sh-why { color: var(--muted); font-size: 0.72rem; }
 	.sh-man { display: grid; gap: 4px; font-size: 0.78rem; color: var(--ink-2); }
-	.sh-man input { font: 0.76rem var(--font-data); padding: 5px 6px; border: 1px solid var(--line); border-radius: 3px; background: var(--bg); color: var(--ink); width: 100%; box-sizing: border-box; }
 </style>

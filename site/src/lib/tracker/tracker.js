@@ -4,10 +4,13 @@
 import { FUELS } from './fuels.js';
 import { efAt, plantEf, BY_PLANT } from './emissions.js';
 import { onDateSettled, onTimeSettled } from '../site/datefield.js';
+import '../site/datepick.js';   // <date-pick>: the date box's calendar (TRK-07)
+import '../site/timepick.js';   // <time-pick>: the time box while zoomed (ZM-03)
 import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTotal } from './series.js';
-import PLANT_META from './plants.json';  // owner and hydro scheme per plant (ingest/plant_meta.py)
+import PLANT_META from './plants.json';  // owner, hydro scheme, other names and metering note per plant (ingest/plant_meta.py)
 import CAPACITY from './capacity.json';   // installed MW per plant (ingest/capacity.py)
-import { readView, writeView, slug, describe, shareLinks, setTitle } from '#lib/site/view.js';
+import { readView, writeView, slug, describe, shareLinks, setTitle, addYears } from '#lib/site/view.js';
+import { squareButton as squareWire, SWATCH_TITLE } from '#lib/site/swatch.js';
 import { readQuery, stamp, fromStamp, FOLDABLE, FOLD_DEFAULT, foldList } from '#lib/site/viewurl.js';
 import { priceScale } from '#lib/prices/data.js';
 import { fit } from '#lib/site/fitselect.js';
@@ -67,24 +70,28 @@ export function mountTracker(D, hooks = {}) {
     flex: { groups: [
       { ...one('geo'), name: 'Inflexible', f: ['geo', 'bio', 'waste'] },   // geothermal runs flat out; cogeneration follows its mill or steelworks
       { ...one('coal'), name: 'Slow flexible' },    // Huntly's Rankine units: hours to start, slow to ramp
-      { id: 'fast', name: 'Fast flexible', tok: '--g-fast', f: ['gas', 'diesel', 'hydro'] },
+      { id: 'fast', name: 'Fast flexible', tok: '--g-fast', f: ['gas', 'diesel', 'hydro', 'batt'] },
       VRE('Variable'),
     ] },
     rf: { groups: [REN, FOSSIL('Fossils')] },
     // views built from plants rather than fuels (see plantSets below)
     site: { by: 'site' }, scheme: { by: 'scheme' }, owner: { by: 'owner' },
     // inverter-based generation (wind and solar) against the synchronous machines (hydro, geothermal, thermal)
-    vre: { groups: [{ id: 'resid', name: 'Synchronous', tok: '--g-resid', f: ['geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro'] }, VRE('Inverter-based')] },
+    vre: { groups: [{ id: 'resid', name: 'Synchronous', tok: '--g-resid', f: ['geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro'] }, { ...VRE('Inverter-based'), f: ['wind', 'solar', 'roof', 'batt'] }] },
   };
   const SIGNED = FUELS.filter(f => f.signed).map(f => f.k);
   // what each grouping shows, in a note under the generation chart
   // one line under the generation chart for the groupings that need it; the full definitions are on /methods/groupings
   const NOTES = {
+    // every grouping has one (owner's call, 1 Nov 2026)
+    detailed: "Each fuel on its own: geothermal, bioenergy, waste heat, coal/gas (Huntly's Rankine units), gas, diesel, hydro, wind, grid solar, embedded solar and batteries.",
+    site: 'Every plant as its own layer, largest first; batteries by site and embedded solar by island.',
+    scheme: 'Hydro only, by river scheme (Waikato, Waitaki, Clutha, Manapōuri and the rest), the largest at the base.',
     simple: 'Five groups: geothermal, thermal, hydro, wind, and solar (grid-scale and embedded together).',
     flex: 'Grouped by how readily each fuel can follow demand: inflexible, slow, fast and variable.',
     rf: 'Renewables against fossil fuels. Geothermal counts as renewable, although it emits some CO₂.',
-    vre: 'Wind and solar, connected through inverters, against spinning hydro, geothermal and thermal plant.',
-    owner: "Today's owners, applied to the whole history.",
+    vre: 'Wind, solar and batteries, connected through inverters, against spinning hydro, geothermal and thermal plant.',
+    owner: "Today's owners, applied to the whole history. Batteries count with their owner, with charging as one layer below zero.",
   };
   const groupById = id => (VIEWS[state.view].groups || []).find(g => g.id === id) || setById(id);
 
@@ -95,9 +102,15 @@ export function mountTracker(D, hooks = {}) {
   const OWNERS = ['Genesis', 'Meridian', 'Contact', 'Mercury', 'Nova', 'Other generators'];
   const hydroOnly = () => VIEWS[state.view].by === 'scheme';
   const topIsAll = () => level() === 'top' && !hydroOnly();  // shares of all generation (not just the layers shown)
-  const ownerOf = p => PLANT_META[p.name]?.owner || 'Other generators';
+  const ownerOf = p => { const o = PLANT_META[p.name]?.owner; return OWNERS.includes(o) ? o : 'Other generators'; };
   const schemeOf = p => PLANT_META[p.name]?.scheme || 'Other hydro';
-  const SITE_SHARE = 0.95, SITE_MAX = 12;  // by site: the plants making up 95% of each fuel (at most 12) get their own layer
+  // other names a plant has had or goes by ([plant_aka] and the register names of a station shown whole): the list's
+  // filter finds a plant by them, and its drill-down lists them with what its metered history counts ([plant_metering])
+  const akaOf = name => PLANT_META[name]?.aka || [];
+  const meteredOf = name => PLANT_META[name]?.metered || '';
+  // by site: every plant its own layer, so the list has every site (owner's report GRP-03, 28 Oct 2026; it was the
+  // plants making up 95% of each fuel, at most 12, and an "Other ..." row)
+  const SITE_SHARE = Infinity, SITE_MAX = Infinity;   // (idle ones too, at the foot of their fuel)
   const energy = p => {  // MWh over the view, cached per view
     const cache = V.energy || (V.energy = new Map());
     if (!cache.has(p)) { const a = V.avg(p.s); let e = 0; for (let j = 0; j < V.n; j++) e += a[j] * V.hrs[j]; cache.set(p, e); }
@@ -115,8 +128,10 @@ export function mountTracker(D, hooks = {}) {
       }
       sets.sort((a, b) => (a.name === 'Other hydro') - (b.name === 'Other hydro') || b.cap - a.cap);
     } else if (by === 'owner') {
+      // batteries count with their owner (discharge only; charging is one layer below zero: owner's call, 30 Oct 2026)
+      const withBatt = M.plants.filter(p => (p.fuel === 'batt' || !FUEL[p.fuel].signed) && (r === 'NZ' || p.isl === r));
       OWNERS.forEach((o, i) => {
-        const ps = regional.filter(p => ownerOf(p) === o);
+        const ps = withBatt.filter(p => ownerOf(p) === o);
         if (ps.length) sets.push({ id: 'o:' + o, name: o, tok: `--o${i + 1}`, plants: ps });
       });
     } else if (by === 'site') {
@@ -197,12 +212,16 @@ export function mountTracker(D, hooks = {}) {
   // a link's drill-down and point wait for the window they belong to: a long range or past date loads its history
   // first (a retired plant is only in the history), so they're applied by the rebuild after that (waiting: until then)
   let linked = init.link && (q.group || q.fuel || q.plant || init.t != null) ? { group: q.group, fuel: q.fuel, plant: q.plant, t: init.t } : null;
+  // a link's hidden layers (off=wind,solar), applied by the first rebuild whose list has them (owner's report SHR-07, 1 Nov 2026)
+  let linkedOff = init.link && q.off ? new Set(q.off) : null;
   let waiting = !!saved;
   // the drill-down in the address: plants and plant sets (scheme, owner, other plants of a fuel) by slug
   const groupKey = id => id == null ? null : /^[sox]:/.test(id) ? slug(id.slice(2)) : id;
+  // the layers switched off, by name, while their list is built; a link's own until then
+  const offNow = () => linkedOff ? [...linkedOff] : V?.layers ? V.layers.filter(x => state.hidden.has(x.id)).map(x => slug(x.name)) : [];
   const ownQuery = () => {
     const d = state.drill, l = linked;
-    return { by: state.view, unit: state.unit, chart: state.chart, price: state.price ? 'on' : null, fold: foldList([...state.fold]), zoom: state.zoom, ...(l ? { group: l.group, fuel: l.fuel, plant: l.plant }
+    return { by: state.view, unit: state.unit, chart: state.chart, price: state.price ? 'on' : null, fold: foldList([...state.fold]), zoom: state.zoom, off: offNow(), ...(l ? { group: l.group, fuel: l.fuel, plant: l.plant }
       : { group: groupKey(d.group), fuel: d.fuel, plant: d.plant ? slug(d.plant) : null }) };
   };
   const shared = () => ({ region: state.region, range: state.range, int: state.intPicked ? state.int : null, end: state.end });
@@ -233,7 +252,7 @@ export function mountTracker(D, hooks = {}) {
       || `${DOW[p.dow]} ${p.dom} ${MON[p.mon]}${state.end != null && p.y !== lp(models.live.END).y ? ' ' + p.y : ''}, ${clock(p)}`;
   }
   // the live week's interpolated intervals, named in the summary heading: " · interpolated" for a 5-minute point,
-  // " · 2 of 6 intervals interpolated" for a half-hour of the live week (history's half-hours average what was published)
+  // " · 2 of 6 interpolated" (5-minute intervals) for a half-hour of the live week (history's half-hours average what was published)
   function filledNote(t) {
     const F = models.live.filled;
     if (!F || !F.size) return '';
@@ -241,17 +260,25 @@ export function mountTracker(D, hooks = {}) {
     if (state.kind !== 'live' && !(t >= models.live.t[0])) return '';
     let k = 0;
     for (let i = 0; i < 6; i++) if (F.has(t + i * 3e5)) k++;
-    return k === 6 ? ' · interpolated' : k ? ` · ${k} of 6 intervals interpolated` : '';
+    return k === 6 ? ' · interpolated' : k ? ` · ${k} of 6 interpolated` : '';
   }
   // a partial first or last period: what the faded part of the generation chart is
+  // Drawn as the energy it holds, so it steps down, washed out (owner's call TRK-04, 31 Oct 2026: honest rather than
+  // scaled up to a whole period); the tooltip says how much of the period that is.
   function partialNote(j) {
     if (!isLong() || !V.n) return '';
     const word = { '1d': 'day', '1w': 'week', '1mo': 'month', '1yr': 'year' }[state.int] || 'period';
-    const rate = energyMode() ? `, drawn at its rate ${j === V.n - 1 && V.partialCut ? 'over the days shown' : 'so far'} for a whole ${word}` : '';
-    if (j === V.n - 1 && V.partial) return `Partial ${word}: ${partialTo()}${rate}`;
-    if (j === 0 && V.partialFirst) { const p = lp(V.t[0]); return `Partial ${word}: from ${p.dom} ${MON[p.mon]} ${p.y}${rate}`; }
+    const p = lp(V.t[j]);
+    const whole = { '1w': 7, '1mo': new Date(Date.UTC(p.y, p.mon + 1, 0)).getUTCDate(), '1yr': (p.y % 4 === 0 && p.y % 100 !== 0) || p.y % 400 === 0 ? 366 : 365 }[state.int];
+    const have = Math.round(V.hrs[j] / 24);
+    const share = whole && have < whole ? ` (${have} of ${whole} days)` : '';
+    const what = energyMode() ? ` · energy ${j === V.n - 1 && !V.partialCut ? 'so far' : 'for those days only'}` : '';
+    if (j === V.n - 1 && V.partial) return `Part ${word}: ${partialFrom(j)}${partialTo()}${share}${what}`;
+    if (j === 0 && V.partialFirst) return `Part ${word}: from ${p.dom} ${MON[p.mon]} ${p.y}${share}${what}`;
     return '';
   }
+  // where a partial last period's data starts: its own start, or the window's for a cut first period
+  const partialFrom = j => { const p = lp(V.t[j]); return `${p.dom} ${MON[p.mon]} `; };
   // where the last period's data stops: the newest data, or the end of a past window
   const partialTo = () => { const p = lp(V.partialTo); return `to ${p.dom} ${MON[p.mon]}${V.partialCut ? ' ' + p.y : ''}`; };
   function heading(j) {
@@ -317,7 +344,8 @@ export function mountTracker(D, hooks = {}) {
     if (state.end != null) {
       // [end − range, end); daily points sit at local midnight, which moves an hour at the clock changes
       stop = firstAtOrAfter(M.t, state.end);
-      start = firstAtOrAfter(M.t, state.end - R.days * DAY - (daily ? 2 * 36e5 : 0));
+      // whole local days back, so a clock change inside the window doesn't add an hour of the day before (CHT-10)
+      start = firstAtOrAfter(M.t, moveBack(state.end, R) - (daily ? 2 * 36e5 : 0));
     } else if (state.kind === 'live') start = Math.max(0, M.N - R.n);
     else if (R.days) start = firstAtOrAfter(M.t, M.END - R.days * DAY + (daily ? 36e5 : 0));
     // the zoom: part of the window ([zf, zt), times); ignored if it would leave fewer than two points
@@ -388,6 +416,13 @@ export function mountTracker(D, hooks = {}) {
     return { id: k, name: k === 'hvdc' ? 'HVDC transfer' : f.name, tok: f.tok, hatch: f.hatch ? k : null, tag: f.tag,
              signed: !!f.signed, s: V.fuels[k], drill: plantsFor(k).length ? { group, fuel: k, plant: null } : null };
   }
+  // batteries charging (below zero), for groupings that count their discharge inside a group (Flexibility,
+  // Inverter vs synchronous, By owner; owner's call, 30 Oct 2026)
+  function chargingLayer() {
+    const a = V.fuels.batt, s = new Float64Array(V.n);
+    for (let j = 0; j < V.n; j++) s[j] = Math.min(0, a[j]);
+    return { ...fuelLayer('batt', null), id: 'batt-c', name: 'Battery charging', signed: true, s };
+  }
   function relayer() {
     const r = state.region, d = state.drill, L = [], groups = VIEWS[state.view].groups;
     if (d.plant) {
@@ -409,14 +444,14 @@ export function mountTracker(D, hooks = {}) {
         : (a, b) => FUELS.findIndex(f => f.k === a.fuel) - FUELS.findIndex(f => f.k === b.fuel) || bySize(a, b);
       for (const p of [...set.plants].sort(order)) {
         const i = seen[p.fuel] = (seen[p.fuel] ?? -1) + 1;
-        L.push({ id: 'p:' + p.name, name: p.name, tok: FUEL[p.fuel].tok, shade: i, section: set.fuel ? null : p.fuel, s: V.avg(p.s), plant: p,
+        L.push({ id: 'p:' + p.name, name: p.name, tok: FUEL[p.fuel].tok, shade: i, section: set.fuel ? null : p.fuel, s: V.avg(p.s), plant: p, signed: !!FUEL[p.fuel].signed,
                  drill: { group: d.group, fuel: null, plant: p.name } });
       }
     } else if (d.group) {
       for (const k of groupById(d.group).f) if (present[r].includes(k)) L.push(fuelLayer(k, d.group));
     } else if (VIEWS[state.view].by) {
       const by = VIEWS[state.view].by, sets = V.sets || (V.sets = plantSets());
-      const sum = ps => { const o = new Float64Array(V.n); for (const p of ps) { const a = V.avg(p.s); for (let j = 0; j < V.n; j++) o[j] += a[j]; } return o; };
+      const sum = ps => { const o = new Float64Array(V.n); for (const p of ps) { const a = V.avg(p.s), pos = FUEL[p.fuel].signed; for (let j = 0; j < V.n; j++) o[j] += pos ? Math.max(0, a[j]) : a[j]; } return o; };
       const setLayer = (x, shadeIx) => ({ id: x.id, name: x.name, tok: x.tok || FUEL[x.fuel].tok, shade: shadeIx, section: by === 'site' ? x.fuel : null,
                                           s: sum(x.plants), drill: { group: x.id, fuel: null, plant: null }, count: x.plants.length });
       if (by === 'owner') {
@@ -424,13 +459,21 @@ export function mountTracker(D, hooks = {}) {
         if (present[r].includes('roof')) L.push({ ...fuelLayer('roof', null), name: 'Embedded solar (homes, businesses, small farms)' });
       } else {
         for (const f of FUELS) {
-          if (f.signed || !present[r].includes(f.k)) continue;
+          if (!present[r].includes(f.k)) continue;
+          if (f.signed) {
+            // by site, each battery is a row under its fuel like any other plant, charging below zero (GRP-03)
+            if (by === 'site' && f.k === 'batt') plantsFor('batt').forEach((p, i) => L.push({ id: 'p:' + p.name, name: p.name, tok: f.tok, shade: i,
+              signed: true, section: f.k, s: V.avg(p.s), plant: p, drill: { group: null, fuel: null, plant: p.name } }));
+            continue;
+          }
           const mine = sets.filter(x => x.fuel === f.k);
           if (by === 'scheme') { if (f.k === 'hydro') mine.forEach((x, i) => L.push(setLayer(x, i))); continue; }
           if (by === 'site') {
             const small = new Set(mine.flatMap(x => x.plants));
             const ps = plantsFor(f.k).filter(p => !small.has(p));   // largest first (which plants get a row is by output)
-            if (!ps.length || f.k === 'roof') { L.push({ ...fuelLayer(f.k, null), section: f.k }); continue; }
+            if (!ps.length) { L.push({ ...fuelLayer(f.k, null), section: f.k }); continue; }
+            // embedded solar's rows are its islands (as when drilling into it), hatched as an estimate
+            if (f.k === 'roof') { ps.forEach((p, i) => L.push({ id: 'p:' + p.name, name: p.name, tok: f.tok, shade: i, section: f.k, s: V.avg(p.s), plant: p, hatch: 'roof', u: V.avg(p.u), drill: null })); continue; }
             ps.forEach((p, i) => L.push({ id: 'p:' + p.name, name: p.name, tok: f.tok, shade: i, section: f.k, s: V.avg(p.s), plant: p,
                                           drill: { group: null, fuel: null, plant: p.name } }));
             for (const x of mine) L.push({ ...setLayer(x, null), light: true });
@@ -439,7 +482,10 @@ export function mountTracker(D, hooks = {}) {
           L.push(fuelLayer(f.k, null));
         }
       }
-      if (!hydroOnly()) for (const k of SIGNED) if (present[r].includes(k)) L.push(fuelLayer(k, null));
+      if (!hydroOnly()) for (const k of SIGNED) if (present[r].includes(k)) {
+        if (k === 'batt' && by === 'site') continue;
+        L.push(k === 'batt' && by === 'owner' ? chargingLayer() : fuelLayer(k, null));
+      }
     } else if (!groups) {
       for (const k of present[r]) L.push(fuelLayer(k, null));
     } else {
@@ -447,12 +493,14 @@ export function mountTracker(D, hooks = {}) {
         const ks = g.f.filter(k => present[r].includes(k));
         if (!ks.length) continue;
         const s = new Float64Array(V.n);
-        for (const k of ks) { const a = V.fuels[k]; for (let j = 0; j < V.n; j++) s[j] += a[j]; }
+        for (const k of ks) { const a = V.fuels[k], pos = FUEL[k].signed; for (let j = 0; j < V.n; j++) s[j] += pos ? Math.max(0, a[j]) : a[j]; }
         // a group of several fuels opens onto its fuels; a single-fuel group goes straight to its plants
         const drill = g.f.length > 1 ? { group: g.id, fuel: null, plant: null } : plantsFor(ks[0]).length ? { group: null, fuel: ks[0], plant: null } : null;
         L.push({ id: 'g:' + g.id, name: g.name, tok: g.tok, tag: g.f.length > 1 && ks.includes('roof') ? 'incl. est.' : FUEL[ks[0]].tag, hatch: g.f.length === 1 && FUEL[ks[0]].hatch ? ks[0] : null, signed: false, s, drill });
       }
-      for (const k of SIGNED) if (present[r].includes(k)) L.push(fuelLayer(k, null));
+      // a grouping that counts batteries' discharge in a group shows their charging on its own, below zero
+      const battIn = groups.some(g => g.f.includes('batt'));
+      for (const k of SIGNED) if (present[r].includes(k)) L.push(k === 'batt' && battIn ? chargingLayer() : fuelLayer(k, null));
     }
     V.layers = L; V.eu = null;
   }
@@ -482,6 +530,14 @@ export function mountTracker(D, hooks = {}) {
   const level = () => state.drill.plant ? 'unit' : state.drill.fuel ? 'plant' : state.drill.group ? 'fuel' : 'top';
   function drillTo(d) {
     linked = null; state.drill = d; state.hidden.clear(); state.filter = ''; relayer(); buildSummary(); render(); save(true);
+  }
+  // a row of the mix table opens that fuel's plants in the list and chart above (owner's report LOW-03, 1 Nov 2026)
+  const canOpen = k => !!FUEL[k] && plantsFor(k).length > 0;
+  function openFuel(k) {
+    if (!canOpen(k)) return;
+    linked = null; state.view = 'detailed'; state.drill = { ...TOP_LEVEL, fuel: k }; state.hidden.clear(); state.filter = ''; state.open.clear();
+    rebuild(); save(true);
+    $('charts').scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   }
   // a link's drill-down, once its window is built (rebuild); anything that no longer exists is dropped there
   function fromLink(l) {
@@ -745,8 +801,8 @@ export function mountTracker(D, hooks = {}) {
     assignLines(layers); syncSwatches();
     const pos = new Float64Array(n), neg = new Float64Array(n), tops = [];
     // HVDC is signed like the batteries: arriving is stacked on top of the island's generation, leaving goes below zero
-    // a partial first or last period, drawn at its rate so far for a period as long as its neighbour's
-    const whole = j => energy && n > 1 && ((j === n - 1 && V.partial) ? V.hrs[n - 2] / V.hrs[j] : (j === 0 && V.partialFirst) ? V.hrs[1] / V.hrs[0] : 1);
+    // a partial first or last period is drawn as the energy it holds (washed out below; TRK-04, 31 Oct 2026)
+    const whole = () => 1;
     let mx = 0, mn = 0;
     for (const l of layers) {
       let a = pct ? Float64Array.from(l.s, pctOf) : energy ? Float64Array.from(l.s, (v, j) => en(v, j) * whole(j)) : l.s;
@@ -806,8 +862,10 @@ export function mountTracker(D, hooks = {}) {
         ctx.save(); ctx.globalAlpha = 0.6; ctx.fillStyle = C['--surface'];
         ctx.fillRect(xa, F.top, xb - xa, F.bottom - F.top); ctx.restore();
       };
-      if (V.partial) wash(X(n - 2), F.x1);
-      if (V.partialFirst) wash(F.x0, X(1));
+      // a dashed edge where the whole periods end, so the washed part reads as different, not as a fall
+      const edge = x => { ctx.save(); ctx.setLineDash([3, 3]); ctx.strokeStyle = C['--ink-2']; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(Math.round(x) + 0.5, F.top); ctx.lineTo(Math.round(x) + 0.5, F.bottom); ctx.stroke(); ctx.restore(); };
+      if (V.partial) { wash(X(n - 2), F.x1); edge(X(n - 2)); }
+      if (V.partialFirst) { wash(F.x0, X(1)); edge(X(1)); }
     }
     if (dom.lo < 0) { ctx.strokeStyle = C['--ink-2']; ctx.lineWidth = 1; const y = Math.round(Y(0)) + 0.5; ctx.beginPath(); ctx.moveTo(F.x0, y); ctx.lineTo(F.x1, y); ctx.stroke(); }
     if (cap) {
@@ -918,7 +976,7 @@ export function mountTracker(D, hooks = {}) {
     const c = setup($('cv-price')), { ctx } = c;
     let mx = 0; for (let j = 0; j < V.n; j++) mx = Math.max(mx, V.pNI[j], V.pSI[j]);
     const dom = nice(0, mx * 1.08, ticksFor('cv-price', 3));
-    const F = frame(c, dom, v => '$' + fmt(v), { unit: '$/MWh' }), { X, Y } = F;
+    const F = frame(c, dom, v => '$' + fmt(v), { axis: true, unit: '$/MWh' }), { X, Y } = F;
     const r = state.region, aNI = r === 'SI' ? 0.35 : 1, aSI = r === 'NI' ? 0.35 : 1;
     line(ctx, X, Y, V.pSI, alpha(C['--p-si'], aSI));
     line(ctx, X, Y, V.pNI, alpha(C['--p-ni'], aNI));
@@ -937,7 +995,7 @@ export function mountTracker(D, hooks = {}) {
     let mn = Infinity, mx = 0;
     for (let j = 0; j < V.n; j++) { mx = Math.max(mx, V.underlying[j], V.metered[j]); mn = Math.min(mn, V.metered[j]); }
     const dom = nice(mn * 0.95, mx * 1.02, ticksFor('cv-demand', 3));
-    const F = frame(c, dom, v => fmt(v), { unit: 'MW' }), { X, Y } = F;
+    const F = frame(c, dom, v => fmt(v), { axis: true, unit: 'MW' }), { X, Y } = F;
     // the embedded solar estimate's uncertainty (± one standard deviation) as a band around the dashed line
     if (V.roofU.some(u => u > 0.5)) band(ctx, X, Y, V.underlying.map((v, j) => v - V.roofU[j]), V.underlying.map((v, j) => v + V.roofU[j]), alpha(C['--ink-2'], 0.22));
     line(ctx, X, Y, V.underlying, C['--ink-2'], 1.5, [4, 3]);
@@ -948,7 +1006,7 @@ export function mountTracker(D, hooks = {}) {
     const c = setup($('cv-hvdc')), { ctx } = c;
     let mn = 0, mx = 0; for (let j = 0; j < V.n; j++) { mn = Math.min(mn, V.hvdc[j]); mx = Math.max(mx, V.hvdc[j]); }
     const dom = nice(mn, mx, ticksFor('cv-hvdc', 2));
-    const F = frame(c, dom, v => fmt(v), { unit: 'MW' }), { X, Y } = F;
+    const F = frame(c, dom, v => fmt(v), { axis: true, unit: 'MW' }), { X, Y } = F;
     area(ctx, X, Y, V.hvdc, 0, alpha(C['--f-hvdc'], 0.35));
     line(ctx, X, Y, V.hvdc, C['--f-hvdc'], 1.5);
     ctx.font = FONT; ctx.fillStyle = C['--muted']; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
@@ -960,7 +1018,7 @@ export function mountTracker(D, hooks = {}) {
     const c = setup($('cv-co2')), { ctx } = c;
     let mx = 0; for (let j = 0; j < V.n; j++) mx = Math.max(mx, V.co2[j]);
     const dom = nice(0, Math.max(mx, 10) * 1.1, ticksFor('cv-co2', 2));
-    const F = frame(c, dom, v => fmt(v), { unit: 'g/kWh' }), { X, Y } = F;
+    const F = frame(c, dom, v => fmt(v), { axis: true, unit: 'g/kWh' }), { X, Y } = F;
     area(ctx, X, Y, V.co2, 0, alpha(C['--co2'], 0.28));
     line(ctx, X, Y, V.co2, C['--co2'], 1.5);
     c.base.F = F; c.base.over = (ctx, j) => dot(ctx, X(j), Y(V.co2[j]), C['--co2']);
@@ -1007,7 +1065,13 @@ export function mountTracker(D, hooks = {}) {
     $('cv-gen').closest('.chart').classList.toggle('priced', state.price);
     const note = $('gen-note'), txt = NOTES[state.view] || '';
     note.hidden = !txt;
-    note.textContent = txt ? txt + ' ' : '';
+    note.textContent = '';
+    // the grouping's name first, in bold (owner's call, 1 Nov 2026): "Simplified – Five groups: ..."
+    if (txt) {
+      const b = document.createElement('b');
+      b.textContent = $('sel-view').querySelector(`option[value="${state.view}"]`)?.textContent || state.view;
+      note.append(b, ` – ${txt} `);
+    }
     if (txt) { const a = document.createElement('a'); a.href = '/methods/groupings#groupings'; a.textContent = 'How the groups are made'; note.append(a); }
     const up = lv !== 'top' ? parts[parts.length - 2] : null;
     $('sum-level').hidden = !up;
@@ -1020,6 +1084,12 @@ export function mountTracker(D, hooks = {}) {
       $('sum-back').textContent = `‹ ${up.label === 'Generation' ? 'All sources' : up.label}`;
       $('sum-back').onclick = () => drillTo(up.to);
     }
+    // a plant's other names, and what its metered history counts where that differs from the dispatch data
+    const aka = lv === 'unit' ? akaOf(d.plant) : [], metered = lv === 'unit' ? meteredOf(d.plant) : '';
+    const pn = $('plant-note');
+    pn.hidden = !aka.length && !metered;
+    pn.innerHTML = (aka.length ? `<p><b>Also known as</b> ${aka.map(esc).join(', ')}</p>` : '')
+      + (metered ? `<p><b>Metered history</b></p><ul>${metered.split('\n').map(x => `<li>${esc(x)}</li>`).join('')}</ul><p><a href="/methods/generation#whole">More</a></p>` : '');
   }
   // Long lists (the site view, a fuel's plants) get a filter box; the site view groups its rows under collapsible
   // fuel headings with subtotals. Section headings toggle open; their colour square hides every row in them.
@@ -1029,14 +1099,14 @@ export function mountTracker(D, hooks = {}) {
     for (const id of ids) off ? state.hidden.add(id) : state.hidden.delete(id);
     for (const l of V.layers) if (ids.includes(l.id)) { l.row.classList.toggle('off', off); l.row.querySelector('.sw-btn')?.setAttribute('aria-pressed', String(!off)); }
     if (tr) { tr.classList.toggle('off', off); tr.querySelector('.sw-btn').setAttribute('aria-pressed', String(!off)); }
-    render();
+    render(); save();
   }
   // every row's and heading's on/off look from state.hidden (after All, None or Only this)
   function syncHidden() {
     for (const l of V.layers) if (l.row) { const off = state.hidden.has(l.id); l.row.classList.toggle('off', off); l.row.querySelector('button.sw-btn')?.setAttribute('aria-pressed', String(!off)); }
     for (const x of V.sections) if (x.row) { const all = x.members.every(m => state.hidden.has(m.id)); x.row.classList.toggle('off', all); x.row.querySelector('.sw-btn').setAttribute('aria-pressed', String(!all)); }
     syncMixTools();
-    render();
+    render(); save();
   }
   // Only this: hide every other layer; on the layers already shown alone, show everything again
   function onlyThis(ids) {
@@ -1052,27 +1122,21 @@ export function mountTracker(D, hooks = {}) {
     $('mix-all').disabled = !V.layers.some(l => state.hidden.has(l.id));
     $('mix-none').disabled = V.layers.every(l => state.hidden.has(l.id));
   }
-  // a colour square: click hides or shows; double-click, Shift+click or a long press shows only that row (or section)
+  // a colour square: click hides or shows; double-click, Shift+click or a long press shows only that row (or section);
+  // the same on the Prices tab (#lib/site/swatch.js)
   function squareButton(btn, ids, toggle) {
-    let held = null, longPressed = false;
-    btn.title = 'Hide or show · double-click or press and hold: show only this';
-    btn.addEventListener('click', e => {
-      if (longPressed) { longPressed = false; return; }
-      if (e.shiftKey) onlyThis(ids); else toggle();
-    });
-    btn.addEventListener('dblclick', e => { e.preventDefault(); onlyThis(ids); });
-    btn.addEventListener('pointerdown', e => {
-      if (e.pointerType === 'mouse') return;
-      clearTimeout(held); held = setTimeout(() => { longPressed = true; onlyThis(ids); navigator.vibrate?.(15); }, 500);
-    });
-    for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) btn.addEventListener(ev, () => clearTimeout(held));
-    btn.addEventListener('contextmenu', e => { if (longPressed) e.preventDefault(); });
+    btn.title = SWATCH_TITLE;
+    squareWire(btn, toggle, () => onlyThis(ids));
   }
   function applyFilter() {
     const q = norm(state.filter.trim());
     for (const l of V.layers) {
       const sec = V.sections.find(x => x.members.includes(l));
-      l.row.hidden = q ? !norm(l.name).includes(q) : !!(sec && sec.row && !state.open.has(sec.id));
+      // a match on another name shows that name beside the row's ("Stratford (Taranaki Combined Cycle)")
+      const alt = q && !norm(l.name).includes(q) ? akaOf(l.name).find(a => norm(a).includes(q)) : null;
+      l.row.hidden = q ? !norm(l.name).includes(q) && !alt : !!(sec && sec.row && !state.open.has(sec.id));
+      const aka = l.row.querySelector('.aka');
+      if (aka) { aka.hidden = !alt; aka.textContent = alt ? `(${alt})` : ''; }
     }
     for (const x of V.sections) {
       if (!x.row) continue;
@@ -1111,7 +1175,7 @@ export function mountTracker(D, hooks = {}) {
       const tr = document.createElement('tr'); tr.style.setProperty('--c', colourOf(l));
       if (state.hidden.has(l.id)) tr.className = 'off';
       if (cur && cur.row) tr.classList.add('in-sec');
-      const nameHtml = `${esc(l.name)}${l.tag ? ` <span class="tag">${l.tag}</span>` : ''}`;
+      const nameHtml = `${esc(l.name)}${akaOf(l.name).length ? ' <span class="aka" hidden></span>' : ''}${l.tag ? ` <span class="tag">${l.tag}</span>` : ''}`;
       tr.innerHTML = `<td><div class="row-name">${canHide ? `<button type="button" class="sw-btn" aria-pressed="${!state.hidden.has(l.id)}" aria-label="Show ${esc(l.name)} in the chart"><span class="sw${l.hatch ? ' hatch' : ''}"></span></button>` : `<span class="sw-btn"><span class="sw"></span></span>`}${l.drill ? `<button type="button" class="drill">${nameHtml}</button>` : `<span class="nm">${nameHtml}</span>`}</div></td><td class="n" data-q></td><td class="n"><div class="share"><span data-s></span><span class="bar" data-b></span></div></td>`;
       if (canHide) squareButton(tr.querySelector('.sw-btn'), [l.id], () => {
         toggleHidden([l.id]);
@@ -1264,7 +1328,7 @@ export function mountTracker(D, hooks = {}) {
   function drawAll() { for (const id of CHARTS) if (unfolded(id)) DRAW[id](); }
   const paintAll = () => { for (const id of CHARTS) if (unfolded(id)) paint(id); };
   function schedule() {
-    $('sum-pin').hidden = state.hoverBy !== 'pin' || state.hover == null;
+    syncPinChip();
     cancelAnimationFrame(raf);
     raf = requestAnimationFrame(() => { if (stale) { drawAll(); stale = false; } paintAll(); updateSummary(); });
   }
@@ -1276,9 +1340,33 @@ export function mountTracker(D, hooks = {}) {
   // local midnight at or before t; whole days later or earlier (a day is 23-25 hours at the clock changes)
   const midnightOf = t => { const k = KEY.day(t) * DAY; return k - nzOffset(k - nzOffset(k)); };
   const addDays = (m, k) => midnightOf(m + k * DAY + 3 * 36e5);
+  // a year on or back from a local midnight: the same date, so 1 year steps 31 Dec to 31 Dec through leap years and
+  // shows the whole year, 366 days in a leap year (owner's report CHT-11, 1 Nov 2026)
+  const moveBy = (m, R, dir) => R.days === 365 ? addYears(m, dir) : addDays(m, dir * R.days);
+  const moveBack = (end, R) => moveBy(end, R, -1);
   const endOfToday = () => addDays(midnightOf(models.live.END), 1);
   const ymd = t => { const p = lp(t); return `${p.y}-${String(p.mon + 1).padStart(2, '0')}-${String(p.dom).padStart(2, '0')}`; };
   const firstDay = () => history.index?.first ?? Date.UTC(1997, 6, 31, 12);
+  // the end (exclusive local midnight, or null for the latest) of range r with moment t near its middle
+  function endAround(t, r) {
+    const R = RANGES[r];
+    if (R.fixed || !R.days) return null;
+    let end = addDays(midnightOf(t), Math.ceil(R.days / 2));
+    end = Math.max(end, addDays(midnightOf(firstDay()), R.days));
+    return end >= endOfToday() ? null : end;
+  }
+  // The pin is the anchor (owner's call ZM-02, 31 Oct 2026): a range button opens the new range around the pinned
+  // moment and keeps it pinned (a finer view, a pinned day opened on 5-minute data, shows that day and lets go);
+  // the arrows step freely and let go once it leaves the window. One chip in the bar says what is pinned and lets
+  // go of it, the only place the pin is named (it was under the summary's heading, and a Go to chip in the bar).
+  let pinAfter = null;   // { t, h } for the next rebuild: the moment to pin, and how long its point was
+  function syncPinChip() {
+    const on = state.hoverBy === 'pin' && state.hover != null && V && state.hover < V.n;
+    const b = $('pin-chip');
+    if (!b) return;
+    b.hidden = !on;
+    if (on) $('pin-chip-txt').textContent = chip(state.hover);
+  }
   // a zoom's length and span in words: "2 h 25 min", "1:05 pm – 3:30 pm Mon 19 Oct", "3 Feb – 18 Mar 2026"
   function zoomWord(ms) {
     const h = ms / 36e5;
@@ -1299,7 +1387,9 @@ export function mountTracker(D, hooks = {}) {
     }
     // the date control: the chosen range ends on this date (today = the latest data)
     const R = RANGES[state.range], inp = $('in-date'), end = state.end ?? endOfToday();
-    $('lb-date').textContent = R.fixed ? 'All data' : `${R.label} ending`;
+    // a past day on 1D is that whole day, so the box says "Day" rather than "24 hours ending" (CHT-10)
+    $('lb-date').textContent = R.fixed ? 'All data' : state.range === '1d' && state.end != null ? 'Day' : `${R.label} ending`;
+    if (inp._sync) inp._sync();   // the calendar button's spoken label follows
     inp.disabled = !!R.fixed;
     inp.style.visibility = R.fixed ? 'hidden' : '';  // All has no end date
     inp.value = R.fixed ? '' : ymd(end - 1);
@@ -1314,7 +1404,8 @@ export function mountTracker(D, hooks = {}) {
       inp.value = d; tin.value = hm;
       inp.max = ymd(models.live.END + 3e5);
     }
-    $('btn-latest').hidden = state.end == null;
+    // Latest also shows when a dragged stretch sits behind the newest data (ZM-03)
+    $('btn-latest').hidden = state.end == null && !(state.zoom && !state.zoom.span && V?.zoomed && zoomSpan().to < models.live.END);
     // the arrows on the chart and beside the date step by the range
     for (const [p, n] of [['nav-prev', 'nav-next'], ['tb-prev', 'tb-next']]) {
       const prev = $(p), next = $(n);
@@ -1365,7 +1456,7 @@ export function mountTracker(D, hooks = {}) {
   // hv: the store's version it was merged from; a model older than the files loaded since is merged again (setView)
   const merge = kind => Object.assign(toModel(history.merged(kind, models.live), models.live.END), { hv: history.version(kind) });
   // the span of history a window [end − range, end) needs (the latest 31 days when end is null)
-  const spanFor = (r, end) => { const to = end ?? models.live.END; return [end == null ? to - 31 * DAY : end - RANGES[r].days * DAY - DAY, to]; };
+  const spanFor = (r, end) => { const to = end ?? models.live.END; return [end == null ? to - 31 * DAY : moveBack(end, RANGES[r]) - DAY, to]; };
   function useModel() {
     const m = models[state.kind];
     if (m !== M) { M = m; derive(); }
@@ -1433,7 +1524,7 @@ export function mountTracker(D, hooks = {}) {
     if (R.fixed) return;
     const from = stepEnd !== undefined ? stepEnd : state.end;
     if (dir > 0 && from == null) return;
-    let end = addDays(from ?? endOfToday(), dir * R.days);
+    let end = moveBy(from ?? endOfToday(), R, dir);
     if (end >= endOfToday()) end = null;
     stepEnd = end;
     $('in-date').value = ymd((end ?? endOfToday()) - 1);
@@ -1453,7 +1544,7 @@ export function mountTracker(D, hooks = {}) {
     }
     if (from < firstDay()) return;
     state.zoom = { from, to };
-    const R = RANGES[state.range], wFrom = M.t[0], wEnd = state.end ?? endOfToday(), wStart = R.days ? addDays(wEnd, -R.days) : wFrom;
+    const R = RANGES[state.range], wFrom = M.t[0], wEnd = state.end ?? endOfToday(), wStart = R.days ? moveBack(wEnd, R) : wFrom;
     if (from >= wStart && to <= wEnd) rebuild();
     else setView(state.range, addDays(midnightOf(to - 1), 1), true);
   }
@@ -1526,8 +1617,10 @@ export function mountTracker(D, hooks = {}) {
     // a pinned time line, or the point a touch or the arrow keys left, stays where it was when the new view still
     // shows that moment (grouping, region, drill-down: owner's report GRP-01, 30 Oct 2026, on a computer and on a
     // phone); anything else that rebuilds starts afresh
-    const keepBy = ['pin', 'touch', 'key'].includes(state.hoverBy) ? state.hoverBy : null;
-    const pinT = keepBy && state.hover != null && V?.t ? V.t[state.hover] : null;
+    const want = pinAfter; pinAfter = null;
+    const keepBy = want != null ? 'pin' : ['pin', 'touch', 'key'].includes(state.hoverBy) ? state.hoverBy : null;
+    const pinT = want ? want.t : (keepBy && state.hover != null && V?.t ? V.t[state.hover] : null);
+    const pinH = want ? want.h : keepBy && state.hover != null && V?.hrs ? V.hrs[state.hover] : 0;
     V = buildView();  // first: the drill-down checks below look at this view's plant sets
     const link = linked && !waiting ? linked : null;
     if (link) state.drill = fromLink(link);
@@ -1536,8 +1629,12 @@ export function mountTracker(D, hooks = {}) {
     if (d.fuel && !plantsFor(d.fuel).length) { d.fuel = null; d.plant = null; }
     if (d.group && !(setById(d.group)?.plants.length || groupById(d.group)?.f?.some(k => present[state.region].includes(k)))) { d.group = null; d.plant = null; }
     relayer(); keepPicks(prev); state.hover = null;
+    if (linkedOff && !waiting) { for (const x of V.layers) if (linkedOff.has(slug(x.name))) state.hidden.add(x.id); linkedOff = null; }
     const pinJ = pinT != null ? pointAt(pinT) : null;
-    if (pinJ != null && V.t[pinJ] === pinT) { state.hover = pinJ; state.hoverBy = keepBy; }
+    // kept when the moment is still on screen as the same point or within a longer one (a day, a week); a finer view
+    // (a pinned day opened on 5-minute data) drops it rather than pin its first minutes
+    // (a half-hour or finer pin stays on a finer view: 7:30 pm on 30 days is 7:30 pm on 1D)
+    if (pinJ != null && (V.hrs[pinJ] >= pinH - 1e-9 || pinH <= 1)) { state.hover = pinJ; state.hoverBy = keepBy; }
     else if (keepBy) state.hoverBy = null;
     if (link) {
       linked = null;
@@ -1558,6 +1655,7 @@ export function mountTracker(D, hooks = {}) {
     state.fold = new Set(a.fold ?? FOLD_DEFAULT);
     state.hidden.clear(); state.filter = ''; state.open.clear();
     linked = { group: a.group, fuel: a.fuel, plant: a.plant, t: null }; waiting = false;
+    linkedOff = a.off ? new Set(a.off) : null;
     state.zoom = a.zoom || null;
     const range = a.range || '1d', end = a.end ?? null;
     if (range !== state.range || end !== state.end || (a.int && a.int !== state.int)) setView(range, end, !!a.int, a.int || null);
@@ -1575,7 +1673,7 @@ export function mountTracker(D, hooks = {}) {
     const key = [state.region, state.range, state.int, state.kind, state.end, from, to, M.END].join('|');
     if (key === lastShared) return;   // grouping, drill-down and hidden layers don't change it
     lastShared = key;
-    const w = { region: state.region, range: state.range, label: R.label, days: R.days ?? null, int: state.int, kind: state.kind,
+    const w = { openFuel, canOpen, region: state.region, range: state.range, label: R.label, days: R.days ?? null, int: state.int, kind: state.kind,
                 end: state.end, from, to, M, live: models.live, history };
     clearTimeout(shareTimer);
     requestAnimationFrame(() => { clearTimeout(shareTimer); shareTimer = setTimeout(() => { if (lastShared === key) hooks.view(w); }, 0); });
@@ -1588,8 +1686,19 @@ export function mountTracker(D, hooks = {}) {
     if (b.dataset.v === state.range && !state.zoom) return;
     for (const x of $('seg-range').querySelectorAll('button')) x.setAttribute('aria-pressed', String(x === b));
     stepEnd = undefined;
-    soon(() => { state.zoom = null; setView(b.dataset.v); });
+    const r = b.dataset.v;
+    // the pin is the anchor: the new range opens around the pinned moment (its point's middle, so a pinned year opens
+    // that year), still pinned; without one, a dragged zoom carries over the same way (owner's calls ZM-02, 30-31 Oct)
+    const z = state.zoom && !state.zoom.span && V?.zoomed ? state.zoom : null;
+    const pin = state.hoverBy === 'pin' && state.hover != null && V ? { t: V.t[state.hover], h: V.hrs[state.hover] } : null;
+    soon(() => {
+      state.zoom = null;
+      if (pin) { pinAfter = pin; setView(r, RANGES[r].fixed ? null : endAround(pin.t + (pin.h * 36e5) / 2, r)); return; }
+      if (z && !RANGES[r].fixed) { setView(r, endAround((z.from + z.to) / 2, r)); return; }
+      setView(r);
+    });
   });
+  $('pin-chip').addEventListener('click', () => { state.hover = null; state.hoverBy = null; hover(); });
   // the menu on 1D: the last hour, 3, 6 or 12 hours of the day (5-minute points), or the whole 24 hours
   const spanMenu = $('span-menu'), spanBtn = $('btn-span');
   const closeSpans = () => { spanMenu.hidden = true; spanBtn.setAttribute('aria-expanded', 'false'); };
@@ -1624,7 +1733,14 @@ export function mountTracker(D, hooks = {}) {
     state.zoom = null; setView(state.range, addDays(day, 1));
   });
   onTimeSettled($('in-time'), v => zoomEndAt(fromStamp(`${$('in-date').value}T${v}`)));
-  $('btn-latest').addEventListener('click', () => { if (state.zoom && !state.zoom.span) state.zoom = null; setView(state.range, null); });
+  // zoomed, Latest moves the stretch to the newest data and keeps its length (owner's report ZM-03, 1 Nov 2026)
+  $('btn-latest').addEventListener('click', () => {
+    if (!state.zoom || !V?.zoomed) return setView(state.range, null);
+    const latest = models.live.END + 3e5, z = zoomSpan();
+    if (zoomedHours()) return zoomEndAt(latest);
+    state.zoom = { from: latest - (z.to - z.from), to: latest };
+    setView(state.range, null, true);
+  });
   for (const id of ['nav-prev', 'tb-prev']) $(id)?.addEventListener('click', () => step(-1));
   for (const id of ['nav-next', 'tb-next']) $(id)?.addEventListener('click', () => step(1));
   $('sel-view').addEventListener('change', e => {
@@ -1795,7 +1911,6 @@ export function mountTracker(D, hooks = {}) {
   }
   let downBy = '', tap = null;
   const TAP_PX = 18;   // how near the time line a tap must land to let it go
-  $('sum-unpin').addEventListener('click', () => { state.hover = null; state.hoverBy = null; hover(); });
   for (const box of boxes) {
     box.addEventListener('pointerleave', e => { hideTip(); if (e.pointerType === 'mouse' && state.hoverBy !== 'pin') { state.hover = null; hover(); } });
     box.addEventListener('keydown', e => {
@@ -1902,7 +2017,7 @@ export function mountTracker(D, hooks = {}) {
       const L = this.links(), layers = V.layers.filter(l => !state.hidden.has(l.id)), u = isLong() ? 'MW average' : 'MW';
       const f1 = v => Math.round(v * 10) / 10, f2 = v => Math.round(v * 100) / 100;
       // generation in the chart's own unit: energy (MWh, GWh or TWh) for days and longer, as the chart shows it; a
-      // partial period's energy is what it generated so far (the chart draws it at its rate for a whole period)
+      // partial period's energy is what it generated so far, as the chart draws it
       const energy = isLong(), gu = energy ? eu().unit : 'MW', g = (v, j) => energy ? +en(v, j).toPrecision(6) : f1(v);
       const header = ['start_nz', 'start_utc', ...(energy ? ['hours'] : []), ...layers.map(l => `${l.name} (${gu})`), `${totalLabel()} (${gu})`,
         'Price, North Island, Haywards ($/MWh)', 'Price, South Island, Benmore ($/MWh)', `Demand, metered (${u})`, `Demand with embedded solar (${u})`,

@@ -52,7 +52,7 @@
 .a-foot a { color: var(--accent); }
 
 /* article charts (src/lib/articles/charts) */
-.ch { display: grid; gap: 8px; min-width: 0; }
+.ch { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; min-width: 0; }
 .ch-plot { position: relative; }
 .ch svg { display: block; overflow: visible; touch-action: pan-y pinch-zoom; }
 .ch-grid { stroke: var(--grid); stroke-width: 1; shape-rendering: crispEdges; }
@@ -92,7 +92,8 @@
 .ch-tip-r i.none { background: none; }
 .ch-tip-r b { font-family: var(--font-data); font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
 .ch-tip-r.strong b { font-weight: 700; }
-.ch-data { font-size: 0.8rem; }
+/* a wide data table scrolls inside itself rather than widening the chart, its key and the page (ART-03) */
+.ch-data { font-size: 0.8rem; min-width: 0; max-width: 100%; overflow-x: auto; }
 .ch-data summary { cursor: pointer; color: var(--muted); font-size: 0.76rem; width: max-content; }
 .ch-data summary:hover { color: var(--accent); }
 .ch-data table { margin-top: 6px; }

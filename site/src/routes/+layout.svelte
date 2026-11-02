@@ -14,6 +14,16 @@
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
+	// the scrollbar's width as --sbw, so the masthead can span the window less the scrollbar on every page and its links
+	// stay put between reading pages and the full-width ones (owner's call HOME-01, 31 Oct 2026; tracker.css)
+	$effect(() => {
+		const root = document.documentElement;
+		const set = () => root.style.setProperty('--sbw', `${Math.max(0, innerWidth - root.clientWidth)}px`);
+		const ro = new ResizeObserver(set);
+		ro.observe(root);
+		set();
+		return () => ro.disconnect();
+	});
 </script>
 
 <svelte:head>

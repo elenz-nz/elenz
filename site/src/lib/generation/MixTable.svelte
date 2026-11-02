@@ -3,7 +3,8 @@
 	// and capacity factor (energy over installed capacity, capacity.json). From mixRows() in ./data.js.
 	type Row = { f: { k: string; name: string; tok: string; hatch?: number; tag?: string; ren?: number }; e: number; ep: number; share: number; avg: number; peak: number; cf: number };
 	type Mix = { rows: Row[]; tot: number; totPrev: number; avg: number; peak: number; ren: number; renShare: number; renSharePrev: number };
-	let { mix, prevLabel }: { mix: Mix; prevLabel: string | null } = $props();
+	// canOpen, onopen: a row opens that fuel's plants in the chart above (owner's report LOW-03, 1 Nov 2026)
+	let { mix, prevLabel, canOpen = () => false, onopen }: { mix: Mix; prevLabel: string | null; canOpen?: (k: string) => boolean; onopen?: (k: string) => void } = $props();
 
 	const big = $derived(mix.tot >= 1e7);   // over 10,000 GWh: TWh
 	const unit = $derived(big ? 'TWh' : 'GWh');
@@ -44,8 +45,9 @@
 		<tbody>
 			{#each mix.rows as r (r.f.k)}
 				{@const ch = change(r.e, r.ep)}
-				<tr>
-					<td><span class="nm"><span class="sw" class:hatch={r.f.hatch} style="--c: var({r.f.tok})"></span>{r.f.name}{#if r.f.tag}<span class="tag">{r.f.tag}</span>{/if}</span></td>
+				{@const go = canOpen(r.f.k)}
+				<tr class:go onclick={() => { if (go) onopen?.(r.f.k); }}>
+					<td><span class="nm"><span class="sw" class:hatch={r.f.hatch} style="--c: var({r.f.tok})"></span>{#if go}<button type="button" class="open" title="Show {r.f.name} plants in the chart above" onclick={(e) => { e.stopPropagation(); onopen?.(r.f.k); }}>{r.f.name}</button>{:else}{r.f.name}{/if}{#if r.f.tag}<span class="tag">{r.f.tag}</span>{/if}</span></td>
 					<td class="n">{energy(r.e)}</td>
 					<td class="n"><span class="bar" style="width: {Math.max(1, (36 * r.share) / maxShare)}px; background: var({r.f.tok})"></span>{pct(r.share)}</td>
 					{#if showPrev}<td class="n {ch.cls}">{ch.text}</td>{/if}
@@ -89,4 +91,7 @@
 	/* the row under the pointer is highlighted, as on the Prices tab's price captured by fuel */
 	tbody tr:hover td { background: color-mix(in srgb, var(--ink) 7%, transparent); }
 	tbody tr:hover .nm { color: var(--ink); }
+	tbody tr.go { cursor: pointer; }
+	.open { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
+	tbody tr.go:hover .open { text-decoration: underline; text-underline-offset: 2px; }
 </style>

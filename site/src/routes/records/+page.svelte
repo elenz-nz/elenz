@@ -9,44 +9,71 @@
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import Spark from '#lib/records/Spark.svelte';
 	import InfoTip from '#lib/site/InfoTip.svelte';
-	import { energy, pace, soFar, toGo, paceAt, periodWhen,
-		LISTED as DEFS, PERIODS, PERIOD_KEYS, periodOf, periodSub, GROUPS, REGIONS, LIVE_URL, MONTHS, get, notShown, parts, when, step, fmt, recent, milestones, provisional,
-		liveBeats, loadRecords, fullName, dayOf, clock, yearOf
+	import RecordIcon from '#lib/records/RecordIcon.svelte';
+	import { energy, pace, soFar, paceAt, periodWhen,
+		LISTED as DEFS, PERIODS, PERIOD_KEYS, periodOf, periodSub, GROUPS, REGIONS, LIVE_URL, MONTHS, get, notShown, parts, when, step, fmt, recentAll, topCards, CARD_GROUPS, cardGroupLabel, milestones, provisional,
+		liveBeats, liveNear, loadRecords, fullName, dayOf, clock, yearOf, isNew
 	} from '#lib/records/records.js';
 
 	let R = $state<any>(null);
 	let live = $state<any>({});
+	let near = $state<any>({});
 	let status = $state<'loading' | 'none' | 'ok'>('loading');
 	let region = $state('NZ');
 	// the period the table lists: each half-hour record's highest trading period, day, week, month or year (?period=)
 	let period = $state('tp');
 	let cat = $state('all');
+	// the page's three lists as tabs under Heading for a record and New and provisional (owner's call REC-01, 31 Oct
+	// 2026: the page had too many lines; ?tab=milestones|months in the address)
+	const TABS = [{ k: 'all', label: 'All-time records' }, { k: 'milestones', label: 'Milestones' }, { k: 'months', label: 'By month' }];
+	let tab = $state('all');
 	let liveD = $state.raw<any>(null);   // tracker.json: the live week, for the live check and the pace
 	let paceAll = $state(false);          // the pace cards beyond the first PACE_CARDS
-	const PACE_CARDS = 8;
+	const PACE_CARDS = 8;   // owner's call, 31 Oct 2026
+	// whole rows only: at least that many where there are enough, otherwise the whole rows there are, with Show all for
+	// the rest (owner's reports REC-09, 1-2 Nov 2026)
+	let paceCols = $state(1);
+	const paceShown = $derived.by(() => {
+		const n = paces.length, want = Math.ceil(PACE_CARDS / paceCols) * paceCols;
+		return n >= want ? want : n <= paceCols ? n : n - (n % paceCols);
+	});
+	function countCols(el: HTMLElement) {
+		const ro = new ResizeObserver(() => { paceCols = Math.max(1, getComputedStyle(el).gridTemplateColumns.split(' ').length); });
+		ro.observe(el);
+		return { destroy: () => ro.disconnect() };
+	}
 	let moy = $state(new Date(Date.now() + 13 * 36e5).getUTCMonth());   // this month in New Zealand
+	let moyPer = $state('tp');   // By month: trading periods or days (owner's call REC-13, 2 Nov 2026)
+	const MOY_PERIODS = PERIODS.filter((p) => p.k === 'tp' || p.k === 'day');
 
 	onMount(() => {
 		const qs = new URLSearchParams(location.search), q = qs.get('region'), qp = qs.get('period');
 		if (q && ['NZ', 'NI', 'SI'].includes(q)) region = q;
 		if (qp && PERIOD_KEYS.includes(qp)) period = qp;
+		const qt = qs.get('tab');
+		if (qt && TABS.some((x) => x.k === qt)) tab = qt;
+		if (new URLSearchParams(location.search).get('by') === 'day') moyPer = 'day';
 		(async () => {
 			R = await loadRecords();
 			status = R ? 'ok' : 'none';
 			if (!R) return;
 			try {
 				const r = await fetch(LIVE_URL, { cache: 'no-cache' });
-				if (r.ok) { liveD = await r.json(); live = liveBeats(R, liveD); }
+				if (r.ok) { liveD = await r.json(); live = liveBeats(R, liveD); near = liveNear(R, liveD); }
 			} catch { /* the live check is extra; the records stand without it */ }
 		})();
 	});
 
 	function setRegion(r: string) { region = r; syncUrl(); }
 	function setPeriod(p: string) { period = p; syncUrl(); }
+	function setTab(k: string) { tab = k; syncUrl(); }
+	function setMoyPer(p: string) { moyPer = p; syncUrl(); }
 	function syncUrl() {
 		const u = new URL(location.href);
 		if (region === 'NZ') u.searchParams.delete('region'); else u.searchParams.set('region', region);
 		if (period === 'tp') u.searchParams.delete('period'); else u.searchParams.set('period', period);
+		if (tab === 'all') u.searchParams.delete('tab'); else u.searchParams.set('tab', tab);
+		if (moyPer === 'tp') u.searchParams.delete('by'); else u.searchParams.set('by', moyPer);
 		replaceState(u, {});
 	}
 	// the whole row opens its record (the name and description are the link itself, for keyboards and new tabs; a click
@@ -67,27 +94,36 @@
 
 	// link: the record's page
 	type Row = { d: any; rec: any; na: string | null; prov: any; isNew: boolean; p: string; link: string | null };
-	// groups with no record for this region (HVDC for an island) are left out rather than listed as not shown
-	const shownGroups = $derived(GROUPS.filter((g) => DEFS.some((d) => d.group === g && d.regions.includes(region))));
-	$effect(() => { if (cat !== 'all' && !shownGroups.includes(cat)) cat = 'all'; });
-	const groups = $derived.by(() => {
+	// every row for this region and period; records that can't apply here (a South Island renewable share that is always
+	// 100%, fossil records where there's no fossil plant, a "most sent south" year when no year was) are left out, and
+	// so are groups left empty (owner's report REC-03, 31 Oct 2026); a record still being worked out keeps its row
+	const allGroups = $derived.by(() => {
 		if (!R) return [];
-		return shownGroups.filter((g) => cat === 'all' || g === cat).map((g) => ({
+		return GROUPS.map((g) => ({
 			name: g,
 			rows: DEFS.filter((d) => d.group === g).map((d): Row => {
-				// a record kept for periods only (lowest hydro, lowest price) shows its day record on the half-hour list
-				const p = d.kind !== 'hh' ? 'tp' : d.periods && period === 'tp' ? 'day' : period;
+				const p = d.kind !== 'hh' ? 'tp' : period;
 				const rec = get(R, d.id, region, p);
 				const na = notShown(d, region, rec, R, p);
 				const prov = na ? null : p === 'tp' ? provisional(R, live, d.id, region) : (rec?.prov ?? null);
-				// its page opens on the day record by itself, so the link leaves the list's period off and Back to Records
-				// returns to the same list
-				const link = na ? null : d.periods && period === 'tp' ? href(d.id, region, 'tp') : href(d.id);
-				return { d, rec, na, prov, p, link, isNew: !na && !!rec?.since && Date.now() - rec.since < 30 * 864e5 };
-			}),
-		}));
+				const link = na ? null : href(d.id);
+				return { d, rec, na, prov, p, link, isNew: !na && isNew(rec, p) };
+			}).filter((row) => !row.na || /^Being worked out/.test(row.na)),
+		})).filter((g) => g.rows.length);
 	});
-	const cards = $derived(R ? recent(R, live).slice(0, 6) : []);
+	const shownGroups = $derived(allGroups.map((g) => g.name));
+	$effect(() => { if (cat !== 'all' && R && !shownGroups.includes(cat)) cat = 'all'; });
+	const groups = $derived(allGroups.filter((g) => cat === 'all' || g.name === cat));
+	// new and provisional: four, a row of them at full width, then Show all (owner's call REC-09, 31 Oct 2026)
+	const CARDS = 4;
+	let cardsAll = $state(false);
+	// every new, provisional and close record (each region and period), most notable first (records.js recentAll); the
+	// first CARDS are the most notable, compact (the period, not the date); Show all lists every one by period, in full
+	const allCards = $derived(R ? recentAll(R, live, near) : []);
+	const topCardList = $derived(topCards(allCards, CARDS));
+	// Show all: one region at a time (owner's call, 1 Nov 2026: every region together was too many), the same region as
+	// the All-time records list: picking it in either place changes both (and the address)
+	const cardGroups = $derived(CARD_GROUPS.map((k) => ({ k, label: cardGroupLabel(k), cards: allCards.filter((c) => c.group === k && c.region === region) })).filter((g) => g.cards.length));
 	// heading for a record: one card per record and period, New Zealand's where it is on pace, otherwise an island's
 	const paces = $derived.by(() => {
 		if (!R || !liveD) return [];
@@ -95,10 +131,21 @@
 		return pace(R, liveD).sort((a, b) => (a.region === 'NZ' ? 0 : 1) - (b.region === 'NZ' ? 0 : 1))
 			.filter((x) => { const k = x.d.id + x.period; return !seen.has(k) && !!seen.add(k); });
 	});
-	const miles = $derived(R ? milestones(R, region).slice(-6).reverse() : []);
-	const MOY = ['demand_max', 'demand_min', 'ren_max', 'wind_max', 'solar_max', 'roof_max', 'price_max'];
-	const moyRows = $derived(R ? MOY.map((id) => DEFS.find((d) => d.id === id)!).filter((d) => d.regions.includes(region))
-		.map((d) => ({ d, tv: R.moy?.[d.id]?.[region]?.[moy] ?? null })).filter((x) => x.tv && !notShown(x.d, region, get(R, x.d.id, region))) : []);
+	// every half-hour record has a best half-hour and a best day for each month of the year (records.py by_month_of_year,
+	// best_day_by_month), for each region
+	const moyFor = (r: string) => (R ? DEFS.filter((d) => d.kind === 'hh' && d.regions.includes(r))
+		.map((d) => ({ d, tv: (moyPer === 'day' ? R.moy_day : R.moy)?.[d.id]?.[r]?.[moy] ?? null })).filter((x) => x.tv && !notShown(x.d, r, get(R, x.d.id, r))) : []);
+	// Milestones and By month: pointing at a row lights the same milestone or record in the other regions' cards; a
+	// click (or tap) pins it there and another click on it lets go (owner's call, 31 Oct 2026). Rows carry data-k: the
+	// record's id, plus the level for a milestone. Changing tab or month lets go.
+	let hov = $state<string | null>(null);
+	let pinned = $state<string | null>(null);
+	const lit = $derived(pinned ?? hov);
+	const keyAt = (e: Event) => (e.target as Element | null)?.closest<HTMLElement>('[data-k]')?.dataset.k ?? null;
+	function rowOver(e: PointerEvent) { if (e.pointerType === 'mouse') hov = keyAt(e); }
+	function rowLeave(e: PointerEvent) { if (e.pointerType === 'mouse') hov = null; }
+	function pinClick(e: MouseEvent) { const k = keyAt(e); if (k) pinned = pinned === k ? null : k; }
+	$effect(() => { void tab; void moy; void moyPer; pinned = null; hov = null; });
 
 </script>
 
@@ -106,33 +153,23 @@
 	<title>Records · ELENZ</title>
 	<meta name="description" content="New Zealand's electricity records since 1997: peak demand, renewable share, wind and solar, prices and the HVDC link, for New Zealand and each island, from the Electricity Authority's metered data." />
 	<Preview title="New Zealand's electricity records since 1997 · ELENZ" description="New Zealand's electricity records since 1997: peak demand, renewable share, wind and solar, prices and the HVDC link, for New Zealand and each island, from the Electricity Authority's metered data." path="/records" />
+	<!-- with JavaScript off, a plain line instead of "Loading" (owner's report RES-04, 2 Nov 2026) -->
+	{@html '<noscript><style>.js-only { display: none !important; }</style></noscript>'}
 </svelte:head>
+<svelte:window onkeydown={(e) => { if (e.key === 'Escape' && pinned) pinned = null; }} />
 
 <div class="wrap">
 	<Masthead />
 
 	<main class="rec-page">
 		<section class="hero" aria-labelledby="rec-h">
-			<div>
-				<h1 id="rec-h">Records</h1>
-			</div>
-			{#if R?.final_to?.gen}
-				<span class="pill" title="Records rest on the EA's metered data, published 5–6 weeks after each month. Anything newer is provisional.">Official to {dayOf(R.final_to.gen)}</span>
-			{/if}
+			<h1 id="rec-h">Records</h1>
+			<a class="how" href="/methods/records">How records work</a>
 		</section>
 
-		<div class="toolbar">
-			<div class="ctl">
-				<label for="rec-region" class="vh">Region</label>
-				<select class="pick" id="rec-region" value={region} onchange={(e) => setRegion((e.currentTarget as HTMLSelectElement).value)}>
-					{#each REGIONS as r}<option value={r.id}>{r.name}</option>{/each}
-				</select>
-			</div>
-			<a class="how" href="/methods/records">How records work</a>
-		</div>
-
 		{#if status === 'loading'}
-			<p class="note" role="status">Loading the records…</p>
+			<p class="note js-only" role="status">Loading the records…</p>
+			<noscript><p class="note">The records need JavaScript turned on. <a href="/methods/records">How records work</a> and <a href="/about">About</a> work without it.</p></noscript>
 		{:else if status === 'none'}
 			<section class="panel empty">
 				<h2>The records are being worked out</h2>
@@ -141,60 +178,123 @@
 		{:else}
 			{#if paces.length}
 				<section aria-labelledby="pace-h" class="sec">
-					<div class="ttl-row"><h2 id="pace-h">Heading for a record</h2><InfoTip label="About records on pace">This day, week, month or year so far, against its record: listed once half of it has gone, while its average so far beats the record. It uses dispatch data (the live week and the days before it), so it is provisional, and the rest of the period can still change it. <a href="/methods/records">How records work</a></InfoTip></div>
-					<div class="cards">
-						{#each paceAll ? paces : paces.slice(0, PACE_CARDS) as p}
-							<a class="card pace" href={href(p.d.id, p.region, p.period)}>
-								<span class="c-name"><span class="dot" style="--c:var({p.d.tok})"></span>{fullName(p.d)} · {periodOf(p.period).label} · {p.region}</span>
-								<span>
-									<span class="c-val">{parts(p.d, p.v, p.period).n}<small>{parts(p.d, p.v, p.period).u}</small></span>
-									<span class="c-sub">{soFar(p)}, {paceAt(p)}. The record {periodOf(p.period).word} ({periodWhen(p.bestT, p.period)}{p.provBest ? ', provisional' : ''}) had {fmt(p.d, p.ref, p.period)} then; {toGo(p)}.</span>
-								</span>
+					<div class="sec-head"><div class="ttl-row"><h2 id="pace-h">Heading for a record</h2><InfoTip label="About records on pace">
+						<p>These are records that could fall soon: a day, week, month or year still running that is ahead of its record's pace.</p>
+						<ul>
+							<li>Listed once half the period has gone, for as long as it stays ahead.</li>
+							<li>One tile per record: New Zealand's where it's on pace, otherwise an island's.</li>
+							<li>From live dispatch data, so provisional until the period ends and the metered data confirms it.</li>
+						</ul>
+						<p><a href="/methods/records#pace">How records work</a></p>
+					</InfoTip></div>
+					{#if paces.length > paceShown}<button type="button" class="more-btn" aria-expanded={paceAll} onclick={() => (paceAll = !paceAll)}>{paceAll ? 'Show fewer' : `Show all ${paces.length}`}</button>{/if}</div>
+					<!-- simple tiles, almost buttons: the record's picture and name; the detail is on its page (owner's call, 30 Oct 2026) -->
+					<div class="paces" use:countCols>
+						{#each paceAll ? paces : paces.slice(0, paceShown) as p}
+							<a class="pt" href={href(p.d.id, p.region, p.period)} style="--c:var({p.d.tok})"
+								title="{fullName(p.d)}: {soFar(p)}, {paceAt(p)}, ahead of the record {periodOf(p.period).word}">
+								<span class="pt-ic"><RecordIcon id={p.d.id} /></span>
+								<span class="pt-txt"><b>{fullName(p.d)}</b><small>This {periodOf(p.period).word}{p.region === 'NZ' ? '' : ` · ${p.region === 'NI' ? 'North Island' : 'South Island'}`}</small></span>
+								<svg class="pt-go" width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
 							</a>
 						{/each}
 					</div>
-					{#if paces.length > PACE_CARDS}<button type="button" class="more-btn" onclick={() => (paceAll = !paceAll)}>{paceAll ? 'Show fewer' : `Show all ${paces.length}`}</button>{/if}
 				</section>
 			{/if}
 
-			{#if cards.length}
+			{#if allCards.length}
 				<section aria-labelledby="new-h" class="sec">
-					<h2 id="new-h">New and provisional</h2>
-					<div class="cards">
-						{#each cards as c}
-							{@const p = c.prov}
-							{@const shown = p ?? c.rec}
-							<!-- kept bare: name, value, when and the progression; the dashed border marks a provisional record, and the
-							     record's own page explains it -->
-							<a class="card" class:prov={!!p} href={href(c.d.id, c.region, 'tp')} title={p ? 'Provisional: not yet confirmed by the metered data' : undefined}>
-								<span class="c-name"><span class="dot" style="--c:var({c.d.tok})"></span>{fullName(c.d)} · {c.region}</span>
-								<span class="c-row">
-									<span>
-										{#if c.settled}
-											<span class="c-val gone">{parts(c.d, c.settled.pv).n}<small>{parts(c.d, c.settled.pv).u}</small></span>
-											<span class="c-sub">Not confirmed</span>
-										{:else}
-											<span class="c-val">{parts(c.d, shown.v).n}<small>{parts(c.d, shown.v).u}</small></span>
-											<span class="c-sub">{when(c.d, shown)}</span>
-										{/if}
-									</span>
-									{#if c.rec}<Spark steps={p ? [...c.rec.steps, [p.t, p.v]] : c.rec.steps} end={R.end} tok={c.d.tok} w={110} h={40} dashed={!!c.d.est} hollow={!!p} />{/if}
+					<div class="sec-head"><div class="ttl-row"><h2 id="new-h">New and provisional</h2><InfoTip label="About new and provisional records">
+						<p>These are records set in the last 30 days for New Zealand or either island, newer ones waiting on the metered data, and recent dispatch figures close to a record.</p>
+						<ul>
+							<li>First four: the most notable, one per record, each saying its period (trading period, day, week, month or year).</li>
+							<li>“Show all”: every one for the region picked beside it, under its period with its date. It’s the same region as the All-time records list below; changing either changes both.</li>
+							<li>Dashed border: provisional, from dispatch data, until the EA's metered data confirms it. It beats the record by more than dispatch data usually strays from the meters.</li>
+							<li>Dotted border: close to the record, too close for dispatch data to call either way.</li>
+							<li>Struck through: a provisional record the metered data didn't confirm.</li>
+						</ul>
+						<p><a href="/methods/records#official">How records work</a></p>
+					</InfoTip></div>
+					<div class="sec-ctl">
+						{#if cardsAll}<label for="card-region" class="vh">Region</label>
+						<select class="pick" id="card-region" value={region} onchange={(e) => setRegion((e.currentTarget as HTMLSelectElement).value)}>{#each REGIONS as r}<option value={r.id}>{r.name}</option>{/each}</select>{/if}
+						{#if allCards.length > CARDS}<button type="button" class="more-btn" aria-expanded={cardsAll} onclick={() => (cardsAll = !cardsAll)}>{cardsAll ? 'Show fewer' : 'Show all'}</button>{/if}
+					</div></div>
+					{#snippet card(c: any, full: boolean)}
+						{@const p = c.prov}
+						{@const nr = c.near}
+						{@const shown = p ?? nr ?? c.rec}
+						{@const label = c.d.kind === 'run' ? 'Run' : periodOf(c.period).label}
+						<!-- kept bare: name, value, the period (or when, in the full list) and the progression; the dashed border marks
+						     a provisional record, the dotted one a close call, and the record's own page explains them -->
+						<a class="card" class:prov={!!p} class:near={!!nr} href={href(c.d.id, c.region, c.period)} title={p ? 'Provisional: not yet confirmed by the metered data' : nr ? 'Close to the record: too close for dispatch data to call' : undefined}>
+							<span class="c-name"><span class="dot" style="--c:var({c.d.tok})"></span>{fullName(c.d)} · {c.region}</span>
+							<span class="c-row">
+								<span>
+									{#if c.settled}
+										<span class="c-val gone">{parts(c.d, c.settled.pv).n}<small>{parts(c.d, c.settled.pv).u}</small></span>
+										<span class="c-sub">Not confirmed{full ? '' : ` · ${label}`}</span>
+									{:else}
+										<span class="c-val">{parts(c.d, shown.v, c.period).n}<small>{parts(c.d, shown.v, c.period).u}</small></span>
+										<span class="c-sub">{nr ? 'Close to the record · ' : ''}{full ? when(c.d, shown, false, c.period) : label}</span>
+									{/if}
 								</span>
-							</a>
+								{#if c.rec}<Spark steps={p ? [...c.rec.steps, [p.t, p.v]] : c.rec.steps} end={R.end} tok={c.d.tok} w={110} h={40} dashed={!!c.d.est} hollow={!!p} />{/if}
+							</span>
+						</a>
+					{/snippet}
+					{#if cardsAll}
+						{#if !cardGroups.length}<p class="none-here">Nothing new or provisional for {REGIONS.find((r) => r.id === region)?.name} just now.</p>{/if}
+						{#each cardGroups as g}
+							<h3 class="card-group">{g.label} <span>{g.cards.length}</span></h3>
+							<div class="cards">{#each g.cards as c}{@render card(c, true)}{/each}</div>
 						{/each}
-					</div>
+					{:else}
+						<div class="cards">{#each topCardList as c}{@render card(c, false)}{/each}</div>
+					{/if}
 				</section>
 			{/if}
 
-			<section aria-labelledby="all-h" class="sec">
-				<div class="sec-head">
-					<div class="ttl-row"><h2 id="all-h">All-time records · {regionName}</h2><InfoTip label="About these records">Official records use the EA’s metered data and final prices, which arrive 5–6 weeks after each month (final prices a day or two). Newer records come from dispatch data and stay provisional until the metered month confirms them. Embedded solar is modelled. <a href="/methods/records">How records work</a></InfoTip></div>
-					<span class="unit">{period === 'tp' ? 'Half-hour averages unless stated' : `Averages over each ${periodOf(period).word}; runs are any length`}</span>
+			<div class="rec-tabs" role="tablist" aria-label="Records">
+				{#each TABS as t}
+					<button type="button" role="tab" id="tab-{t.k}" aria-selected={tab === t.k} aria-controls="panel-{t.k}" onclick={() => setTab(t.k)}>{t.label}</button>
+				{/each}
+			</div>
+
+			{#if tab === 'all'}
+			<section aria-labelledby="all-h" class="sec" id="panel-all">
+				<!-- the list's title bar: its heading, the region (only the list, milestones and month records follow it) and how
+				     far the official data goes; it sticks while the list scrolls (owner's call, 30 Oct 2026) -->
+				<div class="toolbar list-bar">
+					<div class="ttl-row"><h2 id="all-h">All-time records</h2><InfoTip label="About these records">
+						<p>These are the highest and lowest figures since August 1997 for {region === 'NI' ? 'the North Island' : region === 'SI' ? 'the South Island' : 'New Zealand'}, from a single half-hour up to a whole year.</p>
+						<ul>
+							<li>The region menu and the period buttons pick the list.</li>
+							<li>Day to year records are the period's average MW, with its energy beside it.</li>
+							<li>Official to: the last day the EA's metered data covers. It arrives 5–6 weeks after each month; final prices arrive a day or two after.</li>
+							<li>Dashed edge: a newer record from dispatch data, provisional until the metered month confirms it.</li>
+							<li>Embedded solar records are estimates, as embedded solar is modelled.</li>
+							<li>Open a record for its history and the period it fell in.</li>
+						</ul>
+						<p><a href="/methods/records">How records work</a></p>
+					</InfoTip></div>
+					<!-- region and period together, like the tracker's region and range; on phones a row of their own, the
+					     periods' short names -->
+					<div class="bar-ctl">
+						<label for="rec-region" class="vh">Region</label>
+						<select class="pick" id="rec-region" value={region} onchange={(e) => setRegion((e.currentTarget as HTMLSelectElement).value)}>
+							{#each REGIONS as r}<option value={r.id}>{r.name}</option>{/each}
+						</select>
+						<div class="seg per" role="group" aria-label="Records for each">
+							{#each PERIODS as p}
+								<button type="button" aria-pressed={period === p.k} title={p.label} onclick={() => setPeriod(p.k)}><span class="lg">{p.label}</span><span class="sh" aria-hidden="true">{p.short}</span></button>
+							{/each}
+						</div>
+					</div>
+					{#if R?.final_to?.gen}<span class="pill official">Official to {dayOf(R.final_to.gen)}</span>{/if}
 				</div>
-				<div class="seg per" role="group" aria-label="Records for each">
-					{#each PERIODS as p}
-						<button type="button" aria-pressed={period === p.k} onclick={() => setPeriod(p.k)}>{p.label}</button>
-					{/each}
+				<div class="sec-head">
+					<span class="unit">{period === 'tp' ? 'Half-hour averages unless stated' : `Averages over each ${periodOf(period).word}; runs are any length`}</span>
 				</div>
 				<div class="chips" role="group" aria-label="Show records about">
 					{#each ['all', ...shownGroups] as g}
@@ -242,46 +342,96 @@
 				</div>
 			</section>
 
-			<div class="two">
-				{#if miles.length}
-					<section class="panel" aria-labelledby="mile-h">
-						<h2 id="mile-h">Milestones · {regionName}</h2>
-						<ul class="miles">
-							{#each miles as m}
-								<li>
-									<span class="dot" style="--c:var({m.d.tok})"></span>
-									<span><b>{m.d.unit === '%' ? `${m.level}% renewable` : `${m.level.toLocaleString('en-NZ')} MW of ${m.d.id === 'wind_max' ? 'wind' : m.d.id === 'solar_max' ? 'grid solar' : m.d.id === 'roof_max' ? 'embedded solar' : 'demand'}`}</b>
-										first passed {clock(m.t)}, {dayOf(m.t)}{#if m.d.est} <span class="tag est">Estimate</span>{/if}</span>
-								</li>
-							{/each}
-						</ul>
-					</section>
-				{/if}
+			{/if}
 
-				<section class="panel" aria-labelledby="moy-h">
+			<!-- Milestones and By month: a card for each region side by side (owner's call, 31 Oct 2026), the full lists -->
+			{#if tab === 'milestones'}
+				<section class="sec" id="panel-milestones" aria-labelledby="mile-h">
+					<div class="ttl-row"><h2 id="mile-h">Milestones</h2><InfoTip label="About milestones">
+						<p>These are the first times each round level was passed, newest first, for New Zealand and each island.</p>
+						<ul>
+							<li>Covers wind, grid and embedded solar, renewable share and peak demand, with the islands' own demand levels.</li>
+							<li>Each milestone is the first half-hour over the level. The South Island has been 100% renewable since the data began.</li>
+							<li>Point at one to light it in every region; click or tap to pin it there, again to let go.</li>
+						</ul>
+						<p><a href="/methods/records#milestones">How milestones work</a></p>
+					</InfoTip></div>
+					<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+					<div class="regions" onpointerover={rowOver} onpointerleave={rowLeave} onclick={pinClick}>
+						{#each REGIONS as rg}
+							{@const ms = milestones(R, rg.id).reverse()}
+							<section class="panel" aria-label="Milestones, {rg.name}">
+								<h3>{rg.name}</h3>
+								{#if ms.length}
+									<ul class="miles">
+										{#each ms as m}
+											{@const k = `${m.d.id}:${m.level}`}
+											<li data-k={k} class:lit={lit === k} class:pinned={pinned === k} title={pinned === k ? 'Pinned · click to let go' : 'Click to pin'}>
+												<span class="dot" style="--c:var({m.d.tok})"></span>
+												<span><b>{m.d.unit === '%' ? `${m.level}% renewable` : `${m.level.toLocaleString('en-NZ')} MW of ${m.d.id === 'wind_max' ? 'wind' : m.d.id === 'solar_max' ? 'grid solar' : m.d.id === 'roof_max' ? 'embedded solar' : 'demand'}`}</b>
+													{m.always ? `every half-hour since the data began, ${dayOf(m.t)}` : `first passed ${clock(m.t)}, ${dayOf(m.t)}`}{#if m.d.est} <span class="tag est">Estimate</span>{/if}</span>
+											</li>
+										{/each}
+									</ul>
+								{:else}
+									<p class="note">None yet.</p>
+								{/if}
+							</section>
+						{/each}
+					</div>
+				</section>
+			{/if}
+
+			{#if tab === 'months'}
+				<section class="sec" id="panel-months" aria-labelledby="moy-h">
 					<div class="sec-head">
 						<div class="ttl-row"><h2 id="moy-h">Records for
 							<select class="pick" bind:value={moy} aria-label="Month of the year">
 								{#each MONTHS as m, i}<option value={i}>{m}</option>{/each}
 							</select>
-						</h2><InfoTip label="About month records">The best {MONTHS[moy]} on record, so a month can be a record even when the all-time ones hold.</InfoTip></div>
-						<span class="unit">{regionName}</span>
+						</h2><InfoTip label="About month records">
+							<p>These are the highest and lowest {moyPer === 'day' ? 'days' : 'half-hours'} of any {MONTHS[moy]} since 1997, with the year each was set, for New Zealand and each island.</p>
+							<ul>
+								<li>The month menu picks the month; {R?.moy_day ? 'TP and Day pick trading periods or whole days.' : 'these are trading periods.'}</li>
+								<li>A month can set one of these even when the all-time record holds.</li>
+								<li>Point at one to light it in every region; click or tap to pin it there, again to let go.</li>
+							</ul>
+							<p><a href="/methods/records#half-hours">How records work</a></p>
+						</InfoTip></div>
+						{#if R?.moy_day}
+							<div class="seg per" role="group" aria-label="Records for each">
+								{#each MOY_PERIODS as p}
+									<button type="button" aria-pressed={moyPer === p.k} title={p.label} onclick={() => setMoyPer(p.k)}><span class="lg">{p.label}</span><span class="sh" aria-hidden="true">{p.short}</span></button>
+								{/each}
+							</div>
+						{:else}
+							<span class="unit">Trading periods</span>
+						{/if}
 					</div>
-					<table class="moy">
-						<tbody>
-							{#each moyRows as x}
-								<tr>
-									<th scope="row"><span class="dot" style="--c:var({x.d.tok})"></span>{fullName(x.d)}{#if x.d.est} <span class="tag est">Est.</span>{/if}</th>
-									<td class="n val">{parts(x.d, x.tv[1]).n}<small>{parts(x.d, x.tv[1]).u}</small></td>
-									<td class="n muted">{yearOf(x.tv[0])}</td>
-								</tr>
-							{:else}
-								<tr><td class="muted">No records for this month yet.</td></tr>
-							{/each}
-						</tbody>
-					</table>
+					<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+					<div class="regions" onpointerover={rowOver} onpointerleave={rowLeave} onclick={pinClick}>
+						{#each REGIONS as rg}
+							{@const rows = moyFor(rg.id)}
+							<section class="panel" aria-label="{MONTHS[moy]} records, {rg.name}">
+								<h3>{rg.name}</h3>
+								<table class="moy">
+									<tbody>
+										{#each rows as x}
+											<tr data-k={x.d.id} class:lit={lit === x.d.id} class:pinned={pinned === x.d.id} title={pinned === x.d.id ? 'Pinned · click to let go' : 'Click to pin'}>
+												<th scope="row"><span class="dot" style="--c:var({x.d.tok})"></span>{fullName(x.d)}{#if x.d.est} <span class="tag est">Est.</span>{/if}</th>
+												<td class="n val">{parts(x.d, x.tv[1], moyPer).n}<small>{parts(x.d, x.tv[1], moyPer).u}</small></td>
+												<td class="n muted">{yearOf(x.tv[0])}</td>
+											</tr>
+										{:else}
+											<tr><td class="muted">No records for this month yet.</td></tr>
+										{/each}
+									</tbody>
+								</table>
+							</section>
+						{/each}
+					</div>
 				</section>
-			</div>
+			{/if}
 
 		{/if}
 	</main>
@@ -291,14 +441,33 @@
 
 <style>
 	.rec-page { display: grid; gap: 14px; }
-	.hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px 20px; flex-wrap: wrap; padding-block: 6px 2px; }
+	.hero { display: flex; align-items: baseline; justify-content: space-between; gap: 10px 20px; flex-wrap: wrap; padding-block: 6px 2px; }
 	.hero h1 { font-size: 1.6rem; letter-spacing: -0.02em; line-height: 1.15; }
-	.pill::before { display: none; }
-	.how { margin-left: auto; color: var(--accent); font-weight: 600; font-size: 0.86rem; }
+	.how { color: var(--accent); font-weight: 600; font-size: 0.86rem; }
+	/* the main list's title bar: sticks to the top of the window while the list shows (.toolbar in tracker.css) */
+	.list-bar { gap: 6px 14px; }
+	.bar-ctl { display: flex; align-items: center; gap: 8px; min-width: 0; }
+	.bar-ctl .seg { flex: none; }
+	.per .sh { display: none; }
+	.official { margin-left: auto; white-space: nowrap; }
+	.official::before { display: none; }
 
 	.sec { display: grid; gap: 10px; }
+	/* a faint break between sections, as this page holds a lot (owner's report REC-01, 2 Nov 2026) */
+	.sec + .sec, .sec + .rec-tabs, .hero + .sec { border-top: 1px solid var(--grid); padding-top: 18px; margin-top: 8px; }
+	/* the three lists' tabs: underlined like the tracker's Generation and Prices tabs */
+	.rec-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; margin-top: 6px; }
+	.rec-tabs button { font: inherit; font-size: 0.95rem; font-weight: 600; color: var(--muted); background: none; border: 0; border-bottom: 2px solid transparent; padding: 8px 12px; margin-bottom: -1px; min-height: 40px; white-space: nowrap; cursor: pointer; }
+	.rec-tabs button:hover { color: var(--ink); }
+	.rec-tabs button[aria-selected='true'] { color: var(--ink); border-bottom-color: var(--accent); }
+	.rec-tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+	@media (max-width: 420px) { .rec-tabs button { font-size: 0.86rem; padding-inline: 9px; } }
 	.sec h2, .panel h2 { font-size: 1rem; }
 	.sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+	.sec > .sec-head { align-items: center; }
+	.sec-head .more-btn { margin-top: 0; }
+	.sec-ctl { display: flex; align-items: center; gap: 8px; }
+	.none-here { margin: 4px 0 0; color: var(--muted); font-size: 0.86rem; }
 	.unit { color: var(--muted); font-size: 0.8rem; }
 	.note { color: var(--muted); font-size: 0.8rem; margin: 0; }
 	.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px; min-width: 0; display: grid; gap: 10px; align-content: start; }
@@ -312,10 +481,40 @@
 	.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 10px; }
 	.card { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; display: grid; gap: 8px; align-content: start; color: inherit; text-decoration: none; }
 	.card:hover { border-color: var(--ink-2); }
-	.card.pace { border-left: 3px solid var(--accent); }
+	/* Heading for a record: one small tile each, the record's colour on a tint of it */
+	.paces { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
+	.pt { display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 8px; border-radius: 6px; color: var(--ink); text-decoration: none;
+		background: color-mix(in srgb, var(--c) 16%, var(--surface)); border: 1px solid color-mix(in srgb, var(--c) 45%, var(--line));
+		transition: transform 0.15s, border-color 0.15s, background 0.15s; }
+	.pt:hover, .pt:focus-visible { transform: translateY(-2px); border-color: var(--c); background: color-mix(in srgb, var(--c) 24%, var(--surface)); }
+	.pt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+	.pt-ic { position: relative; display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 50%; color: var(--c); }
+	/* a slow ring: it's still going */
+	.pt-ic::after { content: ""; position: absolute; inset: 0; border-radius: 50%; animation: pt-ring 2.6s ease-out infinite; }
+	@keyframes pt-ring { from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 45%, transparent); } to { box-shadow: 0 0 0 9px color-mix(in srgb, var(--c) 0%, transparent); } }
+	.pt-txt { display: grid; min-width: 0; line-height: 1.25; }
+	.pt-txt b { font-size: 0.88rem; font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.pt-txt small { font-size: 0.74rem; color: var(--ink-2); }
+	.pt-go { margin-left: auto; flex: none; color: var(--muted); transition: transform 0.15s, color 0.15s; }
+	.pt:hover .pt-go { transform: translateX(2px); color: var(--c); }
+	@media (prefers-reduced-motion: reduce) { .pt-ic::after { animation: none; } .pt, .pt-go { transition: none; } .pt:hover { transform: none; } }
+	/* phones: two to a row, the name free to wrap, no arrow */
+	@media (max-width: 560px) {
+		.paces { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+		.pt { gap: 8px; padding: 6px 10px 6px 6px; border-radius: 6px; }
+		.pt-ic { width: 30px; height: 30px; }
+		.pt-ic :global(svg) { width: 18px; height: 18px; }
+		.pt-txt b { font-size: 0.8rem; white-space: normal; }
+		.pt-txt small { font-size: 0.7rem; }
+		.pt-go { display: none; }
+	}
+	.card-group { margin: 14px 0 8px; font-size: 0.86rem; font-weight: 600; color: var(--ink-2); }
+	.card-group:first-of-type { margin-top: 2px; }
+	.card-group span { color: var(--muted); font-weight: 400; margin-left: 4px; }
 	.more-btn { justify-self: start; margin-top: 8px; font: inherit; font-size: 0.84rem; font-weight: 600; color: var(--accent); background: none; border: 1px solid var(--line); border-radius: 4px; padding: 6px 12px; min-height: 36px; cursor: pointer; }
 	.more-btn:hover { border-color: var(--accent); }
 	.card.prov { border-style: dashed; border-color: color-mix(in srgb, var(--warn-ink) 55%, var(--line)); }
+	.card.near { border-style: dotted; border-color: color-mix(in srgb, var(--warn-ink) 55%, var(--line)); }
 	.c-name { display: flex; align-items: center; font-size: 0.82rem; color: var(--ink-2); font-weight: 600; }
 	.c-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; }
 	.c-val { display: block; font-family: var(--font-data); font-size: 1.6rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; }
@@ -323,14 +522,12 @@
 	.c-sub { display: block; color: var(--muted); font-size: 0.78rem; margin-top: 4px; }
 	.c-val.gone { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; }
 
-	.per { justify-self: start; flex-wrap: wrap; }
-	.per button { min-height: 32px; padding-inline: 12px; font-size: 0.84rem; }
 	.chips { display: flex; gap: 6px; flex-wrap: wrap; }
 	.chip { font: inherit; font-size: 0.8rem; font-weight: 500; padding: 5px 11px; min-height: 32px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); cursor: pointer; }
 	.chip:hover { color: var(--ink); border-color: var(--ink-2); }
 	.chip[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--surface); }
 
-	.tbl { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; overflow-x: auto; }
+	.tbl { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; overflow-x: auto; }
 	table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
 	.tbl table { min-width: 860px; }
 	thead th { text-align: left; color: var(--muted); font-weight: 600; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 8px 12px; border-bottom: 1px solid var(--line); }
@@ -354,19 +551,30 @@
 	/* a record with a provisional one beyond it: a dashed edge, like the provisional cards (its page says more) */
 	tr.prov > th[scope='row'] { border-left: 2px dashed color-mix(in srgb, var(--warn-ink) 65%, var(--line)); padding-left: 10px; }
 
-	.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+	/* Milestones and By month: a card per region, three across; one under another below 900 px */
+	.regions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: start; }
+	.regions h3 { margin: 0; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+	@media (max-width: 900px) { .regions { grid-template-columns: minmax(0, 1fr); } }
 	.miles { list-style: none; margin: 0; padding: 0; display: grid; }
-	.miles li { display: flex; align-items: baseline; gap: 2px; padding: 7px 0; border-bottom: 1px solid var(--grid); font-size: 0.86rem; color: var(--ink-2); }
+	.miles li { display: flex; align-items: baseline; gap: 2px; padding: 7px 6px; border-bottom: 1px solid var(--grid); font-size: 0.86rem; color: var(--ink-2); }
 	.miles li:last-child { border-bottom: 0; }
 	.miles b { color: var(--ink); font-weight: 600; }
-	.moy th[scope='row'] { display: flex; align-items: center; padding-left: 0; font-weight: 500; }
-	.moy td.n:last-child { padding-right: 0; width: 4em; }
-	.moy tr:last-child td, .moy tr:last-child th { border-bottom: 0; }
-	select.pick { font-size: 1rem; }
+	/* each row a grid, so name, figure and year always fit inside the card: the name wraps, the year keeps a fixed
+	   column (owner's report, 1 Nov 2026: years spilled out of the cards at some widths; a flex th broke the table) */
+	.moy, .moy tbody { display: block; }
+	.moy tr { display: grid; grid-template-columns: minmax(0, 1fr) auto 2.6em; align-items: center; column-gap: 10px; border-bottom: 1px solid var(--grid); }
+	.moy tr:last-child { border-bottom: 0; }
+	.moy th[scope='row'], .moy td { padding: 9px 0; border-bottom: 0; min-width: 0; }
+	.moy th[scope='row'] { display: flex; align-items: center; font-weight: 500; overflow-wrap: anywhere; }
+	.moy td.n:last-child { text-align: right; }
+	/* the same milestone or record lit in every region's card; a pinned one keeps an accent edge */
+	.miles li[data-k], .moy tr[data-k] { cursor: pointer; }
+	.moy tr[data-k] { padding-inline: 6px; }
+	.miles li.lit, .moy tr.lit { background: var(--accent-soft); }
+	.miles li.pinned { box-shadow: inset 3px 0 0 var(--accent); }
+	.moy tr.pinned { box-shadow: inset 3px 0 0 var(--accent); }
+	#moy-h select.pick { font-size: 1rem; }
 
-	@media (max-width: 860px) {
-		.two { grid-template-columns: minmax(0, 1fr); }
-	}
 	@media (max-width: 640px) {
 		/* phones: each record a short block (name and value, then when) instead of a wide table */
 		.tbl { overflow: visible; }
@@ -387,6 +595,30 @@
 		.tbl tbody tr > td:nth-child(4), .tbl tbody tr > td:nth-child(5) { display: none; }
 		.tbl .na-note { grid-column: 1 / -1; padding-left: 18px; }
 		.hero h1 { font-size: 1.3rem; }
-		.how { margin-left: 0; }
+	}
+	/* narrower screens: the bar in two rows, the heading and Official to, then the region and periods */
+	@media (max-width: 900px) {
+		.list-bar .ttl-row { order: 0; }
+		.official { order: 1; }
+		.bar-ctl { order: 2; flex-basis: 100%; }
+	}
+	/* phones: the periods' short names, as the tracker's range buttons */
+	@media (max-width: 560px) {
+		.per .lg { display: none; }
+		.per .sh { display: inline; }
+		.official { font-size: 0.68rem; padding-inline: 7px; letter-spacing: 0.02em; }
+	}
+	/* small phones (360 px): a little tighter so region and periods keep to one row; on the very smallest the periods
+	   wrap under the region */
+	@media (max-width: 400px) {
+		.list-bar { column-gap: 8px; }
+		.bar-ctl { gap: 6px; flex-wrap: wrap; row-gap: 6px; }
+		.list-bar select.pick { font-size: 0.85rem; padding-inline: 7px 22px; background-position: right 11px center, right 7px center; }
+		.list-bar .per button { font-size: 0.74rem; padding-inline: 4px; }
+		.official { text-transform: none; letter-spacing: 0; font-size: 0.72rem; }
+	}
+	@media (max-width: 340px) {
+		.list-bar h2 { font-size: 0.92rem; }
+		.official { font-size: 0.68rem; padding-inline: 6px; }
 	}
 </style>

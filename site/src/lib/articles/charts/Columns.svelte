@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tapAway, leaveFor } from './tap.js';
 	// Column chart for articles: grouped or stacked (optionally as shares of 100%), negatives allowed.
 	// Hover or focus a column for its values; a data table sits under the chart.
 	import Tip from './Tip.svelte';
@@ -108,7 +109,7 @@
 	]);
 </script>
 
-<div class="ch" bind:clientWidth={w}>
+<div class="ch" bind:clientWidth={w} use:tapAway={() => (hover = -1)}>
 	{#if showLegend}<Legend items={legendItems} />{/if}
 	<div class="ch-plot">
 		<svg width={w} {height} role="img" aria-label={`${series.map((s) => s.name).join(', ')} by ${label.toLowerCase()}`}>
@@ -143,7 +144,7 @@
 					<text class="ch-tick" x={band * i + band / 2} y={ph + 18} text-anchor="middle">{xlabels ? (xlabels[i] ?? '') : c}</text>
 					{#if tops[i]}<text class="ch-top" x={band * i + band / 2} y={topY(i) - 7} text-anchor="middle">{tops[i]}</text>{/if}
 					<rect class="ch-hit" x={band * i} y="0" width={band} height={ph} tabindex="0" role="button" aria-label="{c}: {series.map((s) => `${s.name} ${fmt(s.values[i])}`).join(', ')}{line ? `, ${line.name} ${line.fmt(line.values[i])}` : ''}{marks ? `, ${marks.name} ${marks.fmt(marks.values[i])}` : ''}"
-						onpointerenter={() => (hover = i)} onpointermove={(e) => (py = e.offsetY - 10)} onpointerleave={() => (hover = -1)}
+						onpointerenter={() => (hover = i)} onpointerdown={() => (hover = i)} onpointermove={(e) => (py = e.offsetY - 10)} onpointerleave={leaveFor(() => (hover = -1))}
 						onfocus={() => { hover = i; py = m.t; }} onblur={() => (hover = -1)} />
 				{/each}
 			</g>

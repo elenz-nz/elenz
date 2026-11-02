@@ -6,7 +6,7 @@
 	// (Handoff.svelte, build.rec); the path carries data-handoff="rec" for that.
 	import { onMount } from 'svelte';
 	import { loadRecords, liveBeats, recent, get, def, parts, fullName, trimZeros } from '#lib/records/records.js';
-	import { build } from './build.svelte.js';
+	import { build, peekLink } from './build.svelte.js';
 
 	let { D }: { D?: any; now?: any } = $props();
 	let R = $state<any>(null);
@@ -22,6 +22,9 @@
 		const d = def('demand_max'), rec = get(R, 'demand_max', 'NZ');
 		return rec && d ? { d, region: 'NZ', rec, prov: null, label: 'Record' } : null;
 	});
+
+	// the picture opens the record it shows, not the Records index (HOME-05)
+	$effect(() => { peekLink.rec = pick ? `/records/${pick.d.id}${pick.region === 'NZ' ? '' : `?region=${pick.region}`}` : ''; });
 
 	const W = 600, H = 210, TOP = 64, BOT = 8;   // the figure sits over the top-left, so the steps start lower down
 	const chart = $derived.by(() => {

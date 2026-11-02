@@ -38,8 +38,10 @@ Open-Meteo Satellite Radiation API (`satellite-api.open-meteo.com/v1/archive`, `
 at least 2016, about 40–50 minutes behind real time. Values are blank while the sun is under ~10° and for a couple
 of housekeeping slots a day: `rooftop.fill_gaps` fills them from the nearest valid clear-sky index.
 
-Annual 2025 sunshine (kWh/m²) at the points is close to NIWA's long-term figures: Christchurch 1,468, Wellington
-1,467, Dunedin 1,277, Nelson/Tasman 1,600; Auckland 1,623 may be ~5% high.
+Annual 2025 sunshine (kWh/m²) at the points runs 6-9% above NIWA's 1991-2020 means (https://figure.nz/chart/72IvcxUqOYF0xjMa,
+MJ/m²/day × 365.25 / 3.6; checked 2 Nov 2026): Christchurch 1,468 against 1,371, Wellington 1,467 against 1,385, Dunedin 1,277
+against 1,200, Auckland 1,623 against 1,491; Nelson/Tasman 1,600 isn't in that list. One year against a 30-year mean, at
+network points rather than NIWA's stations. An earlier note here said "close to NIWA, Auckland ~5% high", with no source.
 
 ## PV model (`ingest/pv.py`, `check_pv.py`)
 
@@ -162,7 +164,7 @@ burned for generation, and generation emissions. 25 quarters, FY21 Q1 (Jul–Sep
 - Check: Rankines, Huntly 5 and 6 modelled from the dispatch data reproduce Genesis's reported generation emissions
   within ±5% in 20 of 23 quarters, −0.4% overall. FY22 Q3 emissions were revised in a later report from 404 to 611 kt.
 - Geothermal: each station's operational emissions by year (NZGA emissions working group, McLean et al.: CY2020,
-  CY2022 published as lifecycle less 10 g/kWh, CY2023), the latest carried forward; Tauhara 32, Te Huka 3 and TOPP2 0
+  CY2022 published as lifecycle less 10 g/kWh, CY2023), the latest carried forward; Contact's stations use Contact's own figures from FY23 (GEO_CONTACT, green borrowing update reports; Tauhara was TIMES-NZ's assumed 32 until 2 Nov 2026), Ngāwhā 0 from 2024 (Top Energy); TOPP2 0
   (TIMES-NZ assumptions) until published. Generation-weighted over the dispatch data: 2021 70, 2022 69, 2023 60,
   2025 54 g/kWh (NZGA MW-weighted fleet including undispatched stations: 2020 69, 2023 57). Dispatched stations only:
   Ngāwhā B (OEC4) is the only dispatched Ngāwhā plant; TOPP1, GDL and Ngāwhā A are on local networks; 'Wairakei' is
@@ -170,11 +172,18 @@ burned for generation, and generation emissions. 25 quarters, FY21 Q1 (Jul–Sep
 - Kawerau pulp mill cogeneration (KAW0112 ONU0, 'Carter Holt Harvey Energy Ltd CoGen' / 'Norske Skog CoGen', 53 MW,
   Oji): listed as geothermal, but runs ~35–45 MW steady, far more than the 10 MW geothermal mill turbine in the ISK
   Kawerau field study, and geothermal once supplied only ~6% of the mill's electricity (OSTI). Most likely the kraft
-  mill's recovery and bark boilers (black liquor and wood), so counted as zero (bioenergy) for now.
+  mill's recovery and bark boilers (black liquor and wood), so counted as zero (bioenergy) for now. Not confirmed (2 Nov 2026): the mill's cogeneration was about 13.5 MW in 2012 (ISK study), a power boiler closed in 2019 (Oji), and Oji reports 96 GWh at Tasman in 2025 against about 240 GWh here. The site also has the 8 MW TA3a geothermal turbine (NZGA, Bloomer 2015; the ISK study says 10 MW) and GDL/KA24 (57 GWh in 2023) connected to the mill complex. What ONU0 covers is an open question to the EA; no fuel change until it's answered.
 - To reclassify at the next history rebuild: Kinleith (wood-waste cogeneration; turbine failed 2025) and the Kawerau
   mill as Bioenergy; Glenbrook (NZ Steel, waste gas from the ironmaking kilns; two of four kilns replaced by the arc
   furnace in Aug 2026) as zero-emission waste heat (UN CDM ACM0004 counts waste-gas generation as zero; the
   ironmaking emissions sit in industrial processes). Both are 'gas' in the EA register.
+
+Against em6's factors (Carbon Methodology v1.6, Nov 2025, checked 2 Nov 2026): close on the Rankines (1.01 coal, 0.589 gas), Huntly 5 (0.40), the
+Taranaki Combined Cycle (0.40) and most geothermal; apart on Tauhara (0.080 from the generator, close to Contact's commissioning-year 86.53; Contact's FY26 is 22.8), Kinleith (0.364 from the generator, 0 here by
+the owner's call, 2 Nov 2026: Oji calls it biomass cogeneration, and the limit is stated on the method page; 2.1 PJ of fossil fuels against 10.1 PJ of biomass at
+the mill in 2025), the Kawerau mill (0.060 as geothermal, 0 here), Whareroa and Kapuni (0.683, the 0.46 fleet average here), Junction Road (0.548, ~0.51 here), diesel (0.76, 0.80 here).
+MBIE doesn't document that its coal generation includes Glenbrook (Energy in New Zealand 2025 lists 0.68 PJ of waste heat separately and puts the mill's
+coal under other transformation); the case for it is that subtracting Glenbrook reproduces Genesis's figures.
 
 ## Metered history (`metered_check.py`, BUILD 6, 16 Oct 2026)
 
@@ -182,14 +191,13 @@ History back to Aug 1997 comes from the EA's metering (`ingest/metered.py`, `fac
 dispatch files (from 10 Sep 2020) cover the weeks since the latest published month and fill what the metering lacks.
 
 **Overlap, Sep 2020 - Sep 2026 (73 months).** Generation_MD against the site's dispatch history, matched by connection
-point: half-hourly national correlation 0.999 every month; dispatch energy 1-2% above metered every year (by fuel:
-wind +3-4%, hydro +1-2%, geothermal within ±2%, gas and coal within 2%), most likely dispatch MW at the generator
-against metering at the grid connection. Plant level: some embedded points are metered net of local load in
+point: half-hourly national correlation 0.999 every month. (The by-fuel figures first given here, dispatch 1-2% above
+metered and wind +3-4%, don't hold on the site's own series: see "Dispatch against metered, and records" below.) Plant level: some embedded points are metered net of local load in
 Generation_MD (Mangahao ~10% of dispatch, Cobb ~35%, Whareroa ~50%); `Embedded_generation` at those points matches
 dispatch within ~1% (Mangahao 12.4 vs 12.3 GWh, Sep 2026; Te Huka 3 26.7 vs 27.2; Omeheu + Rangitaiki 8.6 vs 8.7), so
 where an embedded meter reads more than Generation_MD at a listed point the difference goes to that point's plant.
-Waikato stations correlate only 0.4-0.7 by half-hour: the chain is block dispatched (the owner's note), so a station's
-dispatch isn't its output. Glenbrook's Generation_MD is ~1.45 × dispatch (dispatch sees part of the plant).
+Waikato stations correlate only 0.4-0.7 by half-hour while the chain's total agrees, so a station's dispatch there
+isn't taken as its output. Glenbrook's Generation_MD is ~1.45 × dispatch (dispatch sees part of the plant).
 
 **Data quirks.** Generation_MD covers embedded stations only from Jan 2009; before that they are in
 `Embedded_generation` (Oct 1998 on, most from Apr 1999) under old codes, only those the tracker shows later being
@@ -301,3 +309,58 @@ before a plant's start (Huntly 5 testing in 2006, Ōtāhuhu B Nov 1998, traces a
 **Uncertain:** New Plymouth's units were run down before Dec 2007 (output ~300-400 MW 2002-07; dates not found);
 Ōtāhuhu A's two Olympus units (MW not found); Ōhaaki's derating date; Kawerau Mill (register 53, output peaks ~40,
 Wikipedia 37); the Stratford peakers (register 2 × 106, Wikipedia 200).
+
+## Other embedded generation (`embedded_other.py`, 1 Nov 2026)
+
+Non-solar generation on local networks that isn't dispatched, so the live week sees it only as lower demand (raised on
+r/nzsolar, 1 Nov 2026: Teviot, Hau Nui). Measured per month as reconciled injection (`Volumes/Reconciliation`, every
+trader at every connection point) less the dispatch data's non-solar generation at the same point, leaving out
+solar-shaped injection series (under 5% of their energy 9 pm-5 am), points whose injection is all on a generator's own
+network (grid stations: block dispatch and terminal-vs-connection differences) and Glenbrook (metered ~1.45 x dispatch).
+
+| Month | GWh | Average MW | Share of dispatched non-solar generation | At points with no dispatched unit |
+| --- | --- | --- | --- | --- |
+| Jan 2026 | 88 | 119 | 2.8% | 64 GWh |
+| Jun 2026 | 102 | 142 | 2.8% | 72 GWh |
+| Sep 2026 | 117 | 163 | 3.3% | 87 GWh |
+
+- **Flat through the day:** Sep 153-173 MW by hour of day, Jan 111-125, so no solar leaks in, and a profile from the
+  latest reconciliation month would estimate it well.
+- **By fuel** (Sep; known plants by point, the rest by the point's GUEHMT registry capacity less dispatched plant,
+  weighted by typical capacity factors): hydro ~57%, geothermal ~16%, landfill gas ~14%, wind ~6%, gas, diesel and
+  unclassified ~7%. About 95% renewable. Jan and Jun are similar (hydro 46-45%, less from Teviot).
+- **Largest:** Ngāwhā's original units at `KOE1101` (16-18 GWh a month, ~22-25 MW: only Ngāwhā B, `NGB0`, is
+  dispatched); Teviot and other Pioneer hydro at `CYD0331` (8-21 GWh); flat output sold through Contact at Silverdale
+  `SVL0331`, Takapu Road `TAK0331` and Bombay `BOB1101` (~20 MW together, landfill gas; the registry files Bombay as
+  natural gas); Hokitika `HKK0661` hydro (6-8 GWh); ~60 small points, mostly hydro (West Coast, Otago, Southland).
+- **Wind is small** (~9 MW average). Hau Nui (`GYT0331`, 8.8 MW in the registry) injected only ~0.1 GWh in Sep 2026.
+- **Effect on shares:** a 24% solar share in the live week is ~23.3% of all generation; the renewable share reads
+  slightly low, the fossil share slightly high.
+- **History vs live:** `Generation_MD` already carries all of Ngāwhā (29-40 GWh a month) and Teviot's own meter
+  (1-13 GWh), so those step down where the history hands over to dispatch data. The rest is missing from the history
+  too: ~2.2-2.4% of generation. Together with industrial cogeneration used on site (in neither dataset), this is the
+  gap to MBIE's totals (`metered_check.py`).
+- **Glenbrook:** metered 44-48 GWh against 32 GWh dispatched in Jan and Jun 2026 (Sep: 6.5 against 9.0).
+
+## Dispatch against metered, and records (`dispatch_vs_metered.py`, `dispatch_metered_fit.py`, 1 Nov 2026)
+
+`dispatch_vs_metered.py` builds every month from Sep 2020 twice from the stored history states, with the site's own
+code: as published (metered generation and demand, final prices, metered HVDC) and dispatch-only (as the site had it
+before any of that arrived). Run read-only in GitHub Actions against KV (a one-off workflow on its own branch).
+
+- **Averages agree closely:** over the 73 months, national wind +0.2%, hydro -0.1%, NZ demand 0.0% (NI -0.6%, SI
+  +1.0%). The plants that differ: Ngāwhā -45% (only Ngāwhā B dispatched), Glenbrook -31%, Kawerau Mill +43% (meter
+  net of the mill's load), Te Rapa +36% (closed 2023), Teviot (metered only), and the Waikato chain station by station
+  (Maraetai +11%, Arapuni -11%, Karāpiro -9%; the chain agrees). Fossil generation reads 3% low in dispatch.
+- **Extremes don't:** a month's highest half-hour in dispatch data runs above the metered one: wind +10 MW nationally
+  (NI 0, SI +10), hydro +21 MW, NZ demand +25 MW, the NI renewable share +0.6 points (Glenbrook and Ngāwhā).
+  Dispatch prices: monthly highest up to $357,000/MWh against final prices of a few thousand.
+- **Provisional records replayed** (each month's figure against the official record before it): uncorrected, 30
+  provisional records the metered data didn't confirm (24 events: wind 12, renewable share 5, demand 4, fossil 2,
+  hydro 1), plus 16 from dispatch prices; 4 real records missed. Missed by small amounts: wind 0-11 MW, the renewable
+  share 0.0-0.7 points.
+- **Corrections** (`dispatch_metered_fit.py` -> `facilities/dispatch_adjust.json`): Ngāwhā x1.80, Glenbrook x1.47,
+  Kawerau Mill x0.68 (latest 24 months); then each record's median shift at the month's extreme, and a margin, the 90th
+  percentile of what is left. The same for whole days, weeks and months. Leave-one-month-out: no provisional record
+  clear of the margin went unconfirmed; of 161 real records, 113 provisional, 46 close (within the margin), 2 missed.
+  Prices set no provisional records (final prices arrive the next day).

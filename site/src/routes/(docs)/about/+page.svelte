@@ -9,6 +9,7 @@
 		sources: '/methods', 'm-gen': '/methods/generation', 'm-roof': '/methods/embedded-solar', 'm-price': '/methods/prices',
 		'm-explain': '/methods/price-explainer', 'm-demand': '/methods/demand', 'm-hvdc': '/methods/hvdc',
 		'm-co2': '/methods/emissions', 'm-hist': '/methods/history', 'm-groups': '/methods/groupings',
+		controls: '/guide',
 	};
 	onMount(() => {
 		const to = MOVED[location.hash.slice(1)];
@@ -106,7 +107,7 @@
 	<header class="mt-head">
 		<p class="mt-kicker">Elenz</p>
 		<h1 id="mt-h">About Elenz</h1>
-		<p class="mt-lede">Elenz shows how New Zealand’s electricity system is running: what is generating, by fuel and by plant; the wholesale price in each island; demand; the flow on the HVDC link between the islands; and how much greenhouse gas the mix emits. The live view updates every five minutes from the Electricity Authority’s market data, and the history goes back to August 1997.</p>
+		<p class="mt-lede">Elenz makes New Zealand’s electricity system easy to follow. The figures behind it are public, but they are spread across market files and technical reports. We bring them together in one place, live every five minutes and back to August 1997, so anyone can see what is powering the country, what it costs and how it is changing.</p>
 		<p class="mt-meta">Free, no ads, and not affiliated with any organisation.</p>
 	</header>
 
@@ -121,6 +122,9 @@
 				</article>
 			{/each}
 		</div>
+
+		<h2 id="using">Using Elenz</h2>
+		<p>Every control on the site, and a few tips, are in <a href="/guide">the guide</a>.</p>
 
 		<h2 id="data">Where the data comes from</h2>
 		<p>Almost everything comes from the Electricity Authority’s market data, published free under CC BY 4.0: the real-time dispatch feed for the live week, and metered generation, grid flows and final prices for the history. Embedded solar is modelled from installed capacity and satellite sunshine, and the live HVDC transfer is estimated, because neither is in the market data.</p>

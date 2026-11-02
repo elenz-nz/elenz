@@ -1,14 +1,30 @@
 // A record as a 1200 x 630 image (the size link previews use), drawn in the browser for the "Download image"
 // button on a record's page: the mark, the record, when it was set, what it beat, and its progression.
-// Always in the light palette (tracker.css), so it reads the same wherever it is posted.
+// In the page's own light or dark colours (owner's report REC-05/06, 31 Oct 2026: downloads were always light).
 import { fmt, fullName, when, step, REGIONS, periodOf, energy } from './records.js';
 
-const C = {
-  bg: '#f2f5f5', ink: '#132020', ink2: '#3f4f4e', muted: '#667574', line: '#d6dfde',
+// tracker.css's palettes, light and dark
+const LIGHT = {
+  bg: '#f2f5f5', ink: '#132020', ink2: '#3f4f4e', muted: '#667574', line: '#d6dfde', tagBg: '#e5ebeb',
   '--ink': '#132020', '--g-ren': '#208a68', '--g-fossil': '#96501a', '--f-coal': '#4b4744', '--f-wind': '#2f9a78',
   '--f-solar': '#c48e10', '--accent': '#0d6275', '--f-hvdc': '#71838f', '--f-geo': '#a63a78', '--f-hydro': '#2f6db8',
   warnBg: '#f6ecd9', warnInk: '#6b4a0d',
 };
+const DARK = {
+  bg: '#131c1c', ink: '#e1e9e9', ink2: '#b3c1c0', muted: '#849493', line: '#2f3e3e', tagBg: '#243030',
+  '--ink': '#e1e9e9', '--g-ren': '#2ea88a', '--g-fossil': '#a8693a', '--f-coal': '#5f5a57', '--f-wind': '#2fa883',
+  '--f-solar': '#bb8c18', '--accent': '#5cb5c8', '--f-hvdc': '#7f909b', '--f-geo': '#c4508f', '--f-hydro': '#4f8bd6',
+  warnBg: '#2e2412', warnInk: '#e9c98a',
+};
+let C = LIGHT;
+
+/** Is the page showing its dark colours (the theme picked on the site, else the system's)? */
+export function pageIsDark() {
+  if (typeof document === 'undefined') return false;
+  const t = document.documentElement.dataset.theme;
+  if (t === 'dark' || t === 'light') return t === 'dark';
+  return typeof matchMedia !== 'undefined' && matchMedia('(prefers-color-scheme: dark)').matches;
+}
 const UI = '"Schibsted Grotesk", system-ui, sans-serif';
 const DATA = '"IBM Plex Mono", ui-monospace, monospace';
 
@@ -22,7 +38,8 @@ function mark(ctx, x, y, s) {
 }
 
 /** Draw a record onto a canvas (1200 x 630). isNew: say "New record". */
-export async function drawRecord(canvas, { d, region, rec, end, isNew, period = 'tp' }) {
+export async function drawRecord(canvas, { d, region, rec, end, isNew, period = 'tp', dark = pageIsDark() }) {
+  C = dark ? DARK : LIGHT;
   try { await document.fonts.ready; } catch { /* fonts are a nicety */ }
   canvas.width = 1200; canvas.height = 630;
   const ctx = canvas.getContext('2d');
@@ -35,7 +52,7 @@ export async function drawRecord(canvas, { d, region, rec, end, isNew, period = 
   const tag = isNew ? 'New record' : 'Record';
   ctx.font = `600 22px ${UI}`;
   const tw = ctx.measureText(tag).width + 36;
-  ctx.fillStyle = isNew ? C.warnBg : '#e5ebeb';
+  ctx.fillStyle = isNew ? C.warnBg : C.tagBg;
   ctx.beginPath(); ctx.roundRect(1136 - tw, 52, tw, 44, 22); ctx.fill();
   ctx.fillStyle = isNew ? C.warnInk : C.ink2; ctx.fillText(tag, 1136 - tw + 18, 75);
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	// The table of plants whose capacity changed is read from capacity.json (ingest/capacity.py), so it stays in step.
-	import { REPO } from '../registry.js';
+	import { REPO, ref } from '../registry.js';
 	import CAPACITY from '#lib/tracker/capacity.json';
 	import { FUELS } from '#lib/tracker/fuels.js';
 
@@ -33,7 +33,7 @@
 <p>Geothermal runs close to flat out, so its capacity factor is high; wind and solar follow the weather; peaking gas plant and Huntly’s Rankine units run when they are needed, so theirs are low.</p>
 
 <h2 id="sources">Where the figures come from</h2>
-<p>Every plant the tracker shows has a row in <a href={REPO + 'facilities/plant_capacity.csv'}><code>facilities/plant_capacity.csv</code></a>, with its MW, the dates each figure applies, and where it comes from. Most come straight from the EA’s plant register. The register gives each plant’s capacity today, though, not its history, and it misses some plants, so about a third of the rows are corrections:</p>
+<p>Every plant the tracker shows has a row in <a href={REPO + 'facilities/plant_capacity.csv'}><code>facilities/plant_capacity.csv</code></a>, with its MW, the dates each figure applies, and where it comes from. Most come straight from the EA’s plant register. The register gives each plant’s capacity today, though, not its history, and it misses some plants, so nearly half the rows are corrections:</p>
 <ul>
 	<li><b>Upgrades and derating:</b> Manapōuri, Clyde, Arapuni, Whakamaru, Karāpiro, Benmore and Ōhau B and C; Wairakei, Mokai, Ngāwhā, Ngā Tamariki and Ōhaaki. The register shows today’s figure for the whole history.</li>
 	<li><b>Closures and retired plant:</b> New Plymouth, Ōtāhuhu A and B, the old Stratford gas turbines, Te Awamutu, Edgecumbe, Te Rapa, and the Taranaki Combined Cycle (closed March 2026).</li>
@@ -41,7 +41,7 @@
 	<li><b>Plants that run above their listed figure:</b> Coleridge (42 MW from May 2026), Ngā Awa Pūrua (148 MW from April 2023) and Te Huka 3 (54 MW) run above the register’s figure all the time, so their capacity is what they run at.</li>
 	<li><b>Figures counted twice:</b> the register repeats a station’s figure on each of its connections or units at Benmore (2009–12), Matahina and Whareroa, and splits West Wind’s 142.6 MW as 80 + 80.</li>
 </ul>
-<p>Corrections come from the operators’ announcements, Wikipedia’s station histories, and steps in the metered output itself, where a plant starts generating above its old figure. Each row says which.</p>
+<p>Corrections come from the operators’ announcements, <a href={ref('wikipedia')}>Wikipedia’s station histories</a>, and steps in the metered output itself, where a plant starts generating above its old figure. Each row says which.</p>
 
 <h2 id="rules">How capacity is counted</h2>
 <ul>
@@ -58,19 +58,20 @@
 <p class="formula">Headroom = capacity − output, for hydro, gas, coal/gas (Huntly’s Rankines), diesel and batteries<small>for each island and fuel, never below zero, then added up; batteries count discharge only</small></p>
 <ul>
 	<li><b>Installed:</b> capacity is every unit’s installed MW, from the table below. Every unit counts as available, so this is the most there could have been.</li>
-	<li><b>Offered:</b> capacity is what generators offered for each half-hour in their final energy offers (the EA’s daily offers files, from January 2013). The EA holds no reliable offer records before December 2012, apart from the offers used in final pricing, so on ranges that reach back further the offered levels start in 2013 and the chart says so. Plant that is off and slow to start isn’t offered, so most days Huntly’s Rankine units drop out, as do units out for maintenance or faults and plant short of fuel. On 16 October 2026 the lowest headroom was about 3,500 MW installed but 1,150 MW offered: Huntly 1, 2, 4 and 5 offered nothing, and Manapōuri offered 620 of its 800 MW.</li>
+	<li><b>Offered:</b> capacity is what generators offered for each half-hour in their final energy offers (the EA’s daily offers files, from January 2013). <a href={ref('ea-offers')}>The EA holds no reliable offer records before December 2012</a>, apart from the offers used in final pricing, so on ranges that reach back further the offered levels start in 2013 and the chart says so. Plant that is off and slow to start isn’t offered, so most days Huntly’s Rankine units drop out, as do units out for maintenance or faults and plant short of fuel. On 16 October 2026 the lowest headroom was about 3,500 MW installed but 1,150 MW offered: Huntly 1, 2, 4 and 5 offered nothing, and Manapōuri offered 620 of its 800 MW.</li>
 	<li><b>Under $1,000:</b> only the part offered under $1,000/MWh. Generators offer water they want to keep, and peaking plant, at high prices, so this is what was there at a price the market usually pays. Whirinaki’s diesel units are usually offered above it.</li>
 </ul>
-<p>Geothermal, bioenergy and waste heat are left out because they run close to flat out as a rule, and wind and solar because they follow the weather. An island on its own counts only its own plant, not what the HVDC link could bring. Thermal plant and batteries sit at the bottom of the By fuel view and hydro on top; <b>Include hydro</b> takes hydro out.</p>
+<p>Geothermal, bioenergy and waste heat are left out because they run close to flat out as a rule, and wind and solar because they follow the weather. An island on its own counts only its own plant, not what the HVDC link could bring.</p>
+<p><b>Levels</b> draws the three as nested areas; <b>By fuel</b> stacks one of them by fuel, thermal plant and batteries at the bottom and hydro on top. Turning off <b>Include hydro</b> leaves hydro out of both.</p>
 <p>The chart follows the range and interval. Where a point covers more data than it shows (days built from half-hours, or weeks and months), each level is its lowest within the point. The offers job (<a href={REPO + 'ingest/offered.py'}><code>ingest/offered.py</code></a>) keeps each day’s lowest offered headroom; daily history keeps each day’s highest half-hour of dispatchable output, so installed headroom’s lowest reaches back to 1997.</p>
 <p>Even offered headroom overstates the margin a little:</p>
 <ul>
-	<li>offers are published the day after, so the newest day has none (shaded);</li>
+	<li>offers are published the day after, and now and then a day comes later, so recent days without them are shaded “Offers not published yet”;</li>
 	<li>capacity held as reserve on running plant is still counted;</li>
 	<li>a unit offered but needing hours to reach full output, or a river chain that can’t run every station at once, counts in full;</li>
 	<li>output the grid can’t carry, and transmission outages, aren’t considered.</li>
 </ul>
-<p>Offers don’t say why MW wasn’t offered: an outage, maintenance, a unit not committed, or fuel or water kept back all look the same. Transpower’s security-of-supply reports and the system operator’s residual generation figures take outages and reserves into account.</p>
+<p>Offers don’t say why MW wasn’t offered: an outage, maintenance, a unit not committed, or fuel or water kept back all look the same. <a href={ref('sos')}>Transpower’s security-of-supply reports</a> and the system operator’s residual generation figures take outages and reserves into account.</p>
 
 <h2 id="changes">Plants whose capacity changed since 1997</h2>
 <div class="tbl">
@@ -87,7 +88,7 @@
 <h2 id="limits">Known limits</h2>
 <ul>
 	<li><b>Uncertain rows.</b> New Plymouth counts its full 600 MW until it was mothballed in December 2007, though its output says units were run down earlier. Ōtāhuhu A counts its four 45 MW turbines, without two later units whose size wasn’t found. Ōhaaki’s derating from 104 MW to about 65 MW isn’t dated. Clyde’s rise to 464 MW is dated from its output (November 2015), not the consent change (2005). Each is marked in the file.</li>
-	<li><b>Dispatch and metered output differ:</b> dispatch figures run 1–2% above metered (see <a href="/methods/history#seam">history</a>), so capacity factors for the latest weeks, which use dispatch data, read slightly high.</li>
+	<li><b>Dispatch and metered output differ for a few plants:</b> most agree within a fraction of a percent, but Ngāwhā, Glenbrook, Kawerau Mill and stations on block-dispatched river chains read differently (see <a href="/methods/history#seam">history</a>), so their capacity factors for the latest weeks, which use dispatch data, differ from the metered ones.</li>
 	<li>Plants not in the market data, such as small embedded hydro and industrial cogeneration that isn’t metered, aren’t counted in either the output or the capacity.</li>
 </ul>
 

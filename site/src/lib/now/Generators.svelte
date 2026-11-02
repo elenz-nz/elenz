@@ -5,19 +5,19 @@
 	import InfoTip from '#lib/site/InfoTip.svelte';
 	import { onMount } from 'svelte';
 	import { replaceState } from '$app/navigation';
-	import { generatorRows, readSettings, writeSettings, pick } from './generators.js';
+	import { generatorRows, readSettings, writeSettings, pick, SORTS } from './generators.js';
 	import { slug } from '#lib/site/viewurl.js';
 
 	let { D, when }: { D: any; when: string } = $props();
 
 	const SHOW = 20;   // rows before "Show all", while no filter is set
 	const rows = $derived(generatorRows(D));
-	let s = $state({ fuel: '', island: '', owner: '', by: 'mw', asc: false, text: '', on: false });
+	let s = $state<{ fuel: string; island: string; owner: string; by: string; asc: boolean; then: { by: string; asc: boolean }[]; text: string; on: boolean }>({ fuel: '', island: '', owner: '', by: 'mw', asc: false, then: [], text: '', on: false });
 	let ready = false;
 	let all = $state(false);
 	let open = $state(new Set<string>());
 
-	onMount(() => { s = readSettings(location.search, rows); ready = true; });
+	onMount(() => { const r = readSettings(location.search, rows); s = { ...r, then: r.then ?? [] }; ready = true; });
 	// keep the address in step with the settings (replace, so Back leaves the page rather than undoing filters)
 	$effect(() => {
 		const qs = writeSettings(s);
@@ -38,30 +38,46 @@
 	const fmt = (v: number) => Math.round(v).toLocaleString('en-NZ').replace('-', '−');
 	// a charging battery shows how hard it is charging, as a share of its MW rating, below zero
 	const pctText = (r: { pct: number | null; charging: boolean }) => (r.pct == null ? '–' : r.charging ? `−${Math.round(-r.pct)}%` : `${Math.round(Math.max(0, r.pct))}%`);
-	function sortBy(by: string) {
+	// a click sorts by that column (again: the other way); Shift-click adds it as the next key, or turns an added one
+	// round, e.g. island then MW (owner's report NOW-10, 31 Oct 2026)
+	const natural = (by: string) => ['name', 'fuel', 'island', 'owner'].includes(by);   // words A to Z first, numbers largest first
+	function sortBy(by: string, add = false) {
+		const then = s.then ?? [];
+		if (add && s.by !== by) {
+			const k = then.find((x) => x.by === by);
+			s.then = k ? then.map((x) => (x.by === by ? { by, asc: !x.asc } : x)) : [...then, { by, asc: natural(by) }];
+			return;
+		}
+		s.then = add ? then : [];
 		if (s.by === by) s.asc = !s.asc;
-		else { s.by = by; s.asc = by === 'name'; }
+		else { s.by = by; s.asc = natural(by); }
 	}
+	const thenBy = (by: string) => { s.then = by ? [{ by, asc: natural(by) }] : []; };
 	const ariaSort = (by: string) => (s.by === by ? (s.asc ? 'ascending' : 'descending') : 'none');
+	// the column's place among several sort keys, and its direction, for its arrow
+	const sortMark = (by: string) => {
+		const keys = [{ by: s.by, asc: s.asc }, ...(s.then ?? [])], i = keys.findIndex((k) => k.by === by);
+		return i < 0 ? '' : `${keys[i].asc ? '↑' : '↓'}${keys.length > 1 ? i + 1 : ''}`;
+	};
 	function toggle(key: string) {
 		const n = new Set(open);
 		n.has(key) ? n.delete(key) : n.add(key);
 		open = n;
 	}
-	const reset = () => { s = { fuel: '', island: '', owner: '', by: 'mw', asc: false, text: '', on: false }; };
+	const reset = () => { s = { fuel: '', island: '', owner: '', by: 'mw', asc: false, then: [], text: '', on: false }; };
 </script>
 
 <section class="gens" aria-labelledby="gens-h">
 	<div class="p-head">
 		<h2 id="gens-h">Every generator right now</h2>
 		<span class="p-info"><InfoTip label="About this list">
+			<p>This lists every power station that has generated in the past 7 days and what each is doing right now.</p>
 			<ul>
-				<li>Every plant that has generated in the past 7 days. One that hasn't run all week, like a peaker on standby, isn't listed.</li>
-				<li>MW is the plant's 5-minute dispatch target.</li>
-				<li>% is that MW against the plant's installed capacity. A plant that always runs above its listed capacity counts what it runs at.</li>
-				<li>Batteries show negative while charging.</li>
-				<li>Embedded solar isn't listed.</li>
-				<li>Tap a plant for its history.</li>
+				<li>MW: the plant's 5-minute dispatch target. Some hydro stations are dispatched together as a block, so one station's actual output can differ.</li>
+				<li>% of capacity: current MW against the plant's installed capacity.</li>
+				<li>Batteries show negative MW while charging.</li>
+				<li>Click a column heading to sort by it; Shift-click another to sort within it (island, then MW).</li>
+				<li>Tap a plant to see its history in the Tracker.</li>
 			</ul>
 			<p><a href="/methods/capacity">How capacity is counted</a></p>
 		</InfoTip></span>
@@ -81,6 +97,19 @@
 		<label><span class="sr">Owner</span>
 			<select bind:value={s.owner}><option value="">All owners</option>{#each owners as o (o)}<option value={slug(o)}>{o}</option>{/each}</select>
 		</label>
+		<!-- phones hide the fuel, island and owner columns, so their sorts are offered here -->
+		<label class="g-sort"><span class="sr">Sort by</span>
+			<select value={s.by} onchange={(e) => sortBy((e.currentTarget as HTMLSelectElement).value)}>
+				{#each Object.entries(SORTS) as [k, name] (k)}<option value={k}>Sort: {name}</option>{/each}
+			</select>
+		</label>
+		<!-- the phone's way to Shift-click a second column (owner's report NOW-10, 2 Nov 2026) -->
+		<label class="g-sort"><span class="sr">Then by</span>
+			<select value={s.then?.[0]?.by ?? ''} onchange={(e) => thenBy((e.currentTarget as HTMLSelectElement).value)}>
+				<option value="">Then: nothing</option>
+				{#each Object.entries(SORTS).filter(([k]) => k !== s.by) as [k, name] (k)}<option value={k}>Then: {name}</option>{/each}
+			</select>
+		</label>
 		<label class="g-on"><input type="checkbox" bind:checked={s.on} /> Generating only</label>
 		{#if filtered}<button type="button" class="g-reset" onclick={reset}>Clear</button>{/if}
 	</div>
@@ -89,12 +118,12 @@
 		<table class="gtab">
 			<thead>
 				<tr>
-					<th scope="col" aria-sort={ariaSort('name')}><button type="button" onclick={() => sortBy('name')}>Plant</button></th>
-					<th scope="col" class="c-fuel">Fuel</th>
-					<th scope="col" class="c-isl">Island</th>
-					<th scope="col" class="c-own">Owner</th>
-					<th scope="col" class="n" aria-sort={ariaSort('mw')}><button type="button" onclick={() => sortBy('mw')}>MW</button></th>
-					<th scope="col" class="n c-pct" aria-sort={ariaSort('pct')}><button type="button" onclick={() => sortBy('pct')}>Of capacity</button></th>
+					<th scope="col" aria-sort={ariaSort('name')}><button type="button" onclick={(e) => sortBy('name', e.shiftKey)} data-sort={sortMark('name')}>Plant</button></th>
+					<th scope="col" class="c-fuel" aria-sort={ariaSort('fuel')}><button type="button" onclick={(e) => sortBy('fuel', e.shiftKey)} data-sort={sortMark('fuel')}>Fuel</button></th>
+					<th scope="col" class="c-isl" aria-sort={ariaSort('island')}><button type="button" onclick={(e) => sortBy('island', e.shiftKey)} data-sort={sortMark('island')}>Island</button></th>
+					<th scope="col" class="c-own" aria-sort={ariaSort('owner')}><button type="button" onclick={(e) => sortBy('owner', e.shiftKey)} data-sort={sortMark('owner')}>Owner</button></th>
+					<th scope="col" class="n" aria-sort={ariaSort('mw')}><button type="button" onclick={(e) => sortBy('mw', e.shiftKey)} data-sort={sortMark('mw')}>MW</button></th>
+					<th scope="col" class="n c-pct" aria-sort={ariaSort('pct')}><button type="button" onclick={(e) => sortBy('pct', e.shiftKey)} data-sort={sortMark('pct')}>Of capacity</button></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -165,8 +194,7 @@
 	.gtab th button { all: unset; cursor: pointer; }
 	.gtab th button:hover { color: var(--ink); }
 	.gtab th button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-	.gtab th[aria-sort='ascending'] button::after { content: ' ↑'; color: var(--accent); }
-	.gtab th[aria-sort='descending'] button::after { content: ' ↓'; color: var(--accent); }
+	.gtab th button[data-sort]:not([data-sort=''])::after { content: ' ' attr(data-sort); color: var(--accent); }
 	.gtab td { padding: 6px 8px 6px 0; border-bottom: 1px solid var(--grid); }
 	.gtab .n { text-align: right; font-family: var(--font-data); padding-right: 0; padding-left: 8px; }
 	.gtab th.n { font-family: var(--font-ui); }
@@ -189,8 +217,10 @@
 	.none { color: var(--muted); padding: 14px 0; }
 	.gtab tfoot th, .gtab tfoot td { padding-top: 8px; border: 0; font-weight: 700; color: var(--ink) !important; text-transform: none !important; letter-spacing: 0 !important; font-size: 0.86rem !important; }
 	/* phones: plant, MW and share of capacity; fuel stays as the dot, island and owner as filters */
+	.g-sort { display: none; }
 	@media (max-width: 640px) {
 		.c-fuel, .c-isl, .c-own { display: none; }
+		.g-sort { display: block; }
 		.g-find { flex: 1 1 100%; }
 		.g-find input { width: 100%; box-sizing: border-box; }
 		.g-ctl select { flex: 1 1 30%; min-width: 0; }

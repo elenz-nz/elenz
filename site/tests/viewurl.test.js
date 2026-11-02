@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { readQuery, writeQuery, slug, stamp, fromStamp, endOfDay, ymd, describe, shareLinks, addDays, midnightOf } from '#lib/site/viewurl.js';
+import { readQuery, writeQuery, slug, stamp, fromStamp, endOfDay, ymd, describe, shareLinks, addDays, addYears, midnightOf } from '#lib/site/viewurl.js';
 
 const PLANTS = JSON.parse(readFileSync(new URL('../src/lib/tracker/plants.json', import.meta.url)));
 const CAPACITY = JSON.parse(readFileSync(new URL('../src/lib/tracker/capacity.json', import.meta.url)));
@@ -131,4 +131,24 @@ test('zoom: the menu spans and a dragged span', () => {
   const L = shareLinks('/tracker', { range: '1d', zoom: { span: 3 } }, { latestEnd: endOfDay('2026-10-18'), days: 1, zoomAt: z });
   assert.equal(L.live, 'https://elenz.co.nz/tracker?zoom=3h');
   assert.equal(L.fixed(false).url, 'https://elenz.co.nz/tracker?end=2026-10-18&zoom=2026-10-19T13:05~2026-10-19T15:30');
+});
+
+test('the Prices tab can turn its priced-apart shading off (PRC-01)', () => {
+  assert.deepEqual(readQuery('?hide=OTA,spread,hvdc,bogus').hide, ['OTA', 'spread']);
+  assert.equal(writeQuery({ hide: ['spread'] }), 'hide=spread');
+});
+
+test('hidden layers travel in the address, by name', () => {
+  const q = writeQuery({ region: 'NZ', range: '1d', off: ['wind', 'manapouri'] });
+  assert.match(q, /off=wind%2Cmanapouri|off=wind,manapouri/);
+  assert.deepEqual(readQuery('?' + q).off, ['wind', 'manapouri']);
+  assert.equal(readQuery('?off=BAD<x>').off, undefined);
+  assert.ok(!writeQuery({ region: 'NZ', range: '1d', off: [] }).includes('off'));
+});
+
+test('a year on or back keeps the date through leap years (CHT-11)', () => {
+  const nzMidnight = (y, m, d) => midnightOf(Date.UTC(y, m - 1, d, 2));
+  assert.equal(addYears(nzMidnight(2025, 1, 1), -1), nzMidnight(2024, 1, 1));   // 366 days
+  assert.equal(addYears(nzMidnight(2024, 1, 1), -1), nzMidnight(2023, 1, 1));
+  assert.equal(addYears(nzMidnight(2023, 7, 1), 1), nzMidnight(2024, 7, 1));
 });

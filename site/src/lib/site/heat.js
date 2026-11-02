@@ -22,7 +22,16 @@ export function loadTod(base = '/data/history') {
 /** The window a heat map covers for a view's [from, to): daily rows (at least MIN_DAYS) or, over MAX_DAYS, monthly. */
 export function heatWindow(from, to) {
   if (to - from > MAX_DAYS * DAY) return { kind: 'months', from, to };
-  return { kind: 'days', from: Math.min(from, to - MIN_DAYS * DAY), to };
+  // a year's daily rows start at its first whole day, like the cards above them, which use daily points there (a live
+  // year starts at noon a year ago, so the heat map began a day earlier than they did); shorter ranges use half-hours,
+  // which start where the range does
+  const start = Math.min(from, to - MIN_DAYS * DAY);
+  return { kind: 'days', from: to - start > 32 * DAY ? nextMidnight(start) : start, to };
+}
+/** The first NZ local midnight at or after t. */
+function nextMidnight(t) {
+  const loc = t + nzOffset(t), day = Math.ceil(loc / DAY) * DAY;
+  return day - nzOffset(day - nzOffset(day));
 }
 
 /** Load what a heat map needs: { kind: 'days', seg } (half-hourly segment) or { kind: 'months', tod, from, to }. */

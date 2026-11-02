@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tapAway, leaveFor } from './tap.js';
 	// Generation stacked by fuel over a few days, demand as a line on top, and an optional second panel (price)
 	// on its own axis underneath. One crosshair drives both panels and the readout.
 	import Tip from './Tip.svelte';
@@ -66,7 +67,7 @@
 	]);
 </script>
 
-<div class="ch" bind:clientWidth={w}>
+<div class="ch" bind:clientWidth={w} use:tapAway={() => (hi = -1)}>
 	<Legend items={[...layers.map((L) => ({ name: L.name, tok: L.tok })), { name: line.name, tok: line.tok, kind: 'line' as const }]} />
 	<div class="ch-plot">
 		<svg width={w} height={H} role="img" aria-label="{line.name} and generation by fuel{panel ? `, with ${panel.name.toLowerCase()}` : ''}">
@@ -102,7 +103,7 @@
 					<circle class="ch-dot" cx={x(hi)} cy={y(line.values[hi])} r="4" style="fill: var({line.tok})" />
 					{#if panel}<circle class="ch-dot" cx={x(hi)} cy={ph + gap + py(panel.values[hi])} r="4" style="fill: var({panel.tok})" />{/if}
 				{/if}
-				<rect class="ch-hit" x="0" y="0" width={pw} height={ph + (panel ? gap + qh : 0)} onpointermove={move} onpointerleave={() => (hi = -1)} role="presentation" />
+				<rect class="ch-hit" x="0" y="0" width={pw} height={ph + (panel ? gap + qh : 0)} onpointermove={move} onpointerdown={move} onpointerleave={leaveFor(() => (hi = -1))} role="presentation" />
 			</g>
 		</svg>
 		{#if hi >= 0}<Tip x={m.l + x(hi)} y={Math.max(0, tipY)} {w} title={TIME.format(new Date(t0 + hi * step)).replace(/\b(AM|PM)\b/g, (s) => s.toLowerCase())} {rows} />{/if}

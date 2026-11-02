@@ -18,8 +18,15 @@ the owner. Merged branches are deleted automatically.
 Auto-merge only works while something is still to wait for: on a PR whose checks have all passed GitHub refuses it
 (HTTP 422 "Pull request is in clean status"). Then merge it directly:
 `gh api -X PUT repos/elenz-nz/elenz/pulls/<n>/merge -f merge_method=squash` (the checks still gate it: GitHub refuses a
-merge while a required check is failing or pending). After a squash merge, `git checkout main && git pull` before the
+merge while a required check is failing or pending). It also refuses (HTTP 405 "Protected branch update failed", the PR's `mergeable_state`
+"unstable") while any check is still running, the preview's `Workers Builds` included, and auto-merge is refused
+then too: wait until the PR reads "clean" and merge directly (31 Oct 2026, PR #49). After a squash merge, `git checkout main && git pull` before the
 next branch; the old local branch has no remote any more, which is expected.
+A merge doesn't always deploy: Cloudflare's production build for #46 (30 Oct 2026) never ran, and the site stayed on the
+previous build. To check what is live, `https://elenz.co.nz/_app/version.json` holds the build time (ms since 1970,
+UTC); it should be just after the merge. If it isn't, retry the build in the Cloudflare dashboard (Workers & Pages →
+elenz → Deployments) or merge the next change. The `Workers Builds` check isn't reported on every main commit, so its
+absence alone proves nothing.
 A Claude session can't push until the repository is attached with push access (`add_repo`, owner `elenz-nz`, repo
 `elenz`, access `push`); a push refused with "not in this session's authorized repository set" (HTTP 403) means that
 step was skipped, not that anything is wrong with the repository or its token.
@@ -30,7 +37,7 @@ Preview links (since 24 Oct 2026): Cloudflare Workers Builds builds every other 
 live data; that's safe because only the Worker's scheduled handler writes to KV and previews run no crons. Its pages
 keep elenz.co.nz as their canonical address, and every host but elenz.co.nz is sent `X-Robots-Tag: noindex`
 (`site/static/_headers` for static files; `noindexOffSite` in `worker/index.js` for the Worker's own responses), so
-Google doesn't index previews as copies. `preview_urls` is set explicitly because `workers_dev` is off. The build's check on the pull request says whether it built.
+Google doesn't index previews as copies. `preview_urls` is set explicitly because `workers_dev` is off. The build's check on the pull request says whether it built. A new branch's first push doesn't always start one (2 Nov 2026, PR #59: no Workers check after 10 minutes and the preview answered 404); an empty commit started it.
 Each branch's preview copies the dashboard's "Previews Base" build settings the first time it builds and keeps that copy:
 after changing the base (preview command `npx wrangler preview`), an existing branch keeps its old settings, so use a
 fresh branch. A preview build's check links under `.../previews/<branch>/builds/`; one under `.../production/builds/`
@@ -45,6 +52,34 @@ Until the site is announced every page shows a thin "Beta" line above the masthe
 `.beta-note` in `site/src/lib/tracker/tracker.css`). It has no end date: the owner decides when to announce. Then
 delete the markup, the styles (keeping `.mast-wrap` is harmless) and this section.
 
+## ⓘ notes: how to write them (owner's rules, 1 Nov 2026)
+
+Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike across the site (rewritten to it in PR #52):
+
+1. **One plain opening sentence** (`<p>`) saying what the chart or card shows, in layman's terms. Don't repeat the title
+   word for word (it sits right beside the note): "This shows…", "This lists…", "These are…".
+2. **Then 2–5 short bullets** (`<ul>`), one idea each, saying what you can see or do. Say what it can do, not what it
+   can't (no "not on All", "no comparison"): drop a bullet that doesn't apply rather than explain its absence.
+3. **Same order everywhere:** how to read it (lines, colours, units), then what you can do (buttons, hover, drag), then
+   where the numbers come from.
+4. **Start a bullet with the thing on screen**: "Dashed line:", "Shading:", a button's name in quotes ("Scale to this
+   view"), so readers can match it to what they see.
+5. **Fit the view.** Name the region, interval and choice shown ("New Zealand's", "the North Island", "each week",
+   "wind"), and show bullets only when they apply (`{#if}` on island views, daily and longer intervals, a metric).
+6. **End with a link to the method page section** (`<p><a href="/methods/…#…">How … is worked out</a></p>`); a second
+   link only when two methods matter. A new kind of chart gets a method section to link to.
+7. **Plain words and NZ English.** Explain a term the first time a note uses it (dispatch, node, capacity factor,
+   inverter-based); keep the same words everywhere (North Island, South Island, embedded solar, the live week, final
+   prices, metered). Give prices a feel: $100/MWh is 10c a kWh, before lines and retail charges.
+8. **Same chart, same note** (HVDC transfer reads the same on both tracker tabs).
+9. **Phone-sized:** about 70 words in any one view.
+10. **Estimates and provisional figures stated as plain facts** ("estimated", "provisional"), not apologies.
+11. **Lowercase for ordinary things** (wholesale price, generation), capitals only for names (Haywards, the EA, Huntly).
+12. **Works in light and dark mode:** no "paler" or "darker" for colour scales; "fainter colour" reads right in both.
+13. A data state (no offers yet, not built yet) belongs on the chart itself (a banner, shading, a legend key), not in
+    the ⓘ. The Generation chart's ⓘ ends with the grouping's own note (`NOTES` in tracker.js, one for every grouping,
+    the grouping's name in bold, not capitals).
+
 ## Layout
 
 - `site/`: SvelteKit 3 + Svelte 5, `adapter-static`, every page prerendered. Hosted on Cloudflare Workers as static
@@ -57,7 +92,7 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   it out onto the Tracker preview (the line grows on its own clock, `GROW`, as the dot passes the line's end and flies
   on), then climbs the Records preview's staircase on its own clock (`CLIMB`, so it finishes even where the page can't
   scroll that far; stops are pulled in to the last scroll position) (`RecordsPeek.svelte`: the latest record's
-  progression, path `data-handoff="rec"`, drawn up to the dot by a clip from `build.rec`); shared chart geometry in `geometry.js`, map positions in `src/lib/home/maplayout.js`); `/now` the live page
+  progression, path `data-handoff="rec"`, drawn up to the dot by a clip from `build.rec`; the preview's picture opens the record it shows, `peekLink` in `build.svelte.js`, HOME-05); once the line has gone into its dot the hero chart takes no hover and its axis words fade (`html[data-ho]`, HOME-02); the Now preview's figures show in full while its rings draw (no count-up); a short landscape screen (≤ 520 px tall) gets the compact logo and a smaller figure (HOME-06); shared chart geometry in `geometry.js`, map positions in `src/lib/home/maplayout.js`); `/now` the live page
   (`src/routes/now/+page.svelte`: live figures, the island map with each island's mix ring, the generation mix now,
   from tracker.json's newest interval via `src/lib/home/now.js`; island outlines in `src/lib/home/nzmap.js`, made by
   `analysis/make_nz_map.py`; under the price tiles the price explainer, "Why is the price high?": rules and wording in
@@ -84,25 +119,41 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   23/25-hour clock-change days); their energy is shown beside it (`energy`, `periodHours` in records.js: average x the
   period's hours from its NZ local midnights) on the record page, the index table and the share image (owner's call,
   23 Oct 2026). Each record page has Share (phones: the share sheet with the record's image, a line about it and the
-  link; computers: copies the link) and Download (the 1200 x 630 PNG from `shareImage.js`) beside the region picker,
-  and again at its foot. Its two charts (`Progression`, `DayChart`) pin a point on click, tap or drag (it stays after
-  the finger lifts; another click, a tap outside or Escape lets go), and on touch the tooltip sits above the chart.
+  link; computers: copies the link) and Download (the 1200 x 630 PNG from `shareImage.js`, in the page's light or dark
+  colours, `pageIsDark`; REC-05/06) beside the region picker, and again at its foot. The image is drawn ahead
+  (`prepared`), because phones refuse a share that waits on drawing; when a browser refuses to share or copy (Firefox on
+  Android, SHR-03; a second share there is refused with InvalidStateError, a share it never settled, so the link
+  is copied instead) the link is shown with its own Copy button (`src/lib/site/CopyLink.svelte`, also in the tracker
+  tabs' Share panel). Its two charts (`Progression`, `DayChart`) pin a point on click, tap or drag (it stays after
+  the finger lifts; another click, a tap outside or Escape lets go), and on touch the tooltip sits above the chart. With a mouse the pin keeps its own line and tooltip while the pointer reads another point, for comparing, and the hover tooltip slides clear of it (`held`, `keepClear` in keepclear.js; REC-05).
   A mouse drag across either zooms into that span (owner's call, 25 Oct 2026; the y axis fits what is shown, the
   progression's x axis turns to months, `DayChart` labels with `periodAxis`'s `lab` past its usual ticks). Zoom and pin
   are bound to the page, which shows Reset zoom and Pinned · Release in the card's heading (`ChartControls.svelte`), never
   over the chart; Escape lets go of the pin first, then the zoom. The progression's explanation is the ⓘ beside "How the
   record grew" (`growNote`), not a line under the chart. "Has stood for" counts from the end of the record's period
   (`recEnd`: a year record from 1 January after it), not its start.
-  Records added 23 Oct 2026 (records.py VERSION 4): most fossil generation, peak hydro, and, for days/weeks/months/years
-  only (`periods: true` in DEFS), lowest hydro and lowest price: the half-hour list shows their day record (`Average over
-  the day`), and their page opens on its day (owner's report, 25 Oct 2026: the note there looked like a gap). A record
+  Records added 23 Oct 2026 (records.py VERSION 4): most fossil generation, peak hydro, lowest hydro and lowest price.
+  Every record the data holds is shown, half-hours included (owner's rule, 30 Oct 2026: nothing left out for being
+  less interesting; lowest hydro and lowest price had been kept to days and longer). Under Heading for a record and New and provisional, three tabs (`TABS`, `?tab=milestones|months`;
+  owner's call REC-01, 31 Oct 2026): All-time records (with the region picker), Milestones and By month (each a card for New Zealand and each island side by side,
+  three across from 900 px, full lists; owner's call, 31 Oct 2026; pointing at a row lights the same milestone or record in every region's card, a click pins it and another lets go, `data-k`/`lit`/`pinned`). The month-of-year table lists every
+  half-hour record, with TP and Day buttons (`moyPer`, address `by=day`; records.json `moy_day`, `best_day_by_month` in records.py, official days only; owner's call REC-13, 2 Nov 2026; until a file has `moy_day` it shows trading periods alone) and Milestones all of them. "New" (`isNew` in
+  records.js, `_since_ok` in records.py) is a record first seen in the last 30 days whose period ended within `NEW_LAG`
+  (120) days of that (metered data runs 5-6 weeks behind each month), so a rebuild that moves an old record isn't new (REC-02, 31 Oct 2026); New and provisional (owner's
+  call, 1 Nov 2026; `recentAll`, `topCards` in records.js) holds every new, provisional and close record for every region
+  and period, ranked: new official before provisional before close, a bigger jump against the record's usual step, NZ
+  before an island, a half-hour, month or year before a week or day. The first 4 cards are the most notable (one per
+  record, at most two per group) and give only the period; Show all lists every card for one region (the page's
+  `region`, shared with the All-time list and its picker) under its period (Trading period, Day, Week, Month, Year,
+  Runs) with its date (REC-09). Both Show all buttons sit in their section titles. An island's list leaves out records that can't apply there (always 100% renewable, no
+  fossil plant, never a net southward period; a period record that never moved shows as one step) and groups left empty (REC-03). A record
   page's "Records" breadcrumb returns to the list's own period (`period`, the one asked for), not the page's `per`. A DEFS entry's `v` is the records.json version that first has it; an older file says it is being worked out.
   "Heading for a record" (owner's call, 23 Oct 2026): `pace()` in records.js lists a current day/week/month/year once
   half of it has gone (`PACE_SHARE`) and only while it is ahead of its record period at the same point (whole days, or
   half-hours for a day), from records.json `pace` (records.py `pace_sums`: the current periods' sums in the history,
   and `to`) plus the live week after it, against each record's `curve` (`period_curve`: the record period's running
-  figure; on the provisional record when one is beyond); shown as cards on /records (8, then Show all) and a panel on
-  the record's page. The Records index's rows open their record from anywhere on the row.
+  figure; on the provisional record when one is beyond); shown as cards on /records (whole rows only, `paceShown`: 8 made up to a whole row, or the whole rows there are, then Show all; REC-09) and a panel on
+  the record's page. The Records index's rows open their record from anywhere on the row. The region picker, the period buttons (Trading period to Year, styled like the tracker's range buttons; their short names on phones) and the "Official to" pill sit in the main list's own title bar (`.list-bar`, a sticky `.toolbar` inside the list's section, so it sticks only while the list shows; two rows up to 900 px, region and periods kept to one row down to 360 px), not at the top of the page: Heading for a record and New and provisional cover every region (owner's call, 30 Oct 2026). Every card on the page has an ⓘ in short bullet points.
   `hist/records-detail.json` (records.py `build_detail`, published with records.json when it changes; served by the
   Worker; loaded only by record pages via `loadDetail`): `bg`, each record's best by month (by year for year records)
   against `months`/`years`, the faint line behind `Progression` (`bgOf`; its hover follows the pointer's date and gives
@@ -130,26 +181,30 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   (`src/routes/tracker/prices/+page.svelte`: six node prices, the island spread and HVDC on one time axis for the live week and
   30 days; each period's price range, spread and half-hours over $500/$1,000 for 12 months and All; price captured by fuel;
   a time-of-day heat map. Data shaping in `src/lib/prices/data.js`, SVG charts in `src/lib/prices/`. Under the Generation tab's charts, `src/lib/generation/GenLower.svelte`: a share of generation over the range with the same dates a year earlier (365 days; not on All), dispatchable headroom (hydro, gas, coal/gas, diesel and battery capacity less output at three levels: installed (`capacity.json`), offered and offered under $1,000/MWh (`hist/off/*` from `ingest/offered.py`); Levels view (nested areas) or By fuel (one level stacked, hydro on top and optional); where a chart point spans more data, each level's lowest within it, which for installed capacity on daily history needs `peak.disp`/`peak.dispx`, each day's highest half-hour of dispatchable output with and without hydro (since BUILD 7); method on /methods/capacity#headroom), the mix by fuel with capacity factors (from `capacity.json`; peaks only for half-hourly or finer data; batteries count discharge, daily history's `batt_d`), and the range by time of day; data shaping in `src/lib/generation/data.js`. Both tabs' heat maps follow the range
-  (`src/lib/site/heat.js`): one row per day from half-hourly history up to 400 days (at least the last 7), scrolling
+  (`src/lib/site/heat.js`): one row per day from half-hourly history up to 400 days (at least the last 7; a year starts at its first whole day, like the cards above it), scrolling
   past 40 rows (latest at the foot), and one row per month (or year) for All from `hist/tod.json` (`ingest/tod.py`);
   colours on a fixed scale (generation: set by today's installed capacity; the renewable share: fixed bands 80-98%;
-  prices: fixed bands) or "Scale to this view" (the renewable share: `renBandsScaled`, the sixths of the shares shown). The tracker hands it its window through the `view` hook of `mountTracker` (model, live week, history store), and it loads the year-earlier and 30-day history only when scrolled near. Cards say what they cover with `src/lib/site/Context.svelte` (range chip, dates, region, resolution; `src/lib/site/context.js`), as do the Prices tab's lower cards. On both tabs the Live / History / Delayed pill and the About this data button sit on the tabs line (TrackerTabs' `children`), and the control bar sticks to the top of the window at every width (two rows on phones, control names hidden) (`.toolbar` in tracker.css; `src/lib/site/sticky.js` keeps `--tb-h`, its height; the summary panel scrolls with the page, owner's call Oct 2026) and has arrows beside the date that step by the range (Generation: `tb-prev`/`tb-next`, synced in tracker.js with the chart's own arrows). Every chart and lower card can be enlarged over the page to the window's width (`src/lib/site/PopButton.svelte`, always in the card's or chart's top right corner, so cards are `position: relative`; `.card.popped` in tracker.css; heat maps take `--rh`, their row height). From 1,600 px wide the lower cards on both tabs sit in two even columns split down the centre (Generation: `.row2` is `display: contents` there). Price captured by fuel (`src/lib/prices/FuelBars.svelte`) shows a row on hover and pins it on click (Pinned · Release); the Generation tab's mix table highlights the row under the pointer. The share chart and heat map offer Renewables, Wind, Solar, Inverter-based (wind and solar), Hydro, Gas and Coal/gas (`METRICS` in `src/lib/generation/data.js`). Every view is in the address, so any view can be linked (keys and parsing in `src/lib/site/viewurl.js`, pure and
+  prices: fixed bands) or "Scale to this view" (the renewable share: `renBandsScaled`, the sixths of the shares shown). The tracker hands it its window through the `view` hook of `mountTracker` (model, live week, history store), and it loads the year-earlier and 30-day history only when scrolled near. Cards say what they cover with `src/lib/site/Context.svelte` (the dates as the chip, then region and resolution; `span` in `src/lib/site/context.js`: the clock at both ends of a short live window, none for whole days), as do the Prices tab's lower cards (owner's call, 30 Oct 2026: dates, never "3 days to ...", on every card of both tabs). On both tabs the Live / History / Delayed pill and the About this data button sit on the tabs line (TrackerTabs' `children`), and the control bar sticks to the top of the window at every width (two rows on phones, control names hidden) (`.toolbar` in tracker.css; `src/lib/site/sticky.js` keeps `--tb-h`, its height; the summary panel scrolls with the page, owner's call Oct 2026) and has arrows beside the date that step by the range (Generation: `tb-prev`/`tb-next`, synced in tracker.js with the chart's own arrows). Every chart and lower card can be enlarged over the page to the window's width (`src/lib/site/PopButton.svelte`, always in the card's or chart's top right corner, so cards are `position: relative`; `.card.popped` in tracker.css; heat maps take `--rh`, their row height). From 1,600 px wide the lower cards on both tabs sit in two even columns split down the centre (Generation: `.row2` is `display: contents` there). Price captured by fuel (`src/lib/prices/FuelBars.svelte`) shows a row on hover and pins it on click (Pinned · Release); the Generation tab's mix table highlights the row under the pointer, and a click opens that fuel's plants in the list and chart above (`openFuel`, passed down in the `view` hook; LOW-03). "Scale to this view" flashes the heat map's key (`.scale-flash`; PRC-06). The share chart and heat map offer Renewables, Wind, Solar, Inverter-based (wind and solar), Hydro, Gas and Coal/gas (`METRICS` in `src/lib/generation/data.js`). Every view is in the address, so any view can be linked (keys and parsing in `src/lib/site/viewurl.js`, pure and
   shared with the Worker and the tests in `site/tests/` (`npm test`); the browser side in `src/lib/site/view.js`):
-  `region`, `range`, `int`, `end=YYYY-MM-DD` shared by both tabs; the Generation tab's `by` (grouping), `unit=pct`, `chart=lines`, `price=on`, `fold` and
+  `region`, `range`, `int`, `end=YYYY-MM-DD` shared by both tabs; the Generation tab's `by` (grouping), `unit=pct`, `chart=lines`, `price=on`, `fold`, `off` (layers switched off in the list, by `slug()` of their name, so a shared link hides the same; `offNow`, applied by the rebuild that has them; SHR-07) and
   drill-down `group`, `fuel`, `plant` (plants and plant sets by `slug()`: "manapouri", "branch-river-arnold"; old slugs
-  can be mapped in `PLANT_ALIASES`); the Prices tab's `scale`, `hide` (nodes) and `band`; and in links only, `t`, the
+  can be mapped in `PLANT_ALIASES`); the Prices tab's `scale`, `hide` (nodes, and `spread` for the price chart's priced-apart shading off: PRC-01, where the list
+  has All/None and the Generation list's colour squares, `#lib/site/swatch.js`: double-click, Shift or a long press shows one alone; HVDC's net average is in the stats card) and `band` (an island's region uses its own node, PRC-04); and in links only, `t`, the
   point the summary opens on. An address with a query is a link and opens exactly that; a plain visit opens on this
   browser's last region, range and interval (localStorage `elenz-view`, plus the grouping and MW/%) and `elenz-prices`,
   never the date or drill-down. Settings replace the address; each drill-down step pushes one, so Back steps out of it
   (`onPop` in tracker.js). The tab links carry the shared settings plus the other tab's own from its last visit in this
   browser tab (sessionStorage, `tabHref`). The Share button (`src/lib/site/ShareLink.svelte`, beside About this data)
   copies a link to the live view or to the dates shown (`shareLinks`), optionally marking the pinned point; on phones
-  it opens the share sheet. A click on any chart pins the time line there (accent line, "Pinned · Release" under the
-  summary's heading; another click on it, Release or Escape lets go); drilling down is from the summary list only (the
+  it opens the share sheet. A click on any chart pins the time line there (accent line, and a "Pinned <time> ×" chip in the sticky
+  bar, `#pin-chip`/`syncPinChip`, the one place the pin is named; another click on it, the chip or Escape lets go); drilling down is from the summary list only (the
   generation chart no longer drills on click). Touch keeps its point without pinning, so it can still scrub; a tap on
   the line a touch left (within `TAP_PX`, without sliding) lets it go (owner's report CHT-02, 30 Oct 2026). A pin, or
   a touch's point, survives a rebuild whose view still shows that moment (`pinT`/`keepBy` in `rebuild()`: grouping, region, drill-down, a range
-  with the same points; GRP-01). Charts allow pinch-zoom of the page (`touch-action: pan-y pinch-zoom`, PHN-03).
+  with the same points; GRP-01). Charts allow pinch-zoom of the page (`touch-action: pan-y pinch-zoom`, PHN-03). Every chart under generation has
+  its time labels (ZM-01, 31 Oct 2026), and the summary's sub-line keeps room for two lines at every width so a note
+  (interpolated, partial) doesn't make it jump (CHT-08). On Prices a tap on the line (pinned, even from a link, or left by a
+  touch) lets it go (`onunpin` on `TimeChart`, SHR-07).
   The Prices tab zooms the same way on its 5-minute and half-hourly views (`zoom` state in its page, the same address
   key; `onzoom` on `TimeChart`; its 1D menu sits outside the sticky bar). Downloads on daily and longer intervals give
   generation as energy in the chart's unit, with an `hours` column (a partial period: energy so far).
@@ -162,13 +217,25 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   time the stretch ends (NZ time); choosing either moves the stretch there (`zoomEndAt`, both tabs: snapped to 5 minutes,
   window = the day it ends in, widened to 3D if it starts the day before; at the newest data a menu-length stretch is
   live "last N hours" again). Without a zoom the date box picks a whole day, as before (`onTimeSettled`/`timeSettled` in
-  datefield.js). The 1D menu
+  datefield.js). The time box is the site's own too (`<time-pick>`, `src/lib/site/timepick.js`, styled as the calendar; ZM-03, 2 Nov 2026: the browsers' pickers redrew the chart at every step): an hour only marks itself, and picking the minutes applies it. Latest while zoomed moves the stretch to the newest data at the same length (`zoomEndAt`), and shows when a dragged stretch sits behind the newest data. The date box is the site's own calendar on both tabs (`<date-pick>`, `src/lib/site/datepick.js`, a
+  custom element with `value`/`min`/`max`/`disabled` and a `change` event, hung from `<body>` so the bar's clip
+  doesn't cut it; owner's report TRK-07: Firefox's picker redrew the chart while scrolling its month and year lists):
+  moving between months or years changes nothing until a day is picked, which closes it; the month name opens a year
+  list, then months. On 1D a past day is labelled "Day" (it shows that whole day). A past window counts whole local
+  days back (`addDays` in `buildView` and `spanFor`), so a clock change inside it no longer adds an hour of the day
+  before (CHT-10). A past 1Y window is a calendar year (`addYears` in viewurl.js, `moveBy` on both tabs: 366 days in a leap year, and the arrows keep the date; CHT-11). The pin is the anchor (owner's call ZM-02, 31 Oct 2026): a range button opens the new range around
+  the pinned point's middle (`endAround`; a pinned year on All opens that year on 1Y), still pinned (`pinAfter` in
+  `rebuild()`), unless the new view is finer than the pin and the pin is longer than an hour (a pinned day opened on 1D
+  shows that whole day and lets go; 7:30 pm on 30 days stays 7:30 pm on 1D); without a pin, a dragged zoom carries over
+  the same way. The ‹ › arrows step freely and let go of a pin once it leaves the window. The Prices tab does the same
+  (`pickRange`, `setView` keeps a pin by its time, not its place in the list). The 1D menu
   (`#span-menu`) lives outside the sticky bar because the bar's clip-path clips anything hanging below it. Share's link
   to the dates shown turns a span into fixed times (`zoomAt`). On an island's chart, HVDC is signed like the batteries
   (23 Oct 2026): arriving is stacked on top of the island's generation, leaving is drawn below zero (`drawGen`). Both are
   drawn light so the generation behind reads through, and High/Low sit on the generation, never on HVDC. In the energy
-  view a partial first or last period (week so far ...) is drawn at its rate so far for a whole period, faded; its note
-  is in the tooltip (`partialNote`), not on the chart, and the summary's sub-line says where the data stops (for
+  view a partial first or last period (week so far ...) is drawn as the energy it holds, so it steps down, washed out
+  behind a dashed edge (owner's call TRK-04, 31 Oct 2026: honest rather than scaled to a whole period); its note
+  ("Part month: 1 Oct to 16 Oct (16 of 31 days) · energy so far") is in the tooltip (`partialNote`), and the summary's sub-line says where the data stops (for
   touch). The last period is partial when it runs up to the newest data or when a past window ends part way through
   it (`partialCut`, e.g. 1 year by weeks ending on a Thursday; TRK-04, 30 Oct 2026). Chart type (owner's call, 29 Oct 2026): Stacked (default) or Lines (`#seg-chart`,
   `state.chart`, address `chart=lines`), each visible layer as its own line from zero in the same unit (MW, energy, %),
@@ -192,17 +259,22 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   ones, e.g. `fold=price,ren`, `fold=none` for all open; absent: the default, all), kept in `elenz-view`. "All charts shown" in
   Downloads leaves folded charts out; the CSV keeps every column.
   Chart notes are ⓘ buttons (`src/lib/site/InfoTip.svelte`, fixed-position popover) right after each card's title (owner's
-  rule, Oct 2026: a card is a title with its ⓘ beside it, holding a short description and a link to the method page;
+  rule, Oct 2026: a card is a title with its ⓘ beside it, written to the rules in "ⓘ notes" above;
   `.ttl-row` wraps a title and its ⓘ where the heading isn't a `.ch-head`). On the Generation tab each chart's unit (MW/GWh/TWh, %, $/MWh, g/kWh) is drawn in small type under its top axis label (`axisUnit` in tracker.js; the price overlay's under the right axis's), not beside the title (owner's call, 29 Oct 2026, tidier on phones); the full description is in the canvas's aria-label. The grouping menu is sized to the choice it shows (`fitSelect`), and under 560 px the generation chart's header is two rows (title, ⓘ and grouping; then MW/%, chart type, $ Price and the total: `.chart.gen .legends { display: contents }` with `order`); the ⓘ notes on this tab are short bullet points (owner's call, 29 Oct 2026). The Prices tab follows suit: the scale is a fitted dropdown (`fitSelect` action, `#lib/site/fitselect.js`, shared with tracker.js), `TimeChart`'s `unit` puts each chart's unit under its top label, the ⓘ notes are bullets, and under 560 px the price chart's header is two rows (title, ⓘ, scale; then Haywards/Benmore on long ranges) with its key (`priceKey`) moved under the chart on both tracker tabs, Now, Records and
   article figures (`Figure`'s source). Region and month pickers are boxed dropdowns (`select.pick`), the same everywhere; the page-level "About this data" is a labelled
-  pill, and both summaries have a labelled "Controls" panel listing every less obvious feature (keep it up to date).
-  Tracker and Now use the full width of big screens (`.wrap.wide`; reading pages keep 1,260 px). The browser tab's title says what the view shows (`describe`, set through `setTitle` in `#lib/site/view.js`, which sets it again when the page comes back into view or from the back/forward cache: phones sometimes showed the address instead, SITE-06), and the
+  pill, and both summaries have a labelled "Controls" panel: an opening line, then one bullet per thing you can do across the tab, in the ⓘ style (each chart's own ⓘ says what it shows), linking to the full descriptions on /guide (`#generation`, `#prices`; owner's reports GRP-06, CHT-13), with Reset charts to default at its top (`resetView` in view.js: forgets `elenz-view`, `elenz-prices`, `elenz-gen-lower` and the tab links, then opens the plain address; CHT-16): keep the panels and /guide up to date.
+  With JavaScript off, the tracker tabs, Now, Records, a record's page and the landing page show one plain line instead of empty charts or "Loading" (a `<noscript><style>` in each page's head; RES-04).
+  Tracker and Now use the full width of big screens (`.wrap.wide`; reading pages keep 1,260 px); the masthead spans
+  the window on every page (`.wrap:not(.wide) > .mast-wrap`, with `--gutter` and `--sbw`, the scrollbar's width set by
+  the root layout), so its logo and links don't move between them (owner's call HOME-01, 31 Oct 2026); from 1,340 px a reading page draws a faint
+  funnel under it, narrowing from the window's width to the column's (`::after`, `--inset`). The browser tab's title says what the view shows (`describe`, set through `setTitle` in `#lib/site/view.js`, which sets it again when the page comes back into view or from the back/forward cache: phones sometimes showed the address instead, SITE-06), and the
   Worker puts the same title into the page title, og:title and og:url of `/tracker` and `/tracker/prices` for a linked view. The tracker page markup
-  is in `src/routes/tracker/+page.svelte` (About and Data and methods share one layout with a contents sidebar, the route group `src/routes/(docs)/`; About page: `src/routes/(docs)/about/+page.svelte`, short: what each page shows, where the data comes from in brief, support, contact; links to its old `#m-*` sections forward to the method pages. Data and methods: `/methods` overview, `/methods/sources` every dataset, `/methods/<slug>` one page per series (generation, embedded-solar, demand, hvdc, prices, price-explainer, emissions, groupings, history); topics and datasets in `src/lib/methods/registry.ts` (each page's header and "Data used" box come from it, so a dataset is described once), bodies in `src/lib/methods/pages/<slug>.svelte`, styles in `methods.css`. The emissions and price explainer pages import their factors and rules from `emissions.js` and `explain.js`, so they stay in step; the other pages are prose: when a method changes, update its page and its `updated` date; shared
+  is in `src/routes/tracker/+page.svelte` (About and Data and methods share one layout with a contents sidebar (sticky; a "Contents" dropdown naming the page under
+  860 px, DOC-04, sticky too), the route group `src/routes/(docs)/`; About page: `src/routes/(docs)/about/+page.svelte`, short: why Elenz exists, what each page shows, where the data comes from in brief, support, contact; links to its old `#m-*` sections and `#controls` forward; the guide, `/guide` (`src/routes/(docs)/guide/+page.svelte`, owner's review DOC-01, 2 Nov 2026): how to use each page, with screenshots in light and dark (`site/static/guide`, made by `analysis/guide_shots.py`; redo them when a layout they show changes). Data and methods: `/methods` overview, `/methods/sources` every dataset, `/methods/<slug>` one page per series (generation, embedded-solar, demand, hvdc, prices, price-explainer, emissions, groupings, history); topics and datasets in `src/lib/methods/registry.ts` (each page's header and "Data used" box come from it, so a dataset is described once; reports, papers and announcements are `REFERENCES` there, linked from the claim with `ref('<id>')` and listed in the page's "References" box and on /methods/sources#references), bodies in `src/lib/methods/pages/<slug>.svelte`, styles in `methods.css`. The emissions and price explainer pages import their factors and rules from `emissions.js` and `explain.js`, so they stay in step; the other pages are prose: when a method changes, update its page and its `updated` date; shared
   masthead, footer (© line, data credits, link icons: fill in a `href` in its `LINKS` to show a social account), logo mark and the "Support Elenz" link to Buy Me a Coffee in `src/lib/site/`; site copy speaks as "we", never "I" or "me"); the canvas chart code is `src/lib/tracker/tracker.js` (vanilla JS, driven by
   element ids in the page; each chart is drawn once per view into an off-screen base, and moving the time line only
   copies the base back and draws the line, dots and time chip over it (`paint`), so scrubbing stays smooth on phones:
-  call `render()` when anything other than the hover point changes, `hover()` when only the point moves; plant lists (a fuel's or group's plants, By site's rows) go largest first by installed MW (`bySize`: the most a plant has had in capacity.json), so their order and shades don't change with the range (owner's call, 26 Oct 2026); a rebuild keeps the viewer's picks in the summary (`picks`/`keepPicks`: each plant's own last state, so "Only this" survives a range change that adds plants or moves a site into or out of "Other ..."); a click on the ‹ › arrows or a range button answers at once (date box, pressed button) and the view is built just after that paint (`soon()`, quick steps add up through `stepEnd`), and the lower cards are told a frame later (`share()`), so clicks stay under ~50 ms at phone speed: keep heavy work out of click handlers; `history.merged(kind, live, from, to)` joins only the window a card needs), styles in `src/lib/tracker/tracker.css` (colour tokens, light/dark). The fuel table
+  call `render()` when anything other than the hover point changes, `hover()` when only the point moves; groupings (owner's calls, 30 Oct 2026): By site gives every plant its own layer (no "Other ..."; batteries by site, embedded solar by island), and Flexibility (Fast flexible), Inverter vs synchronous (Inverter-based) and By owner count batteries' discharge in their group with charging as one layer below zero (`chargingLayer`); Detailed, Simplified and Renewable vs fossil keep batteries separate; plant lists (a fuel's or group's plants, By site's rows) go largest first by installed MW (`bySize`: the most a plant has had in capacity.json), so their order and shades don't change with the range (owner's call, 26 Oct 2026); a rebuild keeps the viewer's picks in the summary (`picks`/`keepPicks`: each plant's own last state, so "Only this" survives a range change that adds plants or moves a site into or out of "Other ..."); a click on the ‹ › arrows or a range button answers at once (date box, pressed button) and the view is built just after that paint (`soon()`, quick steps add up through `stepEnd`), and the lower cards are told a frame later (`share()`), so clicks stay under ~50 ms at phone speed: keep heavy work out of click handlers; `history.merged(kind, live, from, to)` joins only the window a card needs), styles in `src/lib/tracker/tracker.css` (colour tokens, light/dark). The fuel table
   (colours, renewable flags, fallback emission factors) is `src/lib/tracker/fuels.js`, shared with the home pages;
   every emissions calculation goes through `src/lib/tracker/emissions.js` (the Rankines' quarterly factor, each
   geothermal station's own factor by year; evidence in `analysis/emission_factors.py` and `analysis/README.md`).
@@ -213,7 +285,8 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   (`capacity.json`, else the register nameplate), fuel, island and owner (`plants.json`); stations shown whole and
   two-bus plants expand into their `units`; groups whose members are separate stations (`STATION_GROUPS`: Waikaremoana's
   Kaitawa, Tuai and Piripaua) are listed one row per station. A charging battery shows a negative % of its MW rating. Sort, filters and search live in /now's address (`fuel`, `island`, `owner`
-  as a slug, `sort` = mw | pct | name with `-asc`/`-desc`, `q`, `on=1` generating only); 20 rows until "Show all".
+  as a slug, `sort` = mw | pct | name | fuel | island | owner with `-asc`/`-desc`, comma-separated for Shift-click's
+  further keys (`sort=island,mw`, NOW-10); the word sorts group the list, largest MW first within each, and phones get Sort and Then menus since those columns are hidden there and there's no Shift (NOW-10); `q`, `on=1` generating only); 20 rows until "Show all".
   Each plant links to `/tracker?fuel=<fuel>&plant=<slug>`. Later the index of plant pages (/plants).
 - Not found (SITE-07, 30 Oct 2026): `src/routes/404/+page.svelte` prerenders `build/404.html` (noindex, not in the
   sitemap), which Cloudflare serves with status 404 for any address with no file (`assets.not_found_handling:
@@ -277,7 +350,10 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   (missing months are read back from `hist/hh`; bump its `VERSION` to remake all); `hist/records.json` (each record by
   region, its progression, context for its half-hour, the best for each month of the year, provisional records from
   dispatch months and which ones were settled) is published while the history is complete, only when it changes. Official
-  means metered generation (meta.source), final prices, metered HVDC. Clock-change days count like any other
+  means metered generation (meta.source), final prices, metered HVDC. Dispatch months are corrected before they are
+  compared (`facilities/dispatch_adjust.json`, published in records.json as `adj` for the live check in records.js):
+  Ngāwhā, Glenbrook and Kawerau Mill scaled to their meters, each record's usual shift taken off; `prov` only beyond the
+  record by more than the margin `m`, `near` within it ("close to the record"). Prices set no provisional records. Clock-change days count like any other
   (since BUILD 7; before it, Generation_MD's clock-numbered days before 2009 were left out).
   Try it on downloaded months: `python3 ingest/records.py <folder of YYYY-MM.json> [out.json]`.
   `offered.py` (its own workflow, `offers.yml`, started by the Worker with the history job every 6 hours): final
@@ -312,7 +388,13 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   `analysis/make_points.py`), `rooftop_capacity.json` (capacity snapshot the live job uses until the history job
   has stored `hist/roof_cap.json`).
 - `facilities/overrides.toml`: curated corrections (any change rebuilds history, except the site-only `[owners]`,
-  `[plant_owners]` and `[hydro_schemes]`; the scheme is "Tekapo" (owner's call, 30 Oct 2026), its stations keep the
+  `[plant_owners]`, `[hydro_schemes]`, `[plant_aka]` and `[plant_metering]` (`SITE_ONLY` in history.py; owner's call,
+  31 Oct 2026: `[plant_aka]` other names a plant has had or goes by, matched by the tracker's list filter (the matched
+  name shown beside the row) and /now's search; `[plant_metering]` what the metered history counts where it differs
+  from the dispatch data (stations shown whole, Kaimai and Ngāwhā, the split meters at WPG0331 and KAW2201,
+  Glenbrook); both shown under the summary's heading when the tracker drills into the plant, `#plant-note`; the
+  members of `[plant_groups]` and the register names in `[plant_names]` are added to `aka` automatically, numbered
+  parts of the plant's own name left out); the scheme is "Tekapo" (owner's call, 30 Oct 2026), its stations keep the
   register's "Takapō A/B"), `[plant_groups]` (stations the metered history only sees whole: Huntly
   Rankines, Stratford, Waikaremoana, Te Mihi, Southdown, shown as one plant everywhere with their register plants as
   units), `[solar_farms_in_registry]` (dispatched farms the
@@ -330,7 +412,7 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
 - `facilities/NEXT_REBUILD.md`: changes waiting for the next full history rebuild (they touch fingerprinted files).
   Bundle them into one rebuild; never start one while another is running. While a build is being collected, its items
   go on the branch `next-rebuild` (a draft PR), not on `main`.
-- `ingest/plant_meta.py` writes `site/src/lib/tracker/plants.json` (plant → owner, hydro scheme) from the register and
+- `ingest/plant_meta.py` writes `site/src/lib/tracker/plants.json` (plant → owner, hydro scheme, `aka`, `metered`) from the register and
   those tables. Rerun it and commit the JSON after refreshing the register or editing the tables.
 - `.github/workflows/checks.yml`: on every push, ruff (syntax errors and undefined names only), `ingest/tests/smoke.py`
   (the live and history paths on a committed one-hour sample of real dispatch data and matching final prices, no network)
@@ -441,9 +523,12 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
   (Oct 1998 on) under old codes (RKA0111 Rotokawa, NGA0331 Ngāwhā, KMI0331 Kaimai, TRC0331 Te Rapa, TWF0331/2
   Tararua ...). Only embedded stations the tracker shows later are included, so totals don't jump in 2009.
   Generation_MD is net of local load at some embedded points (Mangahao ~10% of gross, Cobb ~35%); the embedded meter
-  there has the gross figure. Over Sep 2020-Sep 2026 dispatch MW ran 1-2% above metered (wind ~3.5%, hydro 1-2%), with
-  half-hourly national correlation 0.999. Plant-level differences: river chains are block dispatched (Waikato above
-  all: Mercury only has to meet the chain's total), so per-station dispatch there isn't what each station did.
+  there has the gross figure. Over Sep 2020-Sep 2026, on the site's own series, dispatch and metered agree within 0.2% for
+  national wind and hydro (half-hourly national correlation 0.999); the plants that differ are Ngāwhā (dispatch ~45% low),
+  Glenbrook (~30% low), Kawerau Mill (~45% high) and block-dispatched river chains, and dispatch extremes run a little
+  further (wind's monthly peak ~10 MW high). Records correct for this (records.py, facilities/dispatch_adjust.json,
+  analysis/dispatch_vs_metered.py and dispatch_metered_fit.py; refresh the corrections about once a year). Plant-level differences: river chains can be block dispatched (the owner only has
+  to meet the chain's total), so per-station dispatch there isn't what each station did. No public list names the groups, so site copy stays general and names no chain or station until a public document does (owner's rule, 2 Nov 2026).
   `Grid_import` starts Oct 2000 and until ~2003 covered only local networks' injections, so Generation_MD stands in
   for connection points it lacks (J| columns). HVDC_Flows changed layout three times (HVDC_BN/BS/HN/HS to ~1999,
   DCP1/DCP2 poles, then BEN/HAY connection points; the 3501 rows repeat totals); `hvdc.parse_metered` reads all.
@@ -482,7 +567,7 @@ delete the markup, the styles (keeping `.mast-wrap` is harmless) and this sectio
 
 Recurring upkeep: add Genesis's Rankine coal share to `emissions.js` each quarter (performance report ~3 weeks
 after quarter end; FY27 Q1 due late Oct 2026); add each year's NZGA geothermal figures (NZ Geothermal Workshop,
-November); renew the Worker's `GITHUB_TOKEN` before it expires (~Oct 2027).
+November) and Contact's station figures (`GEO_CONTACT`, green borrowing update report, about September); renew the Worker's `GITHUB_TOKEN` before it expires (~Oct 2027).
 
 Terms: the EA confirmed by email (21 Oct 2026) that the EMI datasets and the API are CC BY 4.0, covering republishing,
 derived data and a possible paid API for commercial users; attribution is still required (the footer credit).
@@ -493,7 +578,7 @@ programmatically is likely to change, with plenty of warning. Everything that re
 `EMI_KEY`), `common.py` `BLOB` (the emidatasets blob container: dispatch, final prices, metered files, offers, the
 register) and `rooftop.py` (`GUEHMT` report). Watch for the EA's notice and plan the switch as one change.
 
-Open questions: farm mounting is settled for most farms by the clear days of 18-19 Oct 2026 (analysis/README.md); Lauriston,
+Open questions: what KAW0112 ONU0 covers (asked of the EA, Nov 2026; shown as bioenergy, the register says geothermal; no fuel change until it's answered; analysis/README.md); farm mounting is settled for most farms by the clear days of 18-19 Oct 2026 (analysis/README.md); Lauriston,
 Pukenui and Omeheu stay uncertain; Kōwhai Park is single-axis tracking (east to west, from photos; owner, 22 Oct 2026),
 not fitted (it tripped and has been off since 20 Oct). Battery discharge is left out of the renewable share and
 emissions intensity (as em6, owner's call 22 Oct 2026): tracker.js `genR`, now.js, generation/data.js `shares`,

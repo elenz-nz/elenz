@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { REPO } from '../registry.js';
+	import { REPO, ref } from '../registry.js';
 </script>
 
 <h2 id="layers">Three sources, by age</h2>
 <p>Each stretch of time uses the best data published for it. Going back from now:</p>
 <ol>
 	<li><b>The last seven days</b>: the real-time dispatch feed, every 5 minutes (missed intervals are asked for again; ones with no case are interpolated).</li>
-	<li><b>Back to the latest metered month</b> (about five to six weeks): the EA’s daily dispatch files, the same dispatch cases, arriving 1–4 days late.</li>
+	<li><b>Back to the latest metered month</b> (usually five to ten weeks, as each month’s metering arrives five to six weeks after it ends): the EA’s daily dispatch files, the same dispatch cases, arriving 1–4 days late.</li>
 	<li><b>Every month the EA has published metering for, back to August 1997</b>: metered data, what each station actually delivered to the grid, as the market settles it.</li>
 </ol>
 <p>Prices are the EA’s final prices throughout the history, and HVDC is metered wherever published (about two weeks behind). The history job runs every six hours, adds months as the EA publishes them, and rebuilds every month whenever the plant register, the corrections or the metered plant table change.</p>
@@ -34,19 +34,27 @@
 <p>Plants that have closed are included: New Plymouth, Ōtāhuhu A and B, Southdown, Te Awamutu, and Taranaki Combined Cycle (within Stratford).</p>
 
 <h2 id="seam">Where the sources hand over</h2>
-<p>Over September 2020 to September 2026, where both exist, dispatch and metered figures agree closely (half-hourly national correlation 0.999 every month), but dispatch totals run 1–2% above metered ones every year: wind 3–4%, hydro 1–2%, geothermal, gas and coal within 2%. That is most likely because dispatch measures output at the generator and metering at the grid connection. The site uses each as published rather than scaling one to the other, so where the history switches from metered to dispatch data, about six weeks back, totals can step up slightly.</p>
-<p>Plant by plant, the two can differ more. The Waikato stations are dispatched as one block, so their dispatch figures are the chain’s total split between stations, not each station’s output (correlation only 0.4–0.7 by half-hour); the metered figures are the real ones. Glenbrook’s metered output is about 1.45 times its dispatch, which sees only part of the plant.</p>
+<p>Over September 2020 to September 2026, where both exist, the site’s dispatch and metered figures agree closely: national wind and hydro within 0.2% over the period, demand within 1% in each island, and a half-hourly national correlation of 0.999 every month. The differences are in a few plants:</p>
+<ul>
+	<li><b>Ngāwhā</b>: only Ngāwhā B is dispatched, so dispatch shows about 45% less than the whole station’s meter (about 25 MW).</li>
+	<li><b>Glenbrook</b>: dispatch sees part of the plant, about 30% less than its meter.</li>
+	<li><b>Kawerau Mill</b>: its meter is net of the mill’s own load, so dispatch reads about 45% more.</li>
+	<li><b>Teviot</b>: in the metered history, not dispatched.</li>
+	<li><b>River chains</b> <a href={ref('block')}>dispatched as a block</a>: a station’s dispatch can differ from its meter while the chain’s total agrees.</li>
+</ul>
+<p>Dispatch half-hours, being 5-minute targets averaged, also reach slightly further at their extremes: a month’s highest half-hour of wind reads about 10 MW above the metered one nationally, hydro and demand about 20–25 MW. The site shows each as published rather than scaling one to the other, so where the history switches from metered to dispatch data, at the start of the month after the latest metered one, Ngāwhā steps down and Teviot drops out. <a href="/methods/records#official">Records</a> set in dispatch data are corrected for all of this before they count as provisional.</p>
+<p>Plant by plant, the two can differ more. On a chain dispatched as a block, the dispatch figures are the chain’s total split between stations, not each station’s output; the metered figures are the real ones. Glenbrook’s metered output is about 1.45 times its dispatch, which sees only part of the plant.</p>
 
 <h2 id="resolution">Resolution</h2>
 <ul>
 	<li>The 30-day view shows half-hours.</li>
-	<li>1 year and All show days, or weeks, months and years. Each is the average over its half-hours, with peak demand and peak generation from each day’s highest half-hour.</li>
+	<li>1 year and All show days, or weeks, months and years. Generation is shown as each period’s energy; demand, HVDC and prices as its average. Peak demand and peak generation come from each day’s highest half-hour.</li>
 	<li>Energy figures add up the half-hours, so they are the same at any interval.</li>
 </ul>
 
 <h2 id="checks">Checks</h2>
 <ul>
-	<li>Against MBIE’s annual net generation, which also counts industrial cogeneration and small embedded plants the EA’s metering doesn’t see: the total is 1.4–3.2% below MBIE in 2000–08 and 3.9–5.7% below in 2009–19; hydro is 1.3–2.9% below throughout; geothermal within ±5% from 2001.</li>
+	<li>Against <a href={ref('mbie-elec')}>MBIE’s annual net generation</a> (how MBIE compiles it: <a href={ref('mbie-methods')}>Energy statistics: sources and methods</a>), which also counts industrial cogeneration and small embedded plants the EA’s metering doesn’t see: the total is 1.4–3.2% below MBIE in 2000–08 and 3.9–5.7% below in 2009–19; hydro is 1.3–2.9% below throughout; geothermal within ±5% from 2001.</li>
 	<li>Emissions follow the national inventory year to year (see <a href="/methods/emissions#checks">emissions</a>).</li>
 	<li>Metered demand matches the dispatch data’s island load within 1–2% where both exist.</li>
 </ul>

@@ -115,6 +115,8 @@
 	<title>ELENZ · New Zealand's electricity, right now</title>
 	<meta name="description" content="New Zealand's electricity right now: demand, prices, the generation mix, renewable share, emissions and the HVDC link, live from the Electricity Authority's market data." />
 	<Preview title="New Zealand's electricity, right now · ELENZ" description="New Zealand's electricity right now: demand, prices, the generation mix, renewable share, emissions and the HVDC link, live from the Electricity Authority's market data." path="/now" />
+	<!-- with JavaScript off, a plain line instead of empty tiles and "Loading" (owner's report RES-04, 2 Nov 2026) -->
+	{@html '<noscript><style>.home > :not(.hero), .status { display: none !important; }</style></noscript>'}
 </svelte:head>
 
 <div class="wrap wide">
@@ -125,6 +127,7 @@
 			<div>
 				<h1 id="home-h">New Zealand's electricity, right now</h1>
 				<p class="lede"><a href="/tracker">Open the tracker</a> for history back to 1997.</p>
+				<noscript><p class="lede">The live figures need JavaScript turned on. <a href="/methods">Data and methods</a> and <a href="/about">About</a> work without it.</p></noscript>
 			</div>
 			<div class="status">
 				{#if error}
@@ -144,7 +147,8 @@
 			<div class="kpi">
 				<span class="k-lbl">Demand</span>
 				<span class="k-val">{nz ? fmt(nz.demand) : '–'}<small>MW</small></span>
-				<span class="k-sub">{#if nz}{fmt(nz.underlying)} MW with embedded solar <span class="tag">est.</span>{/if}</span>
+				<!-- only while there is embedded solar to add (none at night: NOW-05) -->
+				<span class="k-sub">{#if nz && nz.roof >= 0.5}{fmt(nz.underlying)} MW with embedded solar <span class="tag">est.</span>{/if}</span>
 			</div>
 			<div class="kpi">
 				<span class="k-lbl">Renewable share</span>
@@ -244,7 +248,7 @@
 			<div class="now-side">
 			{#if recNew.length}<RecordLine items={recNew} />{/if}
 			<section class="panel mix-panel" aria-labelledby="mix-h">
-				<div class="p-head"><h2 id="mix-h">Generation now</h2><span class="p-info"><InfoTip label="About this table">Generation is dispatch, the market's 5-minute targets for each plant; embedded solar is estimated. <a href="/methods/generation">How generation is built</a></InfoTip></span></div>
+				<div class="p-head"><h2 id="mix-h">Generation now</h2><span class="p-info"><InfoTip label="About this table"><p>This shows how much electricity each type of generation is supplying to New Zealand right now.</p><ul><li>Figures are the market's dispatch: the output each power station is told to run at, updated every 5 minutes.</li><li>Embedded solar (rooftops and small solar farms) is estimated from satellite cloud data.</li></ul><p><a href="/methods/generation">How generation is built</a></p></InfoTip></span></div>
 				{#if now && nz}
 					<div class="stack" aria-hidden="true">
 						{#each now.mix as f}<span class:hatch={f.hatch} style="--c:var({f.tok});width:{(f.mw / nz.gen) * 100}%" title="{f.name} {fmt(f.mw)} MW"></span>{/each}

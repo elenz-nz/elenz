@@ -18,8 +18,15 @@ Stored:
 Official and provisional. A record is official once it rests on final data: metered generation and demand (the EA
 publishes a month's metering 5-6 weeks after it ends: meta.source == 'metered'), final prices, metered HVDC. Months
 after that (dispatch data) can set provisional records, shown as such until the metered month confirms them or
-doesn't: dispatch runs 1-2% above metered (wind ~3.5%), so near misses often don't survive. When a provisional record
-is settled, `resolved` says which way it went for NEW_DAYS. The website also checks the live week itself.
+doesn't. Dispatch and metered averages agree closely, but a few plants are off (Ngāwhā: only Ngāwhā B is dispatched;
+Glenbrook; Kawerau Mill) and dispatch half-hours, being instant targets averaged, run a little beyond the metered
+extremes. So a dispatch month is judged on corrected figures (facilities/dispatch_adjust.json, from
+analysis/dispatch_metered_fit.py): those plants scaled to their meters, then each record's usual shift taken off. It is
+a provisional record only when it beats the official one by more than the record's margin `m` (how far a month
+usually strays after correction); within `m` either side it is `near` ("close to the record"). Replayed over Sep 2020 -
+Sep 2026, no provisional record clear of the margin failed to be confirmed (30 did, uncorrected). Prices never set
+provisional records: dispatch prices can be many times the final ones, which arrive the next day. When a provisional
+record is settled, `resolved` says which way it went for NEW_DAYS. The website checks the live week the same way.
 
 Definitions follow the rest of the site (src/lib/home/now.js): generation is each fuel's output summed, battery
 discharge only, no HVDC; the renewable share is of that total less battery discharge (geothermal, bioenergy, hydro, wind, grid and embedded
@@ -38,11 +45,12 @@ import time
 import numpy as np
 import pandas as pd
 
-from common import NZ
+from common import FACILITIES, NZ
 
-VERSION = 5                # bump when summarise() changes: every month's summary is remade (2: per-day sums for periods;
+VERSION = 6                # bump when summarise() changes: every month's summary is remade (2: per-day sums for periods;
                            # 3: renewable share without battery discharge; 4: most fossil, hydro high and low, lowest price;
-                           # 5: info, the month's highest and lowest half-hour of demand with embedded solar added back)
+                           # 5: info, the month's highest and lowest half-hour of demand with embedded solar added back;
+                           # 6: dispatch months corrected (dispatch_adjust.json))
 REGIONS = ('NZ', 'NI', 'SI')
 GEN = ('geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
 REN = ('geo', 'bio', 'hydro', 'wind', 'solar', 'roof')
@@ -65,12 +73,12 @@ HALF_HOURS = {
     'fossil_min': ('min', 'gen', REGIONS, 0),
     'fossil_max': ('max', 'gen', REGIONS, 0),
     'hydro_max': ('max', 'gen', REGIONS, 0),
-    'hydro_min': ('min', 'gen', REGIONS, 0),         # the site shows its periods only (a dry month or year)
+    'hydro_min': ('min', 'gen', REGIONS, 0),
     'wind_max': ('max', 'gen', REGIONS, 0),
     'solar_max': ('max', 'gen', REGIONS, 0),
     'roof_max': ('max', 'gen', REGIONS, 0),
     'price_max': ('max', 'price', REGIONS, 2),
-    'price_min': ('min', 'price', REGIONS, 2),        # the site shows its periods only (half-hours go to zero often)
+    'price_min': ('min', 'price', REGIONS, 2),
     'gap_max': ('max', 'price', ('NZ',), 2),
     'hvdc_n_max': ('max', 'hvdc', ('NZ',), 0),
     'hvdc_s_max': ('max', 'hvdc', ('NZ',), 0),
@@ -86,6 +94,45 @@ RUNS = {
     'huntly_off_run': ('gen', ('NZ',)),                     # no Huntly Rankine running
 }
 FUEL_OF = {'wind_max': 'wind', 'solar_max': 'solar'}       # records whose context lists the biggest plants
+
+_ADJ = None
+
+
+def adjustments():
+    """facilities/dispatch_adjust.json: {'plants': {name: metered/dispatch}, 'hh': {record: {region: {shift, m}}},
+    'period': {period: {record: {region: {shift, m}}}}}; empty if the file is missing."""
+    global _ADJ
+    if _ADJ is None:
+        try:
+            with open(os.path.join(FACILITIES, 'dispatch_adjust.json'), encoding='utf-8') as f:
+                _ADJ = json.load(f)
+        except FileNotFoundError:
+            _ADJ = {}
+    return _ADJ
+
+
+def _adj(k, r, period='tp'):
+    """(shift, margin) for a record and region in dispatch data: shift is taken off the dispatch figure."""
+    a = adjustments()
+    e = (a.get('hh', {}) if period == 'tp' else a.get('period', {}).get(period, {})).get(k, {}).get(r)
+    return (e['shift'], e['m']) if e else (0.0, 0.0)
+
+
+def adjusted(js):
+    """A dispatch month with the plants dispatch reads systematically off scaled to their meters (a copy; the
+    island fuel series are changed, nothing else)."""
+    fac = adjustments().get('plants', {})
+    n = js['N']
+    out = dict(js)
+    for isl in ('NI', 'SI'):
+        out[isl] = dict(js[isl])
+    for p in js.get('plants', []):
+        k = fac.get(p['name'])
+        if not k or p['isl'] not in ('NI', 'SI') or p['fuel'] not in GEN or p['fuel'] == 'batt':
+            continue
+        d = (k - 1) * np.maximum(np.nan_to_num(_arr(p['s'], n)), 0)
+        out[p['isl']][p['fuel']] = _arr(out[p['isl']].get(p['fuel']), n) + d
+    return out
 
 # Periods: every half-hour record also has its highest (or lowest) day, week (Monday to Sunday), calendar month and
 # calendar year. A period's figure is its average over the half-hours it has (MW, %, $/MWh), so periods of different
@@ -228,12 +275,15 @@ def summarise(js):
     """One month (hist/hh layout) -> its summary (see the module docstring)."""
     n, t0, step = js['N'], js['t0'], js['step']
     t = t0 + np.arange(n) * step
+    fin = official(js['meta'])
+    if not fin['gen']:
+        js = adjusted(js)
     S = series(js)
     hh = {}
-    for k, (kind, _, regions, dp) in HALF_HOURS.items():
+    for k, (kind, fam, regions, dp) in HALF_HOURS.items():
         hh[k] = {}
         for r in regions:
-            v = S[k][r]
+            v = S[k][r] if fin[fam] or fam != 'gen' else S[k][r] - _adj(k, r)[0]
             ok = v[~np.isnan(v)]
             hh[k][r] = {'seq': running(t, v, kind, dp),
                         'lo': round(float(ok.min()), dp) if len(ok) else None,
@@ -255,7 +305,7 @@ def summarise(js):
             head, tail, inner = run_parts(S[k][r])
             runs[k][r] = {'head': head, 'tail': tail, 'top': [[int(t[i]), m] for i, m in inner]}
     return {'v': VERSION, 'month': js['meta']['month'], 't0': t0, 'step': step, 'n': n,
-            'end': t0 + (n - 1) * step, 'ok': official(js['meta']), 'hh': hh, 'mo': mo, 'run': runs, 'info': info,
+            'end': t0 + (n - 1) * step, 'ok': fin, 'hh': hh, 'mo': mo, 'run': runs, 'info': info,
             'days': day_sums(js, S)}
 
 
@@ -265,12 +315,38 @@ def _month_start(month):
     return int(pd.Timestamp(month + '-01', tz=NZ).tz_convert('UTC').timestamp() * 1000)
 
 
+# A record is "new" (records.js isNew) only when it was set in data that had just arrived: its period ended within
+# NEW_LAG days of the day it first appeared (metered data runs 5-6 weeks behind the month, so a record early in a month first appears 70-80 days after it). A rebuild that changes old data can move a record to a half-hour years
+# back, which isn't new (owner's report REC-02, 31 Oct 2026). `since` is dropped otherwise, and after a year.
+NEW_LAG = 120
+PERIOD_DAYS = {'day': 1, 'week': 7, 'month': 31, 'year': 366}
+
+
+def _since_ok(rec, period_days, now_ms):
+    since = rec.get('since')
+    if since and (now_ms - since > 365 * 864e5 or since - rec['t'] > (NEW_LAG + period_days) * 864e5):
+        rec['since'] = None
+    return rec
+
+
 def _better(kind, a, b):
     return a > b if kind == 'max' else a < b
 
 
+def _beyond(kind, cand, best, m):
+    """A dispatch figure against the official record: 'prov' when it beats it by more than the margin m, 'near'
+    within m either side, None otherwise."""
+    if cand is None or best is None:
+        return None
+    gap = cand - best if kind == 'max' else best - cand
+    if m <= 0:   # nothing to judge it by (prices, HVDC, modelled solar; a record that never moves): beaten or not
+        return 'prov' if gap > 0 else None
+    return 'prov' if gap > m else 'near' if gap >= -m else None
+
+
 def half_hour_record(sums, k, r, kind, fam):
-    """Official record, progression, everything kept for the page, and any provisional record beyond it."""
+    """Official record, progression, everything kept for the page, and any provisional record beyond it (or a dispatch
+    figure close to it: `near`). Prices: official only."""
     steps, best, lo, hi = [], None, None, None
     prov = None
     for s in sums:
@@ -285,17 +361,20 @@ def half_hour_record(sums, k, r, kind, fam):
             if e['lo'] is not None:
                 lo = e['lo'] if lo is None else min(lo, e['lo'])
                 hi = e['hi'] if hi is None else max(hi, e['hi'])
-        elif e['seq']:
-            tv = e['seq'][-1]   # the month's best
-            if best is not None and _better(kind, tv[1], best) and (prov is None or _better(kind, tv[1], prov[1])):
+        elif e['seq'] and fam != 'price':
+            tv = e['seq'][-1]   # the month's best (corrected, for dispatch months)
+            if prov is None or _better(kind, tv[1], prov[1]):
                 prov = tv
     if not steps:
         return None
     out = {'t': steps[-1][0], 'v': steps[-1][1], 'n': len(steps) - 1,
            'prev': steps[-2] if len(steps) > 1 else None, 'steps': steps,
            'constant': lo is not None and lo == hi}
-    if prov and _better(kind, prov[1], best):   # a later official month may have beaten it since
-        out['prov'] = {'t': prov[0], 'v': prov[1]}
+    if prov:   # against the record as it stands (a later official month may have beaten it since)
+        m = _adj(k, r)[1] if fam == 'gen' else 0.0
+        how = _beyond(kind, prov[1], best, m)
+        if how:
+            out[how] = {'t': prov[0], 'v': prov[1], 'm': m}
     return out
 
 
@@ -363,7 +442,7 @@ def run_record(sums, k, r, fam):
             steps.append([a, m])
     out = {'top': [[a, m / 2, ong] for a, m, ong in top], 't': top[0][0], 'v': top[0][1] / 2, 'ongoing': top[0][2],
            'n': len(steps) - 1, 'steps': [[a, m / 2] for a, m in steps]}
-    prov = sorted(all_runs(sums, k, r), key=lambda x: -x[1])
+    prov = sorted(all_runs(sums, k, r), key=lambda x: -x[1]) if fam != 'price' else None
     if prov and prov[0][1] > top[0][1]:
         out['prov'] = {'t': prov[0][0], 'v': prov[0][1] / 2, 'ongoing': prov[0][2]}
     return out
@@ -386,6 +465,19 @@ def by_month_of_year(sums, k, r, kind, fam, monthly=False):
         i = int(s['month'][5:]) - 1
         if best[i] is None or _better(kind, tv[1], best[i][1]):
             best[i] = tv
+    return best
+
+
+def best_day_by_month(rows, kind):
+    """The best whole day for each calendar month (1-12): [[t, value] or None] x 12. rows: period_figures' days,
+    [[start, value, official]]; official days only, as by_month_of_year keeps to official months."""
+    best = [None] * 12
+    for t, v, ok in rows:
+        if not ok:
+            continue
+        i = pd.Timestamp(t, unit='ms', tz='UTC').tz_convert(NZ).month - 1
+        if best[i] is None or _better(kind, v, best[i][1]):
+            best[i] = [t, v]
     return best
 
 
@@ -462,6 +554,8 @@ def period_figures(sums, now_ms=None):
                         v = how[1] * tot[how[0]][0] / tot[how[0]][1]
                     if v is None or v != v:
                         continue
+                    if not ok and HALF_HOURS[k][1] == 'gen':
+                        v -= _adj(k, r, p)[0]   # dispatch data: its usual shift for this period
                     out[p][k].setdefault(r, []).append([start, round(v, HALF_HOURS[k][3]), ok])
     return out
 
@@ -542,22 +636,24 @@ def period_curve(days, read_month, p, k, r, start):
     return _cum(parts, how, dp)
 
 
-def period_record(figs, kind):
-    """[[start, value, official]] oldest first -> the official record, its progression, and a provisional one beyond it."""
+def period_record(figs, kind, m=0.0, fam='gen'):
+    """[[start, value, official]] oldest first -> the official record, its progression, and a provisional one beyond
+    it by more than the margin m (or `near`, within m). Prices: official only."""
     steps, best, prov = [], None, None
     for t, v, ok in figs:
         if ok:
             if best is None or _better(kind, v, best):
                 best = v
                 steps.append([t, v])
-        elif best is not None and _better(kind, v, best) and (prov is None or _better(kind, v, prov[1])):
+        elif fam != 'price' and (prov is None or _better(kind, v, prov[1])):
             prov = [t, v]
     if not steps:
         return None
     out = {'t': steps[-1][0], 'v': steps[-1][1], 'n': len(steps) - 1, 'prev': steps[-2] if len(steps) > 1 else None,
            'steps': steps}
-    if prov and _better(kind, prov[1], best):
-        out['prov'] = {'t': prov[0], 'v': prov[1]}
+    how = _beyond(kind, prov[1], best, m) if prov else None
+    if how:
+        out[how] = {'t': prov[0], 'v': prov[1], 'm': m}
     return out
 
 
@@ -620,11 +716,11 @@ def build(sums, old=None, read_month=None, now_ms=None):
             rec['since'] = now_ms
         elif first_pub and recent_from[fam] is not None and rec['t'] >= recent_from[fam]:
             rec['since'] = now_ms
-        if rec.get('since') and now_ms - rec['since'] > 365 * 864e5:
-            rec['since'] = None   # only "new" matters; old dates are noise
-        return rec
+        return _since_ok(rec, 31 if group == 'months' else 0, now_ms)
 
+    a = adjustments()
     out = {'v': VERSION, 'built': now_ms, 'first': sums[0]['t0'] if sums else None, 'final_to': last_ok,
+           'adj': {'plants': a.get('plants', {}), 'hh': a.get('hh', {}), 'period': a.get('period', {})},
            'end': sums[-1]['end'] if sums else None, 'records': {}, 'months': {}, 'runs': {}, 'moy': {}, 'resolved': []}
     for k, (kind, fam, regions, _) in HALF_HOURS.items():
         out['records'][k], out['moy'][k] = {}, {}
@@ -656,21 +752,23 @@ def build(sums, old=None, read_month=None, now_ms=None):
         if m not in cache and read_month:
             cache[m] = read_month(m)
         return cache.get(m)
+    # the best day of each month of the year, beside the half-hours in moy (By month's Day button)
+    out['moy_day'] = {k: {r: best_day_by_month(rows, kind) for r, rows in figs.get('day', {}).get(k, {}).items()}
+                      for k, (kind, _, _, _) in HALF_HOURS.items()}
     out['periods'] = {}
     for p in PERIODS:
         out['periods'][p] = {}
         for k, (kind, fam, regions, _) in HALF_HOURS.items():
             out['periods'][p][k] = {}
             for r in regions:
-                rec = period_record(figs.get(p, {}).get(k, {}).get(r, []), kind)
+                rec = period_record(figs.get(p, {}).get(k, {}).get(r, []), kind, _adj(k, r, p)[1] if fam == 'gen' else 0.0, fam)
                 if rec is not None:
                     prev = (old.get('periods') or {}).get(p, {}).get(k, {}).get(r) or {}
                     if prev.get('t') == rec['t'] and prev.get('since'):
                         rec['since'] = prev['since']
                     elif prev:
                         rec['since'] = now_ms
-                    if rec.get('since') and now_ms - rec['since'] > 365 * 864e5:
-                        rec['since'] = None
+                    _since_ok(rec, PERIOD_DAYS.get(p, 0), now_ms)
                     # the target's figure through its period, for "on record pace" (the provisional one if it is beyond)
                     tgt = rec.get('prov') or rec
                     curve = period_curve(all_days, read_m, p, k, r, tgt['t'])
