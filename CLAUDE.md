@@ -37,7 +37,7 @@ Preview links (since 24 Oct 2026): Cloudflare Workers Builds builds every other 
 live data; that's safe because only the Worker's scheduled handler writes to KV and previews run no crons. Its pages
 keep elenz.co.nz as their canonical address, and every host but elenz.co.nz is sent `X-Robots-Tag: noindex`
 (`site/static/_headers` for static files; `noindexOffSite` in `worker/index.js` for the Worker's own responses), so
-Google doesn't index previews as copies. `preview_urls` is set explicitly because `workers_dev` is off. The build's check on the pull request says whether it built.
+Google doesn't index previews as copies. `preview_urls` is set explicitly because `workers_dev` is off. The build's check on the pull request says whether it built. A new branch's first push doesn't always start one (2 Nov 2026, PR #59: no Workers check after 10 minutes and the preview answered 404); an empty commit started it.
 Each branch's preview copies the dashboard's "Previews Base" build settings the first time it builds and keeps that copy:
 after changing the base (preview command `npx wrangler preview`), an existing branch keeps its old settings, so use a
 fresh branch. A preview build's check links under `.../previews/<branch>/builds/`; one under `.../production/builds/`
