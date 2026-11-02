@@ -155,8 +155,6 @@
 	<title>Records · ELENZ</title>
 	<meta name="description" content="New Zealand's electricity records since 1997: peak demand, renewable share, wind and solar, prices and the HVDC link, for New Zealand and each island, from the Electricity Authority's metered data." />
 	<Preview title="New Zealand's electricity records since 1997 · ELENZ" description="New Zealand's electricity records since 1997: peak demand, renewable share, wind and solar, prices and the HVDC link, for New Zealand and each island, from the Electricity Authority's metered data." path="/records" />
-	<!-- with JavaScript off, a plain line instead of "Loading" (owner's report RES-04, 2 Nov 2026) -->
-	{@html '<noscript><style>.js-only { display: none !important; }</style></noscript>'}
 </svelte:head>
 <svelte:window onkeydown={(e) => { if (e.key === 'Escape' && pinned) pinned = null; }} />
 

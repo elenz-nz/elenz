@@ -223,14 +223,12 @@
 	<title>Tracker · ELENZ</title>
 	<meta name="description" content="New Zealand's electricity generation by fuel, plant, owner or hydro scheme, with wholesale prices, demand, HVDC transfer and emissions, from the last 24 hours back to 1997." />
 	<Preview title="Electricity generation, prices and demand · ELENZ Tracker" description="New Zealand's electricity generation by fuel, plant, owner or hydro scheme, with wholesale prices, demand, HVDC transfer and emissions, from the last 24 hours back to 1997." path="/tracker" />
-	<!-- with JavaScript off, a plain line instead of empty charts and "Loading" (owner's report RES-04, 2 Nov 2026) -->
-	{@html '<noscript><style>.toolbar, .layout, .status, .lower { display: none !important; }</style></noscript>'}
 </svelte:head>
 
 <div class="wrap wide">
 	<Masthead heading />
 	<TrackerTabs>
-		<div class="status">
+		<div class="status js-only">
 			<span class="tstatus" role="status">{status}</span>
 			{#if meta}
 				{#if view && (view.kind !== 'live' || view.past) && !view.error}
@@ -255,7 +253,7 @@
 		</div>
 	</TrackerTabs>
 
-	<nav class="toolbar" aria-label="View controls" use:barHeight>
+	<nav class="toolbar js-only" aria-label="View controls" use:barHeight>
 		<div class="ctl">
 			<label for="sel-region" class="vh">Region</label>
 			<select class="pick" id="sel-region">
@@ -321,7 +319,7 @@
 
 	<noscript><p class="notice">The charts need JavaScript turned on. <a href="/methods">Data and methods</a> and <a href="/about">About</a> work without it.</p></noscript>
 
-	<div class="layout">
+	<div class="layout js-only">
 		<!-- The chart panel takes arrow keys to move the time cursor, so it needs to be focusable. -->
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 		<section class="charts" id="charts" tabindex="0" aria-label="Generation chart. Hover or use the left and right arrow keys to read values at a point in time, Page Up and Page Down to move by the range; Escape returns to range totals.">
