@@ -1,5 +1,5 @@
 <script lang="ts">
-	// A small picture of what a record is about, for the "Heading for a record" tiles on /records (owner's call,
+	// A small picture of what a record is about, for the "Heading for a record" tiles on /records (design decision,
 	// 30 Oct 2026: simple, almost buttons, a bit of fun): a bolt for demand, a leaf for the renewable share, a chimney
 	// for fossil plant, a drop for hydro, a turbine for wind, a sun for solar, a dollar for prices, arrows for HVDC.
 	// Drawn in currentColor on a 24 x 24 grid, so the tile sets the colour (the record's own token).

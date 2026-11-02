@@ -1,5 +1,5 @@
 // <time-pick>: the time box beside the date when a chart is zoomed into hours (both tracker tabs). The browsers' own
-// time pickers change at every step, so the chart redrew while scrolling through the hours (owner's report ZM-03,
+// time pickers change at every step, so the chart redrew while scrolling through the hours (test report ZM-03,
 // 1 Nov 2026). As with <date-pick>, nothing changes until the choice is made: an hour only marks itself, and picking
 // the minutes closes the panel and sends `change`. It has `value` ('HH:MM', 24-hour) and `disabled`; shown in the site's
 // own "7:30 pm". The panel hangs from document.body, outside the sticky bar. Tab moves through the

@@ -23,15 +23,15 @@
 	// the period the table lists: each half-hour record's highest trading period, day, week, month or year (?period=)
 	let period = $state('tp');
 	let cat = $state('all');
-	// the page's three lists as tabs under Heading for a record and New and provisional (owner's call REC-01, 31 Oct
+	// the page's three lists as tabs under Heading for a record and New and provisional (design decision REC-01, 31 Oct
 	// 2026: the page had too many lines; ?tab=milestones|months in the address)
 	const TABS = [{ k: 'all', label: 'All-time records' }, { k: 'milestones', label: 'Milestones' }, { k: 'months', label: 'By month' }];
 	let tab = $state('all');
 	let liveD = $state.raw<any>(null);   // tracker.json: the live week, for the live check and the pace
 	let paceAll = $state(false);          // the pace cards beyond the first PACE_CARDS
-	const PACE_CARDS = 8;   // owner's call, 31 Oct 2026
+	const PACE_CARDS = 8;   // design decision, 31 Oct 2026
 	// whole rows only: at least that many where there are enough, otherwise the whole rows there are, with Show all for
-	// the rest (owner's reports REC-09, 1-2 Nov 2026)
+	// the rest (test reports REC-09, 1-2 Nov 2026)
 	let paceCols = $state(1);
 	const paceShown = $derived.by(() => {
 		const n = paces.length, want = Math.ceil(PACE_CARDS / paceCols) * paceCols;
@@ -43,7 +43,7 @@
 		return { destroy: () => ro.disconnect() };
 	}
 	let moy = $state(new Date(Date.now() + 13 * 36e5).getUTCMonth());   // this month in New Zealand
-	let moyPer = $state('tp');   // By month: trading periods or days (owner's call REC-13, 2 Nov 2026)
+	let moyPer = $state('tp');   // By month: trading periods or days (design decision REC-13, 2 Nov 2026)
 	const MOY_PERIODS = PERIODS.filter((p) => p.k === 'tp' || p.k === 'day');
 
 	onMount(() => {
@@ -96,7 +96,7 @@
 	type Row = { d: any; rec: any; na: string | null; prov: any; isNew: boolean; p: string; link: string | null };
 	// every row for this region and period; records that can't apply here (a South Island renewable share that is always
 	// 100%, fossil records where there's no fossil plant, a "most sent south" year when no year was) are left out, and
-	// so are groups left empty (owner's report REC-03, 31 Oct 2026); a record still being worked out keeps its row
+	// so are groups left empty (test report REC-03, 31 Oct 2026); a record still being worked out keeps its row
 	const allGroups = $derived.by(() => {
 		if (!R) return [];
 		return GROUPS.map((g) => ({
@@ -114,16 +114,16 @@
 	const shownGroups = $derived(allGroups.map((g) => g.name));
 	$effect(() => { if (cat !== 'all' && R && !shownGroups.includes(cat)) cat = 'all'; });
 	const groups = $derived(allGroups.filter((g) => cat === 'all' || g.name === cat));
-	// new and provisional: four, a row of them at full width, then Show all (owner's call REC-09, 31 Oct 2026)
+	// new and provisional: four, a row of them at full width, then Show all (design decision REC-09, 31 Oct 2026)
 	const CARDS = 4;
 	let cardsAll = $state(false);
 	// every new, provisional and close record (each region and period), most notable first (records.js recentAll); the
 	// first CARDS are the most notable, compact (the period, not the date); Show all lists every one by period, in full
 	const allCards = $derived(R ? recentAll(R, live, near) : []);
 	const topCardList = $derived(topCards(allCards, CARDS));
-	// Show all: one region at a time (owner's call, 1 Nov 2026: every region together was too many), the same region as
+	// Show all: one region at a time (design decision, 1 Nov 2026: every region together was too many), the same region as
 	// the All-time records list: picking it in either place changes both (and the address)
-	// Show all: each period's cards newest record first (owner's report, UAT round 3); the first four stay ranked
+	// Show all: each period's cards newest record first (test report, UAT round 3); the first four stay ranked
 	const cardDate = (c: any) => c.prov?.t ?? c.near?.t ?? c.settled?.pt ?? c.rec?.t ?? 0;
 	const cardGroups = $derived(CARD_GROUPS.map((k) => ({ k, label: cardGroupLabel(k), cards: allCards.filter((c) => c.group === k && c.region === region).sort((a, b) => cardDate(b) - cardDate(a)) })).filter((g) => g.cards.length));
 	// heading for a record: one card per record and period, New Zealand's where it is on pace, otherwise an island's
@@ -138,7 +138,7 @@
 	const moyFor = (r: string) => (R ? DEFS.filter((d) => d.kind === 'hh' && d.regions.includes(r))
 		.map((d) => ({ d, tv: (moyPer === 'day' ? R.moy_day : R.moy)?.[d.id]?.[r]?.[moy] ?? null })).filter((x) => x.tv && !notShown(x.d, r, get(R, x.d.id, r))) : []);
 	// Milestones and By month: pointing at a row lights the same milestone or record in the other regions' cards; a
-	// click (or tap) pins it there and another click on it lets go (owner's call, 31 Oct 2026). Rows carry data-k: the
+	// click (or tap) pins it there and another click on it lets go (design decision, 31 Oct 2026). Rows carry data-k: the
 	// record's id, plus the level for a milestone. Changing tab or month lets go.
 	let hov = $state<string | null>(null);
 	let pinned = $state<string | null>(null);
@@ -188,7 +188,7 @@
 						<p><a href="/methods/records#pace">How records work</a></p>
 					</InfoTip></div>
 					{#if paces.length > paceShown}<button type="button" class="more-btn" aria-expanded={paceAll} onclick={() => (paceAll = !paceAll)}>{paceAll ? 'Show fewer' : `Show all ${paces.length}`}</button>{/if}</div>
-					<!-- simple tiles, almost buttons: the record's picture and name; the detail is on its page (owner's call, 30 Oct 2026) -->
+					<!-- simple tiles, almost buttons: the record's picture and name; the detail is on its page (design decision, 30 Oct 2026) -->
 					<div class="paces" use:countCols>
 						{#each paceAll ? paces : paces.slice(0, paceShown) as p}
 							<a class="pt" href={href(p.d.id, p.region, p.period)} style="--c:var({p.d.tok})"
@@ -264,7 +264,7 @@
 			{#if tab === 'all'}
 			<section aria-labelledby="all-h" class="sec" id="panel-all">
 				<!-- the list's title bar: its heading, the region (only the list, milestones and month records follow it) and how
-				     far the official data goes; it sticks while the list scrolls (owner's call, 30 Oct 2026) -->
+				     far the official data goes; it sticks while the list scrolls (design decision, 30 Oct 2026) -->
 				<div class="toolbar list-bar">
 					<div class="ttl-row"><h2 id="all-h">All-time records</h2><InfoTip label="About these records">
 						<p>These are the highest and lowest figures since August 1997 for {region === 'NI' ? 'the North Island' : region === 'SI' ? 'the South Island' : 'New Zealand'}, from a single half-hour up to a whole year.</p>
@@ -344,7 +344,7 @@
 
 			{/if}
 
-			<!-- Milestones and By month: a card for each region side by side (owner's call, 31 Oct 2026), the full lists -->
+			<!-- Milestones and By month: a card for each region side by side (design decision, 31 Oct 2026), the full lists -->
 			{#if tab === 'milestones'}
 				<section class="sec" id="panel-milestones" aria-labelledby="mile-h">
 					<div class="ttl-row"><h2 id="mile-h">Milestones</h2><InfoTip label="About milestones">
@@ -453,7 +453,7 @@
 	.official::before { display: none; }
 
 	.sec { display: grid; gap: 10px; }
-	/* a faint break between sections, as this page holds a lot (owner's report REC-01, 2 Nov 2026) */
+	/* a faint break between sections, as this page holds a lot (test report REC-01, 2 Nov 2026) */
 	.sec + .sec, .sec + .rec-tabs, .hero + .sec { border-top: 1px solid var(--grid); padding-top: 18px; margin-top: 8px; }
 	/* the three lists' tabs: underlined like the tracker's Generation and Prices tabs */
 	.rec-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; margin-top: 6px; }
@@ -560,7 +560,7 @@
 	.miles li:last-child { border-bottom: 0; }
 	.miles b { color: var(--ink); font-weight: 600; }
 	/* each row a grid, so name, figure and year always fit inside the card: the name wraps, the year keeps a fixed
-	   column (owner's report, 1 Nov 2026: years spilled out of the cards at some widths; a flex th broke the table) */
+	   column (test report, 1 Nov 2026: years spilled out of the cards at some widths; a flex th broke the table) */
 	.moy, .moy tbody { display: block; }
 	.moy tr { display: grid; grid-template-columns: minmax(0, 1fr) auto 2.6em; align-items: center; column-gap: 10px; border-bottom: 1px solid var(--grid); }
 	.moy tr:last-child { border-bottom: 0; }

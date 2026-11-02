@@ -18,7 +18,7 @@
 	const dir = $derived(Math.abs(hv) < 1 ? '' : hv > 0 ? 'north' : 'south');
 
 	// how far each part has built (driven by the hand-off's flying dot, Handoff.svelte; complete otherwise). The rings
-	// and the link draw as it goes; the figures show in full from the start, never counting up (owner's call HOME-02)
+	// and the link draw as it goes; the figures show in full from the start, never counting up (design decision HOME-02)
 	const fill = $derived({ NI: build.ni, SI: build.si });
 	const link = $derived(build.link);
 	// a segment shows the part of it the sweep has reached

@@ -7,8 +7,8 @@
 	// each month (or year) through the history, drawn faintly behind the record line (records.py build_detail), so the
 	// near misses show; the tooltip gives the record in force at the pointer's date and that month's best. The month
 	// (or year) still running is drawn as it stands so far across the whole period (the chart's dates run on to its
-	// end), dotted, in a hatched band (a wash like the tracker's partial periods didn't show on a single line; owner,
-	// 25 Oct 2026), and the tooltip there says "so far" and how long is left ("6 days to go"). Month and year
+	// end), dotted, in a hatched band (a wash like the tracker's partial periods didn't show on a single line; design
+	// decision, 25 Oct 2026), and the tooltip there says "so far" and how long is left ("6 days to go"). Month and year
 	// records leave the running period out of `bg` (it isn't whole), so the page passes its figure so far as `now` ({ t: its start, v }). info (demand records only): the same line for demand with embedded solar
 	// added back, drawn dashed above the faint line for information (embedded solar is modelled, so it is never a
 	// record), with infoNow for its running period and infoLabel naming it in the tooltip. The page's ⓘ beside the heading explains the chart; zoom and pin are bound
@@ -33,7 +33,7 @@
 
 	// drawn at the width it is shown, so labels stay readable on phones
 	let cw = $state(1000);
-	// on touch the tooltip sits above the chart, kept wholly inside it (owner's report REC-08, 31 Oct 2026: near the right
+	// on touch the tooltip sits above the chart, kept wholly inside it (test report REC-08, 31 Oct 2026: near the right
 	// edge it ran off the page, which then zoomed out oddly)
 	let tipW = $state(0);
 	const touchLeft = (fx: number, w: number, tw: number) => (w ? Math.min(Math.max(fx * w, tw / 2 + 2), w - tw / 2 - 2) : 0);
@@ -169,7 +169,7 @@
 		return hoursToGo(Math.max(0, fromNow < 48 ? fromNow : (cur.to - periodStart(nowT, 'day')) / 36e5));
 	}
 	const read = $derived(readAt(hov ?? pin));
-	// pinned and pointing elsewhere: both show, for comparing (owner's report REC-05, 2 Nov 2026)
+	// pinned and pointing elsewhere: both show, for comparing (test report REC-05, 2 Nov 2026)
 	const held = $derived(hov !== null && pin !== null && Math.abs(x(hov) - x(pin)) >= 1 ? readAt(pin) : null);
 	$effect(() => { void read; keepClear(hoverTip, held ? heldTip : null); });
 

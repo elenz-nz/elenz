@@ -50,7 +50,7 @@
 		return `${p.day} ${'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ')[+p.month - 1]} ${p.year}`;
 	};
 
-	// the chart notes (ⓘ) name the region and interval shown (owner's rules for notes, 1 Nov 2026)
+	// the chart notes (ⓘ) name the region and interval shown (team rules for notes, 1 Nov 2026)
 	const regionOf = $derived(({ NI: 'the North Island', SI: 'the South Island' } as Record<string, string>)[lower?.region] ?? 'New Zealand');
 	const regionPos = $derived(regionOf === 'New Zealand' ? "New Zealand's" : `${regionOf}'s`);
 	const island = $derived(lower?.region === 'NI' || lower?.region === 'SI');
@@ -417,7 +417,7 @@
 				<div class="help" id="sum-help" role="note" hidden={!helpOpen}>
 					<button type="button" class="reset-view" title="Forget this browser's saved views and go back to the default charts on both tracker tabs" onclick={resetView}>Reset charts to default</button>
 					<!-- what works across the tab, one line each; each chart's own ⓘ says what it shows, and /guide#generation has the
-					     full descriptions (owner's reports GRP-06, CHT-13) -->
+					     full descriptions (test reports GRP-06, CHT-13) -->
 					<p>These work across every chart on this tab. The ⓘ beside a chart's title says what that chart shows.</p>
 					<ul>
 						<li><b>Hover or touch a chart:</b> this list shows that time.</li>

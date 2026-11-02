@@ -1,6 +1,6 @@
 // A record as a 1200 x 630 image (the size link previews use), drawn in the browser for the "Download image"
 // button on a record's page: the mark, the record, when it was set, what it beat, and its progression.
-// In the page's own light or dark colours (owner's report REC-05/06, 31 Oct 2026: downloads were always light).
+// In the page's own light or dark colours (test report REC-05/06, 31 Oct 2026: downloads were always light).
 import { fmt, fullName, when, step, REGIONS, periodOf, energy } from './records.js';
 
 // tracker.css's palettes, light and dark

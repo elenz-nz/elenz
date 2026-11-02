@@ -1,6 +1,6 @@
 // <date-pick>: the tracker's date box (both tabs). The browsers' own date pickers differ (Firefox's month and year
 // lists redrew the chart at every step and broke the page when scrolled quickly; Edge's is another design), so the
-// site draws its own (owner's report TRK-07, 28 Oct 2026; owner's call: our own calendar).
+// site draws its own (test report TRK-07, 28 Oct 2026; design decision: our own calendar).
 //
 // It behaves like <input type="date"> where the tracker needs it to: `value`, `min`, `max` ('YYYY-MM-DD' or ''),
 // `disabled`, and a `change` event when a day is picked. Moving between months or years never changes the value, so

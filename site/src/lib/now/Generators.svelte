@@ -39,7 +39,7 @@
 	// a charging battery shows how hard it is charging, as a share of its MW rating, below zero
 	const pctText = (r: { pct: number | null; charging: boolean }) => (r.pct == null ? '–' : r.charging ? `−${Math.round(-r.pct)}%` : `${Math.round(Math.max(0, r.pct))}%`);
 	// a click sorts by that column (again: the other way); Shift-click adds it as the next key, or turns an added one
-	// round, e.g. island then MW (owner's report NOW-10, 31 Oct 2026)
+	// round, e.g. island then MW (test report NOW-10, 31 Oct 2026)
 	const natural = (by: string) => ['name', 'fuel', 'island', 'owner'].includes(by);   // words A to Z first, numbers largest first
 	function sortBy(by: string, add = false) {
 		const then = s.then ?? [];
@@ -103,7 +103,7 @@
 				{#each Object.entries(SORTS) as [k, name] (k)}<option value={k}>Sort: {name}</option>{/each}
 			</select>
 		</label>
-		<!-- the phone's way to Shift-click a second column (owner's report NOW-10, 2 Nov 2026) -->
+		<!-- the phone's way to Shift-click a second column (test report NOW-10, 2 Nov 2026) -->
 		<label class="g-sort"><span class="sr">Then by</span>
 			<select value={s.then?.[0]?.by ?? ''} onchange={(e) => thenBy((e.currentTarget as HTMLSelectElement).value)}>
 				<option value="">Then: nothing</option>

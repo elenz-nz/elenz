@@ -1,6 +1,6 @@
 <script lang="ts">
-	// How to use the site, moved from About so that page can stay an overview (owner's review DOC-01, 2 Nov 2026). The
-	// tracker's Controls panels are one line each and link here (owner's reports GRP-06, CHT-13): keep them in step.
+	// How to use the site, moved from About so that page can stay an overview (team review DOC-01, 2 Nov 2026). The
+	// tracker's Controls panels are one line each and link here (test reports GRP-06, CHT-13): keep them in step.
 	import Preview from '#lib/site/Preview.svelte';
 	const DESC = 'How to use Elenz: every control on the tracker, the Now page and Records, with tips.';
 	// the pictures: crops of real pages in light and dark, made by analysis/guide_shots.py (site/static/guide)

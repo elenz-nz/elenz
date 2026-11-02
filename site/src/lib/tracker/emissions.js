@@ -105,7 +105,7 @@ export const GEO_YEARS = {
   ngawha_oec4:   [ 313,  313,   95],   // commissioned 2021; until 2023 the field's pre-reinjection figure (2020, OEC1–3)
 };
 export const GEO_YEAR_COLS = [2020, 2022, 2023];
-// A generator's own published figure beats the table above and any assumption (owner's call, 2 Nov 2026).
+// A generator's own published figure beats the table above and any assumption (design decision, 2 Nov 2026).
 // Contact's stations, g CO₂e/kWh by year to June, from its Green Borrowing Programme update reports (asset tables; add
 // each new year, published about September). Null before a station ran. Used from July 2022; Ōhaaki isn't in the reports.
 // em6's 0.080 for Tauhara is close to its commissioning year (FY24), so it isn't used.
@@ -129,7 +129,7 @@ export const GEO_ASSUMED = { topp2: 0,
   kawerau_mill: 0 };
 export const GEO_DEFAULT = 57;   // fleet average, CY2023: for anything unmatched
 
-// dispatch plant name → station (confirmed by the owner, 15 Oct 2026): 'Wairakei' is the whole site (A, B and binary);
+// dispatch plant name → station (confirmed by the team, 15 Oct 2026): 'Wairakei' is the whole site (A, B and binary);
 // 'Ngāwhā B' (OEC4) is the only dispatched Ngāwhā plant (Ngāwhā A, ~20 MW, isn't); TOPP1 and GDL aren't dispatched;
 // Te Ahi O Maui and TOPP2 share a 33 kV bus on Kawerau's 220 kV since TOPP2 came online.
 const GEO_PLANT = {

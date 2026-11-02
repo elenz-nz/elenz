@@ -1,4 +1,4 @@
-// The hover tooltip on a record's charts keeps clear of the pinned one, so both can be read (owner's report REC-05,
+// The hover tooltip on a record's charts keeps clear of the pinned one, so both can be read (test report REC-05,
 // 2 Nov 2026). Called from an $effect once both are drawn: the hover tooltip slides above or below the pinned one,
 // whichever keeps it in the chart, or the nearer one if both fit.
 const GAP = 6;

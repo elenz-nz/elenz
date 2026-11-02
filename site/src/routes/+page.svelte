@@ -254,7 +254,7 @@
 		.live-fig { margin-top: 30px; }
 	}
 	/* a phone on its side (a short, wide screen): the compact logo and a figure sized to the height, so the first screen
-	   fits, and previews no taller than the screen (owner's report HOME-06, 29 Oct 2026) */
+	   fits, and previews no taller than the screen (test report HOME-06, 29 Oct 2026) */
 	@media (max-height: 520px) and (orientation: landscape) {
 		.hero { min-height: calc(100svh - 56px); gap: 2px; padding-block: 4px 0; }
 		.brand { flex-direction: row; gap: 12px; }

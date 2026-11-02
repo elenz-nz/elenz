@@ -69,7 +69,7 @@
 	.area { fill: url(#bd-fill); opacity: calc(1 - var(--ho-lift, 0)); }
 	:global(html[data-ho]) .line, :global(html[data-ho]) .dot { opacity: 0; }
 	/* and once it has gone into the dot the chart is gone as a whole: no hover readout over an empty hero, no axis words
-	   (owner's report HOME-02, 25 Oct 2026) */
+	   (test report HOME-02, 25 Oct 2026) */
 	:global(html[data-ho]) .backdrop { pointer-events: none; cursor: default; }
 	:global(html[data-ho]) .guide, :global(html[data-ho]) .hdot, :global(html[data-ho]) .peek-tip { display: none; }
 	.lbl { transition: opacity 0.2s; }

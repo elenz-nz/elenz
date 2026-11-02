@@ -13,7 +13,7 @@
 	const cur = (href: string) => (path === href ? 'page' : undefined);
 	// on About, the sidebar's Contact is the current item while the address ends in #contact
 	const atContact = $derived(page.url.hash === '#contact');
-	// phones: the contents are a dropdown naming the page you're on, instead of a row of pills (owner's call DOC-04,
+	// phones: the contents are a dropdown naming the page you're on, instead of a row of pills (design decision DOC-04,
 	// 31 Oct 2026); it closes when a page is chosen
 	const here = $derived(path === '/about' ? (atContact ? 'Contact' : 'About') : path === '/guide' ? 'Using Elenz' : path === '/privacy' ? 'Privacy' : path === '/methods' ? 'Data and methods'
 		: path === '/methods/sources' ? 'Every data source' : (TOPICS.find((t) => path === `/methods/${t.slug}`)?.title ?? 'Contents'));

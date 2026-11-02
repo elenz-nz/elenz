@@ -88,7 +88,7 @@
 .mt-body th { text-align: left; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding: 6px 12px 6px 0; border-bottom: 1px solid var(--line); vertical-align: bottom; }
 .mt-body td { padding: 6px 12px 6px 0; border-bottom: 1px solid var(--line); color: var(--ink-2); vertical-align: top; line-height: 1.45; }
 .mt-body td.n, .mt-body th.n { text-align: right; font-family: var(--font-data); font-variant-numeric: tabular-nums; white-space: nowrap; }
-/* a figure column's heading sits over its figures, and the row under the pointer lights up (owner's report DOC-03) */
+/* a figure column's heading sits over its figures, and the row under the pointer lights up (test report DOC-03) */
 .mt-body th.n { font-family: inherit; }
 .mt-body td:last-child, .mt-body th:last-child { padding-right: 0; }
 .mt-body td:first-child, .mt-body th:first-child { padding-left: 4px; }

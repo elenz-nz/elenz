@@ -16,7 +16,7 @@
 
 	let cw = $state(640);
 
-	// on touch the tooltip sits above the chart, kept wholly inside it (owner's report REC-08, 31 Oct 2026: near the right
+	// on touch the tooltip sits above the chart, kept wholly inside it (test report REC-08, 31 Oct 2026: near the right
 
 	// edge it ran off the page, which then zoomed out oddly)
 
@@ -78,7 +78,7 @@
 	let pin = $state<number | null>(null);
 	let touch = $state(false);
 	const hover = $derived(hov ?? pin);
-	// pinned and pointing elsewhere: both show, for comparing (owner's report REC-05, 2 Nov 2026)
+	// pinned and pointing elsewhere: both show, for comparing (test report REC-05, 2 Nov 2026)
 	const held = $derived(hov !== null && pin !== null && pin !== hov && pin >= i0 && pin <= i1 ? pin : null);
 	let heldTip = $state<HTMLElement | null>(null), hoverTip = $state<HTMLElement | null>(null);
 	$effect(() => { void hover; keepClear(hoverTip, held !== null ? heldTip : null); });
