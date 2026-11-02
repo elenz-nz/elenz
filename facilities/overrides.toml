@@ -66,7 +66,7 @@ HLY91 = "HLY11"  # Huntly battery
 "Ngāwhā B" = "Ngāwhā"     # OEC4; the metered history has the whole station (Ngāwhā A and B) as one
 "West Wind 1" = "West Wind"   # one farm on two connections (WWD1102, WWD1103), each sometimes carrying most of it
 "West Wind 2" = "West Wind"
-"Takapō A" = "Tekapo A"   # the register's spelling; the site keeps Tekapo (owner's call, 30 Oct 2026)
+"Takapō A" = "Tekapo A"   # the register's spelling; the site keeps Tekapo (design decision, 30 Oct 2026)
 "Takapō B" = "Tekapo B"
 
 # Stations the metered history (Generation_MD, before Sep 2020 and for every month it covers) sees only as a whole:
