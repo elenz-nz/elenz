@@ -56,7 +56,8 @@
 		void chart;
 		try { return stepsEl.getPointAtLength(k * stepsEl.getTotalLength()).x; } catch { return W + 10; }
 	});
-	const clipId = 'rec-clip-' + Math.random().toString(36).slice(2, 8);
+	const uid = $props.id();
+	const clipId = 'rec-clip-' + uid;
 </script>
 
 <div class="rec-peek">

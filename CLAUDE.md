@@ -39,7 +39,7 @@ Preview links (since 24 Oct 2026): Cloudflare Workers Builds builds every other 
 (e.g. `preview-test-elenz`). The `previews` block in `wrangler.jsonc` points it at the live KV namespace, so it shows
 live data; that's safe because only the Worker's scheduled handler writes to KV and previews run no crons. Its pages
 keep elenz.co.nz as their canonical address, and every host but elenz.co.nz is sent `X-Robots-Tag: noindex`
-(`site/static/_headers` for static files; `noindexOffSite` in `worker/index.js` for the Worker's own responses), so
+(`site/static/_headers` for static files; `finish` in `worker/index.js` for the Worker's own responses), so
 Google doesn't index previews as copies. `preview_urls` is set explicitly because `workers_dev` is off. The build's check on the pull request says whether it built. A new branch's first push doesn't always start one (2 Nov 2026, PR #59: no Workers check after 10 minutes and the preview answered 404); an empty commit started it.
 Each branch's preview copies the dashboard's "Previews Base" build settings the first time it builds and keeps that copy:
 after changing the base (preview command `npx wrangler preview`), an existing branch keeps its old settings, so use a
@@ -384,7 +384,12 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
 - `worker/index.js`: serves static assets, `/data/tracker.json` from KV (binding `DATA`), falling back to the
   bundled snapshot, and `/data/history/{index,day,hh/YYYY-MM}.json` from KV keys `hist/*`; rewrites the title,
   og:title and og:url of the tracker's two pages for a linked view (from its address), which `run_worker_first` in
-  `wrangler.jsonc` routes through it (`withPreview`, HTMLRewriter); its `scheduled` handler
+  `wrangler.jsonc` routes through it (`withPreview`, HTMLRewriter). When KV refuses a read (a daily limit or an outage;
+  `kv()`), tracker.json falls back to the bundled snapshot, history answers 503 and `/data/health` says so, rather than
+  the visitor getting Cloudflare's error page. Security headers: `site/static/_headers` for static files and
+  `SECURITY_HEADERS` for the Worker's own responses, the same list (the Worker tests compare them; `frame-ancestors` is
+  the only CSP rule, so scripts and styles aren't restricted; Permissions-Policy must leave `screen-wake-lock` and
+  `web-share` alone for Keep screen on and Share). Its `scheduled` handler
   dispatches the GitHub jobs (live every 5 minutes, history every 6 hours, watchdog every 15 minutes) (Worker secret `GITHUB_TOKEN`: fine-grained,
   elenz only, Actions read/write; it expires, so renew it yearly). KV free plan: 1,000 writes/day (the job uses ~600), 100,000 reads/day.
 - `facilities/rooftop_points.csv`, `rooftop_nsp.csv` (irradiance points and NSP → point; regenerate with
@@ -419,9 +424,10 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   those tables. Rerun it and commit the JSON after refreshing the register or editing the tables.
 - `.github/workflows/checks.yml`: on every push, ruff (syntax errors and undefined names only), `ingest/tests/smoke.py`
   (the live and history paths on a committed one-hour sample of real dispatch data and matching final prices, no network)
-  and the site's `npm run check`, `npm test` (`site/tests/`: the tracker's address), `npm run build`, `npm run check:previews` (which also runs `scripts/check-css.js`) and `npm run test:browsers`. Its `ingest` and `site` jobs are required checks: a pull request can't
+  and the site's `npm run check`, `npm test` (`site/tests/`: the tracker's address), `npm run build`, `npm run check:previews` (which also runs `scripts/check-css.js`), the Worker tests and `npm run test:browsers`. Its `ingest` and `site` jobs are required checks: a pull request can't
   merge into `main` (so nothing deploys) until both pass.
   Browser tests (design decision, 2 Nov 2026; `site/playwright.config.js`, `site/tests/e2e/site.spec.js`): Playwright opens the built site in Chromium, Firefox and WebKit (Safari's engine) and at two phone sizes, through the site's own links as well as direct visits and refreshes, and with JavaScript off. They use the snapshot bundled at `static/data/tracker.json` (no history files), not the live site, so a fix can still merge while the live site is down; check only what the snapshot can show. WebKit here is new, so old Safari is covered by `check-css.js` alone. A new page or card with its own fault worth guarding gets a test; put the bug back once to see the test fail. To run them in a Claude session: `npx playwright test --project=chromium --project=phone-chrome` after a build (only Chromium is installed there; `@playwright/test` is pinned to that browser's version, so bump them together).
+  Worker tests (`worker/tests/worker.test.js`; `cd worker && npm ci && npm test`): the Worker in Cloudflare's own runtime (Miniflare, with a local KV store and a small stand-in for the static site): ETags, history names, `/data/health`, link previews, noindex, security headers, KV refusing reads and the crons. `worker/package.json` holds only these test tools, so the site's install stays small. `_headers` itself isn't read there: check static files' headers on a preview. A change to what the Worker does gets a test.
 - `.github/workflows/watchdog.yml`: checks the live site every 15 minutes; opens an issue labelled `stale-data`
   (GitHub emails it to the Elenz team) when live data is over 45 minutes old, history over 5 days behind, or the Worker
   can't start a job, and closes it when the data recovers.
@@ -512,8 +518,10 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
 - `history.py` keeps to `WRITE_BUDGET` (280) KV writes per UTC day, counted in `hist/progress.json` (saved by every
   run that writes anything, including runs that rebuild no month); a rebuild that hits it resumes next run
   (`rebuild_left`), and `hist/index.json`/`day.json` are only republished when complete.
-- `ingest/requirements.txt` pins major versions (pandas 3, numpy 2): the live job installs them on every run, so
-  check a new major version locally before widening the pin.
+- `ingest/requirements.txt` locks every Python package to an exact version and hash, because the live job installs them
+  on every run alongside its Cloudflare token: a new release reaches it only through a pull request. It's generated from
+  `ingest/requirements.in` (the allowed major versions); the command to refresh it is at the top of that file. Nothing
+  else may be installed on the same `pip install -r` line: pip then requires a hash for that too.
 - `npm run check` type-checks the Svelte/TypeScript files only (`checkJs` is off in `site/tsconfig.json`: the chart
   code in `src/lib/tracker/*.js` and `src/lib/home/now.js` is untyped JavaScript and gave ~800 false alarms).
 - GitHub's own schedules (the backups in the three workflows) fire only now and then (9 scheduled runs in two days,

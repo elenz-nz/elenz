@@ -12,7 +12,8 @@
 	let asked = $state('');
 	onMount(() => {
 		const p = location.pathname;
-		if (p !== '/404' && p !== '/404.html') asked = decodeURIComponent(p);
+		if (p === '/404' || p === '/404.html') return;
+		try { asked = decodeURIComponent(p); } catch { asked = p; }   // a badly encoded address (/%E0%A4%A) can't be decoded
 	});
 
 	// where people most likely meant to go: the closest section to the address first
