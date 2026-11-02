@@ -42,9 +42,12 @@
 	const tipStyle = (t: { x: number; y: number }) => `left: ${t.x}px; top: ${t.y}px; transform: translate(${t.x > innerWidth / 2 ? 'calc(-100% - 14px)' : '14px'}, ${t.y > innerHeight - 70 ? 'calc(-100% - 14px)' : '14px'})`;
 </script>
 
+<!-- a finger that starts on the map and scrolls the page leaves no pointerleave on some phones -->
+<svelte:window onscroll={() => (tip = null)} />
+
 <div class="hm" class:ren style="--fc: var({tok})">
 	<div class="scroll" class:tall={rows.length > 40} bind:this={scroller}>
-		<div class="grid" role="img" aria-label={label} onpointerleave={() => (tip = null)}>
+		<div class="grid" role="img" aria-label={label} onpointerleave={() => (tip = null)} onpointercancel={() => (tip = null)}>
 			{#each rows as r, j (r.day)}
 				<div class="r">
 					<span class="d">{r.month ? r.lab : r.lab != null ? (j % 7 === 0 || j === rows.length - 1 ? r.lab : '') : j % 5 === 0 || j === rows.length - 1 ? short(r.day) : ''}</span>

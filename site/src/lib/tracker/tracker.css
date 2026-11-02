@@ -188,7 +188,10 @@ time-pick[hidden] { display: none; }
 /* The control bar stays at the top of the window as the page scrolls, so every chart below can be moved through
    from where it is. --tb-h is its height (#lib/site/sticky.js), for anything that sticks below it. Its
    background runs the full window width. On phones it is packed into two short rows (see the 560px block). */
-.toolbar { position: sticky; top: 0; z-index: 20; background: var(--bg); box-shadow: 0 0 0 100vmax var(--bg); clip-path: inset(0 -100vmax); }
+.toolbar { position: sticky; top: 0; z-index: 20; background: var(--bg); }
+/* A plain strip out to the window's edges. Not a huge box-shadow held in by clip-path: older iPhones could lose the clip
+   while scrolling, and the shadow then covered the whole page in the background colour, leaving only this bar. */
+.toolbar::before { content: ''; position: absolute; inset: 0 calc(-1 * var(--gutter)); z-index: -1; background: var(--bg); }
 /* The summary panel scrolls with the page (owner's call, Oct 2026): it sits beside the generation chart it controls
    rather than following the reader down past the other charts. */
 
@@ -448,6 +451,10 @@ a { color: var(--accent); }
   .pages a { padding-inline: 5px; }
   .status .pill { letter-spacing: 0.01em; padding-inline: 7px 8px; font-size: 0.7rem; }
   .toolbar .seg button { padding: 2px 5px; }
+}
+/* the smallest phones: the five page links and the theme button, in the window's width */
+@media (max-width: 340px) {
+  .pages a { padding-inline: 3px; font-size: 0.8rem; }
 }
 .pill.live { background: var(--live-bg); color: var(--live-ink); }
 .pill.live::before { background: currentColor; }

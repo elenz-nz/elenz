@@ -306,7 +306,7 @@
 			<span>Pinned</span><b id="pin-chip-txt"></b><span class="pin-x" aria-hidden="true">×</span><span class="vh">: let go</span>
 		</button>
 	</nav>
-	<!-- the 1D menu sits outside the sticky bar, which clips anything hanging below it; placed by tracker.js -->
+	<!-- the 1D menu sits outside the sticky bar; placed by tracker.js -->
 	<div class="span-menu" id="span-menu" role="group" aria-label="Show the last part of the day" hidden>
 		<span class="span-hd">Last</span>
 		<button type="button" role="menuitemradio" aria-checked="false" data-h="1">1 hour</button>

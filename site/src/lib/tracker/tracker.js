@@ -1702,7 +1702,7 @@ export function mountTracker(D, hooks = {}) {
   // the menu on 1D: the last hour, 3, 6 or 12 hours of the day (5-minute points), or the whole 24 hours
   const spanMenu = $('span-menu'), spanBtn = $('btn-span');
   const closeSpans = () => { spanMenu.hidden = true; spanBtn.setAttribute('aria-expanded', 'false'); };
-  // fixed to the window (the sticky bar clips anything that hangs below it), placed under the button
+  // fixed to the window, outside the sticky bar, placed under the button
   const placeSpans = () => { const r = spanBtn.getBoundingClientRect(); spanMenu.style.top = `${r.bottom + 4}px`; spanMenu.style.left = `${Math.max(8, Math.min(window.innerWidth - 170, r.right - 150))}px`; };
   spanBtn.addEventListener('click', e => {
     e.stopPropagation();
