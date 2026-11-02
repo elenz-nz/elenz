@@ -147,29 +147,28 @@
 	// month's best follow from it
 	let hov = $state<number | null>(null);
 	let touch = $state(false);               // the last pointer was a finger or pen
-	const hoverT = $derived(hov ?? pin);
-	const hover = $derived.by(() => {
-		if (hoverT === null || hoverT < pts[0][0]) return null;
+	// what a date reads: the record in force then, that month's best, the dashed line's, and how long is left
+	function readAt(t: number | null) {
+		if (t === null || t < pts[0][0]) return null;
 		let i = 0;
-		while (i + 1 < pts.length && pts[i + 1][0] <= hoverT) i++;
-		return i;
-	});
-	function segAt(list: { t: number; v: number | null; to: number }[]) {
-		if (hoverT === null) return null;
-		let b = null;
-		for (const s of list) if (s.t <= hoverT) b = s; else break;
-		return b && b.v != null && hoverT < b.to + 864e5 ? b : null;
+		while (i + 1 < pts.length && pts[i + 1][0] <= t) i++;
+		const seg = (list: { t: number; v: number | null; to: number }[]) => {
+			let b = null;
+			for (const s of list) if (s.t <= t) b = s; else break;
+			return b && b.v != null && t < b.to + 864e5 ? b : null;
+		};
+		return { t, i, p: pts[i], bg: seg(segs), inf: seg(isegs), left: leftAt(t), ahead: t > t1 };
 	}
-	const bgAt = $derived(segAt(segs));
-	const infoAt = $derived(segAt(isegs));
 	// in the period still running: how long is left of it, from now
 	// (counted from the start of today, as "Heading for a record" does, until the last two days, then from now)
-	const left = $derived.by(() => {
-		if (!cur || hoverT === null || hoverT < cur.t) return null;
+	function leftAt(t: number) {
+		if (!cur || t < cur.t) return null;
 		const nowT = Date.now(), fromNow = (cur.to - nowT) / 36e5;
 		return hoursToGo(Math.max(0, fromNow < 48 ? fromNow : (cur.to - periodStart(nowT, 'day')) / 36e5));
-	});
-	const ahead = $derived(hoverT !== null && hoverT > t1);   // past the record line's end: only the faint line goes on
+	}
+	const read = $derived(readAt(hov ?? pin));
+	// pinned and pointing elsewhere: both show, for comparing (owner's report REC-05, 2 Nov 2026)
+	const held = $derived(hov !== null && pin !== null && Math.abs(x(hov) - x(pin)) >= 1 ? readAt(pin) : null);
 
 	let fig = $state<HTMLElement>();
 	const pxOf = (e: PointerEvent) => { const r = (e.currentTarget as SVGSVGElement).getBoundingClientRect(); return ((e.clientX - r.left) / r.width) * W; };
@@ -220,6 +219,28 @@
 	}
 </script>
 
+{#snippet marks(r: NonNullable<ReturnType<typeof readAt>>, pinned: boolean)}
+	<line x1={x(r.t)} x2={x(r.t)} y1={T} y2={H - B} class="cursor" class:pinned />
+	{#if !r.ahead}<circle cx={x(r.t)} cy={y(r.p[1])} r="4" style="fill:var({tok})" />{/if}
+	{#if r.bg}<circle cx={x(r.t)} cy={y(r.bg.v as number)} r="3.5" class="hole bg-dot" style="stroke:var({tok})" />{/if}
+	{#if r.inf}<circle cx={x(r.t)} cy={y(r.inf.v as number)} r="3" class="hole bg-dot info-dot" style="stroke:var({tok})" />{/if}
+{/snippet}
+{#snippet tipOf(r: NonNullable<ReturnType<typeof readAt>>, isHeld: boolean)}
+	{@const fx = x(r.t) / W}
+	{@const ty = r.ahead && r.bg ? y(r.bg.v as number) : y(r.p[1])}
+	{#if isHeld}
+		<div class="tip held" style="left:{fx * 100}%;top:{(ty / H) * 100}%" class:flip={fx > 0.7} aria-hidden="true">{@render lines(r)}</div>
+	{:else}
+		<div class="tip" bind:clientWidth={tipW} style={touch ? `left:${touchLeft(fx, cw, tipW)}px` : `left:${fx * 100}%;top:${(ty / H) * 100}%`} class:flip={!touch && fx > 0.7} class:above={touch} aria-hidden="true">{@render lines(r)}</div>
+	{/if}
+{/snippet}
+{#snippet lines(r: NonNullable<ReturnType<typeof readAt>>)}
+	<b>{val(r.p[1])}</b><span>{prov && r.i === pts.length - 1 ? 'Provisional, ' : 'Record from '}{whenOf(r.p[0])}</span>
+	{#if r.bg}<span class="bgl">{bgWhen ? bgWhen(r.bg.t) : ''}{r.left ? ' so far' : ''}: {val(r.bg.v as number)}</span>{/if}
+	{#if r.inf}<span class="bgl">{infoLabel}{r.left ? ' so far' : ''}: {val(r.inf.v as number)} <i>(estimate, not a record)</i></span>{/if}
+	{#if r.left}<span class="bgl togo">{r.left}</span>{/if}
+{/snippet}
+
 <svelte:window onpointerdown={outside} onkeydown={outside} />
 
 <figure class="prog" bind:clientWidth={cw} bind:this={fig}>
@@ -258,33 +279,18 @@
 			{/if}
 			<circle cx={x(last[0])} cy={y(last[1])} r="5" style="fill:var({tok})" />
 		</g>
-		{#if hover !== null && hoverT !== null}
-			{@const p = pts[hover]}
-			<line x1={x(hoverT)} x2={x(hoverT)} y1={T} y2={H - B} class="cursor" class:pinned={hov === null} />
-			{#if !ahead}<circle cx={x(hoverT)} cy={y(p[1])} r="4" style="fill:var({tok})" />{/if}
-			{#if bgAt}<circle cx={x(hoverT)} cy={y(bgAt.v as number)} r="3.5" class="hole bg-dot" style="stroke:var({tok})" />{/if}
-			{#if infoAt}<circle cx={x(hoverT)} cy={y(infoAt.v as number)} r="3" class="hole bg-dot info-dot" style="stroke:var({tok})" />{/if}
-		{/if}
+		{#if read}{@render marks(read, hov === null)}{/if}
+		{#if held}{@render marks(held, true)}{/if}
 		{#if drag && Math.abs(drag.b - drag.a) >= 6}
 			<rect class="zsel" x={Math.min(drag.a, drag.b)} y={T} width={Math.abs(drag.b - drag.a)} height={H - T - B} />
 		{/if}
 	</svg>
-	{#if hover !== null && hoverT !== null && !drag}
-		{@const p = pts[hover]}
-		{@const fx = x(hoverT) / W}
-		{@const ty = ahead && bgAt ? y(bgAt.v as number) : y(p[1])}
-		<div class="tip" bind:clientWidth={tipW} style={touch ? `left:${touchLeft(fx, cw, tipW)}px` : `left:${fx * 100}%;top:${(ty / H) * 100}%`} class:flip={!touch && fx > 0.7} class:above={touch} aria-hidden="true">
-			<b>{val(p[1])}</b><span>{prov && hover === pts.length - 1 ? 'Provisional, ' : 'Record from '}{whenOf(p[0])}</span>
-			{#if bgAt}<span class="bgl">{bgWhen ? bgWhen(bgAt.t) : ''}{left ? ' so far' : ''}: {val(bgAt.v as number)}</span>{/if}
-			{#if infoAt}<span class="bgl">{infoLabel}{left ? ' so far' : ''}: {val(infoAt.v as number)} <i>(estimate, not a record)</i></span>{/if}
-			{#if left}<span class="bgl togo">{left}</span>{/if}
-		</div>
-	{/if}
+	{#if held && !drag}{@render tipOf(held, true)}{/if}
+	{#if read && !drag}{@render tipOf(read, false)}{/if}
 	</div>
 	<figcaption class="sr" aria-live="polite">
-		{#if hover !== null}
-			{@const p = pts[hover]}
-			Record {val(p[1])} {prov && hover === pts.length - 1 ? 'provisional,' : 'from'} {whenOf(p[0])}{#if bgAt}; {bgWhen ? bgWhen(bgAt.t) : ''}{left ? ' so far' : ''}: {val(bgAt.v as number)}{/if}{#if infoAt}; {infoLabel}: {val(infoAt.v as number)}, an estimate{/if}{#if left}; {left}{/if}
+		{#if read}
+			Record {val(read.p[1])} {prov && read.i === pts.length - 1 ? 'provisional,' : 'from'} {whenOf(read.p[0])}{#if read.bg}; {bgWhen ? bgWhen(read.bg.t) : ''}{read.left ? ' so far' : ''}: {val(read.bg.v as number)}{/if}{#if read.inf}; {infoLabel}: {val(read.inf.v as number)}, an estimate{/if}{#if read.left}; {read.left}{/if}
 		{/if}
 	</figcaption>
 </figure>
@@ -318,6 +324,7 @@
 	/* touch: above the chart, centred on the point, so the finger doesn't hide it */
 	.tip.above { top: 0; transform: translate(-50%, calc(-100% - 6px)); z-index: 2; }
 	.cursor.pinned { stroke: var(--accent); stroke-dasharray: none; }
+	.tip.held { border-color: var(--accent); }
 	.tip b { font-family: var(--font-data); color: var(--ink); font-size: 0.9rem; }
 	.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 </style>

@@ -18,7 +18,7 @@
 	import { heatWindow, heatSource } from '#lib/site/heat.js';
 	import { FUELS } from '#lib/tracker/fuels.js';
 
-	type View = { region: string; range: string; label: string; days: number | null; int: string; kind: string; end: number | null; from: number; to: number; M: any; live: any; history: any };
+	type View = { openFuel: (k: string) => void; canOpen: (k: string) => boolean; region: string; range: string; label: string; days: number | null; int: string; kind: string; end: number | null; from: number; to: number; M: any; live: any; history: any };
 	let { v }: { v: View | null } = $props();
 
 	const RES: Record<string, string> = RES_;
@@ -399,7 +399,7 @@
 				<PopButton open={popped === 'mix'} name="mix table" onclick={() => pop('mix')} />
 			</div>
 			{#if mix}
-				<MixTable {mix} prevLabel={canCompare && prev ? (prevYear ?? 'year before') : null} />
+				<MixTable {mix} prevLabel={canCompare && prev ? (prevYear ?? 'year before') : null} canOpen={v?.canOpen} onopen={(k) => { popped = null; v?.openFuel(k); }} />
 			{:else}
 				<p class="empty">Loading…</p>
 			{/if}

@@ -30,6 +30,14 @@
 	let liveD = $state.raw<any>(null);   // tracker.json: the live week, for the live check and the pace
 	let paceAll = $state(false);          // the pace cards beyond the first PACE_CARDS
 	const PACE_CARDS = 8;   // owner's call, 31 Oct 2026
+	// at least that many, made up to a whole row, so the last row is never left short (owner's report REC-09, 1 Nov 2026)
+	let paceCols = $state(1);
+	const paceShown = $derived(Math.ceil(PACE_CARDS / paceCols) * paceCols);
+	function countCols(el: HTMLElement) {
+		const ro = new ResizeObserver(() => { paceCols = Math.max(1, getComputedStyle(el).gridTemplateColumns.split(' ').length); });
+		ro.observe(el);
+		return { destroy: () => ro.disconnect() };
+	}
 	let moy = $state(new Date(Date.now() + 13 * 36e5).getUTCMonth());   // this month in New Zealand
 
 	onMount(() => {
@@ -166,10 +174,10 @@
 						</ul>
 						<p><a href="/methods/records#pace">How records work</a></p>
 					</InfoTip></div>
-					{#if paces.length > PACE_CARDS}<button type="button" class="more-btn" aria-expanded={paceAll} onclick={() => (paceAll = !paceAll)}>{paceAll ? 'Show fewer' : `Show all ${paces.length}`}</button>{/if}</div>
+					{#if paces.length > paceShown}<button type="button" class="more-btn" aria-expanded={paceAll} onclick={() => (paceAll = !paceAll)}>{paceAll ? 'Show fewer' : `Show all ${paces.length}`}</button>{/if}</div>
 					<!-- simple tiles, almost buttons: the record's picture and name; the detail is on its page (owner's call, 30 Oct 2026) -->
-					<div class="paces">
-						{#each paceAll ? paces : paces.slice(0, PACE_CARDS) as p}
+					<div class="paces" use:countCols>
+						{#each paceAll ? paces : paces.slice(0, paceShown) as p}
 							<a class="pt" href={href(p.d.id, p.region, p.period)} style="--c:var({p.d.tok})"
 								title="{fullName(p.d)}: {soFar(p)}, {paceAt(p)}, ahead of the record {periodOf(p.period).word}">
 								<span class="pt-ic"><RecordIcon id={p.d.id} /></span>
@@ -424,6 +432,8 @@
 	.official::before { display: none; }
 
 	.sec { display: grid; gap: 10px; }
+	/* a faint break between sections, as this page holds a lot (owner's report REC-01, 2 Nov 2026) */
+	.sec + .sec, .sec + .rec-tabs { border-top: 1px solid var(--grid); padding-top: 18px; margin-top: 8px; }
 	/* the three lists' tabs: underlined like the tracker's Generation and Prices tabs */
 	.rec-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; margin-top: 6px; }
 	.rec-tabs button { font: inherit; font-size: 0.95rem; font-weight: 600; color: var(--muted); background: none; border: 0; border-bottom: 2px solid transparent; padding: 8px 12px; margin-bottom: -1px; min-height: 40px; white-space: nowrap; cursor: pointer; }

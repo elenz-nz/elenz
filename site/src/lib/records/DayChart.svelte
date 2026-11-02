@@ -77,6 +77,8 @@
 	let pin = $state<number | null>(null);
 	let touch = $state(false);
 	const hover = $derived(hov ?? pin);
+	// pinned and pointing elsewhere: both show, for comparing (owner's report REC-05, 2 Nov 2026)
+	const held = $derived(hov !== null && pin !== null && pin !== hov && pin >= i0 && pin <= i1 ? pin : null);
 	let box = $state<HTMLElement>();
 	const pxOf = (e: PointerEvent) => { const r = (e.currentTarget as SVGSVGElement).getBoundingClientRect(); return ((e.clientX - r.left) / r.width) * W; };
 	const iOf = (px: number) => i0 + ((px - L) / (W - L - R)) * Math.max(1, i1 - i0);
@@ -155,10 +157,20 @@
 		<line x1={x(hover)} x2={x(hover)} y1={T} y2={H - B} class="cursor hov" class:pinned={hov === null} />
 		<circle cx={x(hover)} cy={y(day.v[hover] as number)} r="3.5" style="fill:var({tok})" />
 	{/if}
+	{#if held !== null && held !== at}
+		<line x1={x(held)} x2={x(held)} y1={T} y2={H - B} class="cursor hov pinned" />
+		<circle cx={x(held)} cy={y(day.v[held] as number)} r="3.5" style="fill:var({tok})" />
+	{/if}
 	{#if drag && Math.abs(drag.b - drag.a) >= 6}
 		<rect class="zsel" x={Math.min(drag.a, drag.b)} y={T} width={Math.abs(drag.b - drag.a)} height={H - T - B} />
 	{/if}
 </svg>
+{#if held !== null && !drag}
+	{@const fx = x(held) / W}
+	<div class="tip held" class:flip={fx > 0.7} style="left:{fx * 100}%;top:{(y(day.v[held] as number) / H) * 100}%" aria-hidden="true">
+		<b>{val(day.v[held] as number)}</b><span>{tipAt ? tipAt(held) : clock(day.t0 + held * day.step)}{held === at ? ' · the record' : ''} · pinned</span>
+	</div>
+{/if}
 {#if hover !== null && !drag && hover >= i0 && hover <= i1}
 	{@const fx = x(hover) / W}
 	<div class="tip" class:flip={!touch && fx > 0.7} class:above={touch} bind:clientWidth={tipW} style={touch ? `left:${touchLeft(fx, cw, tipW)}px` : `left:${fx * 100}%;top:${(y(day.v[hover] as number) / H) * 100}%`} aria-hidden="true">
@@ -178,6 +190,7 @@
 	.tip.flip { transform: translate(calc(-100% - 12px), -50%); }
 	.tip.above { top: 0; transform: translate(-50%, calc(-100% - 6px)); z-index: 2; }
 	.cursor.pinned { stroke: var(--accent); opacity: 1; }
+	.tip.held { border-color: var(--accent); }
 	.tip b { font-family: var(--font-data); color: var(--ink); font-size: 0.9rem; }
 	.grid { stroke: var(--grid); stroke-width: 1; }
 	.lab { fill: var(--muted); font-family: var(--font-data); font-size: 12px; }

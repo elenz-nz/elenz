@@ -15,7 +15,7 @@
 	const atContact = $derived(page.url.hash === '#contact');
 	// phones: the contents are a dropdown naming the page you're on, instead of a row of pills (owner's call DOC-04,
 	// 31 Oct 2026); it closes when a page is chosen
-	const here = $derived(path === '/about' ? (atContact ? 'Contact' : 'About') : path === '/privacy' ? 'Privacy' : path === '/methods' ? 'Data and methods'
+	const here = $derived(path === '/about' ? (atContact ? 'Contact' : 'About') : path === '/guide' ? 'Using Elenz' : path === '/privacy' ? 'Privacy' : path === '/methods' ? 'Data and methods'
 		: path === '/methods/sources' ? 'Every data source' : (TOPICS.find((t) => path === `/methods/${t.slug}`)?.title ?? 'Contents'));
 	let dropOpen = $state(false);
 	$effect(() => { void page.url.href; dropOpen = false; });
@@ -26,6 +26,7 @@
 		<p>Elenz</p>
 		<ul>
 			<li><a href="/about" aria-current={cur('/about') && !atContact ? 'page' : undefined}>About</a></li>
+			<li><a href="/guide" aria-current={cur('/guide')}>Using Elenz</a></li>
 			<li><a href="/about#contact" aria-current={cur('/about') && atContact ? 'location' : undefined}>Contact</a></li>
 			<li><a href="/privacy" aria-current={cur('/privacy')}>Privacy</a></li>
 		</ul>

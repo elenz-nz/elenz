@@ -86,8 +86,13 @@
 .mt-body table { border-collapse: collapse; font-size: 0.85rem; width: 100%; }
 .mt-body caption { caption-side: bottom; text-align: left; padding-top: 6px; font-size: 0.78rem; color: var(--muted); }
 .mt-body th { text-align: left; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding: 6px 12px 6px 0; border-bottom: 1px solid var(--line); vertical-align: bottom; }
-.mt-body td { padding: 6px 12px 6px 0; border-bottom: 1px solid var(--grid); color: var(--ink-2); vertical-align: top; line-height: 1.45; }
-.mt-body :where(td.n, th.n) { text-align: right; font-family: var(--font-data); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mt-body td { padding: 6px 12px 6px 0; border-bottom: 1px solid var(--line); color: var(--ink-2); vertical-align: top; line-height: 1.45; }
+.mt-body td.n, .mt-body th.n { text-align: right; font-family: var(--font-data); font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* a figure column's heading sits over its figures, and the row under the pointer lights up (owner's report DOC-03) */
+.mt-body th.n { font-family: inherit; }
+.mt-body td:last-child, .mt-body th:last-child { padding-right: 0; }
+.mt-body td:first-child, .mt-body th:first-child { padding-left: 4px; }
+.mt-body tbody tr:hover td { background: color-mix(in srgb, var(--ink) 5%, transparent); }
 .mt-body td.n { color: var(--ink); }
 .mt-body tr.sub td { color: var(--muted); }
 /* a compact grid of quarters (the Rankine coal share) */

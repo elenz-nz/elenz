@@ -93,7 +93,7 @@ export const TOPICS: Topic[] = [
 		title: 'History since 1997',
 		summary: 'How the record back to August 1997 is put together from metered data, the daily dispatch files and the live feed, where the sources hand over, and the known gaps.',
 		shownOn: [['Tracker', '/tracker'], ['Prices', '/tracker/prices']],
-		updated: '2026-11-01',
+		updated: '2026-11-02',
 	},
 	{
 		slug: 'records',
@@ -383,6 +383,18 @@ export const REFERENCES: Reference[] = [
 		url: 'https://www.mbie.govt.nz/assets/2020-thermal-generation-stack-update-report.pdf',
 		use: 'Heat rates for Huntly 5 and 6, Stratford’s peakers and Whirinaki (table 3-3); Kinleith’s fuels (section 3.1.3).',
 		topics: ['emissions', 'generation'],
+	},
+	{
+		id: 'mbie-elec', title: 'Electricity statistics', by: 'Ministry of Business, Innovation and Employment',
+		url: 'https://www.mbie.govt.nz/building-and-energy/energy-and-natural-resources/energy-statistics-and-modelling/energy-statistics/electricity-statistics',
+		use: 'Annual net generation, the check on the history’s yearly totals, hydro and geothermal.',
+		topics: ['history'],
+	},
+	{
+		id: 'mbie-methods', title: 'Energy statistics: sources and methods', by: 'Ministry of Business, Innovation and Employment',
+		url: 'https://www.mbie.govt.nz/assets/Energy-statistics-sources-and-methods.pdf',
+		use: 'How MBIE compiles those figures, and what it counts that the EA’s metering doesn’t.',
+		topics: ['history'],
 	},
 	{
 		id: 'stack2011', title: '2011 NZ Generation Data Update', by: 'Parsons Brinckerhoff for the Ministry of Economic Development', date: 'January 2012',

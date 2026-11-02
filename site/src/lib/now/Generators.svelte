@@ -52,6 +52,7 @@
 		if (s.by === by) s.asc = !s.asc;
 		else { s.by = by; s.asc = natural(by); }
 	}
+	const thenBy = (by: string) => { s.then = by ? [{ by, asc: natural(by) }] : []; };
 	const ariaSort = (by: string) => (s.by === by ? (s.asc ? 'ascending' : 'descending') : 'none');
 	// the column's place among several sort keys, and its direction, for its arrow
 	const sortMark = (by: string) => {
@@ -100,6 +101,13 @@
 		<label class="g-sort"><span class="sr">Sort by</span>
 			<select value={s.by} onchange={(e) => sortBy((e.currentTarget as HTMLSelectElement).value)}>
 				{#each Object.entries(SORTS) as [k, name] (k)}<option value={k}>Sort: {name}</option>{/each}
+			</select>
+		</label>
+		<!-- the phone's way to Shift-click a second column (owner's report NOW-10, 2 Nov 2026) -->
+		<label class="g-sort"><span class="sr">Then by</span>
+			<select value={s.then?.[0]?.by ?? ''} onchange={(e) => thenBy((e.currentTarget as HTMLSelectElement).value)}>
+				<option value="">Then: nothing</option>
+				{#each Object.entries(SORTS).filter(([k]) => k !== s.by) as [k, name] (k)}<option value={k}>Then: {name}</option>{/each}
 			</select>
 		</label>
 		<label class="g-on"><input type="checkbox" bind:checked={s.on} /> Generating only</label>

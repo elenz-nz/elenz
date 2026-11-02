@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { portal } from '#lib/site/portal.js';
 	// Price by time of day: one row per NZ day (or month or year on All, #lib/site/heat.js), one cell per half-hour,
 	// coloured by price band: fixed bands, so periods compare, or (scaled) bands at the sixths of the prices shown.
@@ -8,6 +9,9 @@
 
 	type Row = { day: number; t: number; v: number[]; lab?: string; long?: string; month?: boolean };
 	let { rows, scaled = false }: { rows: Row[]; scaled?: boolean } = $props();
+	// counts each change of `scaled`, restarting the key's flash; not on the first draw
+	let flash = $state(0), wasScaled: boolean | undefined;
+	$effect(() => { const on = scaled; if (wasScaled !== undefined && on !== wasScaled) flash = untrack(() => flash) + 1; wasScaled = on; });
 
 	const FIXED = [50, 100, 150, 250, 500];
 	const BINS = $derived((scaled && quantileEdges(rows)) || FIXED);
@@ -42,9 +46,10 @@
 		</div>
 	</div>
 	{#if tip}<div class="hm-tip" use:portal style={tipStyle(tip)}>{tip.text}</div>{/if}
-	<div class="leg">
+	<!-- the key flashes when "Scale to this view" changes it (owner's report PRC-06, 1 Nov 2026) -->
+	{#key flash}<div class="leg" class:scale-flash={flash > 0}>
 		{#each LEGEND as l}<span><i class="b{l.c}"></i>{l.label}</span>{/each}
-	</div>
+	</div>{/key}
 </div>
 
 <style>
