@@ -5,17 +5,29 @@
 // (Chrome), then the desktop layout on phones. A refresh hid the first, so these go through the site's own links.
 import { test as base, expect } from '@playwright/test';
 
-// any uncaught error in the page fails the test
+// any uncaught error in the page fails the test. WebKit also reports cancelled requests as page errors ("... due to access
+// control checks"), such as a data file cut off by a refresh; those aren't faults. The analytics script is blocked so
+// the tests reach nothing outside the build.
 const test = base.extend({
   page: async ({ page }, use) => {
     const errors = [];
-    page.on('pageerror', (e) => errors.push(e.message));
+    await page.route(/cloudflareinsights\.com/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
+    page.on('pageerror', (e) => { if (!/access control checks/.test(e.message)) errors.push(e.message); });
     await use(page);
     expect(errors, 'uncaught errors in the page').toEqual([]);
   },
 });
 
 const isPhone = (testInfo) => testInfo.project.name.startsWith('phone');
+// empty when the page fits the screen; otherwise by how much, and which elements reach past the edge
+const sticksOut = () => {
+  const root = document.documentElement, over = root.scrollWidth - root.clientWidth;
+  if (over <= 0) return '';
+  const scrolls = (e) => { for (let p = e.parentElement; p && p !== document.body; p = p.parentElement) if (/auto|scroll|hidden|clip/.test(getComputedStyle(p).overflowX)) return true; return false; };
+  const names = [...document.body.querySelectorAll('*')].filter((e) => e.getBoundingClientRect().right > root.clientWidth + 0.5 && !scrolls(e))
+    .map((e) => `${e.tagName.toLowerCase()}${e.id ? '#' + e.id : ''}.${String(e.className.baseVal ?? e.className).split(' ')[0]} r=${Math.round(e.getBoundingClientRect().right)}`);
+  return `${over}px: ${names.slice(-8).join(' | ')}`;
+};
 
 // what each page must show once it has loaded; the data-free parts only, so none of this waits on history files
 const SHOWS = {
@@ -95,7 +107,7 @@ test.describe('on a phone', () => {
   for (const path of ['/', '/now', '/tracker', '/tracker/prices', '/records', '/articles', '/about']) {
     test(`${path} fits the screen`, async ({ page }) => {
       await page.goto(path);
-      await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), { message: 'sideways scroll, px' }).toBeLessThanOrEqual(0);
+      await expect.poll(() => page.evaluate(sticksOut), { message: 'what sticks out past the side of the screen' }).toBe('');
     });
   }
 
