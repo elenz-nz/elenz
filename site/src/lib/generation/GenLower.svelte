@@ -268,7 +268,7 @@
 
 <svelte:window onkeydown={(e) => { if (popped && e.key === 'Escape') popped = null; }} />
 
-<div class="lower" bind:this={box}>
+<div class="lower js-only" bind:this={box}>
 	<section class="card" class:popped={popped === 'share'} aria-label="{m.title} share of generation over the range">
 		<div class="card-head">
 			<div>

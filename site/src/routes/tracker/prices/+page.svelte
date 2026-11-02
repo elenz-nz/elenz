@@ -701,14 +701,12 @@
 	<title>Prices · Tracker · ELENZ</title>
 	<meta name="description" content="New Zealand wholesale electricity prices at six grid nodes, every 5 minutes: the gap between the islands, HVDC transfer, the price each fuel earned, and price ranges and spikes back to 1997." />
 	<Preview title="Wholesale electricity prices · ELENZ Tracker" description="New Zealand wholesale electricity prices at six grid nodes, every 5 minutes: the gap between the islands, HVDC transfer, the price each fuel earned, and price ranges and spikes back to 1997." path="/tracker/prices" />
-	<!-- with JavaScript off, a plain line instead of empty charts and "Loading" (owner's report RES-04, 2 Nov 2026) -->
-	{@html '<noscript><style>.toolbar, .layout, .status, .lower { display: none !important; }</style></noscript>'}
 </svelte:head>
 
 <div class="wrap wide">
 	<Masthead heading />
 	<TrackerTabs>
-		<div class="status">
+		<div class="status js-only">
 			<span class="tstatus" role="status">{status}</span>
 			{#if meta}
 				{#if R.src !== 'live' || endT !== null}
@@ -731,7 +729,7 @@
 		</div>
 	</TrackerTabs>
 
-	<nav class="toolbar" aria-label="View controls" use:barHeight>
+	<nav class="toolbar js-only" aria-label="View controls" use:barHeight>
 		<div class="ctl">
 			<label for="p-region" class="vh">Region</label>
 			<select class="pick" id="p-region" bind:value={region} onchange={() => { if (region !== 'NZ') bandKey = islandBand(region); save(); }}>
@@ -874,7 +872,7 @@
 		</button>
 	{/snippet}
 
-	<div class="layout">
+	<div class="layout js-only">
 		<!-- The chart panels take arrow keys to move the time cursor, so they need to be focusable. -->
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -->
 		<section class="charts" id="charts" tabindex="0" aria-busy={busy} onkeydown={keys}
@@ -1047,7 +1045,7 @@
 		</div>
 	{/if}
 
-	<div class="p-row">
+	<div class="p-row js-only">
 		<section class="card" class:popped={popped === 'cap'}>
 			<div class="card-head">
 				<div>

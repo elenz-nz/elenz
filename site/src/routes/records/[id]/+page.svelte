@@ -242,8 +242,6 @@
 	<title>{fullName(d)} · Records · ELENZ</title>
 	<meta name="description" content="New Zealand's electricity record for {fullName(d).toLowerCase()} since 1997, for New Zealand and each island: the record, how it grew, and the day it fell." />
 	<Preview title="{fullName(d)} · New Zealand electricity records" description="New Zealand's electricity record for {fullName(d).toLowerCase()} since 1997, for New Zealand and each island: the record, how it grew, and the day it fell." path="/records/{data.id}" />
-	<!-- with JavaScript off, a plain line instead of "Loading" (owner's report RES-04, 2 Nov 2026) -->
-	{@html '<noscript><style>.js-only { display: none !important; }</style></noscript>'}
 </svelte:head>
 
 <div class="wrap">

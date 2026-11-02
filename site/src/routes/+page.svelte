@@ -117,8 +117,6 @@
 	<title>ELENZ · New Zealand's electricity</title>
 	<meta name="description" content="New Zealand's electricity, live: the generation mix and renewable share now, and a tracker of generation, prices, demand and the HVDC link back to 1997." />
 	<Preview title="ELENZ · New Zealand's electricity, live" description="New Zealand's electricity, live: the generation mix and renewable share now, and a tracker of generation, prices, demand and the HVDC link back to 1997." path="/" />
-	<!-- with JavaScript off, a plain line instead of "Loading", and no empty previews (owner's report RES-04, 2 Nov 2026) -->
-	{@html '<noscript><style>.js-only, .pages-list .window { display: none !important; }</style></noscript>'}
 </svelte:head>
 
 <div class="wrap">
@@ -172,7 +170,7 @@
 						<p>{p.blurb}</p>
 						<a class="go" href={p.href}>Open {p.name} →</a>
 					</div>
-					<a class="window" href={p.window?.href ?? (p.href === '/records' && peekLink.rec ? peekLink.rec : p.href)} aria-label={p.window?.label ?? (p.href === '/records' && peekLink.rec ? 'Open the record shown' : `Open ${p.name}`)} tabindex="-1">
+					<a class="window js-only" href={p.window?.href ?? (p.href === '/records' && peekLink.rec ? peekLink.rec : p.href)} aria-label={p.window?.label ?? (p.href === '/records' && peekLink.rec ? 'Open the record shown' : `Open ${p.name}`)} tabindex="-1">
 						<span class="view">
 							{#if D && now}<Peek {D} {now} />{:else}<span class="ph">{error ? 'Preview unavailable' : 'Loading…'}</span>{/if}
 						</span>
