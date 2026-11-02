@@ -123,7 +123,9 @@
 	const topCardList = $derived(topCards(allCards, CARDS));
 	// Show all: one region at a time (owner's call, 1 Nov 2026: every region together was too many), the same region as
 	// the All-time records list: picking it in either place changes both (and the address)
-	const cardGroups = $derived(CARD_GROUPS.map((k) => ({ k, label: cardGroupLabel(k), cards: allCards.filter((c) => c.group === k && c.region === region) })).filter((g) => g.cards.length));
+	// Show all: each period's cards newest record first (owner's report, UAT round 3); the first four stay ranked
+	const cardDate = (c: any) => c.prov?.t ?? c.near?.t ?? c.settled?.pt ?? c.rec?.t ?? 0;
+	const cardGroups = $derived(CARD_GROUPS.map((k) => ({ k, label: cardGroupLabel(k), cards: allCards.filter((c) => c.group === k && c.region === region).sort((a, b) => cardDate(b) - cardDate(a)) })).filter((g) => g.cards.length));
 	// heading for a record: one card per record and period, New Zealand's where it is on pace, otherwise an island's
 	const paces = $derived.by(() => {
 		if (!R || !liveD) return [];
