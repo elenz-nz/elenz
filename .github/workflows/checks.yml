@@ -1,5 +1,5 @@
 # Checks on every push and pull request: the ingest code (syntax and undefined names, then a smoke test on a
-# committed one-hour sample of real dispatch data) and the website (type check, tests and build).
+# committed one-hour sample of real dispatch data) and the website (type check, tests, build and browser tests).
 #
 # The ingest and site jobs are required checks on main (ruleset "protect main"): a pull request merges, and so
 # deploys the site and the live job's ingest code, only once both pass. Renaming a job means updating the ruleset.
@@ -33,7 +33,7 @@ jobs:
 
   site:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: site
@@ -51,3 +51,7 @@ jobs:
       - run: npm run build
       - name: Link previews (every public page has og:title, og:description, og:url and an image)
         run: npm run check:previews
+      - name: Browser tests (the built site in Chromium, Firefox and WebKit, Safari's engine, at desktop and phone sizes)
+        run: |
+          npx playwright install --with-deps chromium firefox webkit
+          npm run test:browsers

@@ -416,8 +416,9 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   those tables. Rerun it and commit the JSON after refreshing the register or editing the tables.
 - `.github/workflows/checks.yml`: on every push, ruff (syntax errors and undefined names only), `ingest/tests/smoke.py`
   (the live and history paths on a committed one-hour sample of real dispatch data and matching final prices, no network)
-  and the site's `npm run check`, `npm test` (`site/tests/`: the tracker's address), `npm run build` and `npm run check:previews`. Its `ingest` and `site` jobs are required checks: a pull request can't
+  and the site's `npm run check`, `npm test` (`site/tests/`: the tracker's address), `npm run build`, `npm run check:previews` (which also runs `scripts/check-css.js`) and `npm run test:browsers`. Its `ingest` and `site` jobs are required checks: a pull request can't
   merge into `main` (so nothing deploys) until both pass.
+  Browser tests (owner's call, 2 Nov 2026; `site/playwright.config.js`, `site/tests/e2e/site.spec.js`): Playwright opens the built site in Chromium, Firefox and WebKit (Safari's engine) and at two phone sizes, through the site's own links as well as direct visits and refreshes, and with JavaScript off. They use the snapshot bundled at `static/data/tracker.json` (no history files), not the live site, so a fix can still merge while the live site is down; check only what the snapshot can show. WebKit here is new, so old Safari is covered by `check-css.js` alone. A new page or card with its own fault worth guarding gets a test; put the bug back once to see the test fail. To run them in a Claude session: `npx playwright test --project=chromium --project=phone-chrome` after a build (only Chromium is installed there; `@playwright/test` is pinned to that browser's version, so bump them together).
 - `.github/workflows/watchdog.yml`: checks the live site every 15 minutes; opens an issue labelled `stale-data`
   (GitHub emails it to the owner) when live data is over 45 minutes old, history over 5 days behind, or the Worker
   can't start a job, and closes it when the data recovers.
