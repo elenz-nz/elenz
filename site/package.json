@@ -11,7 +11,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test": "node --test tests/*.test.js",
-		"check:previews": "node scripts/check-previews.js"
+		"check:previews": "node scripts/check-previews.js && node scripts/check-css.js"
 	},
 	"devDependencies": {
 		"@fontsource/ibm-plex-mono": "^5.3.0",

@@ -6,8 +6,8 @@
 // `disabled`, and a `change` event when a day is picked. Moving between months or years never changes the value, so
 // nothing redraws until a day is chosen; picking a day closes the calendar.
 //
-// The calendar hangs from document.body, fixed to the window, so the sticky control bar (which clips anything below
-// it) doesn't cut it off. Keyboard: arrows move a day or a week, Page Up/Down a month (Shift: a year), Home/End the
+// The calendar hangs from document.body, fixed to the window, outside the sticky control bar.
+// Keyboard: arrows move a day or a week, Page Up/Down a month (Shift: a year), Home/End the
 // week's ends, Enter picks, Escape closes. The month name opens a year list, then a month list.
 
 const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];

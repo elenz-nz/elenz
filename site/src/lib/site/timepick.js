@@ -2,7 +2,7 @@
 // time pickers change at every step, so the chart redrew while scrolling through the hours (owner's report ZM-03,
 // 1 Nov 2026). As with <date-pick>, nothing changes until the choice is made: an hour only marks itself, and picking
 // the minutes closes the panel and sends `change`. It has `value` ('HH:MM', 24-hour) and `disabled`; shown in the site's
-// own "7:30 pm". The panel hangs from document.body (the sticky bar clips anything below it). Tab moves through the
+// own "7:30 pm". The panel hangs from document.body, outside the sticky bar. Tab moves through the
 // buttons, Enter picks, Escape closes. Styles are the calendar's (.dp-*, in tracker.css).
 
 const VALID = /^([01]\d|2[0-3]):([0-5]\d)$/;

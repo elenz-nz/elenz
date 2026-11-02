@@ -789,7 +789,7 @@
 			</button>
 		{/if}
 	</nav>
-	<!-- outside the sticky bar, which clips anything hanging below it -->
+	<!-- outside the sticky bar -->
 		{#if spanOpen}
 			<div class="span-menu" id="p-span-menu" bind:this={spanMenu} style="top:{spanPos.top}px;left:{spanPos.left}px" role="group" aria-label="Show the last part of the day">
 				<span class="span-hd">Last</span>

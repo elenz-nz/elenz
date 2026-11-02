@@ -28,9 +28,12 @@
 	const hh = (c: number) => `${String(Math.floor(c / 2)).padStart(2, '0')}:${c % 2 ? '30' : '00'}`;
 </script>
 
+<!-- a finger that starts on the map and scrolls the page leaves no pointerleave on some phones -->
+<svelte:window onscroll={() => (tip = null)} />
+
 <div class="hm">
 	<div class="scroll" class:tall={rows.length > 40} bind:this={scroller}>
-		<div class="grid" role="img" aria-label="Heat map of half-hourly prices by day and time of day" onpointerleave={() => (tip = null)}>
+		<div class="grid" role="img" aria-label="Heat map of half-hourly prices by day and time of day" onpointerleave={() => (tip = null)} onpointercancel={() => (tip = null)}>
 			{#each rows as r, j (r.day)}
 				<div class="r">
 					<span class="d">{r.month ? r.lab : j % (rows.length > 40 ? 7 : 5) === 0 || j === rows.length - 1 ? shortDate(r.t) : ''}</span>

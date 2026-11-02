@@ -218,8 +218,7 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   window = the day it ends in, widened to 3D if it starts the day before; at the newest data a menu-length stretch is
   live "last N hours" again). Without a zoom the date box picks a whole day, as before (`onTimeSettled`/`timeSettled` in
   datefield.js). The time box is the site's own too (`<time-pick>`, `src/lib/site/timepick.js`, styled as the calendar; ZM-03, 2 Nov 2026: the browsers' pickers redrew the chart at every step): an hour only marks itself, and picking the minutes applies it. Latest while zoomed moves the stretch to the newest data at the same length (`zoomEndAt`), and shows when a dragged stretch sits behind the newest data. The date box is the site's own calendar on both tabs (`<date-pick>`, `src/lib/site/datepick.js`, a
-  custom element with `value`/`min`/`max`/`disabled` and a `change` event, hung from `<body>` so the bar's clip
-  doesn't cut it; owner's report TRK-07: Firefox's picker redrew the chart while scrolling its month and year lists):
+  custom element with `value`/`min`/`max`/`disabled` and a `change` event, hung from `<body>`, outside the sticky bar; owner's report TRK-07: Firefox's picker redrew the chart while scrolling its month and year lists):
   moving between months or years changes nothing until a day is picked, which closes it; the month name opens a year
   list, then months. On 1D a past day is labelled "Day" (it shows that whole day). A past window counts whole local
   days back (`addDays` in `buildView` and `spanFor`), so a clock change inside it no longer adds an hour of the day
@@ -229,7 +228,7 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   shows that whole day and lets go; 7:30 pm on 30 days stays 7:30 pm on 1D); without a pin, a dragged zoom carries over
   the same way. The ‹ › arrows step freely and let go of a pin once it leaves the window. The Prices tab does the same
   (`pickRange`, `setView` keeps a pin by its time, not its place in the list). The 1D menu
-  (`#span-menu`) lives outside the sticky bar because the bar's clip-path clips anything hanging below it. Share's link
+  (`#span-menu`) lives outside the sticky bar and is placed under its button. Share's link
   to the dates shown turns a span into fixed times (`zoomAt`). On an island's chart, HVDC is signed like the batteries
   (23 Oct 2026): arriving is stacked on top of the island's generation, leaving is drawn below zero (`drawGen`). Both are
   drawn light so the generation behind reads through, and High/Low sit on the generation, never on HVDC. In the energy
@@ -264,6 +263,7 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   article figures (`Figure`'s source). Region and month pickers are boxed dropdowns (`select.pick`), the same everywhere; the page-level "About this data" is a labelled
   pill, and both summaries have a labelled "Controls" panel: an opening line, then one bullet per thing you can do across the tab, in the ⓘ style (each chart's own ⓘ says what it shows), linking to the full descriptions on /guide (`#generation`, `#prices`; owner's reports GRP-06, CHT-13), with Reset charts to default at its top (`resetView` in view.js: forgets `elenz-view`, `elenz-prices`, `elenz-gen-lower` and the tab links, then opens the plain address; CHT-16): keep the panels and /guide up to date.
   With JavaScript off, the tracker tabs, Now, Records, a record's page and the landing page show one plain line instead of empty charts or "Loading" (RES-04): mark what should go with the class `js-only`; the one rule is a `<noscript><style>` in `src/app.html`. Never put that style in a page (`{@html}` in `<svelte:head>` included; `tests/noscript.test.js` checks): on a click between pages Svelte builds the page's markup itself and Chrome treats the style as real, which hid the charts on Now and the tracker for everyone on Chrome (fixed 2 Nov 2026, the day it went in; a refresh or a direct visit looked fine).
+  Older Safari (found on BrowserStack, 2 Nov 2026): Vite 8 rewrites `max-width` rules as `width<=`, which Safari reads only from 16.4, so older iPhones lost every width rule and got the desktop layout; `build.cssTarget` in `vite.config.ts` stops that and `scripts/check-css.js` (in `npm run check:previews`) fails if it returns. Don't hang a sticky element's background on a huge box-shadow held in by clip-path: older iPhones lost the clip while scrolling and the shadow blanked the page, leaving only the bar (`.toolbar::before` is a plain strip to the window's edges). `color-mix()` needs Safari 16.2; older ones skip those declarations, which only loses a few tints. BrowserStack's free trial gives only about a minute a device. iOS 14 isn't supported (owner's call, 2 Nov 2026: on an iPhone 12 at iOS 14.7 the data never loaded, and it isn't worth chasing); Safari 15 is the floor.
   Tracker and Now use the full width of big screens (`.wrap.wide`; reading pages keep 1,260 px); the masthead spans
   the window on every page (`.wrap:not(.wide) > .mast-wrap`, with `--gutter` and `--sbw`, the scrollbar's width set by
   the root layout), so its logo and links don't move between them (owner's call HOME-01, 31 Oct 2026); from 1,340 px a reading page draws a faint
