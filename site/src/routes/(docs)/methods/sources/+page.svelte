@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Every dataset Elenz uses, from the registry (#lib/methods/registry.ts), with links to the pages that use it.
 	import Preview from '#lib/site/Preview.svelte';
-	import { SOURCES, TOPICS, reportHref } from '#lib/methods/registry.js';
+	import { REFERENCES, SOURCES, TOPICS, reportHref } from '#lib/methods/registry.js';
 
 	const title = (slug: string) => TOPICS.find((t) => t.slug === slug)?.title ?? slug;
 	const groups: [string, string[]][] = [
@@ -50,6 +50,14 @@
 				{/each}
 			</div>
 		{/each}
+
+		<h2 id="references">Reports and references</h2>
+		<p>The method pages also cite these for facts the datasets can’t show. Each is listed again on the pages that use it.</p>
+		<ul>
+			{#each REFERENCES as r (r.id)}
+				<li><a href={r.url} target="_blank" rel="noopener">{r.title}</a>. {r.by}{r.date ? `, ${r.date}` : ''}. {r.use} <small>({#each r.topics as t, i (t)}{i ? ', ' : ''}<a href="/methods/{t}">{title(t)}</a>{/each})</small></li>
+			{/each}
+		</ul>
 
 		<h2 id="more">Also</h2>
 		<p>Only data that may be republished is used. Live hydro lake storage and planned outages aren’t on the site yet, because there is no source for them that can be republished freely.</p>

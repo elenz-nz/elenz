@@ -105,8 +105,25 @@ export const GEO_YEARS = {
   ngawha_oec4:   [ 313,  313,   95],   // commissioned 2021; until 2023 the field's pre-reinjection figure (2020, OEC1–3)
 };
 export const GEO_YEAR_COLS = [2020, 2022, 2023];
-// stations without published figures yet: estimates (TIMES-NZ assumptions), until the NZGA publishes them
-export const GEO_ASSUMED = { tauhara: 32, te_huka_3: 0, topp2: 0,
+// A generator's own published figure beats the table above and any assumption (owner's call, 2 Nov 2026).
+// Contact's stations, g CO₂e/kWh by year to June, from its Green Borrowing Programme update reports (asset tables; add
+// each new year, published about September). Null before a station ran. Used from July 2022; Ōhaaki isn't in the reports.
+// em6's 0.080 for Tauhara is close to its commissioning year (FY24), so it isn't used.
+export const GEO_CONTACT_FY = [2023, 2024, 2025, 2026];
+export const GEO_CONTACT = {
+  //             FY23   FY24   FY25   FY26
+  wairakei:   [ 19.5,  20.01, 20.43, 19.4],
+  te_mihi:    [36.69,  31.35, 38.94, 37.1],
+  poihipi:    [39.25,  40.65, 44.09, 42.0],
+  te_huka:    [49.27,  22.92,  4.37,  0],
+  tauhara:    [ null,  86.53, 40.96, 22.8],
+  te_huka_3:  [ null,   null,  1.65,  0],
+};
+// Ngāwhā: Top Energy's Sustainability Report 2025: 2024 was the first year all its geothermal emissions were avoided,
+// with a Unique Emission Factor from the EPA; em6 has 0 from the generator too.
+export const GEO_REPORTED = { ngawha_oec4: { from: 2024, g: 0 } };
+// stations without published figures yet: estimates (TIMES-NZ assumptions, and em6's), until the NZGA publishes them
+export const GEO_ASSUMED = { topp2: 0,
   // Kawerau pulp mill cogeneration (KAW0112 ONU0): bioenergy since BUILD 5 (Oct 2026); kept at zero in case a file
   // built before then still lists it as geothermal
   kawerau_mill: 0 };
@@ -128,12 +145,17 @@ const GEO_PLANT = {
 const geoCache = new Map();
 /** Geothermal factor (t CO₂e/MWh) for a dispatch plant at time t. */
 export function geoEf(name, t) {
-  const year = new Date(t + 13 * 3600e3).getUTCFullYear();   // NZ year, near enough
-  const key = name + '|' + year;
+  const nz = new Date(t + 13 * 3600e3), year = nz.getUTCFullYear();   // NZ year, near enough
+  const fy = year + (nz.getUTCMonth() >= 6 ? 1 : 0);                  // year to June
+  const key = name + '|' + year + '|' + fy;
   let ef = geoCache.get(key);
   if (ef === undefined) {
-    const st = GEO_PLANT[name], row = st && GEO_YEARS[st];
-    if (row) {
+    const st = GEO_PLANT[name], row = st && GEO_YEARS[st], own = st && GEO_REPORTED[st], con = st && GEO_CONTACT[st];
+    if (con && (fy >= GEO_CONTACT_FY[0] || !row)) {
+      const i = Math.min(Math.max(fy - GEO_CONTACT_FY[0], 0), con.length - 1);
+      ef = (con[i] ?? con.find((v) => v !== null)) / 1000;
+    } else if (own && year >= own.from) ef = own.g / 1000;
+    else if (row) {
       let i = 0;
       while (i + 1 < GEO_YEAR_COLS.length && year >= GEO_YEAR_COLS[i + 1]) i++;
       ef = row[i] / 1000;

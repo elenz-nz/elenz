@@ -33,7 +33,7 @@
 				<li><a href="/methods/{t.slug}"><b>{t.title}{#if t.estimate}<span class="est-tag">Est.</span>{/if}</b><span>{t.summary}</span></a></li>
 			{/each}
 		</ul>
-		<p><a href="/methods/sources">Every data source</a> lists all {SOURCES.length} datasets, with what each is used for, how far back it goes, how soon it is published and its licence.</p>
+		<p><a href="/methods/sources">Every data source</a> lists all {SOURCES.length} datasets, with what each is used for, how far back it goes, how soon it is published and its licence, then the <a href="/methods/sources#references">reports and references</a> the methods cite.</p>
 
 		<h2 id="conventions">Conventions</h2>
 		<dl>
