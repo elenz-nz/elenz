@@ -16,6 +16,7 @@
 //             wrangler.jsonc), which puts what a linked view shows into the page title, og:title and og:url, e.g.
 //             "Wind generation · North Island · 7 days to 18 Oct 2026", from its address (site/src/lib/site/viewurl.js,
 //             shared with the pages). The pages are prerendered, so they can't do it themselves.
+//  tests:     worker/tests/worker.test.js runs this file in Cloudflare's own runtime (cd worker && npm ci && npm test).
 import { readQuery, writeQuery, describe, SITE_URL } from '../site/src/lib/site/viewurl.js';
 
 const WORKFLOWS = 'https://api.github.com/repos/elenz-nz/elenz/actions/workflows';
@@ -42,22 +43,51 @@ function withPreview(res, tab, url) {
     .transform(res);
 }
 
+// ---------- security headers ----------
+// The same list as site/static/_headers, which covers the static files; Cloudflare doesn't apply that file to responses
+// the Worker makes itself. worker/tests/worker.test.js checks the two agree. frame-ancestors is the only CSP rule: it stops
+// other sites framing Elenz and restricts no scripts or styles. Screen wake lock and sharing stay allowed (/now's Keep
+// screen on, the Share buttons).
+export const SECURITY_HEADERS = {
+  'Content-Security-Policy': "frame-ancestors 'self'",
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Strict-Transport-Security': 'max-age=2592000',
+  'X-Content-Type-Options': 'nosniff',
+};
+
 // ---------- noindex off the real site ----------
 // Branch previews (https://<branch>-elenz.elenz.workers.dev) serve the whole site with live data; Google must not index
 // them as copies. Static files get the header from site/static/_headers, which Cloudflare doesn't apply to responses
 // the Worker makes, so the Worker adds it to its own (the tracker's pages and /data/*) on any other host.
 const SITE_HOST = new URL(SITE_URL).hostname;
-function noindexOffSite(res, url) {
-  if (url.hostname === SITE_HOST) return res;
+function finish(res, url) {
   const out = new Response(res.body, res);
-  out.headers.set('X-Robots-Tag', 'noindex');
+  for (const [k, v] of Object.entries(SECURITY_HEADERS)) out.headers.set(k, v);
+  if (url.hostname !== SITE_HOST) out.headers.set('X-Robots-Tag', 'noindex');
   return out;
 }
+
+// ---------- when KV refuses a read ----------
+// A daily limit or an outage makes a KV read throw. Without this the visitor gets Cloudflare's error page; with it the
+// tracker falls back to the bundled snapshot, history answers 503, and /data/health says what's wrong.
+async function kv(read, fallback = null) {
+  try {
+    return await read();
+  } catch (e) {
+    console.log(`KV read failed: ${e && e.message}`);
+    return fallback;
+  }
+}
+const unavailable = () => new Response('{"error":"not available right now"}', {
+  status: 503,
+  headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'retry-after': '300' },
+});
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    return noindexOffSite(await serve(request, env, url), url);
+    return finish(await serve(request, env, url), url);
   },
 
   async scheduled(event, env) {
@@ -70,12 +100,19 @@ async function serve(request, env, url) {
     // for an outside uptime monitor: 200 while the data is fresh, 503 (with the reasons) when it isn't. Unlike the
     // GitHub watchdog, it doesn't depend on the Worker's cron, so it also catches the cron itself stopping.
     const now = Date.now();
-    const [live, index, cron, progress] = await Promise.all([
+    const reads = await kv(() => Promise.all([
       env.DATA.getWithMetadata('tracker.json', { type: 'stream' }),
       env.DATA.get('hist/index.json', 'json'),
       env.DATA.get('cron-status', 'json'),
       env.DATA.get('hist/progress.json', 'json'),
-    ]);
+    ]));
+    if (!reads) {
+      return new Response(JSON.stringify({ ok: false, problems: ['the data store could not be read'] }), {
+        status: 503,
+        headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
+      });
+    }
+    const [live, index, cron, progress] = reads;
     // a rebuild republishes the index only when every month is done (a few days for the full history), so while
     // one is under way (months left, the job saving progress) the index may lag up to rebuildDays
     const rebuilding = !!(progress && progress.rebuild_left && progress.rebuild_left.length && progress.at && now - progress.at < 2 * 864e5);
@@ -102,7 +139,9 @@ async function serve(request, env, url) {
   }
   if (url.pathname === '/data/status.json' && env.DATA) {
     // last outcome of the scheduled trigger, for checking the pipeline without the Cloudflare dashboard
-    const [live, history] = await Promise.all([env.DATA.get('cron-status', 'json'), env.DATA.get('cron-status-history', 'json')]);
+    const statuses = await kv(() => Promise.all([env.DATA.get('cron-status', 'json'), env.DATA.get('cron-status-history', 'json')]));
+    if (!statuses) return unavailable();
+    const [live, history] = statuses;
     const status = { ...(live || { result: 'no scheduled run recorded yet' }), history: history || { result: 'no history run triggered yet' } };
     return new Response(JSON.stringify(status), {
       headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
@@ -112,7 +151,7 @@ async function serve(request, env, url) {
     // the live job stores a version tag with the file (KV metadata, same write): sent as the ETag, so a browser
     // that already has this version gets 304 Not Modified (no body) instead of ~110 KB. Weak, because Cloudflare
     // compresses the response; the comparison ignores the W/ prefix either way.
-    const { value: body, metadata } = await env.DATA.getWithMetadata('tracker.json', { type: 'stream', cacheTtl: 30 });
+    const { value: body, metadata } = await kv(() => env.DATA.getWithMetadata('tracker.json', { type: 'stream', cacheTtl: 30 }), {});
     if (body) {
       const headers = {
         'content-type': 'application/json; charset=utf-8',
@@ -132,7 +171,8 @@ async function serve(request, env, url) {
   }
   const hist = url.pathname.match(HISTORY_FILE);
   if (hist && env.DATA) {
-    const body = await env.DATA.get('hist/' + hist[1], { type: 'stream', cacheTtl: 600 });
+    const body = await kv(() => env.DATA.get('hist/' + hist[1], { type: 'stream', cacheTtl: 600 }), false);
+    if (body === false) return unavailable();
     if (!body) return new Response('{"error":"not available yet"}', { status: 404, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
     return new Response(body, {
       headers: {
@@ -154,17 +194,21 @@ async function scheduled(event, env) {
   const statusKey = history ? 'cron-status-history' : 'cron-status';
   const dispatch = async (wf) => {
     if (!env.GITHUB_TOKEN) return 'GITHUB_TOKEN secret not set';
-    const r = await fetch(`${WORKFLOWS}/${wf}/dispatches`, {
-      method: 'POST',
-      headers: {
-        authorization: `Bearer ${env.GITHUB_TOKEN}`,
-        accept: 'application/vnd.github+json',
-        'x-github-api-version': '2022-11-28',
-        'user-agent': 'elenz-cron',
-      },
-      body: JSON.stringify({ ref: 'main' }),
-    });
-    return r.status === 204 ? 'ok' : `GitHub said HTTP ${r.status}: ${(await r.text()).slice(0, 300)}`;
+    try {
+      const r = await fetch(`${WORKFLOWS}/${wf}/dispatches`, {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${env.GITHUB_TOKEN}`,
+          accept: 'application/vnd.github+json',
+          'x-github-api-version': '2022-11-28',
+          'user-agent': 'elenz-cron',
+        },
+        body: JSON.stringify({ ref: 'main' }),
+      });
+      return r.status === 204 ? 'ok' : `GitHub said HTTP ${r.status}: ${(await r.text()).slice(0, 300)}`;
+    } catch (e) {
+      return `could not reach GitHub: ${e && e.message}`;   // recorded below, so /data/health reports it
+    }
   };
   const result = await dispatch(workflow);
   // the offers job (offered capacity, ingest/offered.py) runs alongside the history job
@@ -179,10 +223,14 @@ async function scheduled(event, env) {
   if (result !== 'ok') console.log(result);
   // record the outcome when it changes, or hourly, to stay well inside KV's free daily write limit
   if (env.DATA) {
-    const now = new Date().toISOString();
-    const prev = await env.DATA.get(statusKey, 'json');
-    if (history || !prev || prev.result !== result || Date.parse(now) - Date.parse(prev.at) > 3600e3) {
-      await env.DATA.put(statusKey, JSON.stringify({ at: now, cron: event.cron, result }));
+    try {
+      const now = new Date().toISOString();
+      const prev = await env.DATA.get(statusKey, 'json');
+      if (history || !prev || prev.result !== result || Date.parse(now) - Date.parse(prev.at) > 3600e3) {
+        await env.DATA.put(statusKey, JSON.stringify({ at: now, cron: event.cron, result }));
+      }
+    } catch (e) {
+      console.log(`could not save the trigger status: ${e && e.message}`);   // the jobs have already been started
     }
   }
 }

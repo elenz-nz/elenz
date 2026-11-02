@@ -1,0 +1,8 @@
+# The packages the Python jobs use, with the major versions we allow. The exact versions they install are locked in
+# requirements.txt, so a new release can't reach the 5-minute live job until it has passed the checks in a pull request.
+#
+# To move to newer versions, or after changing this file (needs uv, https://docs.astral.sh/uv/):
+#   uv pip compile ingest/requirements.in --universal --generate-hashes --python-version 3.13 -o ingest/requirements.txt
+# Locked at pandas 3.1 and numpy 2.5 (Nov 2026); widen these after checking a new major version.
+pandas>=3.0,<4
+numpy>=2.0,<3

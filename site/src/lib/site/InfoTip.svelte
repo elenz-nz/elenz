@@ -12,7 +12,8 @@
 	let btn = $state<HTMLButtonElement>();
 	let pop = $state<HTMLDivElement>();
 	let pos = $state({ top: 0, left: 0 });
-	const id = 'info-' + Math.random().toString(36).slice(2, 9);
+	const uid = $props.id();   // the same in the prerendered page and in the browser
+	const id = 'info-' + uid;
 
 	function place() {
 		if (!btn) return;

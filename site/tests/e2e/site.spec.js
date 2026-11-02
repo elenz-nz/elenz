@@ -107,6 +107,27 @@ test('a heat map tooltip clears when the page scrolls', async ({ page }) => {
   await expect(page.locator('.hm-tip')).toHaveCount(0);
 });
 
+// SvelteKit's own router can't decode this address and stops there (an uncaught URIError, so `base`, not `test`), which
+// leaves the page as prerendered: it must still read properly and its links must still work.
+base('a badly encoded address shows the not-found page', async ({ page }) => {
+  await page.route(/cloudflareinsights\.com/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
+  await page.route('**/records/bad%E0%A4%A', (r) => r.fulfill({ path: 'build/404.html', status: 404, contentType: 'text/html' }));
+  await page.goto('/records/bad%E0%A4%A');
+  await expect(page.getByRole('heading', { name: /can’t find that page/ })).toBeVisible();
+  await page.locator('main a[href="/methods"], a[href="/methods"]').first().click();
+  await expect(page).toHaveURL(/\/methods$/);
+});
+
+test('an ⓘ opens the note it points to, after the page has hydrated', async ({ page }) => {
+  await page.goto('/tracker');
+  await expectShown(page, '/tracker');
+  const tip = page.locator('button.info-tip').first();
+  await tip.click();
+  await expect(tip).toHaveAttribute('aria-expanded', 'true');
+  const id = await tip.getAttribute('aria-controls');
+  await expect(page.locator(`[id="${id}"]`)).toBeVisible();
+});
+
 test.describe('on a phone', () => {
   test.beforeEach(({}, testInfo) => test.skip(!isPhone(testInfo), 'phones only'));
 
