@@ -436,7 +436,7 @@ export const REFERENCES: Reference[] = [
 	{
 		id: 'block', title: 'Electricity Industry Participation Code 2010, Part 1', by: 'Electricity Authority', date: '15 May 2025',
 		url: 'https://www.ea.govt.nz/documents/7239/Part_1_-_Preliminary_provisions.pdf',
-		use: 'Defines a block dispatch group: generating stations on one continuous water course under an agreement with the system operator. No public list names the groups; the Waikato chain’s shows in the data, where its stations’ dispatch follows their meters poorly but the chain’s total agrees.',
+		use: 'Defines a block dispatch group: generating stations on one continuous water course under an agreement with the system operator. No public list names the groups.',
 		topics: ['generation', 'history'],
 	},
 	{

@@ -40,10 +40,10 @@
 	<li><b>Glenbrook</b>: dispatch sees part of the plant, about 30% less than its meter.</li>
 	<li><b>Kawerau Mill</b>: its meter is net of the mill’s own load, so dispatch reads about 45% more.</li>
 	<li><b>Teviot</b>: in the metered history, not dispatched.</li>
-	<li><b>River chains</b> <a href={ref('block')}>dispatched as a block</a>, the Waikato above all: each station differs (Arapuni about 11% more metered, Maraetai about 11% less) while the chain agrees.</li>
+	<li><b>River chains</b> <a href={ref('block')}>dispatched as a block</a>: a station’s dispatch can differ from its meter while the chain’s total agrees.</li>
 </ul>
 <p>Dispatch half-hours, being 5-minute targets averaged, also reach slightly further at their extremes: a month’s highest half-hour of wind reads about 10 MW above the metered one nationally, hydro and demand about 20–25 MW. The site shows each as published rather than scaling one to the other, so where the history switches from metered to dispatch data, at the start of the month after the latest metered one, Ngāwhā steps down and Teviot drops out. <a href="/methods/records#official">Records</a> set in dispatch data are corrected for all of this before they count as provisional.</p>
-<p>Plant by plant, the two can differ more. The Waikato stations are dispatched as one block, so their dispatch figures are the chain’s total split between stations, not each station’s output (correlation only 0.4–0.7 by half-hour); the metered figures are the real ones. Glenbrook’s metered output is about 1.45 times its dispatch, which sees only part of the plant.</p>
+<p>Plant by plant, the two can differ more. On a chain dispatched as a block, the dispatch figures are the chain’s total split between stations, not each station’s output; the metered figures are the real ones. Glenbrook’s metered output is about 1.45 times its dispatch, which sees only part of the plant.</p>
 
 <h2 id="resolution">Resolution</h2>
 <ul>

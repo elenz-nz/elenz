@@ -526,8 +526,8 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   national wind and hydro (half-hourly national correlation 0.999); the plants that differ are Ngāwhā (dispatch ~45% low),
   Glenbrook (~30% low), Kawerau Mill (~45% high) and block-dispatched river chains, and dispatch extremes run a little
   further (wind's monthly peak ~10 MW high). Records correct for this (records.py, facilities/dispatch_adjust.json,
-  analysis/dispatch_vs_metered.py and dispatch_metered_fit.py; refresh the corrections about once a year). Plant-level differences: river chains are block dispatched (Waikato above
-  all: Mercury only has to meet the chain's total), so per-station dispatch there isn't what each station did.
+  analysis/dispatch_vs_metered.py and dispatch_metered_fit.py; refresh the corrections about once a year). Plant-level differences: river chains can be block dispatched (the owner only has
+  to meet the chain's total), so per-station dispatch there isn't what each station did. No public list names the groups, so site copy stays general and names no chain or station until a public document does (owner's rule, 2 Nov 2026).
   `Grid_import` starts Oct 2000 and until ~2003 covered only local networks' injections, so Generation_MD stands in
   for connection points it lacks (J| columns). HVDC_Flows changed layout three times (HVDC_BN/BS/HN/HS to ~1999,
   DCP1/DCP2 poles, then BEN/HAY connection points; the 3501 rows repeat totals); `hvdc.parse_metered` reads all.

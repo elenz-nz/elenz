@@ -196,8 +196,8 @@ metered and wind +3-4%, don't hold on the site's own series: see "Dispatch again
 Generation_MD (Mangahao ~10% of dispatch, Cobb ~35%, Whareroa ~50%); `Embedded_generation` at those points matches
 dispatch within ~1% (Mangahao 12.4 vs 12.3 GWh, Sep 2026; Te Huka 3 26.7 vs 27.2; Omeheu + Rangitaiki 8.6 vs 8.7), so
 where an embedded meter reads more than Generation_MD at a listed point the difference goes to that point's plant.
-Waikato stations correlate only 0.4-0.7 by half-hour: the chain is block dispatched (the owner's note), so a station's
-dispatch isn't its output. Glenbrook's Generation_MD is ~1.45 × dispatch (dispatch sees part of the plant).
+Waikato stations correlate only 0.4-0.7 by half-hour while the chain's total agrees, so a station's dispatch there
+isn't taken as its output. Glenbrook's Generation_MD is ~1.45 × dispatch (dispatch sees part of the plant).
 
 **Data quirks.** Generation_MD covers embedded stations only from Jan 2009; before that they are in
 `Embedded_generation` (Oct 1998 on, most from Apr 1999) under old codes, only those the tracker shows later being
