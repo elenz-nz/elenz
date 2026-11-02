@@ -30,15 +30,21 @@
 	let liveD = $state.raw<any>(null);   // tracker.json: the live week, for the live check and the pace
 	let paceAll = $state(false);          // the pace cards beyond the first PACE_CARDS
 	const PACE_CARDS = 8;   // owner's call, 31 Oct 2026
-	// at least that many, made up to a whole row, so the last row is never left short (owner's report REC-09, 1 Nov 2026)
+	// whole rows only: at least that many where there are enough, otherwise the whole rows there are, with Show all for
+	// the rest (owner's reports REC-09, 1-2 Nov 2026)
 	let paceCols = $state(1);
-	const paceShown = $derived(Math.ceil(PACE_CARDS / paceCols) * paceCols);
+	const paceShown = $derived.by(() => {
+		const n = paces.length, want = Math.ceil(PACE_CARDS / paceCols) * paceCols;
+		return n >= want ? want : n <= paceCols ? n : n - (n % paceCols);
+	});
 	function countCols(el: HTMLElement) {
 		const ro = new ResizeObserver(() => { paceCols = Math.max(1, getComputedStyle(el).gridTemplateColumns.split(' ').length); });
 		ro.observe(el);
 		return { destroy: () => ro.disconnect() };
 	}
 	let moy = $state(new Date(Date.now() + 13 * 36e5).getUTCMonth());   // this month in New Zealand
+	let moyPer = $state('tp');   // By month: trading periods or days (owner's call REC-13, 2 Nov 2026)
+	const MOY_PERIODS = PERIODS.filter((p) => p.k === 'tp' || p.k === 'day');
 
 	onMount(() => {
 		const qs = new URLSearchParams(location.search), q = qs.get('region'), qp = qs.get('period');
@@ -46,6 +52,7 @@
 		if (qp && PERIOD_KEYS.includes(qp)) period = qp;
 		const qt = qs.get('tab');
 		if (qt && TABS.some((x) => x.k === qt)) tab = qt;
+		if (new URLSearchParams(location.search).get('by') === 'day') moyPer = 'day';
 		(async () => {
 			R = await loadRecords();
 			status = R ? 'ok' : 'none';
@@ -60,11 +67,13 @@
 	function setRegion(r: string) { region = r; syncUrl(); }
 	function setPeriod(p: string) { period = p; syncUrl(); }
 	function setTab(k: string) { tab = k; syncUrl(); }
+	function setMoyPer(p: string) { moyPer = p; syncUrl(); }
 	function syncUrl() {
 		const u = new URL(location.href);
 		if (region === 'NZ') u.searchParams.delete('region'); else u.searchParams.set('region', region);
 		if (period === 'tp') u.searchParams.delete('period'); else u.searchParams.set('period', period);
 		if (tab === 'all') u.searchParams.delete('tab'); else u.searchParams.set('tab', tab);
+		if (moyPer === 'tp') u.searchParams.delete('by'); else u.searchParams.set('by', moyPer);
 		replaceState(u, {});
 	}
 	// the whole row opens its record (the name and description are the link itself, for keyboards and new tabs; a click
@@ -122,9 +131,10 @@
 		return pace(R, liveD).sort((a, b) => (a.region === 'NZ' ? 0 : 1) - (b.region === 'NZ' ? 0 : 1))
 			.filter((x) => { const k = x.d.id + x.period; return !seen.has(k) && !!seen.add(k); });
 	});
-	// every half-hour record has a best for each month of the year (records.py by_month_of_year), for each region
+	// every half-hour record has a best half-hour and a best day for each month of the year (records.py by_month_of_year,
+	// best_day_by_month), for each region
 	const moyFor = (r: string) => (R ? DEFS.filter((d) => d.kind === 'hh' && d.regions.includes(r))
-		.map((d) => ({ d, tv: R.moy?.[d.id]?.[r]?.[moy] ?? null })).filter((x) => x.tv && !notShown(x.d, r, get(R, x.d.id, r))) : []);
+		.map((d) => ({ d, tv: (moyPer === 'day' ? R.moy_day : R.moy)?.[d.id]?.[r]?.[moy] ?? null })).filter((x) => x.tv && !notShown(x.d, r, get(R, x.d.id, r))) : []);
 	// Milestones and By month: pointing at a row lights the same milestone or record in the other regions' cards; a
 	// click (or tap) pins it there and another click on it lets go (owner's call, 31 Oct 2026). Rows carry data-k: the
 	// record's id, plus the level for a milestone. Changing tab or month lets go.
@@ -135,7 +145,7 @@
 	function rowOver(e: PointerEvent) { if (e.pointerType === 'mouse') hov = keyAt(e); }
 	function rowLeave(e: PointerEvent) { if (e.pointerType === 'mouse') hov = null; }
 	function pinClick(e: MouseEvent) { const k = keyAt(e); if (k) pinned = pinned === k ? null : k; }
-	$effect(() => { void tab; void moy; pinned = null; hov = null; });
+	$effect(() => { void tab; void moy; void moyPer; pinned = null; hov = null; });
 
 </script>
 
@@ -143,6 +153,8 @@
 	<title>Records · ELENZ</title>
 	<meta name="description" content="New Zealand's electricity records since 1997: peak demand, renewable share, wind and solar, prices and the HVDC link, for New Zealand and each island, from the Electricity Authority's metered data." />
 	<Preview title="New Zealand's electricity records since 1997 · ELENZ" description="New Zealand's electricity records since 1997: peak demand, renewable share, wind and solar, prices and the HVDC link, for New Zealand and each island, from the Electricity Authority's metered data." path="/records" />
+	<!-- with JavaScript off, a plain line instead of "Loading" (owner's report RES-04, 2 Nov 2026) -->
+	{@html '<noscript><style>.js-only { display: none !important; }</style></noscript>'}
 </svelte:head>
 <svelte:window onkeydown={(e) => { if (e.key === 'Escape' && pinned) pinned = null; }} />
 
@@ -156,7 +168,8 @@
 		</section>
 
 		{#if status === 'loading'}
-			<p class="note" role="status">Loading the records…</p>
+			<p class="note js-only" role="status">Loading the records…</p>
+			<noscript><p class="note">The records need JavaScript turned on. <a href="/methods/records">How records work</a> and <a href="/about">About</a> work without it.</p></noscript>
 		{:else if status === 'none'}
 			<section class="panel empty">
 				<h2>The records are being worked out</h2>
@@ -377,15 +390,23 @@
 								{#each MONTHS as m, i}<option value={i}>{m}</option>{/each}
 							</select>
 						</h2><InfoTip label="About month records">
-							<p>These are the highest and lowest half-hours of any {MONTHS[moy]} since 1997, with the year each was set, for New Zealand and each island.</p>
+							<p>These are the highest and lowest {moyPer === 'day' ? 'days' : 'half-hours'} of any {MONTHS[moy]} since 1997, with the year each was set, for New Zealand and each island.</p>
 							<ul>
-								<li>The month menu picks the month.</li>
+								<li>The month menu picks the month; {R?.moy_day ? 'TP and Day pick trading periods or whole days.' : 'these are trading periods.'}</li>
 								<li>A month can set one of these even when the all-time record holds.</li>
 								<li>Point at one to light it in every region; click or tap to pin it there, again to let go.</li>
 							</ul>
 							<p><a href="/methods/records#half-hours">How records work</a></p>
 						</InfoTip></div>
-						<span class="unit">Trading periods</span>
+						{#if R?.moy_day}
+							<div class="seg per" role="group" aria-label="Records for each">
+								{#each MOY_PERIODS as p}
+									<button type="button" aria-pressed={moyPer === p.k} title={p.label} onclick={() => setMoyPer(p.k)}><span class="lg">{p.label}</span><span class="sh" aria-hidden="true">{p.short}</span></button>
+								{/each}
+							</div>
+						{:else}
+							<span class="unit">Trading periods</span>
+						{/if}
 					</div>
 					<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 					<div class="regions" onpointerover={rowOver} onpointerleave={rowLeave} onclick={pinClick}>
@@ -398,7 +419,7 @@
 										{#each rows as x}
 											<tr data-k={x.d.id} class:lit={lit === x.d.id} class:pinned={pinned === x.d.id} title={pinned === x.d.id ? 'Pinned · click to let go' : 'Click to pin'}>
 												<th scope="row"><span class="dot" style="--c:var({x.d.tok})"></span>{fullName(x.d)}{#if x.d.est} <span class="tag est">Est.</span>{/if}</th>
-												<td class="n val">{parts(x.d, x.tv[1]).n}<small>{parts(x.d, x.tv[1]).u}</small></td>
+												<td class="n val">{parts(x.d, x.tv[1], moyPer).n}<small>{parts(x.d, x.tv[1], moyPer).u}</small></td>
 												<td class="n muted">{yearOf(x.tv[0])}</td>
 											</tr>
 										{:else}
@@ -433,7 +454,7 @@
 
 	.sec { display: grid; gap: 10px; }
 	/* a faint break between sections, as this page holds a lot (owner's report REC-01, 2 Nov 2026) */
-	.sec + .sec, .sec + .rec-tabs { border-top: 1px solid var(--grid); padding-top: 18px; margin-top: 8px; }
+	.sec + .sec, .sec + .rec-tabs, .hero + .sec { border-top: 1px solid var(--grid); padding-top: 18px; margin-top: 8px; }
 	/* the three lists' tabs: underlined like the tracker's Generation and Prices tabs */
 	.rec-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; margin-top: 6px; }
 	.rec-tabs button { font: inherit; font-size: 0.95rem; font-weight: 600; color: var(--muted); background: none; border: 0; border-bottom: 2px solid transparent; padding: 8px 12px; margin-bottom: -1px; min-height: 40px; white-space: nowrap; cursor: pointer; }

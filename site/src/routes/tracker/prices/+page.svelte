@@ -979,6 +979,7 @@
 					</button>
 				</div>
 				<div class="help" id="p-help" role="note" hidden={!helpOpen}>
+					<button type="button" class="reset-view" title="Forget this browser's saved views and go back to the default charts on both tracker tabs" onclick={resetView}>Reset charts to default</button>
 					<!-- what works across the tab, one line each; each chart's own ⓘ says what it shows, and /guide#prices has the
 					     full descriptions (owner's reports GRP-06, CHT-13) -->
 					<p>These work across every chart on this tab. The ⓘ beside a chart's title says what that chart shows.</p>
@@ -992,7 +993,6 @@
 						<li><b>Menu beside the title:</b> changes the price scale.</li>
 					</ul>
 					<p><a href="/guide#prices">Every control in detail</a> · <a href="/methods/prices">How the figures are worked out</a></p>
-					<button type="button" class="reset-view" title="Forget this browser's saved views and go back to the default charts on both tracker tabs" onclick={resetView}>Reset charts to default</button>
 				</div>
 				{#if view?.mode === 'time'}
 					<div class="mix-tools" role="group" aria-label="Nodes shown in the price chart"><span>Nodes</span><button type="button" onclick={() => showNodes(true)} disabled={!nodeKeys().some((k) => off.includes(k))}>All</button><button type="button" onclick={() => showNodes(false)} disabled={nodeKeys().every((k) => off.includes(k))}>None</button></div>

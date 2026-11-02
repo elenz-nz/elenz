@@ -3,7 +3,20 @@
 	// tracker's Controls panels are one line each and link here (owner's reports GRP-06, CHT-13): keep them in step.
 	import Preview from '#lib/site/Preview.svelte';
 	const DESC = 'How to use Elenz: every control on the tracker, the Now page and Records, with tips.';
+	// the pictures: crops of real pages in light and dark, made by analysis/guide_shots.py (site/static/guide)
+	const SIZE: Record<string, [number, number]> = {
+		'tracker-pin': [1600, 796], 'tracker-zoom': [1200, 585], 'tracker-plants': [498, 840], 'tracker-controls': [453, 882],
+		'tracker-phone': [780, 1560], 'prices-range': [1200, 495], 'now-generators': [1600, 603], 'records-list': [1600, 183], 'record-compare': [1600, 502],
+	};
 </script>
+
+{#snippet shot(name: string, alt: string, caption: string)}
+	<figure class="shot">
+		<img class="on-light" src="/guide/{name}-light.webp" {alt} width={SIZE[name][0]} height={SIZE[name][1]} loading="lazy" />
+		<img class="on-dark" src="/guide/{name}-dark.webp" {alt} width={SIZE[name][0]} height={SIZE[name][1]} loading="lazy" />
+		<figcaption>{caption}</figcaption>
+	</figure>
+{/snippet}
 
 <svelte:head>
 	<title>Guide · ELENZ</title>
@@ -21,6 +34,7 @@
 	<div class="mt-body">
 		<h2 id="generation">Tracker: Generation</h2>
 		<p>The Controls panel beside the charts has a short version of this.</p>
+		{@render shot('tracker-pin', 'The Generation tab on 7 days with a time pinned: the Pinned chip in the bar, a line through the chart, and the list showing that time.', 'A pinned time: the chip in the bar, the line on the chart, and the list beside it showing that moment.')}
 		<dl>
 			<dt>Read a time</dt>
 			<dd>Hover a chart, or touch and slide on a phone. The list beside the charts shows every source at that time.</dd>
@@ -30,6 +44,9 @@
 			<dd>Range, interval and region are in the bar at the top. The ‹ › arrows beside the date, on the generation chart, or Page Up and Page Down step back and forward by the range. The date opens a calendar: select the month name to jump to another year, then pick a day. Latest comes back to now, or moves a zoomed stretch to the newest data.</dd>
 			<dt>Zoom in</dt>
 			<dd>Drag across any chart to zoom into that stretch; every chart follows. The arrow beside 1D picks the last 1, 3, 6 or 12 hours. While zoomed, the date box gains a time: pick the hour, then the minutes, to move the zoomed stretch so it ends then (NZ time), or the ‹ › arrows step by the zoom’s length. Reset zoom in the bar, or Escape twice, shows the whole range again, and choosing another range while zoomed opens that range around what you zoomed into.</dd>
+		</dl>
+		{@render shot('tracker-zoom', 'A drag across the generation chart, with the stretch being zoomed into shaded.', 'Drag across any chart to zoom into that stretch.')}
+		<dl>
 			<dt>Break it down</dt>
 			<dd>Select a name in the list to go from a fuel to its plants and their grid connections; ‹ Back above the list, or the browser’s Back, steps out. The menu above the generation chart groups it other ways: by site, hydro scheme, owner, flexibility, renewable vs fossil, inverter vs synchronous. MW/% switches to shares.</dd>
 			<dt>Compare sources</dt>
@@ -42,6 +59,12 @@
 			<dd>The corner button on each chart enlarges it, and ⓘ beside its title says what it shows and how it’s made. Share copies a link to this view, live or for the dates shown; Download gives the charts as a picture or the data as a spreadsheet file. The address always holds the whole view, so it can be bookmarked.</dd>
 		</dl>
 
+		<div class="shots3">
+			{@render shot('tracker-plants', 'The list showing wind plants, with a back link, a filter box and colour squares.', 'A fuel’s plants in the list.')}
+			{@render shot('tracker-controls', 'The Controls panel, with Reset charts to default at the top.', 'The Controls panel.')}
+			{@render shot('tracker-phone', 'The Generation tab on a phone: region, range and interval over the chart.', 'The same tab on a phone.')}
+		</div>
+
 		<h2 id="prices">Tracker: Prices</h2>
 		<dl>
 			<dt>Read and pin</dt>
@@ -52,8 +75,10 @@
 			<dd>Select a node’s colour square in the list to hide or show its line. The menu beside the price chart’s title changes its scale (Spike-proof, Capped or Linear); on long ranges, choose the island whose price range is shown.</dd>
 		</dl>
 
+		{@render shot('prices-range', 'The price range chart on 1Y: each day’s lowest to highest price, with the Haywards and Benmore buttons above it.', 'On 1Y and ALL, each period’s range of prices, for Haywards or Benmore.')}
+
 		<h2 id="reset">Back to the default charts</h2>
-		<p>The tracker remembers your last region, range, interval and chart settings in this browser. Reset charts to default, at the foot of either tab’s Controls panel, clears them.</p>
+		<p>The tracker remembers your last region, range, interval and chart settings in this browser. Reset charts to default, at the top of either tab’s Controls panel, clears them.</p>
 
 		<h2 id="now">Now</h2>
 		<dl>
@@ -65,15 +90,20 @@
 			<dd>Stops your screen going to sleep while the page is open, for leaving it up on a spare display.</dd>
 		</dl>
 
+		{@render shot('now-generators', 'Every generator right now, sorted by island and then by MW.', 'Sorted by island, then MW.')}
+
 		<h2 id="records">Records</h2>
+		{@render shot('records-list', 'Heading for a record: tiles for records that could fall soon, with a Show all button.', 'Heading for a record, at the top of the page.')}
 		<dl>
 			<dt>The lists</dt>
-			<dd>Heading for a record and New and provisional sit at the top. Under them, All-time records has the region picker and the period buttons, from a trading period to a year; Milestones and By month show New Zealand and each island side by side. Point at a row to light up the same record in each region’s card, and click to hold it.</dd>
+			<dd>Heading for a record and New and provisional sit at the top. Under them, All-time records has the region picker and the period buttons, from a trading period to a year; Milestones and By month show New Zealand and each island side by side, and By month’s TP and Day buttons switch between trading periods and whole days. Point at a row to light up the same record in each region’s card, and click to hold it.</dd>
 			<dt>A record’s page</dt>
 			<dd>Hover a chart to read it, and click to pin a point: the pin stays while you hover elsewhere, so two points can be compared. Click it again or press Escape to let go. Drag across a chart to zoom in; Reset zoom goes back.</dd>
 			<dt>Share and Download</dt>
 			<dd>Share sends the record’s link (on a phone, with its image), and Download saves the image in the page’s light or dark colours.</dd>
 		</dl>
+
+		{@render shot('record-compare', 'How the record grew, with a pinned point and its tooltip beside a second point under the pointer.', 'A pinned point, in the accent colour, beside the point under the pointer.')}
 
 		<h2 id="everywhere">Everywhere</h2>
 		<dl>
@@ -84,3 +114,19 @@
 		</dl>
 	</div>
 </main>
+
+<style>
+	.shot { margin: 4px 0 8px; min-width: 0; }
+	.shot img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 4px; }
+	.shot figcaption { margin-top: 5px; font-size: 0.8rem; color: var(--muted); line-height: 1.4; }
+	/* each picture in the page's own colours */
+	.on-dark { display: none !important; }
+	@media (prefers-color-scheme: dark) {
+		:global(:root:not([data-theme='light'])) .on-dark { display: block !important; }
+		:global(:root:not([data-theme='light'])) .on-light { display: none !important; }
+	}
+	:global(:root[data-theme='dark']) .on-dark { display: block !important; }
+	:global(:root[data-theme='dark']) .on-light { display: none !important; }
+	.shots3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: start; }
+	@media (max-width: 640px) { .shots3 { grid-template-columns: minmax(0, 1fr); max-width: 300px; } }
+</style>

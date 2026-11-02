@@ -117,6 +117,8 @@
 	<title>ELENZ · New Zealand's electricity</title>
 	<meta name="description" content="New Zealand's electricity, live: the generation mix and renewable share now, and a tracker of generation, prices, demand and the HVDC link back to 1997." />
 	<Preview title="ELENZ · New Zealand's electricity, live" description="New Zealand's electricity, live: the generation mix and renewable share now, and a tracker of generation, prices, demand and the HVDC link back to 1997." path="/" />
+	<!-- with JavaScript off, a plain line instead of "Loading", and no empty previews (owner's report RES-04, 2 Nov 2026) -->
+	{@html '<noscript><style>.js-only, .pages-list .window { display: none !important; }</style></noscript>'}
 </svelte:head>
 
 <div class="wrap">
@@ -153,7 +155,8 @@
 						<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {when(now.end)}</span>
 					{/if}
 				{:else}
-					<p class="sub" role="status">{error || 'Loading the latest data…'}</p>
+					<p class="sub js-only" role="status">{error || 'Loading the latest data…'}</p>
+					<noscript><p class="sub">The live figures need JavaScript turned on. <a href="/methods">Data and methods</a> and <a href="/about">About</a> work without it.</p></noscript>
 				{/if}
 			</div>
 

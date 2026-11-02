@@ -14,6 +14,7 @@
 	// record), with infoNow for its running period and infoLabel naming it in the tooltip. The page's ⓘ beside the heading explains the chart; zoom and pin are bound
 	// to the page, which shows Reset zoom and Release in the card's heading (ChartControls).
 	import { trimZeros, bgEnd, hoursToGo, periodStart } from './records.js';
+	import { keepClear } from './keepclear.js';
 
 	// fmt: axis labels (bare numbers); full: a value with its unit, for the tooltip and readout (fmt if not given)
 	let { steps: all, first: dataFirst, end, tok = '--ink', label, fmt, full, prov = null, dashed = false, when, bg = null, bgWhen, now = null, info = null, infoNow = null, infoLabel = 'With embedded solar', zoom = $bindable(null), pin = $bindable(null) }:
@@ -146,6 +147,7 @@
 	// the pointer's date (hov: under the mouse; pin: clicked, tapped or dragged to); the record in force then and that
 	// month's best follow from it
 	let hov = $state<number | null>(null);
+	let heldTip = $state<HTMLElement | null>(null), hoverTip = $state<HTMLElement | null>(null);
 	let touch = $state(false);               // the last pointer was a finger or pen
 	// what a date reads: the record in force then, that month's best, the dashed line's, and how long is left
 	function readAt(t: number | null) {
@@ -169,6 +171,7 @@
 	const read = $derived(readAt(hov ?? pin));
 	// pinned and pointing elsewhere: both show, for comparing (owner's report REC-05, 2 Nov 2026)
 	const held = $derived(hov !== null && pin !== null && Math.abs(x(hov) - x(pin)) >= 1 ? readAt(pin) : null);
+	$effect(() => { void read; keepClear(hoverTip, held ? heldTip : null); });
 
 	let fig = $state<HTMLElement>();
 	const pxOf = (e: PointerEvent) => { const r = (e.currentTarget as SVGSVGElement).getBoundingClientRect(); return ((e.clientX - r.left) / r.width) * W; };
@@ -229,9 +232,9 @@
 	{@const fx = x(r.t) / W}
 	{@const ty = r.ahead && r.bg ? y(r.bg.v as number) : y(r.p[1])}
 	{#if isHeld}
-		<div class="tip held" style="left:{fx * 100}%;top:{(ty / H) * 100}%" class:flip={fx > 0.7} aria-hidden="true">{@render lines(r)}</div>
+		<div class="tip held" bind:this={heldTip} style="left:{fx * 100}%;top:{(ty / H) * 100}%" class:flip={fx > 0.7} aria-hidden="true">{@render lines(r)}</div>
 	{:else}
-		<div class="tip" bind:clientWidth={tipW} style={touch ? `left:${touchLeft(fx, cw, tipW)}px` : `left:${fx * 100}%;top:${(ty / H) * 100}%`} class:flip={!touch && fx > 0.7} class:above={touch} aria-hidden="true">{@render lines(r)}</div>
+		<div class="tip" bind:this={hoverTip} bind:clientWidth={tipW} style={touch ? `left:${touchLeft(fx, cw, tipW)}px` : `left:${fx * 100}%;top:${(ty / H) * 100}%`} class:flip={!touch && fx > 0.7} class:above={touch} aria-hidden="true">{@render lines(r)}</div>
 	{/if}
 {/snippet}
 {#snippet lines(r: NonNullable<ReturnType<typeof readAt>>)}

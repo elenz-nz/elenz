@@ -305,7 +305,7 @@ canvas { display: block; width: 100%; }
 .help p { margin: 0; color: var(--ink-2); font-size: 0.8rem; line-height: 1.45; }
 .help ul { margin: 6px 0; padding-left: 16px; display: grid; gap: 3px; color: var(--ink-2); font-size: 0.8rem; line-height: 1.45; }
 .help li b { color: var(--ink); font-weight: 600; }
-.help .reset-view { font: inherit; font-size: 0.78rem; font-weight: 600; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px; min-height: 28px; margin-top: 8px; cursor: pointer; }
+.help .reset-view { display: block; justify-self: start; font: inherit; font-size: 0.78rem; font-weight: 600; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 3px 10px; min-height: 28px; margin-bottom: 8px; cursor: pointer; }
 .help .reset-view:hover { border-color: var(--accent); color: var(--accent); }
 /* "Scale to this view" draws the eye to the key it changes, like the About page's Contact (PRC-06) */
 .scale-flash { border-radius: 6px; animation: scale-flash 2.2s ease-out; }

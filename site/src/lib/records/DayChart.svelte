@@ -6,6 +6,7 @@
 	// zooms into that stretch (the y axis fits what is shown; labAt labels the x axis when its usual ticks thin out);
 	// Reset zoom (the page's, in the card's heading: zoom is bound) or Escape goes back.
 	import { clock } from './records.js';
+	import { keepClear } from './keepclear.js';
 
 	let { day, t, tok = '--ink', fmt, full, label, xticks, tipAt, labAt, avg = null, avgLabel = '', zoom = $bindable(null) }: {
 		day: { t0: number; step: number; v: (number | null)[] }; t: number; tok?: string; fmt: (v: number) => string;
@@ -79,6 +80,8 @@
 	const hover = $derived(hov ?? pin);
 	// pinned and pointing elsewhere: both show, for comparing (owner's report REC-05, 2 Nov 2026)
 	const held = $derived(hov !== null && pin !== null && pin !== hov && pin >= i0 && pin <= i1 ? pin : null);
+	let heldTip = $state<HTMLElement | null>(null), hoverTip = $state<HTMLElement | null>(null);
+	$effect(() => { void hover; keepClear(hoverTip, held !== null ? heldTip : null); });
 	let box = $state<HTMLElement>();
 	const pxOf = (e: PointerEvent) => { const r = (e.currentTarget as SVGSVGElement).getBoundingClientRect(); return ((e.clientX - r.left) / r.width) * W; };
 	const iOf = (px: number) => i0 + ((px - L) / (W - L - R)) * Math.max(1, i1 - i0);
@@ -167,13 +170,13 @@
 </svg>
 {#if held !== null && !drag}
 	{@const fx = x(held) / W}
-	<div class="tip held" class:flip={fx > 0.7} style="left:{fx * 100}%;top:{(y(day.v[held] as number) / H) * 100}%" aria-hidden="true">
+	<div class="tip held" bind:this={heldTip} class:flip={fx > 0.7} style="left:{fx * 100}%;top:{(y(day.v[held] as number) / H) * 100}%" aria-hidden="true">
 		<b>{val(day.v[held] as number)}</b><span>{tipAt ? tipAt(held) : clock(day.t0 + held * day.step)}{held === at ? ' · the record' : ''} · pinned</span>
 	</div>
 {/if}
 {#if hover !== null && !drag && hover >= i0 && hover <= i1}
 	{@const fx = x(hover) / W}
-	<div class="tip" class:flip={!touch && fx > 0.7} class:above={touch} bind:clientWidth={tipW} style={touch ? `left:${touchLeft(fx, cw, tipW)}px` : `left:${fx * 100}%;top:${(y(day.v[hover] as number) / H) * 100}%`} aria-hidden="true">
+	<div class="tip" bind:this={hoverTip} class:flip={!touch && fx > 0.7} class:above={touch} bind:clientWidth={tipW} style={touch ? `left:${touchLeft(fx, cw, tipW)}px` : `left:${fx * 100}%;top:${(y(day.v[hover] as number) / H) * 100}%`} aria-hidden="true">
 		<b>{val(day.v[hover] as number)}</b><span>{tipAt ? tipAt(hover) : clock(day.t0 + hover * day.step)}{hover === at ? ' · the record' : ''}</span>
 	</div>
 {/if}

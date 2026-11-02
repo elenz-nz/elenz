@@ -417,6 +417,7 @@
 					</button>
 				</div>
 				<div class="help" id="sum-help" role="note" hidden={!helpOpen}>
+					<button type="button" class="reset-view" title="Forget this browser's saved views and go back to the default charts on both tracker tabs" onclick={resetView}>Reset charts to default</button>
 					<!-- what works across the tab, one line each; each chart's own ⓘ says what it shows, and /guide#generation has the
 					     full descriptions (owner's reports GRP-06, CHT-13) -->
 					<p>These work across every chart on this tab. The ⓘ beside a chart's title says what that chart shows.</p>
@@ -431,7 +432,6 @@
 						<li><b>Chart titles:</b> open or fold the charts under generation.</li>
 					</ul>
 					<p><a href="/guide#generation">Every control in detail</a> · <a href="/methods">How the figures are worked out</a></p>
-					<button type="button" class="reset-view" title="Forget this browser's saved views and go back to the default charts on both tracker tabs" onclick={resetView}>Reset charts to default</button>
 				</div>
 				<div class="sum-level" id="sum-level" hidden><span id="sum-level-txt"></span><button type="button" class="back" id="sum-back">‹ Back</button></div>
 				<div class="plant-note" id="plant-note" hidden></div>
