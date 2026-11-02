@@ -49,7 +49,7 @@
 		</div>
 	</div>
 	{#if tip}<div class="hm-tip" use:portal style={tipStyle(tip)}>{tip.text}</div>{/if}
-	<!-- the key flashes when "Scale to this view" changes it (owner's report PRC-06, 1 Nov 2026) -->
+	<!-- the key flashes when "Scale to this view" changes it (test report PRC-06, 1 Nov 2026) -->
 	{#key flash}<div class="leg" class:scale-flash={flash > 0}>
 		{#each LEGEND as l}<span><i class="b{l.c}"></i>{l.label}</span>{/each}
 	</div>{/key}

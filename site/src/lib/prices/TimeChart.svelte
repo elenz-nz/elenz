@@ -11,7 +11,7 @@
 	// onpoint(e, i) fires as the pointer moves (for the page's tooltip), onleave when it leaves. onpin(i): a click (not a
 	// touch) at point i, to pin the time line there; while pinned the line ignores the pointer. onzoom(from, to): a mouse
 	// drag across the chart, as times (to exclusive: the end of the last point dragged over), to zoom into that span.
-	// unit: the axis's unit ($/MWh, MW ...) in small type under its top label (owner's call, 29 Oct 2026: replaces a unit
+	// unit: the axis's unit ($/MWh, MW ...) in small type under its top label (design decision, 29 Oct 2026: replaces a unit
 	// beside the card's title, which took a row on phones); a label it would sit on is left out.
 	import { firstAtOrAfter } from '#lib/tracker/series.js';
 
@@ -113,7 +113,7 @@
 		if (i >= 0 && i !== hover) hover = i;
 		if (i >= 0) onpoint?.(e, i);
 	}
-	// a tap on the line, pinned or left by a touch, lets it go, as on the Generation tab (owner's report SHR-07,
+	// a tap on the line, pinned or left by a touch, lets it go, as on the Generation tab (test report SHR-07,
 	// 31 Oct 2026: on a phone a pin, even one opened from a shared link, couldn't be released)
 	const TAP_PX = 24;
 	function click(e: MouseEvent) {

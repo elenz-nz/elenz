@@ -121,7 +121,7 @@
 			default: return `${day}, ${p.h % 12 || 12}:${String(p.mi).padStart(2, '0')} ${p.h < 12 ? 'am' : 'pm'}`;
 		}
 	}
-	// the ⓘ notes name the region shown and what's being shared (owner's rules for notes, 1 Nov 2026)
+	// the ⓘ notes name the region shown and what's being shared (team rules for notes, 1 Nov 2026)
 	const regionPos = $derived(({ NI: "the North Island's", SI: "the South Island's" } as Record<string, string>)[v?.region ?? ''] ?? "New Zealand's");
 	const regionIn = $derived(({ NI: 'the North Island', SI: 'the South Island' } as Record<string, string>)[v?.region ?? ''] ?? 'New Zealand');
 	const SHARE_OF: Record<string, string> = { ren: 'renewables', wind: 'wind', sun: 'solar', ibr: 'inverter-based plant', hydro: 'hydro', gas: 'gas', coal: 'coal/gas' };
@@ -178,7 +178,7 @@
 		const o = levelVals.O;
 		if (!o) return [];
 		// a recent range with no offers at all yet (a 24-hour view before yesterday's offers arrive): all of it is waiting
-		// for them, once the offers have loaded (owner's call, 1 Nov 2026; the ⓘ no longer says "no offers loaded")
+		// for them, once the offers have loaded (design decision, 1 Nov 2026; the ⓘ no longer says "no offers loaded")
 		if (!hasOffers) return offDone && !offLate && v && v.to > Date.now() - 4 * DAY ? [[0, o.length]] : [];
 		let last = -1;
 		for (let i = 0; i < o.length; i++) if (o[i] === o[i]) last = i;
@@ -273,7 +273,7 @@
 		<div class="card-head">
 			<div>
 				<div class="ttl-row"><h2>{metric === 'ren' ? 'Renewable share' : `${m.title} share`}</h2><InfoTip>
-			<!-- every ⓘ: a sentence, then short points that fit the view, then the method link (owner's rules, 1 Nov 2026) -->
+			<!-- every ⓘ: a sentence, then short points that fit the view, then the method link (team rules, 1 Nov 2026) -->
 			<p>This shows the share of {regionPos} generation that came from {SHARE_OF[metric]} over the dates chosen.</p>
 			<ul>
 				<li>The buttons switch between Renewables, Wind, Solar, Inverter-based, Hydro, Gas and Coal/gas.</li>
@@ -283,7 +283,7 @@
 				{#if metric === 'coal'}<li>Coal/gas: Huntly's Rankine units, which can burn either.</li>{/if}
 			</ul>
 			<p><a href="/methods/groupings#renewable">How shares are worked out</a></p></InfoTip></div>
-				<!-- every lower card names only its dates, on both tabs (owner's call, 30 Oct 2026) -->
+				<!-- every lower card names only its dates, on both tabs (design decision, 30 Oct 2026) -->
 				<Context range={dates} items={[v ? `${RES[v.int]}, % of generation` : '']} />
 			</div>
 			<div class="tools">

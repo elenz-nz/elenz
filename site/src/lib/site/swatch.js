@@ -1,4 +1,4 @@
-// A list's colour square, the same on both tracker tabs (owner's report PRC-01, 31 Oct 2026: the Prices list should
+// A list's colour square, the same on both tracker tabs (test report PRC-01, 31 Oct 2026: the Prices list should
 // do everything the Generation list does): a click hides or shows that line; a double-click, Shift+click or a long
 // press (touch) shows only that one, and again shows them all.
 

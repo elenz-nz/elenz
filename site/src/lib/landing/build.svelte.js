@@ -3,5 +3,5 @@
 // Anything it isn't driving (reduced motion, no hand-off) stays complete.
 export const build = $state({ ni: 1, link: 1, si: 1, rec: 1 });
 
-// where the Records preview's picture leads: the record it shows (owner's report HOME-05), set by RecordsPeek.svelte
+// where the Records preview's picture leads: the record it shows (test report HOME-05), set by RecordsPeek.svelte
 export const peekLink = $state({ rec: '' });

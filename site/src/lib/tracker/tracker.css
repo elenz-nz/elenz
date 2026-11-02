@@ -44,10 +44,10 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
 /* Tracker and Now use the whole width of a big screen (reading pages keep .wrap's 1,260 px) */
 .wrap.wide { max-width: none; padding-inline: var(--gutter); }
 /* the masthead spans the window on every page, as on the wide ones, so the logo and links don't move when going
-   between them (owner's call HOME-01, 31 Oct 2026); --sbw is the scrollbar's width (root layout) */
+   between them (design decision HOME-01, 31 Oct 2026); --sbw is the scrollbar's width (root layout) */
 .wrap:not(.wide) > .mast-wrap { width: calc(100vw - var(--sbw, 0px) - 2 * var(--gutter)); margin-left: calc(50% - (100vw - var(--sbw, 0px)) / 2 + var(--gutter)); }
 /* on a reading page wider than its column, a faint funnel under the masthead narrows from the window's width to the
-   column's, so the full-width header leads into the page (owner's idea, 31 Oct 2026); --inset: the column's edge */
+   column's, so the full-width header leads into the page (team idea, 31 Oct 2026); --inset: the column's edge */
 @media (min-width: 1340px) {
   .wrap:not(.wide) > .mast-wrap { position: relative; padding-bottom: 14px;
     --inset: calc((100vw - var(--sbw, 0px) - 2 * var(--gutter) - 1220px) / 2); }
@@ -108,7 +108,7 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .tgl:hover { color: var(--ink); border-color: var(--muted); }
 .tgl[aria-pressed="true"] { background: var(--surface); border-color: var(--ink-2); color: var(--ink); font-weight: 600; box-shadow: inset 0 -2px 0 var(--p-si); }
 .tgl:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-/* the region and month pickers: boxed, with a chevron, so they read as dropdowns (owner's call, Oct 2026) */
+/* the region and month pickers: boxed, with a chevron, so they read as dropdowns (design decision, Oct 2026) */
 select.pick { font: inherit; font-size: 0.95rem; font-weight: 700; color: var(--ink); background-color: var(--surface); cursor: pointer; border: 1px solid var(--line); border-radius: 4px; padding: 3px 26px 3px 9px; appearance: none;
   background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
   background-position: right 13px center, right 9px center; background-size: 4px 4px; background-repeat: no-repeat; }
@@ -192,7 +192,7 @@ time-pick[hidden] { display: none; }
 /* A plain strip out to the window's edges. Not a huge box-shadow held in by clip-path: older iPhones could lose the clip
    while scrolling, and the shadow then covered the whole page in the background colour, leaving only this bar. */
 .toolbar::before { content: ''; position: absolute; inset: 0 calc(-1 * var(--gutter)); z-index: -1; background: var(--bg); }
-/* The summary panel scrolls with the page (owner's call, Oct 2026): it sits beside the generation chart it controls
+/* The summary panel scrolls with the page (design decision, Oct 2026): it sits beside the generation chart it controls
    rather than following the reader down past the other charts. */
 
 /* Main layout */
@@ -237,7 +237,7 @@ time-pick[hidden] { display: none; }
 .ch-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; min-height: 22px; }
 .ch-head h2 { font-size: 0.86rem; font-weight: 600; letter-spacing: 0.01em; }
 .ch-head .unit { color: var(--muted); font-size: 0.78rem; }
-/* a card's ⓘ sits right after its title (owner's call, Oct 2026): .ch-head's gap pulled in, or the title in .ttl-row */
+/* a card's ⓘ sits right after its title (design decision, Oct 2026): .ch-head's gap pulled in, or the title in .ttl-row */
 .ch-head .info-tip { margin-left: -10px; align-self: center; width: 24px; height: 24px; }
 /* the charts under generation fold to one line from their title (tracker.js syncFold): the heading stays, with its
    value at the time line; the canvas and the enlarge button go */
@@ -323,7 +323,7 @@ canvas { display: block; width: 100%; }
 .sum-when { font-size: 1.12rem; font-weight: 700; letter-spacing: -0.01em; }
 .sum-sub { color: var(--muted); font-size: 0.8rem; }
 /* phones: room for the sub-line's two lines whether or not a note (interpolated, partial) wraps it, so scrubbing
-   doesn't make the summary jump (owner's report ZM-01, 31 Oct 2026) */
+   doesn't make the summary jump (test report ZM-01, 31 Oct 2026) */
 .sum-sub { min-height: calc(2 * 1.4em); line-height: 1.4; }
 table { border-collapse: collapse; width: 100%; }
 .mix th { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-weight: 600; padding: 0 0 6px; border-bottom: 1px solid var(--line); }

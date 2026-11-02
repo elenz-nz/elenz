@@ -14,7 +14,7 @@
 	let mark = $state(true);
 	let done = $state('');       // which link was just copied
 	let manual = $state('');     // a link the browser wouldn't copy: shown to copy by hand
-	let why = $state('');        // why the share sheet didn't open (the browser's error name), for the owner's retests
+	let why = $state('');        // why the share sheet didn't open (the browser's error name), for retests
 	let btn = $state<HTMLButtonElement>(), pop = $state<HTMLDivElement>();
 	let timer: ReturnType<typeof setTimeout> | undefined;
 
@@ -35,7 +35,7 @@
 	async function send(url: string, key: string) {
 		manual = '';
 		if (canShare) {
-			// shaped like the record pages' share, which Firefox on Android opens (owner's retest, 31 Oct 2026: there the
+			// shaped like the record pages' share, which Firefox on Android opens (team retest, 31 Oct 2026: there the
 			// tracker's title-and-link share fell back to the link): a line of text, the title and the link
 			const data = { title: document.title, text: document.title.replace(/ · ELENZ$/, ''), url };
 			try {
@@ -45,7 +45,7 @@
 			catch (e: any) {
 				if (e?.name === 'AbortError') return;
 				// Firefox on Android never settles a share sent to an app, so every later share is refused as "already
-				// in progress" until the page reloads (owner's retest, 31 Oct 2026). It refuses before using up the tap,
+				// in progress" until the page reloads (team retest, 31 Oct 2026). It refuses before using up the tap,
 				// so the link can still be copied: do that, as on a computer
 				if (e?.name !== 'InvalidStateError') { why = e?.name || 'Error'; manual = url; return; }
 			}

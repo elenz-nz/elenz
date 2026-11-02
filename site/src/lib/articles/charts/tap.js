@@ -1,4 +1,4 @@
-// Touch for the article charts (owner's report ART-03, 31 Oct 2026): on a phone the readout stays where the finger
+// Touch for the article charts (test report ART-03, 31 Oct 2026): on a phone the readout stays where the finger
 // last was instead of vanishing as it lifts, and a tap anywhere outside the chart clears it. A mouse leaving the
 // chart still clears it at once.
 

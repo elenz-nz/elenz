@@ -10,7 +10,7 @@ export const LIVE_URL = '/data/tracker.json';
 export const NEW_DAYS = 30;        // as records.py: a record is "new" this long after it first appears
 // A record is new only when it was set in recently arrived data: its period ended within NEW_LAG days (plus the
 // period's own length) of the day it first appeared. A rebuild that changes old data can move a record to another
-// half-hour years back; that isn't new (owner's report REC-02, 31 Oct 2026: 2009 records shown as New after BUILD 7).
+// half-hour years back; that isn't new (test report REC-02, 31 Oct 2026: 2009 records shown as New after BUILD 7).
 export const NEW_LAG = 120;   // metered data runs 5-6 weeks behind each month: a record early in a month appears 70-80 days on
 const PERIOD_DAYS = { tp: 0, day: 1, week: 7, month: 31, year: 366 };
 /** Is this record new: first seen in the last NEW_DAYS, and set in data that had just arrived then? */
@@ -89,7 +89,7 @@ export const MILESTONES = [
   { id: 'wind_max', at: [100, 250, 500, 750, 1000, 1250, 1500] },
   { id: 'solar_max', at: [100, 250, 500, 750, 1000] },
   { id: 'roof_max', at: [100, 250, 500, 750, 1000] },
-  // an island can have its own levels (owner's UAT note REC-13, 1 Nov 2026): the South Island has been 100% renewable
+  // an island can have its own levels (UAT note REC-13, 1 Nov 2026): the South Island has been 100% renewable
   // since the data began, and island demand is far below the country's
   { id: 'ren_max', at: [90, 95, 98, 99], SI: [100] },
   { id: 'demand_max', at: [6000, 6500, 7000, 7500], NI: [4500, 5000], SI: [2000, 2500] },
@@ -116,7 +116,7 @@ export function notShown(d, region, rec, R = null, period = 'tp') {
   // a period's net transfer: "most sent south" is only a record if some period's net flow was south at all
   if (period !== 'tp' && d.id.startsWith('hvdc_') && rec.v <= 0) return `Never a net ${d.id === 'hvdc_s_max' ? 'south' : 'north'}ward ${periodOf(period).word}`;
   // never moved since 1997: the half-hour list says so (`constant`); a period record shows it as a single step
-  // (owner's report, 31 Oct 2026: the South Island's renewable and lowest-fossil days to years were flat lines)
+  // (test report, 31 Oct 2026: the South Island's renewable and lowest-fossil days to years were flat lines)
   if (rec.constant || (period !== 'tp' && (rec.steps?.length ?? 0) <= 1)) {
     if (d.id.startsWith('ren') && rec.v === 100) return 'Always 100%: no fossil plant in the South Island';
     if (d.id === 'fossil_min' && rec.v === 0) return 'No fossil plant in the South Island';
@@ -163,7 +163,7 @@ export function fmt(d, v, period = 'tp') {
   const p = parts(d, v, period);
   return d.unit === '%' ? p.n + p.u : d.unit === '$' ? p.n + p.u : `${p.n} ${p.u}`;
 }
-// A period record's energy (owner's call, 23 Oct 2026): records are ranked by the period's average MW, which is fair
+// A period record's energy (design decision, 23 Oct 2026): records are ranked by the period's average MW, which is fair
 // across months of 28-31 days, years of 365-366 and clock-change days of 23-25 hours, and the energy is shown beside
 // it as the more familiar figure: average MW x the period's hours (from its NZ local midnights).
 const P_NZ = new Intl.DateTimeFormat('en-CA', { timeZone: NZ, year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', hourCycle: 'h23' });
@@ -466,7 +466,7 @@ export function recent(R, live, now = Date.now(), near = null) {
 }
 
 // ---------- every new, provisional and close record, ranked (the New and provisional cards) ----------
-// Owner's call, 1 Nov 2026: every record, region and period goes in; the four cards shown first are the most notable,
+// Design decision, 1 Nov 2026: every record, region and period goes in; the four cards shown first are the most notable,
 // and Show all lists them all by period. Notable: a new official record before a provisional one, before one close to
 // the record; a bigger jump (against the record's usual step) before a small one; New Zealand before an island; a
 // half-hour, month or year before a week or day. The first four take one card per record and at most two per group.
@@ -591,7 +591,7 @@ export function freshLive(R, D, hours = 24) {
 }
 
 // ---------- heading for a record ----------
-// "On record pace" (owner's call, 23 Oct 2026): the current day, week, month or year is ahead of where its record
+// "On record pace" (design decision, 23 Oct 2026): the current day, week, month or year is ahead of where its record
 // period was at the same point, as in a race. Shown once half of the period has gone, and only while it is ahead.
 // The record's figure through its period is its `curve` (records.py period_curve: after each half-hour for a day,
 // after each day otherwise); the current period's comes from the history (records.json `pace`, every day of the period

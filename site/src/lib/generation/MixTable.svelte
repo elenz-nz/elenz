@@ -3,7 +3,7 @@
 	// and capacity factor (energy over installed capacity, capacity.json). From mixRows() in ./data.js.
 	type Row = { f: { k: string; name: string; tok: string; hatch?: number; tag?: string; ren?: number }; e: number; ep: number; share: number; avg: number; peak: number; cf: number };
 	type Mix = { rows: Row[]; tot: number; totPrev: number; avg: number; peak: number; ren: number; renShare: number; renSharePrev: number };
-	// canOpen, onopen: a row opens that fuel's plants in the chart above (owner's report LOW-03, 1 Nov 2026)
+	// canOpen, onopen: a row opens that fuel's plants in the chart above (test report LOW-03, 1 Nov 2026)
 	let { mix, prevLabel, canOpen = () => false, onopen }: { mix: Mix; prevLabel: string | null; canOpen?: (k: string) => boolean; onopen?: (k: string) => void } = $props();
 
 	const big = $derived(mix.tot >= 1e7);   // over 10,000 GWh: TWh

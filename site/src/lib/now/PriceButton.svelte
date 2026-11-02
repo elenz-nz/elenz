@@ -28,6 +28,6 @@
 	.why.lit:hover { filter: brightness(1.1); }
 	.why.lit.low { background: var(--accent); border-color: var(--accent); }
 	.why { max-width: 100%; box-sizing: border-box; }
-	/* narrow phones: the label and the arrow only, so "Islands split" fits its tile (owner's report NOW-08) */
+	/* narrow phones: the label and the arrow only, so "Islands split" fits its tile (test report NOW-08) */
 	@media (max-width: 420px) { .why .w { display: none; } }
 </style>

@@ -20,7 +20,7 @@
 
 <div class="fb">
 	<div class="rows">
-		<!-- a solid zero line where every bar starts, so the dashed average isn't read as zero (owner's report PRC-05) -->
+		<!-- a solid zero line where every bar starts, so the dashed average isn't read as zero (test report PRC-05) -->
 		<div class="zero" aria-hidden="true">{#if avg / top > 0.15}<span>$0</span>{/if}</div>
 		<div class="avg" style="left: calc(var(--lw) + (100% - var(--lw) - var(--rw)) * {Math.min(1, avg / top)})">
 			<span>Average {money(avg)}</span>

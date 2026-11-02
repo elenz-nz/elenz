@@ -1,5 +1,5 @@
 <script lang="ts">
-	// A link to copy, shown when the share sheet or the clipboard refused (owner's report SHR-03, 31 Oct 2026: Firefox on
+	// A link to copy, shown when the share sheet or the clipboard refused (test report SHR-03, 31 Oct 2026: Firefox on
 	// Android asked to copy the address bar). Its Copy button is a fresh tap, which browsers allow to write the clipboard;
 	// failing that the text is selected for the phone's own Copy.
 	import { onMount } from 'svelte';
