@@ -221,7 +221,7 @@ async function scheduled(event, env) {
     if (w !== 'ok') console.log('watchdog: ' + w);
   }
   if (result !== 'ok') console.log(result);
-  // record the outcome when it changes, or hourly, to stay well inside KV's free daily write limit
+  // record the outcome when it changes, or hourly, to keep KV writes down
   if (env.DATA) {
     try {
       const now = new Date().toISOString();

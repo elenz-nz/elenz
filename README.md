@@ -106,8 +106,7 @@ Run the same job on your own computer with `python3 ingest/update.py` (it uses `
 data once the EA publishes it, adds newly published daily dispatch files and final prices, and writes per-month
 half-hourly files and one daily file to KV, plus the records (`ingest/records.py`), the heat maps' monthly averages
 (`ingest/tod.py`) and the price explainer's usual values (`ingest/explain.py`). `.github/workflows/offers.yml`, started
-with it, reduces the EA's daily generator offers to offered capacity by plant (`ingest/offered.py`). History keeps to 280 KV writes a day (the free plan allows 1,000 and the live
-job uses about 600), so a full rebuild of every month since 1997 takes about four days; bump `BUILD` in `history.py`
+with it, reduces the EA's daily generator offers to offered capacity by plant (`ingest/offered.py`). A full rebuild of every month since 1997 takes under an hour; bump `BUILD` in `history.py`
 after changing how months are built. Changes to the plant register, `facilities/overrides.toml` or
 `facilities/metered_plants.csv` trigger a rebuild automatically.
 
