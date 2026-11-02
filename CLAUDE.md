@@ -145,7 +145,7 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   before an island, a half-hour, month or year before a week or day. The first 4 cards are the most notable (one per
   record, at most two per group) and give only the period; Show all lists every card for one region (the page's
   `region`, shared with the All-time list and its picker) under its period (Trading period, Day, Week, Month, Year,
-  Runs) with its date (REC-09). Both Show all buttons sit in their section titles. An island's list leaves out records that can't apply there (always 100% renewable, no
+  Runs), newest record first, with its date (REC-09). Both Show all buttons sit in their section titles. An island's list leaves out records that can't apply there (always 100% renewable, no
   fossil plant, never a net southward period; a period record that never moved shows as one step) and groups left empty (REC-03). A record
   page's "Records" breadcrumb returns to the list's own period (`period`, the one asked for), not the page's `per`. A DEFS entry's `v` is the records.json version that first has it; an older file says it is being worked out.
   "Heading for a record" (owner's call, 23 Oct 2026): `pace()` in records.js lists a current day/week/month/year once
