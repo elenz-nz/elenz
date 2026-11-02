@@ -19,14 +19,20 @@ const test = base.extend({
 });
 
 const isPhone = (testInfo) => testInfo.project.name.startsWith('phone');
-// empty when the page fits the screen; otherwise by how much, and which elements reach past the edge
+// empty when the page fits the screen; otherwise by how much, and the path down to what causes it, found by hiding each
+// element in turn (text and ::before strips have no box of their own to look at)
 const sticksOut = () => {
-  const root = document.documentElement, over = root.scrollWidth - root.clientWidth;
-  if (over <= 0) return '';
-  const scrolls = (e) => { for (let p = e.parentElement; p && p !== document.body; p = p.parentElement) if (/auto|scroll|hidden|clip/.test(getComputedStyle(p).overflowX)) return true; return false; };
-  const names = [...document.body.querySelectorAll('*')].filter((e) => e.getBoundingClientRect().right > root.clientWidth + 0.5 && !scrolls(e))
-    .map((e) => `${e.tagName.toLowerCase()}${e.id ? '#' + e.id : ''}.${String(e.className.baseVal ?? e.className).split(' ')[0]} r=${Math.round(e.getBoundingClientRect().right)}`);
-  return `${over}px: ${names.slice(-8).join(' | ')}`;
+  const root = document.documentElement, over = () => root.scrollWidth - root.clientWidth;
+  const before = over();
+  if (before <= 0) return '';
+  const fitsWithout = (e) => { const d = e.style.getPropertyValue('display'); e.style.setProperty('display', 'none', 'important'); const fits = over() <= 0; e.style.removeProperty('display'); if (d) e.style.setProperty('display', d); return fits; };
+  const path = [];
+  for (let node = document.body; node;) {
+    node = [...node.children].find(fitsWithout);
+    if (node) path.push(`${node.tagName.toLowerCase()}${node.id ? '#' + node.id : ''}.${String(node.className.baseVal ?? node.className).split(' ')[0]}`);
+  }
+  const last = path.length ? document.querySelector(path.at(-1).replace(/\.$/, '')) : null;
+  return `${before}px: ${path.join(' > ')} "${(last?.textContent ?? '').trim().slice(0, 60)}"`;
 };
 
 // what each page must show once it has loaded; the data-free parts only, so none of this waits on history files
