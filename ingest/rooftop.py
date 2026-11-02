@@ -40,7 +40,7 @@ CLASSES = tuple(ORIENT)
 GROUND_KW = 1000     # a month's new systems over 10 kW averaging this or more at an NSP count as ground-mounted
 # NSPs whose small solar farms come in smaller batches than the rule catches, from the scan of metered exports
 # (analysis/README.md): Ashburton's arrays (flat-topped exports, ~3.7 MW at ETRN) arrived as 6.5 MW of 8 systems in
-# Dec 2024 and 4.6 MW of 8 in Aug 2025, averaging 500-800 kW each (owner decision, 22 Oct 2026). Piako and Huirangi stay
+# Dec 2024 and 4.6 MW of 8 in Aug 2025, averaging 500-800 kW each (design decision, 22 Oct 2026). Piako and Huirangi stay
 # with the rule: their rounded exports come from on-site use or tracking, but what is modelled is their generation.
 GROUND_KW_AT = {'ASB0661EASHGN': 500}
 # panel (DC) to inverter (AC) ratio; the registry records the lesser of the two, about the AC rating

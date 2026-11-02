@@ -38,7 +38,7 @@ const ORDER = [...SHARED, 'by', 'unit', 'chart', 'price', 'fold', 'off', 'group'
 /** The spans the 1D menu offers, in hours. */
 export const SPANS = [1, 3, 6, 12];
 // the Generation tab's charts under the generation chart that fold to one line, in page order; all start folded
-// (owner's call, 29 Oct 2026: price and renewable share are also on $ Price and the share card, and the page is
+// (design decision, 29 Oct 2026: price and renewable share are also on $ Price and the share card, and the page is
 // cleaner, on portrait phones above all), so a link needs `fold` only when some are open
 export const FOLDABLE = ['price', 'ren', 'demand', 'hvdc', 'co2'];
 export const FOLD_DEFAULT = FOLDABLE;

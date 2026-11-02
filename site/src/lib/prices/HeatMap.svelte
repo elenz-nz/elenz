@@ -28,9 +28,12 @@
 	const hh = (c: number) => `${String(Math.floor(c / 2)).padStart(2, '0')}:${c % 2 ? '30' : '00'}`;
 </script>
 
+<!-- a finger that starts on the map and scrolls the page leaves no pointerleave on some phones -->
+<svelte:window onscroll={() => (tip = null)} />
+
 <div class="hm">
 	<div class="scroll" class:tall={rows.length > 40} bind:this={scroller}>
-		<div class="grid" role="img" aria-label="Heat map of half-hourly prices by day and time of day" onpointerleave={() => (tip = null)}>
+		<div class="grid" role="img" aria-label="Heat map of half-hourly prices by day and time of day" onpointerleave={() => (tip = null)} onpointercancel={() => (tip = null)}>
 			{#each rows as r, j (r.day)}
 				<div class="r">
 					<span class="d">{r.month ? r.lab : j % (rows.length > 40 ? 7 : 5) === 0 || j === rows.length - 1 ? shortDate(r.t) : ''}</span>
@@ -46,7 +49,7 @@
 		</div>
 	</div>
 	{#if tip}<div class="hm-tip" use:portal style={tipStyle(tip)}>{tip.text}</div>{/if}
-	<!-- the key flashes when "Scale to this view" changes it (owner's report PRC-06, 1 Nov 2026) -->
+	<!-- the key flashes when "Scale to this view" changes it (test report PRC-06, 1 Nov 2026) -->
 	{#key flash}<div class="leg" class:scale-flash={flash > 0}>
 		{#each LEGEND as l}<span><i class="b{l.c}"></i>{l.label}</span>{/each}
 	</div>{/key}

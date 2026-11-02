@@ -46,8 +46,8 @@ The JSON is rebuilt from the stored state when the plant register, overrides or 
 so mapping fixes apply to history as they do to the live page. A rebuild that runs out of time or KV writes carries
 on from where it stopped on the next run.
 
-KV allows 1,000 writes a day (UTC) on the free plan and the live job uses ~600, so this job keeps to WRITE_BUDGET a
-day, counted in hist/progress.json.
+This job keeps to WRITE_BUDGET KV writes a day (UTC), counted in hist/progress.json, as a stop on a runaway job. Workers
+Paid includes 1,000,000 KV writes a month; on the free plan (1,000 a day, the live job ~600) it has to go back to 280.
 
 Run from the repo root:  python3 ingest/history.py [--budget MINUTES] [--rebuild] [--from YYYY-MM-DD]
 """
@@ -91,7 +91,7 @@ BUILD = 8                    # bump to rebuild every month's JSON after changing
                              # 8: (being collected, see facilities/NEXT_REBUILD.md)
 GEN_FUELS = ('geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
 DISPATCHABLE = ('hydro', 'gas', 'coal', 'diesel', 'batt')   # as DISPATCHABLE in site/src/lib/tracker/series.js
-WRITE_BUDGET = 280           # KV writes a day (UTC) for this job; the live job needs ~600 of the 1,000
+WRITE_BUDGET = 3000          # KV writes a day (UTC) for this job; a full rebuild needs ~800. Free plan: 280 (see above)
 FIRST_DAY = date(2020, 9, 10)  # first daily dispatch file
 FIRST_MONTH = mt.FIRST_MONTH   # first month of metered history (Generation_MD): Aug 1997
 ROOF_FROM = pd.Timestamp('2013-08-01', tz=NZ).tz_convert('UTC')   # embedded solar: the registry's first month

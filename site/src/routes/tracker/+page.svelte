@@ -50,7 +50,7 @@
 		return `${p.day} ${'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ')[+p.month - 1]} ${p.year}`;
 	};
 
-	// the chart notes (ⓘ) name the region and interval shown (owner's rules for notes, 1 Nov 2026)
+	// the chart notes (ⓘ) name the region and interval shown (team rules for notes, 1 Nov 2026)
 	const regionOf = $derived(({ NI: 'the North Island', SI: 'the South Island' } as Record<string, string>)[lower?.region] ?? 'New Zealand');
 	const regionPos = $derived(regionOf === 'New Zealand' ? "New Zealand's" : `${regionOf}'s`);
 	const island = $derived(lower?.region === 'NI' || lower?.region === 'SI');
@@ -223,14 +223,12 @@
 	<title>Tracker · ELENZ</title>
 	<meta name="description" content="New Zealand's electricity generation by fuel, plant, owner or hydro scheme, with wholesale prices, demand, HVDC transfer and emissions, from the last 24 hours back to 1997." />
 	<Preview title="Electricity generation, prices and demand · ELENZ Tracker" description="New Zealand's electricity generation by fuel, plant, owner or hydro scheme, with wholesale prices, demand, HVDC transfer and emissions, from the last 24 hours back to 1997." path="/tracker" />
-	<!-- with JavaScript off, a plain line instead of empty charts and "Loading" (owner's report RES-04, 2 Nov 2026) -->
-	{@html '<noscript><style>.toolbar, .layout, .status, .lower { display: none !important; }</style></noscript>'}
 </svelte:head>
 
 <div class="wrap wide">
 	<Masthead heading />
 	<TrackerTabs>
-		<div class="status">
+		<div class="status js-only">
 			<span class="tstatus" role="status">{status}</span>
 			{#if meta}
 				{#if view && (view.kind !== 'live' || view.past) && !view.error}
@@ -239,7 +237,7 @@
 				{:else if live}
 					<span class="pill live" title="Data to {when(meta.end)}. Updated from the EMI real-time dispatch feed every 5 minutes"><span class="pword">Live · </span>{clockOnly(meta.end)}</span>
 				{:else}
-					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {clockOnly(meta.end)}<span class="pday">{when(meta.end).slice(clockOnly(meta.end).length)}</span></span>
+					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed<span class="ptime"> · {clockOnly(meta.end)}</span><span class="pday">{when(meta.end).slice(clockOnly(meta.end).length)}</span></span>
 				{/if}
 			{/if}
 			<DownloadMenu items={downloads} />
@@ -255,7 +253,7 @@
 		</div>
 	</TrackerTabs>
 
-	<nav class="toolbar" aria-label="View controls" use:barHeight>
+	<nav class="toolbar js-only" aria-label="View controls" use:barHeight>
 		<div class="ctl">
 			<label for="sel-region" class="vh">Region</label>
 			<select class="pick" id="sel-region">
@@ -308,7 +306,7 @@
 			<span>Pinned</span><b id="pin-chip-txt"></b><span class="pin-x" aria-hidden="true">×</span><span class="vh">: let go</span>
 		</button>
 	</nav>
-	<!-- the 1D menu sits outside the sticky bar, which clips anything hanging below it; placed by tracker.js -->
+	<!-- the 1D menu sits outside the sticky bar; placed by tracker.js -->
 	<div class="span-menu" id="span-menu" role="group" aria-label="Show the last part of the day" hidden>
 		<span class="span-hd">Last</span>
 		<button type="button" role="menuitemradio" aria-checked="false" data-h="1">1 hour</button>
@@ -321,7 +319,7 @@
 
 	<noscript><p class="notice">The charts need JavaScript turned on. <a href="/methods">Data and methods</a> and <a href="/about">About</a> work without it.</p></noscript>
 
-	<div class="layout">
+	<div class="layout js-only">
 		<!-- The chart panel takes arrow keys to move the time cursor, so it needs to be focusable. -->
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 		<section class="charts" id="charts" tabindex="0" aria-label="Generation chart. Hover or use the left and right arrow keys to read values at a point in time, Page Up and Page Down to move by the range; Escape returns to range totals.">
@@ -419,7 +417,7 @@
 				<div class="help" id="sum-help" role="note" hidden={!helpOpen}>
 					<button type="button" class="reset-view" title="Forget this browser's saved views and go back to the default charts on both tracker tabs" onclick={resetView}>Reset charts to default</button>
 					<!-- what works across the tab, one line each; each chart's own ⓘ says what it shows, and /guide#generation has the
-					     full descriptions (owner's reports GRP-06, CHT-13) -->
+					     full descriptions (test reports GRP-06, CHT-13) -->
 					<p>These work across every chart on this tab. The ⓘ beside a chart's title says what that chart shows.</p>
 					<ul>
 						<li><b>Hover or touch a chart:</b> this list shows that time.</li>

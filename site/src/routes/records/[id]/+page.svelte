@@ -138,7 +138,7 @@
 	// a new record, region or period starts both charts afresh
 	$effect(() => { void d.id; void region; void per; growZoom = null; growPin = null; dayZoom = null; });
 
-	// the progression's ⓘ: a sentence, then short points that fit the record (owner's rules for notes, 1 Nov 2026)
+	// the progression's ⓘ: a sentence, then short points that fit the record (team rules for notes, 1 Nov 2026)
 	const growNote = $derived.by(() => {
 		if (!rec) return null;
 		const tr = trimZeros(rec.steps) !== rec.steps, n = rec.steps.length - 1 - (tr ? rec.steps.findIndex((s: [number, number]) => s[1] !== 0) : 0);
@@ -185,7 +185,7 @@
 		return await new Promise((ok) => c.toBlob(ok, 'image/png'));
 	}
 	// The image is drawn ahead (a moment after the record shows), so the share sheet opens straight from the tap:
-	// phones refuse a share that waits on drawing first (owner's report SHR-03, 31 Oct 2026). If it isn't ready, or
+	// phones refuse a share that waits on drawing first (test report SHR-03, 31 Oct 2026). If it isn't ready, or
 	// the theme changed, the line and link go without it.
 	let prepared = $state.raw<{ key: string; file: File } | null>(null);
 	const imageKey = () => `${fileName}|${rec?.t}|${rec?.v}|${isNew}|${pageIsDark()}`;
@@ -242,8 +242,6 @@
 	<title>{fullName(d)} · Records · ELENZ</title>
 	<meta name="description" content="New Zealand's electricity record for {fullName(d).toLowerCase()} since 1997, for New Zealand and each island: the record, how it grew, and the day it fell." />
 	<Preview title="{fullName(d)} · New Zealand electricity records" description="New Zealand's electricity record for {fullName(d).toLowerCase()} since 1997, for New Zealand and each island: the record, how it grew, and the day it fell." path="/records/{data.id}" />
-	<!-- with JavaScript off, a plain line instead of "Loading" (owner's report RES-04, 2 Nov 2026) -->
-	{@html '<noscript><style>.js-only { display: none !important; }</style></noscript>'}
 </svelte:head>
 
 <div class="wrap">
@@ -353,7 +351,7 @@
 			<div class="two">
 				{#if per !== 'tp'}
 					<section class="panel" aria-labelledby="day-h">
-						<!-- the period in the title, the rest in the ⓘ, as on the other charts (owner's report REC-05, 26 Oct 2026) -->
+						<!-- the period in the title, the rest in the ⓘ, as on the other charts (test report REC-05, 26 Oct 2026) -->
 						<div class="p-head"><div class="ttl-row"><h2 id="day-h">The {periodOf(per).word} it fell <span class="h-when">{periodWhen(rec.t, per, true)}</span></h2><InfoTip label="About this chart"><p>This shows the {periodOf(per).word} the record was set: {parts(d, rec.v, per).n} {parts(d, rec.v, per).u}{en ? ` (${en})` : ''}{d.unit === '%' ? ' of its generation renewable' : ''}{rec.prev ? `, beating ${f(rec.prev[1])} (${periodWhen(rec.prev[0], per)})` : ''}.</p><ul><li>Dashed line: the record’s average.</li><li>“Open in the tracker” shows what happened through it.</li></ul><p><a href="/methods/records#periods">How records work</a></p></InfoTip></div><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
 						{#if ser && serAxis}
 							<DayChart day={ser} t={-1} tok={d.tok} fmt={axisFmt} full={f} xticks={serAxis.ticks} tipAt={serAxis.tip} labAt={serAxis.lab} bind:zoom={dayZoom} avg={rec.v} avgLabel="Average {f(rec.v)}"

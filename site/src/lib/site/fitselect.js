@@ -1,5 +1,5 @@
 // A <select> only as wide as the choice it shows (a select is normally as wide as its longest option), so chart
-// headers fit fewer rows on a phone (owner's call, 29 Oct 2026). Used by the Generation tab (tracker.js) and, as a
+// headers fit fewer rows on a phone (design decision, 29 Oct 2026). Used by the Generation tab (tracker.js) and, as a
 // Svelte action, by the Prices tab: <select use:fitSelect={value}>.
 let measure = null;
 export function fit(sel) {

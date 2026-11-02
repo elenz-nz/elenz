@@ -1,5 +1,5 @@
 # Checks on every push and pull request: the ingest code (syntax and undefined names, then a smoke test on a
-# committed one-hour sample of real dispatch data) and the website (type check, tests and build).
+# committed one-hour sample of real dispatch data) and the website (type check, tests, build, Worker and browser tests).
 #
 # The ingest and site jobs are required checks on main (ruleset "protect main"): a pull request merges, and so
 # deploys the site and the live job's ingest code, only once both pass. Renaming a job means updating the ruleset.
@@ -23,7 +23,8 @@ jobs:
           python-version: '3.13'
           cache: pip
           cache-dependency-path: ingest/requirements.txt
-      - run: pip install -r ingest/requirements.txt ruff
+      - run: pip install -r ingest/requirements.txt
+      - run: pip install ruff
       - name: Syntax errors and undefined names
         run: ruff check ingest analysis --select E9,F63,F7,F82 --output-format github
       - name: Smoke test (live and history paths on a sample)
@@ -33,7 +34,7 @@ jobs:
 
   site:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: site
@@ -43,7 +44,9 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: site/package-lock.json
+          cache-dependency-path: |
+            site/package-lock.json
+            worker/package-lock.json
       - run: npm ci
       - run: npm run check
       - name: Tests (the tracker's address and share links)
@@ -51,3 +54,12 @@ jobs:
       - run: npm run build
       - name: Link previews (every public page has og:title, og:description, og:url and an image)
         run: npm run check:previews
+      - name: Worker tests (the Worker in Cloudflare's runtime with a local KV store)
+        working-directory: worker
+        run: |
+          npm ci
+          npm test
+      - name: Browser tests (the built site in Chromium, Firefox and WebKit, Safari's engine, at desktop and phone sizes)
+        run: |
+          npx playwright install --with-deps chromium firefox webkit
+          npm run test:browsers

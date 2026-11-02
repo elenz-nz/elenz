@@ -115,8 +115,6 @@
 	<title>ELENZ · New Zealand's electricity, right now</title>
 	<meta name="description" content="New Zealand's electricity right now: demand, prices, the generation mix, renewable share, emissions and the HVDC link, live from the Electricity Authority's market data." />
 	<Preview title="New Zealand's electricity, right now · ELENZ" description="New Zealand's electricity right now: demand, prices, the generation mix, renewable share, emissions and the HVDC link, live from the Electricity Authority's market data." path="/now" />
-	<!-- with JavaScript off, a plain line instead of empty tiles and "Loading" (owner's report RES-04, 2 Nov 2026) -->
-	{@html '<noscript><style>.home > :not(.hero), .status { display: none !important; }</style></noscript>'}
 </svelte:head>
 
 <div class="wrap wide">
@@ -129,7 +127,7 @@
 				<p class="lede"><a href="/tracker">Open the tracker</a> for history back to 1997.</p>
 				<noscript><p class="lede">The live figures need JavaScript turned on. <a href="/methods">Data and methods</a> and <a href="/about">About</a> work without it.</p></noscript>
 			</div>
-			<div class="status">
+			<div class="status js-only">
 				{#if error}
 					<span class="tstatus" role="status">{error}</span>
 				{:else if !now}
@@ -143,7 +141,7 @@
 			</div>
 		</section>
 
-		<section class="kpis" aria-label="New Zealand right now">
+		<section class="kpis js-only" aria-label="New Zealand right now">
 			<div class="kpi">
 				<span class="k-lbl">Demand</span>
 				<span class="k-val">{nz ? fmt(nz.demand) : '–'}<small>MW</small></span>
@@ -182,7 +180,7 @@
 
 		{#if ex}<PriceExplainer x={ex} open={peOpen} onclose={() => (peChoice = false)} />{/if}
 
-		<div class="below">
+		<div class="below js-only">
 		<div class="grid">
 			<section class="panel map-panel" aria-label="The two islands">
 				<div class="map" style="aspect-ratio: {W} / {VIEW.h}">

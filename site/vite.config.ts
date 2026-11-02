@@ -3,6 +3,9 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+	// Vite 8 otherwise rewrites `max-width` rules as `width<=`, which Safari only reads from 16.4: older iPhones then skip
+	// every width rule and get the desktop layout. scripts/check-css.js fails the build check if it comes back.
+	build: { cssTarget: ['safari15', 'ios15', 'chrome100', 'edge100', 'firefox100'] },
 	plugins: [
 		sveltekit({
 			compilerOptions: {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	// What a chart covers, under its title: its dates first (as a chip; owner's call, 30 Oct 2026: dates, not "3 days to
+	// What a chart covers, under its title: its dates first (as a chip; design decision, 30 Oct 2026: dates, not "3 days to
 	// ..."), then the region, resolution and anything else.
 	// Built from #lib/site/context.js. locked: the chart keeps its own span whatever range is picked (the 30-day heat
 	// maps), shown by a padlock in the chip; the text says why.

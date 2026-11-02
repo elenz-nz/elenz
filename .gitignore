@@ -13,8 +13,11 @@ __pycache__/
 
 # site build output
 site/node_modules/
+worker/node_modules/
 site/.svelte-kit/
 site/build/
+site/test-results/
+site/playwright-report/
 *.tmp
 
 .DS_Store

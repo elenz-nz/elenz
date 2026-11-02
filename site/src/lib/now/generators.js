@@ -70,7 +70,7 @@ export function readSettings(search, rows) {
   const q = new URLSearchParams(search || '');
   const get = (/** @type {string} */ k) => q.get(k) || '';
   const fuels = new Set(rows.map((r) => r.fuel)), owners = new Set(rows.map((r) => slug(r.owner)));
-  // sort=island,mw-asc: the first key sorts, the rest break its ties in turn (Shift-click, owner's report NOW-10)
+  // sort=island,mw-asc: the first key sorts, the rest break its ties in turn (Shift-click, test report NOW-10)
   const keys = get('sort').split(',').map((x) => { const [by, dir] = x.split('-'); return by in SORTS ? { by, asc: dir === 'asc' ? true : dir === 'desc' ? false : TEXT_SORT.has(by) } : null; })
     .filter((k, i, a) => k && a.findIndex((x) => x?.by === k.by) === i);
   const first = keys[0] ?? { by: 'mw', asc: false };
@@ -113,7 +113,7 @@ export function pick(rows, s) {
   const out = rows.filter((r) => (!s.fuel || r.fuel === s.fuel) && (!s.island || r.isl === s.island) &&
     (!s.owner || slug(r.owner) === s.owner) && (!text || [r.name, ...(r.aka || [])].some((n) => norm(n).includes(text))) && (!s.on || Math.abs(r.mw) >= 0.5));
   // the sort keys in turn (Shift-click adds one); fuel, island and owner group the list, and within the last group
-  // the largest MW comes first (owner's report NOW-10)
+  // the largest MW comes first (test report NOW-10)
   const val = (by, r) => (by === 'name' ? norm(r.name) : by === 'pct' ? r.pct : by === 'fuel' ? norm(r.fuelName)
     : by === 'island' ? r.isl : by === 'owner' ? (r.owner === 'Other generators' ? '\uffff' : norm(r.owner)) : r.mw);
   const keys = [{ by: s.by, asc: s.asc }, ...(s.then ?? [])];

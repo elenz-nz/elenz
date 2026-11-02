@@ -2,25 +2,24 @@
 
 These changes touch files in the history's rebuild fingerprint (`mapping_hash()` in `ingest/history.py`:
 `metered_plants.csv`, `overrides.toml` except its site-only tables, the register, the BUILD number), so pushing any of
-them starts a rebuild of every month (~4 days at the KV write budget). Bundle them and push them together, and never
+them starts a rebuild of every month (under an hour, in the next history run). Bundle them and push them together, and never
 while a rebuild is still running (check `/data/history/progress.json`: `rebuild_left` empty).
 
 The last rebuild (BUILD 7, 23-27 Oct 2026: Mill Creek 2014-15, Kawerau TG1/TG2, West Wind as one plant, Ōtāhuhu
 names, clock-change days before 2009, daily peak dispatchable output, small solar farms at Ashburton) finished on
 27 Oct 2026 and its items were checked and removed.
 
-## BUILD 8: collecting, held until the owner says go (opened 28 Oct 2026)
+## BUILD 8: collecting, held until the Elenz team says go (opened 28 Oct 2026)
 
 This is the branch `next-rebuild` (draft pull request "BUILD 8 (held)"). `BUILD` is already 8 here, so merging it
-starts a full rebuild of every month (~4 days). Add each fingerprinted change to this branch with a numbered section
+starts a full rebuild of every month (under an hour, in the next history run). Add each fingerprinted change to this branch with a numbered section
 below saying what changed and what to check once the rebuild has run.
 
-To start it (only when the owner says go): bring the branch up to date with `main`, check
-`/data/history/progress.json` has `rebuild_left` empty, mark the pull request ready for review, let the checks pass and
-merge. Afterwards check each item, run the Offers workflow with "resummarise" if an item changes generation, and clear
+To start it (only when the Elenz team says go): bring the branch up to date with `main`, check
+`/data/history/progress.json` has `rebuild_left` empty, let the checks pass and merge. Afterwards check each item, run the Offers workflow with "resummarise" if an item changes generation, and clear
 the done items from this file.
 
-### 1. Tekapo A and B (owner's call, 30 Oct 2026)
+### 1. Tekapo A and B (design decision, 30 Oct 2026)
 
 The site spells the stations Tekapo A and Tekapo B, like their scheme ("Tekapo" in `[hydro_schemes]`), not the
 register's "Takapō A/B". Changed: `[plant_names]` in `overrides.toml` (the dispatch data's names), the two rows in
@@ -33,7 +32,7 @@ Check afterwards: By hydro scheme > Tekapo lists Tekapo A and Tekapo B on 24 hou
 anywhere in the tracker (search the plant list for "takapo"); `/tracker?fuel=hydro&plant=takapo-a` opens Tekapo A;
 their capacity factors are back in the mix table.
 
-### 2. Huntly in September 2020 (owner's call, 2 Nov 2026)
+### 2. Huntly in September 2020 (design decision, 2 Nov 2026)
 
 `Generation_MD` has no HLY2201 rows for September 2020 and the dispatch files start on 10 September, so 1-9 September
 had no Huntly at all: the Rankines and unit 5 at zero, North Island demand about 600 MW low (demand adds generation

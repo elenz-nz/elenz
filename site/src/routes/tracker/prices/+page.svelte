@@ -52,7 +52,7 @@
 	const CHART_KEYS = ['spread'];   // 'spread' in off: the price chart's priced-apart shading turned off (PRC-01)
 	let off = $state<string[]>([]); // nodes hidden from the price chart, and 'spread' for its shading off
 	let bandKey = $state('HAY');
-	// an island's region shows its own reference node's price range (owner's report PRC-04, 31 Oct 2026: choosing an
+	// an island's region shows its own reference node's price range (test report PRC-04, 31 Oct 2026: choosing an
 	// island didn't change the range bars); for New Zealand the Haywards/Benmore buttons choose
 	const islandBand = (r: string) => (r === 'SI' ? 'BEN' : 'HAY');
 	let heatKey = $state('HAY');
@@ -177,7 +177,7 @@
 		return shareLinks('/tracker/prices', { ...sharedNow(), ...ownNow() }, { point: lastT, pointLabel: label, tDay, days: R.days, latestEnd: endOfToday });
 	}
 
-	// The pin is the anchor, as on the Generation tab (owner's call ZM-02, 31 Oct 2026): a range button opens the new
+	// The pin is the anchor, as on the Generation tab (design decision ZM-02, 31 Oct 2026): a range button opens the new
 	// range around the pinned moment (its point's middle), still pinned (a pinned day opened on 1D shows that
 	// whole day and lets go); without a pin, a dragged zoom carries over.
 	let pinAfter: { t: number; h: number } | null = null;
@@ -285,7 +285,7 @@
 	}
 	const intChoices = $derived(pastLive && R.past ? R.past : R.ints);
 	const effInt = $derived(intPicked && intChoices.includes(int) ? int : R.def && intChoices.includes(R.def) ? R.def : intChoices[0]);
-	// the ⓘ notes name the period shown (owner's rules for notes, 1 Nov 2026)
+	// the ⓘ notes name the period shown (team rules for notes, 1 Nov 2026)
 	const perWord = $derived(({ '1d': 'day', '1w': 'week', '1mo': 'month', '1yr': 'year' } as Record<string, string>)[effInt] ?? '');
 
 	let token = 0;
@@ -481,7 +481,7 @@
 			{ tok: '--p-si', label: 'Benmore', value: money(valOf(P.SI.price)) },
 			{ tok: '--o1', label: 'Spread HAY − BEN', value: signedMoney(valOf(P.spread)) }
 		];
-		// the range's figures sit straight under the node they're for (owner's report PRC-04, 2 Nov 2026)
+		// the range's figures sit straight under the node they're for (test report PRC-04, 2 Nov 2026)
 		const band = [
 			{ label: `${NODE[bandKey].name}, middle 80%`, value: `${money(I.p10[at])} – ${money(I.p90[at])}` },
 			{ label: `${NODE[bandKey].name}, low`, value: money(I.pmin[at]) },
@@ -617,7 +617,7 @@
 		const next = moveBy(endT ?? endOfToday, R, dir);
 		setEnd(next >= endOfToday ? null : Math.max(next, addDays(FIRST, R.days)));
 	}
-	// zoomed, Latest moves the stretch to the newest data and keeps its length (owner's report ZM-03, 1 Nov 2026)
+	// zoomed, Latest moves the stretch to the newest data and keeps its length (test report ZM-03, 1 Nov 2026)
 	const toLatest = () => (zoomEnds && live ? zoomEndAt(live.t[live.n - 1] + 3e5) : setEnd(null));
 	const isoDay = ymd;
 	const dateValue = $derived(zoomStamp ? zoomStamp[0] : live ? ymd((endT ?? latestT) - 1) : '');
@@ -652,7 +652,7 @@
 	}
 	const popH = $derived(Math.min(560, Math.round(winH * 0.62)));
 	const toggleNode = (k: string) => { off = off.includes(k) ? off.filter((x) => x !== k) : [...off, k]; save(); };
-	// the list works like the Generation tab's (owner's report PRC-01, 31 Oct 2026), with the same colour squares
+	// the list works like the Generation tab's (test report PRC-01, 31 Oct 2026), with the same colour squares
 	// (#lib/site/swatch.js: a click hides or shows, double-click, Shift or a long press shows one alone), All and
 	// None for the nodes; the spread row turns the price chart's priced-apart shading off and on
 	const nodeKeys = () => regionNodes.map((r) => r.k);
@@ -701,14 +701,12 @@
 	<title>Prices · Tracker · ELENZ</title>
 	<meta name="description" content="New Zealand wholesale electricity prices at six grid nodes, every 5 minutes: the gap between the islands, HVDC transfer, the price each fuel earned, and price ranges and spikes back to 1997." />
 	<Preview title="Wholesale electricity prices · ELENZ Tracker" description="New Zealand wholesale electricity prices at six grid nodes, every 5 minutes: the gap between the islands, HVDC transfer, the price each fuel earned, and price ranges and spikes back to 1997." path="/tracker/prices" />
-	<!-- with JavaScript off, a plain line instead of empty charts and "Loading" (owner's report RES-04, 2 Nov 2026) -->
-	{@html '<noscript><style>.toolbar, .layout, .status, .lower { display: none !important; }</style></noscript>'}
 </svelte:head>
 
 <div class="wrap wide">
 	<Masthead heading />
 	<TrackerTabs>
-		<div class="status">
+		<div class="status js-only">
 			<span class="tstatus" role="status">{status}</span>
 			{#if meta}
 				{#if R.src !== 'live' || endT !== null}
@@ -716,7 +714,7 @@
 				{:else if isLive}
 					<span class="pill live" title="Dispatch prices from the EMI real-time feed, every 5 minutes"><span class="pword">Live · </span>{clock(meta.end)}</span>
 				{:else}
-					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {clock(meta.end)}<span class="pday"> {dayLabel(meta.end)}</span></span>
+					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed<span class="ptime"> · {clock(meta.end)}</span><span class="pday"> {dayLabel(meta.end)}</span></span>
 				{/if}
 			{/if}
 			<DownloadMenu items={downloads} />
@@ -731,7 +729,7 @@
 		</div>
 	</TrackerTabs>
 
-	<nav class="toolbar" aria-label="View controls" use:barHeight>
+	<nav class="toolbar js-only" aria-label="View controls" use:barHeight>
 		<div class="ctl">
 			<label for="p-region" class="vh">Region</label>
 			<select class="pick" id="p-region" bind:value={region} onchange={() => { if (region !== 'NZ') bandKey = islandBand(region); save(); }}>
@@ -791,7 +789,7 @@
 			</button>
 		{/if}
 	</nav>
-	<!-- outside the sticky bar, which clips anything hanging below it -->
+	<!-- outside the sticky bar -->
 		{#if spanOpen}
 			<div class="span-menu" id="p-span-menu" bind:this={spanMenu} style="top:{spanPos.top}px;left:{spanPos.left}px" role="group" aria-label="Show the last part of the day">
 				<span class="span-hd">Last</span>
@@ -874,7 +872,7 @@
 		</button>
 	{/snippet}
 
-	<div class="layout">
+	<div class="layout js-only">
 		<!-- The chart panels take arrow keys to move the time cursor, so they need to be focusable. -->
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -->
 		<section class="charts" id="charts" tabindex="0" aria-busy={busy} onkeydown={keys}
@@ -981,7 +979,7 @@
 				<div class="help" id="p-help" role="note" hidden={!helpOpen}>
 					<button type="button" class="reset-view" title="Forget this browser's saved views and go back to the default charts on both tracker tabs" onclick={resetView}>Reset charts to default</button>
 					<!-- what works across the tab, one line each; each chart's own ⓘ says what it shows, and /guide#prices has the
-					     full descriptions (owner's reports GRP-06, CHT-13) -->
+					     full descriptions (test reports GRP-06, CHT-13) -->
 					<p>These work across every chart on this tab. The ⓘ beside a chart's title says what that chart shows.</p>
 					<ul>
 						<li><b>Hover or touch a chart:</b> this list shows that time.</li>
@@ -1047,7 +1045,7 @@
 		</div>
 	{/if}
 
-	<div class="p-row">
+	<div class="p-row js-only">
 		<section class="card" class:popped={popped === 'cap'}>
 			<div class="card-head">
 				<div>
@@ -1107,7 +1105,7 @@
 	.lg-set { display: contents; }
 	.lg-foot { display: none; }
 	/* phones: the price chart's header in two rows (title, ⓘ and scale; then the node on long ranges), its key under
-	   the chart (owner's call, 29 Oct 2026) */
+	   the chart (design decision, 29 Oct 2026) */
 	@media (max-width: 560px) {
 		.chart .ch-head { gap: 6px 8px; align-items: center; }
 		.chart .ch-head :global(.info-tip) { margin-left: -6px; }

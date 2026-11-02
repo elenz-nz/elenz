@@ -70,7 +70,7 @@ capacity, ~1,264 kWh per kW of panels, before calibration.
   Lauriston undecided (×1.01). Fixed at Twin Rivers, Taiohi, Papareireiā, Tauhei (north; Tauhei new, 147 MW),
   Omeheu and Pukenui (east-west vs north nearly tied). Kōwhai Park can't be fitted: dispatch held at ~130-135 MW
   (of ~160 MW AC) and stopped abruptly, to zero for the rest of the day, at 18:10 on 16 Oct, 17:15 on 18 Oct and
-  16:45 on 19 Oct; no output at all 20-22 Oct (as of 22 Oct). Owner (22 Oct 2026): it tripped off twice and hasn't
+  16:45 on 19 Oct; no output at all 20-22 Oct (as of 22 Oct). Team note (22 Oct 2026): it tripped off twice and hasn't
   come back; photos show single-axis trackers, turning east to west, so it is recorded as tracking without a fit.
 - Hence `CAL = 0.95` (about ±6%: one standard deviation on the factor, so about 0.89-1.01; it feeds the
   uncertainty band, it isn't applied on top).
@@ -180,7 +180,7 @@ burned for generation, and generation emissions. 25 quarters, FY21 Q1 (Jul–Sep
 
 Against em6's factors (Carbon Methodology v1.6, Nov 2025, checked 2 Nov 2026): close on the Rankines (1.01 coal, 0.589 gas), Huntly 5 (0.40), the
 Taranaki Combined Cycle (0.40) and most geothermal; apart on Tauhara (0.080 from the generator, close to Contact's commissioning-year 86.53; Contact's FY26 is 22.8), Kinleith (0.364 from the generator, 0 here by
-the owner's call, 2 Nov 2026: Oji calls it biomass cogeneration, and the limit is stated on the method page; 2.1 PJ of fossil fuels against 10.1 PJ of biomass at
+the design decision, 2 Nov 2026: Oji calls it biomass cogeneration, and the limit is stated on the method page; 2.1 PJ of fossil fuels against 10.1 PJ of biomass at
 the mill in 2025), the Kawerau mill (0.060 as geothermal, 0 here), Whareroa and Kapuni (0.683, the 0.46 fleet average here), Junction Road (0.548, ~0.51 here), diesel (0.76, 0.80 here).
 MBIE doesn't document that its coal generation includes Glenbrook (Energy in New Zealand 2025 lists 0.68 PJ of waste heat separately and puts the mill's
 coal under other transformation); the case for it is that subtracting Glenbrook reproduces Genesis's figures.
@@ -286,7 +286,7 @@ under macron names the history doesn't use, and has no end date for TCC (closed 
   → 25 (Aug 2008, OEC3) → 57 (Dec 2020, OEC4; the register has only OEC4). Ngā Tamariki 86 → 132 (unit 5, Jan 2026).
   Rotokawa 29 → 35 (2003). Te Mihi 166 from its first output (Nov 2013; register 181).
   Ngā Awa Pūrua 144 → 148 from Apr 2023 and Te Huka 3 54 (register 51.4): both run above their listed capacity
-  all the time, so the capacity is what they run at (owner's call, 30 Oct 2026, after /now showed them over 100%).
+  all the time, so the capacity is what they run at (design decision, 30 Oct 2026, after /now showed them over 100%).
 - Thermal: Stratford 200 (old turbines) → 577 (TCC from Mar 1998 alongside them) → 377 (2002) → 589 (peakers, May
   2011) → 572 → 542 (TCC derated, register) → 212 (TCC closed Mar 2026). New Plymouth 600 to Dec 2007, 100 May-Dec
   2008. Ōtāhuhu A 180 to Apr 2004 (its last output); Ōtāhuhu B 385 → 404 (2005), to Sep 2015. Southdown 130 → 180
