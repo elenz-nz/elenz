@@ -19,6 +19,10 @@ Sources (EMI, CC BY 4.0), one file per month:
                                        R:<trader> is active (Mill Creek's first months, Apr 2014 - Aug 2015, are in
                                        neither file above)
 
+  facilities/metered_fill_YYYYMM.csv   half-hourly MW by generator code for what Generation_MD lacks, added to it:
+                                       Huntly in September 2020, from Grid_import and the units' offers
+                                       (analysis/huntly_sep2020.py)
+
 State columns for a month (half-hourly, trading period start, UTC), alongside the dispatch columns (state.py):
   M|POC code   Generation_MD MW by connection point and generator code (mapped to plants later, so fixes to
                facilities/metered_plants.csv apply to history without downloading again)
@@ -62,6 +66,7 @@ RECON = 'Datasets/Wholesale/Volumes/Reconciliation'
 FIRST_MONTH = date(1997, 8, 1)          # Generation_MD's first month
 GRID_IMPORT_FROM = date(2000, 10, 1)    # Grid_import's first month
 EMBEDDED_FROM = date(1998, 10, 1)       # Embedded_generation's first month
+FILL_POC = 'HLY2201'                    # the connection point of the metered_fill files' generator codes
 GMD_STRAIGHT_FROM = date(2009, 1, 1)    # Generation_MD counts clock-change days straight from 2009 (straighten())
 STEP = pd.Timedelta(minutes=30)
 
@@ -202,6 +207,18 @@ def fetch_recon(get, m, rows, log=print):
     return d.pivot_table(index='t', columns='key', values='mw', aggfunc='sum')
 
 
+def fill_of(m):
+    """The Generation_MD rows month m lacks, from facilities/metered_fill_YYYYMM.csv (column t, UTC, then one column
+    of MW for each generator code, all at FILL_POC), as a long frame with read_emi's columns; None for most months."""
+    path = os.path.join(FACILITIES, f'metered_fill_{m:%Y%m}.csv')
+    if not os.path.exists(path):
+        return None
+    f = pd.read_csv(path).melt(id_vars='t', var_name='gen_code', value_name='mw')
+    f['t'] = pd.to_datetime(f.t, utc=True)
+    f['poc_code'] = FILL_POC
+    return f
+
+
 def fetch_month(get, m, log=print):
     """Metered columns for month m (a date, first of the month), or None if Generation_MD isn't published yet."""
     tag = f'{m:%Y%m}'
@@ -209,6 +226,9 @@ def fetch_month(get, m, log=print):
     if raw is None:
         return None
     g = read_emi(raw)
+    fill = fill_of(m)
+    if fill is not None:
+        g = pd.concat([g, fill], ignore_index=True)
     g['key'] = 'M|' + g.poc_code + ' ' + g.gen_code.astype(str)
     out = [g.pivot_table(index='t', columns='key', values='mw', aggfunc='sum')]
     covered = g.groupby('t').size().rename('mg') * 0 + 1
@@ -287,6 +307,9 @@ def complete(s, m):
     if recon_rows(f'{m:%Y-%m}') and ('mq' not in s or not (s['mq'] == 1).any()):
         return False
     if clock_month(m) and ('mc' not in s or not (s['mc'] == 1).any()):
+        return False
+    fill = fill_of(m)   # a month with a fill is read again once, for a state saved before the fill was added
+    if fill is not None and any(f'M|{FILL_POC} {c}' not in s for c in fill.gen_code.unique()):
         return False
     return True
 

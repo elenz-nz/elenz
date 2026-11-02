@@ -536,7 +536,8 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   is estimated as sent less the old link's losses (`LOSS_NORTH`, `LOSS_SOUTH`; hvdc.VERSION 2, 23 Oct 2026). Stored
   months keep their HVDC columns, so history.py re-reads months before 2003 once when hvdc.VERSION goes up (state
   column `hv`, progress `hv`) and rebuilds them.
-  Generation_MD gaps: Huntly's Rankines and unit 5 are missing for Sep 2020 (dispatch fills from 10 Sep), Matahina
+  Generation_MD gaps: Huntly (HLY2201) is missing for Sep 2020, filled from Grid_import split by the units' offers
+  (`facilities/metered_fill_202009.csv`, `analysis/huntly_sep2020.py`, `fill_of` in metered.py; BUILD 8), Matahina
   from Oct 2021 (dispatch fills).
 - Clock-change days: Generation_MD numbers them by the clock until Sep 2008 and leaves out an hour (forward: TP5-6
   empty, data to TP46 only; back: 48 periods, the repeated hour once). From Apr 2009, and in every other metered file

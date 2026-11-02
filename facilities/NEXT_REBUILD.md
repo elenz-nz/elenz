@@ -33,6 +33,23 @@ Check afterwards: By hydro scheme > Tekapo lists Tekapo A and Tekapo B on 24 hou
 anywhere in the tracker (search the plant list for "takapo"); `/tracker?fuel=hydro&plant=takapo-a` opens Tekapo A;
 their capacity factors are back in the mix table.
 
+### 2. Huntly in September 2020 (owner's call, 2 Nov 2026)
+
+`Generation_MD` has no HLY2201 rows for September 2020 and the dispatch files start on 10 September, so 1-9 September
+had no Huntly at all: the Rankines and unit 5 at zero, North Island demand about 600 MW low (demand adds generation
+back) and the renewable share about 10 points high. No record falls in those days. Grid_import has HLY2201 for every
+half-hour of the month (469.9 GWh), tracking Generation_MD in August and October 2020 at a correlation of 0.9997, 4-13 MW
+lower (it is net of station load). `analysis/huntly_sep2020.py` splits it between the Rankines, unit 5 and unit 6 by
+clearing it through their offers; tested on 25-31 August against Generation_MD the mean errors were 12.8, 5.2 and 0.2 MW,
+correlation 0.997 or better. The result is `facilities/metered_fill_202009.csv`, added to the month's Generation_MD by
+`fetch_month`; `complete()` makes the stored month read again, and the fill is in the rebuild fingerprint. The whole
+month becomes metered, so the Rankines show as one there, like the months either side. Plant notes and the history
+page's known gaps are updated on this branch.
+
+Check afterwards: on 1-12 Sep 2020 at 30m, Huntly has no break at 10 September; the Rankines show whole in the drill-down
+with no units; NI demand is about 3,000 MW on 1-9 September, not 2,500; the renewable share there is about 75%, not
+86%; no record moves into or out of those days (DAT-10, GRP-07).
+
 ## Not fixable from EMI data
 
 - Highbank before Oct 2001: no meter in `Generation_MD` or `Embedded_generation`, and reconciliation starts in 2005.

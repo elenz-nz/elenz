@@ -511,6 +511,9 @@ def mapping_hash():
               'metered_plants.csv', 'metered_islands.csv'):
         with open(os.path.join(FACILITIES, f), 'rb') as fh:
             h.update(fh.read())
+    for f in sorted(x for x in os.listdir(FACILITIES) if x.startswith('metered_fill_')):
+        with open(os.path.join(FACILITIES, f), 'rb') as fh:
+            h.update(fh.read())
     o = {k: v for k, v in overrides().items() if k not in SITE_ONLY}
     h.update(json.dumps(o, sort_keys=True, ensure_ascii=False).encode())
     return h.hexdigest()[:16]

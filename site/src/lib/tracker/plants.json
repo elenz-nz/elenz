@@ -81,20 +81,21 @@
 "aka":[
 "e3p"
 ],
-"metered":"September 2020: the metered data has no unit 5 that month. 1–9 September shows nothing, and from 10 September the dispatch data fills in."
+"metered":"September 2020: Generation_MD has no Huntly that month, so the history uses the grid meter for the whole station, split between units by their offers."
 },
 "Huntly 6":{
 "owner":"Genesis",
 "aka":[
 "P40"
-]
+],
+"metered":"September 2020: Generation_MD has no Huntly that month, so the history uses the grid meter for the whole station, split between units by their offers."
 },
 "Huntly Battery":{
 "owner":"Genesis"
 },
 "Huntly Rankines":{
 "owner":"Genesis",
-"metered":"The metered history has one meter for units 1–4 together, so it shows them as one. The dispatch data (the live week and the weeks since the newest metered month) shows each unit.\nSeptember 2020: the metered data has no Rankines that month. 1–9 September shows nothing, and from 10 September the dispatch data fills in, so that stretch shows each unit."
+"metered":"The metered history has one meter for units 1–4 together, so it shows them as one. The dispatch data (the live week and the weeks since the newest metered month) shows each unit.\nSeptember 2020: Generation_MD has no Huntly that month, so the history uses the grid meter for the whole station, split between units by their offers."
 },
 "Junction Road":{
 "owner":"Nova"
