@@ -3,7 +3,7 @@
 	// days), or each period's price range, spread and spikes (12 months and all history); then the price each fuel
 	// captured over the range and a heat map of the last 30 days by time of day. Data: #lib/prices/data.js.
 	import Preview from '#lib/site/Preview.svelte';
-	import { onMount, untrack } from 'svelte';
+	import { onMount } from 'svelte';
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
 	import { fromLayout, historyStore, firstAtOrAfter, slice, nzOffset } from '#lib/tracker/series.js';
 	import Masthead from '#lib/site/Masthead.svelte';
@@ -288,6 +288,13 @@
 	// the ⓘ notes name the period shown (team rules for notes, 1 Nov 2026)
 	const perWord = $derived(({ '1d': 'day', '1w': 'week', '1mo': 'month', '1yr': 'year' } as Record<string, string>)[effInt] ?? '');
 
+	// after the paint that shows a click's effect (the next frame, then a task), as soon() does on the Generation tab, so
+	// clicks stay quick at phone speed. Returns the way to cancel it, for an $effect: a newer change replaces one waiting.
+	function afterPaint(fn: () => void) {
+		let timer: ReturnType<typeof setTimeout> | undefined;
+		const frame = requestAnimationFrame(() => { timer = setTimeout(fn, 0); });
+		return () => { cancelAnimationFrame(frame); clearTimeout(timer); };
+	}
 	let token = 0;
 	async function build() {
 		if (!live) return;
@@ -364,7 +371,7 @@
 		return { mode: 'time', S, n, t: S.t, t0: S.t[0], t1: S.t[n - 1], spread, sep, shade, series, hvdc: S.hvdcN, histEnd };
 	}
 
-	/** 12 months and all history: per period (day, week or month). */
+	/** 12 months and all history: per period (a day on 12 months, a week or month on either). */
 	function longView(S: any, histEnd: number) {
 		const P = periods(S, effInt);
 		return { mode: 'long', S, P, n: P.n, t: P.t, t0: P.t[0], t1: P.t[P.n - 1], histEnd };
@@ -599,13 +606,14 @@
 	const heatRowsOf = (src: any, k: string) => src.kind === 'months'
 		? monthRows(src.tod, src.from, src.to, (P: any, c: number) => { const a = k === 'HAY' ? P.NI?.price : k === 'BEN' ? P.SI?.price : P.nodes?.[k]; const x = a ? a[c] : null; return x == null ? NaN : x; }, effInt === '1yr')
 		: heat(src.seg, k);
-	$effect(() => { const k = heatKey; void effInt; untrack(() => { if (heatSeg) heatRows = heatRowsOf(heatSeg, k); }); });
+	$effect(() => { const k = heatKey; void effInt; return afterPaint(() => { if (heatSeg) heatRows = heatRowsOf(heatSeg, k); }); });
 	// nodes the heat map has prices for (the extra nodes start in Sep 2020 for months, and need bus rows for the live week)
 	const heatHas = (k: string) => !!heatSeg && (heatSeg.kind === 'months' ? Object.values(heatSeg.tod).some((P: any) => P.nodes?.[k]) : !!(heatSeg.seg && priceOf(heatSeg.seg, k)));
 
-	// rebuild when the range, interval or data change
-	// (build reads and writes the view, so it runs untracked: only these three trigger it)
-	$effect(() => { void range; void int; void intPicked; void live; void endT; void zoom; untrack(() => build()); });
+	// rebuild when the range, interval or data change. A click answers at once (the pressed button, the date box) and the
+	// view is built just after that paint (afterPaint). (build reads and writes the view, so it runs outside the effect:
+	// only these trigger it.)
+	$effect(() => { void range; void int; void intPicked; void live; void endT; void zoom; return afterPaint(build); });
 
 	// ---------- moving through time: the date box and the arrows ----------
 	const canMove = $derived(R.days != null);
@@ -872,7 +880,7 @@
 		</button>
 	{/snippet}
 
-	<div class="layout js-only">
+	<div class="layout js-only" class:waiting={!view}>
 		<!-- The chart panels take arrow keys to move the time cursor, so they need to be focusable. -->
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -->
 		<section class="charts" id="charts" tabindex="0" aria-busy={busy} onkeydown={keys}
@@ -1046,7 +1054,7 @@
 	{/if}
 
 	<div class="p-row js-only">
-		<section class="card" class:popped={popped === 'cap'}>
+		<section class="card cap-card" class:popped={popped === 'cap'} class:waiting={!view}>
 			<div class="card-head">
 				<div>
 					<div class="ttl-row"><h2>Price captured by fuel</h2><InfoTip>
@@ -1068,7 +1076,7 @@
 				<p class="empty">{status || 'Loading…'}</p>
 			{/if}
 		</section>
-		<section class="card" class:popped={popped === 'heat'} style={popped === 'heat' ? '--rh: 15px' : ''}>
+		<section class="card" class:popped={popped === 'heat'} class:waiting={!heatRows.length} style={popped === 'heat' ? '--rh: 15px' : ''}>
 			<div class="card-head">
 				<div>
 					<div class="ttl-row"><h2>Price by time of day</h2><InfoTip>
@@ -1132,6 +1140,14 @@
 	.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; min-width: 0; max-width: 100%; }
 	.tools .seg { flex-wrap: wrap; }   /* six nodes don't fit a phone's width in one row */
 	.more { margin: 2px 2px 0; color: var(--muted); font-size: 0.8rem; }
+	/* until the data arrives: room for what's coming, at each part's height on 1D, so the page doesn't jump when it does */
+	.layout.waiting #charts { min-height: 327px; }
+	.layout.waiting #charts-more { min-height: 365px; }
+	.layout.waiting .side { min-height: 619px; }
+	.card.waiting { min-height: 258px; }
+	.card.cap-card.waiting { min-height: 364px; }
+	@media (max-width: 560px) { .layout.waiting #charts { min-height: 351px; } }
+	@media (max-width: 440px) { .layout.waiting #charts-more { min-height: 414px; } }
 	.more a { color: inherit; }
 	/* big screens: the two cards split down the centre, as on the Generation tab */
 	@media (min-width: 1600px) {

@@ -38,7 +38,7 @@ const RANGES = {
   '7d': { model: 'live', n: 2016, days: 7, label: '7 days', ints: ['5m', '30m'], past: ['30m', '1d'], span: 'Last 7 days' },
   '30d': { model: 'hh', days: 30, label: '30 days', ints: ['30m', '1d'], span: 'Last 30 days' },
   '1y': { model: 'day', days: 365, label: '1 year', ints: ['1d', '1w', '1mo'], def: '1w', span: 'Last 12 months' },
-  'all': { model: 'day', label: 'All', fixed: true, ints: ['1d', '1w', '1mo', '1yr'], def: '1mo', span: null },
+  'all': { model: 'day', label: 'All', fixed: true, ints: ['1w', '1mo', '1yr'], def: '1mo', span: null },   // no Day: 10,000+ days can't be read at any chart's width (design decision, 3 Nov 2026)
 };
 const DAY = 864e5;
 const INTS = {
@@ -1147,6 +1147,7 @@ export function mountTracker(D, hooks = {}) {
   // a row's quantity, share and bar cells, kept so a hover doesn't search the table for them
   const cellsOf = tr => ({ q: tr.querySelector('[data-q]'), s: tr.querySelector('[data-s]'), b: tr.querySelector('[data-b]') });
   function buildSummary() {
+    $('summary').closest('.layout').classList.remove('waiting');   // the data is here: the space held for it goes (tracker.css)
     renderCrumbs();
     const body = $('mix-body'); body.innerHTML = '';
     $('col-name').textContent = { top: VIEWS[state.view].by === 'owner' ? 'Owner' : VIEWS[state.view].by === 'site' ? 'Site' : 'Source',
@@ -1679,7 +1680,12 @@ export function mountTracker(D, hooks = {}) {
     requestAnimationFrame(() => { clearTimeout(shareTimer); shareTimer = setTimeout(() => { if (lastShared === key) hooks.view(w); }, 0); });
   }
 
-  $('sel-region').addEventListener('change', e => { if (!['NZ', 'NI', 'SI'].includes(e.target.value)) return; state.region = e.target.value; state.hidden.clear(); rebuild(); });
+  $('sel-region').addEventListener('change', e => {
+    const r = e.target.value;
+    if (!['NZ', 'NI', 'SI'].includes(r)) return;
+    stepEnd = undefined;
+    soon(() => { state.region = r; state.hidden.clear(); rebuild(); });
+  });
   $('seg-range').addEventListener('click', e => {
     const b = e.target.closest('button');
     if (!b || !Object.hasOwn(RANGES, b.dataset.v)) return;
@@ -1745,7 +1751,9 @@ export function mountTracker(D, hooks = {}) {
   for (const id of ['nav-next', 'tb-next']) $(id)?.addEventListener('click', () => step(1));
   $('sel-view').addEventListener('change', e => {
     if (!Object.hasOwn(VIEWS, e.target.value)) return;
-    state.view = e.target.value; state.drill = { ...TOP_LEVEL }; linked = null; state.hidden.clear(); state.filter = ''; state.open.clear(); rebuild();
+    const v = e.target.value;
+    stepEnd = undefined;
+    soon(() => { state.view = v; state.drill = { ...TOP_LEVEL }; linked = null; state.hidden.clear(); state.filter = ''; state.open.clear(); rebuild(); });
   });
   $('seg-unit').addEventListener('click', e => {
     const b = e.target.closest('button');
@@ -1769,7 +1777,15 @@ export function mountTracker(D, hooks = {}) {
   $('mix-filter').addEventListener('input', e => { state.filter = e.target.value; applyFilter(); });
   $('mix-all').addEventListener('click', () => { state.hidden.clear(); syncHidden(); });
   $('mix-none').addEventListener('click', () => { for (const l of V.layers) state.hidden.add(l.id); syncHidden(); });
-  $('seg-int').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || !intsFor(state.range, state.kind).includes(b.dataset.v)) return; state.int = b.dataset.v; state.intPicked = true; rebuild(); });
+  // like the range buttons: the button answers at once and the view is built just after that paint
+  $('seg-int').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b || !intsFor(state.range, state.kind).includes(b.dataset.v)) return;
+    for (const x of $('seg-int').querySelectorAll('button')) x.setAttribute('aria-pressed', String(x === b));
+    stepEnd = undefined;
+    const v = b.dataset.v;
+    soon(() => { state.int = v; state.intPicked = true; rebuild(); });
+  });
 
   // ---------- pointer and keyboard: one time cursor across both chart panels, a tooltip that follows the mouse ----------
   const boxes = [$('charts'), $('charts-more')];

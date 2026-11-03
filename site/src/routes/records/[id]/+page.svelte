@@ -42,13 +42,17 @@
 		if (qp && PERIOD_KEYS.includes(qp)) period = qp;
 		(async () => {
 			R = await loadRecords();
-			status = R ? 'ok' : 'none';
-			if (!R) return;
+			if (!R) { status = 'none'; return; }
 			loadDetail().then((x) => (det = x));
-			try {
-				const r = await fetch(LIVE_URL, { cache: 'no-cache' });
-				if (r.ok) { liveD = await r.json(); live = liveBeats(R, liveD); near = liveNear(R, liveD); }
-			} catch { /* the live check is extra */ }
+			const check = (async () => {
+				try {
+					const r = await fetch(LIVE_URL, { cache: 'no-cache' });
+					if (r.ok) { liveD = await r.json(); live = liveBeats(R, liveD); near = liveNear(R, liveD); }
+				} catch { /* the live check is extra */ }
+			})();
+			// it can add a panel above the charts, so the page waits for it (not for long), rather than move them down
+			await Promise.race([check, new Promise((r) => setTimeout(r, 2500))]);
+			status = 'ok';
 		})();
 	});
 	function setRegion(r: string) { region = r; syncUrl(); }
@@ -258,12 +262,13 @@
 							{#each REGIONS as r}<option value={r.id}>{r.name}</option>{/each}
 						</select>
 					{/if}
-					{#if rec && !na}
-						<button type="button" class="pill-btn" onclick={() => share('top')} disabled={busy} title={canShare ? 'Share this record' : 'Copy a link to this record'} aria-label={canShare ? 'Share this record' : 'Copy a link to this record'}>
+					<!-- there from the start, disabled until the record loads, so the region picker beside them doesn't move -->
+					{#if status === 'loading' || (rec && !na)}
+						<button type="button" class="pill-btn js-only" onclick={() => share('top')} disabled={busy || !rec} title={canShare ? 'Share this record' : 'Copy a link to this record'} aria-label={canShare ? 'Share this record' : 'Copy a link to this record'}>
 							<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M8.5 11.5a3.2 3.2 0 0 0 4.6 0l2.6-2.6a3.2 3.2 0 0 0-4.6-4.6l-1 1M11.5 8.5a3.2 3.2 0 0 0-4.6 0l-2.6 2.6a3.2 3.2 0 0 0 4.6 4.6l1-1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
 							<span class="pill-word">{shareMsg || 'Share'}</span>
 						</button>
-						<button type="button" class="pill-btn" onclick={download} disabled={busy} title="Download the record as an image" aria-label="Download the record as an image">
+						<button type="button" class="pill-btn js-only" onclick={download} disabled={busy || !rec} title="Download the record as an image" aria-label="Download the record as an image">
 							<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3.5v9M6 8.5l4 4 4-4M4 15.5h12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
 							<span class="pill-word">Download</span>
 						</button>
@@ -282,7 +287,7 @@
 		</div>
 
 		{#if status === 'loading'}
-			<p class="note js-only" role="status">Loading the record…</p>
+			<p class="note js-only hold" role="status">Loading the record…</p>
 			<noscript><p class="note">This record needs JavaScript turned on. <a href="/methods/records">How records work</a> and <a href="/about">About</a> work without it.</p></noscript>
 		{:else if status === 'none'}
 			<section class="panel"><p>The records will appear once the history rebuild finishes, in the next few days.</p></section>
@@ -443,6 +448,8 @@
 	.head { display: grid; gap: 6px; padding-block: 6px 2px; }
 	.crumb { margin: 0; color: var(--muted); font-size: 0.82rem; }
 	.crumb a, .link, .others a, .note a { color: var(--accent); }
+	/* a screenful held while the record loads, so the links and footer under it are off the screen and don't jump */
+	.hold { min-height: 100vh; }
 	.h-row { display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; }
 	h1 { font-size: 1.6rem; letter-spacing: -0.02em; line-height: 1.15; display: flex; align-items: center; flex-wrap: wrap; }
 	.sub { margin: 0; color: var(--ink-2); }

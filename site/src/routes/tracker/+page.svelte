@@ -319,7 +319,7 @@
 
 	<noscript><p class="notice">The charts need JavaScript turned on. <a href="/methods">Data and methods</a> and <a href="/about">About</a> work without it.</p></noscript>
 
-	<div class="layout js-only">
+	<div class="layout js-only waiting">
 		<!-- The chart panel takes arrow keys to move the time cursor, so it needs to be focusable. -->
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 		<section class="charts" id="charts" tabindex="0" aria-label="Generation chart. Hover or use the left and right arrow keys to read values at a point in time, Page Up and Page Down to move by the range; Escape returns to range totals.">
@@ -328,7 +328,7 @@
 					<h2 class="crumbs" id="gen-title">Generation</h2>{@render info('gen')}
 					<div class="legends">
 						<span class="lg" id="lg-tot">Total <b id="v-gen"></b></span>
-						<select class="grp" id="sel-view" aria-label="Group the generation sources">
+						<select class="grp" id="sel-view" aria-label="Group the generation sources" style="width: 89px"> <!-- Detailed's width: as wide as its longest option, the header would wrap until fit() runs -->
 							<option value="detailed">Detailed</option>
 							<option value="simple">Simplified</option>
 							<option value="site">By site</option>

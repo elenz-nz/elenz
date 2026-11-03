@@ -118,6 +118,33 @@ base('a badly encoded address shows the not-found page', async ({ page }) => {
   await expect(page).toHaveURL(/\/methods$/);
 });
 
+// Space is held for what the data fills in (.waiting), so a slow connection doesn't move the page under the reader (seen
+// in the analytics, 3 Nov 2026: Prices scored 0.31 to 0.66 on every load). Tablet width, where the Generation tab's list
+// sits above the lower charts. Only Chromium reports layout shifts.
+test.describe('while the data loads', () => {
+  test.use({ viewport: { width: 820, height: 1180 } });
+  for (const path of ['/tracker', '/tracker/prices']) {
+    test(`${path} stays where it is`, async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name !== 'chromium', 'Chromium on a computer only');
+      await page.addInitScript(() => {
+        window.shifts = 0;
+        new PerformanceObserver((l) => { for (const e of l.getEntries()) if (!e.hadRecentInput) window.shifts += e.value; }).observe({ type: 'layout-shift', buffered: true });
+      });
+      await page.route(/\/data\/tracker\.json/, async (r) => { await new Promise((ok) => setTimeout(ok, 500)); await r.fallback(); });
+      await page.goto(path);
+      await expect(page.locator('.mix tbody tr').first()).toBeVisible();
+      await page.waitForTimeout(700);
+      expect(await page.evaluate(() => window.shifts)).toBeLessThan(0.1);
+    });
+  }
+});
+
+test('All offers no daily interval on the Prices tab', async ({ page }) => {
+  await page.goto('/tracker/prices');
+  await page.locator('[aria-labelledby="p-lb-range"] button', { hasText: 'ALL' }).click();
+  await expect(page.locator('[aria-labelledby="p-lb-int"] button')).toHaveText(['Week', 'Month']);
+});
+
 test('an ⓘ opens the note it points to, after the page has hydrated', async ({ page }) => {
   await page.goto('/tracker');
   await expectShown(page, '/tracker');
