@@ -55,12 +55,16 @@
 		if (new URLSearchParams(location.search).get('by') === 'day') moyPer = 'day';
 		(async () => {
 			R = await loadRecords();
-			status = R ? 'ok' : 'none';
-			if (!R) return;
-			try {
-				const r = await fetch(LIVE_URL, { cache: 'no-cache' });
-				if (r.ok) { liveD = await r.json(); live = liveBeats(R, liveD); near = liveNear(R, liveD); }
-			} catch { /* the live check is extra; the records stand without it */ }
+			if (!R) { status = 'none'; return; }
+			const check = (async () => {
+				try {
+					const r = await fetch(LIVE_URL, { cache: 'no-cache' });
+					if (r.ok) { liveD = await r.json(); live = liveBeats(R, liveD); near = liveNear(R, liveD); }
+				} catch { /* the live check is extra; the records stand without it */ }
+			})();
+			// it can add cards above the list, so the page waits for it (not for long), rather than move everything down
+			await Promise.race([check, new Promise((r) => setTimeout(r, 2500))]);
+			status = 'ok';
 		})();
 	});
 
@@ -168,7 +172,7 @@
 		</section>
 
 		{#if status === 'loading'}
-			<p class="note js-only" role="status">Loading the records…</p>
+			<p class="note js-only hold" role="status">Loading the records…</p>
 			<noscript><p class="note">The records need JavaScript turned on. <a href="/methods/records">How records work</a> and <a href="/about">About</a> work without it.</p></noscript>
 		{:else if status === 'none'}
 			<section class="panel empty">
@@ -453,6 +457,8 @@
 	.official::before { display: none; }
 
 	.sec { display: grid; gap: 10px; }
+	/* a screenful held while the records load, so the footer under it is off the screen and doesn't jump */
+	.hold { min-height: 100vh; }
 	/* a faint break between sections, as this page holds a lot (test report REC-01, 2 Nov 2026) */
 	.sec + .sec, .sec + .rec-tabs, .hero + .sec { border-top: 1px solid var(--grid); padding-top: 18px; margin-top: 8px; }
 	/* the three lists' tabs: underlined like the tracker's Generation and Prices tabs */

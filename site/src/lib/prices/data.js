@@ -101,7 +101,7 @@ export const RANGES = {
   '7d': { mode: 'time', src: 'live', days: 7, ints: ['5m', '30m'], past: ['30m', '1d'], label: '7 days' },
   '30d': { mode: 'time', src: 'hh', days: 30, ints: ['30m', '1d'], label: '30 days' },
   '1y': { mode: 'long', src: 'day', days: 365, ints: ['1d', '1w', '1mo'], label: '12 months' },
-  'all': { mode: 'long', src: 'day', days: null, ints: ['1d', '1w', '1mo'], def: '1w', label: 'All history' },
+  'all': { mode: 'long', src: 'day', days: null, ints: ['1w', '1mo'], def: '1w', label: 'All history' },   // no Day, as on the Generation tab
 };
 export const INT_LABEL = { '5m': '5m', '30m': '30m', '1d': 'Day', '1w': 'Week', '1mo': 'Month' };
 const INT_KEY = { '30m': KEY.hh, '1d': KEY.day, '1w': KEY.week, '1mo': KEY.month };
