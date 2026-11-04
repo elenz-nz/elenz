@@ -142,7 +142,12 @@ def desktop(browser, theme):
 
 
 def phone(browser, theme):
-    page = context(browser, theme, viewport={'width': 390, 'height': 780}, device_scale_factor=2, has_touch=True, is_mobile=True).new_page()
+    ctx = context(browser, theme, viewport={'width': 390, 'height': 780}, device_scale_factor=2, has_touch=True, is_mobile=True)
+    # the clock a minute after the newest data, so the status button reads Live even if the feed has stalled
+    req = urllib.request.Request(f'{LIVE}/data/tracker.json', headers={'User-Agent': 'Mozilla/5.0'})
+    end = json.load(urllib.request.urlopen(req, timeout=60))['meta']['end']
+    ctx.add_init_script(f'const late = Date.now() - {end + 60000}, wall = Date.now.bind(Date); Date.now = () => wall() - late;')
+    page = ctx.new_page()
     page.goto(BASE + '/tracker?range=3d')
     page.wait_for_selector('#mix-body tr', timeout=30000)
     page.wait_for_timeout(1500)
