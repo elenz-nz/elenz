@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { REPO } from '../registry.js';
+	import Shot from '../Shot.svelte';
 </script>
 
 <h2 id="nodes">Which prices</h2>
@@ -51,6 +52,8 @@
 	<dt>Range figures</dt>
 	<dd>Each node’s average and highest price over the range, and the time it was over $500/MWh.</dd>
 </dl>
+<Shot name="prices-range" alt="The price range chart on 1Y: each day’s lowest to highest price, with the Haywards and Benmore buttons above it." caption="The price range on 1Y." />
+<Shot name="prices-fuel" alt="The price captured by fuel card: a row for each fuel, its $/MWh and its share of the generation-weighted average." caption="Price captured by fuel." />
 <p>The Prices tab’s HVDC chart is the same series as the Generation tab’s; see <a href="/methods/hvdc">HVDC transfer</a>.</p>
 
 <h2 id="scales">Price scales</h2>

@@ -48,7 +48,7 @@
 {/if}
 
 <style>
-	.awake { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 0.74rem; font-weight: 500; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px 3px 8px; min-height: 26px; cursor: pointer; white-space: nowrap; }
+	.awake { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 0.74rem; font-weight: 500; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 3px 10px 3px 8px; min-height: 30px; cursor: pointer; white-space: nowrap; }
 	.awake:hover { color: var(--ink); border-color: var(--ink-2); }
 	.awake[aria-pressed='true'] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
 	/* on: a slow, faint glow, just enough to see it's working */

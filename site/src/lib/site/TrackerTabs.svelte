@@ -4,7 +4,7 @@
 	// The links carry the current address's shared settings (region, range, interval, date: #lib/site/view.js), so
 	// switching tabs keeps the same window, plus the other tab's own settings from its last visit (its drill-down,
 	// grouping or chart options). Worked out as the link is used, since the pages update the address as views change.
-	// children: the page's status (Live / History / Delayed pill and the About this data button), at the line's right.
+	// children: the page's status (Reset, Download, Share and the Live / History / Delayed button), at the line's right.
 	import { page } from '$app/state';
 	import type { Snippet } from 'svelte';
 	import { tabHref } from '#lib/site/view.js';

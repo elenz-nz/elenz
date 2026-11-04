@@ -17,7 +17,7 @@
 
 <style>
 	.why { justify-self: start; display: inline-flex; align-items: center; gap: 5px; margin-top: 2px; font: inherit; font-size: 0.76rem; font-weight: 600; color: var(--accent);
-		background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 2px 9px; min-height: 26px; cursor: pointer; white-space: nowrap; }
+		background: transparent; border: 1px solid var(--line); border-radius: 4px; padding: 2px 9px; min-height: 26px; cursor: pointer; white-space: nowrap; }
 	.why:hover { border-color: var(--accent); }
 	.why:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 	.why svg { transition: transform 0.15s; }

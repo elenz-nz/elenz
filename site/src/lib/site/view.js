@@ -67,13 +67,22 @@ export function writeView({ region, range, int, end }, { query = {}, store = {},
   Promise.resolve().then(() => go(url, {})).catch(() => history[push ? 'pushState' : 'replaceState'](history.state, '', url))
     .then(retitle);
 }
-// After the address changes, phones' tab lists can show the address in place of the title until the title changes
-// (test report SITE-06, 31 Oct 2026: still seen after changing range on a phone). Setting the same title again does
-// nothing, so it is nudged: an invisible zero-width space for a frame, then the title itself.
-function retitle() {
-  if (typeof document === 'undefined' || !titled.title || location.pathname !== titled.path) return;
-  document.title = titled.title + '\u200b';
-  requestAnimationFrame(() => { if (location.pathname === titled.path) document.title = titled.title; });
+// Firefox on Android blanks a tab's title whenever the address's path or query changes, shows the address instead, and
+// fills it in only when the page reports a new title (ContentStateReducer's UpdateUrlAction in android-components; test
+// report SITE-06). That is why a fixed title wouldn't help: the page would never report it again. So after the address
+// changes the title is nudged: an invisible zero-width space, then the title itself. The browser takes the new address
+// on its own time, so a nudge straight away can land before it (one frame later wasn't enough, SITE-06, 3 Nov 2026):
+// it waits, and goes again later for a slow phone. Harmless everywhere else; the character never stays.
+const NUDGES = [300, 1500];
+let nudges = [];
+export function retitle() {
+  if (typeof document === 'undefined') return;
+  nudges.forEach(clearTimeout);
+  nudges = NUDGES.map((ms) => setTimeout(() => {
+    if (!document.title) return;
+    document.title = document.title.replaceAll('\u200b', '') + '\u200b';
+    setTimeout(() => { document.title = document.title.replaceAll('\u200b', ''); }, 120);
+  }, ms));
 }
 
 /** The address for another tab: this page's shared settings with that tab's own from its last visit in this browser
@@ -110,7 +119,11 @@ export function setTitle(title) {
   document.title = title;
   if (titleHooked) return;
   titleHooked = true;
-  const again = () => { if (document.visibilityState === 'visible' && location.pathname === titled.path && document.title !== titled.title) document.title = titled.title; };
+  const again = () => {
+    if (document.visibilityState !== 'visible' || location.pathname !== titled.path) return;
+    if (document.title.replaceAll('\u200b', '') !== titled.title) document.title = titled.title;
+    retitle();
+  };
   document.addEventListener('visibilitychange', again);
   window.addEventListener('pageshow', again);
   window.addEventListener('popstate', () => setTimeout(again, 0));

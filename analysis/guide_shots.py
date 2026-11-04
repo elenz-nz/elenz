@@ -1,12 +1,14 @@
-"""The screenshots on /guide, in light and dark: site/static/guide/<name>-light.webp and -dark.webp.
+"""The screenshots on /guide and the method pages, in light and dark: site/static/guide/<name>-light.webp and -dark.webp.
 
   python3 analysis/guide_shots.py                          from the live site
   python3 analysis/guide_shots.py http://localhost:4173    from `npm run preview` (its /data comes from the live site)
 
-Needs Python's playwright and Pillow. Redo them when a layout they show changes; site/src/routes/(docs)/guide/+page.svelte
-holds each image's width and height, so it doesn't jump as they load. Every shot is a crop of a real page.
+Needs Python's playwright and Pillow. Redo them when a layout they show changes. Each image's width and height goes into
+site/src/lib/methods/shots.json, which Shot.svelte reads, so a page doesn't jump as they load. Every shot is a crop of a
+real page.
 """
 import io
+import json
 import os
 import sys
 import urllib.request
@@ -16,8 +18,10 @@ from playwright.sync_api import sync_playwright
 
 BASE = (sys.argv[1] if len(sys.argv) > 1 else 'https://elenz.co.nz').rstrip('/')
 OUT = os.path.join(os.path.dirname(__file__), '..', 'site', 'static', 'guide')
+SIZES = os.path.join(os.path.dirname(__file__), '..', 'site', 'src', 'lib', 'methods', 'shots.json')
 LIVE = 'https://elenz.co.nz'
 MAX_W = 1600
+sizes = {}
 
 
 def save(png, name, theme):
@@ -25,6 +29,7 @@ def save(png, name, theme):
     if im.width > MAX_W:
         im = im.resize((MAX_W, round(im.height * MAX_W / im.width)), Image.LANCZOS)
     im.save(os.path.join(OUT, f'{name}-{theme}.webp'), quality=82, method=6)
+    sizes[name] = [im.width, im.height]
     print(f'{name}-{theme}: {im.width} x {im.height}')
 
 
@@ -64,6 +69,13 @@ def desktop(browser, theme):
     def shot(name, selectors=None, clip=None):
         save(page.screenshot(clip=clip or clip_of(page, selectors)), name, theme)
 
+    # a card further down the page, once it has filled in (they load as they're scrolled near)
+    def card(name, selector, wait=2500):
+        el = page.locator(selector).first
+        el.scroll_into_view_if_needed()
+        page.wait_for_timeout(wait)
+        save(el.screenshot(), name, theme)
+
     # a pinned time: the bar's chip, the line and the list at that time
     go('/tracker?range=7d', '#mix-body tr')
     c = page.locator('#cv-gen').bounding_box()
@@ -85,11 +97,24 @@ def desktop(browser, theme):
     go('/tracker?range=7d&fuel=wind', '#mix-body tr')
     b = page.locator('#summary').bounding_box()
     shot('tracker-plants', clip={'x': b['x'] - 8, 'y': b['y'] - 8, 'width': b['width'] + 16, 'height': 560})
-    # the Controls panel
+    # the How to panel
     go('/tracker?range=7d', '#mix-body tr')
     page.click('button.ctl-btn')
     page.wait_for_timeout(250)
     shot('tracker-controls', ['#sum-help'])
+    # for the method pages: spare capacity and the time-of-day map, over 30 days
+    go('/tracker?range=30d', '#mix-body tr')
+    card('tracker-headroom', 'section[aria-label^="Spare dispatchable capacity"]')
+    card('tracker-heat', 'section[aria-label$="by time of day over the range"]')
+    # price captured by fuel, over 30 days
+    go('/tracker/prices?range=30d', '.cap-card', 2500)
+    card('prices-fuel', '.cap-card')
+    # the price explainer, open
+    go('/now', '.why')
+    if not page.locator('.pe').count():
+        page.click('.why')
+    page.wait_for_selector('.pe')
+    card('now-explainer', '.pe', 800)
     # Prices on a long range
     go('/tracker/prices?range=1y', '.layout .chart', 3000)
     shot('prices-range', ['.layout .chart'])
@@ -135,3 +160,6 @@ if __name__ == '__main__':
             desktop(browser, theme)
             phone(browser, theme)
         browser.close()
+    with open(SIZES, 'w') as f:
+        json.dump(sizes, f, indent=0, sort_keys=True)
+        f.write('\n')

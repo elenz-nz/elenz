@@ -65,7 +65,7 @@ export const TOPICS: Topic[] = [
 		title: 'Price explainer',
 		summary: 'The “Why is the price high?” panel on the Now page: what counts as usual, when it is highlighted or opens by itself, and how a possible price setter is found.',
 		shownOn: [['Now', '/now']],
-		updated: '2026-11-01',
+		updated: '2026-11-05',
 	},
 	{
 		slug: 'emissions',

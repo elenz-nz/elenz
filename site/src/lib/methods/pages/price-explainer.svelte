@@ -2,6 +2,7 @@
 	// Thresholds and factors come straight from the explainer's own code, so this page can't drift from it.
 	import { BELOW, FACTORS, RULES } from '#lib/now/explain.js';
 	import { REPO } from '../registry.js';
+	import Shot from '../Shot.svelte';
 	const R = RULES;
 	const usd = (v: number) => '$' + v.toLocaleString('en-NZ');
 </script>
@@ -14,6 +15,7 @@
 	<li>plants running well below the past week;</li>
 	<li>a possible price setter.</li>
 </ul>
+<Shot name="now-explainer" alt="The price explainer open under the price tiles: why the price is what it is, a pair of bars for each reason, and a 24-hour price chart." caption="The price explainer on the Now page." />
 <p>The button has three states:</p>
 <dl>
 	<dt>Quiet</dt>
@@ -53,6 +55,7 @@
 		</tbody>
 	</table>
 </div>
+<p>A smaller gap counts at low prices: with the higher price under {usd(R.apartUnder)}, the islands are treated as apart from more than {usd(R.apartGap)} <i>and</i> {Math.round(R.splitRel * 100)}%. The button then reads “Islands split” and the card says why the dearer island is dearer, but the button isn’t highlighted, because a gap that size is ordinary. Whenever the islands are apart, the card gives the HVDC link’s estimated flow.</p>
 <h3 id="tested">How often, tested on 30 years</h3>
 <p>The rules were tested on every half-hour of the EA’s final prices at Haywards and Benmore from March 1997 to September 2026:</p>
 <ul>

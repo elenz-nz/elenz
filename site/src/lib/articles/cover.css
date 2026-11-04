@@ -27,7 +27,7 @@ figure.cv {
 	--cv-p1: #4f8bd6; --cv-p2: #86aee0; --cv-p3: #dfa46c; --cv-p4: #d9772a;
 }
 
-figure.cv { margin: 0 0 6px; border-radius: 6px; overflow: hidden; background: var(--cv-bg-2); line-height: 0; outline: 1px solid var(--cv-edge); outline-offset: -1px; }
+figure.cv { margin: 0 0 6px; border-radius: 4px; overflow: hidden; background: var(--cv-bg-2); line-height: 0; outline: 1px solid var(--cv-edge); outline-offset: -1px; }
 figure.cv svg { display: block; width: 100%; height: auto; }
 figure.cv text { font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif; fill: var(--cv-ink); }
 figure.cv .word { font-size: 30px; font-weight: 800; letter-spacing: 0.08em; }

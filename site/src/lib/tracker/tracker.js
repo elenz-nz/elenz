@@ -531,13 +531,21 @@ export function mountTracker(D, hooks = {}) {
   function drillTo(d) {
     linked = null; state.drill = d; state.hidden.clear(); state.filter = ''; relayer(); buildSummary(); render(); save(true);
   }
+  const toCharts = () => $('charts').scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  // a row of the list: where the list sits under the charts (phones) the page goes up to them, or the list closing up
+  // under the finger moves everything below it (test report GRP-03, 3 Nov 2026)
+  function drillFromList(d) {
+    const stacked = $('summary').getBoundingClientRect().top >= $('charts').getBoundingClientRect().bottom - 1;
+    drillTo(d);
+    if (stacked) toCharts();
+  }
   // a row of the mix table opens that fuel's plants in the list and chart above (test report LOW-03, 1 Nov 2026)
   const canOpen = k => !!FUEL[k] && plantsFor(k).length > 0;
   function openFuel(k) {
     if (!canOpen(k)) return;
     linked = null; state.view = 'detailed'; state.drill = { ...TOP_LEVEL, fuel: k }; state.hidden.clear(); state.filter = ''; state.open.clear();
     rebuild(); save(true);
-    $('charts').scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    toCharts();
   }
   // a link's drill-down, once its window is built (rebuild); anything that no longer exists is dropped there
   function fromLink(l) {
@@ -1184,7 +1192,7 @@ export function mountTracker(D, hooks = {}) {
         if (x && x.row) { const all = x.members.every(m => state.hidden.has(m.id)); x.row.classList.toggle('off', all); x.row.querySelector('.sw-btn').setAttribute('aria-pressed', String(!all)); }
         syncMixTools();
       });
-      if (l.drill) tr.querySelector('.drill').addEventListener('click', () => drillTo(l.drill));
+      if (l.drill) tr.querySelector('.drill').addEventListener('click', () => drillFromList(l.drill));
       l.row = tr; l.cells = cellsOf(tr);
       body.appendChild(tr);
     }

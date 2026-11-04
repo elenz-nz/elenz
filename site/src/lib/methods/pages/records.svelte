@@ -2,6 +2,7 @@
 	// The list of records comes from the Records pages' own definitions, so this page can't drift from them.
 	import { LISTED as DEFS, GROUPS, NEW_DAYS, NEW_LAG } from '#lib/records/records.js';
 	import { REPO } from '../registry.js';
+	import Shot from '../Shot.svelte';
 	// what each record measures, in a line (the definitions' own `sub` is written for the Records list, where some say
 	// only "Half-hour")
 	const WHAT: Record<string, string> = {
@@ -62,6 +63,7 @@
 	<li><b>“Has stood for”</b> counts from the end of the record’s half-hour, day, week, month or year, when it was set.</li>
 	<li><b>Zoom</b>: drag across either chart with a mouse; Reset zoom or Escape goes back.</li>
 </ul>
+<Shot name="record-compare" alt="A record’s progression chart with one point pinned and another read beside it." caption="How the record grew, with one point pinned and a second read beside it." />
 
 <h2 id="official">Official and provisional</h2>
 <p>A record is official once it rests on final data. The history uses:</p>
@@ -89,6 +91,7 @@
 
 <h2 id="pace">On record pace</h2>
 <p>Once half of the current day, week, month or year has gone, the records page lists any record it is on pace to break: where its average so far is ahead of where the record period was at the same point, as in a race.</p>
+<Shot name="records-list" alt="Heading for a record: tiles for records that could fall soon, with a Show all button." caption="Heading for a record, at the top of the Records page." />
 <ul>
 	<li>Weeks, months and years compare whole days (the record period’s average after the same number of days); a day compares whole half-hours.</li>
 	<li>The current period comes from the history and the live week after it, both dispatch data, so it is provisional.</li>

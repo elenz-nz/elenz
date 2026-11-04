@@ -38,7 +38,7 @@
 	.info-tip { display: inline-grid; place-items: center; flex: none; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--muted); cursor: pointer; vertical-align: middle; }
 	.info-tip:hover, .info-tip[aria-expanded='true'] { color: var(--ink); background: var(--grid); }
 	.info-tip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-	.info-pop-tip { position: fixed; z-index: 40; width: min(340px, calc(100vw - 24px)); padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.16); color: var(--ink-2); font-size: 0.8rem; line-height: 1.5; font-weight: 400; text-align: left; letter-spacing: normal; text-transform: none; }
+	.info-pop-tip { position: fixed; z-index: 40; width: min(340px, calc(100vw - 24px)); padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.16); color: var(--ink-2); font-size: 0.8rem; line-height: 1.5; font-weight: 400; text-align: left; letter-spacing: normal; text-transform: none; }
 	.info-pop-tip[hidden] { display: none; }
 	.info-pop-tip :global(a) { color: var(--accent); }
 	.info-pop-tip :global(p) { margin: 0 0 6px; }

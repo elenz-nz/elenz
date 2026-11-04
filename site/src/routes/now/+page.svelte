@@ -5,6 +5,7 @@
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
 	import Masthead from '#lib/site/Masthead.svelte';
 	import KeepAwake from '#lib/now/KeepAwake.svelte';
+	import StatusPill from '#lib/site/StatusPill.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import { summarise, ring } from '#lib/home/now.js';
 	import { explainNow } from '#lib/now/explain.js';
@@ -59,6 +60,7 @@
 	const fmt = (v: number) => Math.round(v).toLocaleString('en-NZ');
 	const money = (v: number) => (v < 0 ? '−$' : '$') + Math.abs(v).toLocaleString('en-NZ', { maximumFractionDigits: v >= 100 || v <= -100 ? 0 : 2, minimumFractionDigits: v >= 100 || v <= -100 ? 0 : 2 });
 
+	let sim = $state('');
 	const live = $derived(now !== null && (clock - now.end) / 60000 < LIVE_MINUTES);
 	const nz = $derived(now?.regions.NZ);
 	const hv = $derived(now ? now.hvdc.mid : 0);
@@ -91,6 +93,12 @@
 			due = nextDue(D.meta.end);
 			if (D.meta.end === stamp) return;
 			stamp = D.meta.end;
+			// preview links only: a chosen price state for testing (#lib/now/simulate.js, NOW-08)
+			const ask = new URLSearchParams(location.search).get('sim');
+			if (ask && location.hostname !== 'elenz.co.nz') {
+				const { simulate, SIMS } = await import('#lib/now/simulate.js');
+				if (SIMS.includes(ask)) { simulate(D, ask); sim = ask; }
+			}
 			now = summarise(D) as Now;
 			try { ex = explainNow(D, PLANT_META); } catch (e) { console.warn('price explainer left out:', e); ex = null; }   // never let it break the page
 			lastD = D;
@@ -121,6 +129,7 @@
 	<Masthead />
 
 	<main class="home">
+		{#if sim}<p class="sim">Simulated prices (“{sim}”). This test only shows on preview links.</p>{/if}
 		<section class="hero" aria-labelledby="home-h">
 			<div>
 				<h1 id="home-h">New Zealand's electricity, right now</h1>
@@ -132,12 +141,17 @@
 					<span class="tstatus" role="status">{error}</span>
 				{:else if !now}
 					<span class="tstatus" role="status">Loading the latest data…</span>
-				{:else if live}
-					<span class="pill live" title="Data to {when(now.end)}, from the EMI real-time dispatch feed">Live · {clockOnly(now.end)}</span>
-				{:else}
-					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed · {when(now.end)}</span>
 				{/if}
 				<KeepAwake />
+				<StatusPill id="now-about" kind={!now ? '' : live ? 'live' : 'stale'}
+					title={!now ? '' : live ? `Data to ${when(now.end)}, from the EMI real-time dispatch feed` : `The newest data is more than ${LIVE_MINUTES} minutes old`}>
+					{#snippet label()}
+						{#if !now || live}Live · {now ? clockOnly(now.end) : ''}{:else}Delayed · {when(now.end)}{/if}
+					{/snippet}
+					{#if now}<p class="asof">Data to {when(now.end)}</p>{/if}
+					<p>Dispatch data from the Electricity Authority's real-time dispatch feed, updated every 5 minutes.</p>
+					<a href="/methods">How each figure is built</a>
+				</StatusPill>
 			</div>
 		</section>
 
@@ -281,6 +295,7 @@
 
 <style>
 	.home { display: grid; gap: 14px; }
+	.sim { margin: 0; padding: 6px 12px; border: 1px dashed var(--warn-ink); border-radius: 4px; color: var(--warn-ink); font-size: 0.84rem; }
 	.hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px 20px; flex-wrap: wrap; padding-block: 6px 2px; }
 	.hero h1 { margin: 0; font-size: 1.6rem; letter-spacing: -0.02em; line-height: 1.15; }
 	.lede { margin: 6px 0 0; color: var(--ink-2); max-width: 70ch; }

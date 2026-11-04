@@ -26,7 +26,7 @@
 
 	const sub = $derived(
 		x.variant === 'low' ? (x.lowStart ? `${x.nearZero ? 'Near zero' : 'Low'} since ${clock(x.lowStart)}.` : '')
-		: x.since && x.tier !== 'quiet' ? `${x.variant === 'split' ? 'Split' : 'High'} for ${duration(x.t - x.since + 300000)}.` : ''
+		: x.since && (x.tier !== 'quiet' || x.variant === 'split') ? `${x.variant === 'split' ? 'Split' : 'High'} for ${duration(x.t - x.since + 300000)}.` : ''
 	);
 
 	// the 24-hour chart (ExplainChart.svelte) pops out larger in a modal dialog: Esc, the close button or a click
@@ -158,7 +158,7 @@
 	.pop:hover { background: var(--accent-soft); }
 	.pop:focus-visible, .close:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-	.big { width: min(1040px, calc(100vw - 32px)); max-width: none; border: 1px solid var(--line); border-radius: 6px; padding: 0;
+	.big { width: min(1040px, calc(100vw - 32px)); max-width: none; border: 1px solid var(--line); border-radius: 4px; padding: 0;
 		background: var(--surface); color: var(--ink); box-shadow: 0 18px 50px rgb(0 0 0 / 0.25); }
 	.big::backdrop { background: rgb(10 18 18 / 0.5); }
 	.big-in { padding: 14px 18px 16px; display: grid; gap: 6px; }
@@ -171,7 +171,7 @@
 
 	.pe-setter { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; display: grid; gap: 6px; }
 	.ps-head { margin: 0; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
-	.est { font-size: 0.68rem; padding: 2px 7px; border-radius: 999px; border: 1px dashed var(--muted); text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--ink-2); }
+	.est { font-size: 0.68rem; padding: 2px 7px; border-radius: 4px; border: 1px dashed var(--muted); text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--ink-2); }
 	.ps-name { margin: 0; display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap; }
 	.ps-name b { font-size: 1.05rem; }
 	.ps-name small { color: var(--muted); font-size: 0.82rem; }

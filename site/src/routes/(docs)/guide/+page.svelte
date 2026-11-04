@@ -1,22 +1,10 @@
 <script lang="ts">
 	// How to use the site, moved from About so that page can stay an overview (team review DOC-01, 2 Nov 2026). The
-	// tracker's Controls panels are one line each and link here (test reports GRP-06, CHT-13): keep them in step.
+	// tracker's How to panels are one line each and link here (test reports GRP-06, CHT-13): keep them in step.
 	import Preview from '#lib/site/Preview.svelte';
+	import Shot from '#lib/methods/Shot.svelte';
 	const DESC = 'How to use Elenz: every control on the tracker, the Now page and Records, with tips.';
-	// the pictures: crops of real pages in light and dark, made by analysis/guide_shots.py (site/static/guide)
-	const SIZE: Record<string, [number, number]> = {
-		'tracker-pin': [1600, 796], 'tracker-zoom': [1200, 585], 'tracker-plants': [498, 840], 'tracker-controls': [453, 882],
-		'tracker-phone': [780, 1560], 'prices-range': [1200, 495], 'now-generators': [1600, 603], 'records-list': [1600, 183], 'record-compare': [1600, 502],
-	};
 </script>
-
-{#snippet shot(name: string, alt: string, caption: string)}
-	<figure class="shot">
-		<img class="on-light" src="/guide/{name}-light.webp" {alt} width={SIZE[name][0]} height={SIZE[name][1]} loading="lazy" />
-		<img class="on-dark" src="/guide/{name}-dark.webp" {alt} width={SIZE[name][0]} height={SIZE[name][1]} loading="lazy" />
-		<figcaption>{caption}</figcaption>
-	</figure>
-{/snippet}
 
 <svelte:head>
 	<title>Guide · ELENZ</title>
@@ -33,9 +21,11 @@
 
 	<div class="mt-body">
 		<h2 id="generation">Tracker: Generation</h2>
-		<p>The Controls panel beside the charts has a short version of this.</p>
-		{@render shot('tracker-pin', 'The Generation tab on 7 days with a time pinned: the Pinned chip in the bar, a line through the chart, and the list showing that time.', 'A pinned time: the chip in the bar, the line on the chart, and the list beside it showing that moment.')}
+		<p>The How to panel beside the charts has a short version of this.</p>
+		<Shot name="tracker-pin" alt="The Generation tab on 7 days with a time pinned: the Pinned chip in the bar, a line through the chart, and the list showing that time." caption="A pinned time: the chip in the bar, the line on the chart, and the list beside it showing that moment." />
 		<dl>
+			<dt>Live, History or Delayed</dt>
+			<dd>The button at the end of the tabs line says what you’re looking at: the live week, history, or live data that has fallen behind. Select it for the time of the newest data and where it comes from. The Now page has the same button.</dd>
 			<dt>Read a time</dt>
 			<dd>Hover a chart, or touch and slide on a phone. The list beside the charts shows every source at that time.</dd>
 			<dt>Pin it</dt>
@@ -45,7 +35,7 @@
 			<dt>Zoom in</dt>
 			<dd>Drag across any chart to zoom into that stretch; every chart follows. The arrow beside 1D picks the last 1, 3, 6 or 12 hours. While zoomed, the date box gains a time: pick the hour, then the minutes, to move the zoomed stretch so it ends then (NZ time), or the ‹ › arrows step by the zoom’s length. Reset zoom in the bar, or Escape twice, shows the whole range again, and choosing another range while zoomed opens that range around what you zoomed into.</dd>
 		</dl>
-		{@render shot('tracker-zoom', 'A drag across the generation chart, with the stretch being zoomed into shaded.', 'Drag across any chart to zoom into that stretch.')}
+		<Shot name="tracker-zoom" alt="A drag across the generation chart, with the stretch being zoomed into shaded." caption="Drag across any chart to zoom into that stretch." />
 		<dl>
 			<dt>Break it down</dt>
 			<dd>Select a name in the list to go from a fuel to its plants and their grid connections; ‹ Back above the list, or the browser’s Back, steps out. The menu above the generation chart groups it other ways: by site, hydro scheme, owner, flexibility, renewable vs fossil, inverter vs synchronous. MW/% switches to shares.</dd>
@@ -60,9 +50,9 @@
 		</dl>
 
 		<div class="shots3">
-			{@render shot('tracker-plants', 'The list showing wind plants, with a back link, a filter box and colour squares.', 'A fuel’s plants in the list.')}
-			{@render shot('tracker-controls', 'The Controls panel, with Reset charts to default at the top.', 'The Controls panel.')}
-			{@render shot('tracker-phone', 'The Generation tab on a phone: region, range and interval over the chart.', 'The same tab on a phone.')}
+			<Shot name="tracker-plants" alt="The list showing wind plants, with a back link, a filter box and colour squares." caption="A fuel’s plants in the list." />
+			<Shot name="tracker-controls" alt="The How to panel: a line on what it covers, then a short list of what you can do." caption="The How to panel." />
+			<Shot name="tracker-phone" alt="The Generation tab on a phone: region, range and interval over the chart." caption="The same tab on a phone." />
 		</div>
 
 		<h2 id="prices">Tracker: Prices</h2>
@@ -75,10 +65,10 @@
 			<dd>Select a node’s colour square in the list to hide or show its line. The menu beside the price chart’s title changes its scale (Spike-proof, Capped or Linear); on long ranges, choose the island whose price range is shown.</dd>
 		</dl>
 
-		{@render shot('prices-range', 'The price range chart on 1Y: each day’s lowest to highest price, with the Haywards and Benmore buttons above it.', 'On 1Y and ALL, each period’s range of prices, for Haywards or Benmore.')}
+		<Shot name="prices-range" alt="The price range chart on 1Y: each day’s lowest to highest price, with the Haywards and Benmore buttons above it." caption="On 1Y and ALL, each period’s range of prices, for Haywards or Benmore." />
 
 		<h2 id="reset">Back to the default charts</h2>
-		<p>The tracker remembers your last region, range, interval and chart settings in this browser. Reset charts to default, at the top of either tab’s Controls panel, clears them.</p>
+		<p>The tracker remembers your last region, range, interval and chart settings in this browser. Reset, on the tabs line of either tab (an arrow on a phone), clears them.</p>
 
 		<h2 id="now">Now</h2>
 		<dl>
@@ -90,10 +80,10 @@
 			<dd>Stops your screen going to sleep while the page is open, for leaving it up on a spare display.</dd>
 		</dl>
 
-		{@render shot('now-generators', 'Every generator right now, sorted by island and then by MW.', 'Sorted by island, then MW.')}
+		<Shot name="now-generators" alt="Every generator right now, sorted by island and then by MW." caption="Sorted by island, then MW." />
 
 		<h2 id="records">Records</h2>
-		{@render shot('records-list', 'Heading for a record: tiles for records that could fall soon, with a Show all button.', 'Heading for a record, at the top of the page.')}
+		<Shot name="records-list" alt="Heading for a record: tiles for records that could fall soon, with a Show all button." caption="Heading for a record, at the top of the page." />
 		<dl>
 			<dt>The lists</dt>
 			<dd>Heading for a record and New and provisional sit at the top. Under them, All-time records has the region picker and the period buttons, from a trading period to a year; Milestones and By month show New Zealand and each island side by side, and By month’s TP and Day buttons switch between trading periods and whole days. Point at a row to light up the same record in each region’s card, and click to hold it.</dd>
@@ -103,7 +93,7 @@
 			<dd>Share sends the record’s link (on a phone, with its image), and Download saves the image in the page’s light or dark colours.</dd>
 		</dl>
 
-		{@render shot('record-compare', 'How the record grew, with a pinned point and its tooltip beside a second point under the pointer.', 'A pinned point, in the accent colour, beside the point under the pointer.')}
+		<Shot name="record-compare" alt="How the record grew, with a pinned point and its tooltip beside a second point under the pointer." caption="A pinned point, in the accent colour, beside the point under the pointer." />
 
 		<h2 id="everywhere">Everywhere</h2>
 		<dl>
@@ -116,17 +106,6 @@
 </main>
 
 <style>
-	.shot { margin: 4px 0 8px; min-width: 0; }
-	.shot img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 4px; }
-	.shot figcaption { margin-top: 5px; font-size: 0.8rem; color: var(--muted); line-height: 1.4; }
-	/* each picture in the page's own colours */
-	.on-dark { display: none !important; }
-	@media (prefers-color-scheme: dark) {
-		:global(:root:not([data-theme='light'])) .on-dark { display: block !important; }
-		:global(:root:not([data-theme='light'])) .on-light { display: none !important; }
-	}
-	:global(:root[data-theme='dark']) .on-dark { display: block !important; }
-	:global(:root[data-theme='dark']) .on-light { display: none !important; }
 	.shots3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: start; }
 	@media (max-width: 640px) { .shots3 { grid-template-columns: minmax(0, 1fr); max-width: 300px; } }
 </style>

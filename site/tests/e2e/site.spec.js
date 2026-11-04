@@ -66,7 +66,7 @@ test('clicking between pages shows each page in full', async ({ page }) => {
   await expectShown(page, '/tracker/prices');
   await expectJsOnlyShown(page);
   await go('/now', '/now');
-  await page.locator('a.home').first().click();
+  await page.locator('a.brand svg').first().click();   // the whole logo is the link (SITE-01)
   await expect(page).toHaveURL(/\/$/);
   await expectShown(page, '/');
   await expectJsOnlyShown(page);
@@ -155,8 +155,41 @@ test('an ⓘ opens the note it points to, after the page has hydrated', async ({
   await expect(page.locator(`[id="${id}"]`)).toBeVisible();
 });
 
+for (const path of ['/now', '/tracker', '/tracker/prices']) {
+  test(`${path}: the status button is last on its line and opens its panel (TRK-01)`, async ({ page }) => {
+    await page.goto(path);
+    const pill = page.locator('.status .pill');
+    await expect(pill).toBeEnabled();
+    const others = page.locator('.status > :is(button, .dl-wrap, .share-wrap):not(.pill)');
+    const right = (l) => l.evaluate((e) => e.getBoundingClientRect().right);
+    for (const b of await others.all()) if (await b.isVisible()) expect(await right(b)).toBeLessThan(await right(pill));
+    const panel = page.locator('.info-pop[aria-label="About this data"]');
+    await expect(panel).toBeHidden();
+    await pill.click();
+    await expect(panel).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(panel).toBeHidden();
+  });
+}
+
+for (const path of ['/tracker', '/tracker/prices']) {
+  test(`${path}: Reset is out on the tabs line (TRK-01)`, async ({ page }) => {
+    await page.goto(path);
+    await expect(page.locator('.status .reset-btn')).toBeVisible();
+  });
+}
+
 test.describe('on a phone', () => {
   test.beforeEach(({}, testInfo) => test.skip(!isPhone(testInfo), 'phones only'));
+
+  // the tabs line is the widest thing on these pages: Reset took it past the smallest phones' width
+  for (const path of ['/tracker', '/tracker/prices']) {
+    test(`${path} fits a 320 px screen`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 640 });
+      await page.goto(path);
+      await expect.poll(() => page.evaluate(sticksOut), { message: 'what sticks out past the side of the screen' }).toBe('');
+    });
+  }
 
   for (const path of ['/', '/now', '/tracker', '/tracker/prices', '/records', '/articles', '/about']) {
     test(`${path} fits the screen`, async ({ page }) => {

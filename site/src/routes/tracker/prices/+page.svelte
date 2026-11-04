@@ -10,6 +10,7 @@
 	import TrackerTabs from '#lib/site/TrackerTabs.svelte';
 	import { readView, writeView, resetView, midnightOf, addDays, addYears, ymd, endOfDay, describe, shareLinks, setTitle } from '#lib/site/view.js';
 	import ShareLink from '#lib/site/ShareLink.svelte';
+	import StatusPill from '#lib/site/StatusPill.svelte';
 	import { heatWindow, heatSource, monthRows } from '#lib/site/heat.js';
 	import { dateSettled, timeSettled } from '#lib/site/datefield.js';
 	import '#lib/site/datepick.js';   // <date-pick>, the date box's calendar
@@ -71,14 +72,15 @@
 	let heatScaled = $state(false);   // the heat map's colours fitted to the rows shown rather than the fixed price bands
 	let popped = $state<string | null>(null); // a lower chart enlarged over the page
 	let winH = $state(800);
-	let infoOpen = $state(false), helpOpen = $state(false);
-	let infoBtn = $state<HTMLButtonElement>(), infoBox = $state<HTMLDivElement>(), helpBtn = $state<HTMLButtonElement>();
+	let helpOpen = $state(false);
+	let helpBtn = $state<HTMLButtonElement>();
 	let tipS = $state<{ chart: string; i: number; x: number; y: number } | null>(null); // the tooltip that follows the mouse
 	const store = historyStore();
 	const FIRST = Date.UTC(1997, 6, 31, 12); // history starts 1 Aug 1997 (NZ), the metered history's first month
 	const R = $derived(RANGES[range as keyof typeof RANGES] as { mode: string; src: string; days: number | null; ints: string[]; past?: string[]; label: string; def?: string });
 	const age = $derived(meta ? (now - meta.end) / 60000 : 0);
 	const isLive = $derived(meta !== null && age < LIVE_MINUTES);
+	const pastView = $derived(R.src !== 'live' || endT !== null);
 
 	// ---------- settings: region and range shared with the Generation tab; the rest kept for this page ----------
 	// region, range, interval and date are shared with the Generation tab through the address (#lib/site/view.js);
@@ -650,13 +652,8 @@
 		if (e instanceof KeyboardEvent) {
 			if (e.key !== 'Escape') return;
 			if (popped) popped = null;
-			if (infoOpen) { infoOpen = false; infoBtn?.focus(); }
 			if (helpOpen) helpOpen = false;
-			return;
 		}
-		if (!infoOpen) return;
-		const t = e.target as Node;
-		if (!infoBox?.contains(t) && !infoBtn?.contains(t)) infoOpen = false;
 	}
 	const popH = $derived(Math.min(560, Math.round(winH * 0.62)));
 	const toggleNode = (k: string) => { off = off.includes(k) ? off.filter((x) => x !== k) : [...off, k]; save(); };
@@ -716,24 +713,20 @@
 	<TrackerTabs>
 		<div class="status js-only">
 			<span class="tstatus" role="status">{status}</span>
-			{#if meta}
-				{#if R.src !== 'live' || endT !== null}
-					<span class="pill hist" title="Final prices from the EA, then the live week">History</span>
-				{:else if isLive}
-					<span class="pill live" title="Dispatch prices from the EMI real-time feed, every 5 minutes"><span class="pword">Live · </span>{clock(meta.end)}</span>
-				{:else}
-					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed<span class="ptime"> · {clock(meta.end)}</span><span class="pday"> {dayLabel(meta.end)}</span></span>
-				{/if}
-			{/if}
+			<button type="button" class="pill-btn reset-btn" title="Forget this browser's saved views and go back to the default charts on both tracker tabs" aria-label="Reset charts to default" onclick={resetView}>
+				<svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.6-3.7M3 2.6v2.9h2.9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+				<span class="pill-word">Reset</span>
+			</button>
 			<DownloadMenu items={downloads} />
 			<ShareLink {links} />
-			<button type="button" class="pill-btn about-btn" bind:this={infoBtn} aria-expanded={infoOpen} aria-controls="p-about" aria-label="About this data" title="About this data" onclick={() => (infoOpen = !infoOpen)}>
-				<svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg><span class="pill-word">About this data</span>
-			</button>
-			<div class="info-pop" id="p-about" role="region" aria-label="About this data" bind:this={infoBox} hidden={!infoOpen}>
+			<StatusPill id="p-about" kind={!meta ? '' : pastView ? 'hist' : isLive ? 'live' : 'stale'}
+				title={!meta ? '' : pastView ? 'Final prices from the EA, then the live week' : isLive ? 'Dispatch prices from the EMI real-time feed, every 5 minutes' : `The newest data is more than ${LIVE_MINUTES} minutes old`}>
+				{#snippet label()}
+					{#if !meta || isLive && !pastView}<span class="pword">Live · </span>{meta ? clock(meta.end) : ''}{:else if pastView}History{:else}Delayed<span class="ptime"> · {clock(meta.end)}</span><span class="pday"> {dayLabel(meta.end)}</span>{/if}
+				{/snippet}
 				<p>Prices from the Electricity Authority: its real-time dispatch feed for the live week (dispatch prices, every 5 minutes), and its final prices for history, usually published the next day.</p>
 				<a href="/methods/prices">How the price charts are built</a>
-			</div>
+			</StatusPill>
 		</div>
 	</TrackerTabs>
 
@@ -980,12 +973,11 @@
 						<div class="sum-when">{head[0]}</div>
 						<div class="sum-sub">{head[1]}</div>
 					</div>
-					<button type="button" class="ctl-btn" bind:this={helpBtn} aria-expanded={helpOpen} aria-controls="p-help" title="Everything the charts and this list can do" onclick={() => (helpOpen = !helpOpen)}>
-						<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h7M12 4h2M2 12h3M8 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /><circle cx="10.5" cy="4" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /><circle cx="6.5" cy="12" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>Controls
+					<button type="button" class="ctl-btn" bind:this={helpBtn} aria-expanded={helpOpen} aria-controls="p-help" title="How to use the charts and this list" onclick={() => (helpOpen = !helpOpen)}>
+						<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h7M12 4h2M2 12h3M8 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /><circle cx="10.5" cy="4" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /><circle cx="6.5" cy="12" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>How to
 					</button>
 				</div>
 				<div class="help" id="p-help" role="note" hidden={!helpOpen}>
-					<button type="button" class="reset-view" title="Forget this browser's saved views and go back to the default charts on both tracker tabs" onclick={resetView}>Reset charts to default</button>
 					<!-- what works across the tab, one line each; each chart's own ⓘ says what it shows, and /guide#prices has the
 					     full descriptions (test reports GRP-06, CHT-13) -->
 					<p>These work across every chart on this tab. The ⓘ beside a chart's title says what that chart shows.</p>

@@ -57,11 +57,11 @@
 	.nf-lede { margin: 12px 0 0; color: var(--ink-2); font-size: 1.02rem; max-width: 60ch; }
 	code { font-family: var(--font-data); font-size: 0.88em; background: var(--grid); padding: 1px 6px; border-radius: 4px; overflow-wrap: anywhere; }
 	.nf-go { display: flex; flex-wrap: wrap; gap: 10px; margin: 22px 0 28px; }
-	.nf-go a { padding: 9px 16px; border-radius: 7px; font-weight: 600; text-decoration: none; border: 1px solid var(--accent); }
+	.nf-go a { padding: 9px 16px; border-radius: 4px; font-weight: 600; text-decoration: none; border: 1px solid var(--accent); }
 	.nf-home { background: var(--accent); color: var(--surface); }
 	.nf-near { color: var(--accent); background: var(--surface); }
 	.nf-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
-	.nf-list a { display: grid; gap: 2px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); text-decoration: none; }
+	.nf-list a { display: grid; gap: 2px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); color: var(--ink); text-decoration: none; }
 	.nf-list a:hover, .nf-list a:focus-visible { border-color: var(--accent); }
 	.nf-list b { font-weight: 650; }
 	.nf-list span { color: var(--muted); font-size: 0.86rem; }
