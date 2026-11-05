@@ -208,7 +208,7 @@ for (const path of ['/tracker?range=3d', '/tracker/prices?range=3d']) {
       await slide(page, '.ts-thumb', -150);
       await expect(page).toHaveURL(/end=\d{4}-\d\d-\d\d/);
       await expect(page).not.toHaveURL(/zoom=/);
-      await slide(page, '.ts-thumb', 2000);
+      await slide(page, '.ts-thumb', 400);   // past the track's end, but inside the window: Firefox here loses a press let go outside it
       await expect(page).not.toHaveURL(/end=/);
     });
 

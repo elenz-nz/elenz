@@ -305,9 +305,15 @@ export function mountSlider(el, host) {
     n.addEventListener('pointermove', move);
     n.addEventListener('pointerup', up);
     n.addEventListener('pointercancel', up);
+    n.addEventListener('lostpointercapture', up);   // whatever took the pointer away, a drag never stays stuck on
     if (m !== 'jump') n.addEventListener('keydown', key);
   }
-  const ro = new ResizeObserver(() => { if (track.clientWidth !== width) { width = track.clientWidth; drawn = ''; if (T && view) { place(); paintTrack(); } } });
+  // on the next frame: changing the page inside a resize callback sets off the browser's "ResizeObserver loop" error
+  const ro = new ResizeObserver(() => requestAnimationFrame(() => {
+    if (track.clientWidth === width) return;
+    width = track.clientWidth; drawn = '';
+    if (T && view && !drag) { place(); paintTrack(); }
+  }));
   ro.observe(track);
   return { sync, destroy: () => ro.disconnect() };
 }
