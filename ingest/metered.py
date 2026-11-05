@@ -22,6 +22,9 @@ Sources (EMI, CC BY 4.0), one file per month:
   facilities/metered_fill_YYYYMM.csv   half-hourly MW by generator code for what Generation_MD lacks, added to it:
                                        Huntly in September 2020, from Grid_import and the units' offers
                                        (analysis/huntly_sep2020.py)
+  IMPORT_STAND_IN below                connection points whose Generation_MD row starts late and is simply their
+                                       Grid_import: KAW0112 ONU0 from 2013 until the row starts in January 2020
+                                       (analysis/kawerau_onepu.py)
 
 State columns for a month (half-hourly, trading period start, UTC), alongside the dispatch columns (state.py):
   M|POC code   Generation_MD MW by connection point and generator code (mapped to plants later, so fixes to
@@ -67,6 +70,10 @@ FIRST_MONTH = date(1997, 8, 1)          # Generation_MD's first month
 GRID_IMPORT_FROM = date(2000, 10, 1)    # Grid_import's first month
 EMBEDDED_FROM = date(1998, 10, 1)       # Embedded_generation's first month
 FILL_POC = 'HLY2201'                    # the connection point of the metered_fill files' generator codes
+# (POC, generator code): (first month, first month Generation_MD has it). Generation_MD equals Grid_import to the
+# half-hour at KAW0112 from Jan 2020, and before then has no row, so Grid_import stands in. Only about 1 MW or less
+# went in on average before 2013, when the point was still a load.
+IMPORT_STAND_IN = {('KAW0112', 'norskeskog'): (date(2013, 1, 1), date(2020, 1, 1))}
 GMD_STRAIGHT_FROM = date(2009, 1, 1)    # Generation_MD counts clock-change days straight from 2009 (straighten())
 STEP = pd.Timedelta(minutes=30)
 
@@ -219,6 +226,11 @@ def fill_of(m):
     return f
 
 
+def stand_ins(m):
+    """[(POC, generator code)] for which Grid_import stands in for Generation_MD in month m."""
+    return [k for k, (a, b) in IMPORT_STAND_IN.items() if a <= m < b]
+
+
 def fetch_month(get, m, log=print):
     """Metered columns for month m (a date, first of the month), or None if Generation_MD isn't published yet."""
     tag = f'{m:%Y%m}'
@@ -269,6 +281,8 @@ def fetch_month(get, m, log=print):
         x = x[x.isl.isin(['NI', 'SI'])]
         if prefix == 'I':
             import_pocs = set(x.poc)
+            for poc, code in stand_ins(m):
+                out.append(x[x.poc == poc].groupby('t').mw.sum().rename(f'M|{poc} {code}').to_frame())
         out.append(x.pivot_table(index='t', columns='isl', values='mw', aggfunc='sum').add_prefix(f'{prefix}|'))
     # Generation_MD at connection points Grid_import doesn't cover (all of them before Oct 2000; the generating
     # stations until about 2003, when Grid_import had only local networks' injections): it stands in for their imports
@@ -310,6 +324,8 @@ def complete(s, m):
         return False
     fill = fill_of(m)   # a month with a fill is read again once, for a state saved before the fill was added
     if fill is not None and any(f'M|{FILL_POC} {c}' not in s for c in fill.gen_code.unique()):
+        return False
+    if any(f'M|{poc} {code}' not in s for poc, code in stand_ins(m)):   # likewise for Grid_import standing in
         return False
     return True
 

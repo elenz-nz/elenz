@@ -57,7 +57,8 @@ export const slug = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').to
   .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
 /** Old plant slugs that should still open their plant after a rename: { 'old-slug': 'new-slug' }. */
-export const PLANT_ALIASES = { 'takapo-a': 'tekapo-a', 'takapo-b': 'tekapo-b' };   // renamed in BUILD 8
+export const PLANT_ALIASES = { 'takapo-a': 'tekapo-a', 'takapo-b': 'tekapo-b',   // renamed in BUILD 8
+  'kawerau-mill-cogen': 'kawerau-onepu' };                                           // renamed in BUILD 9
 
 // ---------- NZ days and times ----------
 const DAY = 864e5;

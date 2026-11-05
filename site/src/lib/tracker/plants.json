@@ -127,6 +127,15 @@
 "Kawerau":{
 "owner":"Mercury"
 },
+"Kawerau (Onepu)":{
+"owner":"Other generators",
+"aka":[
+"Norske Skog CoGen",
+"Carter Holt Harvey Energy Ltd CoGen",
+"Kawerau Mill CoGen"
+],
+"metered":"This meter is a whole site's grid connection, not one generator's. It counts power going into the grid there, so it leaves out what the site uses itself and the power it takes from the grid at the same time. Generation_MD has no row for it before 2020, so 2013–2019 use the same figure from the grid meter (Grid_import). The dispatch data (the live week and the weeks since the newest metered month) reads higher."
+},
 "Kawerau (TOPP2)":{
 "owner":"Other generators",
 "metered":"Since December 2025 one metered code at KAW2201 carries TOPP2 and Te Ahi O Maui together. The metered history splits it 65% TOPP2, 35% Te Ahi O Maui, by their shares in the dispatch data. The dispatch data (the live week and the weeks since the newest metered month) has each plant's own output."
@@ -134,13 +143,6 @@
 "Kawerau (Te Ahi O Maui)":{
 "owner":"Other generators",
 "metered":"Since December 2025 one metered code at KAW2201 carries Te Ahi O Maui and TOPP2 together. The metered history splits it 35% Te Ahi O Maui, 65% TOPP2, by their shares in the dispatch data. The dispatch data (the live week and the weeks since the newest metered month) has each plant's own output."
-},
-"Kawerau Mill CoGen":{
-"owner":"Other generators",
-"aka":[
-"Norske Skog CoGen",
-"Carter Holt Harvey Energy Ltd CoGen"
-]
 },
 "Kawerau TG1/TG2":{
 "owner":"Other generators"
