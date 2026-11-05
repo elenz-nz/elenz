@@ -351,6 +351,7 @@ canvas { display: block; width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) { .scale-flash { animation: none; } }
 /* the summary's How to button: what the charts and the list can do */
+.toolbar > .ctl-int { min-width: 81px; }   /* its widest two-button set: the date beside it stays put as the slider leaves the live week */
 .ctl-btn { display: inline-flex; align-items: center; gap: 6px; flex: none; margin: -2px 0 0; font: inherit; font-size: 0.76rem; font-weight: 500; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 3px 10px 3px 8px; min-height: 28px; cursor: pointer; }
 .ctl-btn:hover, .ctl-btn[aria-expanded="true"] { color: var(--ink); border-color: var(--ink-2); }
 .sum-when { font-size: 1.12rem; font-weight: 700; letter-spacing: -0.01em; }
