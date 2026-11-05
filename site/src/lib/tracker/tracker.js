@@ -10,7 +10,7 @@ import PLANT_META from './plants.json';  // owner, hydro scheme, other names and
 import CAPACITY from './capacity.json';   // installed MW per plant (ingest/capacity.py)
 import { readView, writeView, slug, describe, shareLinks, setTitle, addYears } from '#lib/site/view.js';
 import { squareButton as squareWire, SWATCH_TITLE } from '#lib/site/swatch.js';
-import { readQuery, stamp, fromStamp, FOLDABLE, FOLD_DEFAULT, foldList } from '#lib/site/viewurl.js';
+import { readQuery, stamp, fromStamp, FOLDABLE, FOLD_DEFAULT, foldList, SPANS } from '#lib/site/viewurl.js';
 import { priceScale } from '#lib/prices/data.js';
 import { fit } from '#lib/site/fitselect.js';
 import { mountSlider, spanView, windowOf } from '#lib/site/slider.js';
