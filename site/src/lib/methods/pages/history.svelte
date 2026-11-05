@@ -38,7 +38,7 @@
 <ul>
 	<li><b>Ngāwhā</b>: only Ngāwhā B is dispatched, so dispatch shows about 45% less than the whole station’s meter (about 25 MW).</li>
 	<li><b>Glenbrook</b>: dispatch sees part of the plant, about 30% less than its meter.</li>
-	<li><b>Kawerau Mill</b>: its meter is net of the mill’s own load, so dispatch reads about 45% more.</li>
+	<li><b>Kawerau (Onepu)</b>: its meter is a whole site’s grid connection, not one generator’s (see <a href="/methods/generation#onepu">generation</a>), so dispatch reads about 45% more.</li>
 	<li><b>Teviot</b>: in the metered history, not dispatched.</li>
 	<li><b>River chains</b> <a href={ref('block')}>dispatched as a block</a>: a station’s dispatch can differ from its meter while the chain’s total agrees.</li>
 </ul>
@@ -63,6 +63,7 @@
 <ul>
 	<li><b>Huntly, September 2020</b>: <code>Generation_MD</code> has no Huntly rows that month. The month uses the grid meter at <code>HLY2201</code> (<code>Grid_import</code>), which reads a few MW under the generators’ own meters because it is net of the station’s load, split between the Rankines, unit 5 and unit 6 by clearing it through their offers. Tested on the week before, where <code>Generation_MD</code> gives each unit, that split comes within about 13 MW for the Rankines and 5 MW for unit 5 on average (<a href={REPO + 'analysis/huntly_sep2020.py'}><code>analysis/huntly_sep2020.py</code></a>).</li>
 	<li><b>Matahina from October 2021</b>: no metered rows; the dispatch figures stand in.</li>
+	<li><b>Kawerau (Onepu), 2013 to 2019</b>: <code>Generation_MD</code> has no row for it until January 2020, and from then its figure is the same as <code>Grid_import</code> at <code>KAW0112</code> to the half-hour, so <code>Grid_import</code> stands in. Before 2013 very little went into the grid there (see <a href="/methods/generation#onepu">generation</a>).</li>
 	<li><b>Before April 1999</b>: <code>Embedded_generation</code> doesn’t yet have Rotokawa, Ngāwhā, Kaimai and Tararua, about 1–2% of generation in 1997–99. Geothermal in 1998–2000 is up to 15% below MBIE’s for that reason.</li>
 	<li><b>Highbank before October 2001</b>: no metered rows for it at all; it appears in <code>Embedded_generation</code> from then (25 MW).</li>
 	<li><b>Mill Creek, May 2014 to August 2015</b>: its first 16 months (60 MW of wind, commissioning from May 2014) aren’t in <code>Embedded_generation</code> or <code>Generation_MD</code>; they come from the EA’s reconciliation data, Meridian’s injection at Wilton.</li>

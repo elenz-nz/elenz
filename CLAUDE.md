@@ -358,7 +358,7 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   dispatch months and which ones were settled) is published while the history is complete, only when it changes. Official
   means metered generation (meta.source), final prices, metered HVDC. Dispatch months are corrected before they are
   compared (`facilities/dispatch_adjust.json`, published in records.json as `adj` for the live check in records.js):
-  Ngāwhā, Glenbrook and Kawerau Mill scaled to their meters, each record's usual shift taken off; `prov` only beyond the
+  Ngāwhā, Glenbrook and Kawerau (Onepu) scaled to their meters, each record's usual shift taken off; `prov` only beyond the
   record by more than the margin `m`, `near` within it ("close to the record"). Prices set no provisional records. Clock-change days count like any other
   (since BUILD 7; before it, Generation_MD's clock-numbered days before 2009 were left out).
   Try it on downloaded months: `python3 ingest/records.py <folder of YYYY-MM.json> [out.json]`.
@@ -498,9 +498,15 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   11.2 GJ/MWh; coal 91.8, gas 54.1 kg CO₂e/GJ; gas plant 0.46 t/MWh; geothermal per station by year (NZGA). These
   reproduce Genesis's reported Huntly emissions within ±5% in most quarters. The dispatch data's Rankine output
   matches Genesis's reported Rankine output within 1–2% a quarter.
-- Fuel labels corrected in `[units]` (BUILD 5, Oct 2026): Kinleith (KIN0112, wood-waste cogeneration) and the Kawerau
-  pulp mill (KAW0112 ONU0, listed as geothermal) are `bio` (Bioenergy, renewable, zero emissions); Glenbrook (GLN0332 GLN0,
-  waste gas from NZ Steel's ironmaking) is `waste` (Waste heat, zero emissions, grouped with fossils).
+- Fuel labels corrected in `[units]` (BUILD 5, Oct 2026): Kinleith (KIN0112, wood-waste cogeneration) is `bio` (Bioenergy,
+  renewable, zero emissions); Glenbrook (GLN0332 GLN0, waste gas from NZ Steel's ironmaking) is `waste` (Waste heat, zero
+  emissions, grouped with fossils).
+- Kawerau (Onepu), KAW0112 ONU0 (BUILD 9; the register's "Carter Holt Harvey Energy Ltd CoGen", on the site as Kawerau
+  Mill CoGen, bioenergy, from BUILD 5 to 8): the meter is a whole site's grid connection. Generation_MD is exactly its
+  Grid_import, with Grid_export at the same point usually flowing in the same half-hour; before 2013 it was a load. Shown
+  as geothermal, with TOPP1's and GDL's factors, because they have no meter of their own in the EA's files and what
+  goes in is mostly under their 33 MW. That's a reading of public meters: no public document places them there, so
+  site copy says so (`analysis/kawerau_onepu.py`, analysis/README.md, /methods/generation#onepu).
 - Price nodes: the daily dispatch files carry only connection points with load or generation (~263 rows an interval),
   so bus nodes (HAY2201, BEN2201, OTA2201, ISL2201, INV2201) are missing; WKM2201 is a generating node and is there.
   The real-time API's ~568 rows include the bus nodes. Final prices (`FinalEnergyPrices`) have every node (~246).
@@ -540,7 +546,7 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   Generation_MD is net of local load at some embedded points (Mangahao ~10% of gross, Cobb ~35%); the embedded meter
   there has the gross figure. Over Sep 2020-Sep 2026, on the site's own series, dispatch and metered agree within 0.2% for
   national wind and hydro (half-hourly national correlation 0.999); the plants that differ are Ngāwhā (dispatch ~45% low),
-  Glenbrook (~30% low), Kawerau Mill (~45% high) and block-dispatched river chains, and dispatch extremes run a little
+  Glenbrook (~30% low), Kawerau (Onepu) (~45% high) and block-dispatched river chains, and dispatch extremes run a little
   further (wind's monthly peak ~10 MW high). Records correct for this (records.py, facilities/dispatch_adjust.json,
   analysis/dispatch_vs_metered.py and dispatch_metered_fit.py; refresh the corrections about once a year). Plant-level differences: river chains can be block dispatched (the owner only has
   to meet the chain's total), so per-station dispatch there isn't what each station did. No public list names the groups, so site copy stays general and names no chain or station until a public document does (team rule, 2 Nov 2026).
@@ -553,7 +559,8 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   column `hv`, progress `hv`) and rebuilds them.
   Generation_MD gaps: Huntly (HLY2201) is missing for Sep 2020, filled from Grid_import split by the units' offers
   (`facilities/metered_fill_202009.csv`, `analysis/huntly_sep2020.py`, `fill_of` in metered.py; BUILD 8), Matahina
-  from Oct 2021 (dispatch fills).
+  from Oct 2021 (dispatch fills), KAW0112 before Jan 2020 (Grid_import stands in from 2013, `IMPORT_STAND_IN` in
+  metered.py; BUILD 9; without it North Island generation and demand ran about 20-25 MW low in 2014-19).
 - Clock-change days: Generation_MD numbers them by the clock until Sep 2008 and leaves out an hour (forward: TP5-6
   empty, data to TP46 only; back: 48 periods, the repeated hour once). From Apr 2009, and in every other metered file
   throughout, periods run straight through the change (46 or 50). `metered.straighten()` renumbers those days and
@@ -574,7 +581,9 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
    2009, daily peak dispatchable output, Ashburton's small solar farms) ran 23-27 Oct 2026 (commit 9709b43); every
    item checked out on the published files on 27 Oct, the Offers workflow was rerun with "resummarise", and the old
    plant names were cleaned up. BUILD 8 (Tekapo A and B's names, Huntly in September 2020) ran on 3 Nov 2026 in one 13-minute
-   run, and its items checked out on the published data; see `facilities/NEXT_REBUILD.md` for how a next build is collected.
+   run, and its items checked out on the published data. BUILD 9 (Kawerau (Onepu), geothermal from 2013) ran on 5 Nov 2026
+   in one 26-minute run; its items checked out and Offers was resummarised. See `facilities/NEXT_REBUILD.md` for how a
+   next build is collected.
 4. Pages: landing (`/`), live (`/now`, with the price explainer and Every generator right now), tracker (Generation and
    Prices tabs), Records (`/records`), Articles (`/articles`, published 15 Oct 2026 with the Winter 2026 review), About,
    Data and methods (`/methods`) and Privacy. Stale-data watchdog, uptime monitor, Cloudflare Web Analytics and a Buy
@@ -594,7 +603,7 @@ programmatically is likely to change, with plenty of warning. Everything that re
 `EMI_KEY`), `common.py` `BLOB` (the emidatasets blob container: dispatch, final prices, metered files, offers, the
 register) and `rooftop.py` (`GUEHMT` report). Watch for the EA's notice and plan the switch as one change.
 
-Open questions: what KAW0112 ONU0 covers (asked of the EA, Nov 2026; shown as bioenergy, the register says geothermal; no fuel change until it's answered; analysis/README.md); farm mounting is settled for most farms by the clear days of 18-19 Oct 2026 (analysis/README.md); Lauriston,
+Open questions: which plant is behind KAW0112 ONU0 (shown as geothermal from the public meters; a public document would let the site name them; analysis/README.md); farm mounting is settled for most farms by the clear days of 18-19 Oct 2026 (analysis/README.md); Lauriston,
 Pukenui and Omeheu stay uncertain; Kōwhai Park is single-axis tracking (east to west, from photos; team note, 22 Oct 2026),
 not fitted (it tripped and has been off since 20 Oct). Battery discharge is left out of the renewable share and
 emissions intensity (as em6, design decision 22 Oct 2026): tracker.js `genR`, now.js, generation/data.js `shares`,

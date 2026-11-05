@@ -38,11 +38,11 @@
 		<tbody>
 			<tr><td>Added</td><td>Kaiwaikawe wind (<code>MPE1101 KWK0</code>), Kōwhai Park solar (<code>ISL0661 KPS0</code>), Ruakākā solar (<code>BRB0331 RUS0</code>)</td><td>Dispatching, but not in the register yet</td></tr>
 			<tr><td>Bioenergy</td><td>Kinleith (<code>KIN0112</code>)</td><td>Oji Fibre Solutions’ cogeneration, on <a href={ref('kinleith')}>wood waste</a> and black liquor, with <a href={ref('stack2020')}>natural gas as a secondary fuel</a>; the register says gas</td></tr>
-			<tr><td>Bioenergy</td><td>Kawerau mill site (<code>KAW0112 ONU0</code>)</td><td>The register says geothermal. The site has <a href={ref('tasman')}>biomass</a> and geothermal generation, and what this meter covers isn’t confirmed, so it is shown as bioenergy for now. Oji reports 96 GWh generated at its Tasman mill in <a href={ref('ojifs2025')}>2025</a>, against about 240 GWh here</td></tr>
 			<tr><td>Waste heat</td><td>Glenbrook (<code>GLN0332</code>)</td><td>Runs on <a href={ref('nzsteel')}>waste gas and heat from NZ Steel’s ironmaking</a>, not pipeline gas</td></tr>
 			<tr><td>Island</td><td><code>OHG1101</code>, <code>OHG2201</code></td><td>Pātea moved to OHG1101 in June 2026, and the feed gives it no island</td></tr>
 			<tr><td>Battery charging</td><td><code>RUK99</code>, <code>GLB99</code>, <code>RHO99</code>, <code>HLY91</code></td><td>Charging is dispatched as load on a separate unit; it is netted against its battery (Ruakākā, Glenbrook-Ohurua, Rotohiko, Huntly)</td></tr>
 			<tr><td>One name</td><td>Pātea units 1–3; Kaimai 5; Ngāwhā B; West Wind 1 and 2</td><td>Shown as Pātea, Kaimai, Ngāwhā and West Wind: the names the metered history uses, and one farm for West Wind’s two connections</td></tr>
+			<tr><td>New name</td><td>Kawerau (Onepu) (<code>KAW0112 ONU0</code>)</td><td>The register’s “Carter Holt Harvey Energy Ltd CoGen”: the meter is a whole site’s grid connection, not the mill’s (<a href="#onepu">below</a>)</td></tr>
 		</tbody>
 	</table>
 </div>
@@ -88,11 +88,20 @@
 	<li>The renewable share is worked out as on the <a href="/methods/groupings#renewable">groupings page</a>; embedded solar counts, battery discharge doesn’t.</li>
 </ul>
 
+<h3 id="onepu">Kawerau (Onepu)</h3>
+<p>The register lists <code>KAW0112 ONU0</code> as one geothermal unit of 53 MW, under the mill’s name. Its meter shows something else: a whole site’s connection to the grid.</p>
+<ul>
+	<li>Power flows both ways there, usually in the same half-hour, on what look like separate circuits. The site’s figure counts only the power going into the grid, about 25 MW on average since 2014. It leaves out what the site uses itself and what it takes from the grid.</li>
+	<li>Until 2012 this was a load: about 1 MW or less went into the grid, and about 35–70 MW came out. That changed in 2013, about when <a href={ref('eastland-geo')}>Eastland’s 24 MW TOPP1 geothermal plant</a> started, and when much less power began coming out to the mill.</li>
+	<li>TOPP1 and Eastland’s 9 MW GDL plant have no row of their own in the register or the metered files, and what goes into the grid is mostly less than their 33 MW together. So we show this meter as geothermal, as the register does, with <a href="/methods/emissions#geothermal">their emissions</a>.</li>
+	<li>That is our reading of the meters: no public document says which plant is behind this one. The site also has the mill’s own generation, <a href={ref('tasman')}>biomass</a> and geothermal, and Oji reports <a href={ref('ojifs2025')}>96 GWh generated at its Tasman mill in 2025</a>, against about 240 GWh into the grid here.</li>
+</ul>
+
 <h2 id="limits">Known limits</h2>
 <ul>
 	<li>Plants on local networks that aren’t dispatched don’t appear as generation in the live week: their output shows up as lower demand at the grid. Embedded solar is the exception, and is modelled. The rest came to about 120–165 MW on average in January, June and September 2026, close to 3% of generation and steady day and night: mostly small hydro, Ngāwhā’s older units (about 25 MW) and landfill gas (about 20 MW), with a little wind, gas and diesel. So a 24% solar share in the live week is about 23% of all generation, and the renewable share reads slightly low. (Measured from the EA’s <a href="/methods/sources#reconciliation">reconciled injection</a> less the dispatch data, grid point by grid point.)</li>
 	<li>The metered history already counts all of Ngāwhā and Teviot’s own meter, so both step down where the history hands over to the dispatch data. The other plants are missing from the history too, about 2% of generation.</li>
-	<li>Dispatch and metered generation agree within a fraction of a percent for most plants, but not for Ngāwhā, Glenbrook, Kawerau Mill or the stations of block-dispatched river chains, and dispatch half-hours reach slightly further at their extremes. See <a href="/methods/history#seam">where the sources hand over</a>.</li>
+	<li>Dispatch and metered generation agree within a fraction of a percent for most plants, but not for Ngāwhā, Glenbrook, Kawerau (Onepu) or the stations of block-dispatched river chains, and dispatch half-hours reach slightly further at their extremes. See <a href="/methods/history#seam">where the sources hand over</a>.</li>
 	<li>Huntly’s Rankine units are shown as coal/gas, because the market data doesn’t say which fuel they burned. Their emissions use Genesis’s reported coal share each quarter (see <a href="/methods/emissions">emissions</a>).</li>
 </ul>
 

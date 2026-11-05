@@ -65,8 +65,8 @@ check(js['N'] == len(full) and len(js['NI']['price']) == len(full), 'assemble: s
 check(gen.min() > 2000, f'assemble: NZ generation above 2,000 MW at the evening peak ({gen.min():.0f})')
 check(all(k in js['NI'] for k in bt.KEYS), 'assemble: every fuel key present, including bio and waste')
 names = {p['name']: p['fuel'] for p in js['plants']}
-check(names.get('Kinleith') == 'bio' and names.get('Kawerau Mill CoGen') == 'bio' and names.get('Glenbrook Steel') == 'waste',
-      'assemble: Kinleith is bioenergy, Glenbrook waste heat')
+check(names.get('Kinleith') == 'bio' and names.get('Kawerau (Onepu)') == 'geo' and names.get('Glenbrook Steel') == 'waste',
+      'assemble: Kinleith is bioenergy, Kawerau (Onepu) geothermal, Glenbrook waste heat')
 check('WKM' in js.get('nodes', {}), 'assemble: node prices written')
 json.dumps(js, allow_nan=False)
 check(True, 'assemble: JSON has no NaN')
@@ -155,6 +155,28 @@ def _clock_csv(day, n, missing=()):
     return (f'POC_Code,Gen_Code,Trading_date,{",".join(f"TP{k}" for k in range(1, 51))}\n'
             f'ABC0111,abc,{day:%d/%m/%Y},{",".join(vals)}\n').encode()
 
+
+# Grid_import stands in for KAW0112's Generation_MD row before 2020 (IMPORT_STAND_IN)
+def _kaw_get(url, timeout=None):
+    cols = ','.join(f'TP{k}' for k in range(1, 49))
+    kwh = ','.join(['10000'] * 48)   # 20 MW
+    if url.endswith('_Generation_MD.csv'):
+        return f'POC_Code,Gen_Code,Trading_date,{cols}\nHLY2201,huntly_main,15/06/2018,{kwh}\n'.encode()
+    if url.endswith('_Grid_import.csv') or url.endswith('_Grid_export.csv'):
+        return f'POC,Trading_date,{cols}\nKAW0112,15/06/2018,{kwh}\nHLY2201,15/06/2018,{kwh}\n'.encode()
+    if url.endswith('_Embedded_generation.csv'):
+        return f'POC,Flow_Direction,Trading_date,{cols}\nABC0111,I,15/06/2018,{kwh}\n'.encode()
+    return None
+
+
+k18 = mt.fetch_month(_kaw_get, date(2018, 6, 1), log=lambda *a: None)
+check(mt.complete(k18, date(2018, 6, 1)) and (k18['M|KAW0112 norskeskog'] == 20).all(), 'metered: Grid_import stands in for KAW0112')
+check(k18['J|NI'].fillna(0).eq(0).all(), 'metered: the stand-in is not counted again as an import in demand')
+kgen = mt.generation(k18, '2018-06', log=lambda *a: None)
+check(('Kawerau (Onepu)', 'geo', 'NI') in kgen, 'metered: the stand-in maps to Kawerau (Onepu), geothermal')
+del k18['M|KAW0112 norskeskog']
+check(not mt.complete(k18, date(2018, 6, 1)), 'metered: a month saved before the stand-in is read again')
+check(not mt.stand_ins(date(2012, 12, 1)) and not mt.stand_ins(date(2020, 1, 1)), 'metered: the stand-in covers 2013-2019 only')
 
 fw = mt.read_emi(_clock_csv(date(2005, 10, 2), 46, missing=(5, 6))).set_index('t').mw   # clocks forward, by the clock
 fw_mw = fw.tolist()

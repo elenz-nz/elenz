@@ -8,7 +8,7 @@ and note give the detail). The evidence is
 analysis/capacity_check.py and the "Installed capacity" section of analysis/README.md.
 
 Capacity counts only from the first month the history has a plant's output, so a data gap doesn't pull a capacity
-factor down: the embedded stations before Apr 1999, Kawerau Mill before 2020 ...
+factor down: the embedded stations before Apr 1999, Kawerau (Onepu) before 2013 ...
 
 capacity.json, imported by the site (the Generation tab's mix table):
   steps   {island: {fuel: [[t, MW], ...]}}  the fuel's total installed MW from time t (ms, NZ local midnight) on

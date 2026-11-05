@@ -5,8 +5,8 @@ These changes touch files in the history's rebuild fingerprint (`mapping_hash()`
 them starts a rebuild of every month (under an hour, in the next history run). Bundle them and push them together, and never
 while a rebuild is still running (check `/data/history/progress.json`: `rebuild_left` empty).
 
-The last rebuild (BUILD 8, 3 Nov 2026: Tekapo A and B's names, Huntly in September 2020) took 13 minutes in one run (352
-months, 734 KV writes). Its items were checked on the published data and removed.
+The last rebuild (BUILD 9, 5 Nov 2026: Kawerau (Onepu), geothermal from 2013) took 26 minutes in one run (352 months, 795
+KV writes), reading 84 months' metered files again. Its items were checked on the published data and removed.
 
 ## Collecting a build
 

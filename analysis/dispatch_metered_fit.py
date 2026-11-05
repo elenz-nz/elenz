@@ -31,7 +31,7 @@ NZ = 'Pacific/Auckland'
 PLANTS = {
     'Ngāwhā': 'only Ngāwhā B is dispatched; the meter has the whole station',
     'Glenbrook Steel': 'dispatch sees part of the plant',
-    'Kawerau Mill CoGen': 'the meter is net of the mill’s own load',
+    'Kawerau (Onepu)': 'the meter is the site’s grid connection, not a generator’s',
     'Te Rapa': 'the meter is net of the dairy factory’s own load (closed 2023)',
 }
 FACTOR_MONTHS = 24

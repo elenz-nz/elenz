@@ -169,7 +169,7 @@ burned for generation, and generation emissions. 25 quarters, FY21 Q1 (Jul–Sep
   2025 54 g/kWh (NZGA MW-weighted fleet including undispatched stations: 2020 69, 2023 57). Dispatched stations only:
   Ngāwhā B (OEC4) is the only dispatched Ngāwhā plant; TOPP1, GDL and Ngāwhā A are on local networks; 'Wairakei' is
   the whole site.
-- Kawerau pulp mill cogeneration (KAW0112 ONU0, 'Carter Holt Harvey Energy Ltd CoGen' / 'Norske Skog CoGen', 53 MW,
+- See "Kawerau (Onepu)" below for KAW0112 ONU0, which this note first treated as bioenergy. As first written: Kawerau pulp mill cogeneration (KAW0112 ONU0, 'Carter Holt Harvey Energy Ltd CoGen' / 'Norske Skog CoGen', 53 MW,
   Oji): listed as geothermal, but runs ~35–45 MW steady, far more than the 10 MW geothermal mill turbine in the ISK
   Kawerau field study, and geothermal once supplied only ~6% of the mill's electricity (OSTI). Most likely the kraft
   mill's recovery and bark boilers (black liquor and wood), so counted as zero (bioenergy) for now. Not confirmed (2 Nov 2026): the mill's cogeneration was about 13.5 MW in 2012 (ISK study), a power boiler closed in 2019 (Oji), and Oji reports 96 GWh at Tasman in 2025 against about 240 GWh here. The site also has the 8 MW TA3a geothermal turbine (NZGA, Bloomer 2015; the ISK study says 10 MW) and GDL/KA24 (57 GWh in 2023) connected to the mill complex. What ONU0 covers is an open question to the EA; no fuel change until it's answered.
@@ -178,10 +178,29 @@ burned for generation, and generation emissions. 25 quarters, FY21 Q1 (Jul–Sep
   furnace in Aug 2026) as zero-emission waste heat (UN CDM ACM0004 counts waste-gas generation as zero; the
   ironmaking emissions sit in industrial processes). Both are 'gas' in the EA register.
 
+**Kawerau (Onepu), KAW0112 ONU0** (5 Nov 2026, `kawerau_onepu.py`). The EA's public meters, not the register's name,
+say what this is:
+
+- Generation_MD's `norskeskog` row equals Grid_import at KAW0112 in every half-hour of the months compared (5,808
+  half-hours in Jan 2020, Jun 2021, Apr 2025 and Sep 2026). It's a connection meter's into-grid side, and
+  the row starts only in January 2020, so before then Grid_import stands in (from 2013, `IMPORT_STAND_IN`).
+- Power crosses this connection both ways, in the same half-hour 98% of the time since 2014, so the flows look to be
+  on separate circuits. Into the grid: about 25 MW on average since 2014. Out: 20-120 GWh a year since 2013.
+- Before 2013 it was a load: 300-610 GWh a year out, 5 GWh or less in. Into the grid rose from January 2013, to about
+  25 MW by mid-2014, as Eastland's 24 MW TOPP1 (2012-13) started and the power coming out fell (303 GWh to 90).
+- TOPP1 and GDL (9 MW, 2008) have no row in the register, Generation_MD or Embedded_generation, and what goes in is
+  under their 33 MW in 93% of half-hours since 2014. So: geothermal, as the register says, with their NZGA factors
+  weighted 24:9 (TOPP1 and GDL: CY2021 lifecycle 68 and 55, less 10; CY2022 lifecycle 84 and 63, less 10; CY2023
+  operational 56 and 56), not bioenergy. Oji's 96 GWh at Tasman in 2025 is well under the 241 GWh going in.
+- Still an inference: no public document places TOPP1 or GDL behind this meter. The ISK Kawerau study does say GDL
+  connects directly to the mill complex.
+- The series stays the into-grid side. Netting Grid_export off would move it with the site's own load, and demand
+  already counts both directions in the grid flows.
+
 Against em6's factors (Carbon Methodology v1.6, Nov 2025, checked 2 Nov 2026): close on the Rankines (1.01 coal, 0.589 gas), Huntly 5 (0.40), the
 Taranaki Combined Cycle (0.40) and most geothermal; apart on Tauhara (0.080 from the generator, close to Contact's commissioning-year 86.53; Contact's FY26 is 22.8), Kinleith (0.364 from the generator, 0 here by
 the design decision, 2 Nov 2026: Oji calls it biomass cogeneration, and the limit is stated on the method page; 2.1 PJ of fossil fuels against 10.1 PJ of biomass at
-the mill in 2025), the Kawerau mill (0.060 as geothermal, 0 here), Whareroa and Kapuni (0.683, the 0.46 fleet average here), Junction Road (0.548, ~0.51 here), diesel (0.76, 0.80 here).
+the mill in 2025), Kawerau (Onepu) (0.060, 0.054-0.068 here), Whareroa and Kapuni (0.683, the 0.46 fleet average here), Junction Road (0.548, ~0.51 here), diesel (0.76, 0.80 here).
 MBIE doesn't document that its coal generation includes Glenbrook (Energy in New Zealand 2025 lists 0.68 PJ of waste heat separately and puts the mill's
 coal under other transformation); the case for it is that subtracting Glenbrook reproduces Genesis's figures.
 
@@ -302,7 +321,7 @@ under macron names the history doesn't use, and has no end date for TCC (closed 
   West Wind 71.3 per connection.
 
 **Counted from the first metered output.** For plants older than their first month in the history (embedded stations
-before Apr 1999, Highbank before Mar 2002, Mill Creek before Sep 2015, Kawerau Mill before 2020 ...), capacity starts
+before Apr 1999, Highbank before Mar 2002, Mill Creek before Sep 2015, Kawerau (Onepu) before 2013 ...), capacity starts
 with the data, so a gap doesn't pull a capacity factor down.
 
 **Check** (`python3 analysis/capacity_check.py`): plant-years where the peak runs more than 8% over capacity or the
@@ -313,8 +332,8 @@ shared meter); Waitaki at ~104 MW in 2025-26 against the register's 95 (left as 
 before a plant's start (Huntly 5 testing in 2006, Ōtāhuhu B Nov 1998, traces at Whirinaki 1997-2000 with no known plant).
 
 **Uncertain:** New Plymouth's units were run down before Dec 2007 (output ~300-400 MW 2002-07; dates not found);
-Ōtāhuhu A's two Olympus units (MW not found); Ōhaaki's derating date; Kawerau Mill (register 53, output peaks ~40,
-Wikipedia 37); the Stratford peakers (register 2 × 106, Wikipedia 200).
+Ōtāhuhu A's two Olympus units (MW not found); Ōhaaki's derating date; Kawerau (Onepu) (register 53, a connection meter whose
+into-grid side peaks ~40); the Stratford peakers (register 2 × 106, Wikipedia 200).
 
 ## Other embedded generation (`embedded_other.py`, 1 Nov 2026)
 
@@ -355,8 +374,8 @@ code: as published (metered generation and demand, final prices, metered HVDC) a
 before any of that arrived). Run read-only in GitHub Actions against KV (a one-off workflow on its own branch).
 
 - **Averages agree closely:** over the 73 months, national wind +0.2%, hydro -0.1%, NZ demand 0.0% (NI -0.6%, SI
-  +1.0%). The plants that differ: Ngāwhā -45% (only Ngāwhā B dispatched), Glenbrook -31%, Kawerau Mill +43% (meter
-  net of the mill's load), Te Rapa +36% (closed 2023), Teviot (metered only), and the Waikato chain station by station
+  +1.0%). The plants that differ: Ngāwhā -45% (only Ngāwhā B dispatched), Glenbrook -31%, Kawerau (Onepu) +43% (a
+  site's connection meter), Te Rapa +36% (closed 2023), Teviot (metered only), and the Waikato chain station by station
   (Maraetai +11%, Arapuni -11%, Karāpiro -9%; the chain agrees). Fossil generation reads 3% low in dispatch.
 - **Extremes don't:** a month's highest half-hour in dispatch data runs above the metered one: wind +10 MW nationally
   (NI 0, SI +10), hydro +21 MW, NZ demand +25 MW, the NI renewable share +0.6 points (Glenbrook and Ngāwhā).
@@ -366,7 +385,7 @@ before any of that arrived). Run read-only in GitHub Actions against KV (a one-o
   hydro 1), plus 16 from dispatch prices; 4 real records missed. Missed by small amounts: wind 0-11 MW, the renewable
   share 0.0-0.7 points.
 - **Corrections** (`dispatch_metered_fit.py` -> `facilities/dispatch_adjust.json`): Ngāwhā x1.80, Glenbrook x1.47,
-  Kawerau Mill x0.68 (latest 24 months); then each record's median shift at the month's extreme, and a margin, the 90th
+  Kawerau (Onepu) x0.68 (latest 24 months); then each record's median shift at the month's extreme, and a margin, the 90th
   percentile of what is left. The same for whole days, weeks and months. Leave-one-month-out: no provisional record
   clear of the margin went unconfirmed; of 161 real records, 113 provisional, 46 close (within the margin), 2 missed.
   Prices set no provisional records (final prices arrive the next day).

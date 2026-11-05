@@ -28,7 +28,7 @@ export const TOPICS: Topic[] = [
 		title: 'Generation',
 		summary: 'What each plant and fuel is generating: the dispatch data for the live week, metered output for history, each unit mapped to its plant and fuel.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
-		updated: '2026-11-01',
+		updated: '2026-11-05',
 	},
 	{
 		slug: 'embedded-solar',
@@ -72,7 +72,7 @@ export const TOPICS: Topic[] = [
 		title: 'Emissions intensity',
 		summary: 'Greenhouse gas per kilowatt-hour generated, from each fuel’s output and emission factor. Every factor the site uses is listed here, with where it comes from.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
-		updated: '2026-11-02',
+		updated: '2026-11-05',
 	},
 	{
 		slug: 'groupings',
@@ -86,21 +86,21 @@ export const TOPICS: Topic[] = [
 		title: 'Installed capacity',
 		summary: 'How much each plant could generate, and when that changed, back to 1997: the basis for the Generation tab’s capacity factors and dispatchable headroom.',
 		shownOn: [['Tracker', '/tracker']],
-		updated: '2026-11-01',
+		updated: '2026-11-05',
 	},
 	{
 		slug: 'history',
 		title: 'History since 1997',
 		summary: 'How the record back to August 1997 is put together from metered data, the daily dispatch files and the live feed, where the sources hand over, and the known gaps.',
 		shownOn: [['Tracker', '/tracker'], ['Prices', '/tracker/prices']],
-		updated: '2026-11-02',
+		updated: '2026-11-05',
 	},
 	{
 		slug: 'records',
 		title: 'Records',
 		summary: 'The highest and lowest half-hours, days, weeks, months, years and runs since 1997: which data they rest on, when a record is official or provisional, when a period is on record pace, and what is left out.',
 		shownOn: [['Records', '/records'], ['Now', '/now']],
-		updated: '2026-11-02',
+		updated: '2026-11-05',
 	},
 ];
 
@@ -340,6 +340,24 @@ export const REFERENCES: Reference[] = [
 		url: 'https://www.worldgeothermal.org/pdf/IGAstandard/NZGW/2024/044.pdf',
 		use: 'Each geothermal station’s operational emissions for 2023 (table 2), and how reinjection is changing them.',
 		topics: ['emissions'],
+	},
+	{
+		id: 'nzga2023', title: 'CO₂ group presentation, Geothermal Week 2024', by: 'NZ Geothermal Association', date: '2024',
+		url: 'https://www.nzgeothermal.org.nz/downloads/CO2-group-presentation-for-geo-week-2024_Final.pptx.pdf',
+		use: '2023 operational emissions by station, including TOPP1 and GDL at 56 g CO₂e/kWh.',
+		topics: ['emissions'],
+	},
+	{
+		id: 'nzga2021', title: 'NZGA Strategic Project Update: CO₂ Reduction', by: 'McLean, NZ Geothermal Association', date: 'undated, with 2021’s figures',
+		url: 'https://www.nzgeothermal.org.nz/downloads/CO2-Emissions-Reduction-project.pdf',
+		use: '2021 lifecycle emissions by station, including TOPP1 (68) and GDL (55), from which we take the 10 g/kWh allowance.',
+		topics: ['emissions'],
+	},
+	{
+		id: 'eastland-geo', title: 'Geothermal', by: 'Eastland Generation', date: '2026',
+		url: 'https://eastlandgeneration.nz/renewable-generation/geothermal/',
+		use: 'TOPP1 (24 MW, 2012) and Geothermal Developments Ltd (9 MW, 2008), both at Kawerau.',
+		topics: ['generation', 'emissions'],
 	},
 	{
 		id: 'mclean2021', title: 'Geothermal Greenhouse Gas Emissions in New Zealand in 2020: Lifecycle and Operational Emissions',

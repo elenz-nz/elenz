@@ -102,6 +102,9 @@ export const GEO_YEARS = {
   ngatamariki:   [  52,   40,   43],
   kawerau_kgl:   [ 119,  126,  122],
   te_ahi_o_maui: [  49,   60,   61],
+  // Kawerau (Onepu), KAW0112 ONU0: TOPP1 and GDL weighted by size (24 and 9 MW, Eastland Generation). TOPP1 58, 74, 56;
+  // GDL 45, 53, 56. The first figure is CY2021, the earliest found for both (lifecycle, less the same 10 g/kWh).
+  kawerau_onepu: [  54,   68,   56],
   ngawha_oec4:   [ 313,  313,   95],   // commissioned 2021; until 2023 the field's pre-reinjection figure (2020, OEC1–3)
 };
 export const GEO_YEAR_COLS = [2020, 2022, 2023];
@@ -123,14 +126,12 @@ export const GEO_CONTACT = {
 // with a Unique Emission Factor from the EPA; em6 has 0 from the generator too.
 export const GEO_REPORTED = { ngawha_oec4: { from: 2024, g: 0 } };
 // stations without published figures yet: estimates (TIMES-NZ assumptions, and em6's), until the NZGA publishes them
-export const GEO_ASSUMED = { topp2: 0,
-  // Kawerau pulp mill cogeneration (KAW0112 ONU0): bioenergy since BUILD 5 (Oct 2026); kept at zero in case a file
-  // built before then still lists it as geothermal
-  kawerau_mill: 0 };
+export const GEO_ASSUMED = { topp2: 0 };
 export const GEO_DEFAULT = 57;   // fleet average, CY2023: for anything unmatched
 
 // dispatch plant name → station (confirmed by the team, 15 Oct 2026): 'Wairakei' is the whole site (A, B and binary);
-// 'Ngāwhā B' (OEC4) is the only dispatched Ngāwhā plant (Ngāwhā A, ~20 MW, isn't); TOPP1 and GDL aren't dispatched;
+// 'Ngāwhā B' (OEC4) is the only dispatched Ngāwhā plant (Ngāwhā A, ~20 MW, isn't); TOPP1 and GDL aren't dispatched
+// under their own names (Kawerau (Onepu) takes their factors);
 // Te Ahi O Maui and TOPP2 share a 33 kV bus on Kawerau's 220 kV since TOPP2 came online.
 const GEO_PLANT = {
   'Wairakei': 'wairakei', 'Te Mihi 1': 'te_mihi', 'Te Mihi 2': 'te_mihi', 'Poihipi': 'poihipi', 'Ōhaaki': 'ohaaki',
@@ -139,7 +140,8 @@ const GEO_PLANT = {
   'Kawerau (Te Ahi O Maui)': 'te_ahi_o_maui', 'Kawerau (TOPP2)': 'topp2', 'Ngāwhā B': 'ngawha_oec4',
   // names since BUILD 6 (Oct 2026): stations the metered history sees whole (overrides.toml [plant_groups], [plant_names])
   'Te Mihi': 'te_mihi', 'Ngāwhā': 'ngawha_oec4',
-  'Carter Holt Harvey Energy Ltd CoGen': 'kawerau_mill', 'Norske Skog CoGen': 'kawerau_mill',
+  'Kawerau (Onepu)': 'kawerau_onepu', 'Kawerau Mill CoGen': 'kawerau_onepu',
+  'Carter Holt Harvey Energy Ltd CoGen': 'kawerau_onepu', 'Norske Skog CoGen': 'kawerau_onepu',
 };
 
 const geoCache = new Map();

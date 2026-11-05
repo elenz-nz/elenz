@@ -239,7 +239,7 @@ export const daysBetween = (a, b) => Math.floor((b - a) / 864e5);
 // generation and demand, as records.py's series() works them out. Prices and HVDC are left to the history job: live
 // prices are dispatch prices (final prices arrive a day later and often differ), and live HVDC is an estimate.
 // Dispatch data is corrected first, as records.py does (records.json `adj`, from facilities/dispatch_adjust.json):
-// the plants dispatch reads systematically off (Ngāwhā, Glenbrook, Kawerau Mill) scaled to their meters, then each
+// the plants dispatch reads systematically off (Ngāwhā, Glenbrook, Kawerau (Onepu)) scaled to their meters, then each
 // record's usual shift taken off. It is a provisional record only beyond the record by more than the margin `m`; within
 // it, either side, it is close to the record (liveNear).
 
