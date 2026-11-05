@@ -1,5 +1,5 @@
 <script lang="ts">
-	// One series' method: header from the registry, then the page's own body (#lib/methods/pages). A topic with a `status`
+	// One series' method: header from the registry, then the page's own body (#lib/methods/pages). A `structured` topic
 	// follows the standard structure, so its body places Data sources and References itself; for the others this page
 	// adds them around the body.
 	import Preview from '#lib/site/Preview.svelte';
@@ -25,22 +25,21 @@
 <main class="mt-page" aria-labelledby="mt-h">
 	<header class="mt-head">
 		<p class="mt-kicker"><a href="/methods">Data and methods</a></p>
-		<h1 id="mt-h">{t.title}{#if t.estimate && !t.status}<span class="est-tag">Includes estimates</span>{/if}</h1>
+		<h1 id="mt-h">{t.title}{#if t.estimate && !t.structured}<span class="est-tag">Includes estimates</span>{/if}</h1>
 		<p class="mt-lede">{t.summary}</p>
 		<p class="mt-meta">
 			<span>Shown on {#each t.shownOn as [label, href], j}{j ? (j === t.shownOn.length - 1 ? ' and ' : ', ') : ''}<a {href}>{label}</a>{/each}</span>
-			<span>{t.status ? 'Reviewed' : 'Checked'} against the code {t.status ? 'on ' : ''}{longDate(t.updated)}</span>
+			<span>{t.structured ? 'Reviewed' : 'Checked'} against the code {t.structured ? 'on ' : ''}{longDate(t.updated)}</span>
 		</p>
-		{#if t.status}<p class="mt-status"><b>Data status:</b> {t.status}</p>{/if}
 	</header>
 
-	{#if !t.status}<DataSources slug={t.slug} />{/if}
+	{#if !t.structured}<DataSources slug={t.slug} />{/if}
 
 	<div class="mt-body">
 		{#if Body}<Body />{/if}
 	</div>
 
-	{#if !t.status}<References slug={t.slug} />{/if}
+	{#if !t.structured}<References slug={t.slug} />{/if}
 
 	<p class="mt-report">Spotted a problem with this page, or know a better source? <a href={reportHref(t.title, `/methods/${t.slug}`)}>Email us about it</a></p>
 

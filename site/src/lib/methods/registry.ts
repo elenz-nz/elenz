@@ -19,7 +19,7 @@ export type Topic = {
 	summary: string; // one or two sentences under the title, and on the overview's cards
 	shownOn: [string, string][]; // [label, href]: where the series appears on the site
 	estimate?: boolean; // modelled rather than measured
-	status?: string; // the data status line. Set on pages in the standard structure, whose bodies place Data sources and References
+	structured?: boolean; // follows the standard structure: its body places Data sources and References, and the header leaves out the estimate tag
 	updated: string; // YYYY-MM-DD: when the page was last checked against the code
 };
 
@@ -27,9 +27,9 @@ export const TOPICS: Topic[] = [
 	{
 		slug: 'generation',
 		title: 'Generation',
-		summary: 'How much electricity each plant and fuel is generating. History uses metered output. Recent weeks and the live week use dispatch data, the market’s 5-minute targets.',
+		summary: 'How much electricity each plant and fuel is generating.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
-		status: 'Metered in history. Dispatch data for recent weeks and the live week. Embedded solar is estimated throughout.',
+		structured: true,
 		updated: '2026-11-06',
 	},
 	{
@@ -50,10 +50,10 @@ export const TOPICS: Topic[] = [
 	{
 		slug: 'hvdc',
 		title: 'HVDC transfer',
-		summary: 'The electricity moving between the North and South Islands on the HVDC link. History uses metered flows. The live week and the newest weeks use an estimate.',
+		summary: 'The electricity moving between the North and South Islands on the HVDC link.',
 		shownOn: [['Tracker', '/tracker'], ['Prices', '/tracker/prices'], ['Now', '/now']],
 		estimate: true,
-		status: 'Metered in history. Estimated for the live week and for months not yet published.',
+		structured: true,
 		updated: '2026-11-06',
 	},
 	{
