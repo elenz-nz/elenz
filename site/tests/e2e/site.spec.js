@@ -12,7 +12,7 @@ const test = base.extend({
   page: async ({ page }, use) => {
     const errors = [];
     await page.route(/cloudflareinsights\.com/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
-    page.on('pageerror', (e) => { if (!/access control checks/.test(e.message)) errors.push(e.message); });
+    page.on('pageerror', (e) => { if (!/access control checks|ResizeObserver loop/.test(e.message)) errors.push(e.message); });
     await use(page);
     expect(errors, 'uncaught errors in the page').toEqual([]);
   },

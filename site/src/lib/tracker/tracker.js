@@ -2065,7 +2065,7 @@ export function mountTracker(D, hooks = {}) {
   });
   slider.sync();
 
-  const ro = new ResizeObserver(() => render());
+  const ro = new ResizeObserver(() => requestAnimationFrame(() => render()));   // a frame on, as drawing can change a chart's height
   for (const box of boxes) ro.observe(box);
   for (const id of CHARTS) ro.observe($(id));   // an enlarged chart changes height without its panel changing width
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fit($('sel-view')); render(); });
