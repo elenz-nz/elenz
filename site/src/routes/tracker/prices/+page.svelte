@@ -297,16 +297,22 @@
 	let slider: any = null, sliding = false, slideRange: string | null = null, built: (() => void) | null = null, longData: any = null;
 	const newest = () => (live ? live.t[live.n - 1] + 3e5 : 0);
 	const slideAt = () => ({ range: slideRange ?? range, latest: newest(), first: FIRST });
-	// a month's track: its half-hourly history, a file or two, once the page has settled, so the picture and a drag along it are ready
-	let trackWanted = '';
-	function fetchTrack(a: number, b: number) {
-		const key = String(Math.floor(a / 864e5));
+	// the track's half-hourly history, once the page has settled, so the chart follows a drag all along it and the
+	// picture is there (test report TRK-12, 5 Nov 2026). 1Y and All have the daily history; a track in the live week needs nothing.
+	let trackWanted = '', trackTimer: ReturnType<typeof setTimeout> | undefined;
+	function prepare(a: number, b: number) {
+		if (!live || R.src === 'day' || a >= live.t[0] - 36e5) return;
+		const key = `${Math.floor(a / 864e5)}|${Math.floor(b / 864e5)}`;
 		if (key === trackWanted) return;
 		trackWanted = key;
-		setTimeout(async () => {
-			if (sliding || !live) return;
-			try { await store.load('hh', a, b); longData = store.merged('hh', live); slider?.sync(); } catch { /* the picture just stays away */ }
-		}, 1500);
+		clearTimeout(trackTimer);
+		trackTimer = setTimeout(async () => {
+			const from = Math.max(FIRST, a - 2 * 864e5), to = b + 864e5;
+			try {
+				if (!store.has('hh', from, to)) await store.load('hh', from, to);
+				if (!sliding) { longData = store.merged('hh', live); slider?.sync(); }
+			} catch { trackWanted = ''; }   // the chart still follows, a moment later
+		}, 800);
 	}
 	// n averages of the region's price, capped so a spike doesn't flatten the rest, from data already here
 	function priceOverview(a: number, b: number, n: number) {
@@ -314,7 +320,7 @@
 		const cover = (m: any) => Math.max(0, Math.min(b, m.t[m.t.length - 1]) - Math.max(a, m.t[0]));
 		if (!here.length) return null;
 		const m = here.reduce((p, q) => (cover(q) > cover(p) ? q : p));
-		if (cover(m) < (b - a) * 0.9) { if (b - a < 32 * 864e5) fetchTrack(a, b); return null; }
+		if (cover(m) < (b - a) * 0.9) return null;
 		const s = (region === 'SI' ? m.SI : m.NI).price, sum = new Float64Array(n), hrs = new Float64Array(n), step = (b - a) / n;
 		for (let i = firstAtOrAfter(m.t, a); i < m.t.length && m.t[i] < b; i++) {
 			const k = Math.min(n - 1, Math.floor((m.t[i] - a) / step));
@@ -337,6 +343,7 @@
 			limits: () => ({ min: 36e5, max: 30 * 864e5, resize: false, grid: R.mode === 'time' && effInt !== '1d' ? null : 'day' }),
 			inset: () => ({ left: 52, right: 10 }),
 			overview: priceOverview,
+			prepare,
 			overviewKey: () => [region, longData?.t.length, view?.S?.t[0]].join(),
 			start() { slideRange = range; },
 			ready(from: number, to: number) {
@@ -380,8 +387,7 @@
 			} else if (r.src !== 'day') {
 				if (!store.has('hh', hhFrom, hhTo)) { busy = true; await store.load('hh', hhFrom, hhTo); }
 				if (my !== token) return;
-				const m = store.merged('hh', live);
-				longData = m;
+				const m = store.merged('hh', live, hhFrom - 864e5, hhTo + 864e5);   // only the window: the track's months can all be here
 				setView(timeView(atInterval(addRevenue(windowOf(m, zf, zt), undefined, true), iv), m.histEnd), isZoomed);
 			} else {
 				if (!store.has('day', 0, 0)) { busy = true; await store.load('day', 0, 0); }

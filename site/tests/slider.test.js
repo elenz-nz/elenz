@@ -94,6 +94,14 @@ test('a track holds still while the view stays on it, and follows the newest dat
   assert.equal(trackFor('1d', { from: latest + 3e5 - DAY, to: latest + 3e5 }, latest + 3e5, first, t).b, latest + 3e5);
 });
 
+test('a window dragged to the end of its track stays on that track, though the grid puts it just past the end', () => {
+  const v = { from: latest - 30 * DAY, to: latest }, t = trackFor('30d', v, latest, first);
+  const left = { from: t.a - 10 * 6e4, to: t.a - 10 * 6e4 + 30 * DAY }, kept = trackFor('30d', left, latest, first, t);
+  assert.deepEqual([kept.a, kept.b], [t.a, t.b]);
+  const week = trackFor('1d', { from: latest - DAY, to: latest }, latest, first);   // a day past it is a different track
+  assert.notEqual(trackFor('1d', { from: week.a - DAY, to: week.a }, latest, first, week).a, week.a);
+});
+
 test('asked to centre, the view goes to the middle of the track, as far as the data allows', () => {
   const v = { from: latest - DAY, to: latest }, t = trackFor('1d', v, latest, first);
   const near = { from: latest - 5 * DAY, to: latest - 4 * DAY }, c = trackFor('1d', near, latest, first, t, true);

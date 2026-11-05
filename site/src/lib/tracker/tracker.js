@@ -393,7 +393,7 @@ export function mountTracker(D, hooks = {}) {
     for (const k of BY_PLANT) {
       const ps = M.plants.filter(p => p.fuel === k && (state.region === 'NZ' || p.isl === state.region));
       const em = new Float64Array(M.N), mw = new Float64Array(M.N);
-      for (const p of ps) for (let i = 0; i < M.N; i++) { const x = p.s[i]; if (x > 0) { mw[i] += x; em[i] += x * plantEf(k, p.name, M.t[i]); } }
+      for (const p of ps) for (let i = start; i < stop; i++) { const x = p.s[i]; if (x > 0) { mw[i] += x; em[i] += x * plantEf(k, p.name, M.t[i]); } }
       own[k] = { em: avg(em), mw: avg(mw) };
     }
     // the renewable share and emissions intensity leave battery discharge out (as em6 does): that energy was
@@ -1480,8 +1480,9 @@ export function mountTracker(D, hooks = {}) {
   // the span of history a window [end − range, end) needs (the latest 31 days when end is null)
   // (and a stretch from the slider's own start, zf, and end, zt: it can reach past the window)
   const spanFor = (r, end, zf = state.zoom?.from, zt = state.zoom?.to) => {
-    const to = Math.max(end ?? models.live.END, zt ?? 0), from = end == null ? to - 31 * DAY : moveBack(end, RANGES[r]) - DAY;
-    return [Math.min(from, zf != null ? zf - DAY : Infinity), to];
+    if (zf != null) return [zf - DAY, zt];
+    const to = end ?? models.live.END;
+    return [end == null ? to - 31 * DAY : moveBack(end, RANGES[r]) - DAY, to];
   };
   function useModel() {
     const m = models[state.kind];
@@ -1997,23 +1998,31 @@ export function mountTracker(D, hooks = {}) {
     if (!o) totals.set(m, o = {});
     return o[region] ??= genTotal(m, region);
   }
-  // a month's track: its half-hourly history, a file or two, once the page has settled, so the picture and a drag along it are ready
-  let trackWanted = '';
-  function fetchTrack(a, b) {
-    const key = `${Math.floor(a / DAY)}`;
+  // the track's half-hourly history, once the page has settled, so the charts follow a drag all along it and the
+  // picture is there (test report TRK-12, 5 Nov 2026: a drag stalled at each month not loaded yet). 1Y and All have
+  // the whole daily history already, and a track inside the live week needs nothing.
+  let trackWanted = '', trackTimer = 0;
+  function prepare(a, b) {
+    if (RANGES[state.range].model === 'day' || a >= models.live.t[0] - 36e5) return;
+    const key = `${Math.floor(a / DAY)}|${Math.floor(b / DAY)}`;
     if (key === trackWanted) return;
     trackWanted = key;
-    setTimeout(async () => {
-      if (sliding || (history.has('hh', a, b) && models.hh)) return;
-      try { await history.load('hh', a, b); models.hh = merge('hh'); slider.sync(); } catch { /* the picture just stays away */ }
-    }, 1500);
+    clearTimeout(trackTimer);
+    trackTimer = setTimeout(async () => {
+      const from = Math.max(firstDay(), a - 2 * DAY), to = b + DAY;
+      if (history.has('hh', from, to) && models.hh) return;
+      try {
+        await history.load('hh', from, to);
+        if (!sliding) { models.hh = merge('hh'); slider.sync(); }   // a drag under way merges it as it moves on
+      } catch { trackWanted = ''; }   // the charts still follow, a moment later
+    }, 800);
   }
   // n averages of total generation over [a, b), from a model already here; null if none covers nearly all of it
   function overview(a, b, n) {
     const here = [M, models.live, models.hh, models.day].filter(m => m && m.N);
     const cover = m => Math.max(0, Math.min(b, m.t[m.N - 1]) - Math.max(a, m.t[0]));
     const m = here.reduce((p, q) => (cover(q) > cover(p) ? q : p));
-    if (cover(m) < (b - a) * 0.9) { if (b - a < 32 * DAY) fetchTrack(a, b); return null; }
+    if (cover(m) < (b - a) * 0.9) return null;
     const sum = new Float64Array(n), hrs = new Float64Array(n), s = totalOf(m, state.region), step = (b - a) / n;
     for (let i = firstAtOrAfter(m.t, a); i < m.N && m.t[i] < b; i++) {
       const k = Math.min(n - 1, Math.floor((m.t[i] - a) / step));
@@ -2037,6 +2046,7 @@ export function mountTracker(D, hooks = {}) {
     limits: () => ({ min: (ZOOM_MIN[state.int] ?? 0) * DAY || 36e5, max: Infinity, resize: false, grid: isLong() ? 'day' : null }),
     inset: () => ({ left: PADL, right: padR() }),
     overview,
+    prepare,
     overviewKey: () => [state.region, history.version('hh'), history.version('day')].join(),
     start() { slideRange = state.range; },
     ready(from, to) {
@@ -2051,7 +2061,8 @@ export function mountTracker(D, hooks = {}) {
       const v = spanView(from, to, slideAt());
       if (final) slideRange = null;
       state.zoom = v.zoom;
-      if (v.range === state.range && v.end === state.end) { useModel(); rebuild(); return; }
+      const kind = kindFor(v.range, v.end);   // (state.zoom is set: a stretch's own start decides)
+      if (v.range === state.range && v.end === state.end && kind === state.kind && (kind === 'live' || models[kind]?.hv === history.version(kind))) { useModel(); rebuild(); return; }
       return setView(v.range, v.end, true);
     },
   });

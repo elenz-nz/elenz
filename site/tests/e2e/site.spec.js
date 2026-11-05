@@ -213,6 +213,24 @@ for (const path of ['/tracker?range=3d', '/tracker/prices?range=3d']) {
       await expect(page).not.toHaveURL(/end=|zoom=/);
     });
 
+    test('letting go while the mouse is still moving ends the drag', async ({ page }) => {
+      await page.goto(path);
+      const thumb = page.locator('.ts-thumb'), slider = page.locator('.tslider');
+      await expect(thumb).toHaveAttribute('aria-valuetext', /./);
+      const b = await thumb.boundingBox(), x = b.x + b.width / 2, y = b.y + b.height / 2;
+      await page.mouse.move(x, y);
+      await page.mouse.down();
+      for (let i = 1; i <= 6; i++) await page.mouse.move(x - i * 8, y);
+      await page.mouse.up();
+      for (let i = 7; i <= 12; i++) await page.mouse.move(x - i * 8, y);   // still moving as it lets go
+      await expect(slider).not.toHaveClass(/sliding/);
+      const where = await thumb.getAttribute('aria-valuetext');
+      await page.mouse.move(x - 200, y + 200);   // off the slider, and back on it: it no longer follows
+      await page.mouse.move(x - 120, y);
+      await page.waitForTimeout(200);
+      await expect(thumb).toHaveAttribute('aria-valuetext', where);
+    });
+
     test('its window has a fixed length: no ends to drag', async ({ page }) => {
       await page.goto(path);
       await expect(page.locator('.ts-thumb')).toHaveAttribute('aria-valuetext', /./);

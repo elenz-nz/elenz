@@ -12,6 +12,7 @@
 //   go(from, to, final)  show this stretch               ready(from, to)  is its data here?
 //   inset()       { left, right }: the chart's margins, so the track lines up with its time axis
 //   overview(a, b, n)    n values for the small picture in the track, or null while the data isn't here
+//   prepare(a, b)        fetch the track's data, so the charts can follow a drag all along it
 import { addDays, addYears, midnightOf, SPANS } from './viewurl.js';
 import { nzOffset } from '#lib/tracker/series.js';
 
@@ -83,7 +84,8 @@ export function trackFor(range, view, latest, first, prev, centre = false) {
   const days = TRACK_DAYS[range] ?? null;
   if (!centre && prev && prev.key === days) {
     const shift = prev.end ? latest - prev.b : 0, a = prev.a + shift, b = prev.b + shift;
-    if (view.from >= a - 6e4 && view.to <= b + 6e4) return { key: days, a, b, end: prev.end };
+    const slack = Math.min(DAY / 2, (b - a) / 60);   // a window dragged to an end can land on the grid just past it, and stays put
+    if (view.from >= a - slack && view.to <= b + slack) return { key: days, a, b, end: prev.end };
   }
   if (!days) return { key: days, a: first, b: latest, end: true };
   const len = days * DAY;
@@ -190,6 +192,7 @@ export function mountSlider(el, host) {
     T = trackFor(host.range(), view, latest, first, T, centreNext);
     centreNext = false;
     place(); paintTrack();
+    host.prepare?.(T.a, T.b);
   }
 
   // ---------- applying a drag: one view at a time, the newest wins ----------
@@ -207,11 +210,12 @@ export function mountSlider(el, host) {
         return;
       }
       if (drag) drag.shown = s;
-      if (wanted) { const w = wanted; wanted = null; run(w.s, w.final); }
+      if (wanted) { const w = wanted; run(w.s, w.final); wanted = null; }
     }, 0));
   }
   function apply(s, final) {
     clearTimeout(pause);
+    if (wanted?.final) return;   // letting go is the last word: nothing replaces it
     if (busy) { wanted = { s, final }; return; }
     if (final) return run(s, true);
     if (same(s, drag.shown)) return;
@@ -270,7 +274,7 @@ export function mountSlider(el, host) {
     show(drag);
   }
   function move(e) {
-    if (!drag) return;
+    if (!drag || drag.done) return;   // done: the mouse can still be moving as it lets go, and that isn't a drag
     drag.x = e.clientX - drag.left;
     show(drag);
   }
