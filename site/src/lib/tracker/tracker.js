@@ -534,7 +534,13 @@ export function mountTracker(D, hooks = {}) {
   function drillTo(d) {
     linked = null; state.drill = d; state.hidden.clear(); state.filter = ''; relayer(); buildSummary(); render(); save(true);
   }
-  const toCharts = () => $('charts').scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  // a frame later, once the list has closed up: Safari drops a smooth scroll started while the page is shrinking, so if
+  // the charts still aren't back it goes straight there
+  function toCharts() {
+    const to = behavior => $('charts').scrollIntoView({ block: 'start', behavior });
+    requestAnimationFrame(() => to(matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'));
+    setTimeout(() => { if ($('charts').getBoundingClientRect().top < -40) to('auto'); }, 900);
+  }
   // a row of the list: the page goes back up to the charts when they're off the top of the screen, as they are from
   // a long list, or the list closing up leaves the page at its foot. Where the list sits under the charts (phones) it
   // always does, or everything below it moves under the finger (test reports GRP-03, 3 and 5 Nov 2026)
