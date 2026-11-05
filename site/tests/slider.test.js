@@ -44,34 +44,27 @@ test('the whole history is All', () => {
 test('a window glides on the data\'s grid: 5 minutes, then half-hours, not whole days', () => {
   const to = today - 2.4 * DAY + 1000;
   for (const [days, g] of [[1, 3e5], [3, 3e5], [7, 18e5], [30, 18e5]]) {
-    const [a, b] = snapSpan(to - days * DAY, to, { mode: 'move', latest, first });
+    const [a, b] = snapSpan(to - days * DAY, to, { latest, first });
     assert.equal(b % g, 0); assert.equal(b - a, days * DAY); assert.ok(Math.abs(b - to) <= g);
   }
 });
 
 test('daily data keeps to whole days, and a year to the calendar', () => {
-  const [a, b] = snapSpan(today - 3.4 * DAY, today - 0.4 * DAY, { mode: 'move', latest, first, grid: 'day' });
+  const [a, b] = snapSpan(today - 3.4 * DAY, today - 0.4 * DAY, { latest, first, grid: 'day' });
   assert.equal(b, midnightOf(b)); assert.equal(a, addDays(b, -3));
-  const [c, d] = snapSpan(today - 400 * DAY, today - 35 * DAY, { mode: 'move', latest, first });
+  const [c, d] = snapSpan(today - 400 * DAY, today - 35 * DAY, { latest, first });
   assert.equal(new Date(c).getUTCDate(), new Date(d).getUTCDate());
 });
 
 test('a window at the newest data stays there, whatever the time of day', () => {
   for (const h of [1, 9, 20]) {
     const now = today + h * HOUR;
-    assert.deepEqual(snapSpan(now - DAY, now, { mode: 'move', latest: now, first }), [now - DAY, now]);
+    assert.deepEqual(snapSpan(now - DAY, now, { latest: now, first }), [now - DAY, now]);
   }
 });
 
 test('within a step of the newest data, a window goes to it', () => {
-  assert.deepEqual(snapSpan(latest - DAY - 60e3, latest - 60e3, { mode: 'move', latest, first }), [latest - DAY, latest]);
-});
-
-test('the grips keep to the shortest and longest lengths allowed', () => {
-  const to = today - DAY;
-  assert.equal(to - snapSpan(to - 60e3, to, { mode: 'a', latest, first, min: HOUR })[0], HOUR);
-  assert.equal(snapSpan(to - 40 * DAY, to, { mode: 'a', latest, first, max: 30 * DAY })[0], to - 30 * DAY);
-  assert.equal(snapSpan(to - HOUR, latest + HOUR, { mode: 'b', latest, first })[1], latest);
+  assert.deepEqual(snapSpan(latest - DAY - 60e3, latest - 60e3, { latest, first }), [latest - DAY, latest]);
 });
 
 test('a track is eight windows long, for a range or any zoom, up to the whole history', () => {

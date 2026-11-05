@@ -2032,7 +2032,6 @@ export function mountTracker(D, hooks = {}) {
     }
     return Array.from(sum, (x, k) => (hrs[k] ? x / hrs[k] : NaN));
   }
-  const ZOOM_MIN = { '1d': 3, '1w': 21, '1mo': 90, '1yr': 1096 };   // days, so a zoom keeps at least a couple of points
   // measured from the range the drag began on, so a stretch that crosses midnight and needs a wider range for a moment hands it back
   const slideAt = () => ({ range: slideRange ?? state.range, latest: latestT(), first: firstDay() });
   slider = mountSlider($('gen-slider'), {
@@ -2044,8 +2043,7 @@ export function mountTracker(D, hooks = {}) {
       const [from, to] = windowOf(state.range, state.end, latestT(), firstDay());
       return { from, to };
     },
-    // a fixed window: the range buttons set its length (design decision, 5 Nov 2026; resize: true gives it ends to drag)
-    limits: () => ({ min: (ZOOM_MIN[state.int] ?? 0) * DAY || 36e5, max: Infinity, resize: false, grid: isLong() ? 'day' : null }),
+    grid: () => (isLong() ? 'day' : null),
     inset: () => ({ left: PADL, right: padR() }),
     overview,
     prepare,

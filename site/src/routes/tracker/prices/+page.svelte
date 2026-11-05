@@ -338,8 +338,7 @@
 				const [from, to] = rangeWindow(range, endT, newest(), FIRST);
 				return { from, to };
 			},
-			// a fixed window: the range buttons set its length (design decision, 5 Nov 2026; resize: true gives it ends to drag)
-			limits: () => ({ min: 36e5, max: 30 * 864e5, resize: false, grid: R.mode === 'time' && effInt !== '1d' ? null : 'day' }),
+			grid: () => (R.mode === 'time' && effInt !== '1d' ? null : 'day'),
 			inset: () => ({ left: 52, right: 10 }),
 			overview: priceOverview,
 			prepare,

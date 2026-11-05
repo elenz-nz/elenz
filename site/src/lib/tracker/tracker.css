@@ -226,14 +226,8 @@ date-pick { display: inline-block; }
 .ts-thumb:hover::before, .ts-thumb:focus-visible::before { opacity: 0.26; }
 .tslider.sliding .ts-thumb { cursor: grabbing; }
 .tslider.sliding .ts-thumb::before { opacity: 0.26; }
-.ts-grip { position: absolute; top: 6px; bottom: 6px; width: 10px; margin-left: -5px; border: 1px solid var(--accent); border-radius: 3px; background: var(--surface); cursor: ew-resize; touch-action: pan-y; }
-.ts-grip[hidden] { display: none; }
-.ts-grip::before { content: ""; position: absolute; left: 3px; right: 3px; top: 25%; bottom: 25%; border-inline: 1px solid var(--accent); }
-.ts-grip::after { content: ""; position: absolute; inset: -8px -3px; }   /* wider than it looks, leaving the middle of a short window to drag */
 @media (pointer: coarse) {
   .tslider { height: 38px; }
-  .ts-grip { top: 5px; bottom: 5px; width: 12px; margin-left: -6px; }
-  .ts-grip::after { inset: -9px -3px; }
 }
 .ts-tip { position: absolute; bottom: calc(100% + 5px); left: 0; margin-left: var(--l); transform: translateX(-50%); z-index: 6; padding: 2px 7px; border-radius: 4px; background: var(--ink); color: var(--surface); font-size: 0.74rem; white-space: nowrap; pointer-events: none; }
 .ts-tip[hidden] { display: none; }

@@ -1,6 +1,5 @@
 // The time slider under the tracker's charts (test report TRK-12, design decision, 5 Nov 2026): a window of fixed length,
-// set by the range buttons, on a fixed track of time. Drag it and the charts glide with it, not day by day. (limits()'s
-// `resize` gives the window ends to drag; both pages have it off.) The track is eight windows long (`trackLength`,
+// set by the range buttons, on a fixed track of time. Drag it and the charts glide with it, not day by day. The track is eight windows long (`trackLength`,
 // design decision, 5 Nov 2026: one rule for every range and every zoom, stopping at the whole history). It stays put
 // while it's used and stops at its ends: picking a date puts the
 // window in the track's middle (`centre`), and the newest data at its right-hand end. The charts follow during a drag
@@ -9,7 +8,7 @@
 //
 // The page supplies a host:
 //   view()        { from, to }: the stretch shown        bounds()  { first, latest }
-//   range()       the range button in force              limits()  { min, max, resize }: lengths allowed
+//   range()       the range button in force              grid()    'day' for whole days only, else the data's own
 //   go(from, to, final)  show this stretch               ready(from, to)  is its data here?
 //   inset()       { left, right }: the chart's margins, so the track lines up with its time axis
 //   overview(a, b, n)    n values for the small picture in the track, or null while the data isn't here
@@ -67,28 +66,22 @@ export function spanView(from, to, { range, latest, first }) {
 const gridOf = (len, grid) => (grid === 'day' || len >= 40 * DAY ? DAY : len > 3.5 * DAY ? 6 * FIVE : FIVE);
 const onGrid = (t, g) => (g === DAY ? midnightOf(t + 12 * HOUR) : Math.round(t / g) * g);
 
-/** A stretch on the data's grid. mode 'move' keeps its length; 'a' or 'b' moves that end only. grid 'day': whole days only. */
-export function snapSpan(from, to, { mode, latest, first, min = HOUR, max = Infinity, grid }) {
+/** A stretch on the data's grid, keeping its length. grid 'day': whole days only. */
+export function snapSpan(from, to, { latest, first, grid }) {
   const len = to - from;
-  if (mode === 'move') {
-    if (to >= latest - 6e4) return [latest - len, latest];
-    const g = gridOf(len, grid);
-    if (g === DAY) {
-      const days = Math.max(1, Math.round(len / DAY)), year = Math.abs(len - 365.25 * DAY) < 2.5 * DAY;
-      let e = onGrid(to, g);
-      if (e > midnightOf(latest)) return [latest - len, latest];
-      let s = year ? addYears(e, -1) : addDays(e, -days);
-      if (s < first) { s = midnightOf(first + DAY); e = year ? addYears(s, 1) : addDays(s, days); }
-      return [s, e];
-    }
-    const e = Math.round(to / g) * g;
-    if (e >= latest - g / 2) return [latest - len, latest];
-    return e - len < first ? [first, first + len] : [e - len, e];
+  if (to >= latest - 6e4) return [latest - len, latest];
+  const g = gridOf(len, grid);
+  if (g === DAY) {
+    const days = Math.max(1, Math.round(len / DAY)), year = Math.abs(len - 365.25 * DAY) < 2.5 * DAY;
+    let e = onGrid(to, g);
+    if (e > midnightOf(latest)) return [latest - len, latest];
+    let s = year ? addYears(e, -1) : addDays(e, -days);
+    if (s < first) { s = midnightOf(first + DAY); e = year ? addYears(s, 1) : addDays(s, days); }
+    return [s, e];
   }
-  if (mode === 'a') return [Math.min(to - min, Math.max(first, to - max, onGrid(from, gridOf(to - from, grid)))), to];
-  let e = onGrid(to, gridOf(to - from, grid));
-  if (e >= latest - FIVE / 2) e = latest;
-  return [from, Math.max(from + min, Math.min(latest, from + max, e))];
+  const e = Math.round(to / g) * g;
+  if (e >= latest - g / 2) return [latest - len, latest];
+  return e - len < first ? [first, first + len] : [e - len, e];
 }
 
 /** The track around a view: the same one while the view stays on it (moving on with the newest data); otherwise, or
@@ -159,11 +152,9 @@ export function spanLabel(from, to, latest) {
  *  before a change that should put the window in the track's middle (a date picked). */
 export function mountSlider(el, host) {
   el.innerHTML = `<div class="ts-track"><svg class="ts-area" aria-hidden="true" preserveAspectRatio="none"><path/></svg><div class="ts-ticks" aria-hidden="true"></div>
-    <div class="ts-thumb" role="slider" tabindex="0" aria-orientation="horizontal" aria-label="Move through time" title="Drag to move through time"></div>
-    <div class="ts-grip a" role="slider" tabindex="0" aria-orientation="horizontal" aria-label="Start of the time shown"></div>
-    <div class="ts-grip b" role="slider" tabindex="0" aria-orientation="horizontal" aria-label="End of the time shown"></div></div>
+    <div class="ts-thumb" role="slider" tabindex="0" aria-orientation="horizontal" aria-label="Move through time" title="Drag to move through time"></div></div>
     <output class="ts-tip" hidden></output>`;
-  const track = el.querySelector('.ts-track'), thumb = el.querySelector('.ts-thumb'), gripA = el.querySelector('.ts-grip.a'), gripB = el.querySelector('.ts-grip.b');
+  const track = el.querySelector('.ts-track'), thumb = el.querySelector('.ts-thumb');
   const tip = el.querySelector('.ts-tip'), ticks = el.querySelector('.ts-ticks'), area = el.querySelector('.ts-area'), path = area.querySelector('path');
   const MIN_THUMB = matchMedia('(pointer: coarse)').matches ? 44 : 30;   // px, something to get hold of
   let T = null, view = null, drag = null, width = 0, drawn = '', centreNext = false;
@@ -174,11 +165,7 @@ export function mountSlider(el, host) {
     const w = W(), x0 = X(from), x1 = X(to), tw = Math.max(MIN_THUMB, x1 - x0);
     const left = Math.max(0, Math.min(w - tw, (x0 + x1) / 2 - tw / 2));
     thumb.style.left = `${left}px`; thumb.style.width = `${tw}px`;
-    gripA.style.left = `${left}px`; gripB.style.left = `${left + tw}px`;
-    const { resize } = host.limits();
-    gripA.hidden = gripB.hidden = !resize;
-    const text = spanLabel(from, to, host.bounds().latest);
-    for (const g of [thumb, gripA, gripB]) g.setAttribute('aria-valuetext', text);
+    thumb.setAttribute('aria-valuetext', spanLabel(from, to, host.bounds().latest));
     return left + tw / 2;
   }
   function paintTrack() {
@@ -223,7 +210,7 @@ export function mountSlider(el, host) {
     requestAnimationFrame(() => setTimeout(async () => {
       try { await host.go(s[0], s[1], final); } finally { busy = false; }
       if (final) {
-        // the track stays where the drag left it, even if the stretch has outgrown its range
+        // the track stays where the drag left it
         drag = null; el.classList.remove('sliding'); tip.hidden = true;
         T = { ...T, key: trackLength(host.range(), s[1] - s[0]) };
         sync();
@@ -244,10 +231,6 @@ export function mountSlider(el, host) {
   }
 
   // ---------- dragging ----------
-  function limits(d) {
-    const { first, latest } = host.bounds(), L = host.limits();
-    return { mode: d.mode, first, latest, min: L.min, max: L.max, grid: L.grid };
-  }
   function show(d) {
     if (!d.moved) {
       if (Math.abs(d.x - d.x0) < 3 && !d.jumped) return;   // a tap on the window, or a finger starting to scroll the page, moves nothing
@@ -255,27 +238,17 @@ export function mountSlider(el, host) {
       el.classList.add('sliding');
       host.start?.();
     }
-    const { first, latest } = host.bounds(), L = host.limits();
-    let { from, to } = d.base;
+    const { first, latest } = host.bounds(), len = d.base.to - d.base.from;
     const dt = ((d.x - d.x0) / W()) * (T.b - T.a);
-    if (d.mode === 'move') {
-      const len = to - from;
-      from = Math.max(first, Math.max(T.a, Math.min(T.b - len, from + dt)));
-      to = from + len;
-    } else if (d.mode === 'a') {
-      from = Math.max(T.a, Math.max(first, to - L.max), Math.min(to - L.min, from + dt));
-    } else {
-      to = Math.min(T.b, latest, from + L.max, Math.max(from + L.min, to + dt));
-    }
-    d.raw = [from, to];
-    d.snap = snapSpan(from, to, limits(d));
+    const from = Math.max(first, T.a, Math.min(T.b - len, d.base.from + dt)), to = from + len;
+    d.snap = snapSpan(from, to, { first, latest, grid: host.grid() });
     const c = place(from, to);
     tip.textContent = spanLabel(d.snap[0], d.snap[1], latest);
     tip.hidden = false;
     tip.style.left = `${Math.max(tip.offsetWidth / 2, Math.min(W() - tip.offsetWidth / 2, c))}px`;
     apply(d.snap, false);
   }
-  function down(e, mode) {
+  function down(e, jump) {
     if (e.button || drag) return;
     e.preventDefault(); e.stopPropagation();
     const target = e.currentTarget;
@@ -283,14 +256,14 @@ export function mountSlider(el, host) {
     view = host.view();
     if (!view) return;
     let base = { ...view }, jumped = false;
-    if (mode === 'jump') {
+    if (jump) {
       // a press on the track brings the window there, and it can be dragged from there
       const len = base.to - base.from, r = track.getBoundingClientRect(), t = T.a + ((e.clientX - r.left) / r.width) * (T.b - T.a);
       const from = Math.max(T.a, Math.min(T.b - len, t - len / 2));
-      base = { from, to: from + len }; mode = 'move'; jumped = true;
+      base = { from, to: from + len }; jumped = true;
     }
     const r = track.getBoundingClientRect();
-    drag = { mode, base, start: { ...view }, x0: e.clientX - r.left, x: e.clientX - r.left, left: r.left, shown: null, jumped };
+    drag = { base, start: { ...view }, x0: e.clientX - r.left, x: e.clientX - r.left, left: r.left, shown: null, jumped };
     show(drag);
   }
   function move(e) {
@@ -312,21 +285,17 @@ export function mountSlider(el, host) {
     if (drag) return;
     view = host.view();
     const { first, latest } = host.bounds(), len = view.to - view.from;
-    const mode = e.currentTarget === gripA ? 'a' : e.currentTarget === gripB ? 'b' : 'move';
     const by = dir * Math.max(FIVE, (e.shiftKey ? 1 : 0.1) * len);
-    let from = view.from, to = view.to;
-    if (ends) { from = e.key === 'Home' ? first : latest - len; to = from + len; }
-    else if (mode === 'move') { from += by; to += by; if (to > latest) { to = latest; from = to - len; } if (from < first) { from = first; to = from + len; } }
-    else if (mode === 'a') from += by; else to += by;
-    host.go(...snapSpan(from, to, { mode: ends ? 'move' : mode, first, latest, ...host.limits() }), true);
+    const from = ends ? (e.key === 'Home' ? first : latest - len) : Math.max(first, Math.min(latest - len, view.from + by));
+    host.go(...snapSpan(from, from + len, { first, latest, grid: host.grid() }), true);
   }
-  for (const [n, m] of [[thumb, 'move'], [gripA, 'a'], [gripB, 'b'], [track, 'jump']]) {
-    n.addEventListener('pointerdown', (e) => { if (m === 'jump' && e.target !== track && !ticks.contains(e.target) && !area.contains(e.target)) return; down(e, m); });
+  thumb.addEventListener('keydown', key);
+  for (const [n, jump] of [[thumb, false], [track, true]]) {
+    n.addEventListener('pointerdown', (e) => { if (jump && e.target !== track && !ticks.contains(e.target) && !area.contains(e.target)) return; down(e, jump); });
     n.addEventListener('pointermove', move);
     n.addEventListener('pointerup', up);
     n.addEventListener('pointercancel', up);
     n.addEventListener('lostpointercapture', up);   // whatever took the pointer away, a drag never stays stuck on
-    if (m !== 'jump') n.addEventListener('keydown', key);
   }
   // on the next frame: changing the page inside a resize callback sets off the browser's "ResizeObserver loop" error
   const ro = new ResizeObserver(() => requestAnimationFrame(() => {

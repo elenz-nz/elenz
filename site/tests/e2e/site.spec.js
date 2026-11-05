@@ -251,8 +251,8 @@ for (const path of ['/tracker?range=3d', '/tracker/prices?range=3d']) {
     test('its window has a fixed length: no ends to drag', async ({ page }) => {
       await page.goto(path);
       await expect(page.locator('.ts-thumb')).toHaveAttribute('aria-valuetext', /./);
-      await expect(page.locator('.ts-grip').first()).toBeHidden();
-      await expect(page.locator('.ts-grip').last()).toBeHidden();
+      await expect(page.locator('.ts-thumb')).toHaveCount(1);
+      await expect(page.locator('.tslider [role="slider"]')).toHaveCount(1);
     });
   });
 }
