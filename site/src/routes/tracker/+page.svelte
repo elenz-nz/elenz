@@ -286,7 +286,7 @@
 		</div>
 		<button type="button" class="zoom-chip" id="zoom-reset" title="Back to the whole range (Escape)" hidden>
 			<svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="m10.5 10.5 3.5 3.5M5 7h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
-			<span id="zoom-txt"></span><b>Reset zoom</b>
+			<b>Reset zoom</b>
 		</button>
 		<!-- the pinned time, the one place it's named; a tap lets it go (tracker.js syncPinChip, ZM-02) -->
 		<button type="button" class="zoom-chip pin-chip" id="pin-chip" title="Let go of the pinned time (Escape)" hidden>
@@ -412,7 +412,7 @@
 						<li><b>Click or tap a chart:</b> pins the time. ← → move it, with Shift to go further. Click it again, or use the Pinned chip or Escape, to let go.</li>
 						<li><b>Range buttons:</b> open around a pinned or zoomed time.</li>
 						<li><b>‹ › and the date:</b> move through history. Latest comes back to now.</li>
-						<li><b>Slider under the chart:</b> drag its window to move through time, and its ends to show more or less. A date picked sits in its middle.</li>
+						<li><b>Slider under the chart:</b> drag its window to move through time. A date picked sits in its middle.</li>
 						<li><b>Drag across a chart:</b> zooms in. The arrow beside 1D picks recent hours, and Reset zoom goes back.</li>
 						<li><b>A name in this list:</b> breaks it down into plants and units. ‹ Back steps out.</li>
 						<li><b>Colour squares:</b> hide a layer. Double-click, Shift-click or press and hold shows only that one.</li>

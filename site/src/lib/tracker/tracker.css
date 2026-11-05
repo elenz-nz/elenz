@@ -218,6 +218,7 @@ time-pick[hidden] { display: none; }
 .ts-ticks span { position: absolute; bottom: 1px; padding-left: 3px; border-left: 1px solid var(--line); font-family: var(--font-mono, monospace); font-size: 0.62rem; line-height: 1.2; color: var(--muted); white-space: nowrap; pointer-events: none; }
 .ts-thumb { position: absolute; top: -1px; bottom: -1px; border: 1px solid var(--accent); border-radius: 4px; cursor: grab; touch-action: pan-y; }
 .ts-thumb::before { content: ""; position: absolute; inset: 0; border-radius: 3px; background: var(--accent); opacity: 0.16; }
+.ts-thumb::after { content: ""; position: absolute; left: 50%; top: 50%; width: 5px; height: 12px; transform: translate(-50%, -50%); border-inline: 1px solid var(--accent); opacity: 0.7; }   /* it can be grabbed */
 .ts-thumb:hover::before, .ts-thumb:focus-visible::before { opacity: 0.26; }
 .tslider.sliding .ts-thumb { cursor: grabbing; }
 .tslider.sliding .ts-thumb::before { opacity: 0.26; }

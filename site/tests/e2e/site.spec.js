@@ -213,11 +213,11 @@ for (const path of ['/tracker?range=3d', '/tracker/prices?range=3d']) {
       await expect(page).not.toHaveURL(/end=|zoom=/);
     });
 
-    test('its ends zoom', async ({ page }) => {
+    test('its window has a fixed length: no ends to drag', async ({ page }) => {
       await page.goto(path);
       await expect(page.locator('.ts-thumb')).toHaveAttribute('aria-valuetext', /./);
-      await slide(page, '.ts-grip.a', 60);
-      await expect(page).toHaveURL(/zoom=/);
+      await expect(page.locator('.ts-grip').first()).toBeHidden();
+      await expect(page.locator('.ts-grip').last()).toBeHidden();
     });
   });
 }

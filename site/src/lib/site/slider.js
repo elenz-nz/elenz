@@ -1,5 +1,6 @@
-// The time slider under the tracker's charts (test report TRK-12, design decision, 5 Nov 2026): a window on a fixed
-// track of time. Drag it and the charts glide with it, not day by day, and drag either end to show more or less. Each
+// The time slider under the tracker's charts (test report TRK-12, design decision, 5 Nov 2026): a window of fixed length,
+// set by the range buttons, on a fixed track of time. Drag it and the charts glide with it, not day by day. (limits()'s
+// `resize` gives the window ends to drag; both pages have it off.) Each
 // range has its own track (TRACK_DAYS), which stays put while it's used and stops at its ends: picking a date puts the
 // window in the track's middle (`centre`), and the newest data at its right-hand end. The charts follow during a drag
 // where the data is already here (`host.ready`), and otherwise once the finger pauses or lets go; the address and the
@@ -136,13 +137,13 @@ export function spanLabel(from, to, latest) {
  *  before a change that should put the window in the track's middle (a date picked). */
 export function mountSlider(el, host) {
   el.innerHTML = `<div class="ts-track"><svg class="ts-area" aria-hidden="true" preserveAspectRatio="none"><path/></svg><div class="ts-ticks" aria-hidden="true"></div>
-    <div class="ts-thumb" role="slider" tabindex="0" aria-orientation="horizontal" aria-label="Move through time" title="Drag to move through time. Drag the ends to show more or less."></div>
+    <div class="ts-thumb" role="slider" tabindex="0" aria-orientation="horizontal" aria-label="Move through time" title="Drag to move through time"></div>
     <div class="ts-grip a" role="slider" tabindex="0" aria-orientation="horizontal" aria-label="Start of the time shown"></div>
     <div class="ts-grip b" role="slider" tabindex="0" aria-orientation="horizontal" aria-label="End of the time shown"></div></div>
     <output class="ts-tip" hidden></output>`;
   const track = el.querySelector('.ts-track'), thumb = el.querySelector('.ts-thumb'), gripA = el.querySelector('.ts-grip.a'), gripB = el.querySelector('.ts-grip.b');
   const tip = el.querySelector('.ts-tip'), ticks = el.querySelector('.ts-ticks'), area = el.querySelector('.ts-area'), path = area.querySelector('path');
-  const MIN_THUMB = matchMedia('(pointer: coarse)').matches ? 46 : 30;   // px, room for both grips and a grip between them on a finger
+  const MIN_THUMB = matchMedia('(pointer: coarse)').matches ? 44 : 30;   // px, something to get hold of
   let T = null, view = null, drag = null, width = 0, drawn = '', centreNext = false;
   const W = () => track.clientWidth;
   const X = (t) => ((t - T.a) / (T.b - T.a)) * W();

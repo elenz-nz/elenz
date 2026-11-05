@@ -1446,7 +1446,6 @@ export function mountTracker(D, hooks = {}) {
     // a window the slider has moved, at the range's own length, isn't a zoom: nothing to reset (Latest brings it back)
     const chip = $('zoom-reset'), dragged = !!(state.zoom && !state.zoom.span && V && V.zoomed) && !movedWindow();
     chip.hidden = !dragged;
-    if (dragged) $('zoom-txt').textContent = zoomText();
     if (V && V.zoomed) for (const id of ['nav-prev', 'tb-prev', 'nav-next', 'tb-next']) {
       const b = $(id); if (!b) continue;
       b.hidden = false;
@@ -2034,7 +2033,8 @@ export function mountTracker(D, hooks = {}) {
       const [from, to] = windowOf(state.range, state.end, latestT(), firstDay());
       return { from, to };
     },
-    limits: () => ({ min: (ZOOM_MIN[state.int] ?? 0) * DAY || 36e5, max: Infinity, resize: true, grid: isLong() ? 'day' : null }),
+    // a fixed window: the range buttons set its length (design decision, 5 Nov 2026; resize: true gives it ends to drag)
+    limits: () => ({ min: (ZOOM_MIN[state.int] ?? 0) * DAY || 36e5, max: Infinity, resize: false, grid: isLong() ? 'day' : null }),
     inset: () => ({ left: PADL, right: padR() }),
     overview,
     overviewKey: () => [state.region, history.version('hh'), history.version('day')].join(),

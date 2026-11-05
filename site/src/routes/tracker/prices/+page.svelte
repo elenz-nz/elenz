@@ -232,11 +232,6 @@
 	const zoomed = $derived(!!zoom && view?.mode === 'time' && !!view?.zoomed);
 	// a window the slider has moved, at the range's own length, isn't a zoom: nothing to reset (Latest brings it back)
 	const movedWindow = $derived(!!zoom && zoom.from != null && !!R.days && Math.abs((zoom.to as number) - zoom.from - R.days * 864e5) <= 2 * 36e5);
-	const zoomTxt = $derived.by(() => {
-		if (!zoomed || !view) return '';
-		const a = view.t0, b = view.t1;
-		return `${clock(a)} – ${clock(b)}${dayLabel(a) === dayLabel(b) ? ' ' + dayLabel(a) : ''}`;
-	});
 	// zoomed, the stretch shown: [from, to) (to = the end of its last interval), and its length in words
 	const zoomEnds = $derived(zoomed && view ? { from: view.t0, to: view.t1 + view.S.h[view.n - 1] * 36e5 } : null);
 	const zoomWord = (ms: number) => {
@@ -338,8 +333,8 @@
 				const [from, to] = rangeWindow(range, endT, newest(), FIRST);
 				return { from, to };
 			},
-			// long ranges show each period's range and take no zoom, so their window only moves
-			limits: () => ({ min: effInt === '1d' ? 3 * 864e5 : 36e5, max: 30 * 864e5, resize: R.mode === 'time', grid: R.mode === 'time' && effInt !== '1d' ? null : 'day' }),
+			// a fixed window: the range buttons set its length (design decision, 5 Nov 2026; resize: true gives it ends to drag)
+			limits: () => ({ min: 36e5, max: 30 * 864e5, resize: false, grid: R.mode === 'time' && effInt !== '1d' ? null : 'day' }),
 			inset: () => ({ left: 52, right: 10 }),
 			overview: priceOverview,
 			overviewKey: () => [region, longData?.t.length, view?.S?.t[0]].join(),
@@ -858,7 +853,7 @@
 		{#if zoomed && !movedWindow}
 			<button type="button" class="zoom-chip" title="Back to the whole range (Escape)" onclick={() => { zoom = null; save(); }}>
 				<svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="m10.5 10.5 3.5 3.5M5 7h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
-				{#if !zoom?.span}<span>{zoomTxt}</span>{/if}<b>Reset zoom</b>
+				<b>Reset zoom</b>
 			</button>
 		{/if}
 	</nav>
@@ -1059,7 +1054,7 @@
 						<li><b>Click or tap a chart:</b> pins the time. ← → move it. Click it again, or use the Pinned chip or Escape, to let go.</li>
 						<li><b>Range buttons:</b> open around a pinned time.</li>
 						<li><b>‹ › and the date:</b> move through history. Latest comes back to now.</li>
-						<li><b>Slider under the price chart:</b> drag its window to move through time. From 1D to 30D, drag its ends to show more or less. A date picked sits in its middle.</li>
+						<li><b>Slider under the price chart:</b> drag its window to move through time. A date picked sits in its middle.</li>
 						<li><b>Drag across a chart:</b> zooms in, from 1D to 30D. Reset zoom goes back.</li>
 						<li><b>Colour squares:</b> hide a node. Double-click, Shift-click or press and hold shows only that one. The spread's square turns the priced-apart shading on and off.</li>
 						<li><b>Menu beside the title:</b> changes the price scale.</li>
