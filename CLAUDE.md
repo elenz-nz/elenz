@@ -580,7 +580,9 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
    2009, daily peak dispatchable output, Ashburton's small solar farms) ran 23-27 Oct 2026 (commit 9709b43); every
    item checked out on the published files on 27 Oct, the Offers workflow was rerun with "resummarise", and the old
    plant names were cleaned up. BUILD 8 (Tekapo A and B's names, Huntly in September 2020) ran on 3 Nov 2026 in one 13-minute
-   run, and its items checked out on the published data; see `facilities/NEXT_REBUILD.md` for how a next build is collected.
+   run, and its items checked out on the published data. BUILD 9 (Kawerau (Onepu), geothermal from 2013) ran on 5 Nov 2026
+   in one 26-minute run; its items checked out and Offers was resummarised. See `facilities/NEXT_REBUILD.md` for how a
+   next build is collected.
 4. Pages: landing (`/`), live (`/now`, with the price explainer and Every generator right now), tracker (Generation and
    Prices tabs), Records (`/records`), Articles (`/articles`, published 15 Oct 2026 with the Winter 2026 review), About,
    Data and methods (`/methods`) and Privacy. Stale-data watchdog, uptime monitor, Cloudflare Web Analytics and a Buy
