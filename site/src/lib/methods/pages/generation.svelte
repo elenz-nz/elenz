@@ -1,108 +1,169 @@
 <script lang="ts">
 	import { REPO, ref } from '../registry.js';
+	import DataSources from '../DataSources.svelte';
+	import GoodFor from '../GoodFor.svelte';
+	import References from '../References.svelte';
 	import Shot from '../Shot.svelte';
 </script>
 
-<h2 id="shows">What the chart shows</h2>
-<p>The generation chart stacks every source in MW, from the base: geothermal, bioenergy, waste heat, Huntly’s coal/gas Rankine units, gas, diesel, hydro, wind, grid-scale solar and embedded solar (hatched, as it is an estimate), with batteries as a separate layer (below zero while charging). On an island’s own chart, HVDC is shown like the batteries: arriving over the link it is stacked on top, leaving it goes below zero, so the top of the stack is what the island generated plus what it imported. It can also show each source as a percentage of total generation, group the sources in other ways (see <a href="/methods/groupings">groupings</a>), and drill down, from the list beside the chart, from a fuel to its plants and from a plant to its grid connections or units.</p>
-<p>The chart buttons switch it between the stack and lines: each source drawn on its own from zero, in the same units, so plants or fuels can be compared directly. Fuels and groups keep their colours; when two to eight plants or sites of one fuel are shown, each gets its own colour from a separate palette chosen to stay distinguishable with colour-blindness, and keeps it while others are hidden or shown. Embedded solar is dashed and HVDC dotted. The stack’s highest and lowest points are labelled; the lines view leaves that to the tooltip and the list.</p>
-<p>$ Price draws the island reference prices over the chart on a right-hand axis (both for New Zealand, the island’s own on an island’s chart), on the same spike-proof scale as the Prices tab (see <a href="/methods/prices#scales">price scales</a>). It is off unless chosen. Each chart’s unit is written under the top label of its axis: MW for 5-minute and half-hourly points, energy (MWh, GWh or TWh) for days and longer, or % for shares.</p>
+<aside class="mt-caveats" aria-label="Key caveats">
+	<p class="k">Key caveats</p>
+	<ul>
+		<li>Plants on local networks that aren’t dispatched are missing from the live week, apart from modelled embedded solar. They averaged about 120–165 MW in the 2026 months we checked, close to 3% of generation.</li>
+		<li>Dispatch data shows targets, not meter readings. On a river chain dispatched as a block, only the chain’s total is reliable.</li>
+		<li>Ngāwhā, Glenbrook, Kawerau (Onepu) and Teviot read differently in dispatch and metered data, so they can step where the two meet.</li>
+	</ul>
+	<p><a href="#limitations">Accuracy and limitations</a> has the detail.</p>
+</aside>
 
-<h2 id="live">The live week: dispatch data</h2>
-<p>Every five minutes the system operator runs a dispatch case: a solve of the whole market that sets each generating unit’s output for the next interval and the price at every node. The site reads each case from the Electricity Authority’s real-time dispatch feed, usually a minute or two after the interval starts, and keeps the last seven days at 5-minute resolution.</p>
-<ul>
-	<li>Each row in the feed is one unit at one grid connection point, keyed by both (for example <code>MPE1101 KWK0</code>, Kaiwaikawe wind farm). Fuel and plant are looked up per unit, so a connection point with more than one kind of plant isn’t a problem.</li>
-	<li>Dispatch MW is what each unit was dispatched to generate. For most plant that follows what it actually did: dispatched solar farms matched their metered output within 1–2% by half-hour in September 2026. Once the metered data for a month is published, history uses that instead (see <a href="/methods/history">history</a>).</li>
-	<li>Some river chains are <a href={ref('block')}>dispatched as one block</a> (<a href={ref('dispatch')}>“blocks” in the market system</a>): the owner only has to meet the chain’s total, so the dispatch figure for a single station on such a chain is not necessarily what that station generated. The chain’s total is right. The metered history has each station’s real output.</li>
-	<li>The live week comes from the feed alone. An interval the site missed is asked for again (the feed keeps about a month), and one the feed has no case for, about 7–8% of 5-minute intervals, is filled by a straight line between the intervals either side. The EA’s daily dispatch files, the same cases 1–4 days later, are used once days move into the history behind the live week.</li>
-	<li>Now and then a case arrives from the feed incomplete, with whole groups of rows missing (on 19 Oct 2026 at 1 pm, an island’s load and most generation for ten minutes). An interval whose island load (Tiwai aside) or national generation is under three-quarters of the intervals either side, or that has far fewer rows than usual, is treated the same way and fetched again for the next six hours. The summary table says “interpolated” when the time line is on a filled interval.</li>
-	<li>The page shows “Live” while the newest interval is under 15 minutes old, and “Delayed” after that.</li>
-</ul>
+<h2 id="introduction"><span id="shows"></span>Introduction</h2>
+<p>Generation is the electricity produced by New Zealand’s power stations, shown in megawatts (MW) for each fuel and plant. The chart stacks the sources from the base up: geothermal, bioenergy, waste heat, Huntly’s coal/gas Rankine units, gas, diesel, hydro, wind, grid solar and embedded solar. Batteries are a separate layer.</p>
+<p>Grid solar is solar farms that the market dispatches. <a href="/methods/embedded-solar">Embedded solar</a> is solar on local networks that isn’t dispatched. It is hatched on the chart because it is an estimate.</p>
+<p>Recent figures come from dispatch data. Elenz replaces them with metered data as the Electricity Authority (EA) publishes each month. <a href="/methods/history#layers">History since 1997</a> explains how the layers of data fit together.</p>
+<p>To use the chart’s controls, see <a href="/guide#generation">Using Elenz</a>. The other ways of grouping the sources are on the <a href="/methods/groupings">groupings page</a>.</p>
 
-<h2 id="mapping">From units to plants and fuels</h2>
-<p>Each unit is matched to a plant, a fuel and an island through the EA’s register of dispatched generation (<code>DispatchedGenerationPlant.csv</code>). The register keeps dated rows as units are added, moved and retired; the latest row for each unit wins, and retired units and old connections stay mapped so the history can use them.</p>
+<h2 id="data-sources">Data sources</h2>
+<DataSources slug="generation" roles={{
+	genmd: ['Main data', 'Provides each station’s half-hourly output for every month the EA has published.'],
+	embedded: ['Main data before 2009', 'Provides stations on local networks before metered generation covers them, and gross output where metered generation is net of local load.'],
+	dispatch: ['Recent data', 'Provides the weeks since the latest metered month, and plants the metering doesn’t have, such as batteries and new solar farms.'],
+	rtd: ['Live data', 'Provides each generating unit’s dispatched output for the live week.'],
+	register: ['Mapping', 'Matches each unit to its plant, fuel, island and operator.'],
+	nsp: ['Mapping', 'Gives the island of connection points that appear only in the metered history.'],
+	reconciliation: ['Check', 'Measures the other generation on local networks that the dispatch data doesn’t see.'],
+}} />
+
+<h2 id="how-it-works">How it works</h2>
+
+<h3 id="live">Dispatch data</h3>
+<p>Every 5 minutes, the system operator solves the whole market for the coming interval. This dispatch case sets each generating unit’s target output and the price at each node. Elenz reads each case from the EA’s real-time dispatch feed, usually 1 to 2 minutes after the interval starts, and keeps the last 7 days.</p>
+<p>Each row in the feed is one unit at one connection point, such as <code>MPE1101 KWK0</code> for Kaiwaikawe wind farm. We look up the plant and fuel for each unit, so a connection point with several kinds of plant isn’t a problem.</p>
+<p>The live week comes from the feed alone. If Elenz misses an interval, it asks the feed again, because the feed keeps about a month. About 7–8% of 5-minute intervals have no dispatch case at all. We fill each of these with a straight line between the intervals either side.</p>
+<p>A case sometimes arrives with whole groups of rows missing. We treat a case as incomplete if an island’s load, leaving out Tiwai, or national generation is under 75% of the intervals either side. The same applies if it has under 85% of the usual rows. We fill an incomplete case with the same straight line, and ask for it again for the next 6 hours. The summary table says “interpolated” when the time line is on a filled interval.</p>
+
+<h3 id="mapping">From units to plants and fuels</h3>
+<p>The EA’s <a href="/methods/sources#register">register of dispatched generation</a> gives each unit its plant, fuel and island. It keeps dated rows as units are added, moved and retired. The latest row for each unit wins, and retired units and old connections stay mapped so that the history can use them.</p>
 <div class="tbl">
 	<table>
 		<thead><tr><th>Register fuel</th><th>Shown as</th></tr></thead>
 		<tbody>
-			<tr><td>Hydro, Wind, Geothermal, Solar, Diesel, Gas</td><td>The same</td></tr>
-			<tr><td>Coal/Gas</td><td>Coal/gas, Rankine: Huntly units 1, 2 and 4 burn coal or gas, and the market data doesn’t say which</td></tr>
-			<tr><td>Electrical energy</td><td>Battery</td></tr>
+			<tr><td>Hydro, Wind, Geothermal, Solar, Diesel, Gas</td><td>The same name.</td></tr>
+			<tr><td>Coal/Gas</td><td>Coal/gas, Rankine. Huntly units 1, 2 and 4 can burn coal or gas, and the market data doesn’t say which.</td></tr>
+			<tr><td>Electrical energy</td><td>Battery. The register uses this fuel name for battery storage.</td></tr>
 		</tbody>
 	</table>
 </div>
-<p>The register is updated about twice a year, so it lags what is happening on the grid. A curated file of corrections (<a href={REPO + 'facilities/overrides.toml'}><code>facilities/overrides.toml</code></a>) fills the gaps, and every data build warns about any generating unit it can’t map:</p>
+<p>The register is updated about twice a year, so it lags what is happening on the grid. A file of corrections (<a href={REPO + 'facilities/overrides.toml'}><code>facilities/overrides.toml</code></a>) fills the gaps, and every data build warns about any generating unit it can’t map.</p>
 <div class="tbl">
 	<table>
-		<thead><tr><th>Correction</th><th>Units</th><th>Why</th></tr></thead>
+		<thead><tr><th>Correction</th><th>Units</th><th>Reason</th></tr></thead>
 		<tbody>
-			<tr><td>Added</td><td>Kaiwaikawe wind (<code>MPE1101 KWK0</code>), Kōwhai Park solar (<code>ISL0661 KPS0</code>), Ruakākā solar (<code>BRB0331 RUS0</code>)</td><td>Dispatching, but not in the register yet</td></tr>
-			<tr><td>Bioenergy</td><td>Kinleith (<code>KIN0112</code>)</td><td>Oji Fibre Solutions’ cogeneration, on <a href={ref('kinleith')}>wood waste</a> and black liquor, with <a href={ref('stack2020')}>natural gas as a secondary fuel</a>; the register says gas</td></tr>
-			<tr><td>Waste heat</td><td>Glenbrook (<code>GLN0332</code>)</td><td>Runs on <a href={ref('nzsteel')}>waste gas and heat from NZ Steel’s ironmaking</a>, not pipeline gas</td></tr>
-			<tr><td>Island</td><td><code>OHG1101</code>, <code>OHG2201</code></td><td>Pātea moved to OHG1101 in June 2026, and the feed gives it no island</td></tr>
-			<tr><td>Battery charging</td><td><code>RUK99</code>, <code>GLB99</code>, <code>RHO99</code>, <code>HLY91</code></td><td>Charging is dispatched as load on a separate unit; it is netted against its battery (Ruakākā, Glenbrook-Ohurua, Rotohiko, Huntly)</td></tr>
-			<tr><td>One name</td><td>Pātea units 1–3; Kaimai 5; Ngāwhā B; West Wind 1 and 2</td><td>Shown as Pātea, Kaimai, Ngāwhā and West Wind: the names the metered history uses, and one farm for West Wind’s two connections</td></tr>
-			<tr><td>New name</td><td>Kawerau (Onepu) (<code>KAW0112 ONU0</code>)</td><td>The register’s “Carter Holt Harvey Energy Ltd CoGen”: the meter is a whole site’s grid connection, not the mill’s (<a href="#onepu">below</a>)</td></tr>
+			<tr><td>Plants added</td><td>Kaiwaikawe wind (<code>MPE1101 KWK0</code>), Kōwhai Park solar (<code>ISL0661 KPS0</code>), Ruakākā solar (<code>BRB0331 RUS0</code>)</td><td>These units are dispatching but aren’t in the register yet.</td></tr>
+			<tr><td>Fuel changed to bioenergy</td><td>Kinleith (<code>KIN0112</code>)</td><td>Oji Fibre Solutions’ cogeneration runs on <a href={ref('kinleith')}>wood waste</a> and black liquor, with <a href={ref('stack2020')}>natural gas as a secondary fuel</a>. The register says gas.</td></tr>
+			<tr><td>Fuel changed to waste heat</td><td>Glenbrook (<code>GLN0332</code>)</td><td>It runs on <a href={ref('nzsteel')}>waste gas and heat from NZ Steel’s ironmaking</a>, not pipeline gas.</td></tr>
+			<tr><td>Island added</td><td>Connections <code>OHG1101</code> and <code>OHG2201</code></td><td>The feed gives these connections no island, so we assign them to the North Island. Pātea moved to <code>OHG1101</code> in June 2026.</td></tr>
+			<tr><td>Battery charging netted</td><td><code>RUK99</code>, <code>GLB99</code>, <code>RHO99</code>, <code>HLY91</code></td><td>Charging is dispatched as load on a separate unit. We net it against its battery at Ruakākā, Glenbrook-Ohurua, Rotohiko and Huntly.</td></tr>
+			<tr><td>Names merged</td><td>Pātea units 1–3, Kaimai 5, Ngāwhā B, West Wind 1 and 2</td><td>We show each of these under one plant name, so that dispatch data lines up with the metered history. West Wind’s two connections are one wind farm.</td></tr>
+			<tr><td>Name changed</td><td>Kawerau (Onepu) (<code>KAW0112 ONU0</code>)</td><td>The register calls this “Carter Holt Harvey Energy Ltd CoGen”. Its meter is a whole site’s connection to the grid, not the mill’s (see <a href="#onepu">Kawerau (Onepu)</a>).</td></tr>
 		</tbody>
 	</table>
 </div>
 
-<h3 id="whole">Stations shown whole</h3>
-<p>The metered history only sees some stations as a whole, so they are one plant everywhere on the site, with their register plants as units where the dispatch data has them:</p>
-<ul>
-	<li><b>Huntly Rankines</b>: Huntly units 1–4.</li>
-	<li><b>Stratford</b>: Taranaki Combined Cycle (closed March 2026) and Stratford peakers 1 and 2.</li>
-	<li><b>Waikaremoana</b>: Tuai, Piripaua and Kaitawa.</li>
-	<li><b>Te Mihi</b>: Te Mihi 1 and 2.</li>
-	<li><b>Southdown</b>: Southdown and Southdown 5.</li>
-</ul>
-<p>Three plants generate onto two buses and can be split by grid connection: Arapuni (<code>ARI1101</code>, <code>ARI1102</code>), Roxburgh (<code>ROX2201</code>, <code>ROX1101</code>) and West Wind (<code>WWD1102</code>, <code>WWD1103</code>). The metered history has more than one point for some other plants, but those are meters rather than grid connections (an embedded plant’s local network point, a connection that moved), so those plants are shown whole.</p>
-<p>The metered history sees the stations above only whole, so over a range that reaches back into it they show a “Whole station (metered)” row beside their units, which cover only the dispatch data’s weeks.</p>
-<p>A few other plants are counted differently in the metered history than in the dispatch data:</p>
-<ul>
-	<li><b>Kaimai</b> and <b>Ngāwhā</b>: the metered history has the whole scheme or station, but the dispatch data has only one dispatched unit (Kaimai 5; Ngāwhā B), so the live week shows less than their full output.</li>
-	<li><b>Deep Stream</b> and <b>Mahinerangi</b>: one meter (<code>WPG0331</code>) carries both from June 2011, split 30% and 70% by their average shares in the dispatch data, 2020–26.</li>
-	<li><b>Kawerau (Te Ahi O Maui)</b> and <b>Kawerau (TOPP2)</b>: one metered code at <code>KAW2201</code> carries both from December 2025, split 35% and 65% by their dispatch shares.</li>
-	<li><b>Glenbrook</b>: its metered output runs about 1.45 times the dispatch data’s figure.</li>
-</ul>
-<p>When the tracker drills into one of these plants, or a station shown whole, it says what its metered history counts, and lists any other names the plant has had or goes by (Taranaki Combined Cycle for Stratford, Tekapo for Takapō, Waverley for Waipipi, and the project names newer solar farms were built under, such as Kaitaia for Kohirā and Waiotahe for Te Herenga o Te Rā). The list’s filter and the search on Now find plants by those names too.</p>
+<h3 id="totals">Totals, peaks and energy</h3>
+<p>Total generation adds up every source’s output while that output is positive.</p>
+<p class="formula">Total generation = the sum of every source’s output while positive
+<small>This includes battery discharge and embedded solar. It leaves out the HVDC link and battery charging.</small></p>
+<p>An island’s total is that island’s own generation, so power arriving over the HVDC link isn’t counted.</p>
+<p>Peak generation is the highest 5-minute total in the range. The 30-day view uses half-hours, and longer ranges use each day’s highest half-hour.</p>
+<p>With no point in time selected, the summary table shows each source’s energy over the range. Energy is MW × hours, summed, and is shown in GWh, or in TWh once the total passes 10,000 GWh.</p>
+<p>Where each point is a day, week, month or year, the chart shows energy instead of average MW, which reads low for output that varies through the day. These views start at the first whole period in the range. The period still in progress shows its energy so far, and doesn’t count as a high or low.</p>
+<p>When the tracker opens one plant, its nameplate line and capacity factor use the sum of its units’ nameplate MW in today’s register. For a plant seen only in the metered history, we use the most the register ever had installed at once. The mix table’s capacity factors use each plant’s capacity history instead (see <a href="/methods/capacity">Installed capacity</a>).</p>
 
-<h2 id="totals">Totals, peaks and capacity</h2>
-<p class="formula">Total generation = Σ every source’s output while positive
-<small>includes battery discharge and embedded solar; leaves out the HVDC link and battery charging</small></p>
-<ul>
-	<li>An island’s total is that island’s own generation; power arriving over the HVDC link isn’t counted.</li>
-	<li>Peak generation is the highest 5-minute total in the range (half-hourly in the 30-day view; on longer ranges, each day’s highest half-hour).</li>
-	<li>With no point in time selected, the summary table shows each source’s energy over the range: MW × hours, summed, in GWh (TWh once the total passes 10,000 GWh).</li>
-	<li>Where each point is a day, week, month or year, the generation chart and the summary at a point show energy (the average MW × the point’s hours) in MWh, GWh or TWh to suit the size, rather than an average MW, which reads low for anything that varies through the day. These views start at the first whole period in the range; the period still in progress shows its energy so far and isn’t counted as a high or low. A single plant’s nameplate line shows only on the MW views.</li>
-	<li>When the tracker drills into one plant, its nameplate line and capacity factor use the sum of its units’ nameplate MW in the register today (for plants seen only in the metered history, the most the register ever had installed at once). The mix table’s capacity factors use each plant’s capacity history instead (see <a href="/methods/capacity">installed capacity</a>).</li>
-</ul>
-
-<h2 id="time-of-day">By time of day</h2>
-<p>Under the Generation tab’s charts, the time-of-day map shows the renewable share, or one fuel’s output, for every half-hour of the day: one column per half-hour from midnight, so daily and seasonal patterns stand out. Its buttons pick the same choices as the share card above it: renewables, wind, solar, inverter-based (wind and solar), hydro, gas and coal/gas.</p>
+<h3 id="time-of-day">By time of day</h3>
+<p>The time-of-day map shows the renewable share, or one fuel’s output, for every half-hour of the day. Each column is a half-hour from midnight, so daily and seasonal patterns stand out. It can show renewables, wind, solar, inverter-based generation (wind and solar), hydro, gas and coal/gas.</p>
 <Shot name="tracker-heat" alt="The time-of-day map over 30 days: one row per day, one column per half-hour, coloured by the renewable share." caption="The time-of-day map on the Generation tab, over 30 days." />
+<p>The map follows the range, with one row per day for at least the last 7 days and up to 400 days. On All it has one row per month or year, each the average of that half-hour across the period.</p>
+<p>The renewable share uses fixed colour bands, so that different periods can be compared. The bands are under 80%, 80–88%, 88–93%, 93–96%, 96–98%, and 98% and over. The share is worked out as on the <a href="/methods/groupings#renewable">groupings page</a>, so embedded solar counts and battery discharge doesn’t.</p>
+<p>A fuel’s colours use six steps on a fixed scale, set by today’s installed capacity of that fuel in the region shown. The top step starts at 80% of that capacity for half-hours, and at 60% for monthly averages, which smooth out the peaks. Earlier years show fainter colour where less was built.</p>
+<p>“Scale to this view” replaces either scale with one fitted to what is shown. For the renewable share it sets the bands at the sixths of the shares shown, which the early years need because most of their half-hours are under 80%.</p>
+
+<h3 id="whole">Plant notes: stations shown whole</h3>
+<p>The metered history sees some stations only as a whole, so Elenz shows each as one plant. Their register plants appear as units where the dispatch data has them.</p>
 <ul>
-	<li><b>Rows.</b> It follows the range: one row per day (at least the last seven days, up to 400 days, from the half-hourly history and the live week), scrolling once there are more than 40, newest at the foot. On All it has one row per month (or per year, on the yearly interval), each the average of that half-hour across the month, from a file the history job keeps of every month’s time-of-day averages.</li>
-	<li><b>Renewable share colours.</b> Fixed bands, so different periods compare: under 80% (brown, half-hours that leaned on thermal plant), 80–88%, 88–93%, 93–96%, 96–98%, and 98% and over (green). “Scale to this view” sets the bands at the sixths of the shares shown instead, which the early years need: most of their half-hours are under 80%.</li>
-	<li><b>A fuel’s colours.</b> Six steps on a fixed scale set by today’s installed capacity of that fuel in the region shown, the top step starting at 80% of it for half-hours (60% for monthly averages, which smooth out the peaks). Earlier years show fainter colour where less was built, in light and dark mode alike. “Scale to this view” fits the steps to the output shown.</li>
-	<li>The renewable share is worked out as on the <a href="/methods/groupings#renewable">groupings page</a>; embedded solar counts, battery discharge doesn’t.</li>
+	<li><b>Huntly Rankines:</b> Huntly units 1–4.</li>
+	<li><b>Stratford:</b> Taranaki Combined Cycle (closed March 2026) and Stratford peakers 1 and 2.</li>
+	<li><b>Waikaremoana:</b> Tuai, Piripaua and Kaitawa.</li>
+	<li><b>Te Mihi:</b> Te Mihi 1 and 2.</li>
+	<li><b>Southdown:</b> Southdown and Southdown 5.</li>
+</ul>
+<p>Over a range that reaches back into the metered history, these stations show a “Whole station (metered)” row beside their units. The units cover only the weeks of dispatch data.</p>
+<p>Three plants generate onto two buses, so they can be split by connection point: Arapuni (<code>ARI1101</code>, <code>ARI1102</code>), Roxburgh (<code>ROX2201</code>, <code>ROX1101</code>) and West Wind (<code>WWD1102</code>, <code>WWD1103</code>). The metered history has more than one point for some other plants. Those are meters and not connections to the grid, such as a local network point or a connection that moved, so we show those plants whole.</p>
+
+<h3 id="counted-differently">Plant notes: plants counted differently</h3>
+<p>A few plants are counted differently in the metered history and the dispatch data.</p>
+<ul>
+	<li><b>Kaimai and Ngāwhā:</b> the metered history has the whole scheme or station, but the dispatch data has only one dispatched unit (Kaimai 5 and Ngāwhā B). The live week therefore shows less than their full output.</li>
+	<li><b>Deep Stream and Mahinerangi:</b> one meter (<code>WPG0331</code>) has carried both since June 2011. We split it 30% and 70%, their average shares in the dispatch data from 2020 to 2026.</li>
+	<li><b>Kawerau (Te Ahi O Maui) and Kawerau (TOPP2):</b> one metered code at <code>KAW2201</code> has carried both since December 2025. We split it 35% and 65%, by their dispatch shares.</li>
+	<li><b>Glenbrook:</b> its metered output runs about 1.45 times the dispatch figure.</li>
 </ul>
 
-<h3 id="onepu">Kawerau (Onepu)</h3>
-<p>The register lists <code>KAW0112 ONU0</code> as one geothermal unit of 53 MW, under the mill’s name. Its meter shows something else: a whole site’s connection to the grid.</p>
-<ul>
-	<li>Power flows both ways there, usually in the same half-hour, on what look like separate circuits. The site’s figure counts only the power going into the grid, about 25 MW on average since 2014. It leaves out what the site uses itself and what it takes from the grid.</li>
-	<li>Until 2012 this was a load: about 1 MW or less went into the grid, and about 35–70 MW came out. That changed in 2013, about when <a href={ref('eastland-geo')}>Eastland’s 24 MW TOPP1 geothermal plant</a> started, and when much less power began coming out to the mill.</li>
-	<li>TOPP1 and Eastland’s 9 MW GDL plant have no row of their own in the register or the metered files, and what goes into the grid is mostly less than their 33 MW together. So we show this meter as geothermal, as the register does, with <a href="/methods/emissions#geothermal">their emissions</a>.</li>
-	<li>That is our reading of the meters: no public document says which plant is behind this one. The site also has the mill’s own generation, <a href={ref('tasman')}>biomass</a> and geothermal, and Oji reports <a href={ref('ojifs2025')}>96 GWh generated at its Tasman mill in 2025</a>, against about 240 GWh into the grid here.</li>
-</ul>
+<h3 id="onepu">Plant notes: Kawerau (Onepu)</h3>
+<p>The register lists <code>KAW0112 ONU0</code> as one geothermal unit of 53 MW, under the mill’s name. Its meter shows a whole site’s connection to the grid instead.</p>
+<p>Power flows both ways at this connection, usually in the same half-hour, on what look like separate circuits. Elenz counts only the power going into the grid, about 25 MW on average since 2014. That leaves out what the site uses itself and what it takes from the grid.</p>
+<p>Until 2012 this connection was a load: about 1 MW or less went into the grid, and about 35–70 MW came out. That changed in 2013, about when <a href={ref('eastland-geo')}>Eastland’s 24 MW TOPP1 geothermal plant</a> started, and when much less power began coming out to the mill.</p>
+<p>TOPP1 and Eastland’s 9 MW GDL plant have no row of their own in the register or the metered files. What goes into the grid here is mostly less than their combined 33 MW. We therefore show this meter as geothermal, as the register does, with <a href="/methods/emissions#geothermal">their emissions</a>.</p>
+<p>That is our reading of the meters: no public document has been found which specifies the plant behind this one. The wider site also has the mill’s own generation, <a href={ref('tasman')}>biomass</a> and geothermal. Oji reports <a href={ref('ojifs2025')}>96 GWh generated at its Tasman mill in 2025</a>, against about 240 GWh into the grid here.</p>
 
-<h2 id="limits">Known limits</h2>
-<ul>
-	<li>Plants on local networks that aren’t dispatched don’t appear as generation in the live week: their output shows up as lower demand at the grid. Embedded solar is the exception, and is modelled. The rest came to about 120–165 MW on average in January, June and September 2026, close to 3% of generation and steady day and night: mostly small hydro, Ngāwhā’s older units (about 25 MW) and landfill gas (about 20 MW), with a little wind, gas and diesel. So a 24% solar share in the live week is about 23% of all generation, and the renewable share reads slightly low. (Measured from the EA’s <a href="/methods/sources#reconciliation">reconciled injection</a> less the dispatch data, grid point by grid point.)</li>
-	<li>The metered history already counts all of Ngāwhā and Teviot’s own meter, so both step down where the history hands over to the dispatch data. The other plants are missing from the history too, about 2% of generation.</li>
-	<li>Dispatch and metered generation agree within a fraction of a percent for most plants, but not for Ngāwhā, Glenbrook, Kawerau (Onepu) or the stations of block-dispatched river chains, and dispatch half-hours reach slightly further at their extremes. See <a href="/methods/history#seam">where the sources hand over</a>.</li>
-	<li>Huntly’s Rankine units are shown as coal/gas, because the market data doesn’t say which fuel they burned. Their emissions use Genesis’s reported coal share each quarter (see <a href="/methods/emissions">emissions</a>).</li>
-</ul>
+<h2 id="interpretation">How to interpret it</h2>
+<p>The height of the stack is total generation, and each layer shows one source’s part of it. Batteries sit below zero while charging, because they are taking power and not supplying it.</p>
+<p>On an island’s own chart, HVDC is drawn like a battery. Power arriving over the link is stacked on top, and power leaving goes below zero. The top of the stack is therefore what the island generated plus what it imported.</p>
+<p>A step in one plant’s line doesn’t always mean its output changed. It may be the point where metered and dispatch data meet, so check the plant notes above before comparing the two sides of it.</p>
+<GoodFor rows={[
+	{ use: 'New Zealand or island generation by fuel, in history', level: 'good', verdict: 'Metered, for the stations the metering covers.' },
+	{ use: 'One plant’s output, in history', level: 'good', verdict: 'Metered, unless the plant notes say a meter is shared or the plant is shown whole.' },
+	{ use: 'Generation by fuel, recent weeks and live week', level: 'ok', verdict: 'Dispatch data, which agrees closely with metered data nationally.', why: 'It leaves out plants on local networks that aren’t dispatched.' },
+	{ use: 'One station on a river chain, recent weeks and live week', level: 'care', verdict: 'The dispatch figure may not be what that station generated.', why: 'Some chains are dispatched as a block, so use the chain’s total or the metered history.' },
+	{ use: 'Whether Huntly’s Rankine units burned coal or gas', level: 'no', verdict: 'The market data doesn’t say which fuel they burned.' },
+]} />
 
+<h2 id="limitations"><span id="limits"></span>Accuracy and limitations</h2>
+<div class="tbl">
+	<table>
+		<thead><tr><th>Figure</th><th>Status</th><th>Typical accuracy</th></tr></thead>
+		<tbody>
+			<tr><td>Output by plant and fuel, metered months</td><td>Metered</td><td>As published by the EA, apart from the shared meters we split</td></tr>
+			<tr><td>Output by plant and fuel, recent weeks and live week</td><td>Dispatch</td><td>National wind and hydro within 0.2% of metered output, September 2020 to September 2026</td></tr>
+			<tr><td>Battery output, all periods</td><td>Dispatch</td><td>Dispatch nets each battery’s charging, so it is used in metered months too</td></tr>
+			<tr><td>Filled 5-minute intervals</td><td>Estimated</td><td>A straight line between the intervals either side</td></tr>
+			<tr><td>Embedded solar</td><td>Estimated</td><td>About ±9% on clear days and ±19% under cloud (see <a href="/methods/embedded-solar#uncertainty">its uncertainty</a>)</td></tr>
+			<tr><td>Total generation</td><td>Calculated</td><td>The sum of the figures above, so it includes estimated embedded solar from August 2013</td></tr>
+		</tbody>
+	</table>
+</div>
+<p>The largest gap is in the live week. Plants on local networks that aren’t dispatched don’t appear there as generation, because their output shows up as lower demand at the grid. Embedded solar is the exception, and is modelled.</p>
+<p>The other plants came to about 120–165 MW on average in January, June and September 2026, close to 3% of generation and steady day and night. They are mostly small hydro, Ngāwhā’s older units (about 25 MW) and landfill gas (about 20 MW), with a little wind, gas and diesel. A 24% solar share in the live week is therefore about 23% of all generation, and the renewable share reads slightly low. We measured this from the EA’s <a href="/methods/sources#reconciliation">reconciled injection</a> less the dispatch data, connection point by connection point.</p>
+<p>The metered history already counts all of Ngāwhā and has Teviot’s own meter, so both step down where the history moves to dispatch data. The other plants are missing from the history too, about 2% of generation.</p>
+<p>Dispatch figures are targets. For most plants they follow what the plant did: dispatched solar farms matched their metered output within 1–2% by half-hour in September 2026. Dispatch and metered generation agree within a fraction of a percent for most plants. Ngāwhā, Glenbrook, Kawerau (Onepu) and the stations of block-dispatched river chains are the exceptions, and dispatch half-hours reach slightly further at their extremes (see <a href="/methods/history#seam">where the sources hand over</a>).</p>
+<p>Some river chains are <a href={ref('block')}>dispatched as one block</a> (<a href={ref('dispatch')}>“blocks” in the market system</a>). The generator must meet the chain’s total but can divide it between stations, so one station’s dispatch figure may differ from what it generated. The chain’s total holds, and the metered history has each station’s output.</p>
+<p>Huntly’s Rankine units are shown as coal/gas because the market data doesn’t say which fuel they burned. Their emissions use Genesis’s reported coal share each quarter (see <a href="/methods/emissions">Emissions intensity</a>).</p>
+
+<h2 id="coverage">Historical coverage</h2>
+<p>Each row marks a change in what the record can show. <a href="/methods/history#gaps">History since 1997</a> lists every known gap, including missing stations and months.</p>
+<div class="tbl">
+	<table>
+		<thead><tr><th>From</th><th>Change</th></tr></thead>
+		<tbody>
+			<tr><td>August 1997</td><td>Metered generation starts, covering stations connected to the national grid.</td></tr>
+			<tr><td>October 1998</td><td>Embedded generation meters start, most of them from April 1999. We use only stations that Elenz also shows later, so totals don’t jump in 2009.</td></tr>
+			<tr><td>January 2009</td><td>Metered generation starts covering stations on local networks.</td></tr>
+			<tr><td>January 2013</td><td>Kawerau (Onepu) starts, shown as geothermal. Grid imports stand in for it until January 2020.</td></tr>
+			<tr><td>August 2013</td><td>Embedded solar starts, because the registry of installed systems starts then.</td></tr>
+			<tr><td>10 September 2020</td><td>Daily dispatch files start, so unit-level dispatch data is available from here.</td></tr>
+		</tbody>
+	</table>
+</div>
+
+<h2 id="references">References</h2>
+<References slug="generation" inBody />
 <p class="note">Code: <a href={REPO + 'ingest/build_tracker.py'}><code>ingest/build_tracker.py</code></a> (units to plants and fuels), <a href={REPO + 'ingest/update.py'}><code>ingest/update.py</code></a> (the 5-minute job), <a href={REPO + 'ingest/emi_live.py'}><code>ingest/emi_live.py</code></a> (the feed).</p>

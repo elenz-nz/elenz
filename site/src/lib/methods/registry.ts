@@ -19,6 +19,7 @@ export type Topic = {
 	summary: string; // one or two sentences under the title, and on the overview's cards
 	shownOn: [string, string][]; // [label, href]: where the series appears on the site
 	estimate?: boolean; // modelled rather than measured
+	status?: string; // the data status line. Set on pages in the standard structure, whose bodies place Data sources and References
 	updated: string; // YYYY-MM-DD: when the page was last checked against the code
 };
 
@@ -26,9 +27,10 @@ export const TOPICS: Topic[] = [
 	{
 		slug: 'generation',
 		title: 'Generation',
-		summary: 'What each plant and fuel is generating: the dispatch data for the live week, metered output for history, each unit mapped to its plant and fuel.',
+		summary: 'How much electricity each plant and fuel is generating. History uses metered output. Recent weeks and the live week use dispatch data, the market’s 5-minute targets.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
-		updated: '2026-11-05',
+		status: 'Metered in history. Dispatch data for recent weeks and the live week. Embedded solar is estimated throughout.',
+		updated: '2026-11-06',
 	},
 	{
 		slug: 'embedded-solar',
@@ -48,10 +50,11 @@ export const TOPICS: Topic[] = [
 	{
 		slug: 'hvdc',
 		title: 'HVDC transfer',
-		summary: 'Power flowing between the islands on the HVDC link: metered in history, estimated for the live week because the dispatch data doesn’t include it.',
+		summary: 'The electricity moving between the North and South Islands on the HVDC link. History uses metered flows. The live week and the newest weeks use an estimate.',
 		shownOn: [['Tracker', '/tracker'], ['Prices', '/tracker/prices'], ['Now', '/now']],
 		estimate: true,
-		updated: '2026-11-01',
+		status: 'Metered in history. Estimated for the live week and for months not yet published.',
+		updated: '2026-11-06',
 	},
 	{
 		slug: 'prices',
@@ -145,9 +148,9 @@ export const SOURCES: Source[] = [
 		id: 'dispatch', name: 'Dispatch prices and volumes', publisher: EA, dataset: 'DispatchAndPricing/NodalPricesAndVolumes',
 		url: EMI + 'DispatchAndPricing/NodalPricesAndVolumes',
 		what: 'The same dispatch cases as the real-time feed, one file a day, for connection points with load or generation (no bus nodes).',
-		use: 'Fills gaps in the live week; history for the weeks since the latest metered month; plants the metering doesn’t have (batteries, new solar farms).',
+		use: 'History for the weeks since the latest metered month, and plants the metering doesn’t have (batteries, new solar farms).',
 		period: 'From 10 Sep 2020', fresh: '1–4 days late', licence: CCBY,
-		topics: ['generation', 'demand', 'prices', 'history', 'records'],
+		topics: ['generation', 'demand', 'prices', 'hvdc', 'history', 'records'],
 	},
 	{
 		id: 'final', name: 'Final energy prices', publisher: EA, dataset: 'DispatchAndPricing/FinalEnergyPrices',
@@ -438,6 +441,13 @@ export const REFERENCES: Reference[] = [
 		use: 'Battery discharge left out of carbon intensity and the renewable share; em6’s emission factor for each generator.',
 		topics: ['emissions', 'groupings'],
 	},
+	// ---------- the HVDC link ----------
+	{
+		id: 'hvdc-link', title: 'Transpower exploring future role of New Zealand’s inter-island HVDC electricity link', by: 'Transpower', date: '7 March 2024',
+		url: 'https://www.transpower.co.nz/news/transpower-exploring-future-role-new-zealands-inter-island-hvdc-electricity-link',
+		use: 'What the link connects, between Benmore and Haywards, and what it is used for.',
+		topics: ['hvdc'],
+	},
 	// ---------- plants ----------
 	{
 		id: 'nzsteel', title: 'Energy resources and recovery', by: 'New Zealand Steel',
@@ -466,7 +476,7 @@ export const REFERENCES: Reference[] = [
 	{
 		id: 'block', title: 'Electricity Industry Participation Code 2010, Part 1', by: 'Electricity Authority', date: '15 May 2025',
 		url: 'https://www.ea.govt.nz/documents/7239/Part_1_-_Preliminary_provisions.pdf',
-		use: 'Defines a block dispatch group: generating stations on one continuous water course under an agreement with the system operator. No public list names the groups.',
+		use: 'Defines a block dispatch group: generating stations on one continuous water course under an agreement with the system operator. We have found no public list that names the groups.',
 		topics: ['generation', 'history'],
 	},
 	{
