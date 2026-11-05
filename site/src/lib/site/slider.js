@@ -20,6 +20,13 @@ import { nzOffset } from '#lib/tracker/series.js';
 const DAY = 864e5, HOUR = 36e5, FIVE = 3e5;
 const DAYS = { '1d': 1, '3d': 3, '7d': 7, '30d': 30, '1y': 365 };
 const ORDER = ['1d', '3d', '7d', '30d', '1y'];
+/** How much of [a, b) a series really holds, in ms: a series joined from months can span a track with months missing. */
+export function held(m, a, b) {
+  let hours = 0;
+  for (let i = 0; i < m.t.length; i++) if (m.t[i] >= a && m.t[i] < b) hours += m.h[i];
+  return hours * HOUR;
+}
+
 /** How many windows long a track is. */
 export const TRACK_WINDOWS = 8;
 /** The track's length for a window of len on this range: a clock change or a leap year inside the window leaves it alone. */

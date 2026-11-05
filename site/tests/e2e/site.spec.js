@@ -173,6 +173,23 @@ for (const path of ['/now', '/tracker', '/tracker/prices']) {
 }
 
 for (const path of ['/tracker', '/tracker/prices']) {
+  test(`${path}: Reset asks first, and Cancel leaves the view alone`, async ({ page }) => {
+    await page.goto(`${path}?range=7d`);
+    const ask = page.locator('.rs-pop');
+    await expect(ask).toBeHidden();
+    await page.locator('.status .reset-btn').click();
+    await expect(ask).toContainText('Reset all charts?');
+    await page.locator('.rs-no').click();
+    await expect(ask).toBeHidden();
+    await expect(page).toHaveURL(/range=7d/);
+    await page.locator('.status .reset-btn').click();
+    await page.keyboard.press('Escape');
+    await expect(ask).toBeHidden();
+    await page.locator('.status .reset-btn').click();
+    await page.locator('.rs-yes').click();
+    await expect(page).not.toHaveURL(/range=7d/);
+  });
+
   test(`${path}: Reset is out on the tabs line (TRK-01)`, async ({ page }) => {
     await page.goto(path);
     await expect(page.locator('.status .reset-btn')).toBeVisible();

@@ -12,7 +12,7 @@
 	import StatusPill from '#lib/site/StatusPill.svelte';
 	import DownloadMenu from '#lib/site/DownloadMenu.svelte';
 	import { barHeight } from '#lib/site/sticky.js';
-	import { resetView } from '#lib/site/view.js';
+	import ResetButton from '#lib/site/ResetButton.svelte';
 	import { FOLD_DEFAULT } from '#lib/site/viewurl.js';
 
 	type Meta = { intervals: number; expected: number; end: number; api_from: number | null; built: number };
@@ -222,10 +222,7 @@
 	<TrackerTabs>
 		<div class="status js-only">
 			<span class="tstatus" role="status">{status}</span>
-			<button type="button" class="pill-btn reset-btn" title="Forget this browser's saved views and go back to the default charts on both tracker tabs" aria-label="Reset charts to default" onclick={resetView}>
-				<svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.6-3.7M3 2.6v2.9h2.9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-				<span class="pill-word">Reset</span>
-			</button>
+			<ResetButton />
 			<DownloadMenu items={downloads} />
 			<ShareLink links={() => tracker?.links() ?? null} />
 			<!-- History also while that history loads: it flashed Live on every step through 30 days (TRK-05, 26 Oct 2026) -->

@@ -8,7 +8,8 @@
 	import { fromLayout, historyStore, firstAtOrAfter, slice, nzOffset } from '#lib/tracker/series.js';
 	import Masthead from '#lib/site/Masthead.svelte';
 	import TrackerTabs from '#lib/site/TrackerTabs.svelte';
-	import { readView, writeView, resetView, midnightOf, addDays, addYears, ymd, endOfDay, describe, shareLinks, setTitle } from '#lib/site/view.js';
+	import ResetButton from '#lib/site/ResetButton.svelte';
+	import { readView, writeView, midnightOf, addDays, addYears, ymd, endOfDay, describe, shareLinks, setTitle } from '#lib/site/view.js';
 	import ShareLink from '#lib/site/ShareLink.svelte';
 	import StatusPill from '#lib/site/StatusPill.svelte';
 	import { heatWindow, heatSource, monthRows } from '#lib/site/heat.js';
@@ -26,7 +27,7 @@
 	import InfoTip from '#lib/site/InfoTip.svelte';
 	import { swatch, SWATCH_TITLE } from '#lib/site/swatch.js';
 	import { fitSelect } from '#lib/site/fitselect.js';
-	import { mountSlider, spanView, windowOf as rangeWindow } from '#lib/site/slider.js';
+	import { mountSlider, spanView, windowOf as rangeWindow, held } from '#lib/site/slider.js';
 	import { barHeight } from '#lib/site/sticky.js';
 	import { span } from '#lib/site/context.js';
 	import {
@@ -316,10 +317,9 @@
 	// n averages of the region's price, capped so a spike doesn't flatten the rest, from data already here
 	function priceOverview(a: number, b: number, n: number) {
 		const here = [view?.S, live, longData].filter((m) => m && m.t.length);
-		const cover = (m: any) => Math.max(0, Math.min(b, m.t[m.t.length - 1]) - Math.max(a, m.t[0]));
 		if (!here.length) return null;
-		const m = here.reduce((p, q) => (cover(q) > cover(p) ? q : p));
-		if (cover(m) < (b - a) * 0.9) return null;
+		const m = here.reduce((p, q) => (held(q, a, b) > held(p, a, b) ? q : p));
+		if (held(m, a, b) < (b - a) * 0.9) return null;
 		const s = (region === 'SI' ? m.SI : m.NI).price, sum = new Float64Array(n), hrs = new Float64Array(n), step = (b - a) / n;
 		for (let i = firstAtOrAfter(m.t, a); i < m.t.length && m.t[i] < b; i++) {
 			const k = Math.min(n - 1, Math.floor((m.t[i] - a) / step));
@@ -785,10 +785,7 @@
 	<TrackerTabs>
 		<div class="status js-only">
 			<span class="tstatus" role="status">{status}</span>
-			<button type="button" class="pill-btn reset-btn" title="Forget this browser's saved views and go back to the default charts on both tracker tabs" aria-label="Reset charts to default" onclick={resetView}>
-				<svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.6-3.7M3 2.6v2.9h2.9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-				<span class="pill-word">Reset</span>
-			</button>
+			<ResetButton />
 			<DownloadMenu items={downloads} />
 			<ShareLink {links} />
 			<StatusPill id="p-about" kind={!meta ? '' : pastView ? 'hist' : isLive ? 'live' : 'stale'}

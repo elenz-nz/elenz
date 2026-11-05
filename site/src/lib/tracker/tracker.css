@@ -588,6 +588,7 @@ a { color: var(--accent); }
 .span-menu button[aria-checked="true"] { color: var(--ink); font-weight: 600; }
 .span-menu button[aria-checked="true"]::before { content: ""; position: absolute; left: 9px; top: 50%; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%; background: var(--accent); }
 .span-menu .span-tip { font-size: 0.72rem; color: var(--muted); padding: 6px 8px 2px; border-top: 1px solid var(--grid); margin-top: 4px; }
+@media (hover: none), (max-width: 560px) { .span-menu .span-tip { display: none; } }   /* a mouse's drag: on a phone a finger scrolls */
 .zoom-chip { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 0.78rem; color: var(--ink-2); background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 4px; padding: 3px 11px 3px 9px; min-height: 28px; cursor: pointer; }
 .zoom-chip[hidden] { display: none; }
 .zoom-chip b { color: var(--accent); font-weight: 600; }

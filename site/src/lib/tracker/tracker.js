@@ -13,7 +13,7 @@ import { squareButton as squareWire, SWATCH_TITLE } from '#lib/site/swatch.js';
 import { readQuery, stamp, fromStamp, FOLDABLE, FOLD_DEFAULT, foldList, SPANS } from '#lib/site/viewurl.js';
 import { priceScale } from '#lib/prices/data.js';
 import { fit } from '#lib/site/fitselect.js';
-import { mountSlider, spanView, windowOf } from '#lib/site/slider.js';
+import { mountSlider, spanView, windowOf, held } from '#lib/site/slider.js';
 import { composeImage, legendOf, csvText, nzTime, utcTime, fileName, CREDIT, CREDIT_SOLAR, LICENCE } from '#lib/site/download.js';
 export { nzOffset, tzName };
 
@@ -2007,19 +2007,24 @@ export function mountTracker(D, hooks = {}) {
     clearTimeout(trackTimer);
     trackTimer = setTimeout(async () => {
       const from = Math.max(firstDay(), a - 2 * DAY), to = b + DAY;
-      if (history.has('hh', from, to) && models.hh) return;
       try {
-        await history.load('hh', from, to);
-        if (!sliding) { models.hh = merge('hh'); slider.sync(); }   // a drag under way merges it as it moves on
+        if (!history.has('hh', from, to)) await history.load('hh', from, to);
+        if (sliding) return;   // a drag under way merges it as it moves on
+        if (models.hh?.hv !== history.version('hh')) models.hh = merge('hh');
+        slider.sync();
       } catch { trackWanted = ''; }   // the charts still follow, a moment later
     }, 800);
   }
   // n averages of total generation over [a, b), from a model already here; null if none covers nearly all of it
   function overview(a, b, n) {
-    const here = [M, models.live, models.hh, models.day].filter(m => m && m.N);
-    const cover = m => Math.max(0, Math.min(b, m.t[m.N - 1]) - Math.max(a, m.t[0]));
-    const m = here.reduce((p, q) => (cover(q) > cover(p) ? q : p));
-    if (cover(m) < (b - a) * 0.9) return null;
+    // the fullest series, by what it really holds (test report TRK-12, 6 Nov 2026: the view's own model, joined before
+    // the track's months arrived, spans the track too, with months missing, and left the picture blank either side)
+    let m = null, most = 0;
+    for (const q of [models.live, models.hh, models.day]) {
+      const h = q && q.N ? held(q, a, b) : 0;
+      if (h > most) { m = q; most = h; }
+    }
+    if (most < (b - a) * 0.9) return null;
     const sum = new Float64Array(n), hrs = new Float64Array(n), s = totalOf(m, state.region), step = (b - a) / n;
     for (let i = firstAtOrAfter(m.t, a); i < m.N && m.t[i] < b; i++) {
       const k = Math.min(n - 1, Math.floor((m.t[i] - a) / step));
@@ -2044,7 +2049,7 @@ export function mountTracker(D, hooks = {}) {
     inset: () => ({ left: PADL, right: padR() }),
     overview,
     prepare,
-    overviewKey: () => [state.region, history.version('hh'), history.version('day')].join(),
+    overviewKey: () => [state.region, models.hh?.N, models.day?.N].join(),
     start() { slideRange = state.range; },
     ready(from, to) {
       const v = spanView(from, to, slideAt()), zf = v.zoom?.from, zt = v.zoom?.to, kind = kindFor(v.range, v.end, zf);

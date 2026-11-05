@@ -1,7 +1,7 @@
 // Tests for the time slider's rules (src/lib/site/slider.js): run with `npm test`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { spanView, snapSpan, trackFor, trackLength, ticksFor, spanLabel, windowOf } from '#lib/site/slider.js';
+import { spanView, snapSpan, trackFor, trackLength, ticksFor, spanLabel, windowOf, held } from '#lib/site/slider.js';
 import { addDays, midnightOf } from '#lib/site/viewurl.js';
 
 const HOUR = 36e5, DAY = 864e5;
@@ -88,6 +88,14 @@ test('a clock change or a leap year inside a window leaves its track alone', () 
   assert.equal(trackLength('1d', 25 * 36e5), trackLength('1d', DAY));
   assert.equal(trackLength('1y', 366 * DAY), trackLength('1y', 365 * DAY));
   assert.notEqual(trackLength('1d', 12 * 36e5), trackLength('1d', DAY));
+});
+
+test('what a series holds counts its points, so months missing from the middle show', () => {
+  const half = 18e5, run = (from, n) => Array.from({ length: n }, (_, i) => from + i * half);
+  const t = [...run(0, 48), ...run(9 * DAY, 48)], m = { t, h: t.map(() => 0.5) };   // two days, nine apart
+  assert.equal(held(m, 0, 10 * DAY), 2 * DAY);
+  assert.equal(held(m, DAY, 9 * DAY), 0);
+  assert.equal(held(m, 0, 12 * 36e5), 12 * 36e5);
 });
 
 test('a short track is labelled in hours, with the day at midnight', () => {

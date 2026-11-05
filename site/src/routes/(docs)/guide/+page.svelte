@@ -72,7 +72,7 @@
 		<Shot name="prices-range" alt="The price range chart on 1Y: each day’s lowest to highest price, with the Haywards and Benmore buttons above it." caption="On 1Y and ALL, each period’s range of prices, for Haywards or Benmore." />
 
 		<h2 id="reset">Back to the default charts</h2>
-		<p>The tracker remembers your last region, range, interval and chart settings in this browser. Reset, on the tabs line of either tab (an arrow on a phone), clears them.</p>
+		<p>The tracker remembers your last region, range, interval and chart settings in this browser. Reset, on the tabs line of either tab (an arrow on a phone), clears them, once you’ve confirmed.</p>
 
 		<h2 id="now">Now</h2>
 		<dl>
