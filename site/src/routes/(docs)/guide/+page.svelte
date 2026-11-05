@@ -33,9 +33,9 @@
 			<dt>Move through history</dt>
 			<dd>Range, interval and region are in the bar at the top. The ‹ › arrows beside the date, on the generation chart, or Page Up and Page Down step back and forward by the range. The date opens a calendar: select the month name to jump to another year, then pick a day. Latest comes back to now, or moves a zoomed stretch to the newest data.</dd>
 			<dt>Move through time</dt>
-			<dd>Drag the window on the slider under the chart and the charts move with it. The slider covers a week on 1D, 30 days on 3D and 7D, a year on 30D and the whole history on 1Y and All. The range buttons set how much the window shows. Select a spot on the slider to go straight there. To go further, pick a date: it sits in the middle of the slider, and Latest takes you back to its end. The small picture in it is total generation.</dd>
+			<dd>Drag the window on the slider under the chart and the charts move with it. The slider is eight times as long as the window, whichever range or zoom you’re on, so it covers 8 days on 1D, 8 months on 30D and 8 years on 1Y; on All it covers the whole history. The range buttons set how much the window shows. Select a spot on the slider to go straight there. To go further, pick a date: it sits in the middle of the slider, and Latest takes you back to its end. The small picture in it is total generation.</dd>
 			<dt>Zoom in</dt>
-			<dd>Drag across any chart to zoom into that stretch; every chart follows. The arrow beside 1D picks the last 1, 3, 6 or 12 hours. While zoomed, the date box gains a time: pick the hour, then the minutes, to move the zoomed stretch so it ends then (NZ time), or the ‹ › arrows step by the zoom’s length. Reset zoom in the bar, or Escape twice, shows the whole range again, and choosing another range while zoomed opens that range around what you zoomed into.</dd>
+			<dd>Drag across any chart to zoom into that stretch; every chart follows. The arrow beside 1D picks the last 3, 6 or 12 hours. While zoomed, the calendar also shows the time the stretch ends: select it, then pick the hour and the minutes, to move the stretch so it ends then (NZ time), or the ‹ › arrows step by the zoom’s length. Hover over the date for the time it ends. Reset zoom in the bar, or Escape twice, shows the whole range again, and choosing another range while zoomed opens that range around what you zoomed into.</dd>
 		</dl>
 		<Shot name="tracker-zoom" alt="A drag across the generation chart, with the stretch being zoomed into shaded." caption="Drag across any chart to zoom into that stretch." />
 		<dl>
@@ -64,7 +64,7 @@
 			<dt>Move through time</dt>
 			<dd>Drag the window on the slider under the price chart. The range buttons set how much it shows. To go further, pick a date: it sits in the middle of the slider.</dd>
 			<dt>Zoom in</dt>
-			<dd>From 1D to 30D, drag across any chart to zoom into that stretch, or pick the last 1, 3, 6 or 12 hours from the arrow beside 1D. Reset zoom, Escape or a range button goes back. 1Y and ALL show each period’s range of prices rather than every half-hour, so they don’t zoom.</dd>
+			<dd>From 1D to 30D, drag across any chart to zoom into that stretch, or pick the last 3, 6 or 12 hours from the arrow beside 1D. Reset zoom, Escape or a range button goes back. 1Y and ALL show each period’s range of prices rather than every half-hour, so they don’t zoom.</dd>
 			<dt>Nodes and scales</dt>
 			<dd>Select a node’s colour square in the list to hide or show its line. The menu beside the price chart’s title changes its scale (Spike-proof, Capped or Linear); on long ranges, choose the island whose price range is shown.</dd>
 		</dl>

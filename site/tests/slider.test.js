@@ -1,7 +1,7 @@
 // Tests for the time slider's rules (src/lib/site/slider.js): run with `npm test`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { spanView, snapSpan, trackFor, ticksFor, spanLabel, windowOf } from '#lib/site/slider.js';
+import { spanView, snapSpan, trackFor, trackLength, ticksFor, spanLabel, windowOf } from '#lib/site/slider.js';
 import { addDays, midnightOf } from '#lib/site/viewurl.js';
 
 const HOUR = 36e5, DAY = 864e5;
@@ -74,10 +74,26 @@ test('the grips keep to the shortest and longest lengths allowed', () => {
   assert.equal(snapSpan(to - HOUR, latest + HOUR, { mode: 'b', latest, first })[1], latest);
 });
 
-test('the tracks: a week, 30 days, a year, the whole history', () => {
-  const v = { from: latest - DAY, to: latest }, len = (r) => { const t = trackFor(r, v, latest, first); return (t.b - t.a) / DAY; };
-  assert.deepEqual(['1d', '3d', '7d', '30d'].map(len), [7, 30, 30, 365]);
-  for (const r of ['1y', 'all']) { const t = trackFor(r, v, latest, first); assert.deepEqual([t.a, t.b], [first, latest]); }
+test('a track is eight windows long, for a range or any zoom, up to the whole history', () => {
+  const on = (r, len) => { const t = trackFor(r, { from: latest - len, to: latest }, latest, first); return t.b - t.a; };
+  for (const [r, d] of [['1d', 1], ['3d', 3], ['7d', 7], ['30d', 30], ['1y', 365]]) assert.equal(on(r, d * DAY), d * 8 * DAY);
+  assert.equal(on('1d', 3 * 36e5), DAY);             // the zoom menu's 3 hours
+  assert.equal(on('30d', 2 * DAY + 36e5), 49 * 8 * 36e5);   // a stretch dragged on a chart
+  assert.equal(on('all', latest - first), latest - first);
+  assert.equal(on('all', 5 * 365 * DAY), latest - first);    // eight times that is more than there is
+});
+
+test('a clock change or a leap year inside a window leaves its track alone', () => {
+  assert.equal(trackLength('1d', 23 * 36e5), trackLength('1d', DAY));
+  assert.equal(trackLength('1d', 25 * 36e5), trackLength('1d', DAY));
+  assert.equal(trackLength('1y', 366 * DAY), trackLength('1y', 365 * DAY));
+  assert.notEqual(trackLength('1d', 12 * 36e5), trackLength('1d', DAY));
+});
+
+test('a short track is labelled in hours, with the day at midnight', () => {
+  const a = Date.parse('2026-11-04T23:00:00Z'), texts = ticksFor(a, a + DAY, 500).map((x) => x.text);   // from noon, NZ time
+  assert.ok(texts.includes('3 pm') && texts.includes('Fri 6') && texts.includes('9 am'), texts.join());
+  assert.ok(ticksFor(a, a + 8 * DAY, 1000).every((x) => !/[ap]m$/.test(x.text)));
 });
 
 test('the newest data sits at the track\'s end, and a past view in its middle', () => {
@@ -112,7 +128,7 @@ test('asked to centre, the view goes to the middle of the track, as far as the d
 
 test('a track stops at the history\'s start, and leaves it no shorter', () => {
   const old = { from: first + DAY, to: first + 2 * DAY }, t = trackFor('1d', old, latest, first);
-  assert.equal(t.a, first); assert.equal(t.b - t.a, 7 * DAY);
+  assert.equal(t.a, first); assert.equal(t.b - t.a, 8 * DAY);
 });
 
 test('labels fit the track', () => {

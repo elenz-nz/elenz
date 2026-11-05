@@ -266,7 +266,7 @@
 				</button>
 			</div>
 		</div>
-		<div class="ctl">
+		<div class="ctl ctl-int">
 			<span id="lb-int">Interval</span>
 			<div class="seg" role="group" aria-labelledby="lb-int" id="seg-int">
 				<button type="button" data-v="5m">5m</button>
@@ -279,7 +279,6 @@
 				<button type="button" class="step" id="tb-prev" aria-label="Previous 24 hours"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 				<!-- the site's own calendar (#lib/site/datepick.js, TRK-07), not the browser's -->
 				<date-pick id="in-date" aria-labelledby="lb-date" title="Shows the selected range ending on this date"></date-pick>
-				<time-pick id="in-time" aria-label="Ending at (NZ time)" title="Shows the zoomed hours ending at this time (NZ time)" hidden></time-pick>
 				<button type="button" class="step" id="tb-next" aria-label="Next 24 hours"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 				<button type="button" class="latest" id="btn-latest" title="Back to the latest data" hidden><svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 3 5 5-5 5M12 3v10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>Latest</button>
 			</div>
@@ -296,8 +295,7 @@
 	</nav>
 	<!-- the 1D menu sits outside the sticky bar; placed by tracker.js -->
 	<div class="span-menu" id="span-menu" role="group" aria-label="Show the last part of the day" hidden>
-		<span class="span-hd">Last</span>
-		<button type="button" role="menuitemradio" aria-checked="false" data-h="1">1 hour</button>
+		<span class="span-hd">Zoom</span>
 		<button type="button" role="menuitemradio" aria-checked="false" data-h="3">3 hours</button>
 		<button type="button" role="menuitemradio" aria-checked="false" data-h="6">6 hours</button>
 		<button type="button" role="menuitemradio" aria-checked="false" data-h="12">12 hours</button>

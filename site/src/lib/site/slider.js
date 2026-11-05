@@ -1,7 +1,8 @@
 // The time slider under the tracker's charts (test report TRK-12, design decision, 5 Nov 2026): a window of fixed length,
 // set by the range buttons, on a fixed track of time. Drag it and the charts glide with it, not day by day. (limits()'s
-// `resize` gives the window ends to drag; both pages have it off.) Each
-// range has its own track (TRACK_DAYS), which stays put while it's used and stops at its ends: picking a date puts the
+// `resize` gives the window ends to drag; both pages have it off.) The track is eight windows long (`trackLength`,
+// design decision, 5 Nov 2026: one rule for every range and every zoom, stopping at the whole history). It stays put
+// while it's used and stops at its ends: picking a date puts the
 // window in the track's middle (`centre`), and the newest data at its right-hand end. The charts follow during a drag
 // where the data is already here (`host.ready`), and otherwise once the finger pauses or lets go; the address and the
 // lower cards wait for it to let go (`host.go`'s `final`).
@@ -19,8 +20,13 @@ import { nzOffset } from '#lib/tracker/series.js';
 const DAY = 864e5, HOUR = 36e5, FIVE = 3e5;
 const DAYS = { '1d': 1, '3d': 3, '7d': 7, '30d': 30, '1y': 365 };
 const ORDER = ['1d', '3d', '7d', '30d', '1y'];
-/** The track each range sits on, in days; the whole history for 1Y and All. */
-export const TRACK_DAYS = { '1d': 7, '3d': 30, '7d': 30, '30d': 365, '1y': null, all: null };
+/** How many windows long a track is. */
+export const TRACK_WINDOWS = 8;
+/** The track's length for a window of len on this range: a clock change or a leap year inside the window leaves it alone. */
+export function trackLength(range, len) {
+  const own = (DAYS[range] ?? 0) * DAY;
+  return (own && Math.abs(len - own) <= Math.max(2 * HOUR, own * 0.01) ? own : Math.round(len / FIVE) * FIVE) * TRACK_WINDOWS;
+}
 
 const parts = (t) => { const d = new Date(t + nzOffset(t)); return { y: d.getUTCFullYear(), mo: d.getUTCMonth(), d: d.getUTCDate(), dow: d.getUTCDay(), h: d.getUTCHours(), mi: d.getUTCMinutes() }; };
 const MON = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
@@ -81,25 +87,32 @@ export function snapSpan(from, to, { mode, latest, first, min = HOUR, max = Infi
 /** The track around a view: the same one while the view stays on it (moving on with the newest data); otherwise, or
  *  when asked to centre, the one with the view in its middle, or ending at the newest data if that's what's shown. */
 export function trackFor(range, view, latest, first, prev, centre = false) {
-  const days = TRACK_DAYS[range] ?? null;
-  if (!centre && prev && prev.key === days) {
+  const len = trackLength(range, view.to - view.from);
+  if (len >= latest - first) return { key: null, a: first, b: latest, end: true };   // as long as the history, or longer
+  if (!centre && prev && prev.key === len) {
     const shift = prev.end ? latest - prev.b : 0, a = prev.a + shift, b = prev.b + shift;
     const slack = Math.min(DAY / 2, (b - a) / 60);   // a window dragged to an end can land on the grid just past it, and stays put
-    if (view.from >= a - slack && view.to <= b + slack) return { key: days, a, b, end: prev.end };
+    if (view.from >= a - slack && view.to <= b + slack) return { key: len, a, b, end: prev.end };
   }
-  if (!days) return { key: days, a: first, b: latest, end: true };
-  const len = days * DAY;
   let a = view.to >= latest - 6e4 ? latest - len : (view.from + view.to) / 2 - len / 2;
   if (a + len > latest) a = latest - len;
   if (a < first) a = first;
   const b = Math.min(latest, a + len);
-  return { key: days, a, b, end: b >= latest };
+  return { key: len, a, b, end: b >= latest };
 }
 
-/** Labels for a track px wide: { t, text } at whole days, weeks, months or years, at least 56 px apart. */
+/** Labels for a track px wide: { t, text } at hours, whole days, weeks, months or years, at least 56 px apart. */
 export function ticksFor(a, b, px) {
   const per = ((b - a) / DAY / Math.max(px, 1)) * 56, out = [];
   const add = (t, text) => { if (t >= a && t < b) out.push({ t, text }); };
+  if (per <= 0.25) {   // a zoom's short track
+    const every = [1, 2, 3, 6].find((h) => h >= per * 24);
+    for (let t = Math.ceil(a / HOUR) * HOUR; t < b; t += HOUR) {
+      const p = parts(t);
+      if (p.h % every === 0) add(t, p.h ? `${p.h % 12 || 12} ${p.h < 12 ? 'am' : 'pm'}` : `${DOW[p.dow]} ${p.d}`);
+    }
+    return out;
+  }
   if (per <= 7) {
     const every = per <= 1 ? 1 : per <= 2 ? 2 : 7;
     for (let t = midnightOf(a); t < b; t = addDays(t, 1)) {
@@ -205,7 +218,7 @@ export function mountSlider(el, host) {
       if (final) {
         // the track stays where the drag left it, even if the stretch has outgrown its range
         drag = null; el.classList.remove('sliding'); tip.hidden = true;
-        T = { ...T, key: TRACK_DAYS[host.range()] ?? null };
+        T = { ...T, key: trackLength(host.range(), s[1] - s[0]) };
         sync();
         return;
       }

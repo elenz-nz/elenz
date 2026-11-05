@@ -6,6 +6,12 @@
 // `disabled`, and a `change` event when a day is picked. Moving between months or years never changes the value, so
 // nothing redraws until a day is chosen; picking a day closes the calendar.
 //
+// While a chart is zoomed into hours the page also sets `time` ('HH:MM', 24-hour, NZ time; '' for none): the calendar
+// then ends with that time, and a press on it opens hours and minutes. As with the days, nothing changes until the
+// choice is made: an hour only marks itself, and picking the minutes closes the calendar and sends `timechange`
+// (test report ZM-03; the time box sat beside the date until the slider made it come and go at every day's end, and
+// the sticky bar with it: TRK-12, design decision, 5 Nov 2026). On the box itself the time is in the hover tooltip.
+//
 // The calendar hangs from document.body, fixed to the window, outside the sticky control bar.
 // Keyboard: arrows move a day or a week, Page Up/Down a month (Shift: a year), Home/End the
 // week's ends, Enter picks, Escape closes. The month name opens a year list, then a month list.
@@ -15,6 +21,10 @@ const MONTH = ['January', 'February', 'March', 'April', 'May', 'June', 'July', '
 const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const ISO = /^(\d{4})-(\d{2})-(\d{2})$/;
+const HHMM = /^([01]\d|2[0-3]):([0-5]\d)$/;
+const pad = n => String(n).padStart(2, '0');
+const hourName = h => `${h % 12 || 12} ${h < 12 ? 'am' : 'pm'}`;
+const clock = (h, m) => `${h % 12 || 12}:${pad(m)} ${h < 12 ? 'am' : 'pm'}`;
 const ICON = '<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3.2" width="12" height="10.6" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M2 6.6h12M5.2 1.8v2.6M10.8 1.8v2.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
 const ARROW = d => `<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
@@ -35,14 +45,14 @@ let openOne = null;   // only one calendar open at a time
 
 // (on the server, while pages are prerendered, there's no HTMLElement: the class is defined but never registered)
 class DatePick extends (typeof HTMLElement === 'undefined' ? class {} : HTMLElement) {
-  static observedAttributes = ['value', 'min', 'max', 'disabled', 'title'];
+  static observedAttributes = ['value', 'min', 'max', 'time', 'disabled', 'title'];
   constructor() {
     super();
-    this._v = ''; this._min = ''; this._max = ''; this._view = null; this._mode = 'days'; this._focus = null; this._pop = null;
+    this._v = ''; this._t = ''; this._h = 0; this._min = ''; this._max = ''; this._view = null; this._mode = 'days'; this._focus = null; this._pop = null;
   }
   connectedCallback() {
     // properties set before the element was defined sit on the instance: move them onto the accessors
-    for (const k of ['value', 'min', 'max', 'disabled']) if (Object.hasOwn(this, k)) { const v = this[k]; delete this[k]; this[k] = v; }
+    for (const k of ['value', 'min', 'max', 'time', 'disabled']) if (Object.hasOwn(this, k)) { const v = this[k]; delete this[k]; this[k] = v; }
     if (!this._btn) {
       this.innerHTML = `<button type="button" class="dp-btn" aria-haspopup="dialog" aria-expanded="false"><span class="dp-txt"></span>${ICON}</button>`;
       this._btn = this.querySelector('button');
@@ -63,6 +73,13 @@ class DatePick extends (typeof HTMLElement === 'undefined' ? class {} : HTMLElem
   set min(v) { this._min = toDay(v) != null ? v : ''; if (this._pop) this._draw(); }
   get max() { return this._max; }
   set max(v) { this._max = toDay(v) != null ? v : ''; if (this._pop) this._draw(); }
+  get time() { return this._t; }
+  set time(v) {
+    const t = HHMM.test(v || '') ? v : '';
+    if (t === this._t) return;
+    this._t = t; this._sync();
+    if (this._pop) { if (!t && this._mode === 'time') this._mode = 'days'; this._draw(); }
+  }
   get disabled() { return !!this._off; }
   set disabled(v) { this._off = !!v; if (this._btn) this._btn.disabled = this._off; if (this._off) this.close(false); }
   focus(o) { this._btn?.focus(o); }
@@ -73,8 +90,9 @@ class DatePick extends (typeof HTMLElement === 'undefined' ? class {} : HTMLElem
     this.querySelector('.dp-txt').textContent = p ? `${p.dom} ${MON[p.m]} ${p.y}` : '';
     this._btn.disabled = !!this._off;
     const label = this.getAttribute('aria-label') || document.getElementById(this.getAttribute('aria-labelledby') || '')?.textContent || 'Date';
-    this._btn.setAttribute('aria-label', p ? `${label}: ${DAY_NAMES[p.dow]} ${p.dom} ${MONTH[p.m]} ${p.y}. Choose a date` : `${label}. Choose a date`);
-    if (this.title) this._btn.title = this.title;
+    const m = HHMM.exec(this._t), at = m ? clock(+m[1], +m[2]) : '';
+    this._btn.setAttribute('aria-label', p ? `${label}: ${DAY_NAMES[p.dow]} ${p.dom} ${MONTH[p.m]} ${p.y}${at ? `, ${at}` : ''}. Choose a date` : `${label}. Choose a date`);
+    this._btn.title = at ? `Ends at ${at} (NZ time)` : this.title || '';
   }
   _bounds() { return [toDay(this._min) ?? -Infinity, toDay(this._max) ?? Infinity]; }
   _ok(d) { const [lo, hi] = this._bounds(); return d >= lo && d <= hi; }
@@ -142,6 +160,15 @@ class DatePick extends (typeof HTMLElement === 'undefined' ? class {} : HTMLElem
         body += `<button type="button" class="${cls}" data-d="${d}" tabindex="${d === this._focus ? 0 : -1}" aria-label="${DAY_NAMES[p.dow]} ${p.dom} ${MONTH[p.m]} ${p.y}"${d === v ? ' aria-pressed="true"' : ''}${ok ? '' : ' disabled'}>${p.dom}</button>`;
       }
       body += '</div>';
+      const t = HHMM.exec(this._t);
+      if (t) body += `<div class="dp-foot"><span>Ends at</span><button type="button" class="dp-time" data-mode="time" aria-label="Ends at ${clock(+t[1], +t[2])}. Choose a time">${clock(+t[1], +t[2])}<svg width="10" height="10" viewBox="0 0 16 16" aria-hidden="true"><path d="m3 5 5 6 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>`;
+    } else if (this._mode === 'time') {
+      const t = HHMM.exec(this._t), mm = t && +t[1] === this._h ? +t[2] : -1;
+      let hours = '', mins = '';
+      for (let h = 0; h < 24; h++) hours += `<button type="button" class="tp-h${h === this._h ? ' sel' : ''}" data-h="${h}" aria-pressed="${h === this._h}">${hourName(h)}</button>`;
+      for (let k = 0; k < 60; k += 5) mins += `<button type="button" class="tp-m${k === mm ? ' sel' : ''}" data-min="${k}" aria-label="${clock(this._h, k)}">:${pad(k)}</button>`;
+      body += `<div class="dp-head"><span class="dp-cap">Ends at</span><button type="button" class="dp-back" data-mode="days">Back</button></div>`
+        + `<div class="tp-cap">Hour</div><div class="tp-hours">${hours}</div><div class="tp-cap">Minutes</div><div class="tp-mins">${mins}</div>`;
     } else if (this._mode === 'years') {
       const y0 = Number.isFinite(lo) ? parts(lo).y : 1997, y1 = Number.isFinite(hi) ? parts(hi).y : parts(now).y;
       body += `<div class="dp-head"><span class="dp-cap">Year</span><button type="button" class="dp-back" data-mode="days">Back</button></div><div class="dp-years">`;
@@ -163,13 +190,16 @@ class DatePick extends (typeof HTMLElement === 'undefined' ? class {} : HTMLElem
       f?.focus();
       if (this._mode === 'years') f?.scrollIntoView({ block: 'center' });
     }
+    this._place();   // each view has its own height
   }
   _click(e) {
     const b = e.target.closest('button');
     if (!b || b.disabled) return;
     const vp = parts(this._view);
     if (b.dataset.go) { this._view = first(vp.y, vp.m + +b.dataset.go); this._focus = Math.max(this._view, Math.min(this._focus, first(vp.y, vp.m + +b.dataset.go + 1) - 1)); this._draw(); this._pop.querySelector(`[data-go="${b.dataset.go}"]:not([disabled])`)?.focus(); }
-    else if (b.dataset.mode) { this._mode = b.dataset.mode; this._draw(true); }
+    else if (b.dataset.mode) { this._mode = b.dataset.mode; if (b.dataset.mode === 'time') this._h = +this._t.slice(0, 2); this._draw(true); }
+    else if (b.dataset.h != null) { this._h = +b.dataset.h; this._draw(); this._pop.querySelector('.tp-h.sel')?.focus(); }   // an hour only marks itself
+    else if (b.dataset.min != null) this._pickTime(+b.dataset.min);
     else if (b.dataset.y) { this._view = first(+b.dataset.y, vp.m); this._mode = 'months'; this._draw(true); }
     else if (b.dataset.m) { this._view = first(vp.y, +b.dataset.m); this._focus = this._view; this._mode = 'days'; this._clampFocus(); this._draw(true); }
     else if (b.dataset.d) this._pick(+b.dataset.d);
@@ -198,6 +228,12 @@ class DatePick extends (typeof HTMLElement === 'undefined' ? class {} : HTMLElem
     const fp = parts(this._focus);
     this._view = first(fp.y, fp.m);
     this._draw(true);
+  }
+  _pickTime(k) {
+    const v = `${pad(this._h)}:${pad(k)}`, changed = v !== this._t;
+    this._t = v; this._sync();
+    this.close();
+    if (changed) this.dispatchEvent(new Event('timechange', { bubbles: true }));
   }
   _pick(d) {
     if (!this._ok(d)) return;

@@ -3,9 +3,8 @@
 
 import { FUELS } from './fuels.js';
 import { efAt, plantEf, BY_PLANT } from './emissions.js';
-import { onDateSettled, onTimeSettled } from '../site/datefield.js';
+import { onDateSettled } from '../site/datefield.js';
 import '../site/datepick.js';   // <date-pick>: the date box's calendar (TRK-07)
-import '../site/timepick.js';   // <time-pick>: the time box while zoomed (ZM-03)
 import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTotal } from './series.js';
 import PLANT_META from './plants.json';  // owner, hydro scheme, other names and metering note per plant (ingest/plant_meta.py)
 import CAPACITY from './capacity.json';   // installed MW per plant (ingest/capacity.py)
@@ -1409,20 +1408,19 @@ export function mountTracker(D, hooks = {}) {
     // the date control: the chosen range ends on this date (today = the latest data)
     const R = RANGES[state.range], inp = $('in-date'), end = state.end ?? endOfToday();
     // a past day on 1D is that whole day, so the box says "Day" rather than "24 hours ending" (CHT-10)
-    $('lb-date').textContent = R.fixed ? 'All data' : state.range === '1d' && state.end != null ? 'Day' : `${R.label} ending`;
+    $('lb-date').textContent = R.fixed ? 'All data' : state.range === '1d' && state.end != null && !state.zoom ? 'Day' : `${R.label} ending`;
     if (inp._sync) inp._sync();   // the calendar button's spoken label follows
     inp.disabled = !!R.fixed;
     inp.style.visibility = R.fixed ? 'hidden' : '';  // All has no end date
     inp.value = R.fixed ? '' : ymd(end - 1);
     inp.min = ymd(firstDay()); inp.max = ymd(models.live.END);
-    // zoomed into hours (a span from the 1D menu or a dragged stretch): the boxes give the date and time it ends,
-    // and choosing either moves it there
-    const tin = $('in-time'), zh = zoomedHours();
-    tin.hidden = !zh;
-    if (zh) {
-      const z = zoomSpan(), [d, hm] = stamp(z.to).split('T');
-      $('lb-date').textContent = `${zoomWord(z.to - z.from)} ending`;
-      inp.value = d; tin.value = hm;
+    // zoomed into hours (a span from the 1D menu or a dragged stretch): the box gives the date it ends, the calendar
+    // the time too, and choosing either moves it there. A window the slider has moved keeps its range's name.
+    const z = zoomedHours() ? zoomSpan() : null, ends = z ? stamp(z.to).split('T') : null;
+    inp.time = ends ? ends[1] : '';
+    if (z) {
+      if (!movedWindow()) $('lb-date').textContent = `${zoomWord(z.to - z.from)} ending`;
+      inp.value = ends[0];
       inp.max = ymd(models.live.END + 3e5);
     }
     // Latest also shows when a dragged stretch sits behind the newest data (ZM-03)
@@ -1589,7 +1587,6 @@ export function mountTracker(D, hooks = {}) {
   // the date and time boxes, zoomed: the same length of time, ending at t (snapped to 5 minutes). At or past the newest
   // data a span from the menu (or a stretch as long as one) is "the last N hours" again. The window around it is the day it ends in (or the latest),
   // widened to 3 days when the stretch starts the day before, so none of it is cut off.
-  const SPANS = [1, 3, 6, 12];   // the 1D menu's hours (#span-menu)
   function zoomEndAt(t) {
     if (!zoomedHours() || !(t > 0)) return;
     const z = zoomSpan(), len = z.to - z.from, latest = models.live.END + 3e5;
@@ -1765,13 +1762,13 @@ export function mountTracker(D, hooks = {}) {
   $('zoom-reset').addEventListener('click', () => setZoom(null));
   onDateSettled($('in-date'), v => {
     slider.centre();   // a date picked sits in the middle of the slider (design decision, 5 Nov 2026)
-    if (zoomedHours() && !movedWindow()) return zoomEndAt(fromStamp(`${v}T${$('in-time').value || '00:00'}`));
+    if (zoomedHours() && !movedWindow()) return zoomEndAt(fromStamp(`${v}T${$('in-date').time || '00:00'}`));
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
     if (!m) return;
     const day = midnightOf(Date.UTC(+m[1], +m[2] - 1, +m[3], 12) - 12 * 36e5);  // that date's local midnight
     state.zoom = null; setView(state.range, addDays(day, 1));
   });
-  onTimeSettled($('in-time'), v => { slider.centre(); zoomEndAt(fromStamp(`${$('in-date').value}T${v}`)); });
+  $('in-date').addEventListener('timechange', e => { slider.centre(); zoomEndAt(fromStamp(`${e.target.value}T${e.target.time}`)); });
   // zoomed, Latest moves the stretch to the newest data and keeps its length (test report ZM-03, 1 Nov 2026)
   $('btn-latest').addEventListener('click', () => {
     if (movedWindow()) state.zoom = null;

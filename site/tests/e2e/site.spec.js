@@ -240,6 +240,52 @@ for (const path of ['/tracker?range=3d', '/tracker/prices?range=3d']) {
   });
 }
 
+for (const [path, menu, date] of [['/tracker', '#span-menu', '#in-date'], ['/tracker/prices', '#p-span-menu', '#p-date']]) {
+  test(`${path}: the zoom menu starts at 3 hours, and the calendar holds the time`, async ({ page }, info) => {
+    test.skip(info.project.name.includes('phone'), 'the same on a phone, with a mouse here');
+    await page.goto(path);
+    await expect(page.locator(date).locator('.dp-txt')).not.toBeEmpty();
+    await page.locator('.span-btn').click();
+    await expect(page.locator(`${menu} .span-hd`)).toHaveText('Zoom');
+    await expect(page.locator(`${menu} button`).first()).toHaveText('3 hours');
+    await page.locator(`${menu} button`).first().click();
+    await expect(page).toHaveURL(/zoom=3h/);
+    await expect(page.locator('time-pick')).toHaveCount(0);
+    await expect(page.locator(date).locator('button')).toHaveAttribute('title', /^Ends at \d+:\d\d [ap]m/);
+
+    await page.locator(date).locator('button').click();
+    await page.locator('.dp-time').click();
+    const was = page.url();
+    await page.locator('.tp-h').nth(1).click();          // an hour only marks itself
+    await expect(page.locator('.tp-h.sel')).toHaveText('1 am');
+    expect(page.url()).toBe(was);
+    await page.locator('.tp-m').nth(6).click();          // the minutes apply it
+    await expect(page.locator('.dp-pop')).toHaveCount(0);
+    await expect(page).toHaveURL(/zoom=[^&]*T01%3A30|zoom=[^&]*T01:30/);
+  });
+}
+
+for (const [path, width] of [['/tracker?range=3d', 360], ['/tracker?range=3d', 412], ['/tracker/prices?range=3d', 320], ['/tracker/prices?range=3d', 390]]) {
+  test(`${path} at ${width} px: the bar keeps its height and the date stays put through a slide`, async ({ page }, info) => {
+    test.skip(info.project.name.includes('phone'), 'set by width, with a mouse here');
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto(path);
+    const thumb = page.locator('.ts-thumb'), bar = page.locator('.toolbar'), date = page.locator('date-pick button');
+    await expect(thumb).toHaveAttribute('aria-valuetext', /./);
+    const h = (await bar.boundingBox()).height, x0 = (await date.boundingBox()).x;
+    const b = await thumb.boundingBox(), x = b.x + b.width / 2, y = b.y + b.height / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    for (let i = 1; i <= 8; i++) {
+      await page.mouse.move(x - i * 5, y);
+      await page.waitForTimeout(60);
+      expect((await bar.boundingBox()).height).toBe(h);
+      expect((await date.boundingBox()).x).toBe(x0);
+    }
+    await page.mouse.up();
+  });
+}
+
 test('on the 3-hour zoom the forward arrow comes back after a step back (ZM-04)', async ({ page }, testInfo) => {
   test.skip(isPhone(testInfo), 'the 1D menu is covered by the zoom tests');
   await page.goto('/tracker?zoom=3h');

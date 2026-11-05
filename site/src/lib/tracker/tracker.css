@@ -131,13 +131,13 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 
 /* End date: the chosen range ends on this date */
 .ctl > label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-weight: 600; white-space: nowrap; }
-.datebox { display: inline-flex; align-items: center; gap: 4px; }
+.datebox { display: inline-flex; align-items: center; gap: 4px; min-width: 267px; }   /* room for Latest, so the bar doesn't change when it comes (TRK-12) */
 .datebox input { font: inherit; font-size: 0.8rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2px 6px; min-height: 28px; color-scheme: inherit; }
 .datebox input:disabled { color: var(--muted); }
-.ctl > .ctl-lbl { font-size: 0.72rem; white-space: nowrap; }
+.ctl > .ctl-lbl { font-size: 0.72rem; white-space: nowrap; min-width: 10.8em; text-align: right; }
 /* the date box's own calendar (#lib/site/datepick.js): the button in the bar, and the calendar hung from <body> */
-date-pick, time-pick { display: inline-block; }
-time-pick[hidden] { display: none; }
+date-pick { display: inline-block; }
+.dp-txt { display: inline-block; min-width: 6.5em; font-variant-numeric: tabular-nums; }   /* so nothing beside it moves as the date changes */
 .dp-btn { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 0.8rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2px 8px; min-height: 28px; cursor: pointer; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .dp-btn svg { color: var(--muted); flex: none; }
 .dp-btn:hover:not(:disabled) { border-color: var(--accent); }
@@ -173,8 +173,12 @@ time-pick[hidden] { display: none; }
 .dp-years button, .dp-months button { height: 38px; font-variant-numeric: tabular-nums; }
 .dp-years button:hover:not(:disabled):not(.sel), .dp-months button:hover:not(:disabled):not(.sel) { background: var(--grid); }
 @media (pointer: coarse) { .dp-day { height: 40px; } .dp-pop { width: 300px; } }
-/* the time box's panel (#lib/site/timepick.js) */
-.tp-pop { display: grid; gap: 6px; }
+/* the calendar's time, while a chart is zoomed into hours */
+.dp-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; padding: 8px 0 0 4px; border-top: 1px solid var(--grid); font-size: 0.82rem; color: var(--ink-2); }
+.dp-time { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; font-weight: 650; color: var(--ink); }
+.dp-time svg { color: var(--muted); }
+.dp-time:hover { background: var(--grid); }
+.tp-cap { font-size: 0.72rem; font-weight: 600; color: var(--muted); padding: 6px 4px 4px; }
 .tp-hours, .tp-mins { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; }
 .tp-hours button, .tp-mins button { height: 34px; padding: 0; font-size: 0.78rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tp-hours button:hover:not(.sel), .tp-mins button:hover:not(.sel) { background: var(--grid); }
@@ -475,6 +479,25 @@ a { color: var(--accent); }
   .toolbar select.pick { font-size: 0.9rem; }
   .pill .pday { display: none; }   /* the delayed pill keeps its time and drops the day, to fit beside the tabs */
 
+}
+/* the bar keeps its rows while the slider moves: Latest comes and goes, so here it's just its arrow, beside the date,
+   and the date's name goes, as on phones (TRK-12) */
+@media (max-width: 1240px) {
+  .datebox { min-width: 218px; }
+  .datebox button.latest { width: 28px; padding: 0; justify-content: center; font-size: 0; gap: 0; }
+}
+@media (max-width: 900px) {
+  .toolbar .ctl > .ctl-lbl { position: absolute; width: 1px; min-width: 0; height: 1px; overflow: hidden; clip-path: inset(50%); }
+}
+/* narrow phones: region and range no longer share a row, so region and interval do, then range, then the date,
+   whichever range is shown; the date box gives up its icon to keep to two rows on the next width up */
+@media (max-width: 409px) {
+  .datebox { min-width: 197px; }
+  .dp-btn svg { display: none; }
+}
+@media (max-width: 387px) {
+  .toolbar > .ctl:first-child { order: -2; }
+  .toolbar > .ctl-int { order: -1; }
 }
 /* narrow phones: the tabs, the delayed pill and three buttons fit on one line only without the pill's time */
 @media (max-width: 440px) {

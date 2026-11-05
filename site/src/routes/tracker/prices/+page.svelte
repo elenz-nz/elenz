@@ -12,10 +12,9 @@
 	import ShareLink from '#lib/site/ShareLink.svelte';
 	import StatusPill from '#lib/site/StatusPill.svelte';
 	import { heatWindow, heatSource, monthRows } from '#lib/site/heat.js';
-	import { dateSettled, timeSettled } from '#lib/site/datefield.js';
+	import { dateSettled } from '#lib/site/datefield.js';
 	import '#lib/site/datepick.js';   // <date-pick>, the date box's calendar
-	import '#lib/site/timepick.js';   // <time-pick>, the time box while zoomed (ZM-03)
-	import { stamp, fromStamp } from '#lib/site/viewurl.js';
+	import { stamp, fromStamp, SPANS } from '#lib/site/viewurl.js';
 	import DownloadMenu from '#lib/site/DownloadMenu.svelte';
 	import { composeImage, svgImage, legendOf, csvText, nzTime, utcTime, fileName, CREDIT, LICENCE } from '#lib/site/download.js';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
@@ -249,7 +248,7 @@
 		hover = -1; pinned = false;
 		if (to === latest) {
 			// back to the newest data: a length the 1D menu offers is live "last N hours" again
-			const span = zoom?.span || ([1, 3, 6, 12].includes(len / 36e5) ? len / 36e5 : null);
+			const span = zoom?.span || (SPANS.includes(len / 36e5) ? len / 36e5 : null);
 			if (span) { zoom = { span }; range = '1d'; } else zoom = { from, to };
 			endT = null;
 		} else {
@@ -825,7 +824,7 @@
 				</button>
 			</div>
 		</div>
-		<div class="ctl">
+		<div class="ctl ctl-int">
 			<span id="p-lb-int">Interval</span>
 			<div class="seg" role="group" aria-labelledby="p-lb-int">
 				{#each intChoices as k}
@@ -835,15 +834,12 @@
 		</div>
 		{#if canMove}
 			<div class="ctl">
-				<span id="lb-p-date" class="ctl-lbl">{zoomEnds ? `${zoomWord(zoomEnds.to - zoomEnds.from)} ending` : R.days === 1 && endT !== null ? 'Day' : `${R.label} ending`}</span>
+				<span id="lb-p-date" class="ctl-lbl">{zoomEnds && !movedWindow ? `${zoomWord(zoomEnds.to - zoomEnds.from)} ending` : R.days === 1 && endT !== null && !zoomEnds ? 'Day' : `${R.label} ending`}</span>
 				<div class="datebox">
 					<button type="button" class="step" aria-label="Previous {R.label}" title="Previous {R.label}" disabled={!live || (endT ?? endOfToday) - (R.days ?? 0) * 864e5 <= FIRST} onclick={() => step(-1)}><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
-					<date-pick id="p-date" aria-labelledby="lb-p-date" value={dateValue} min="1997-08-01" max={live ? isoDay(latestT + 3e5) : ''}
-						title="Shows the selected range ending on this date" use:dateSettled={pickDate}></date-pick>
-					{#if zoomStamp}
-						<time-pick id="p-time" value={zoomStamp[1]} aria-label="Ending at (NZ time)" title="Shows the zoomed hours ending at this time (NZ time)"
-							use:timeSettled={(v: string) => { slider?.centre(); zoomEndAt(fromStamp(`${zoomStamp ? zoomStamp[0] : ''}T${v}`)); }}></time-pick>
-					{/if}
+					<date-pick id="p-date" aria-labelledby="lb-p-date" value={dateValue} time={zoomStamp ? zoomStamp[1] : ''} min="1997-08-01" max={live ? isoDay(latestT + 3e5) : ''}
+						title="Shows the selected range ending on this date" use:dateSettled={pickDate}
+						ontimechange={(e: Event) => { const d = e.currentTarget as any; slider?.centre(); zoomEndAt(fromStamp(`${d.value}T${d.time}`)); }}></date-pick>
 					<button type="button" class="step" aria-label="Next {R.label}" title={atLatest ? 'Showing the latest data' : `Next ${R.label}`} disabled={atLatest} onclick={() => step(1)}><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 					{#if !atLatest}<button type="button" class="latest" title="Back to the latest data" onclick={toLatest}><svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 3 5 5-5 5M12 3v10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>Latest</button>{/if}
 				</div>
@@ -866,8 +862,8 @@
 	<!-- outside the sticky bar -->
 		{#if spanOpen}
 			<div class="span-menu" id="p-span-menu" bind:this={spanMenu} style="top:{spanPos.top}px;left:{spanPos.left}px" role="group" aria-label="Show the last part of the day">
-				<span class="span-hd">Last</span>
-				{#each [1, 3, 6, 12, 24] as h}
+				<span class="span-hd">Zoom</span>
+				{#each [...SPANS, 24] as h}
 					<button type="button" role="menuitemradio" aria-checked={h === 24 ? range === '1d' && !zoom : zoom?.span === h} onclick={() => pickSpan(h)}>{h} hour{h > 1 ? 's' : ''}</button>
 				{/each}
 				<span class="span-tip">Or drag across any chart to zoom</span>
