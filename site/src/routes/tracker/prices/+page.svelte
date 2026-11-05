@@ -27,6 +27,7 @@
 	import InfoTip from '#lib/site/InfoTip.svelte';
 	import { swatch, SWATCH_TITLE } from '#lib/site/swatch.js';
 	import { fitSelect } from '#lib/site/fitselect.js';
+	import { mountSlider, spanView, windowOf as rangeWindow } from '#lib/site/slider.js';
 	import { barHeight } from '#lib/site/sticky.js';
 	import { span } from '#lib/site/context.js';
 	import {
@@ -297,6 +298,59 @@
 		const frame = requestAnimationFrame(() => { timer = setTimeout(fn, 0); });
 		return () => { cancelAnimationFrame(frame); clearTimeout(timer); };
 	}
+	// ---------- the time slider under the price chart (#lib/site/slider.js; test report TRK-12, 5 Nov 2026) ----------
+	let slider: any = null, sliding = false, slideRange: string | null = null, built: (() => void) | null = null, longData: any = null;
+	const newest = () => (live ? live.t[live.n - 1] + 3e5 : 0);
+	const slideAt = () => ({ range: slideRange ?? range, latest: newest(), first: FIRST });
+	// n averages of the region's price, capped so a spike doesn't flatten the rest, from data already here
+	function priceOverview(a: number, b: number, n: number) {
+		const here = [view?.S, live, longData].filter((m) => m && m.t.length);
+		const cover = (m: any) => Math.max(0, Math.min(b, m.t[m.t.length - 1]) - Math.max(a, m.t[0]));
+		if (!here.length) return null;
+		const m = here.reduce((p, q) => (cover(q) > cover(p) ? q : p));
+		if (cover(m) < (b - a) * 0.9) return null;
+		const s = (region === 'SI' ? m.SI : m.NI).price, sum = new Float64Array(n), hrs = new Float64Array(n), step = (b - a) / n;
+		for (let i = firstAtOrAfter(m.t, a); i < m.t.length && m.t[i] < b; i++) {
+			const k = Math.min(n - 1, Math.floor((m.t[i] - a) / step));
+			if (Number.isFinite(s[i])) { sum[k] += Math.min(500, Math.max(0, s[i])) * m.h[i]; hrs[k] += m.h[i]; }
+		}
+		return Array.from(sum, (x, k) => (hrs[k] ? x / hrs[k] : NaN));
+	}
+	function timeSlider(el: HTMLElement) {
+		slider = mountSlider(el, {
+			range: () => range,
+			bounds: () => ({ first: FIRST, latest: newest() }),
+			view() {
+				if (!live) return null;
+				if (zoomed && zoom?.from != null) return { from: zoom.from, to: zoom.to as number };
+				if (zoomEnds) return zoomEnds;
+				const [from, to] = rangeWindow(range, endT, newest(), FIRST);
+				return { from, to };
+			},
+			// long ranges show each period's range and take no zoom, so their window only moves
+			limits: () => ({ min: effInt === '1d' ? 3 * 864e5 : 36e5, max: 30 * 864e5, resize: R.mode === 'time' }),
+			inset: () => ({ left: 52, right: 10 }),
+			overview: priceOverview,
+			overviewKey: () => [region, longData?.t.length, view?.S?.t[0]].join(),
+			start() { slideRange = range; },
+			ready(from: number, to: number) {
+				const v = spanView(from, to, slideAt()), r = (RANGES as any)[v.range], [a, b] = rangeWindow(v.range, v.end, newest(), FIRST);
+				if (r.src === 'day') return store.has('day', 0, 0);
+				return (r.src === 'live' && liveCovers(a)) || store.has('hh', a, b);
+			},
+			go(from: number, to: number, final: boolean) {
+				sliding = !final;
+				const v = spanView(from, to, slideAt());
+				if (final) slideRange = null;
+				zoom = v.zoom; range = v.range; endT = v.end;
+				if (final) save();
+				return new Promise<void>((done) => { built = done; setTimeout(done, 400); });   // the effect below builds it
+			},
+		});
+		return { destroy() { slider?.destroy(); slider = null; } };
+	}
+	$effect(() => { void range; void endT; void zoom; void view; void latestT; slider?.sync(); });
+
 	let token = 0;
 	async function build() {
 		if (!live) return;
@@ -319,18 +373,21 @@
 				if (!store.has('hh', from, to)) { busy = true; await store.load('hh', from, to); }
 				if (my !== token) return;
 				const m = store.merged('hh', live);
+				longData = m;
 				setView(timeView(atInterval(addRevenue(windowOf(m, zf, zt), undefined, true), iv), m.histEnd), isZoomed);
 			} else {
 				if (!store.has('day', 0, 0)) { busy = true; await store.load('day', 0, 0); }
 				if (my !== token) return;
 				const m0 = store.merged('day', live), m = completeDaily(m0, m0.histEnd, live);
+				longData = m;
 				setView(longView(r.days == null ? m : windowOf(m, from, to), m.histEnd));
 			}
-			if (to !== heatTo || heatFrom !== from) { heatFrom = from; loadHeat(from, to); }
+			if (!sliding && (to !== heatTo || heatFrom !== from)) { heatFrom = from; loadHeat(from, to); }
 		} catch (e: any) {
 			if (my === token) viewError = e.missing ? 'History is still being prepared. Please check back later.' : `History couldn't be loaded. ${e.message}`;
 		} finally {
 			if (my === token) busy = false;
+			built?.(); built = null;
 		}
 	}
 	function setView(v: any, isZoomed = false) {
@@ -912,6 +969,7 @@
 							</button>
 						{/if}
 					</div>
+					<div class="tslider" use:timeSlider role="group" aria-label="Time slider"></div>
 					<div class="legends lg-foot">{@render priceKey()}</div>
 				</div>
 			{:else}
@@ -986,6 +1044,7 @@
 						<li><b>Click or tap a chart:</b> pins the time. ← → move it. Click it again, or use the Pinned chip or Escape, to let go.</li>
 						<li><b>Range buttons:</b> open around a pinned time.</li>
 						<li><b>‹ › and the date:</b> move through history. Latest comes back to now.</li>
+						<li><b>Slider under the price chart:</b> drag its window to move through time, and hold it at the end to carry on. From 1D to 30D, drag its ends to show more or less.</li>
 						<li><b>Drag across a chart:</b> zooms in, from 1D to 30D. Reset zoom goes back.</li>
 						<li><b>Colour squares:</b> hide a node. Double-click, Shift-click or press and hold shows only that one. The spread's square turns the priced-apart shading on and off.</li>
 						<li><b>Menu beside the title:</b> changes the price scale.</li>
@@ -1133,12 +1192,12 @@
 	.tools .seg { flex-wrap: wrap; }   /* six nodes don't fit a phone's width in one row */
 	.more { margin: 2px 2px 0; color: var(--muted); font-size: 0.8rem; }
 	/* until the data arrives: room for what's coming, at each part's height on 1D, so the page doesn't jump when it does */
-	.layout.waiting #charts { min-height: 327px; }
+	.layout.waiting #charts { min-height: 371px; }
 	.layout.waiting #charts-more { min-height: 365px; }
 	.layout.waiting .side { min-height: 619px; }
 	.card.waiting { min-height: 258px; }
 	.card.cap-card.waiting { min-height: 364px; }
-	@media (max-width: 560px) { .layout.waiting #charts { min-height: 351px; } }
+	@media (max-width: 560px) { .layout.waiting #charts { min-height: 395px; } }
 	@media (max-width: 440px) { .layout.waiting #charts-more { min-height: 414px; } }
 	.more a { color: inherit; }
 	/* big screens: the two cards split down the centre, as on the Generation tab */

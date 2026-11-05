@@ -24,12 +24,13 @@ MAX_W = 1600
 sizes = {}
 
 
-def save(png, name, theme):
+def save(png, name, theme, scale=1.5):
     im = Image.open(io.BytesIO(png)).convert('RGB')
+    css = round(im.width / scale)   # how wide it is on the site: pages show a shot no wider (test report DOC-03)
     if im.width > MAX_W:
         im = im.resize((MAX_W, round(im.height * MAX_W / im.width)), Image.LANCZOS)
     im.save(os.path.join(OUT, f'{name}-{theme}.webp'), quality=82, method=6)
-    sizes[name] = [im.width, im.height]
+    sizes[name] = [im.width, im.height, css]
     print(f'{name}-{theme}: {im.width} x {im.height}')
 
 
@@ -153,7 +154,7 @@ def phone(browser, theme):
     page.wait_for_timeout(1500)
     page.evaluate("window.scrollTo(0, document.querySelector('.tabline, .toolbar').getBoundingClientRect().top + scrollY - 8)")
     page.wait_for_timeout(300)
-    save(page.screenshot(), 'tracker-phone', theme)
+    save(page.screenshot(), 'tracker-phone', theme, 2)
     page.context.close()
 
 

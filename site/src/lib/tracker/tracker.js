@@ -14,6 +14,7 @@ import { squareButton as squareWire, SWATCH_TITLE } from '#lib/site/swatch.js';
 import { readQuery, stamp, fromStamp, FOLDABLE, FOLD_DEFAULT, foldList } from '#lib/site/viewurl.js';
 import { priceScale } from '#lib/prices/data.js';
 import { fit } from '#lib/site/fitselect.js';
+import { mountSlider, spanView, windowOf } from '#lib/site/slider.js';
 import { composeImage, legendOf, csvText, nzTime, utcTime, fileName, CREDIT, CREDIT_SOLAR, LICENCE } from '#lib/site/download.js';
 export { nzOffset, tzName };
 
@@ -54,6 +55,7 @@ export function mountTracker(D, hooks = {}) {
   const models = { live: buildModel(D), hh: null, day: null };
   const history = historyStore();
   let M = models.live;
+  let slider = null, sliding = false, slideRange = null;   // the time slider under the generation chart, whether it's being dragged, and the range it began on
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const FUEL = Object.fromEntries(FUELS.map(f => [f.k, f]));
@@ -227,6 +229,7 @@ export function mountTracker(D, hooks = {}) {
   const shared = () => ({ region: state.region, range: state.range, int: state.intPicked ? state.int : null, end: state.end });
   // push: a drill-down step, so Back steps out of it. The browser tab's title says what the view shows.
   const save = (push = false) => {
+    if (sliding) return;   // the slider's drag: saved when it lets go
     writeView(shared(), { store: { view: state.view, unit: state.unit, chart: state.chart, price: state.price, fold: foldList([...state.fold]) }, query: ownQuery(), push });
     const d = state.drill;
     setTitle(describe('generation', { ...shared(), ...ownQuery() }, { plant: d.plant, group: d.group ? groupById(d.group)?.name : null }) + ' · ELENZ');
@@ -532,12 +535,14 @@ export function mountTracker(D, hooks = {}) {
     linked = null; state.drill = d; state.hidden.clear(); state.filter = ''; relayer(); buildSummary(); render(); save(true);
   }
   const toCharts = () => $('charts').scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-  // a row of the list: where the list sits under the charts (phones) the page goes up to them, or the list closing up
-  // under the finger moves everything below it (test report GRP-03, 3 Nov 2026)
+  // a row of the list: the page goes back up to the charts when they're off the top of the screen, as they are from
+  // a long list, or the list closing up leaves the page at its foot. Where the list sits under the charts (phones) it
+  // always does, or everything below it moves under the finger (test reports GRP-03, 3 and 5 Nov 2026)
   function drillFromList(d) {
-    const stacked = $('summary').getBoundingClientRect().top >= $('charts').getBoundingClientRect().bottom - 1;
+    const charts = $('charts').getBoundingClientRect(), bar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tb-h')) || 0;
+    const away = charts.top < bar - 1 || $('summary').getBoundingClientRect().top >= charts.bottom - 1;
     drillTo(d);
-    if (stacked) toCharts();
+    if (away) toCharts();
   }
   // a row of the mix table opens that fuel's plants in the list and chart above (test report LOW-03, 1 Nov 2026)
   const canOpen = k => !!FUEL[k] && plantsFor(k).length > 0;
@@ -1450,6 +1455,7 @@ export function mountTracker(D, hooks = {}) {
     for (const b of $('seg-chart').querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v === state.chart));
     $('btn-price').setAttribute('aria-pressed', String(state.price));
     syncFold();
+    slider?.sync();
   }
   // the folded charts: the card's class (CSS hides the canvas) and each title button's state
   function syncFold() {
@@ -1546,9 +1552,12 @@ export function mountTracker(D, hooks = {}) {
     const z = zoomSpan(), len = z.to - z.from, latest = models.live.END + 3e5;
     let from = z.from + dir * len, to = z.to + dir * len;
     if (to >= latest) {
-      if (state.end == null && dir > 0) return;
+      if (z.to >= latest - 6e4 && dir > 0) return;   // already at the newest data (test report ZM-04, 5 Nov 2026)
       to = latest; from = to - len;
-      state.zoom = state.zoom.span ? { span: state.zoom.span } : { from, to };
+      // back at the newest data, a length the 1D menu offers is live "last N hours" again
+      const span = state.zoom.span || (!isLong() && SPANS.includes(len / 36e5) ? len / 36e5 : null);
+      if (span) { state.zoom = { span }; return setView('1d', null, true); }
+      state.zoom = { from, to };
       return setView(state.range, null, true);
     }
     if (from < firstDay()) return;
@@ -1677,7 +1686,7 @@ export function mountTracker(D, hooks = {}) {
   // arrows or a range shows its charts at once and the cards follow a moment later; several quick steps tell them once.
   let shareTimer = 0;
   function share() {
-    if (!hooks.view || !V || !V.n) return;
+    if (sliding || !hooks.view || !V || !V.n) return;
     const R = RANGES[state.range], from = V.t[0], to = V.t[V.n - 1] + V.hrs[V.n - 1] * 36e5;
     const key = [state.region, state.range, state.int, state.kind, state.end, from, to, M.END].join('|');
     if (key === lastShared) return;   // grouping, drill-down and hidden layers don't change it
@@ -1964,6 +1973,62 @@ export function mountTracker(D, hooks = {}) {
   if (mq) mq.addEventListener('change', retheme);
   const mo = new MutationObserver(retheme);
   mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  // ---------- the time slider under the generation chart (#lib/site/slider.js; test report TRK-12, 5 Nov 2026) ----------
+  const latestT = () => models.live.END + 3e5;
+  const totals = new WeakMap();   // each model's total generation by region, for the slider's small picture
+  function totalOf(m, region) {
+    let o = totals.get(m);
+    if (!o) totals.set(m, o = {});
+    return o[region] ??= genTotal(m, region);
+  }
+  // n averages of total generation over [a, b), from a model already here; null if none covers nearly all of it
+  function overview(a, b, n) {
+    const here = [M, models.live, models.hh, models.day].filter(m => m && m.N);
+    const cover = m => Math.max(0, Math.min(b, m.t[m.N - 1]) - Math.max(a, m.t[0]));
+    const m = here.reduce((p, q) => (cover(q) > cover(p) ? q : p));
+    if (cover(m) < (b - a) * 0.9) return null;
+    const sum = new Float64Array(n), hrs = new Float64Array(n), s = totalOf(m, state.region), step = (b - a) / n;
+    for (let i = firstAtOrAfter(m.t, a); i < m.N && m.t[i] < b; i++) {
+      const k = Math.min(n - 1, Math.floor((m.t[i] - a) / step));
+      sum[k] += s[i] * m.h[i]; hrs[k] += m.h[i];
+    }
+    return Array.from(sum, (x, k) => (hrs[k] ? x / hrs[k] : NaN));
+  }
+  const ZOOM_MIN = { '1d': 3, '1w': 21, '1mo': 90, '1yr': 1096 };   // days, so a zoom keeps at least a couple of points
+  // measured from the range the drag began on, so a stretch that crosses midnight and needs a wider range for a moment hands it back
+  const slideAt = () => ({ range: slideRange ?? state.range, latest: latestT(), first: firstDay() });
+  slider = mountSlider($('gen-slider'), {
+    range: () => state.range,
+    bounds: () => ({ first: firstDay(), latest: latestT() }),
+    view() {
+      if (!V) return null;
+      if (V.zoomed) return state.zoom && !state.zoom.span ? { from: state.zoom.from, to: state.zoom.to } : zoomSpan();
+      const [from, to] = windowOf(state.range, state.end, latestT(), firstDay());
+      return { from, to };
+    },
+    limits: () => ({ min: (ZOOM_MIN[state.int] ?? 0) * DAY || 36e5, max: Infinity, resize: true }),
+    inset: () => ({ left: PADL, right: padR() }),
+    overview,
+    overviewKey: () => [state.region, history.version('hh'), history.version('day')].join(),
+    start() { slideRange = state.range; },
+    ready(from, to) {
+      const v = spanView(from, to, slideAt()), kind = kindFor(v.range, v.end);
+      if (kind === 'live') return true;
+      const [a, b] = spanFor(v.range, v.end);
+      return !!models[kind] && history.has(kind, a, b);
+    },
+    go(from, to, final) {
+      sliding = !final;
+      stepEnd = undefined;
+      const v = spanView(from, to, slideAt());
+      if (final) slideRange = null;
+      state.zoom = v.zoom;
+      if (v.range === state.range && v.end === state.end) { useModel(); rebuild(); return; }
+      return setView(v.range, v.end, true);
+    },
+  });
+  slider.sync();
+
   const ro = new ResizeObserver(() => render());
   for (const box of boxes) ro.observe(box);
   for (const id of CHARTS) ro.observe($(id));   // an enlarged chart changes height without its panel changing width

@@ -32,6 +32,8 @@
 			<dd>Click a chart to hold the time line there. The bar then shows “Pinned” and the time; select it, click the line again or press Escape to let go. On a phone the line stays where your finger lifts; tap it again to let go. While a line is pinned, ← → move it one point (Shift: further), and Home and End jump to the ends. The pin is the anchor: it stays when you change the grouping, region or chart type, and a range button opens the new range around it, still pinned (a pinned day opened on 1D shows that whole day instead). The ‹ › arrows step away from it, and it lets go once it leaves the chart. Share can mark the pinned time.</dd>
 			<dt>Move through history</dt>
 			<dd>Range, interval and region are in the bar at the top. The ‹ › arrows beside the date, on the generation chart, or Page Up and Page Down step back and forward by the range. The date opens a calendar: select the month name to jump to another year, then pick a day. Latest comes back to now, or moves a zoomed stretch to the newest data.</dd>
+			<dt>Move through time</dt>
+			<dd>Drag the window on the slider under the chart. Hold it at either end and the slider rolls on, all the way back to 1997. Drag the window’s ends to show more or less, or select a spot on the slider to go straight there. The small picture in it is total generation, when that data has already loaded.</dd>
 			<dt>Zoom in</dt>
 			<dd>Drag across any chart to zoom into that stretch; every chart follows. The arrow beside 1D picks the last 1, 3, 6 or 12 hours. While zoomed, the date box gains a time: pick the hour, then the minutes, to move the zoomed stretch so it ends then (NZ time), or the ‹ › arrows step by the zoom’s length. Reset zoom in the bar, or Escape twice, shows the whole range again, and choosing another range while zoomed opens that range around what you zoomed into.</dd>
 		</dl>
@@ -59,6 +61,8 @@
 		<dl>
 			<dt>Read and pin</dt>
 			<dd>As on Generation: hover or touch to read a time, click to pin it, ← → to move a pinned line.</dd>
+			<dt>Move through time</dt>
+			<dd>Drag the window on the slider under the price chart, and hold it at either end to carry on. From 1D to 30D, drag its ends to show more or less.</dd>
 			<dt>Zoom in</dt>
 			<dd>From 1D to 30D, drag across any chart to zoom into that stretch, or pick the last 1, 3, 6 or 12 hours from the arrow beside 1D. Reset zoom, Escape or a range button goes back. 1Y and ALL show each period’s range of prices rather than every half-hour, so they don’t zoom.</dd>
 			<dt>Nodes and scales</dt>

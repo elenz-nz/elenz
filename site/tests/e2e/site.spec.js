@@ -179,6 +179,71 @@ for (const path of ['/tracker', '/tracker/prices']) {
   });
 }
 
+// drags a slider part by dx with the mouse, a step at a time
+async function slide(page, part, dx) {
+  const b = await page.locator(part).first().boundingBox();
+  const x = b.x + b.width / 2, y = b.y + b.height / 2;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  for (let i = 1; i <= 8; i++) await page.mouse.move(x + (dx * i) / 8, y);
+  await page.mouse.up();
+}
+
+for (const path of ['/tracker?range=3d', '/tracker/prices?range=3d']) {
+  test.describe(`${path}: the time slider (TRK-12)`, () => {
+    test.beforeEach(({}, testInfo) => test.skip(isPhone(testInfo), 'dragged with a mouse'));
+
+    test('a tap on its window moves nothing', async ({ page }) => {
+      await page.goto(path);
+      const thumb = page.locator('.ts-thumb');
+      await expect(thumb).toHaveAttribute('aria-valuetext', /./);
+      await thumb.click();
+      await page.waitForTimeout(300);
+      await expect(page).not.toHaveURL(/end=|zoom=/);
+    });
+
+    test('its window moves by whole days and comes back to the newest data', async ({ page }) => {
+      await page.goto(path);
+      await expect(page.locator('.ts-thumb')).toHaveAttribute('aria-valuetext', /./);
+      await slide(page, '.ts-thumb', -150);
+      await expect(page).toHaveURL(/end=\d{4}-\d\d-\d\d/);
+      await expect(page).not.toHaveURL(/zoom=/);
+      await slide(page, '.ts-thumb', 2000);
+      await expect(page).not.toHaveURL(/end=/);
+    });
+
+    test('its ends zoom', async ({ page }) => {
+      await page.goto(path);
+      await expect(page.locator('.ts-thumb')).toHaveAttribute('aria-valuetext', /./);
+      await slide(page, '.ts-grip.a', 60);
+      await expect(page).toHaveURL(/zoom=/);
+    });
+  });
+}
+
+test('on the 3-hour zoom the forward arrow comes back after a step back (ZM-04)', async ({ page }, testInfo) => {
+  test.skip(isPhone(testInfo), 'the 1D menu is covered by the zoom tests');
+  await page.goto('/tracker?zoom=3h');
+  await expect(page.locator('#tb-next')).toBeDisabled();
+  await page.locator('#tb-prev').click();
+  await expect(page).toHaveURL(/zoom=\d/);
+  await expect(page.locator('#tb-next')).toBeEnabled();
+  await page.locator('#tb-next').click();
+  await expect(page).toHaveURL(/zoom=3h/);
+  await expect(page.locator('#tb-next')).toBeDisabled();
+});
+
+test('a site picked from far down the list goes back up to the chart (GRP-03)', async ({ page }) => {
+  await page.goto('/tracker?by=site');
+  await expect(page.locator('#summary .sec-btn').first()).toBeVisible();
+  await page.evaluate(() => document.querySelectorAll('#summary tr.sec[aria-expanded="false"] .sec-btn').forEach((b) => b.click()));
+  const last = page.locator('#summary tr:not([hidden]) .drill').last();
+  await last.scrollIntoViewIfNeeded();
+  await last.click();
+  await expect.poll(() => page.evaluate(() => document.getElementById('charts').getBoundingClientRect().top)).toBeLessThan(200);
+  await expect.poll(() => page.evaluate(() => document.getElementById('charts').getBoundingClientRect().top)).toBeGreaterThan(-5);
+});
+
 test.describe('on a phone', () => {
   test.beforeEach(({}, testInfo) => test.skip(!isPhone(testInfo), 'phones only'));
 
