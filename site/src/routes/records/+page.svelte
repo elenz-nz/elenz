@@ -5,6 +5,7 @@
 	import Preview from '#lib/site/Preview.svelte';
 	import { onMount } from 'svelte';
 	import { replaceState, goto } from '$app/navigation';
+	import { retitle } from '#lib/site/view.js';
 	import Masthead from '#lib/site/Masthead.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import Spark from '#lib/records/Spark.svelte';
@@ -79,6 +80,7 @@
 		if (tab === 'all') u.searchParams.delete('tab'); else u.searchParams.set('tab', tab);
 		if (moyPer === 'tp') u.searchParams.delete('by'); else u.searchParams.set('by', moyPer);
 		replaceState(u, {});
+		retitle();
 	}
 	// the whole row opens its record (the name and description are the link itself, for keyboards and new tabs; a click
 	// anywhere else in the row follows it too, but not a text selection or a click on another link)
@@ -480,7 +482,7 @@
 	.empty p { margin: 0; color: var(--ink-2); max-width: 70ch; }
 
 	.dot { display: inline-block; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--c); margin-right: 8px; }
-	.tag { display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em; padding: 1px 7px; border-radius: 999px; background: var(--grid); color: var(--ink-2); margin-left: 6px; vertical-align: 1px; white-space: nowrap; }
+	.tag { display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em; padding: 1px 7px; border-radius: 4px; background: var(--grid); color: var(--ink-2); margin-left: 6px; vertical-align: 1px; white-space: nowrap; }
 	.tag.new { background: var(--warn-bg); color: var(--warn-ink); }
 	.tag.est { background: transparent; border: 1px solid var(--line); color: var(--muted); }
 
@@ -489,7 +491,7 @@
 	.card:hover { border-color: var(--ink-2); }
 	/* Heading for a record: one small tile each, the record's colour on a tint of it */
 	.paces { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
-	.pt { display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 8px; border-radius: 6px; color: var(--ink); text-decoration: none;
+	.pt { display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 8px; border-radius: 4px; color: var(--ink); text-decoration: none;
 		background: color-mix(in srgb, var(--c) 16%, var(--surface)); border: 1px solid color-mix(in srgb, var(--c) 45%, var(--line));
 		transition: transform 0.15s, border-color 0.15s, background 0.15s; }
 	.pt:hover, .pt:focus-visible { transform: translateY(-2px); border-color: var(--c); background: color-mix(in srgb, var(--c) 24%, var(--surface)); }
@@ -504,10 +506,11 @@
 	.pt-go { margin-left: auto; flex: none; color: var(--muted); transition: transform 0.15s, color 0.15s; }
 	.pt:hover .pt-go { transform: translateX(2px); color: var(--c); }
 	@media (prefers-reduced-motion: reduce) { .pt-ic::after { animation: none; } .pt, .pt-go { transition: none; } .pt:hover { transform: none; } }
-	/* phones: two to a row, the name free to wrap, no arrow */
-	@media (max-width: 560px) {
+	/* phones: two to a row, the name free to wrap, no arrow. Up to 640 px, or they drop to one across just above it
+	   and go back to two (REC-01) */
+	@media (max-width: 640px) {
 		.paces { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
-		.pt { gap: 8px; padding: 6px 10px 6px 6px; border-radius: 6px; }
+		.pt { gap: 8px; padding: 6px 10px 6px 6px; border-radius: 4px; }
 		.pt-ic { width: 30px; height: 30px; }
 		.pt-ic :global(svg) { width: 18px; height: 18px; }
 		.pt-txt b { font-size: 0.8rem; white-space: normal; }
@@ -529,7 +532,7 @@
 	.c-val.gone { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; }
 
 	.chips { display: flex; gap: 6px; flex-wrap: wrap; }
-	.chip { font: inherit; font-size: 0.8rem; font-weight: 500; padding: 5px 11px; min-height: 32px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); cursor: pointer; }
+	.chip { font: inherit; font-size: 0.8rem; font-weight: 500; padding: 5px 11px; min-height: 32px; border-radius: 4px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); cursor: pointer; }
 	.chip:hover { color: var(--ink); border-color: var(--ink-2); }
 	.chip[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--surface); }
 

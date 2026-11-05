@@ -3,17 +3,17 @@
 
 import { FUELS } from './fuels.js';
 import { efAt, plantEf, BY_PLANT } from './emissions.js';
-import { onDateSettled, onTimeSettled } from '../site/datefield.js';
+import { onDateSettled } from '../site/datefield.js';
 import '../site/datepick.js';   // <date-pick>: the date box's calendar (TRK-07)
-import '../site/timepick.js';   // <time-pick>: the time box while zoomed (ZM-03)
 import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTotal } from './series.js';
 import PLANT_META from './plants.json';  // owner, hydro scheme, other names and metering note per plant (ingest/plant_meta.py)
 import CAPACITY from './capacity.json';   // installed MW per plant (ingest/capacity.py)
 import { readView, writeView, slug, describe, shareLinks, setTitle, addYears } from '#lib/site/view.js';
 import { squareButton as squareWire, SWATCH_TITLE } from '#lib/site/swatch.js';
-import { readQuery, stamp, fromStamp, FOLDABLE, FOLD_DEFAULT, foldList } from '#lib/site/viewurl.js';
+import { readQuery, stamp, fromStamp, FOLDABLE, FOLD_DEFAULT, foldList, SPANS } from '#lib/site/viewurl.js';
 import { priceScale } from '#lib/prices/data.js';
 import { fit } from '#lib/site/fitselect.js';
+import { mountSlider, spanView, windowOf, held } from '#lib/site/slider.js';
 import { composeImage, legendOf, csvText, nzTime, utcTime, fileName, CREDIT, CREDIT_SOLAR, LICENCE } from '#lib/site/download.js';
 export { nzOffset, tzName };
 
@@ -54,6 +54,7 @@ export function mountTracker(D, hooks = {}) {
   const models = { live: buildModel(D), hh: null, day: null };
   const history = historyStore();
   let M = models.live;
+  let slider = null, sliding = false, slideRange = null;   // the time slider under the generation chart, whether it's being dragged, and the range it began on
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const FUEL = Object.fromEntries(FUELS.map(f => [f.k, f]));
@@ -227,6 +228,7 @@ export function mountTracker(D, hooks = {}) {
   const shared = () => ({ region: state.region, range: state.range, int: state.intPicked ? state.int : null, end: state.end });
   // push: a drill-down step, so Back steps out of it. The browser tab's title says what the view shows.
   const save = (push = false) => {
+    if (sliding) return;   // the slider's drag: saved when it lets go
     writeView(shared(), { store: { view: state.view, unit: state.unit, chart: state.chart, price: state.price, fold: foldList([...state.fold]) }, query: ownQuery(), push });
     const d = state.drill;
     setTitle(describe('generation', { ...shared(), ...ownQuery() }, { plant: d.plant, group: d.group ? groupById(d.group)?.name : null }) + ' · ELENZ');
@@ -353,7 +355,8 @@ export function mountTracker(D, hooks = {}) {
     if (state.zoom && stop - start > 2) {
       if (state.zoom.span) { zt = M.t[stop - 1] + M.h[stop - 1] * 36e5; zf = zt - state.zoom.span * 36e5; }
       else { zf = state.zoom.from; zt = state.zoom.to; }
-      const a = Math.max(start, firstAtOrAfter(M.t, zf)), b = Math.min(stop, firstAtOrAfter(M.t, zt));
+      // a stretch from the slider can sit across the window's edges, so a dragged zoom sets its own ends
+      const a = state.zoom.span ? Math.max(start, firstAtOrAfter(M.t, zf)) : firstAtOrAfter(M.t, zf), b = state.zoom.span ? stop : Math.min(M.N, firstAtOrAfter(M.t, zt));
       if (b - a >= 2) { start = a; stop = b; } else zf = zt = null;
     }
     // grouped views start at the first whole day, week or month in the window rather than with a sliver of one
@@ -389,7 +392,7 @@ export function mountTracker(D, hooks = {}) {
     for (const k of BY_PLANT) {
       const ps = M.plants.filter(p => p.fuel === k && (state.region === 'NZ' || p.isl === state.region));
       const em = new Float64Array(M.N), mw = new Float64Array(M.N);
-      for (const p of ps) for (let i = 0; i < M.N; i++) { const x = p.s[i]; if (x > 0) { mw[i] += x; em[i] += x * plantEf(k, p.name, M.t[i]); } }
+      for (const p of ps) for (let i = start; i < stop; i++) { const x = p.s[i]; if (x > 0) { mw[i] += x; em[i] += x * plantEf(k, p.name, M.t[i]); } }
       own[k] = { em: avg(em), mw: avg(mw) };
     }
     // the renewable share and emissions intensity leave battery discharge out (as em6 does): that energy was
@@ -531,13 +534,29 @@ export function mountTracker(D, hooks = {}) {
   function drillTo(d) {
     linked = null; state.drill = d; state.hidden.clear(); state.filter = ''; relayer(); buildSummary(); render(); save(true);
   }
+  // a frame later, once the list has closed up: Safari drops a smooth scroll started while the page is shrinking, so if
+  // the charts still aren't back it goes straight there
+  function toCharts() {
+    const to = behavior => $('charts').scrollIntoView({ block: 'start', behavior });
+    requestAnimationFrame(() => to(matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'));
+    setTimeout(() => { if ($('charts').getBoundingClientRect().top < -40) to('auto'); }, 900);
+  }
+  // a row of the list: the page goes back up to the charts when they're off the top of the screen, as they are from
+  // a long list, or the list closing up leaves the page at its foot. Where the list sits under the charts (phones) it
+  // always does, or everything below it moves under the finger (test reports GRP-03, 3 and 5 Nov 2026)
+  function drillFromList(d) {
+    const charts = $('charts').getBoundingClientRect(), bar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tb-h')) || 0;
+    const away = charts.top < bar - 1 || $('summary').getBoundingClientRect().top >= charts.bottom - 1;
+    drillTo(d);
+    if (away) toCharts();
+  }
   // a row of the mix table opens that fuel's plants in the list and chart above (test report LOW-03, 1 Nov 2026)
   const canOpen = k => !!FUEL[k] && plantsFor(k).length > 0;
   function openFuel(k) {
     if (!canOpen(k)) return;
     linked = null; state.view = 'detailed'; state.drill = { ...TOP_LEVEL, fuel: k }; state.hidden.clear(); state.filter = ''; state.open.clear();
     rebuild(); save(true);
-    $('charts').scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    toCharts();
   }
   // a link's drill-down, once its window is built (rebuild); anything that no longer exists is dropped there
   function fromLink(l) {
@@ -1184,7 +1203,7 @@ export function mountTracker(D, hooks = {}) {
         if (x && x.row) { const all = x.members.every(m => state.hidden.has(m.id)); x.row.classList.toggle('off', all); x.row.querySelector('.sw-btn').setAttribute('aria-pressed', String(!all)); }
         syncMixTools();
       });
-      if (l.drill) tr.querySelector('.drill').addEventListener('click', () => drillTo(l.drill));
+      if (l.drill) tr.querySelector('.drill').addEventListener('click', () => drillFromList(l.drill));
       l.row = tr; l.cells = cellsOf(tr);
       body.appendChild(tr);
     }
@@ -1389,20 +1408,19 @@ export function mountTracker(D, hooks = {}) {
     // the date control: the chosen range ends on this date (today = the latest data)
     const R = RANGES[state.range], inp = $('in-date'), end = state.end ?? endOfToday();
     // a past day on 1D is that whole day, so the box says "Day" rather than "24 hours ending" (CHT-10)
-    $('lb-date').textContent = R.fixed ? 'All data' : state.range === '1d' && state.end != null ? 'Day' : `${R.label} ending`;
+    $('lb-date').textContent = R.fixed ? 'All data' : state.range === '1d' && state.end != null && !state.zoom ? 'Day' : `${R.label} ending`;
     if (inp._sync) inp._sync();   // the calendar button's spoken label follows
     inp.disabled = !!R.fixed;
     inp.style.visibility = R.fixed ? 'hidden' : '';  // All has no end date
     inp.value = R.fixed ? '' : ymd(end - 1);
     inp.min = ymd(firstDay()); inp.max = ymd(models.live.END);
-    // zoomed into hours (a span from the 1D menu or a dragged stretch): the boxes give the date and time it ends,
-    // and choosing either moves it there
-    const tin = $('in-time'), zh = zoomedHours();
-    tin.hidden = !zh;
-    if (zh) {
-      const z = zoomSpan(), [d, hm] = stamp(z.to).split('T');
-      $('lb-date').textContent = `${zoomWord(z.to - z.from)} ending`;
-      inp.value = d; tin.value = hm;
+    // zoomed into hours (a span from the 1D menu or a dragged stretch): the box gives the date it ends, the calendar
+    // the time too, and choosing either moves it there. A window the slider has moved keeps its range's name.
+    const z = zoomedHours() ? zoomSpan() : null, ends = z ? stamp(z.to).split('T') : null;
+    inp.time = ends ? ends[1] : '';
+    if (z) {
+      if (!movedWindow()) $('lb-date').textContent = `${zoomWord(z.to - z.from)} ending`;
+      inp.value = ends[0];
       inp.max = ymd(models.live.END + 3e5);
     }
     // Latest also shows when a dragged stretch sits behind the newest data (ZM-03)
@@ -1423,9 +1441,9 @@ export function mountTracker(D, hooks = {}) {
     oneDay.textContent = span ? `${span}H` : '1D';
     oneDay.title = span ? `Last ${span} hour${span > 1 ? 's' : ''} (select for 24 hours)` : '24 hours';
     for (const b of spanMenu.querySelectorAll('button[data-h]')) b.setAttribute('aria-checked', String(+b.dataset.h === (span ?? (state.range === '1d' ? 24 : 0))));
-    const chip = $('zoom-reset'), dragged = !!(state.zoom && !state.zoom.span && V && V.zoomed);
+    // a window the slider has moved, at the range's own length, isn't a zoom: nothing to reset (Latest brings it back)
+    const chip = $('zoom-reset'), dragged = !!(state.zoom && !state.zoom.span && V && V.zoomed) && !movedWindow();
     chip.hidden = !dragged;
-    if (dragged) $('zoom-txt').textContent = zoomText();
     if (V && V.zoomed) for (const id of ['nav-prev', 'tb-prev', 'nav-next', 'tb-next']) {
       const b = $(id); if (!b) continue;
       b.hidden = false;
@@ -1442,6 +1460,7 @@ export function mountTracker(D, hooks = {}) {
     for (const b of $('seg-chart').querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v === state.chart));
     $('btn-price').setAttribute('aria-pressed', String(state.price));
     syncFold();
+    slider?.sync();
   }
   // the folded charts: the card's class (CSS hides the canvas) and each title button's state
   function syncFold() {
@@ -1457,7 +1476,12 @@ export function mountTracker(D, hooks = {}) {
   // hv: the store's version it was merged from; a model older than the files loaded since is merged again (setView)
   const merge = kind => Object.assign(toModel(history.merged(kind, models.live), models.live.END), { hv: history.version(kind) });
   // the span of history a window [end − range, end) needs (the latest 31 days when end is null)
-  const spanFor = (r, end) => { const to = end ?? models.live.END; return [end == null ? to - 31 * DAY : moveBack(end, RANGES[r]) - DAY, to]; };
+  // (and a stretch from the slider's own start, zf, and end, zt: it can reach past the window)
+  const spanFor = (r, end, zf = state.zoom?.from, zt = state.zoom?.to) => {
+    if (zf != null) return [zf - DAY, zt];
+    const to = end ?? models.live.END;
+    return [end == null ? to - 31 * DAY : moveBack(end, RANGES[r]) - DAY, to];
+  };
   function useModel() {
     const m = models[state.kind];
     if (m !== M) { M = m; derive(); }
@@ -1469,11 +1493,11 @@ export function mountTracker(D, hooks = {}) {
                      histBuilt: ix && ix.built, ...extra });
   }
   // which data a window needs: the live 5-minute week if it covers it, otherwise half-hourly or daily history
-  function kindFor(r, end) {
+  function kindFor(r, end, zf = state.zoom?.from) {
     const R = RANGES[r];
     if (R.model !== 'live') return R.model;
-    if (end == null) return 'live';
-    return end - R.days * DAY >= models.live.t[0] - 6e4 ? 'live' : 'hh';
+    const from = zf ?? (end == null ? Infinity : end - R.days * DAY);   // a stretch's own start decides
+    return from >= models.live.t[0] - 6e4 ? 'live' : 'hh';
   }
   let pending = 0;
   // keepInt: keep a chosen interval across a range change; wantInt: the interval to open on (from the address);
@@ -1533,14 +1557,22 @@ export function mountTracker(D, hooks = {}) {
   };
   // zoomed, the arrows move the zoom by its own length, into the next window if need be; forward to the latest data
   // a span from the menu becomes "the last N hours" again
+  function movedWindow() {
+    const R = RANGES[state.range], z = state.zoom;
+    return !!(z && z.from != null && R.days && Math.abs(z.to - z.from - R.days * DAY) <= 2 * 36e5);
+  }
   function zoomSpan() { const a = V.t[0], b = V.t[V.n - 1] + V.hrs[V.n - 1] * 36e5; return { from: a, to: b }; }
   function stepZoom(dir) {
     const z = zoomSpan(), len = z.to - z.from, latest = models.live.END + 3e5;
     let from = z.from + dir * len, to = z.to + dir * len;
     if (to >= latest) {
-      if (state.end == null && dir > 0) return;
+      if (z.to >= latest - 6e4 && dir > 0) return;   // already at the newest data (test report ZM-04, 5 Nov 2026)
       to = latest; from = to - len;
-      state.zoom = state.zoom.span ? { span: state.zoom.span } : { from, to };
+      if (movedWindow()) { state.zoom = null; return setView(state.range, null, true); }
+      // back at the newest data, a length the 1D menu offers is live "last N hours" again
+      const span = state.zoom.span || (!isLong() && SPANS.includes(len / 36e5) ? len / 36e5 : null);
+      if (span) { state.zoom = { span }; return setView('1d', null, true); }
+      state.zoom = { from, to };
       return setView(state.range, null, true);
     }
     if (from < firstDay()) return;
@@ -1555,7 +1587,6 @@ export function mountTracker(D, hooks = {}) {
   // the date and time boxes, zoomed: the same length of time, ending at t (snapped to 5 minutes). At or past the newest
   // data a span from the menu (or a stretch as long as one) is "the last N hours" again. The window around it is the day it ends in (or the latest),
   // widened to 3 days when the stretch starts the day before, so none of it is cut off.
-  const SPANS = [1, 3, 6, 12];   // the 1D menu's hours (#span-menu)
   function zoomEndAt(t) {
     if (!zoomedHours() || !(t > 0)) return;
     const z = zoomSpan(), len = z.to - z.from, latest = models.live.END + 3e5;
@@ -1568,10 +1599,8 @@ export function mountTracker(D, hooks = {}) {
       return setView(state.range, null, true);
     }
     state.zoom = { from, to };
-    let end = addDays(midnightOf(to - 1), 1);
-    if (end >= endOfToday()) end = null;
-    const fits = r => from >= (end == null ? latest - RANGES[r].days * DAY : addDays(end, -RANGES[r].days));
-    setView(fits(state.range) || !RANGES['3d'] ? state.range : '3d', end, true);
+    const end = addDays(midnightOf(to - 1), 1);
+    setView(state.range, end >= endOfToday() ? null : end, true);
   }
   // A rebuild (a new range, new data) can bring layers the last view didn't have: a plant that didn't run in the live
   // week, or a site moved into or out of "Other ..." in the By site view. state.hidden only lists what was switched off,
@@ -1669,7 +1698,7 @@ export function mountTracker(D, hooks = {}) {
   // arrows or a range shows its charts at once and the cards follow a moment later; several quick steps tell them once.
   let shareTimer = 0;
   function share() {
-    if (!hooks.view || !V || !V.n) return;
+    if (sliding || !hooks.view || !V || !V.n) return;
     const R = RANGES[state.range], from = V.t[0], to = V.t[V.n - 1] + V.hrs[V.n - 1] * 36e5;
     const key = [state.region, state.range, state.int, state.kind, state.end, from, to, M.END].join('|');
     if (key === lastShared) return;   // grouping, drill-down and hidden layers don't change it
@@ -1732,15 +1761,17 @@ export function mountTracker(D, hooks = {}) {
   document.addEventListener('click', e => { if (!spanMenu.hidden && !spanMenu.contains(e.target)) closeSpans(); });
   $('zoom-reset').addEventListener('click', () => setZoom(null));
   onDateSettled($('in-date'), v => {
-    if (zoomedHours()) return zoomEndAt(fromStamp(`${v}T${$('in-time').value || '00:00'}`));
+    slider.centre();   // a date picked sits in the middle of the slider (design decision, 5 Nov 2026)
+    if (zoomedHours() && !movedWindow()) return zoomEndAt(fromStamp(`${v}T${$('in-date').time || '00:00'}`));
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
     if (!m) return;
     const day = midnightOf(Date.UTC(+m[1], +m[2] - 1, +m[3], 12) - 12 * 36e5);  // that date's local midnight
     state.zoom = null; setView(state.range, addDays(day, 1));
   });
-  onTimeSettled($('in-time'), v => zoomEndAt(fromStamp(`${$('in-date').value}T${v}`)));
+  $('in-date').addEventListener('timechange', e => { slider.centre(); zoomEndAt(fromStamp(`${e.target.value}T${e.target.time}`)); });
   // zoomed, Latest moves the stretch to the newest data and keeps its length (test report ZM-03, 1 Nov 2026)
   $('btn-latest').addEventListener('click', () => {
+    if (movedWindow()) state.zoom = null;
     if (!state.zoom || !V?.zoomed) return setView(state.range, null);
     const latest = models.live.END + 3e5, z = zoomSpan();
     if (zoomedHours()) return zoomEndAt(latest);
@@ -1956,7 +1987,88 @@ export function mountTracker(D, hooks = {}) {
   if (mq) mq.addEventListener('change', retheme);
   const mo = new MutationObserver(retheme);
   mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-  const ro = new ResizeObserver(() => render());
+  // ---------- the time slider under the generation chart (#lib/site/slider.js; test report TRK-12, 5 Nov 2026) ----------
+  const latestT = () => models.live.END + 3e5;
+  const totals = new WeakMap();   // each model's total generation by region, for the slider's small picture
+  function totalOf(m, region) {
+    let o = totals.get(m);
+    if (!o) totals.set(m, o = {});
+    return o[region] ??= genTotal(m, region);
+  }
+  // the track's half-hourly history, once the page has settled, so the charts follow a drag all along it and the
+  // picture is there (test report TRK-12, 5 Nov 2026: a drag stalled at each month not loaded yet). 1Y and All have
+  // the whole daily history already, and a track inside the live week needs nothing.
+  let trackWanted = '', trackTimer = 0;
+  function prepare(a, b) {
+    if (RANGES[state.range].model === 'day' || a >= models.live.t[0] - 36e5) return;
+    const key = `${Math.floor(a / DAY)}|${Math.floor(b / DAY)}`;
+    if (key === trackWanted) return;
+    trackWanted = key;
+    clearTimeout(trackTimer);
+    trackTimer = setTimeout(async () => {
+      const from = Math.max(firstDay(), a - 2 * DAY), to = b + DAY;
+      try {
+        if (!history.has('hh', from, to)) await history.load('hh', from, to);
+        if (sliding) return;   // a drag under way merges it as it moves on
+        if (models.hh?.hv !== history.version('hh')) models.hh = merge('hh');
+        slider.sync();
+      } catch { trackWanted = ''; }   // the charts still follow, a moment later
+    }, 800);
+  }
+  // n averages of total generation over [a, b), from a model already here; null if none covers nearly all of it
+  function overview(a, b, n) {
+    // the fullest series, by what it really holds (test report TRK-12, 6 Nov 2026: the view's own model, joined before
+    // the track's months arrived, spans the track too, with months missing, and left the picture blank either side)
+    let m = null, most = 0;
+    for (const q of [models.live, models.hh, models.day]) {
+      const h = q && q.N ? held(q, a, b) : 0;
+      if (h > most) { m = q; most = h; }
+    }
+    if (most < (b - a) * 0.9) return null;
+    const sum = new Float64Array(n), hrs = new Float64Array(n), s = totalOf(m, state.region), step = (b - a) / n;
+    for (let i = firstAtOrAfter(m.t, a); i < m.N && m.t[i] < b; i++) {
+      const k = Math.min(n - 1, Math.floor((m.t[i] - a) / step));
+      sum[k] += s[i] * m.h[i]; hrs[k] += m.h[i];
+    }
+    return Array.from(sum, (x, k) => (hrs[k] ? x / hrs[k] : NaN));
+  }
+  // measured from the range the drag began on, so a stretch that crosses midnight and needs a wider range for a moment hands it back
+  const slideAt = () => ({ range: slideRange ?? state.range, latest: latestT(), first: firstDay() });
+  slider = mountSlider($('gen-slider'), {
+    range: () => state.range,
+    bounds: () => ({ first: firstDay(), latest: latestT() }),
+    view() {
+      if (!V) return null;
+      if (V.zoomed) return state.zoom && !state.zoom.span ? { from: state.zoom.from, to: state.zoom.to } : zoomSpan();
+      const [from, to] = windowOf(state.range, state.end, latestT(), firstDay());
+      return { from, to };
+    },
+    grid: () => (isLong() ? 'day' : null),
+    inset: () => ({ left: PADL, right: padR() }),
+    overview,
+    prepare,
+    overviewKey: () => [state.region, models.hh?.N, models.day?.N].join(),
+    start() { slideRange = state.range; },
+    ready(from, to) {
+      const v = spanView(from, to, slideAt()), zf = v.zoom?.from, zt = v.zoom?.to, kind = kindFor(v.range, v.end, zf);
+      if (kind === 'live') return true;
+      const [a, b] = spanFor(v.range, v.end, zf, zt);
+      return !!models[kind] && history.has(kind, a, b);
+    },
+    go(from, to, final) {
+      sliding = !final;
+      stepEnd = undefined;
+      const v = spanView(from, to, slideAt());
+      if (final) slideRange = null;
+      state.zoom = v.zoom;
+      const kind = kindFor(v.range, v.end);   // (state.zoom is set: a stretch's own start decides)
+      if (v.range === state.range && v.end === state.end && kind === state.kind && (kind === 'live' || models[kind]?.hv === history.version(kind))) { useModel(); rebuild(); return; }
+      return setView(v.range, v.end, true);
+    },
+  });
+  slider.sync();
+
+  const ro = new ResizeObserver(() => requestAnimationFrame(() => render()));   // a frame on, as drawing can change a chart's height
   for (const box of boxes) ro.observe(box);
   for (const id of CHARTS) ro.observe($(id));   // an enlarged chart changes height without its panel changing width
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fit($('sel-view')); render(); });
@@ -1993,7 +2105,7 @@ export function mountTracker(D, hooks = {}) {
     update(D2) {
       models.live = buildModel(D2);
       for (const kind of ['hh', 'day']) if (models[kind]) models[kind] = merge(kind);
-      if (state.end == null || state.kind === 'live') state.kind = kindFor(state.range, state.end);
+      if (state.end == null || state.kind === 'live') { const k = kindFor(state.range, state.end); if (k === 'live' || models[k]) state.kind = k; }
       M = null; useModel(); updateAsof(); rebuild();
       // history gains days a few times a day: refresh what's loaded, at most hourly (history.load checks the age)
       // (a refresh after a history rebuild drops every cached file, so a past window being shown is loaded again too)

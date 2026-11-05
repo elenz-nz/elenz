@@ -147,14 +147,14 @@
 <style>
 	/* the pages in two columns, each card straight under the one above (no ragged rows); one column on phones */
 	.ab-pages { columns: 2 280px; column-gap: 14px; }
-	.ab-page { break-inside: avoid; margin: 0 0 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; display: grid; gap: 8px; align-content: start; }
+	.ab-page { break-inside: avoid; margin: 0 0 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px 16px; display: grid; gap: 8px; align-content: start; }
 	.ab-page h3 { margin: 0; font-size: 1rem; }
 	.ab-page h3 a { color: var(--ink); text-decoration: none; }
 	.ab-page h3 a:hover { color: var(--accent); text-decoration: underline; }
 	.ab-page p { color: var(--muted); font-size: 0.88rem; }
 	.ab-page li { font-size: 0.88rem; line-height: 1.5; }
 	/* Contact: a section like the others (rule above, heading), able to light up when the sidebar's Contact is used */
-	.ab-contact { position: relative; margin: 18px -16px 0; padding: 18px 16px 14px; border-radius: 8px; display: grid; gap: 12px; scroll-margin-top: 16px; }
+	.ab-contact { position: relative; margin: 18px -16px 0; padding: 18px 16px 14px; border-radius: 4px; display: grid; gap: 12px; scroll-margin-top: 16px; }
 	/* the rule above lines up with the other sections' rules, inside the highlight's padding */
 	.ab-contact::before { content: ''; position: absolute; top: 0; left: 16px; right: 16px; border-top: 1px solid var(--line); }
 	.ab-contact.flash::before { border-color: transparent; }

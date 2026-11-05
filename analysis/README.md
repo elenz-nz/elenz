@@ -244,6 +244,12 @@ reproduces Genesis's figures to a few points in most quarters (FY23 Q1 24 agains
 
 ## Price explainer triggers (`price_triggers.py`, 17 Oct 2026)
 
+Added 5 Nov 2026 (test report NOW-07): under $100/MWh the islands count as apart from more than $20 and 25%, where the
+card says so but the button stays quiet (`apartUnder`, `apartGap` in explain.js). Checked on the last 13 months of the
+site's half-hourly history (19,008 half-hours): the existing rule ($50 and 25%) held 3.7% of the time, about 0.5
+episodes a day; with the low-price rule 7.0%, about 0.8 a day. The extra half-hours have a median higher price of $58
+and a median gap of $29, with HVDC near 900 MW, so they are real transfer limits, but too ordinary to highlight.
+
 Planned for /now: a "Why is the price high?" card, always there but folded into one line under the price tiles. It
 is highlighted (outlined, asking to be opened) when prices are unusual and opens by itself only at extremes. Tested
 on every trading period of final prices at Haywards and Benmore, Mar 1997 to Sep 2026 (`price_fetch.py` first).

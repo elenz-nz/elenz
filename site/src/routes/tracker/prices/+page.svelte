@@ -8,13 +8,14 @@
 	import { fromLayout, historyStore, firstAtOrAfter, slice, nzOffset } from '#lib/tracker/series.js';
 	import Masthead from '#lib/site/Masthead.svelte';
 	import TrackerTabs from '#lib/site/TrackerTabs.svelte';
-	import { readView, writeView, resetView, midnightOf, addDays, addYears, ymd, endOfDay, describe, shareLinks, setTitle } from '#lib/site/view.js';
+	import ResetButton from '#lib/site/ResetButton.svelte';
+	import { readView, writeView, midnightOf, addDays, addYears, ymd, endOfDay, describe, shareLinks, setTitle } from '#lib/site/view.js';
 	import ShareLink from '#lib/site/ShareLink.svelte';
+	import StatusPill from '#lib/site/StatusPill.svelte';
 	import { heatWindow, heatSource, monthRows } from '#lib/site/heat.js';
-	import { dateSettled, timeSettled } from '#lib/site/datefield.js';
+	import { dateSettled } from '#lib/site/datefield.js';
 	import '#lib/site/datepick.js';   // <date-pick>, the date box's calendar
-	import '#lib/site/timepick.js';   // <time-pick>, the time box while zoomed (ZM-03)
-	import { stamp, fromStamp } from '#lib/site/viewurl.js';
+	import { stamp, fromStamp, SPANS } from '#lib/site/viewurl.js';
 	import DownloadMenu from '#lib/site/DownloadMenu.svelte';
 	import { composeImage, svgImage, legendOf, csvText, nzTime, utcTime, fileName, CREDIT, LICENCE } from '#lib/site/download.js';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
@@ -26,6 +27,7 @@
 	import InfoTip from '#lib/site/InfoTip.svelte';
 	import { swatch, SWATCH_TITLE } from '#lib/site/swatch.js';
 	import { fitSelect } from '#lib/site/fitselect.js';
+	import { mountSlider, spanView, windowOf as rangeWindow, held } from '#lib/site/slider.js';
 	import { barHeight } from '#lib/site/sticky.js';
 	import { span } from '#lib/site/context.js';
 	import {
@@ -71,14 +73,15 @@
 	let heatScaled = $state(false);   // the heat map's colours fitted to the rows shown rather than the fixed price bands
 	let popped = $state<string | null>(null); // a lower chart enlarged over the page
 	let winH = $state(800);
-	let infoOpen = $state(false), helpOpen = $state(false);
-	let infoBtn = $state<HTMLButtonElement>(), infoBox = $state<HTMLDivElement>(), helpBtn = $state<HTMLButtonElement>();
+	let helpOpen = $state(false);
+	let helpBtn = $state<HTMLButtonElement>();
 	let tipS = $state<{ chart: string; i: number; x: number; y: number } | null>(null); // the tooltip that follows the mouse
 	const store = historyStore();
 	const FIRST = Date.UTC(1997, 6, 31, 12); // history starts 1 Aug 1997 (NZ), the metered history's first month
 	const R = $derived(RANGES[range as keyof typeof RANGES] as { mode: string; src: string; days: number | null; ints: string[]; past?: string[]; label: string; def?: string });
 	const age = $derived(meta ? (now - meta.end) / 60000 : 0);
 	const isLive = $derived(meta !== null && age < LIVE_MINUTES);
+	const pastView = $derived(R.src !== 'live' || endT !== null);
 
 	// ---------- settings: region and range shared with the Generation tab; the rest kept for this page ----------
 	// region, range, interval and date are shared with the Generation tab through the address (#lib/site/view.js);
@@ -227,11 +230,8 @@
 	}
 	function setZoom(z: { from: number; to: number } | null) { zoom = z; hover = -1; pinned = false; save(); }
 	const zoomed = $derived(!!zoom && view?.mode === 'time' && !!view?.zoomed);
-	const zoomTxt = $derived.by(() => {
-		if (!zoomed || !view) return '';
-		const a = view.t0, b = view.t1;
-		return `${clock(a)} – ${clock(b)}${dayLabel(a) === dayLabel(b) ? ' ' + dayLabel(a) : ''}`;
-	});
+	// a window the slider has moved, at the range's own length, isn't a zoom: nothing to reset (Latest brings it back)
+	const movedWindow = $derived(!!zoom && zoom.from != null && !!R.days && Math.abs((zoom.to as number) - zoom.from - R.days * 864e5) <= 2 * 36e5);
 	// zoomed, the stretch shown: [from, to) (to = the end of its last interval), and its length in words
 	const zoomEnds = $derived(zoomed && view ? { from: view.t0, to: view.t1 + view.S.h[view.n - 1] * 36e5 } : null);
 	const zoomWord = (ms: number) => {
@@ -249,15 +249,13 @@
 		hover = -1; pinned = false;
 		if (to === latest) {
 			// back to the newest data: a length the 1D menu offers is live "last N hours" again
-			const span = zoom?.span || ([1, 3, 6, 12].includes(len / 36e5) ? len / 36e5 : null);
+			const span = zoom?.span || (SPANS.includes(len / 36e5) ? len / 36e5 : null);
 			if (span) { zoom = { span }; range = '1d'; } else zoom = { from, to };
 			endT = null;
 		} else {
 			zoom = { from, to };
 			let end: number | null = addDays(midnightOf(to - 1), 1);
 			if (end >= endOfToday) end = null;
-			const fits = (k: string) => { const d = (RANGES as any)[k].days; return from >= (end == null ? latest - d * 864e5 : addDays(end, -d)); };
-			if (!fits(range)) range = '3d';
 			endT = end;
 		}
 		save();
@@ -295,6 +293,76 @@
 		const frame = requestAnimationFrame(() => { timer = setTimeout(fn, 0); });
 		return () => { cancelAnimationFrame(frame); clearTimeout(timer); };
 	}
+	// ---------- the time slider under the price chart (#lib/site/slider.js; test report TRK-12, 5 Nov 2026) ----------
+	let slider: any = null, sliding = false, slideRange: string | null = null, built: (() => void) | null = null, longData: any = null;
+	const newest = () => (live ? live.t[live.n - 1] + 3e5 : 0);
+	const slideAt = () => ({ range: slideRange ?? range, latest: newest(), first: FIRST });
+	// the track's half-hourly history, once the page has settled, so the chart follows a drag all along it and the
+	// picture is there (test report TRK-12, 5 Nov 2026). 1Y and All have the daily history; a track in the live week needs nothing.
+	let trackWanted = '', trackTimer: ReturnType<typeof setTimeout> | undefined;
+	function prepare(a: number, b: number) {
+		if (!live || R.src === 'day' || a >= live.t[0] - 36e5) return;
+		const key = `${Math.floor(a / 864e5)}|${Math.floor(b / 864e5)}`;
+		if (key === trackWanted) return;
+		trackWanted = key;
+		clearTimeout(trackTimer);
+		trackTimer = setTimeout(async () => {
+			const from = Math.max(FIRST, a - 2 * 864e5), to = b + 864e5;
+			try {
+				if (!store.has('hh', from, to)) await store.load('hh', from, to);
+				if (!sliding) { longData = store.merged('hh', live); slider?.sync(); }
+			} catch { trackWanted = ''; }   // the chart still follows, a moment later
+		}, 800);
+	}
+	// n averages of the region's price, capped so a spike doesn't flatten the rest, from data already here
+	function priceOverview(a: number, b: number, n: number) {
+		const here = [view?.S, live, longData].filter((m) => m && m.t.length);
+		if (!here.length) return null;
+		const m = here.reduce((p, q) => (held(q, a, b) > held(p, a, b) ? q : p));
+		if (held(m, a, b) < (b - a) * 0.9) return null;
+		const s = (region === 'SI' ? m.SI : m.NI).price, sum = new Float64Array(n), hrs = new Float64Array(n), step = (b - a) / n;
+		for (let i = firstAtOrAfter(m.t, a); i < m.t.length && m.t[i] < b; i++) {
+			const k = Math.min(n - 1, Math.floor((m.t[i] - a) / step));
+			if (Number.isFinite(s[i])) { sum[k] += Math.min(500, Math.max(0, s[i])) * m.h[i]; hrs[k] += m.h[i]; }
+		}
+		return Array.from(sum, (x, k) => (hrs[k] ? x / hrs[k] : NaN));
+	}
+	function timeSlider(el: HTMLElement) {
+		slider = mountSlider(el, {
+			range: () => range,
+			bounds: () => ({ first: FIRST, latest: newest() }),
+			view() {
+				if (!live) return null;
+				if (zoomed && zoom?.from != null) return { from: zoom.from, to: zoom.to as number };
+				if (zoomEnds) return zoomEnds;
+				const [from, to] = rangeWindow(range, endT, newest(), FIRST);
+				return { from, to };
+			},
+			grid: () => (R.mode === 'time' && effInt !== '1d' ? null : 'day'),
+			inset: () => ({ left: 52, right: 10 }),
+			overview: priceOverview,
+			prepare,
+			overviewKey: () => [region, longData?.t.length, view?.S?.t[0]].join(),
+			start() { slideRange = range; },
+			ready(from: number, to: number) {
+				const v = spanView(from, to, slideAt()), r = (RANGES as any)[v.range], [a, b] = rangeWindow(v.range, v.end, newest(), FIRST);
+				if (r.src === 'day') return store.has('day', 0, 0);
+				const z: any = v.zoom, za = z?.from ?? a, zb = z?.to ?? b;
+				return (r.src === 'live' && za >= (live?.t[0] ?? 0) - 3e5) || store.has('hh', Math.min(a, za), Math.max(b, zb));
+			},
+			go(from: number, to: number, final: boolean) {
+				sliding = !final;
+				const v = spanView(from, to, slideAt());
+				if (final) slideRange = null;
+				zoom = v.zoom; range = v.range; endT = v.end;
+				if (final) save();
+				return new Promise<void>((done) => { built = done; setTimeout(done, 400); });   // the effect below builds it
+			},
+		});
+		return { destroy() { slider?.destroy(); slider = null; } };
+	}
+	$effect(() => { void range; void endT; void zoom; void view; void latestT; slider?.sync(); });
+
 	let token = 0;
 	async function build() {
 		if (!live) return;
@@ -307,28 +375,31 @@
 		let zf = from, zt = to, isZoomed = false;
 		if (zoom && r.src !== 'day') {
 			if (zoom.span) { zt = to; zf = Math.max(from, to - zoom.span * 36e5); }
-			else if (zoom.from != null && zoom.to != null) { zf = Math.max(from, zoom.from); zt = Math.min(to, zoom.to); }
+			else if (zoom.from != null && zoom.to != null) { zf = zoom.from; zt = zoom.to; }   // a stretch from the slider can reach past the window
 			if (zt - zf >= (iv === '30m' ? 36e5 : 2 * 3e5)) isZoomed = true; else { zf = from; zt = to; }
 		}
 		try {
-			if (r.src === 'live' && liveCovers(from)) {
+			const hhFrom = Math.min(from, zf), hhTo = Math.max(to, zt);
+			if (r.src === 'live' && (isZoomed ? zf >= live.t[0] - 3e5 : liveCovers(from))) {
 				setView(timeView(atInterval(windowOf(live, zf, zt), iv)), isZoomed);
 			} else if (r.src !== 'day') {
-				if (!store.has('hh', from, to)) { busy = true; await store.load('hh', from, to); }
+				if (!store.has('hh', hhFrom, hhTo)) { busy = true; await store.load('hh', hhFrom, hhTo); }
 				if (my !== token) return;
-				const m = store.merged('hh', live);
+				const m = store.merged('hh', live, hhFrom - 864e5, hhTo + 864e5);   // only the window: the track's months can all be here
 				setView(timeView(atInterval(addRevenue(windowOf(m, zf, zt), undefined, true), iv), m.histEnd), isZoomed);
 			} else {
 				if (!store.has('day', 0, 0)) { busy = true; await store.load('day', 0, 0); }
 				if (my !== token) return;
 				const m0 = store.merged('day', live), m = completeDaily(m0, m0.histEnd, live);
+				longData = m;
 				setView(longView(r.days == null ? m : windowOf(m, from, to), m.histEnd));
 			}
-			if (to !== heatTo || heatFrom !== from) { heatFrom = from; loadHeat(from, to); }
+			if (!sliding && (to !== heatTo || heatFrom !== from)) { heatFrom = from; loadHeat(from, to); }
 		} catch (e: any) {
 			if (my === token) viewError = e.missing ? 'History is still being prepared. Please check back later.' : `History couldn't be loaded. ${e.message}`;
 		} finally {
 			if (my === token) busy = false;
+			built?.(); built = null;
 		}
 	}
 	function setView(v: any, isZoomed = false) {
@@ -626,11 +697,13 @@
 		setEnd(next >= endOfToday ? null : Math.max(next, addDays(FIRST, R.days)));
 	}
 	// zoomed, Latest moves the stretch to the newest data and keeps its length (test report ZM-03, 1 Nov 2026)
-	const toLatest = () => (zoomEnds && live ? zoomEndAt(live.t[live.n - 1] + 3e5) : setEnd(null));
+	const toLatest = () => (zoomEnds && live && !movedWindow ? zoomEndAt(live.t[live.n - 1] + 3e5) : setEnd(null));
 	const isoDay = ymd;
 	const dateValue = $derived(zoomStamp ? zoomStamp[0] : live ? ymd((endT ?? latestT) - 1) : '');
 	function pickDate(v: string) {
-		if (zoomStamp) return zoomEndAt(fromStamp(`${v}T${zoomStamp[1]}`));
+		slider?.centre();   // a date picked sits in the middle of the slider (design decision, 5 Nov 2026)
+		if (zoomStamp && !movedWindow) return zoomEndAt(fromStamp(`${v}T${zoomStamp[1]}`));
+		zoom = null;
 		const t = endOfDay(v);
 		setEnd(t === null || t >= endOfToday ? null : Math.max(t, addDays(FIRST, R.days ?? 0)));
 	}
@@ -650,13 +723,8 @@
 		if (e instanceof KeyboardEvent) {
 			if (e.key !== 'Escape') return;
 			if (popped) popped = null;
-			if (infoOpen) { infoOpen = false; infoBtn?.focus(); }
 			if (helpOpen) helpOpen = false;
-			return;
 		}
-		if (!infoOpen) return;
-		const t = e.target as Node;
-		if (!infoBox?.contains(t) && !infoBtn?.contains(t)) infoOpen = false;
 	}
 	const popH = $derived(Math.min(560, Math.round(winH * 0.62)));
 	const toggleNode = (k: string) => { off = off.includes(k) ? off.filter((x) => x !== k) : [...off, k]; save(); };
@@ -716,24 +784,17 @@
 	<TrackerTabs>
 		<div class="status js-only">
 			<span class="tstatus" role="status">{status}</span>
-			{#if meta}
-				{#if R.src !== 'live' || endT !== null}
-					<span class="pill hist" title="Final prices from the EA, then the live week">History</span>
-				{:else if isLive}
-					<span class="pill live" title="Dispatch prices from the EMI real-time feed, every 5 minutes"><span class="pword">Live · </span>{clock(meta.end)}</span>
-				{:else}
-					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed<span class="ptime"> · {clock(meta.end)}</span><span class="pday"> {dayLabel(meta.end)}</span></span>
-				{/if}
-			{/if}
+			<ResetButton />
 			<DownloadMenu items={downloads} />
 			<ShareLink {links} />
-			<button type="button" class="pill-btn about-btn" bind:this={infoBtn} aria-expanded={infoOpen} aria-controls="p-about" aria-label="About this data" title="About this data" onclick={() => (infoOpen = !infoOpen)}>
-				<svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg><span class="pill-word">About this data</span>
-			</button>
-			<div class="info-pop" id="p-about" role="region" aria-label="About this data" bind:this={infoBox} hidden={!infoOpen}>
+			<StatusPill id="p-about" kind={!meta ? '' : pastView ? 'hist' : isLive ? 'live' : 'stale'}
+				title={!meta ? '' : pastView ? 'Final prices from the EA, then the live week' : isLive ? 'Dispatch prices from the EMI real-time feed, every 5 minutes' : `The newest data is more than ${LIVE_MINUTES} minutes old`}>
+				{#snippet label()}
+					{#if !meta || isLive && !pastView}<span class="pword">Live · </span>{meta ? clock(meta.end) : ''}{:else if pastView}History{:else}Delayed<span class="ptime"> · {clock(meta.end)}</span><span class="pday"> {dayLabel(meta.end)}</span>{/if}
+				{/snippet}
 				<p>Prices from the Electricity Authority: its real-time dispatch feed for the live week (dispatch prices, every 5 minutes), and its final prices for history, usually published the next day.</p>
 				<a href="/methods/prices">How the price charts are built</a>
-			</div>
+			</StatusPill>
 		</div>
 	</TrackerTabs>
 
@@ -759,7 +820,7 @@
 				</button>
 			</div>
 		</div>
-		<div class="ctl">
+		<div class="ctl ctl-int">
 			<span id="p-lb-int">Interval</span>
 			<div class="seg" role="group" aria-labelledby="p-lb-int">
 				{#each intChoices as k}
@@ -769,15 +830,12 @@
 		</div>
 		{#if canMove}
 			<div class="ctl">
-				<span id="lb-p-date" class="ctl-lbl">{zoomEnds ? `${zoomWord(zoomEnds.to - zoomEnds.from)} ending` : R.days === 1 && endT !== null ? 'Day' : `${R.label} ending`}</span>
+				<span id="lb-p-date" class="ctl-lbl">{zoomEnds && !movedWindow ? `${zoomWord(zoomEnds.to - zoomEnds.from)} ending` : R.days === 1 && endT !== null && !zoomEnds ? 'Day' : `${R.label} ending`}</span>
 				<div class="datebox">
 					<button type="button" class="step" aria-label="Previous {R.label}" title="Previous {R.label}" disabled={!live || (endT ?? endOfToday) - (R.days ?? 0) * 864e5 <= FIRST} onclick={() => step(-1)}><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
-					<date-pick id="p-date" aria-labelledby="lb-p-date" value={dateValue} min="1997-08-01" max={live ? isoDay(latestT + 3e5) : ''}
-						title="Shows the selected range ending on this date" use:dateSettled={pickDate}></date-pick>
-					{#if zoomStamp}
-						<time-pick id="p-time" value={zoomStamp[1]} aria-label="Ending at (NZ time)" title="Shows the zoomed hours ending at this time (NZ time)"
-							use:timeSettled={(v: string) => zoomEndAt(fromStamp(`${zoomStamp ? zoomStamp[0] : ''}T${v}`))}></time-pick>
-					{/if}
+					<date-pick id="p-date" aria-labelledby="lb-p-date" value={dateValue} time={zoomStamp ? zoomStamp[1] : ''} min="1997-08-01" max={live ? isoDay(latestT + 3e5) : ''}
+						title="Shows the selected range ending on this date" use:dateSettled={pickDate}
+						ontimechange={(e: Event) => { const d = e.currentTarget as any; slider?.centre(); zoomEndAt(fromStamp(`${d.value}T${d.time}`)); }}></date-pick>
 					<button type="button" class="step" aria-label="Next {R.label}" title={atLatest ? 'Showing the latest data' : `Next ${R.label}`} disabled={atLatest} onclick={() => step(1)}><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 					{#if !atLatest}<button type="button" class="latest" title="Back to the latest data" onclick={toLatest}><svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 3 5 5-5 5M12 3v10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>Latest</button>{/if}
 				</div>
@@ -790,18 +848,18 @@
 				<span>Pinned</span><b>{chip(at)}</b><span class="pin-x" aria-hidden="true">×</span><span class="vh">: let go</span>
 			</button>
 		{/if}
-		{#if zoomed}
+		{#if zoomed && !movedWindow}
 			<button type="button" class="zoom-chip" title="Back to the whole range (Escape)" onclick={() => { zoom = null; save(); }}>
 				<svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="m10.5 10.5 3.5 3.5M5 7h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
-				{#if !zoom?.span}<span>{zoomTxt}</span>{/if}<b>Reset zoom</b>
+				<b>Reset zoom</b>
 			</button>
 		{/if}
 	</nav>
 	<!-- outside the sticky bar -->
 		{#if spanOpen}
 			<div class="span-menu" id="p-span-menu" bind:this={spanMenu} style="top:{spanPos.top}px;left:{spanPos.left}px" role="group" aria-label="Show the last part of the day">
-				<span class="span-hd">Last</span>
-				{#each [1, 3, 6, 12, 24] as h}
+				<span class="span-hd">Zoom</span>
+				{#each [...SPANS, 24] as h}
 					<button type="button" role="menuitemradio" aria-checked={h === 24 ? range === '1d' && !zoom : zoom?.span === h} onclick={() => pickSpan(h)}>{h} hour{h > 1 ? 's' : ''}</button>
 				{/each}
 				<span class="span-tip">Or drag across any chart to zoom</span>
@@ -919,6 +977,7 @@
 							</button>
 						{/if}
 					</div>
+					<div class="tslider" use:timeSlider role="group" aria-label="Time slider"></div>
 					<div class="legends lg-foot">{@render priceKey()}</div>
 				</div>
 			{:else}
@@ -980,12 +1039,11 @@
 						<div class="sum-when">{head[0]}</div>
 						<div class="sum-sub">{head[1]}</div>
 					</div>
-					<button type="button" class="ctl-btn" bind:this={helpBtn} aria-expanded={helpOpen} aria-controls="p-help" title="Everything the charts and this list can do" onclick={() => (helpOpen = !helpOpen)}>
-						<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h7M12 4h2M2 12h3M8 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /><circle cx="10.5" cy="4" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /><circle cx="6.5" cy="12" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>Controls
+					<button type="button" class="ctl-btn" bind:this={helpBtn} aria-expanded={helpOpen} aria-controls="p-help" title="How to use the charts and this list" onclick={() => (helpOpen = !helpOpen)}>
+						<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h7M12 4h2M2 12h3M8 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /><circle cx="10.5" cy="4" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /><circle cx="6.5" cy="12" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>How to
 					</button>
 				</div>
 				<div class="help" id="p-help" role="note" hidden={!helpOpen}>
-					<button type="button" class="reset-view" title="Forget this browser's saved views and go back to the default charts on both tracker tabs" onclick={resetView}>Reset charts to default</button>
 					<!-- what works across the tab, one line each; each chart's own ⓘ says what it shows, and /guide#prices has the
 					     full descriptions (test reports GRP-06, CHT-13) -->
 					<p>These work across every chart on this tab. The ⓘ beside a chart's title says what that chart shows.</p>
@@ -994,6 +1052,7 @@
 						<li><b>Click or tap a chart:</b> pins the time. ← → move it. Click it again, or use the Pinned chip or Escape, to let go.</li>
 						<li><b>Range buttons:</b> open around a pinned time.</li>
 						<li><b>‹ › and the date:</b> move through history. Latest comes back to now.</li>
+						<li><b>Slider under the price chart:</b> drag its window to move through time. A date picked sits in its middle.</li>
 						<li><b>Drag across a chart:</b> zooms in, from 1D to 30D. Reset zoom goes back.</li>
 						<li><b>Colour squares:</b> hide a node. Double-click, Shift-click or press and hold shows only that one. The spread's square turns the priced-apart shading on and off.</li>
 						<li><b>Menu beside the title:</b> changes the price scale.</li>
@@ -1141,12 +1200,12 @@
 	.tools .seg { flex-wrap: wrap; }   /* six nodes don't fit a phone's width in one row */
 	.more { margin: 2px 2px 0; color: var(--muted); font-size: 0.8rem; }
 	/* until the data arrives: room for what's coming, at each part's height on 1D, so the page doesn't jump when it does */
-	.layout.waiting #charts { min-height: 327px; }
+	.layout.waiting #charts { min-height: 371px; }
 	.layout.waiting #charts-more { min-height: 365px; }
 	.layout.waiting .side { min-height: 619px; }
 	.card.waiting { min-height: 258px; }
 	.card.cap-card.waiting { min-height: 364px; }
-	@media (max-width: 560px) { .layout.waiting #charts { min-height: 351px; } }
+	@media (max-width: 560px) { .layout.waiting #charts { min-height: 395px; } }
 	@media (max-width: 440px) { .layout.waiting #charts-more { min-height: 414px; } }
 	.more a { color: inherit; }
 	/* big screens: the two cards split down the centre, as on the Generation tab */

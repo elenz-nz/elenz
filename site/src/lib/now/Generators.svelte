@@ -5,6 +5,7 @@
 	import InfoTip from '#lib/site/InfoTip.svelte';
 	import { onMount } from 'svelte';
 	import { replaceState } from '$app/navigation';
+	import { retitle } from '#lib/site/view.js';
 	import { generatorRows, readSettings, writeSettings, pick, SORTS } from './generators.js';
 	import { slug } from '#lib/site/viewurl.js';
 
@@ -24,7 +25,7 @@
 		if (!ready || qs === location.search || (!qs && !location.search)) return;
 		const url = location.pathname + qs + location.hash;
 		// as #lib/site/view.js: the router's replaceState, or the browser's if the router can't take it yet
-		Promise.resolve().then(() => replaceState(url, {})).catch(() => history.replaceState(history.state, '', url));
+		Promise.resolve().then(() => replaceState(url, {})).catch(() => history.replaceState(history.state, '', url)).then(retitle);
 	});
 
 	const fuels = $derived([...new Map(rows.map((r) => [r.fuel, r.fuelName])).entries()].sort((a, b) => a[1].localeCompare(b[1])));
@@ -183,7 +184,7 @@
 	.g-ctl select, .g-ctl input[type='search'] { font: inherit; font-size: 0.86rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 5px 8px; min-height: 32px; }
 	.g-find input { width: 170px; }
 	.g-on { display: inline-flex; align-items: center; gap: 6px; font-size: 0.86rem; color: var(--ink-2); }
-	.g-reset, .g-more, .g-units { font: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--accent); border-radius: 999px; }
+	.g-reset, .g-more, .g-units { font: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--accent); border-radius: 4px; }
 	.g-reset { font-size: 0.8rem; font-weight: 600; padding: 3px 10px; }
 	.g-more { justify-self: start; font-size: 0.84rem; font-weight: 600; padding: 5px 14px; }
 	.g-units { font-size: 0.7rem; padding: 0 7px; margin-left: 6px; color: var(--ink-2); vertical-align: 1px; }

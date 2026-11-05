@@ -15,6 +15,7 @@
 export const RULES = {
   hlRatio: 1.5, hlLevel: 1.25,                // highlighted: ≥ 1.5× typical and ≥ 1.25× the year median
   splitGap: 50, splitRel: 0.25,               // or the islands more than $50 and 25% apart
+  apartUnder: 100, apartGap: 20,              // under $100 the islands count as apart from $20 and 25%: said, not highlighted
   low: 5, lowQuietH: 24, lowShowH: 2,         // or a new low: under $5 after 24 h without one, for its first 2 h
   nearZero: 0.2,                              // a low under this is "near zero"; otherwise just "low"
   windDays: 2,                                // wind: say "lower than it has been for N days" from this many days
@@ -96,7 +97,7 @@ function phrase(f, now, usual, c, long = false) {
   if (!c.effect) return null;
   const name = f.name.toLowerCase();
   if (f.k === 'wind') return `wind is ${c.dev < 0 ? 'below' : 'above'} usual`;
-  if (f.k === 'peakers') return now >= 10 && usual < 10 ? 'peaking plants are running' : c.dev > 0 ? `peaking plants are running ${fmt(now)} MW` : 'peaking plants are off';
+  if (f.k === 'peakers') return now >= 10 && usual < 10 ? 'peaking plants are running' : c.dev > 0 ? `peaking plants are running ${fmt(now)} MW` : now < 10 ? 'peaking plants are off' : 'peaking plants are lower than usual';
   const r = usual > 0 ? now / usual : Infinity;
   if (c.dev < 0) return r <= 0.66 ? `${name} is ${fraction(r)} usual` : `${name} is ${Math.round(-c.rel * 100)}% below usual`;
   // from a small usual, a percentage misleads: say the MW
@@ -146,11 +147,14 @@ export function explainNow(D, plantMeta = {}) {
     const tj = D.t0 + j * step, h = avg(HAY, j, nAvg), b = avg(BEN, j, nAvg);
     if (h == null || b == null) return { hi: null };
     const hi = Math.max(h, b), lo = Math.min(h, b), gap = Math.abs(h - b), ty = typAt(tj);
+    const split = gap > R.splitGap && gap > R.splitRel * Math.max(lo, 1);
     return {
       h, b, hi, lo, gap, ty,
       high: ty != null && hi >= R.hlRatio * ty && hi >= R.hlLevel * E.level,
       open: (ty != null && hi >= R.openRatio * ty && hi >= R.openLevel * E.level && hi >= R.openFloor) || hi >= R.openAny,
-      split: gap > R.splitGap && gap > R.splitRel * Math.max(lo, 1),
+      split,
+      // a smaller gap counts at lower prices: the explainer says the islands are apart, without highlighting
+      apart: split || (hi < R.apartUnder && gap > R.apartGap && gap > R.splitRel * Math.max(lo, 1)),
       low: lo < R.low,
     };
   };
@@ -160,7 +164,7 @@ export function explainNow(D, plantMeta = {}) {
   const held = (key) => { for (let j = J - nHold + 1; j <= J; j++) if (C[j]?.[key]) return true; return false; };
   const now = C[J];
   if (now.hi == null) return null;
-  const isOpen = held('open'), isHigh = held('high'), isSplit = held('split');
+  const isOpen = held('open'), isHigh = held('high'), isSplit = held('split'), isApart = held('apart');
   // when this run of high (or split) prices began: back while it held, bridging gaps up to the 30-minute hold
   const since = (keys) => {
     let j = J, start = null, gap = 0;
@@ -182,7 +186,7 @@ export function explainNow(D, plantMeta = {}) {
   }
   const tier = isOpen ? 'open' : isHigh || isSplit || newLow ? 'highlight' : 'quiet';
   const variant = isOpen ? (isSplit && now.gap > 0.5 * Math.max(now.lo, 1) ? 'split' : 'high')
-    : isSplit ? 'split' : isHigh ? 'high' : now.low ? 'low' : 'usual';
+    : isSplit ? 'split' : isHigh ? 'high' : isApart ? 'split' : now.low ? 'low' : 'usual';
   const ratio = now.ty ? now.hi / now.ty : null;
   const nearZero = now.hi < R.nearZero;   // both islands under $0.20
   const label = slotLabel(t), when = whenLabel(t);
@@ -217,10 +221,10 @@ export function explainNow(D, plantMeta = {}) {
   const dir = (v) => (Math.abs(v) < 1 ? '' : v > 0 ? 'north' : 'south');
   const link = {
     k: 'hvdc', tok: '--f-hvdc', now: Math.abs(hv), usual: Math.abs(hvU),
-    effect: isSplit ? 1 : 0, split: isSplit,
-    title: isSplit ? `Islands ${money(now.gap)} apart` : 'Islands priced together',
+    effect: isApart ? 1 : 0, split: isApart,
+    title: isApart ? `Islands ${money(now.gap)} apart` : 'Islands priced together',
     sub: `HVDC ${fmt(Math.abs(hv))} MW ${dir(hv)} (estimated) · recently ${fmt(Math.abs(hvU))} MW ${dir(hvU)}` +
-      (isSplit ? '' : ` · prices ${money(now.gap)} apart`),
+      (isApart ? '' : ` · prices ${money(now.gap)} apart`),
   };
 
   // plants running well below the past week (an outage proxy) in the region the reasons are about
@@ -255,7 +259,7 @@ export function explainNow(D, plantMeta = {}) {
 
   // a brief spike: the 30-minute hold keeps the state after the price has dropped back, so say so rather than
   // looking for causes in conditions that have already passed
-  const heldOnly = (variant === 'high' && !now.high && !now.open) || (variant === 'split' && !now.split);
+  const heldOnly = (variant === 'high' && !now.high && !now.open) || (variant === 'split' && !now.apart);
   let peak = null;
   if (heldOnly) {
     for (let j = J - nHold - nAvg + 1; j <= J; j++) {
@@ -280,7 +284,8 @@ export function explainNow(D, plantMeta = {}) {
     headline = `Why is the ${hiIsl} Island dearer?`;
     line = `The islands have split: Haywards ${money(now.h)}, Benmore ${money(now.b)} per MWh (30-minute average).`;
     verdict = `Prices split like this when the HVDC link, or the grid near it, can't carry any more power from the ${loIsl} Island, so each island is priced on its own.`;
-    verdictNow = currently || `Currently, none of the conditions shown here is pushing the ${hiIsl} Island price up, so the limit may be a grid constraint or an outage this page can't see.`;
+    const flow = Math.abs(hv) < 1 ? 'The HVDC link is carrying almost nothing (estimated).' : `The HVDC link is carrying ${fmt(Math.abs(hv))} MW ${dir(hv)} (estimated).`;
+    verdictNow = (currently || `Currently, none of the conditions shown here is pushing the ${hiIsl} Island price up, so the limit may be a grid constraint or an outage this page can't see.`) + ` ${flow}`;
     if (heldOnly && peak) {
       line = `The islands split for a short time, ${money(peak.h)} at Haywards and ${money(peak.b)} at Benmore at ${clock(peak.t)}, and are back within ${money(Math.abs((HAY[J] ?? 0) - (BEN[J] ?? 0)))} now.`;
       verdictNow = '';
@@ -341,7 +346,7 @@ export function explainNow(D, plantMeta = {}) {
   const hold = band.length ? band[band.length - 1] : null;
 
   return {
-    t, tier, variant, label, newLow, lowStart, nearZero, since: since(variant === 'split' ? ['split', 'open'] : ['high', 'open']),
+    t, tier, variant, label, newLow, lowStart, nearZero, since: since(variant === 'split' ? ['apart', 'open'] : ['high', 'open']),
     hay: now.h, ben: now.b, hi: now.hi, lo: now.lo, gap: now.gap, typical: now.ty, ratio, level: E.level,
     thresholds: hold ? { highlight: hold.hl, open: hold.open } : null,
     headline, line, verdict, verdictNow, rows, link, setter, offersDay: E.offers_day, setterIsl: sIsl,

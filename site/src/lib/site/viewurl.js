@@ -15,7 +15,7 @@
 //                       fold    the charts under it folded to one line, e.g. price,ren (absent: FOLD_DEFAULT,
 //                               all of them; none: all open)
 //                       group, fuel, plant   the drill-down (plant and set names as slugs, see slug())
-//                       zoom    1h | 3h | 6h | 12h: the last hours of the window (the menu on 1D), or
+//                       zoom    3h | 6h | 12h: the last hours of the window (the menu on 1D), or
 //                               YYYY-MM-DDTHH:MM~YYYY-MM-DDTHH:MM: a span dragged on the chart (NZ time, end exclusive)
 // Prices tab:           scale   capped | linear (absent: spike-proof)
 //                       hide    nodes hidden from the price chart, e.g. OTA,ISL, and 'spread' for the price chart's priced-apart shading off
@@ -36,7 +36,7 @@ export const SCALES = ['spike', 'capped', 'linear'];
 export const SHARED = ['region', 'range', 'int', 'end', 't'];
 const ORDER = [...SHARED, 'by', 'unit', 'chart', 'price', 'fold', 'off', 'group', 'fuel', 'plant', 'zoom', 'scale', 'hide', 'band'];
 /** The spans the 1D menu offers, in hours. */
-export const SPANS = [1, 3, 6, 12];
+export const SPANS = [3, 6, 12];
 // the Generation tab's charts under the generation chart that fold to one line, in page order; all start folded
 // (design decision, 29 Oct 2026: price and renewable share are also on $ Price and the share card, and the page is
 // cleaner, on portrait phones above all), so a link needs `fold` only when some are open

@@ -14,7 +14,7 @@
 {/if}
 
 <style>
-	.rel { font: inherit; font-size: 0.75rem; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; min-height: 28px; cursor: pointer; }
+	.rel { font: inherit; font-size: 0.75rem; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 4px; padding: 3px 10px; min-height: 28px; cursor: pointer; }
 	.rel b { color: var(--accent); font-weight: 600; }
 	.rel:hover b { text-decoration: underline; }
 </style>

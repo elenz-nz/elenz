@@ -12,7 +12,7 @@ const test = base.extend({
   page: async ({ page }, use) => {
     const errors = [];
     await page.route(/cloudflareinsights\.com/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
-    page.on('pageerror', (e) => { if (!/access control checks/.test(e.message)) errors.push(e.message); });
+    page.on('pageerror', (e) => { if (!/access control checks|ResizeObserver loop/.test(e.message)) errors.push(e.message); });
     await use(page);
     expect(errors, 'uncaught errors in the page').toEqual([]);
   },
@@ -66,7 +66,7 @@ test('clicking between pages shows each page in full', async ({ page }) => {
   await expectShown(page, '/tracker/prices');
   await expectJsOnlyShown(page);
   await go('/now', '/now');
-  await page.locator('a.home').first().click();
+  await page.locator('a.brand svg').first().click();   // the whole logo is the link (SITE-01)
   await expect(page).toHaveURL(/\/$/);
   await expectShown(page, '/');
   await expectJsOnlyShown(page);
@@ -155,8 +155,188 @@ test('an ⓘ opens the note it points to, after the page has hydrated', async ({
   await expect(page.locator(`[id="${id}"]`)).toBeVisible();
 });
 
+for (const path of ['/now', '/tracker', '/tracker/prices']) {
+  test(`${path}: the status button is last on its line and opens its panel (TRK-01)`, async ({ page }) => {
+    await page.goto(path);
+    const pill = page.locator('.status .pill');
+    await expect(pill).toBeEnabled();
+    const others = page.locator('.status > :is(button, .dl-wrap, .share-wrap):not(.pill)');
+    const right = (l) => l.evaluate((e) => e.getBoundingClientRect().right);
+    for (const b of await others.all()) if (await b.isVisible()) expect(await right(b)).toBeLessThan(await right(pill));
+    const panel = page.locator('.info-pop[aria-label="About this data"]');
+    await expect(panel).toBeHidden();
+    await pill.click();
+    await expect(panel).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(panel).toBeHidden();
+  });
+}
+
+for (const path of ['/tracker', '/tracker/prices']) {
+  test(`${path}: Reset asks first, and Cancel leaves the view alone`, async ({ page }) => {
+    await page.goto(`${path}?range=7d`);
+    const ask = page.locator('.rs-pop');
+    await expect(ask).toBeHidden();
+    await page.locator('.status .reset-btn').click();
+    await expect(ask).toContainText('Reset all charts?');
+    await page.locator('.rs-no').click();
+    await expect(ask).toBeHidden();
+    await expect(page).toHaveURL(/range=7d/);
+    await page.locator('.status .reset-btn').click();
+    await page.keyboard.press('Escape');
+    await expect(ask).toBeHidden();
+    await page.locator('.status .reset-btn').click();
+    await page.locator('.rs-yes').click();
+    await expect(page).not.toHaveURL(/range=7d/);
+  });
+
+  test(`${path}: Reset is out on the tabs line (TRK-01)`, async ({ page }) => {
+    await page.goto(path);
+    await expect(page.locator('.status .reset-btn')).toBeVisible();
+  });
+}
+
+// drags a slider part by dx with the mouse, a step at a time
+async function slide(page, part, dx) {
+  const b = await page.locator(part).first().boundingBox();
+  const x = b.x + b.width / 2, y = b.y + b.height / 2;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  for (let i = 1; i <= 8; i++) await page.mouse.move(x + (dx * i) / 8, y);
+  await page.mouse.up();
+}
+
+for (const path of ['/tracker?range=3d', '/tracker/prices?range=3d']) {
+  test.describe(`${path}: the time slider (TRK-12)`, () => {
+    test.beforeEach(({}, testInfo) => test.skip(isPhone(testInfo), 'dragged with a mouse'));
+
+    test('a tap on its window moves nothing', async ({ page }) => {
+      await page.goto(path);
+      const thumb = page.locator('.ts-thumb');
+      await expect(thumb).toHaveAttribute('aria-valuetext', /./);
+      await thumb.click();
+      await page.waitForTimeout(300);
+      await expect(page).not.toHaveURL(/end=|zoom=/);
+    });
+
+    test('its window glides, keeps its range, and comes back to the newest data', async ({ page }) => {
+      await page.goto(path);
+      await expect(page.locator('.ts-thumb')).toHaveAttribute('aria-valuetext', /./);
+      await slide(page, '.ts-thumb', -60);
+      await expect(page).toHaveURL(/zoom=\d{4}-\d\d-\d\dT\d\d:\d\d/);
+      await expect(page).toHaveURL(/range=3d/);
+      await expect(page.locator('.zoom-chip:not([hidden]):has-text("Reset zoom")')).toHaveCount(0);   // moved, not zoomed
+      await slide(page, '.ts-thumb', 400);   // past the track's end, but inside the window: Firefox here loses a press let go outside it
+      await expect(page).not.toHaveURL(/end=|zoom=/);
+    });
+
+    test('letting go while the mouse is still moving ends the drag', async ({ page }) => {
+      await page.goto(path);
+      const thumb = page.locator('.ts-thumb'), slider = page.locator('.tslider');
+      await expect(thumb).toHaveAttribute('aria-valuetext', /./);
+      const b = await thumb.boundingBox(), x = b.x + b.width / 2, y = b.y + b.height / 2;
+      await page.mouse.move(x, y);
+      await page.mouse.down();
+      for (let i = 1; i <= 6; i++) await page.mouse.move(x - i * 8, y);
+      await page.mouse.up();
+      for (let i = 7; i <= 12; i++) await page.mouse.move(x - i * 8, y);   // still moving as it lets go
+      await expect(slider).not.toHaveClass(/sliding/);
+      const where = await thumb.getAttribute('aria-valuetext');
+      await page.mouse.move(x - 200, y + 200);   // off the slider, and back on it: it no longer follows
+      await page.mouse.move(x - 120, y);
+      await page.waitForTimeout(200);
+      await expect(thumb).toHaveAttribute('aria-valuetext', where);
+    });
+
+    test('its window has a fixed length: no ends to drag', async ({ page }) => {
+      await page.goto(path);
+      await expect(page.locator('.ts-thumb')).toHaveAttribute('aria-valuetext', /./);
+      await expect(page.locator('.ts-thumb')).toHaveCount(1);
+      await expect(page.locator('.tslider [role="slider"]')).toHaveCount(1);
+    });
+  });
+}
+
+for (const [path, menu, date] of [['/tracker', '#span-menu', '#in-date'], ['/tracker/prices', '#p-span-menu', '#p-date']]) {
+  test(`${path}: the zoom menu starts at 3 hours, and the calendar holds the time`, async ({ page }, info) => {
+    test.skip(info.project.name.includes('phone'), 'the same on a phone, with a mouse here');
+    await page.goto(path);
+    await expect(page.locator(date).locator('.dp-txt')).not.toBeEmpty();
+    await page.locator('.span-btn').click();
+    await expect(page.locator(`${menu} .span-hd`)).toHaveText('Zoom');
+    await expect(page.locator(`${menu} button`).first()).toHaveText('3 hours');
+    await page.locator(`${menu} button`).first().click();
+    await expect(page).toHaveURL(/zoom=3h/);
+    await expect(page.locator('time-pick')).toHaveCount(0);
+    await expect(page.locator(date).locator('button')).toHaveAttribute('title', /^Ends at \d+:\d\d [ap]m/);
+
+    await page.locator(date).locator('button').click();
+    await page.locator('.dp-time').click();
+    const was = page.url();
+    await page.locator('.tp-h').nth(1).click();          // an hour only marks itself
+    await expect(page.locator('.tp-h.sel')).toHaveText('1 am');
+    expect(page.url()).toBe(was);
+    await page.locator('.tp-m').nth(6).click();          // the minutes apply it
+    await expect(page.locator('.dp-pop')).toHaveCount(0);
+    await expect(page).toHaveURL(/zoom=[^&]*T01%3A30|zoom=[^&]*T01:30/);
+  });
+}
+
+for (const [path, width] of [['/tracker?range=3d', 360], ['/tracker?range=3d', 412], ['/tracker/prices?range=3d', 320], ['/tracker/prices?range=3d', 390]]) {
+  test(`${path} at ${width} px: the bar keeps its height and the date stays put through a slide`, async ({ page }, info) => {
+    test.skip(info.project.name.includes('phone'), 'set by width, with a mouse here');
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto(path);
+    const thumb = page.locator('.ts-thumb'), bar = page.locator('.toolbar'), date = page.locator('date-pick button');
+    await expect(thumb).toHaveAttribute('aria-valuetext', /./);
+    const h = (await bar.boundingBox()).height, x0 = (await date.boundingBox()).x;
+    const b = await thumb.boundingBox(), x = b.x + b.width / 2, y = b.y + b.height / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    for (let i = 1; i <= 8; i++) {
+      await page.mouse.move(x - i * 5, y);
+      await page.waitForTimeout(60);
+      expect((await bar.boundingBox()).height).toBe(h);
+      expect((await date.boundingBox()).x).toBe(x0);
+    }
+    await page.mouse.up();
+  });
+}
+
+test('on the 3-hour zoom the forward arrow comes back after a step back (ZM-04)', async ({ page }, testInfo) => {
+  test.skip(isPhone(testInfo), 'the 1D menu is covered by the zoom tests');
+  await page.goto('/tracker?zoom=3h');
+  await expect(page.locator('#tb-next')).toBeDisabled();
+  await page.locator('#tb-prev').click();
+  await expect(page).toHaveURL(/zoom=\d/);
+  await expect(page.locator('#tb-next')).toBeEnabled();
+  await page.locator('#tb-next').click();
+  await expect(page).toHaveURL(/zoom=3h/);
+  await expect(page.locator('#tb-next')).toBeDisabled();
+});
+
+test('a site picked from far down the list goes back up to the chart (GRP-03)', async ({ page }) => {
+  await page.goto('/tracker?by=site');
+  await expect(page.locator('#summary .sec-btn').first()).toBeVisible();
+  await page.evaluate(() => document.querySelectorAll('#summary tr.sec[aria-expanded="false"] .sec-btn').forEach((b) => b.click()));
+  const last = page.locator('#summary tr:not([hidden]) .drill').last();
+  await last.scrollIntoViewIfNeeded();
+  await last.click();
+  await expect.poll(() => page.evaluate(() => document.getElementById('charts').getBoundingClientRect().top)).toBeLessThan(200);
+  await expect.poll(() => page.evaluate(() => document.getElementById('charts').getBoundingClientRect().top)).toBeGreaterThan(-5);
+});
+
 test.describe('on a phone', () => {
   test.beforeEach(({}, testInfo) => test.skip(!isPhone(testInfo), 'phones only'));
+
+  // the tabs line is the widest thing on these pages: Reset took it past the smallest phones' width
+  for (const path of ['/tracker', '/tracker/prices']) {
+    test(`${path} fits a 320 px screen`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 640 });
+      await page.goto(path);
+      await expect.poll(() => page.evaluate(sticksOut), { message: 'what sticks out past the side of the screen' }).toBe('');
+    });
+  }
 
   for (const path of ['/', '/now', '/tracker', '/tracker/prices', '/records', '/articles', '/about']) {
     test(`${path} fits the screen`, async ({ page }) => {

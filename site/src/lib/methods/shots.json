@@ -1,0 +1,67 @@
+{
+"now-explainer": [
+1600,
+949,
+1130
+],
+"now-generators": [
+1600,
+603,
+1114
+],
+"prices-fuel": [
+726,
+588,
+484
+],
+"prices-range": [
+1200,
+561,
+800
+],
+"record-compare": [
+1600,
+502,
+1126
+],
+"records-list": [
+1600,
+183,
+1156
+],
+"tracker-controls": [
+453,
+887,
+302
+],
+"tracker-headroom": [
+1600,
+503,
+1130
+],
+"tracker-heat": [
+759,
+903,
+506
+],
+"tracker-phone": [
+780,
+1560,
+390
+],
+"tracker-pin": [
+1600,
+839,
+1144
+],
+"tracker-plants": [
+498,
+840,
+332
+],
+"tracker-zoom": [
+1200,
+651,
+800
+]
+}

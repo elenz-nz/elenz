@@ -9,9 +9,10 @@
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import GenLower from '#lib/generation/GenLower.svelte';
 	import ShareLink from '#lib/site/ShareLink.svelte';
+	import StatusPill from '#lib/site/StatusPill.svelte';
 	import DownloadMenu from '#lib/site/DownloadMenu.svelte';
 	import { barHeight } from '#lib/site/sticky.js';
-	import { resetView } from '#lib/site/view.js';
+	import ResetButton from '#lib/site/ResetButton.svelte';
 	import { FOLD_DEFAULT } from '#lib/site/viewurl.js';
 
 	type Meta = { intervals: number; expected: number; end: number; api_from: number | null; built: number };
@@ -26,9 +27,6 @@
 	let view = $state<View | null>(null);
 	let lower = $state.raw<any>(null);   // the window the charts show, for the section under them (GenLower)
 	let now = $state(Date.now());
-	let infoOpen = $state(false);
-	let infoBtn = $state<HTMLButtonElement>();
-	let infoBox = $state<HTMLDivElement>();
 	let helpOpen = $state(false);
 	let helpBtn = $state<HTMLButtonElement>();
 	let tracker: ReturnType<typeof mountTracker> | undefined;   // the charts (#lib/tracker/tracker.js), once the data has loaded
@@ -58,6 +56,7 @@
 
 	const age = $derived(meta ? (now - meta.end) / 60000 : 0);
 	const live = $derived(meta !== null && age < LIVE_MINUTES);
+	const pastView = $derived(!!view && (view.kind !== 'live' || view.past) && !view.error);
 	// The info button says only where the data comes from; how each series is built is on the About page.
 	const notice = $derived.by(() => {
 		if (!meta) return '';
@@ -95,13 +94,6 @@
 		if (helpOpen && e instanceof KeyboardEvent && e.key === 'Escape' && helpBtn?.parentElement?.parentElement?.contains(document.activeElement)) {
 			helpOpen = false; helpBtn?.focus();
 		}
-		if (!infoOpen) return;
-		if (e instanceof KeyboardEvent) {
-			if (e.key === 'Escape') { infoOpen = false; infoBtn?.focus(); }
-			return;
-		}
-		const t = e.target as Node;
-		if (!infoBox?.contains(t) && !infoBtn?.contains(t)) infoOpen = false;
 	}
 
 	onMount(() => {
@@ -230,26 +222,19 @@
 	<TrackerTabs>
 		<div class="status js-only">
 			<span class="tstatus" role="status">{status}</span>
-			{#if meta}
-				{#if view && (view.kind !== 'live' || view.past) && !view.error}
-					<!-- also while that history loads: it flashed Live on every step through 30 days (TRK-05, 26 Oct 2026) -->
-					<span class="pill hist" title="History from the EA's daily dispatch files">History</span>
-				{:else if live}
-					<span class="pill live" title="Data to {when(meta.end)}. Updated from the EMI real-time dispatch feed every 5 minutes"><span class="pword">Live · </span>{clockOnly(meta.end)}</span>
-				{:else}
-					<span class="pill stale" title="The newest data is more than {LIVE_MINUTES} minutes old">Delayed<span class="ptime"> · {clockOnly(meta.end)}</span><span class="pday">{when(meta.end).slice(clockOnly(meta.end).length)}</span></span>
-				{/if}
-			{/if}
+			<ResetButton />
 			<DownloadMenu items={downloads} />
 			<ShareLink links={() => tracker?.links() ?? null} />
-			<button type="button" class="pill-btn about-btn" bind:this={infoBtn} aria-expanded={infoOpen} aria-controls="about-data" aria-label="About this data" title="About this data" onclick={() => (infoOpen = !infoOpen)}>
-				<svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10 9v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="10" cy="6.2" r="1.1" fill="currentColor" /></svg><span class="pill-word">About this data</span>
-			</button>
-			<div class="info-pop" id="about-data" role="region" aria-label="About this data" bind:this={infoBox} hidden={!infoOpen}>
+			<!-- History also while that history loads: it flashed Live on every step through 30 days (TRK-05, 26 Oct 2026) -->
+			<StatusPill id="about-data" kind={!meta ? '' : pastView ? 'hist' : live ? 'live' : 'stale'}
+				title={!meta ? '' : pastView ? "History from the EA's daily dispatch files" : live ? `Data to ${when(meta.end)}. Updated from the EMI real-time dispatch feed every 5 minutes` : `The newest data is more than ${LIVE_MINUTES} minutes old`}>
+				{#snippet label()}
+					{#if !meta || live && !pastView}<span class="pword">Live · </span>{meta ? clockOnly(meta.end) : ''}{:else if pastView}History{:else}Delayed<span class="ptime"> · {clockOnly(meta.end)}</span><span class="pday">{when(meta.end).slice(clockOnly(meta.end).length)}</span>{/if}
+				{/snippet}
 				<p class="asof" id="asof"></p>
 				<p>{notice || 'Loading the latest data…'}</p>
 				<a href="/methods">How each chart is built</a>
-			</div>
+			</StatusPill>
 		</div>
 	</TrackerTabs>
 
@@ -278,7 +263,7 @@
 				</button>
 			</div>
 		</div>
-		<div class="ctl">
+		<div class="ctl ctl-int">
 			<span id="lb-int">Interval</span>
 			<div class="seg" role="group" aria-labelledby="lb-int" id="seg-int">
 				<button type="button" data-v="5m">5m</button>
@@ -291,14 +276,13 @@
 				<button type="button" class="step" id="tb-prev" aria-label="Previous 24 hours"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 				<!-- the site's own calendar (#lib/site/datepick.js, TRK-07), not the browser's -->
 				<date-pick id="in-date" aria-labelledby="lb-date" title="Shows the selected range ending on this date"></date-pick>
-				<time-pick id="in-time" aria-label="Ending at (NZ time)" title="Shows the zoomed hours ending at this time (NZ time)" hidden></time-pick>
 				<button type="button" class="step" id="tb-next" aria-label="Next 24 hours"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 				<button type="button" class="latest" id="btn-latest" title="Back to the latest data" hidden><svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 3 5 5-5 5M12 3v10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>Latest</button>
 			</div>
 		</div>
 		<button type="button" class="zoom-chip" id="zoom-reset" title="Back to the whole range (Escape)" hidden>
 			<svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="m10.5 10.5 3.5 3.5M5 7h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
-			<span id="zoom-txt"></span><b>Reset zoom</b>
+			<b>Reset zoom</b>
 		</button>
 		<!-- the pinned time, the one place it's named; a tap lets it go (tracker.js syncPinChip, ZM-02) -->
 		<button type="button" class="zoom-chip pin-chip" id="pin-chip" title="Let go of the pinned time (Escape)" hidden>
@@ -308,8 +292,7 @@
 	</nav>
 	<!-- the 1D menu sits outside the sticky bar; placed by tracker.js -->
 	<div class="span-menu" id="span-menu" role="group" aria-label="Show the last part of the day" hidden>
-		<span class="span-hd">Last</span>
-		<button type="button" role="menuitemradio" aria-checked="false" data-h="1">1 hour</button>
+		<span class="span-hd">Zoom</span>
 		<button type="button" role="menuitemradio" aria-checked="false" data-h="3">3 hours</button>
 		<button type="button" role="menuitemradio" aria-checked="false" data-h="6">6 hours</button>
 		<button type="button" role="menuitemradio" aria-checked="false" data-h="12">12 hours</button>
@@ -356,6 +339,7 @@
 					<button type="button" class="nav prev" id="nav-prev" aria-label="Previous 24 h"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 					<button type="button" class="nav next" id="nav-next" aria-label="Next 24 h"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 				</div>
+				<div class="tslider" id="gen-slider" role="group" aria-label="Time slider"></div>
 			</div>
 		</section>
 
@@ -410,12 +394,11 @@
 						<div class="sum-when" id="sum-when"></div>
 						<div class="sum-sub" id="sum-sub"></div>
 						</div>
-					<button type="button" class="ctl-btn" bind:this={helpBtn} aria-expanded={helpOpen} aria-controls="sum-help" title="Everything the charts and this list can do" onclick={() => (helpOpen = !helpOpen)}>
-						<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h7M12 4h2M2 12h3M8 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /><circle cx="10.5" cy="4" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /><circle cx="6.5" cy="12" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>Controls
+					<button type="button" class="ctl-btn" bind:this={helpBtn} aria-expanded={helpOpen} aria-controls="sum-help" title="How to use the charts and this list" onclick={() => (helpOpen = !helpOpen)}>
+						<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h7M12 4h2M2 12h3M8 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /><circle cx="10.5" cy="4" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /><circle cx="6.5" cy="12" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>How to
 					</button>
 				</div>
 				<div class="help" id="sum-help" role="note" hidden={!helpOpen}>
-					<button type="button" class="reset-view" title="Forget this browser's saved views and go back to the default charts on both tracker tabs" onclick={resetView}>Reset charts to default</button>
 					<!-- what works across the tab, one line each; each chart's own ⓘ says what it shows, and /guide#generation has the
 					     full descriptions (test reports GRP-06, CHT-13) -->
 					<p>These work across every chart on this tab. The ⓘ beside a chart's title says what that chart shows.</p>
@@ -424,6 +407,7 @@
 						<li><b>Click or tap a chart:</b> pins the time. ← → move it, with Shift to go further. Click it again, or use the Pinned chip or Escape, to let go.</li>
 						<li><b>Range buttons:</b> open around a pinned or zoomed time.</li>
 						<li><b>‹ › and the date:</b> move through history. Latest comes back to now.</li>
+						<li><b>Slider under the chart:</b> drag its window to move through time. A date picked sits in its middle.</li>
 						<li><b>Drag across a chart:</b> zooms in. The arrow beside 1D picks recent hours, and Reset zoom goes back.</li>
 						<li><b>A name in this list:</b> breaks it down into plants and units. ‹ Back steps out.</li>
 						<li><b>Colour squares:</b> hide a layer. Double-click, Shift-click or press and hold shows only that one.</li>

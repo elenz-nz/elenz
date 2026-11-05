@@ -32,13 +32,13 @@
 <p class="beta-note"><strong>Beta</strong><span>Elenz is still being tested<span class="bn-more">, so some figures and pages may change</span>.</span><a href="mailto:hello@elenz.co.nz?subject=Elenz%20feedback">Send feedback</a></p>
 <header class="masthead" class:bare={!brand}>
 	{#if brand}
-	<div class="brand">
+	<a class="brand" href="/">
 		<Mark size={32} />
 		<div>
-			<a class="home" href="/"><svelte:element this={heading ? 'h1' : 'p'} class="name">Elenz</svelte:element></a>
+			<svelte:element this={heading ? 'h1' : 'p'} class="name">Elenz</svelte:element>
 			<p>New Zealand's electricity</p>
 		</div>
-	</div>
+	</a>
 	{/if}
 	<div class="mast-r">
 		<nav class="pages" aria-label="Pages">

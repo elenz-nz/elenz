@@ -61,15 +61,14 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 /* Masthead */
 .mast-wrap { display: grid; gap: 14px; min-width: 0; }
 /* BETA NOTE (remove when the site is announced, with the markup in Masthead.svelte) */
-.beta-note { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; padding: 8px 12px; border-radius: 6px; background: var(--accent-soft); color: var(--ink-2); font-size: 0.82rem; line-height: 1.45; }
+.beta-note { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; padding: 8px 12px; border-radius: 4px; background: var(--accent-soft); color: var(--ink-2); font-size: 0.82rem; line-height: 1.45; }
 .beta-note strong { color: var(--accent); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
 .beta-note a { margin-left: auto; color: var(--accent); font-weight: 600; text-decoration: none; white-space: nowrap; }
 .beta-note a:hover { text-decoration: underline; }
 @media (max-width: 560px) { .beta-note .bn-more { display: none; } }
 .masthead { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-.brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
+.brand { display: flex; align-items: center; gap: 11px; min-width: 0; color: inherit; text-decoration: none; }
 .brand svg { flex: none; }
-.brand .home { color: inherit; text-decoration: none; }
 .brand .name { margin: 0; color: var(--ink); font-size: 1.45rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1.05; }
 .brand p { margin: 0; color: var(--muted); font-size: 0.86rem; }
 .mast-r { margin-left: auto; display: flex; align-items: center; gap: 6px; }
@@ -77,15 +76,23 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .pages a { color: var(--ink-2); text-decoration: none; font-weight: 600; font-size: 0.9rem; padding: 6px 11px; border-radius: 4px; }
 .pages a:hover { color: var(--ink); background: var(--grid); }
 .pages a[aria-current="page"] { color: var(--ink); box-shadow: inset 0 -2px 0 var(--accent); border-radius: 4px 4px 0 0; }
-.pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 8px; border-radius: 999px; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; background: var(--accent-soft); color: var(--accent); }
+.pill { display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; height: 30px; padding: 0 9px 0 8px; border: 1px solid transparent; border-radius: 4px; font: inherit; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; background: var(--accent-soft); color: var(--accent); }
 .pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid currentColor; }
 .status { margin-left: auto; display: flex; align-items: center; gap: 8px; position: relative; }
-.status .pill { white-space: nowrap; }
+/* the Live / History / Delayed button (StatusPill.svelte): always last on its line and always the same width, so the
+   buttons beside it don't move between Live and History or as the data arrives */
+.status .pill { white-space: nowrap; flex: none; order: 9; min-width: 124px; }
+.status .pill:not(:disabled) { cursor: pointer; }
+.status .pill:not(:disabled):hover, .status .pill[aria-expanded='true'] { border-color: currentColor; }
+.status .pill.waiting { visibility: hidden; }
+.pcaret { flex: none; transition: transform 0.15s; }
+.pcaret.up { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { .pcaret { transition: none; } }
 .tstatus { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ctl + .ctl { padding-left: 16px; border-left: 1px solid var(--line); margin-left: -1px; }
 
-/* About this data: an info button with a small panel beneath it */
-.info-btn { display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 50%; background: none; color: var(--muted); cursor: pointer; padding: 0; }
+/* the small ⓘ and theme buttons, and the About this data panel under the status button */
+.info-btn { display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 4px; background: none; color: var(--muted); cursor: pointer; padding: 0; }
 .info-btn:hover, .info-btn[aria-expanded="true"] { color: var(--ink); background: var(--grid); }
 .info-pop { position: absolute; right: 0; top: calc(100% + 8px); z-index: 24; width: min(440px, calc(100vw - 32px)); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.12); display: grid; gap: 8px; }
 .info-pop[hidden] { display: none; }
@@ -124,13 +131,13 @@ button:focus-visible, .charts:focus-visible { outline: 2px solid var(--accent); 
 
 /* End date: the chosen range ends on this date */
 .ctl > label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-weight: 600; white-space: nowrap; }
-.datebox { display: inline-flex; align-items: center; gap: 4px; }
+.datebox { display: inline-flex; align-items: center; gap: 4px; min-width: 267px; }   /* room for Latest, so the bar doesn't change when it comes (TRK-12) */
 .datebox input { font: inherit; font-size: 0.8rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2px 6px; min-height: 28px; color-scheme: inherit; }
 .datebox input:disabled { color: var(--muted); }
-.ctl > .ctl-lbl { font-size: 0.72rem; white-space: nowrap; }
+.ctl > .ctl-lbl { font-size: 0.72rem; white-space: nowrap; min-width: 10.8em; text-align: right; }
 /* the date box's own calendar (#lib/site/datepick.js): the button in the bar, and the calendar hung from <body> */
-date-pick, time-pick { display: inline-block; }
-time-pick[hidden] { display: none; }
+date-pick { display: inline-block; }
+.dp-txt { display: inline-block; min-width: 6.5em; font-variant-numeric: tabular-nums; }   /* so nothing beside it moves as the date changes */
 .dp-btn { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 0.8rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2px 8px; min-height: 28px; cursor: pointer; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .dp-btn svg { color: var(--muted); flex: none; }
 .dp-btn:hover:not(:disabled) { border-color: var(--accent); }
@@ -140,8 +147,8 @@ time-pick[hidden] { display: none; }
 .dp-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .datebox button.dp-btn { color: var(--ink); padding: 2px 8px; font-size: 0.8rem; }
 .datebox button.dp-btn:hover { background: var(--surface); }
-.dp-pop { position: fixed; z-index: 40; width: 272px; max-width: calc(100vw - 16px); box-sizing: border-box; padding: 10px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 28px rgb(0 0 0 / 0.18); font-family: var(--font-ui); font-size: 0.86rem; }
-.dp-pop button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; border-radius: 6px; }
+.dp-pop { position: fixed; z-index: 40; width: 272px; max-width: calc(100vw - 16px); box-sizing: border-box; padding: 10px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; box-shadow: 0 8px 28px rgb(0 0 0 / 0.18); font-family: var(--font-ui); font-size: 0.86rem; }
+.dp-pop button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; border-radius: 4px; }
 .dp-pop button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .dp-pop button:disabled { color: var(--line); cursor: default; }
 .dp-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 6px; min-height: 32px; }
@@ -166,8 +173,12 @@ time-pick[hidden] { display: none; }
 .dp-years button, .dp-months button { height: 38px; font-variant-numeric: tabular-nums; }
 .dp-years button:hover:not(:disabled):not(.sel), .dp-months button:hover:not(:disabled):not(.sel) { background: var(--grid); }
 @media (pointer: coarse) { .dp-day { height: 40px; } .dp-pop { width: 300px; } }
-/* the time box's panel (#lib/site/timepick.js) */
-.tp-pop { display: grid; gap: 6px; }
+/* the calendar's time, while a chart is zoomed into hours */
+.dp-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; padding: 8px 0 0 4px; border-top: 1px solid var(--grid); font-size: 0.82rem; color: var(--ink-2); }
+.dp-time { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; font-weight: 650; color: var(--ink); }
+.dp-time svg { color: var(--muted); }
+.dp-time:hover { background: var(--grid); }
+.tp-cap { font-size: 0.72rem; font-weight: 600; color: var(--muted); padding: 6px 4px 4px; }
 .tp-hours, .tp-mins { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; }
 .tp-hours button, .tp-mins button { height: 34px; padding: 0; font-size: 0.78rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tp-hours button:hover:not(.sel), .tp-mins button:hover:not(.sel) { background: var(--grid); }
@@ -197,11 +208,29 @@ time-pick[hidden] { display: none; }
 
 /* Main layout */
 .layout { display: grid; grid-template-columns: minmax(0, 1fr) var(--side-w, 316px); grid-template-rows: auto 1fr; grid-template-areas: "gen side" "more side"; gap: 14px 18px; align-items: start; }
-#charts { grid-area: gen; } #charts-more { grid-area: more; } .side { grid-area: side; }
+#charts { grid-area: gen; scroll-margin-top: calc(var(--tb-h, 0px) + 8px); } #charts-more { grid-area: more; } .side { grid-area: side; }
 .charts[aria-busy="true"] canvas { opacity: 0.45; transition: opacity 0.2s; }
 
 /* Arrows on the generation chart: previous / next range */
 .plot { position: relative; }
+/* the time slider under a chart (#lib/site/slider.js): --l and --r line it up with the chart's time axis */
+.tslider { --l: 50px; --r: 12px; position: relative; height: 34px; margin: 6px 0 4px; padding: 0 var(--r) 0 var(--l); touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.ts-track { position: relative; height: 100%; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); cursor: pointer; }
+.ts-area { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--accent); opacity: 0.2; pointer-events: none; }
+.ts-area[hidden] { display: none; }
+.ts-area path { fill: currentColor; }
+.ts-ticks span { position: absolute; bottom: 1px; padding-left: 3px; border-left: 1px solid var(--line); font-family: var(--font-mono, monospace); font-size: 0.62rem; line-height: 1.2; color: var(--muted); white-space: nowrap; pointer-events: none; }
+.ts-thumb { position: absolute; top: -1px; bottom: -1px; border: 1px solid var(--accent); border-radius: 4px; cursor: grab; touch-action: pan-y; }
+.ts-thumb::before { content: ""; position: absolute; inset: 0; border-radius: 3px; background: var(--accent); opacity: 0.16; }
+.ts-thumb::after { content: ""; position: absolute; left: 50%; top: 50%; width: 5px; height: 12px; transform: translate(-50%, -50%); border-inline: 1px solid var(--accent); opacity: 0.7; }   /* it can be grabbed */
+.ts-thumb:hover::before, .ts-thumb:focus-visible::before { opacity: 0.26; }
+.tslider.sliding .ts-thumb { cursor: grabbing; }
+.tslider.sliding .ts-thumb::before { opacity: 0.26; }
+@media (pointer: coarse) {
+  .tslider { height: 38px; }
+}
+.ts-tip { position: absolute; bottom: calc(100% + 5px); left: 0; margin-left: var(--l); transform: translateX(-50%); z-index: 6; padding: 2px 7px; border-radius: 4px; background: var(--ink); color: var(--surface); font-size: 0.74rem; white-space: nowrap; pointer-events: none; }
+.ts-tip[hidden] { display: none; }
 .nav { position: absolute; top: calc(50% - 33px); width: 30px; height: 44px; display: grid; place-items: center; padding: 0; border-radius: 4px; border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 88%, transparent); color: var(--ink-2); cursor: pointer; opacity: 0.7; }
 .nav.prev { left: 54px; } .nav.next { right: 16px; }
 .chart.priced .nav.next { right: 54px; }   /* clear of the price axis */
@@ -231,7 +260,7 @@ time-pick[hidden] { display: none; }
 .pop-btn { position: absolute; top: 9px; right: 6px; display: grid; place-items: center; width: 26px; height: 26px; padding: 0; border: 1px solid transparent; border-radius: 4px; background: none; color: var(--muted); cursor: pointer; }
 .pop-btn:hover, .pop-btn[aria-pressed="true"] { color: var(--ink); background: var(--grid); }
 .chart.popped .pop-btn { top: 11px; right: 10px; }
-.chart.popped { position: fixed; z-index: 26; left: 50%; top: 50%; transform: translate(-50%, -50%); width: calc(100vw - 32px); background: var(--surface); border: 1px solid var(--line) !important; border-radius: 6px; padding: 14px 16px 12px; box-shadow: 0 18px 50px rgb(0 0 0 / 0.28); }
+.chart.popped { position: fixed; z-index: 26; left: 50%; top: 50%; transform: translate(-50%, -50%); width: calc(100vw - 32px); background: var(--surface); border: 1px solid var(--line) !important; border-radius: 4px; padding: 14px 16px 12px; box-shadow: 0 18px 50px rgb(0 0 0 / 0.28); }
 .chart.popped canvas { height: min(62vh, 560px) !important; }
 .pop-backdrop { position: fixed; inset: 0; z-index: 25; border: 0; padding: 0; background: rgb(10 16 16 / 0.45); cursor: zoom-out; }
 .ch-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; min-height: 22px; }
@@ -308,17 +337,16 @@ canvas { display: block; width: 100%; }
 .help p { margin: 0; color: var(--ink-2); font-size: 0.8rem; line-height: 1.45; }
 .help ul { margin: 6px 0; padding-left: 16px; display: grid; gap: 3px; color: var(--ink-2); font-size: 0.8rem; line-height: 1.45; }
 .help li b { color: var(--ink); font-weight: 600; }
-.help .reset-view { display: block; justify-self: start; font: inherit; font-size: 0.78rem; font-weight: 600; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 3px 10px; min-height: 28px; margin-bottom: 8px; cursor: pointer; }
-.help .reset-view:hover { border-color: var(--accent); color: var(--accent); }
 /* "Scale to this view" draws the eye to the key it changes, like the About page's Contact (PRC-06) */
-.scale-flash { border-radius: 6px; animation: scale-flash 2.2s ease-out; }
+.scale-flash { border-radius: 4px; animation: scale-flash 2.2s ease-out; }
 @keyframes scale-flash {
   0%, 35% { background: var(--accent-soft); box-shadow: 0 0 0 2px var(--accent); }
   100% { background: transparent; box-shadow: 0 0 0 2px transparent; }
 }
 @media (prefers-reduced-motion: reduce) { .scale-flash { animation: none; } }
-/* the summary's Controls button: labelled, so it reads as the place to find what the charts can do */
-.ctl-btn { display: inline-flex; align-items: center; gap: 6px; flex: none; margin: -2px 0 0; font: inherit; font-size: 0.76rem; font-weight: 500; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px 3px 8px; min-height: 28px; cursor: pointer; }
+/* the summary's How to button: what the charts and the list can do */
+.toolbar > .ctl-int { min-width: 81px; }   /* its widest two-button set: the date beside it stays put as the slider leaves the live week */
+.ctl-btn { display: inline-flex; align-items: center; gap: 6px; flex: none; margin: -2px 0 0; font: inherit; font-size: 0.76rem; font-weight: 500; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 3px 10px 3px 8px; min-height: 28px; cursor: pointer; }
 .ctl-btn:hover, .ctl-btn[aria-expanded="true"] { color: var(--ink); border-color: var(--ink-2); }
 .sum-when { font-size: 1.12rem; font-weight: 700; letter-spacing: -0.01em; }
 .sum-when:empty::before { content: '\200b'; }   /* keeps its line before the first time arrives, so the list doesn't move */
@@ -447,6 +475,25 @@ a { color: var(--accent); }
   .pill .pday { display: none; }   /* the delayed pill keeps its time and drops the day, to fit beside the tabs */
 
 }
+/* the bar keeps its rows while the slider moves: Latest comes and goes, so here it's just its arrow, beside the date,
+   and the date's name goes, as on phones (TRK-12) */
+@media (max-width: 1240px) {
+  .datebox { min-width: 218px; }
+  .datebox button.latest { width: 28px; padding: 0; justify-content: center; font-size: 0; gap: 0; }
+}
+@media (max-width: 900px) {
+  .toolbar .ctl > .ctl-lbl { position: absolute; width: 1px; min-width: 0; height: 1px; overflow: hidden; clip-path: inset(50%); }
+}
+/* narrow phones: region and range no longer share a row, so region and interval do, then range, then the date,
+   whichever range is shown; the date box gives up its icon to keep to two rows on the next width up */
+@media (max-width: 409px) {
+  .datebox { min-width: 197px; }
+  .dp-btn svg { display: none; }
+}
+@media (max-width: 387px) {
+  .toolbar > .ctl:first-child { order: -2; }
+  .toolbar > .ctl-int { order: -1; }
+}
 /* narrow phones: the tabs, the delayed pill and three buttons fit on one line only without the pill's time */
 @media (max-width: 440px) {
   .pill .ptime { display: none; }
@@ -459,7 +506,7 @@ a { color: var(--accent); }
 }
 @media (max-width: 400px) {
   .pages a { padding-inline: 5px; }
-  .status .pill { letter-spacing: 0.01em; padding-inline: 7px 8px; font-size: 0.7rem; }
+  .status .pill { letter-spacing: 0.01em; padding-inline: 6px; font-size: 0.7rem; }
   .toolbar .seg button { padding: 2px 5px; }
 }
 /* the smallest phones: the five page links and the theme button, in the window's width */
@@ -477,7 +524,7 @@ a { color: var(--accent); }
 
 
 /* Cards under the charts (Generation and Prices tabs) enlarge over the page like the charts do */
-.card.popped { position: fixed; z-index: 26; left: 50%; top: 50%; transform: translate(-50%, -50%); width: calc(100vw - 32px); max-height: calc(100vh - 32px); overflow: auto; border-radius: 6px; box-shadow: 0 18px 50px rgb(0 0 0 / 0.28); }
+.card.popped { position: fixed; z-index: 26; left: 50%; top: 50%; transform: translate(-50%, -50%); width: calc(100vw - 32px); max-height: calc(100vh - 32px); overflow: auto; border-radius: 4px; box-shadow: 0 18px 50px rgb(0 0 0 / 0.28); }
 
 /* a pinned time line (a click on a chart): said under the summary's heading, with a button to release it */
 .sum-pin { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); }
@@ -487,14 +534,14 @@ a { color: var(--accent); }
 #charts canvas, #charts-more canvas { cursor: crosshair; }
 
 /* Share and Download on the tracker's tabs line: an icon with the word beside it where there's room */
-.pill-btn { display: inline-flex; align-items: center; gap: 5px; height: 30px; min-width: 30px; justify-content: center; padding: 0 9px 0 7px; border: 1px solid var(--line); border-radius: 999px; background: none; color: var(--ink-2); font: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.pill-btn { display: inline-flex; align-items: center; gap: 5px; box-sizing: border-box; height: 30px; min-width: 30px; justify-content: center; padding: 0 9px 0 7px; border: 1px solid var(--line); border-radius: 4px; background: none; color: var(--ink-2); font: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .pill-btn:hover, .pill-btn[aria-expanded='true'] { color: var(--ink); background: var(--grid); border-color: var(--ink-2); }
 @media (max-width: 720px) {
-  .pill-btn { padding: 0; border-color: transparent; border-radius: 50%; }
+  .pill-btn { padding: 0; }
   .pill-word { display: none; }
 }
 
-/* phones: the tabs line (two tabs, the Live pill, Download, Share and About this data) must fit the screen's width,
+/* phones: the tabs line (two tabs, Reset, Download, Share and the Live button) must fit the screen's width,
    or the browser widens the whole page. Tighter tabs and buttons; the Live pill keeps its dot and time and drops the
    word (its colour and title still say live); on the narrowest screens, smaller still. */
 @media (max-width: 560px) {
@@ -503,22 +550,31 @@ a { color: var(--accent); }
   .tabline .tabs a:first-child { padding-left: 2px; }
   .tabline .status { gap: 1px; }
   .tabline .pill-btn, .tabline .info-btn { width: 28px; min-width: 28px; height: 28px; }
+  .tabline .status .pill { height: 28px; min-width: 104px; }
 }
 @media (max-width: 420px) {
   .pill .pword { display: none; }
-  .status .pill { padding-inline: 6px 7px; gap: 5px; }
+  .status .pill { padding-inline: 6px; gap: 4px; }
+  .tabline .status .pill { min-width: 84px; }
+}
+@media (max-width: 380px) {
+  .tabline .pcaret { display: none; }
+  .tabline .status .pill { min-width: 76px; }
 }
 @media (max-width: 350px) {
   .tabline { gap: 0; }
-  .tabline .tabs a { padding-inline: 5px; font-size: 0.86rem; }
+  .tabline .tabs a { padding-inline: 4px; font-size: 0.84rem; }
+  .tabline .tabs a:first-child { padding-left: 0; }
   .tabline .pill-btn, .tabline .info-btn { width: 26px; min-width: 26px; }
+  .tabline .status .pill { min-width: 0; padding-inline: 5px; }
+  .tabline .status .pill::before { display: none; }
 }
 
 /* Shorter ranges: the menu beside 1D, and drag-to-zoom (tracker.js) */
 .span-wrap { margin-left: -6px; }
 .span-btn { display: grid; place-items: center; width: 22px; min-height: 30px; padding: 0; border: 0; border-radius: 4px; background: none; color: var(--ink-2); cursor: pointer; }
 .span-btn:hover, .span-btn[aria-expanded="true"] { color: var(--ink); background: var(--grid); }
-.span-menu { position: fixed; z-index: 30; display: grid; min-width: 150px; padding: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 6px 20px rgb(0 0 0 / 0.15); }
+.span-menu { position: fixed; z-index: 30; display: grid; min-width: 150px; padding: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; box-shadow: 0 6px 20px rgb(0 0 0 / 0.15); }
 .span-menu[hidden] { display: none; }
 .span-menu .span-hd { font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding: 2px 8px 4px; }
 .span-menu button { font: inherit; font-size: 0.82rem; text-align: left; color: var(--ink-2); background: none; border: 0; border-radius: 4px; padding: 5px 8px 5px 24px; cursor: pointer; position: relative; }
@@ -526,7 +582,8 @@ a { color: var(--accent); }
 .span-menu button[aria-checked="true"] { color: var(--ink); font-weight: 600; }
 .span-menu button[aria-checked="true"]::before { content: ""; position: absolute; left: 9px; top: 50%; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%; background: var(--accent); }
 .span-menu .span-tip { font-size: 0.72rem; color: var(--muted); padding: 6px 8px 2px; border-top: 1px solid var(--grid); margin-top: 4px; }
-.zoom-chip { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 0.78rem; color: var(--ink-2); background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 999px; padding: 3px 11px 3px 9px; min-height: 28px; cursor: pointer; }
+@media (hover: none), (max-width: 560px) { .span-menu .span-tip { display: none; } }   /* a mouse's drag: on a phone a finger scrolls */
+.zoom-chip { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 0.78rem; color: var(--ink-2); background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 4px; padding: 3px 11px 3px 9px; min-height: 28px; cursor: pointer; }
 .zoom-chip[hidden] { display: none; }
 .zoom-chip b { color: var(--accent); font-weight: 600; }
 .zoom-chip:hover b { text-decoration: underline; }

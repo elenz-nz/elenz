@@ -4,6 +4,7 @@
 	import Preview from '#lib/site/Preview.svelte';
 	import { onMount } from 'svelte';
 	import { replaceState } from '$app/navigation';
+	import { retitle } from '#lib/site/view.js';
 	import Masthead from '#lib/site/Masthead.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import Progression from '#lib/records/Progression.svelte';
@@ -62,6 +63,7 @@
 		if (region === 'NZ') u.searchParams.delete('region'); else u.searchParams.set('region', region);
 		if (period === 'tp') u.searchParams.delete('period'); else u.searchParams.set('period', period);
 		replaceState(u, {});
+		retitle();
 	}
 	// the tracker over the record's period: the day, the week, the month (30 days to its end), the year by month
 	const trackerHref = (t: number) => {
@@ -456,7 +458,7 @@
 	.per { justify-self: start; flex-wrap: wrap; }
 	.per button { min-height: 32px; padding-inline: 12px; font-size: 0.84rem; }
 	.dot { display: inline-block; flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--c); margin-right: 10px; }
-	.tag { display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em; padding: 1px 7px; border-radius: 999px; background: var(--grid); color: var(--ink-2); margin-left: 8px; white-space: nowrap; }
+	.tag { display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em; padding: 1px 7px; border-radius: 4px; background: var(--grid); color: var(--ink-2); margin-left: 8px; white-space: nowrap; }
 	.tag.new { background: var(--warn-bg); color: var(--warn-ink); }
 	.tag.est { background: transparent; border: 1px solid var(--line); color: var(--muted); }
 	.tag.provtag { background: transparent; border: 1px dashed var(--warn-ink); color: var(--warn-ink); margin-left: 0; }
@@ -481,7 +483,7 @@
 	.en { font-family: var(--font-data); font-size: 1.15rem; font-weight: 500; color: var(--ink-2); }
 	.acts { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 	/* labelled on phones too (the tracker's pill buttons shrink to icons there) */
-	.acts .pill-btn { height: 34px; width: auto; padding: 0 12px 0 10px; border-color: var(--line); border-radius: 999px; }
+	.acts .pill-btn { height: 34px; width: auto; padding: 0 12px 0 10px; border-color: var(--line); border-radius: 4px; }
 	.acts .pill-btn .pill-word { display: inline; }
 	.acts .pill-btn:disabled { opacity: 0.6; cursor: progress; }
 	.stats { display: grid; grid-template-columns: repeat(2, minmax(0, auto)); gap: 14px 36px; margin: 0; }

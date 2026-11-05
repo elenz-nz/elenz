@@ -156,7 +156,8 @@ export function concat(segs) {
     if (q.units.size) for (const [at, s, poc] of whole) unitOf(q, poc.length === 1 ? poc[0] : `${q.name} (all units)`, null).s.set(s, at);
     out.plants.push({ ...q, units: q.units.size > 1 ? [...q.units.values()].sort((a, b) => a.name < b.name ? -1 : 1) : undefined });
   }
-  out.plants.sort((a, b) => (a.fuel < b.fuel ? -1 : a.fuel > b.fuel ? 1 : 0) || b.s.reduce((x, y) => x + y, 0) - a.s.reduce((x, y) => x + y, 0));
+  const size = new Map(out.plants.map(p => [p, p.s.reduce((x, y) => x + y, 0)]));
+  out.plants.sort((a, b) => (a.fuel < b.fuel ? -1 : a.fuel > b.fuel ? 1 : 0) || size.get(b) - size.get(a));
   return out;
   function unitOf(q, name, cap, label) {
     let u = q.units.get(name);
@@ -240,10 +241,12 @@ export function historyStore(base = '/data/history') {
       // the live tail starts at the first period wholly after the history
       let a = firstAtOrAfter(live.t, kind === 'day' ? histEnd + 864e5 - 36e5 : histEnd + 18e5);
       while (a < live.n && step(live.t[a]) === step(histEnd)) a++;
-      const agg = aggregate(slice(live, a, live.n), step);
-      const tail = from > -Infinity || to < Infinity ? slice(agg, firstAtOrAfter(agg.t, from), firstAtOrAfter(agg.t, to)) : agg;
-      const upTo = Math.min(to, histEnd + 1);
-      return { ...concat([...hist.map(s => slice(s, firstAtOrAfter(s.t, from), firstAtOrAfter(s.t, upTo))), tail]), histEnd };
+      const upTo = Math.min(to, histEnd + 1), segs = hist.map(s => slice(s, firstAtOrAfter(s.t, from), firstAtOrAfter(s.t, upTo)));
+      if (a < live.n && to > live.t[a]) {   // (a window that stops short of the live week needn't average it: a slider's drag asks at every step)
+        const agg = aggregate(slice(live, a, live.n), step);
+        segs.push(from > -Infinity || to < Infinity ? slice(agg, firstAtOrAfter(agg.t, from), firstAtOrAfter(agg.t, to)) : agg);
+      }
+      return { ...concat(segs), histEnd };
     },
   };
 }

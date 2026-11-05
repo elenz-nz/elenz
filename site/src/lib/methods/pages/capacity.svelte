@@ -1,6 +1,7 @@
 <script lang="ts">
 	// The table of plants whose capacity changed is read from capacity.json (ingest/capacity.py), so it stays in step.
 	import { REPO, ref } from '../registry.js';
+	import Shot from '../Shot.svelte';
 	import CAPACITY from '#lib/tracker/capacity.json';
 	import { FUELS } from '#lib/tracker/fuels.js';
 
@@ -64,6 +65,7 @@
 <p>Geothermal, bioenergy and waste heat are left out because they run close to flat out as a rule, and wind and solar because they follow the weather. An island on its own counts only its own plant, not what the HVDC link could bring.</p>
 <p><b>Levels</b> draws the three as nested areas; <b>By fuel</b> stacks one of them by fuel, thermal plant and batteries at the bottom and hydro on top. Turning off <b>Include hydro</b> leaves hydro out of both.</p>
 <p>The chart follows the range and interval. Where a point covers more data than it shows (days built from half-hours, or weeks and months), each level is its lowest within the point. The offers job (<a href={REPO + 'ingest/offered.py'}><code>ingest/offered.py</code></a>) keeps each day’s lowest offered headroom; daily history keeps each day’s highest half-hour of dispatchable output, so installed headroom’s lowest reaches back to 1997.</p>
+<Shot name="tracker-headroom" alt="The spare dispatchable capacity chart on the Generation tab over 30 days, with its Levels and By fuel buttons." caption="Spare dispatchable capacity on the Generation tab, in the Levels view." />
 <p>Even offered headroom overstates the margin a little:</p>
 <ul>
 	<li>offers are published the day after, and now and then a day comes later, so recent days without them are shaded “Offers not published yet”;</li>
