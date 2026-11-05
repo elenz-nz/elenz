@@ -23,10 +23,16 @@ test('a stretch inside the range is a zoom, and the range holds', () => {
   assert.deepEqual(spanView(from, to, o('1d')), { range: '1d', end: addDays(today, -1), zoom: { from, to } });
 });
 
-test('a stretch across midnight widens the range; from the drag\'s first range it comes back', () => {
-  const mid = addDays(today, -2), from = mid - 2 * HOUR, to = mid + 2 * HOUR;
-  assert.equal(spanView(from, to, o('1d')).range, '3d');
-  assert.equal(spanView(latest - 5 * HOUR, latest, o('1d')).range, '1d');
+test('a moved window keeps its range, across midnight too', () => {
+  const to = addDays(today, -2) + 3 * HOUR, from = to - 3 * DAY;
+  assert.deepEqual(spanView(from, to, o('3d')), { range: '3d', end: addDays(today, -1), zoom: { from, to } });
+  assert.equal(spanView(from + 2 * DAY, to, o('1d')).range, '1d');
+});
+
+test('a stretch that outgrows its range takes the next one that holds it', () => {
+  assert.equal(spanView(today - 2 * DAY, today, o('1d')).range, '3d');
+  assert.equal(spanView(today - 200 * DAY, today, o('30d')).range, '1y');
+  assert.equal(spanView(today - 500 * DAY, today, o('1y')).range, 'all');
 });
 
 test('the whole history is All', () => {
@@ -35,10 +41,17 @@ test('the whole history is All', () => {
   assert.equal(z.range, 'all'); assert.ok(z.zoom);
 });
 
-test('a window of whole days moves by whole days, and a year keeps to the calendar', () => {
-  const [a, b] = snapSpan(today - 3.4 * DAY, today - 0.4 * DAY, { mode: 'move', latest, first });
-  assert.equal(b, midnightOf(b));
-  assert.equal(a, addDays(b, -3));
+test('a window glides on the data\'s grid: 5 minutes, then half-hours, not whole days', () => {
+  const to = today - 2.4 * DAY + 1000;
+  for (const [days, g] of [[1, 3e5], [3, 3e5], [7, 18e5], [30, 18e5]]) {
+    const [a, b] = snapSpan(to - days * DAY, to, { mode: 'move', latest, first });
+    assert.equal(b % g, 0); assert.equal(b - a, days * DAY); assert.ok(Math.abs(b - to) <= g);
+  }
+});
+
+test('daily data keeps to whole days, and a year to the calendar', () => {
+  const [a, b] = snapSpan(today - 3.4 * DAY, today - 0.4 * DAY, { mode: 'move', latest, first, grid: 'day' });
+  assert.equal(b, midnightOf(b)); assert.equal(a, addDays(b, -3));
   const [c, d] = snapSpan(today - 400 * DAY, today - 35 * DAY, { mode: 'move', latest, first });
   assert.equal(new Date(c).getUTCDate(), new Date(d).getUTCDate());
 });
@@ -50,10 +63,8 @@ test('a window at the newest data stays there, whatever the time of day', () => 
   }
 });
 
-test('near the newest data a window goes to it; a short one moves by 5 minutes', () => {
-  assert.deepEqual(snapSpan(latest - DAY - HOUR, latest - HOUR, { mode: 'move', latest, first }), [latest - DAY, latest]);
-  const [a, b] = snapSpan(today - 7 * HOUR + 1000, today - 4 * HOUR + 1000, { mode: 'move', latest, first });
-  assert.equal(b % 3e5, 0); assert.equal(b - a, 3 * HOUR);
+test('within a step of the newest data, a window goes to it', () => {
+  assert.deepEqual(snapSpan(latest - DAY - 60e3, latest - 60e3, { mode: 'move', latest, first }), [latest - DAY, latest]);
 });
 
 test('the grips keep to the shortest and longest lengths allowed', () => {
@@ -63,19 +74,37 @@ test('the grips keep to the shortest and longest lengths allowed', () => {
   assert.equal(snapSpan(to - HOUR, latest + HOUR, { mode: 'b', latest, first })[1], latest);
 });
 
-test('a track holds still while the view stays on it, and follows the newest data', () => {
-  const v = { from: latest - DAY, to: latest }, t = trackFor('1d', v, latest, first, null);
-  assert.equal(t.b, latest); assert.equal(t.b - t.a, 7 * DAY);
-  const past = { from: latest - 3 * DAY, to: latest - 2 * DAY };
-  assert.deepEqual([trackFor('1d', past, latest, first, t).a, trackFor('1d', past, latest, first, t).b], [t.a, t.b]);
-  const later = trackFor('1d', { from: latest + 3e5 - DAY, to: latest + 3e5 }, latest + 3e5, first, t);
-  assert.equal(later.b, latest + 3e5);
+test('the tracks: a week, 30 days, a year, the whole history', () => {
+  const v = { from: latest - DAY, to: latest }, len = (r) => { const t = trackFor(r, v, latest, first); return (t.b - t.a) / DAY; };
+  assert.deepEqual(['1d', '3d', '7d', '30d'].map(len), [7, 30, 30, 365]);
+  for (const r of ['1y', 'all']) { const t = trackFor(r, v, latest, first); assert.deepEqual([t.a, t.b], [first, latest]); }
 });
 
-test('a view off the track brings a new one, and tracks stop at the history\'s start', () => {
-  const old = { from: first + DAY, to: first + 2 * DAY }, t = trackFor('1d', old, latest, first, null);
-  assert.equal(t.a, first); assert.ok(old.to <= t.b);
-  assert.deepEqual([trackFor('1y', old, latest, first, null).a, trackFor('all', old, latest, first, null).b], [first, latest]);
+test('the newest data sits at the track\'s end, and a past view in its middle', () => {
+  const v = { from: latest - DAY, to: latest }, t = trackFor('1d', v, latest, first);
+  assert.equal(t.b, latest);
+  const past = { from: latest - 100 * DAY, to: latest - 99 * DAY }, m = trackFor('1d', past, latest, first);
+  assert.equal((m.a + m.b) / 2, (past.from + past.to) / 2);
+});
+
+test('a track holds still while the view stays on it, and follows the newest data', () => {
+  const v = { from: latest - DAY, to: latest }, t = trackFor('1d', v, latest, first);
+  const past = { from: latest - 3 * DAY, to: latest - 2 * DAY }, kept = trackFor('1d', past, latest, first, t);
+  assert.deepEqual([kept.a, kept.b], [t.a, t.b]);
+  assert.equal(trackFor('1d', { from: latest + 3e5 - DAY, to: latest + 3e5 }, latest + 3e5, first, t).b, latest + 3e5);
+});
+
+test('asked to centre, the view goes to the middle of the track, as far as the data allows', () => {
+  const v = { from: latest - DAY, to: latest }, t = trackFor('1d', v, latest, first);
+  const near = { from: latest - 5 * DAY, to: latest - 4 * DAY }, c = trackFor('1d', near, latest, first, t, true);
+  assert.equal((c.a + c.b) / 2, (near.from + near.to) / 2);
+  const close = { from: latest - 2 * DAY, to: latest - DAY }, d = trackFor('1d', close, latest, first, t, true);
+  assert.equal(d.b, latest);
+});
+
+test('a track stops at the history\'s start, and leaves it no shorter', () => {
+  const old = { from: first + DAY, to: first + 2 * DAY }, t = trackFor('1d', old, latest, first);
+  assert.equal(t.a, first); assert.equal(t.b - t.a, 7 * DAY);
 });
 
 test('labels fit the track', () => {

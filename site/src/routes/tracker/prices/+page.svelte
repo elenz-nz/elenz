@@ -230,6 +230,8 @@
 	}
 	function setZoom(z: { from: number; to: number } | null) { zoom = z; hover = -1; pinned = false; save(); }
 	const zoomed = $derived(!!zoom && view?.mode === 'time' && !!view?.zoomed);
+	// a window the slider has moved, at the range's own length, isn't a zoom: nothing to reset (Latest brings it back)
+	const movedWindow = $derived(!!zoom && zoom.from != null && !!R.days && Math.abs((zoom.to as number) - zoom.from - R.days * 864e5) <= 2 * 36e5);
 	const zoomTxt = $derived.by(() => {
 		if (!zoomed || !view) return '';
 		const a = view.t0, b = view.t1;
@@ -259,8 +261,6 @@
 			zoom = { from, to };
 			let end: number | null = addDays(midnightOf(to - 1), 1);
 			if (end >= endOfToday) end = null;
-			const fits = (k: string) => { const d = (RANGES as any)[k].days; return from >= (end == null ? latest - d * 864e5 : addDays(end, -d)); };
-			if (!fits(range)) range = '3d';
 			endT = end;
 		}
 		save();
@@ -302,13 +302,24 @@
 	let slider: any = null, sliding = false, slideRange: string | null = null, built: (() => void) | null = null, longData: any = null;
 	const newest = () => (live ? live.t[live.n - 1] + 3e5 : 0);
 	const slideAt = () => ({ range: slideRange ?? range, latest: newest(), first: FIRST });
+	// a month's track: its half-hourly history, a file or two, once the page has settled, so the picture and a drag along it are ready
+	let trackWanted = '';
+	function fetchTrack(a: number, b: number) {
+		const key = String(Math.floor(a / 864e5));
+		if (key === trackWanted) return;
+		trackWanted = key;
+		setTimeout(async () => {
+			if (sliding || !live) return;
+			try { await store.load('hh', a, b); longData = store.merged('hh', live); slider?.sync(); } catch { /* the picture just stays away */ }
+		}, 1500);
+	}
 	// n averages of the region's price, capped so a spike doesn't flatten the rest, from data already here
 	function priceOverview(a: number, b: number, n: number) {
 		const here = [view?.S, live, longData].filter((m) => m && m.t.length);
 		const cover = (m: any) => Math.max(0, Math.min(b, m.t[m.t.length - 1]) - Math.max(a, m.t[0]));
 		if (!here.length) return null;
 		const m = here.reduce((p, q) => (cover(q) > cover(p) ? q : p));
-		if (cover(m) < (b - a) * 0.9) return null;
+		if (cover(m) < (b - a) * 0.9) { if (b - a < 32 * 864e5) fetchTrack(a, b); return null; }
 		const s = (region === 'SI' ? m.SI : m.NI).price, sum = new Float64Array(n), hrs = new Float64Array(n), step = (b - a) / n;
 		for (let i = firstAtOrAfter(m.t, a); i < m.t.length && m.t[i] < b; i++) {
 			const k = Math.min(n - 1, Math.floor((m.t[i] - a) / step));
@@ -328,7 +339,7 @@
 				return { from, to };
 			},
 			// long ranges show each period's range and take no zoom, so their window only moves
-			limits: () => ({ min: effInt === '1d' ? 3 * 864e5 : 36e5, max: 30 * 864e5, resize: R.mode === 'time' }),
+			limits: () => ({ min: effInt === '1d' ? 3 * 864e5 : 36e5, max: 30 * 864e5, resize: R.mode === 'time', grid: R.mode === 'time' && effInt !== '1d' ? null : 'day' }),
 			inset: () => ({ left: 52, right: 10 }),
 			overview: priceOverview,
 			overviewKey: () => [region, longData?.t.length, view?.S?.t[0]].join(),
@@ -336,7 +347,8 @@
 			ready(from: number, to: number) {
 				const v = spanView(from, to, slideAt()), r = (RANGES as any)[v.range], [a, b] = rangeWindow(v.range, v.end, newest(), FIRST);
 				if (r.src === 'day') return store.has('day', 0, 0);
-				return (r.src === 'live' && liveCovers(a)) || store.has('hh', a, b);
+				const z: any = v.zoom, za = z?.from ?? a, zb = z?.to ?? b;
+				return (r.src === 'live' && za >= (live?.t[0] ?? 0) - 3e5) || store.has('hh', Math.min(a, za), Math.max(b, zb));
 			},
 			go(from: number, to: number, final: boolean) {
 				sliding = !final;
@@ -363,14 +375,15 @@
 		let zf = from, zt = to, isZoomed = false;
 		if (zoom && r.src !== 'day') {
 			if (zoom.span) { zt = to; zf = Math.max(from, to - zoom.span * 36e5); }
-			else if (zoom.from != null && zoom.to != null) { zf = Math.max(from, zoom.from); zt = Math.min(to, zoom.to); }
+			else if (zoom.from != null && zoom.to != null) { zf = zoom.from; zt = zoom.to; }   // a stretch from the slider can reach past the window
 			if (zt - zf >= (iv === '30m' ? 36e5 : 2 * 3e5)) isZoomed = true; else { zf = from; zt = to; }
 		}
 		try {
-			if (r.src === 'live' && liveCovers(from)) {
+			const hhFrom = Math.min(from, zf), hhTo = Math.max(to, zt);
+			if (r.src === 'live' && (isZoomed ? zf >= live.t[0] - 3e5 : liveCovers(from))) {
 				setView(timeView(atInterval(windowOf(live, zf, zt), iv)), isZoomed);
 			} else if (r.src !== 'day') {
-				if (!store.has('hh', from, to)) { busy = true; await store.load('hh', from, to); }
+				if (!store.has('hh', hhFrom, hhTo)) { busy = true; await store.load('hh', hhFrom, hhTo); }
 				if (my !== token) return;
 				const m = store.merged('hh', live);
 				longData = m;
@@ -685,11 +698,13 @@
 		setEnd(next >= endOfToday ? null : Math.max(next, addDays(FIRST, R.days)));
 	}
 	// zoomed, Latest moves the stretch to the newest data and keeps its length (test report ZM-03, 1 Nov 2026)
-	const toLatest = () => (zoomEnds && live ? zoomEndAt(live.t[live.n - 1] + 3e5) : setEnd(null));
+	const toLatest = () => (zoomEnds && live && !movedWindow ? zoomEndAt(live.t[live.n - 1] + 3e5) : setEnd(null));
 	const isoDay = ymd;
 	const dateValue = $derived(zoomStamp ? zoomStamp[0] : live ? ymd((endT ?? latestT) - 1) : '');
 	function pickDate(v: string) {
-		if (zoomStamp) return zoomEndAt(fromStamp(`${v}T${zoomStamp[1]}`));
+		slider?.centre();   // a date picked sits in the middle of the slider (design decision, 5 Nov 2026)
+		if (zoomStamp && !movedWindow) return zoomEndAt(fromStamp(`${v}T${zoomStamp[1]}`));
+		zoom = null;
 		const t = endOfDay(v);
 		setEnd(t === null || t >= endOfToday ? null : Math.max(t, addDays(FIRST, R.days ?? 0)));
 	}
@@ -826,7 +841,7 @@
 						title="Shows the selected range ending on this date" use:dateSettled={pickDate}></date-pick>
 					{#if zoomStamp}
 						<time-pick id="p-time" value={zoomStamp[1]} aria-label="Ending at (NZ time)" title="Shows the zoomed hours ending at this time (NZ time)"
-							use:timeSettled={(v: string) => zoomEndAt(fromStamp(`${zoomStamp ? zoomStamp[0] : ''}T${v}`))}></time-pick>
+							use:timeSettled={(v: string) => { slider?.centre(); zoomEndAt(fromStamp(`${zoomStamp ? zoomStamp[0] : ''}T${v}`)); }}></time-pick>
 					{/if}
 					<button type="button" class="step" aria-label="Next {R.label}" title={atLatest ? 'Showing the latest data' : `Next ${R.label}`} disabled={atLatest} onclick={() => step(1)}><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 					{#if !atLatest}<button type="button" class="latest" title="Back to the latest data" onclick={toLatest}><svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 3 5 5-5 5M12 3v10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>Latest</button>{/if}
@@ -840,7 +855,7 @@
 				<span>Pinned</span><b>{chip(at)}</b><span class="pin-x" aria-hidden="true">×</span><span class="vh">: let go</span>
 			</button>
 		{/if}
-		{#if zoomed}
+		{#if zoomed && !movedWindow}
 			<button type="button" class="zoom-chip" title="Back to the whole range (Escape)" onclick={() => { zoom = null; save(); }}>
 				<svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="m10.5 10.5 3.5 3.5M5 7h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
 				{#if !zoom?.span}<span>{zoomTxt}</span>{/if}<b>Reset zoom</b>
@@ -1044,7 +1059,7 @@
 						<li><b>Click or tap a chart:</b> pins the time. ← → move it. Click it again, or use the Pinned chip or Escape, to let go.</li>
 						<li><b>Range buttons:</b> open around a pinned time.</li>
 						<li><b>‹ › and the date:</b> move through history. Latest comes back to now.</li>
-						<li><b>Slider under the price chart:</b> drag its window to move through time, and hold it at the end to carry on. From 1D to 30D, drag its ends to show more or less.</li>
+						<li><b>Slider under the price chart:</b> drag its window to move through time. From 1D to 30D, drag its ends to show more or less. A date picked sits in its middle.</li>
 						<li><b>Drag across a chart:</b> zooms in, from 1D to 30D. Reset zoom goes back.</li>
 						<li><b>Colour squares:</b> hide a node. Double-click, Shift-click or press and hold shows only that one. The spread's square turns the priced-apart shading on and off.</li>
 						<li><b>Menu beside the title:</b> changes the price scale.</li>

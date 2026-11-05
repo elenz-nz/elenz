@@ -202,14 +202,15 @@ for (const path of ['/tracker?range=3d', '/tracker/prices?range=3d']) {
       await expect(page).not.toHaveURL(/end=|zoom=/);
     });
 
-    test('its window moves by whole days and comes back to the newest data', async ({ page }) => {
+    test('its window glides, keeps its range, and comes back to the newest data', async ({ page }) => {
       await page.goto(path);
       await expect(page.locator('.ts-thumb')).toHaveAttribute('aria-valuetext', /./);
-      await slide(page, '.ts-thumb', -150);
-      await expect(page).toHaveURL(/end=\d{4}-\d\d-\d\d/);
-      await expect(page).not.toHaveURL(/zoom=/);
+      await slide(page, '.ts-thumb', -60);
+      await expect(page).toHaveURL(/zoom=\d{4}-\d\d-\d\dT\d\d:\d\d/);
+      await expect(page).toHaveURL(/range=3d/);
+      await expect(page.locator('.zoom-chip:not([hidden]):has-text("Reset zoom")')).toHaveCount(0);   // moved, not zoomed
       await slide(page, '.ts-thumb', 400);   // past the track's end, but inside the window: Firefox here loses a press let go outside it
-      await expect(page).not.toHaveURL(/end=/);
+      await expect(page).not.toHaveURL(/end=|zoom=/);
     });
 
     test('its ends zoom', async ({ page }) => {

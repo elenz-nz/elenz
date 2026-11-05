@@ -356,7 +356,8 @@ export function mountTracker(D, hooks = {}) {
     if (state.zoom && stop - start > 2) {
       if (state.zoom.span) { zt = M.t[stop - 1] + M.h[stop - 1] * 36e5; zf = zt - state.zoom.span * 36e5; }
       else { zf = state.zoom.from; zt = state.zoom.to; }
-      const a = Math.max(start, firstAtOrAfter(M.t, zf)), b = Math.min(stop, firstAtOrAfter(M.t, zt));
+      // a stretch from the slider can sit across the window's edges, so a dragged zoom sets its own ends
+      const a = state.zoom.span ? Math.max(start, firstAtOrAfter(M.t, zf)) : firstAtOrAfter(M.t, zf), b = state.zoom.span ? stop : Math.min(M.N, firstAtOrAfter(M.t, zt));
       if (b - a >= 2) { start = a; stop = b; } else zf = zt = null;
     }
     // grouped views start at the first whole day, week or month in the window rather than with a sliver of one
@@ -1442,7 +1443,8 @@ export function mountTracker(D, hooks = {}) {
     oneDay.textContent = span ? `${span}H` : '1D';
     oneDay.title = span ? `Last ${span} hour${span > 1 ? 's' : ''} (select for 24 hours)` : '24 hours';
     for (const b of spanMenu.querySelectorAll('button[data-h]')) b.setAttribute('aria-checked', String(+b.dataset.h === (span ?? (state.range === '1d' ? 24 : 0))));
-    const chip = $('zoom-reset'), dragged = !!(state.zoom && !state.zoom.span && V && V.zoomed);
+    // a window the slider has moved, at the range's own length, isn't a zoom: nothing to reset (Latest brings it back)
+    const chip = $('zoom-reset'), dragged = !!(state.zoom && !state.zoom.span && V && V.zoomed) && !movedWindow();
     chip.hidden = !dragged;
     if (dragged) $('zoom-txt').textContent = zoomText();
     if (V && V.zoomed) for (const id of ['nav-prev', 'tb-prev', 'nav-next', 'tb-next']) {
@@ -1477,7 +1479,11 @@ export function mountTracker(D, hooks = {}) {
   // hv: the store's version it was merged from; a model older than the files loaded since is merged again (setView)
   const merge = kind => Object.assign(toModel(history.merged(kind, models.live), models.live.END), { hv: history.version(kind) });
   // the span of history a window [end − range, end) needs (the latest 31 days when end is null)
-  const spanFor = (r, end) => { const to = end ?? models.live.END; return [end == null ? to - 31 * DAY : moveBack(end, RANGES[r]) - DAY, to]; };
+  // (and a stretch from the slider's own start, zf, and end, zt: it can reach past the window)
+  const spanFor = (r, end, zf = state.zoom?.from, zt = state.zoom?.to) => {
+    const to = Math.max(end ?? models.live.END, zt ?? 0), from = end == null ? to - 31 * DAY : moveBack(end, RANGES[r]) - DAY;
+    return [Math.min(from, zf != null ? zf - DAY : Infinity), to];
+  };
   function useModel() {
     const m = models[state.kind];
     if (m !== M) { M = m; derive(); }
@@ -1489,11 +1495,11 @@ export function mountTracker(D, hooks = {}) {
                      histBuilt: ix && ix.built, ...extra });
   }
   // which data a window needs: the live 5-minute week if it covers it, otherwise half-hourly or daily history
-  function kindFor(r, end) {
+  function kindFor(r, end, zf = state.zoom?.from) {
     const R = RANGES[r];
     if (R.model !== 'live') return R.model;
-    if (end == null) return 'live';
-    return end - R.days * DAY >= models.live.t[0] - 6e4 ? 'live' : 'hh';
+    const from = zf ?? (end == null ? Infinity : end - R.days * DAY);   // a stretch's own start decides
+    return from >= models.live.t[0] - 6e4 ? 'live' : 'hh';
   }
   let pending = 0;
   // keepInt: keep a chosen interval across a range change; wantInt: the interval to open on (from the address);
@@ -1553,6 +1559,10 @@ export function mountTracker(D, hooks = {}) {
   };
   // zoomed, the arrows move the zoom by its own length, into the next window if need be; forward to the latest data
   // a span from the menu becomes "the last N hours" again
+  function movedWindow() {
+    const R = RANGES[state.range], z = state.zoom;
+    return !!(z && z.from != null && R.days && Math.abs(z.to - z.from - R.days * DAY) <= 2 * 36e5);
+  }
   function zoomSpan() { const a = V.t[0], b = V.t[V.n - 1] + V.hrs[V.n - 1] * 36e5; return { from: a, to: b }; }
   function stepZoom(dir) {
     const z = zoomSpan(), len = z.to - z.from, latest = models.live.END + 3e5;
@@ -1560,6 +1570,7 @@ export function mountTracker(D, hooks = {}) {
     if (to >= latest) {
       if (z.to >= latest - 6e4 && dir > 0) return;   // already at the newest data (test report ZM-04, 5 Nov 2026)
       to = latest; from = to - len;
+      if (movedWindow()) { state.zoom = null; return setView(state.range, null, true); }
       // back at the newest data, a length the 1D menu offers is live "last N hours" again
       const span = state.zoom.span || (!isLong() && SPANS.includes(len / 36e5) ? len / 36e5 : null);
       if (span) { state.zoom = { span }; return setView('1d', null, true); }
@@ -1591,10 +1602,8 @@ export function mountTracker(D, hooks = {}) {
       return setView(state.range, null, true);
     }
     state.zoom = { from, to };
-    let end = addDays(midnightOf(to - 1), 1);
-    if (end >= endOfToday()) end = null;
-    const fits = r => from >= (end == null ? latest - RANGES[r].days * DAY : addDays(end, -RANGES[r].days));
-    setView(fits(state.range) || !RANGES['3d'] ? state.range : '3d', end, true);
+    const end = addDays(midnightOf(to - 1), 1);
+    setView(state.range, end >= endOfToday() ? null : end, true);
   }
   // A rebuild (a new range, new data) can bring layers the last view didn't have: a plant that didn't run in the live
   // week, or a site moved into or out of "Other ..." in the By site view. state.hidden only lists what was switched off,
@@ -1755,15 +1764,17 @@ export function mountTracker(D, hooks = {}) {
   document.addEventListener('click', e => { if (!spanMenu.hidden && !spanMenu.contains(e.target)) closeSpans(); });
   $('zoom-reset').addEventListener('click', () => setZoom(null));
   onDateSettled($('in-date'), v => {
-    if (zoomedHours()) return zoomEndAt(fromStamp(`${v}T${$('in-time').value || '00:00'}`));
+    slider.centre();   // a date picked sits in the middle of the slider (design decision, 5 Nov 2026)
+    if (zoomedHours() && !movedWindow()) return zoomEndAt(fromStamp(`${v}T${$('in-time').value || '00:00'}`));
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
     if (!m) return;
     const day = midnightOf(Date.UTC(+m[1], +m[2] - 1, +m[3], 12) - 12 * 36e5);  // that date's local midnight
     state.zoom = null; setView(state.range, addDays(day, 1));
   });
-  onTimeSettled($('in-time'), v => zoomEndAt(fromStamp(`${$('in-date').value}T${v}`)));
+  onTimeSettled($('in-time'), v => { slider.centre(); zoomEndAt(fromStamp(`${$('in-date').value}T${v}`)); });
   // zoomed, Latest moves the stretch to the newest data and keeps its length (test report ZM-03, 1 Nov 2026)
   $('btn-latest').addEventListener('click', () => {
+    if (movedWindow()) state.zoom = null;
     if (!state.zoom || !V?.zoomed) return setView(state.range, null);
     const latest = models.live.END + 3e5, z = zoomSpan();
     if (zoomedHours()) return zoomEndAt(latest);
@@ -1987,12 +1998,23 @@ export function mountTracker(D, hooks = {}) {
     if (!o) totals.set(m, o = {});
     return o[region] ??= genTotal(m, region);
   }
+  // a month's track: its half-hourly history, a file or two, once the page has settled, so the picture and a drag along it are ready
+  let trackWanted = '';
+  function fetchTrack(a, b) {
+    const key = `${Math.floor(a / DAY)}`;
+    if (key === trackWanted) return;
+    trackWanted = key;
+    setTimeout(async () => {
+      if (sliding || (history.has('hh', a, b) && models.hh)) return;
+      try { await history.load('hh', a, b); models.hh = merge('hh'); slider.sync(); } catch { /* the picture just stays away */ }
+    }, 1500);
+  }
   // n averages of total generation over [a, b), from a model already here; null if none covers nearly all of it
   function overview(a, b, n) {
     const here = [M, models.live, models.hh, models.day].filter(m => m && m.N);
     const cover = m => Math.max(0, Math.min(b, m.t[m.N - 1]) - Math.max(a, m.t[0]));
     const m = here.reduce((p, q) => (cover(q) > cover(p) ? q : p));
-    if (cover(m) < (b - a) * 0.9) return null;
+    if (cover(m) < (b - a) * 0.9) { if (b - a < 32 * DAY) fetchTrack(a, b); return null; }
     const sum = new Float64Array(n), hrs = new Float64Array(n), s = totalOf(m, state.region), step = (b - a) / n;
     for (let i = firstAtOrAfter(m.t, a); i < m.N && m.t[i] < b; i++) {
       const k = Math.min(n - 1, Math.floor((m.t[i] - a) / step));
@@ -2012,15 +2034,15 @@ export function mountTracker(D, hooks = {}) {
       const [from, to] = windowOf(state.range, state.end, latestT(), firstDay());
       return { from, to };
     },
-    limits: () => ({ min: (ZOOM_MIN[state.int] ?? 0) * DAY || 36e5, max: Infinity, resize: true }),
+    limits: () => ({ min: (ZOOM_MIN[state.int] ?? 0) * DAY || 36e5, max: Infinity, resize: true, grid: isLong() ? 'day' : null }),
     inset: () => ({ left: PADL, right: padR() }),
     overview,
     overviewKey: () => [state.region, history.version('hh'), history.version('day')].join(),
     start() { slideRange = state.range; },
     ready(from, to) {
-      const v = spanView(from, to, slideAt()), kind = kindFor(v.range, v.end);
+      const v = spanView(from, to, slideAt()), zf = v.zoom?.from, zt = v.zoom?.to, kind = kindFor(v.range, v.end, zf);
       if (kind === 'live') return true;
-      const [a, b] = spanFor(v.range, v.end);
+      const [a, b] = spanFor(v.range, v.end, zf, zt);
       return !!models[kind] && history.has(kind, a, b);
     },
     go(from, to, final) {
@@ -2072,7 +2094,7 @@ export function mountTracker(D, hooks = {}) {
     update(D2) {
       models.live = buildModel(D2);
       for (const kind of ['hh', 'day']) if (models[kind]) models[kind] = merge(kind);
-      if (state.end == null || state.kind === 'live') state.kind = kindFor(state.range, state.end);
+      if (state.end == null || state.kind === 'live') { const k = kindFor(state.range, state.end); if (k === 'live' || models[k]) state.kind = k; }
       M = null; useModel(); updateAsof(); rebuild();
       // history gains days a few times a day: refresh what's loaded, at most hourly (history.load checks the age)
       // (a refresh after a history rebuild drops every cached file, so a past window being shown is loaded again too)

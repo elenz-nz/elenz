@@ -1,15 +1,16 @@
-// The time slider under the tracker's charts (test report TRK-12, design decision, 5 Nov 2026): a window on a track of
-// time. Drag it to move through time, held at the track's end it carries on and the track rolls with it, and drag either
-// end to show more or less. Each range has its own track (TRACK_DAYS), so the slider stays put while it's used. The
-// charts follow during a drag where the data is already here (`host.ready`), and otherwise once the finger pauses or
-// lets go; the address and the lower cards wait for it to let go (`host.go`'s `final`).
+// The time slider under the tracker's charts (test report TRK-12, design decision, 5 Nov 2026): a window on a fixed
+// track of time. Drag it and the charts glide with it, not day by day, and drag either end to show more or less. Each
+// range has its own track (TRACK_DAYS), which stays put while it's used and stops at its ends: picking a date puts the
+// window in the track's middle (`centre`), and the newest data at its right-hand end. The charts follow during a drag
+// where the data is already here (`host.ready`), and otherwise once the finger pauses or lets go; the address and the
+// lower cards wait for it to let go (`host.go`'s `final`).
 //
 // The page supplies a host:
 //   view()        { from, to }: the stretch shown        bounds()  { first, latest }
 //   range()       the range button in force              limits()  { min, max, resize }: lengths allowed
 //   go(from, to, final)  show this stretch               ready(from, to)  is its data here?
 //   inset()       { left, right }: the chart's margins, so the track lines up with its time axis
-//   overview(a, b, n)    n values of total generation, or null when the data isn't here (no download is made for it)
+//   overview(a, b, n)    n values for the small picture in the track, or null while the data isn't here
 import { addDays, addYears, midnightOf, SPANS } from './viewurl.js';
 import { nzOffset } from '#lib/tracker/series.js';
 
@@ -17,7 +18,7 @@ const DAY = 864e5, HOUR = 36e5, FIVE = 3e5;
 const DAYS = { '1d': 1, '3d': 3, '7d': 7, '30d': 30, '1y': 365 };
 const ORDER = ['1d', '3d', '7d', '30d', '1y'];
 /** The track each range sits on, in days; the whole history for 1Y and All. */
-export const TRACK_DAYS = { '1d': 7, '3d': 7, '7d': 30, '30d': 365, '1y': null, all: null };
+export const TRACK_DAYS = { '1d': 7, '3d': 30, '7d': 30, '30d': 365, '1y': null, all: null };
 
 const parts = (t) => { const d = new Date(t + nzOffset(t)); return { y: d.getUTCFullYear(), mo: d.getUTCMonth(), d: d.getUTCDate(), dow: d.getUTCDay(), h: d.getUTCHours(), mi: d.getUTCMinutes() }; };
 const MON = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
@@ -31,63 +32,65 @@ export function windowOf(range, end, latest, first) {
   return [range === '1y' ? addYears(end, -1) : addDays(end, -DAYS[range]), end];
 }
 
-/** What shows the stretch [from, to): a range, its end and any zoom. The range in force stays while it can hold the
- *  stretch, so a slider never hops to another range or track on its own. */
+/** What shows the stretch [from, to): a range, its end and any zoom. The range in force stays unless the stretch has
+ *  outgrown it, and a stretch needn't sit on whole days: the zoom says where it is. */
 export function spanView(from, to, { range, latest, first }) {
-  const live = to >= latest - 6e4;
+  const live = to >= latest - 6e4, len = to - from;
   if (live && from <= first + DAY) return { range: 'all', end: null, zoom: null };
-  const end = live ? null : addDays(midnightOf(to - 1), 1);
-  if (DAYS[range]) {
-    const [a, b] = windowOf(range, end, latest, first);
-    if (Math.abs(a - from) < 6e4 && (live || Math.abs(b - to) < 6e4)) return { range, end, zoom: null };
-  }
-  const hours = (to - from) / HOUR;
-  if (live && range === '1d' && SPANS.includes(hours)) return { range, end: null, zoom: { span: hours } };
+  let r = range;
+  if (DAYS[r] && len > DAYS[r] * DAY * 1.02) r = ORDER.find((k) => len <= DAYS[k] * DAY * 1.02) ?? 'all';
   const zoom = { from, to };
-  if (range === 'all') return { range, end: null, zoom };
-  for (const r of ORDER.slice(ORDER.indexOf(range))) if (from >= windowOf(r, end, latest, first)[0]) return { range: r, end, zoom };
-  return { range: 'all', end: null, zoom };
+  if (!DAYS[r]) return { range: r, end: null, zoom };
+  const end = live ? null : addDays(midnightOf(to - 1), 1), [a, b] = windowOf(r, end, latest, first);
+  if (Math.abs(a - from) < 6e4 && (live || Math.abs(b - to) < 6e4)) return { range: r, end, zoom: null };
+  const hours = len / HOUR;
+  if (live && r === '1d' && SPANS.includes(hours)) return { range: r, end: null, zoom: { span: hours } };
+  return { range: r, end, zoom };
 }
 
-/** A stretch on the data's grid. mode 'move' keeps its length: a day or more moves by whole days, so it's an ordinary
- *  window again, and shorter by 5 minutes. mode 'a' or 'b' moves that end only. */
-export function snapSpan(from, to, { mode, latest, first, min = HOUR, max = Infinity }) {
+// the stretch's grid: as fine as the data, so a drag glides, with whole days for the long views' daily data
+const gridOf = (len, grid) => (grid === 'day' || len >= 40 * DAY ? DAY : len > 3.5 * DAY ? 6 * FIVE : FIVE);
+const onGrid = (t, g) => (g === DAY ? midnightOf(t + 12 * HOUR) : Math.round(t / g) * g);
+
+/** A stretch on the data's grid. mode 'move' keeps its length; 'a' or 'b' moves that end only. grid 'day': whole days only. */
+export function snapSpan(from, to, { mode, latest, first, min = HOUR, max = Infinity, grid }) {
   const len = to - from;
   if (mode === 'move') {
     if (to >= latest - 6e4) return [latest - len, latest];
-    if (len >= 23 * HOUR) {
+    const g = gridOf(len, grid);
+    if (g === DAY) {
       const days = Math.max(1, Math.round(len / DAY)), year = Math.abs(len - 365.25 * DAY) < 2.5 * DAY;
-      let e = midnightOf(to + 12 * HOUR);
+      let e = onGrid(to, g);
       if (e > midnightOf(latest)) return [latest - len, latest];
       let s = year ? addYears(e, -1) : addDays(e, -days);
       if (s < first) { s = midnightOf(first + DAY); e = year ? addYears(s, 1) : addDays(s, days); }
       return [s, e];
     }
-    let e = Math.round(to / FIVE) * FIVE;
-    if (e >= latest - FIVE / 2) e = latest;
-    return [Math.max(first, e - len), e];
+    const e = Math.round(to / g) * g;
+    if (e >= latest - g / 2) return [latest - len, latest];
+    return e - len < first ? [first, first + len] : [e - len, e];
   }
-  const step = (t) => { const l = mode === 'a' ? to - t : t - from; return l >= 46 * HOUR ? midnightOf(t + 12 * HOUR) : Math.round(t / (l > 12 * HOUR ? 6 * FIVE : FIVE)) * (l > 12 * HOUR ? 6 * FIVE : FIVE); };
-  if (mode === 'a') return [Math.min(to - min, Math.max(first, to - max, step(from))), to];
-  let e = step(to);
+  if (mode === 'a') return [Math.min(to - min, Math.max(first, to - max, onGrid(from, gridOf(to - from, grid)))), to];
+  let e = onGrid(to, gridOf(to - from, grid));
   if (e >= latest - FIVE / 2) e = latest;
   return [from, Math.max(from + min, Math.min(latest, from + max, e))];
 }
 
-/** The track around a view: the same one while the view stays on it (moving on with the newest data); otherwise the
- *  newest stretch if the view is near it, or one with the view three-quarters along. */
-export function trackFor(range, view, latest, first, prev) {
-  const days = TRACK_DAYS[range];
-  if (!days) return { range, a: first, b: latest };
-  const len = Math.max(days * DAY, (view.to - view.from) * 1.5);
-  if (prev && prev.range === range && prev.b - prev.a === len) {
+/** The track around a view: the same one while the view stays on it (moving on with the newest data); otherwise, or
+ *  when asked to centre, the one with the view in its middle, or ending at the newest data if that's what's shown. */
+export function trackFor(range, view, latest, first, prev, centre = false) {
+  const days = TRACK_DAYS[range] ?? null;
+  if (!centre && prev && prev.key === days) {
     const shift = prev.end ? latest - prev.b : 0, a = prev.a + shift, b = prev.b + shift;
-    if (view.from >= a && view.to <= b) return { range, a, b, end: prev.end };
+    if (view.from >= a - 6e4 && view.to <= b + 6e4) return { key: days, a, b, end: prev.end };
   }
-  let b = view.to >= latest - len * 0.7 ? latest : view.to + len * 0.25;
-  let a = b - len;
-  if (a < first) { a = first; b = Math.min(latest, a + len); }
-  return { range, a, b, end: b >= latest };
+  if (!days) return { key: days, a: first, b: latest, end: true };
+  const len = days * DAY;
+  let a = view.to >= latest - 6e4 ? latest - len : (view.from + view.to) / 2 - len / 2;
+  if (a + len > latest) a = latest - len;
+  if (a < first) a = first;
+  const b = Math.min(latest, a + len);
+  return { key: days, a, b, end: b >= latest };
 }
 
 /** Labels for a track px wide: { t, text } at whole days, weeks, months or years, at least 56 px apart. */
@@ -129,7 +132,8 @@ export function spanLabel(from, to, latest) {
   return `${dayName(from)}${year(from) === year(last) ? '' : ` ${year(from)}`} – ${dayName(last)} ${year(last)}`;
 }
 
-/** Puts a slider in el. Returns { sync, destroy }: call sync after every change of view. */
+/** Puts a slider in el. Returns { sync, centre, destroy }: call sync after every change of view, and centre just
+ *  before a change that should put the window in the track's middle (a date picked). */
 export function mountSlider(el, host) {
   el.innerHTML = `<div class="ts-track"><svg class="ts-area" aria-hidden="true" preserveAspectRatio="none"><path/></svg><div class="ts-ticks" aria-hidden="true"></div>
     <div class="ts-thumb" role="slider" tabindex="0" aria-orientation="horizontal" aria-label="Move through time" title="Drag to move through time. Drag the ends to show more or less."></div>
@@ -138,9 +142,8 @@ export function mountSlider(el, host) {
     <output class="ts-tip" hidden></output>`;
   const track = el.querySelector('.ts-track'), thumb = el.querySelector('.ts-thumb'), gripA = el.querySelector('.ts-grip.a'), gripB = el.querySelector('.ts-grip.b');
   const tip = el.querySelector('.ts-tip'), ticks = el.querySelector('.ts-ticks'), area = el.querySelector('.ts-area'), path = area.querySelector('path');
-  // the thumb's least width, px, room for the grips and a grip between them on a finger; a track's length rolled by a second at its end
-  const MIN_THUMB = matchMedia('(pointer: coarse)').matches ? 46 : 30, ROLL = 0.3;
-  let T = null, view = null, drag = null, width = 0, drawn = '';
+  const MIN_THUMB = matchMedia('(pointer: coarse)').matches ? 46 : 30;   // px, room for both grips and a grip between them on a finger
+  let T = null, view = null, drag = null, width = 0, drawn = '', centreNext = false;
   const W = () => track.clientWidth;
   const X = (t) => ((t - T.a) / (T.b - T.a)) * W();
 
@@ -183,7 +186,8 @@ export function mountSlider(el, host) {
     const { first, latest } = host.bounds();
     view = host.view();
     if (!view) return;
-    T = trackFor(host.range(), view, latest, first, T);
+    T = trackFor(host.range(), view, latest, first, T, centreNext);
+    centreNext = false;
     place(); paintTrack();
   }
 
@@ -194,7 +198,13 @@ export function mountSlider(el, host) {
     busy = true;
     requestAnimationFrame(() => setTimeout(async () => {
       try { await host.go(s[0], s[1], final); } finally { busy = false; }
-      if (final) { drag = null; el.classList.remove('sliding'); tip.hidden = true; sync(); return; }
+      if (final) {
+        // the track stays where the drag left it, even if the stretch has outgrown its range
+        drag = null; el.classList.remove('sliding'); tip.hidden = true;
+        T = { ...T, key: TRACK_DAYS[host.range()] ?? null };
+        sync();
+        return;
+      }
       if (drag) drag.shown = s;
       if (wanted) { const w = wanted; wanted = null; run(w.s, w.final); }
     }, 0));
@@ -211,7 +221,7 @@ export function mountSlider(el, host) {
   // ---------- dragging ----------
   function limits(d) {
     const { first, latest } = host.bounds(), L = host.limits();
-    return { mode: d.mode, first, latest, min: L.min, max: L.max };
+    return { mode: d.mode, first, latest, min: L.min, max: L.max, grid: L.grid };
   }
   function show(d) {
     if (!d.moved) {
@@ -240,20 +250,6 @@ export function mountSlider(el, host) {
     tip.style.left = `${Math.max(tip.offsetWidth / 2, Math.min(W() - tip.offsetWidth / 2, c))}px`;
     apply(d.snap, false);
   }
-  // held against the track's end, the track rolls and the window goes with it
-  function roll(now) {
-    const d = drag;
-    if (!d || d.done) return;
-    const dtime = Math.min(50, now - (d.last ?? now)); d.last = now;
-    requestAnimationFrame(roll);
-    const { first, latest } = host.bounds(), over = d.x < 0 ? -1 : d.x > W() ? 1 : 0;
-    const days = TRACK_DAYS[T.range], dir = over;
-    if (!dir || !days) return;
-    const len = T.b - T.a, by = Math.max(-(T.a - first), Math.min(latest - T.b, dir * len * ROLL * (dtime / 1000)));
-    if (!by) return;
-    T = { ...T, a: T.a + by, b: T.b + by, end: T.b + by >= latest };
-    paintTrack(); show(d);
-  }
   function down(e, mode) {
     if (e.button || drag) return;
     e.preventDefault(); e.stopPropagation();
@@ -271,7 +267,6 @@ export function mountSlider(el, host) {
     const r = track.getBoundingClientRect();
     drag = { mode, base, start: { ...view }, x0: e.clientX - r.left, x: e.clientX - r.left, left: r.left, shown: null, jumped };
     show(drag);
-    requestAnimationFrame(roll);
   }
   function move(e) {
     if (!drag) return;
@@ -315,5 +310,5 @@ export function mountSlider(el, host) {
     if (T && view && !drag) { place(); paintTrack(); }
   }));
   ro.observe(track);
-  return { sync, destroy: () => ro.disconnect() };
+  return { sync, centre() { centreNext = true; }, destroy: () => ro.disconnect() };
 }
