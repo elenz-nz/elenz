@@ -367,6 +367,72 @@ network (grid stations: block dispatch and terminal-vs-connection differences) a
   gap to MBIE's totals (`metered_check.py`).
 - **Glenbrook:** metered 44-48 GWh against 32 GWh dispatched in Jan and Jun 2026 (Sep: 6.5 against 9.0).
 
+### The layer: `ingest/embedded.py`, `embedded_backtest.py`, `embedded_split.py` (6 Nov 2026)
+
+The site's version subtracts, at each grid exit point, what the history already counts there: the plants in the
+month's own tracker layout (`hist/hh`), read for this work from https://elenz.co.nz/data/history/hh/. The analysis
+above subtracted dispatch instead.
+
+- **Totals:** Sep 2026 is 85.2 GWh, 119 MW, 2.31% of generation (the analysis above, less Ngāwhā's undispatched units
+  and Teviot, gives 86). Jan 2026 is 68.3 GWh (2.03%), Jun 2026 80.0 GWh (2.17%). By point, everything matches the
+  dispatch-based analysis except Ngāwhā and Teviot (named plants, expected) and Halfway Bush.
+- **Halfway Bush:** Generation_MD meters Deep Stream and Mahinerangi at `WPG0331` (17.45 GWh in Sep 2026), and the
+  reconciliation data reports the same energy at `HWB0331`. `embedded_points.csv` role `meter` maps a meter point to
+  the grid exit point it's reported under.
+- **Old embedded meter codes (to 2008):** `embedded_backtest.py match` finds the reconciliation series that tracks
+  each unmatched meter point half-hour by half-hour:
+
+  | Meter code | Plant | Reported under | Correlation | Energy ratio |
+  | --- | --- | --- | --- | --- |
+  | `KMI0331` | Kaimai | `TGA0331` | 1.00 | 1.00 |
+  | `TWF0331` | Tararua | `LTN0331` | 1.00 | 1.00 |
+  | `TWF0332` | Tararua | `BPE0331` | 1.00 | 1.00 |
+  | `WPI0112` | Waipori | `HWB0331` | 1.00 | 1.00 |
+  | `HBK0661` | Highbank | `ASB0661` | 1.00 | 1.02 |
+  | `ANI0111` | Aniwhenua | `MAT1101` | 1.00 | 1.00 |
+  | `PRU0111` | Patearoa | `NSY0331` | 1.00 | 1.15 |
+  | `RKA0111` | Rotokawa | `WRK0331` | 0.99 | 1.01 |
+  | `KUM0111` | Kūmara | `KUM0661` | 0.98 | 1.5 |
+  | `TRC0331` | Te Rapa | `TWH0331` | 0.97 | 1.00 |
+  | `TVT0111` | Teviot | `CYD0331` | 0.97 | 1.01 |
+  | `GLN0111` | Glenbrook | `GLN0332` | 0.96 | 1.41 |
+  | `NGA0331` | Ngāwhā | `KOE0331` | 0.88 | 0.91 |
+
+  Ngāwhā's output is flat, so its correlation means little; the energy agrees. `WHL0661` (White Hill, 2007-08) maps
+  to `NMA0331`. With these mapped, no counted point of 0.5 GWh or more is left unmatched in any month sampled from
+  2009 on.
+- **The reconciliation data isn't consistent before mid-2008.** Two samples a year, 2005-22 (all months 2007):
+  - **To February 2007**, much embedded hydro is missing: Clyde, Hangatiki, Ongarue and Hokitika don't appear. The
+    layer reads 0.6-1.4% of generation, under half the later level.
+  - **March 2007 to April 2008**, the four large retailers report injection at urban grid exit points (Penrose 0221
+    and 1101, Addington, Bromley, Henderson, Hepburn Rd, Mt Roskill, Albany, Hamilton, Halfway Bush 0332): up to
+    ~50 GWh a month, shaped like demand (morning and evening peaks). Nothing in the data says what it is.
+  - **From May 2008** it's steady: 2.0-2.3% in Jul and Oct 2008, about 2-2.9% every year since.
+  - **Otāhuhu `OTA0221`** keeps ~2 GWh a month into 2009.
+- **2009** (where Generation_MD starts covering embedded stations): 93 MW on average, 2.01% of generation; by month
+  1.63% (Apr) to 2.46% (Oct).
+- **Live estimate back-test, 2023-26** (45 months; each month's half-hours estimated from earlier months' average
+  days by grid exit point):
+
+  | Estimate | Bias | Mean absolute error, month's average | 90th percentile | Half-hourly mean absolute |
+  | --- | --- | --- | --- | --- |
+  | Month two before (A) | +0.5% | 11.8% | 23% | 14.9 MW |
+  | Same month a year before (B) | +0.1% | 10.1% | 19% | 13.7 MW |
+  | B scaled by the change from 14 to 2 months before (C) | +1.5% | 12.9% | 26% | 16.5 MW |
+  | **Mean of A and B (D)** | +0.3% | **9.1%** | **16%** | **12.9 MW** |
+
+  The layer averages 105 MW. D is the site's method (`embedded.blend`). For the named plants, D gives:
+  - Teviot (4.3 MW average): out by 2.3 MW (90th percentile 5.0); A gives 3.3 MW.
+  - Ngāwhā, whole station (50 MW): 4.9 MW (11.6); A gives 6.3 MW. Ngāwhā's error is mostly outages.
+- **Missing readings are zero.** Each reconciliation file covers its whole month and leaves zero readings out (17-19%
+  of a month's point-by-half-hour cells). Treating them as gaps put the live estimate ~10% high, which accounted for
+  the earlier +8% bias.
+- **Daily shape:** nearly level overnight, with a small morning rise and an evening one (Sep 2026: 109-128 MW by
+  hour). The evening rise is hydro following demand, not solar leaking in.
+- **Fuel:** from public documents per point (`facilities/embedded_points.csv`, with sources). Otherwise the
+  registry's split (`facilities/embedded_registry_split.csv`, `embedded_split.py`: GUEHMT capacity by fuel at the
+  latest month less dispatched plant, weighted by typical capacity factors; refresh yearly). Otherwise unclassified.
+
 ## Dispatch against metered, and records (`dispatch_vs_metered.py`, `dispatch_metered_fit.py`, 1 Nov 2026)
 
 `dispatch_vs_metered.py` builds every month from Sep 2020 twice from the stored history states, with the site's own

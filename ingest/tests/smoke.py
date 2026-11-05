@@ -328,5 +328,42 @@ j = sm['t'].index(int(pd.Timestamp('2026-10-16', tz='Pacific/Auckland').timestam
 check(sm['lowO']['NZ'][j] == 0 and sm['lowC']['SI'][j] == 0 and sm['lowOx']['NI'][j] == 0 and sm['lowO']['SI'][j - 1] is None,
       'offered: daily lowest headroom (offered less output, never below zero; no offers, no figure)')
 
+# other embedded generation (embedded.py): a synthetic reconciliation file and month
+import gzip as _gzip  # noqa: E402
+
+import embedded as emb  # noqa: E402
+
+lines = ['PointOfConnection,Network,Island,Participant,TradingDate,TradingPeriod,TradingPeriodStartTime,FlowDirection,KilowattHours']
+for day in ('2026-01-05', '2026-01-06'):
+    for tp in range(1, 49):
+        hh = f'{(tp - 1) // 2:02d}:{30 * ((tp - 1) % 2):02d}'
+        sun = 1000 if 16 <= tp <= 36 else 0
+        for poc, net, tr, kwh in (('AAA0331', 'DUNE', 'XXXX', 2500), ('AAA0331', 'DUNE', 'SUNY', sun),
+                                  ('BBB0331', 'MERI', 'MERI', 5000), ('GLN0332', 'COUP', 'ALNT', 700),
+                                  ('HWB0331', 'DUNE', 'CNIR', 4000), ('AAA0331', 'DUNE', 'XXXX', 0)):
+            lines.append(f'{poc},{net},SI,{tr},{day},{tp},{hh},Injection,{kwh}')
+        lines.append(f'AAA0331,DUNE,SI,XXXX,{day},{tp},{hh},Offtake,9999')
+inj = emb.read_recon(_gzip.compress('\n'.join(lines).encode()))
+t0 = int(pd.Timestamp('2026-01-05', tz='Pacific/Auckland').timestamp() * 1000)
+js_e = {'t0': t0, 'step': 1_800_000, 'N': 96, 'plants': [
+    {'name': 'A hydro', 'fuel': 'hydro', 'poc': ['AAA0331'], 's': [1.0] * 96},
+    {'name': 'Deep Stream', 'fuel': 'hydro', 'poc': ['WPG0331'], 's': [6.0] * 96},
+    {'name': 'A farm', 'fuel': 'solar', 'poc': ['AAA0331'], 's': [9.0] * 96}]}
+o_e, s_e = emb.residual(inj, js_e)
+roles = s_e.role.to_dict()
+check(roles[('AAA0331', 'DUNE', 'SUNY')] == 'solar' and roles[('BBB0331', 'MERI', 'MERI')] == 'generator'
+      and roles[('GLN0332', 'COUP', 'ALNT')] == 'exclude' and roles[('AAA0331', 'DUNE', 'XXXX')] == 'other',
+      'embedded: series sorted into solar, generator network, excluded and other')
+check(abs(o_e['AAA0331'].mean() - 4.0) < 1e-9 and len(o_e) == 96 and not o_e.isna().any().any(),
+      f'embedded: injection less what is counted at the point (5 - 1 MW; solar plants not counted) ({o_e["AAA0331"].mean():.2f})')
+check(abs(o_e['HWB0331'].mean() - 2.0) < 1e-9, 'embedded: a metered point is counted at its grid exit point (8 - 6 MW)')
+prof = emb.profile(o_e)
+check(prof.shape == (48, o_e.shape[1]) and abs(emb.carry(prof, o_e.index)['AAA0331'].mean() - 4.0) < 1e-9,
+      'embedded: average day by half-hour, carried forward')
+bl = emb.blend(prof, prof * 3)
+check(abs(bl['AAA0331'].mean() - 8.0) < 1e-9 and emb.blend(None, prof) is prof, 'embedded: blend of the latest month and a year earlier')
+check(emb.fuel_of('SVL0331') == {'bio': 1.0} and emb.fuel_of('BOB1101') == {'other': 1.0} and emb.name_of('ABY0111') == 'Opuha'
+      and emb.name_of('SVL0331') == '', 'embedded: documented fuels, unclassified Bombay, names only where tied to the point')
+
 print(f'\n{len(failures)} failed' if failures else '\nall passed')
 sys.exit(1 if failures else 0)
