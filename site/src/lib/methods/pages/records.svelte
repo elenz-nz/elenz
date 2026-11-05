@@ -73,7 +73,7 @@
 <p>See <a href="/methods/history">History since 1997</a>.</p>
 <p>Anything newer comes from dispatch data, the market’s 5-minute targets. Dispatch and metered figures agree closely on average, but not quite at the extremes that records are made of, so dispatch data is corrected before it is compared with a record:</p>
 <ul>
-	<li>the plants dispatch reads systematically off are scaled to their meters: Ngāwhā (only Ngāwhā B is dispatched), Glenbrook and Kawerau Mill;</li>
+	<li>the plants dispatch reads systematically off are scaled to their meters: Ngāwhā (only Ngāwhā B is dispatched), Glenbrook and Kawerau (Onepu);</li>
 	<li>each record’s usual shift is taken off: how far a month’s highest (or lowest) half-hour, day, week or month in dispatch data usually sits from the metered one. Wind’s highest half-hour, for example, reads about 10 MW high nationally;</li>
 	<li>what is left still strays a little from month to month. The <b>margin</b> is how far that goes nine months in ten: about 10 MW for peak wind, 25–35 MW for demand, 0.3–0.6 points for the renewable share.</li>
 </ul>

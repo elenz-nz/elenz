@@ -19,7 +19,7 @@ Official and provisional. A record is official once it rests on final data: mete
 publishes a month's metering 5-6 weeks after it ends: meta.source == 'metered'), final prices, metered HVDC. Months
 after that (dispatch data) can set provisional records, shown as such until the metered month confirms them or
 doesn't. Dispatch and metered averages agree closely, but a few plants are off (Ngāwhā: only Ngāwhā B is dispatched;
-Glenbrook; Kawerau Mill) and dispatch half-hours, being instant targets averaged, run a little beyond the metered
+Glenbrook; Kawerau (Onepu)) and dispatch half-hours, being instant targets averaged, run a little beyond the metered
 extremes. So a dispatch month is judged on corrected figures (facilities/dispatch_adjust.json, from
 analysis/dispatch_metered_fit.py): those plants scaled to their meters, then each record's usual shift taken off. It is
 a provisional record only when it beats the official one by more than the record's margin `m` (how far a month

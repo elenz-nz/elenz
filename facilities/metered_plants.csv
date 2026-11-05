@@ -46,7 +46,7 @@ KAW0111,kawerau,Kawerau (Te Ahi O Maui),geo,,,,,,,
 KAW0111,kawerau_geo,Kawerau TG1/TG2,geo,,,,,6,,binary plants on the Kawerau field (1989 and 1993; not dispatched)
 KAW0111,*,Kawerau TG1/TG2,geo,,,2017-12,,,,
 KAW0111,*,Kawerau (Te Ahi O Maui),geo,,2018-01,,,,,
-KAW0112,norskeskog,Kawerau Mill CoGen,bio,,,,,,,pulp mill cogeneration (see overrides.toml)
+KAW0112,norskeskog,Kawerau (Onepu),geo,,,,,,,the site's grid connection (see overrides.toml); Grid_import stands in from 2013 to 2019 (metered.py)
 KAW1101,kawerau_new,Kawerau,geo,,,,,,,
 KAW2201,kawerau_(topp2),Kawerau (Te Ahi O Maui),geo,,,2025-11,,,,Te Ahi O Maui moved here from KAW0111 in Sep 2025
 KAW2201,kawerau_(topp2),Kawerau (Te Ahi O Maui),geo,,2025-12,,0.35,,,one code for both plants once TOPP2 runs (Dec 2025): split by their dispatch shares

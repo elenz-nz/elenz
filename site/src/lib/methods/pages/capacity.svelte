@@ -45,7 +45,7 @@
 
 <h2 id="rules">How capacity is counted</h2>
 <ul>
-	<li><b>From when the history has the plant.</b> Capacity counts from the first month the history has a plant’s output, even if the plant is older, so a gap in the data doesn’t drag its capacity factor down. This affects the embedded stations before April 1999 (the metered files start then), Highbank before March 2002 and Kawerau Mill before 2020.</li>
+	<li><b>From when the history has the plant.</b> Capacity counts from the first month the history has a plant’s output, even if the plant is older, so a gap in the data doesn’t drag its capacity factor down. This affects the embedded stations before April 1999 (the metered files start then), Highbank before March 2002 and Kawerau (Onepu) before 2013.</li>
 	<li><b>Consent limits:</b> where a plant is installed bigger than it is allowed to run, the limit counts. Manapōuri has 854 MW installed but may run at 800 MW.</li>
 	<li><b>Stored units count:</b> a unit that is mothballed but not retired still counts. One of Huntly’s Rankine units was in storage from 2013 to 2021, so their capacity factor over those years is lower than for the units running.</li>
 	<li><b>Embedded solar</b> uses the distributed generation registry’s installed capacity by month, less the dispatched solar farms (see <a href="/methods/embedded-solar">embedded solar</a>), with the latest month carried on.</li>
@@ -88,7 +88,7 @@
 <h2 id="limits">Known limits</h2>
 <ul>
 	<li><b>Uncertain rows.</b> New Plymouth counts its full 600 MW until it was mothballed in December 2007, though its output says units were run down earlier. Ōtāhuhu A counts its four 45 MW turbines, without two later units whose size wasn’t found. Ōhaaki’s derating from 104 MW to about 65 MW isn’t dated. Clyde’s rise to 464 MW is dated from its output (November 2015), not the consent change (2005). Each is marked in the file.</li>
-	<li><b>Dispatch and metered output differ for a few plants:</b> most agree within a fraction of a percent, but Ngāwhā, Glenbrook, Kawerau Mill and stations on block-dispatched river chains read differently (see <a href="/methods/history#seam">history</a>), so their capacity factors for the latest weeks, which use dispatch data, differ from the metered ones.</li>
+	<li><b>Dispatch and metered output differ for a few plants:</b> most agree within a fraction of a percent, but Ngāwhā, Glenbrook, Kawerau (Onepu) and stations on block-dispatched river chains read differently (see <a href="/methods/history#seam">history</a>), so their capacity factors for the latest weeks, which use dispatch data, differ from the metered ones.</li>
 	<li>Plants not in the market data, such as small embedded hydro and industrial cogeneration that isn’t metered, aren’t counted in either the output or the capacity.</li>
 </ul>
 
