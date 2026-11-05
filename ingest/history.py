@@ -88,8 +88,8 @@ BUILD = 9                    # bump to rebuild every month's JSON after changing
                              # spread and revenue by fuel, bioenergy and waste heat; 6: metered history back to Aug 1997,
                              # metered generation wherever published, plant groups; 7: Generation_MD's clock-numbered
                              # change days before 2009 renumbered (metered.straighten()), Mill Creek 2014-15, peak.disp)
-                             # 8: Tekapo A and B's names, Huntly in September 2020; 9: (being collected, see
-                             # facilities/NEXT_REBUILD.md)
+                             # 8: Tekapo A and B's names, Huntly in September 2020; 9: Kawerau (Onepu), geothermal
+                             # from 2013
 GEN_FUELS = ('geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
 DISPATCHABLE = ('hydro', 'gas', 'coal', 'diesel', 'batt')   # as DISPATCHABLE in site/src/lib/tracker/series.js
 WRITE_BUDGET = 3000          # KV writes a day (UTC) for this job; a full rebuild needs ~800. Free plan: 280 (see above)
