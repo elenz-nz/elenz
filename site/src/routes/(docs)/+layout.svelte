@@ -16,7 +16,7 @@
 	// phones: the contents are a dropdown naming the page you're on, instead of a row of pills (design decision DOC-04,
 	// 31 Oct 2026); it closes when a page is chosen
 	const here = $derived(path === '/about' ? (atContact ? 'Contact' : 'About') : path === '/guide' ? 'Using Elenz' : path === '/privacy' ? 'Privacy' : path === '/methods' ? 'Data and methods'
-		: path === '/methods/sources' ? 'Every data source' : (TOPICS.find((t) => path === `/methods/${t.slug}`)?.title ?? 'Contents'));
+		: path === '/methods/sources' ? 'Source register' : (TOPICS.find((t) => path === `/methods/${t.slug}`)?.title ?? 'Contents'));
 	let dropOpen = $state(false);
 	$effect(() => { void page.url.href; dropOpen = false; });
 </script>
@@ -35,14 +35,14 @@
 		<p>Data and methods</p>
 		<ul>
 			<li><a href="/methods" aria-current={cur('/methods')}>Overview</a></li>
-			<li><a href="/methods/sources" aria-current={cur('/methods/sources')}>Every data source</a></li>
+			<li><a href="/methods/sources" aria-current={cur('/methods/sources')}>Source register</a></li>
 		</ul>
 	</div>
 	<div>
-		<p>How each series is built</p>
+		<p>How each figure is built</p>
 		<ul>
 			{#each TOPICS as t (t.slug)}
-				<li><a href="/methods/{t.slug}" aria-current={cur(`/methods/${t.slug}`)}>{t.title}{#if t.estimate}<span class="est-dot" title="Includes estimates"></span>{/if}</a></li>
+				<li><a href="/methods/{t.slug}" aria-current={cur(`/methods/${t.slug}`)}>{t.title}{#if t.estimate}&#8288;<span class="est-dot" title="Includes estimates"></span>{/if}</a></li>
 			{/each}
 		</ul>
 	</div>

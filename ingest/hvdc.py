@@ -21,7 +21,7 @@ FIT = (0.6533, 0.3386, -0.0639, 0.0231, 41.29)
 LOSS = 5.862e-05     # MW of link loss per MW² of transfer
 
 # How metered HVDC is read (history.py re-reads every month before 2003 once when this goes up). 2: the two-row
-# months, Dec 1997 to Dec 2002 (39 of them), estimate the receiving end (below) instead of counting it as zero.
+# months, Dec 1997 to Dec 2002 (38 of them), estimate the receiving end (below) instead of counting it as zero.
 VERSION = 2
 # The old link's losses, sending end minus receiving end, as a·P + b·P² of the power sent (MW), fitted on every
 # half-hour of 1996-2002 where the files meter both ends (old four-row and per-pole layouts): mean error 1.8 MW

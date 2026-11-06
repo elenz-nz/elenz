@@ -43,6 +43,8 @@
 			<dd>Select a name in the list to go from a fuel to its plants and their grid connections; ‹ Back above the list, or the browser’s Back, steps out. The menu above the generation chart groups it other ways: by site, hydro scheme, owner, flexibility, renewable vs fossil, inverter vs synchronous. MW/% switches to shares.</dd>
 			<dt>Compare sources</dt>
 			<dd>The two chart buttons beside MW/% switch between stacked areas and lines, one per source, so plants or fuels can be compared on one scale: drill into a fuel or choose By site, then hide what you don’t need. Up to eight lines get their own colours, chosen to stay distinguishable with colour-blindness. $ Price draws the island prices over the chart on a right axis (spike-proof: linear to about $100, compressed above).</dd>
+			<dt>Spot the estimates</dt>
+			<dd>Embedded solar and other embedded generation are calculated estimates, so both are hatched and marked “est.” in the list. On the demand chart, the dashed line is With embedded generation, grid demand with both layers added back.</dd>
 			<dt>Hide and show</dt>
 			<dd>Select a colour square to hide that layer; the address keeps what’s hidden, so a shared link shows the same. Double-click it, Shift+click it or press and hold it to show only that one (again to show everything); All and None above the list do the rest. In long lists, type in Filter (it also finds a plant by its other names, such as Taranaki Combined Cycle for Stratford), and select a fuel heading to fold its plants. A plant's own view lists its other names and, where its metered history counts something different from the dispatch data, says what.</dd>
 			<dt>Open more charts</dt>

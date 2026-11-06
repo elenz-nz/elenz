@@ -1,14 +1,14 @@
 <script lang="ts">
-	// The reports and documents a method page cites, from the registry. `inBody`: the page gives the section its own
-	// heading (the standard structure); otherwise the box carries a small "References" title.
-	import { refsFor } from './registry.js';
-	let { slug, inBody = false }: { slug: string; inBody?: boolean } = $props();
+	// A method page's References section: the reports and documents it cites, from the registry, then the code and
+	// evidence files it describes (the topic's `code`).
+	import { REPO, refsFor, topic } from './registry.js';
+	let { slug }: { slug: string } = $props();
 	const refs = $derived(refsFor(slug));
+	const code = $derived(topic(slug)?.code ?? []);
 </script>
 
 {#if refs.length}
-	<section class="mt-data" aria-labelledby={inBody ? 'references' : 'mt-refs-h'}>
-		{#if !inBody}<h2 id="mt-refs-h">References</h2>{/if}
+	<section class="mt-data" aria-labelledby="references">
 		<ul>
 			{#each refs as r (r.id)}
 				<li>
@@ -18,4 +18,7 @@
 			{/each}
 		</ul>
 	</section>
+{/if}
+{#if code.length}
+	<p class="note">Code and evidence: {#each code as c, i (c)}{i ? ', ' : ''}<a href={REPO + c}><code>{c}</code></a>{/each}.</p>
 {/if}

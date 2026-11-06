@@ -64,8 +64,8 @@
 			if (view.histFirst == null || view.histEnd == null || !Number.isFinite(view.histFirst) || !Number.isFinite(view.histEnd)) return '';   // an empty window has no dates to name
 			const days = `${dayYear(view.histFirst)} to ${dayYear(view.histEnd)}`;
 			return view.past
-				? `Dispatch data from the Electricity Authority's daily dispatch files, ${days}.`
-				: `Dispatch data from the Electricity Authority: its daily dispatch files, ${days}, then its real-time dispatch feed to ${when(view.liveEnd)}.`;
+				? `History from the Electricity Authority, ${days}: metered data where it has been published, then its daily dispatch files.`
+				: `History from the Electricity Authority, ${days}: metered data where it has been published, then its daily dispatch files. After that, its real-time dispatch feed to ${when(view.liveEnd)}.`;
 		}
 		const mixed = meta.api_from !== null && meta.api_from > meta.end - 7 * 864e5 + 3e5;
 		return mixed
@@ -228,7 +228,7 @@
 			<ShareLink links={() => tracker?.links() ?? null} />
 			<!-- History also while that history loads: it flashed Live on every step through 30 days (TRK-05, 26 Oct 2026) -->
 			<StatusPill id="about-data" kind={!meta ? '' : pastView ? 'hist' : live ? 'live' : 'stale'}
-				title={!meta ? '' : pastView ? "History from the EA's daily dispatch files" : live ? `Data to ${when(meta.end)}. Updated from the EMI real-time dispatch feed every 5 minutes` : `The newest data is more than ${LIVE_MINUTES} minutes old`}>
+				title={!meta ? '' : pastView ? "History from the EA's metered data and daily dispatch files" : live ? `Data to ${when(meta.end)}. Updated from the EMI real-time dispatch feed every 5 minutes` : `The newest data is more than ${LIVE_MINUTES} minutes old`}>
 				{#snippet label()}
 					{#if !meta || live && !pastView}<span class="pword">Live · </span>{meta ? clockOnly(meta.end) : ''}{:else if pastView}History{:else}Delayed<span class="ptime"> · {clockOnly(meta.end)}</span><span class="pday">{when(meta.end).slice(clockOnly(meta.end).length)}</span>{/if}
 				{/snippet}

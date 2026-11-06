@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { REPO } from '../registry.js';
-	import Calculations from '../Calculations.svelte';
+		import Calculations from '../Calculations.svelte';
 	import DataSources from '../DataSources.svelte';
 	import GoodFor from '../GoodFor.svelte';
 	import References from '../References.svelte';
@@ -23,11 +22,7 @@
 
 <h2 id="data-sources">Data sources</h2>
 <p>Elenz uses metered flows wherever the Electricity Authority (EA) has published them. For later periods, the transfer is a calculated estimate made from each island’s generation and demand.</p>
-<DataSources slug="hvdc" roles={{
-	hvdcflows: ['History: metered', 'Flows at both ends of the link, for every month the EA has published. They are also the record the calculated estimate was fitted to.'],
-	dispatch: ['Recent weeks: calculated estimate', 'Each island’s generation and grid demand, which feed the calculated estimate of the transfer until metered flows are published.'],
-	rtd: ['Live week: calculated estimate', 'Each island’s generation and grid demand, which feed the calculated estimate of the transfer for the last 7 days.'],
-}} />
+<DataSources slug="hvdc" />
 
 <h2 id="how-it-works">How it works</h2>
 
@@ -49,7 +44,7 @@
 			<thead><tr><th>Term</th><th>Meaning</th><th>Unit</th></tr></thead>
 			<tbody>
 				<tr><td>Mid-link MW</td><td>Transfer at the midpoint of the link, positive northward</td><td>MW</td></tr>
-				<tr><td>Generation</td><td>Dispatched generation in that island, excluding embedded solar</td><td>MW</td></tr>
+				<tr><td>Generation</td><td>Dispatched generation in that island, excluding embedded solar and other embedded generation</td><td>MW</td></tr>
 				<tr><td>Demand</td><td>Grid demand in that island</td><td>MW</td></tr>
 				<tr><td>0.653, 0.339, 0.064, 0.023 and 41.3</td><td>Fitted coefficients, rounded here from the values in the code</td><td>None</td></tr>
 			</tbody>
@@ -112,8 +107,8 @@ Haywards end = mid-link MW − losses ÷ 2</p>
 	<table>
 		<thead><tr><th>Period</th><th>Status</th><th>Data</th></tr></thead>
 		<tbody>
-			<tr><td>August 1997 to October 2000, most months</td><td>Metered</td><td>One set of rows for each pole, with each end’s northward and southward flow.</td></tr>
-			<tr><td>December 1997, August 1998, June and September 1999, most of 2000, and all of 2001 and 2002</td><td>Metered and calculated estimate</td><td>The file holds only each end’s sending side. The receiving side is a calculated estimate: the power sent less the link’s losses, fitted on months that meter both ends.</td></tr>
+			<tr><td>August 1997 to October 2000, most months</td><td>Metered</td><td>One set of rows for each pole (<code>DCP1</code> and <code>DCP2</code>), with each end’s northward and southward flow.</td></tr>
+			<tr><td>38 months: December 1997, August 1998, June and September 1999, February to September 2000, and November 2000 to December 2002</td><td>Metered and calculated estimate</td><td>The file holds only each end’s sending side. The receiving side is a calculated estimate: the power sent less the link’s losses, fitted on months that meter both ends.</td></tr>
 			<tr><td>January 2003 to the latest published month</td><td>Metered</td><td>Flows at the Benmore and Haywards connection points (<code>BEN2201</code>, <code>BEN0161</code>, <code>HAY2201</code>, <code>HAY1101</code>). The 350 kV rows (<code>BEN3501</code>, <code>HAY3501</code>) repeat the totals, so we leave them out.</td></tr>
 			<tr><td>After the latest published month</td><td>Calculated estimate</td><td>The calculated estimate described under Estimated flows. The change to it falls 2 to 6 weeks before today, always at the start of a month.</td></tr>
 		</tbody>
@@ -121,5 +116,4 @@ Haywards end = mid-link MW − losses ÷ 2</p>
 </div>
 
 <h2 id="references">References</h2>
-<References slug="hvdc" inBody />
-<p class="note">Code: <a href={REPO + 'ingest/hvdc.py'}><code>ingest/hvdc.py</code></a>. Fit and evidence: <a href={REPO + 'analysis/README.md'}><code>analysis/README.md</code></a>.</p>
+<References slug="hvdc" />

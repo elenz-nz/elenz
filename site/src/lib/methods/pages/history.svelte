@@ -1,76 +1,139 @@
 <script lang="ts">
-	import { REPO, ref } from '../registry.js';
+	import { REPO, ref, sourceHref } from '../registry.js';
+	import DataSources from '../DataSources.svelte';
+	import GoodFor from '../GoodFor.svelte';
+	import Handover from '../Handover.svelte';
+	import References from '../References.svelte';
 </script>
 
-<h2 id="layers">Three sources, by age</h2>
-<p>Each stretch of time uses the best data published for it. Going back from now:</p>
-<ol>
-	<li><b>The last seven days</b>: the real-time dispatch feed, every 5 minutes (missed intervals are asked for again; ones with no case are interpolated).</li>
-	<li><b>Back to the latest metered month</b> (usually five to ten weeks, as each month’s metering arrives five to six weeks after it ends): the EA’s daily dispatch files, the same dispatch cases, arriving 1–4 days late.</li>
-	<li><b>Every month the EA has published metering for, back to August 1997</b>: metered data, what each station actually delivered to the grid, as the market settles it.</li>
-</ol>
-<p>Prices are the EA’s final prices throughout the history, and HVDC is metered wherever published (about two weeks behind). The history job runs every six hours, adds months as the EA publishes them, and rebuilds every month whenever the plant register, the corrections or the metered plant table change.</p>
+<aside class="mt-caveats" aria-label="Key caveats">
+	<p class="k">Key caveats</p>
+	<ul>
+		<li>Totals step up by about 2% of generation in January 2009, when other embedded generation starts. Before then those plants are missing.</li>
+		<li>Annual totals from 1999 run 1% to 3.2% below MBIE’s net generation, which also counts generation the Electricity Authority’s data doesn’t show.</li>
+		<li>Glenbrook and Kawerau (Onepu) read differently in metered and dispatch data, so each can step where the two meet.</li>
+	</ul>
+	<p><a href="#limitations">Accuracy and limitations</a> has the detail.</p>
+</aside>
 
-<h2 id="metered">A metered month</h2>
-<p>A month is built from the EA’s monthly metered files, half-hour by half-hour:</p>
+<h2 id="introduction">Introduction</h2>
+<p>The history is the record behind every view older than the live week. It runs back to 1 August 1997, and holds generation by plant and fuel, grid demand, HVDC transfer and prices.</p>
+<p>Elenz builds it month by month, so that one time axis can run from 1997 to today. Plants that have closed stay in the record, including New Plymouth, Ōtāhuhu A and B, Southdown, Te Awamutu and the Taranaki Combined Cycle.</p>
+
+<h2 id="data-sources"><span id="layers"></span>Data sources</h2>
+<Handover />
+<p>Each dataset does the following job in the history.</p>
+<DataSources slug="history" />
+
+<h2 id="how-it-works">How it works</h2>
+<p>The history job runs every 6 hours. It adds each month as the Electricity Authority (EA) publishes it, and rebuilds every month when the plant register, the corrections or the metered plant table change.</p>
+
+<h3 id="metered">A metered month</h3>
+<p>A metered month is built half-hour by half-hour from the EA’s monthly files. Each step below deals with one way the files need interpreting.</p>
 <dl>
-	<dt>Generation</dt>
-	<dd><code>Generation_MD</code>: each station’s output by connection point and generator code. Each code is mapped to a plant, fuel and island in <a href={REPO + 'facilities/metered_plants.csv'}><code>facilities/metered_plants.csv</code></a> (118 generator codes plus the old embedded meters, with date ranges and shares), and connection points the dispatch data never uses, many of them retired, get their island from the EA’s network supply points table. The build warns about any code it doesn’t know.</dd>
-	<dt>Embedded stations</dt>
-	<dd><code>Generation_MD</code> covers stations on local networks only from January 2009. Before that, the site uses <code>Embedded_generation</code> under the old meter codes (Rotokawa <code>RKA0111</code>, Ngāwhā <code>NGA0331</code>, Kaimai <code>KMI0331</code>, Te Rapa <code>TRC0331</code>, Tararua <code>TWF0331</code>/<code>2</code>, Highbank <code>HBK0661</code> and others). Only stations the site also shows later are included, so totals don’t jump in 2009.</dd>
+	<dt>Mapping</dt>
+	<dd>Each code in <a href={sourceHref('genmd')}>metered generation</a> (<code>Generation_MD</code>) is mapped to a plant, fuel and island in <a href={REPO + 'facilities/metered_plants.csv'}><code>facilities/metered_plants.csv</code></a>, with date ranges and shares. Many connection points in these files are retired, so <a href={sourceHref('nsp')}>network supply points</a> supplies their islands. Each build warns about any code it doesn’t recognise.</dd>
+	<dt>Stations on local networks</dt>
+	<dd>Metered generation covers these stations only from January 2009. Before that, we read <a href={sourceHref('embedded')}>embedded generation</a> (<code>Embedded_generation</code>) under the old meter codes, such as Rotokawa <code>RKA0111</code>, Ngāwhā <code>NGA0331</code> and Tararua <code>TWF0331</code> and <code>TWF0332</code>. We include only stations that Elenz also shows later.</dd>
 	<dt>Net meters</dt>
-	<dd>At some embedded points <code>Generation_MD</code> records output net of local load (Mangahao about 10% of its gross output, Cobb about 35%, Whareroa about 50%). Where the embedded meter at a listed point reads more, the difference is added to that point’s plant.</dd>
+	<dd>At some connection points on local networks, metered generation is net of local load. It reads only about 10% of Mangahao’s gross output, about 35% of Cobb’s and about 50% of Whareroa’s. Where the embedded generation meter reads more, we add the difference to that point’s plant.</dd>
 	<dt>Shared meters</dt>
-	<dd>Some meters see two plants, split by their shares in the dispatch data: Deep Stream hydro and Mahinerangi wind (30/70, from June 2011); Te Ahi O Maui and Kawerau’s TOPP2 (35/65, from December 2025). Pātea’s three unit rows (from June 2026) each repeat the station total, so one is used.</dd>
-	<dt>Double readings</dt>
-	<dd>Trustpower’s embedded meters (Kaimai, Rotokawa, Tararua, Highbank, Paerau, Waipori, Teviot) read double until July 2005: a month whose peak is more than 1.4 times the plant’s nameplate is halved.</dd>
-	<dt>Gaps filled from dispatch</dt>
-	<dd>Where the metering lacks a plant, its dispatch figures are used: batteries (always, as dispatch nets their charging), solar farms not in the metering yet, and any plant whose metered energy is under half its dispatch energy in a month.</dd>
-	<dt>Demand and HVDC</dt>
-	<dd>From the metered grid flows; see <a href="/methods/demand#history">demand</a> and <a href="/methods/hvdc#metered">HVDC</a>.</dd>
-	<dt>Embedded solar</dt>
-	<dd>The same model with each month’s installed capacity: none before the registry starts in August 2013, ERA5 reanalysis sunshine for 2013–15, the satellite from 2016. See <a href="/methods/embedded-solar">embedded solar</a>.</dd>
+	<dd>Two meters each carry two plants, and we split them by their shares in the dispatch data. Deep Stream and Mahinerangi are split 30% and 70% from June 2011. Kawerau (Te Ahi O Maui) and Kawerau (TOPP2) are split 35% and 65% from December 2025.</dd>
+	<dt>Repeated rows</dt>
+	<dd>Pātea has three unit rows from June 2026, and each repeats the station total, so we use one.</dd>
+	<dt>Doubled readings</dt>
+	<dd>Trustpower’s embedded meters at Kaimai, Rotokawa, Tararua, Highbank, Paerau, Waipori and Teviot read double until July 2005. We halve a month’s reading if its peak is more than 1.4 times the plant’s nameplate capacity.</dd>
+	<dt>Plants filled from dispatch data</dt>
+	<dd>Some plants use their dispatch figures even in a metered month. Batteries always do, because dispatch nets their charging. So do solar farms not yet in the metered data, and any plant whose metered energy is under half its dispatch energy.</dd>
+	<dt>Demand and HVDC transfer</dt>
+	<dd>These come from the metered grid flows, as <a href="/methods/demand#history">Demand</a> and <a href="/methods/hvdc#metered">HVDC transfer</a> explain.</dd>
+	<dt>Embedded generation</dt>
+	<dd><a href="/methods/embedded-solar">Embedded solar</a> and <a href="/methods/other-embedded">other embedded generation</a> are added as calculated estimates. Each page explains how its layer is made.</dd>
 </dl>
-<p>Plants that have closed are included: New Plymouth, Ōtāhuhu A and B, Southdown, Te Awamutu, and Taranaki Combined Cycle (within Stratford).</p>
 
-<h2 id="seam">Where the sources hand over</h2>
-<p>Over September 2020 to September 2026, where both exist, the site’s dispatch and metered figures agree closely: national wind and hydro within 0.2% over the period, demand within 1% in each island, and a half-hourly national correlation of 0.999 every month. The differences are in a few plants:</p>
+<h3 id="seam">Where the sources hand over</h3>
+<p>Where both exist, the dispatch and metered figures agree closely. Over September 2020 to September 2026, national wind and hydro agree within 0.2%, and demand agrees within 1% in each island. National generation has a half-hourly correlation of 0.999 in every month.</p>
+<p>A few plants differ, and we treat them in two ways.</p>
 <ul>
-	<li><b>Ngāwhā</b>: only Ngāwhā B is dispatched, so dispatch shows about 45% less than the whole station’s meter (about 25 MW).</li>
-	<li><b>Glenbrook</b>: dispatch sees part of the plant, about 30% less than its meter.</li>
-	<li><b>Kawerau (Onepu)</b>: its meter is a whole site’s grid connection, not one generator’s (see <a href="/methods/generation#onepu">generation</a>), so dispatch reads about 45% more.</li>
-	<li><b>Teviot</b>: in the metered history, not dispatched.</li>
-	<li><b>River chains</b> <a href={ref('block')}>dispatched as a block</a>: a station’s dispatch can differ from its meter while the chain’s total agrees.</li>
+	<li><b>Ngāwhā and Teviot:</b> the dispatch data has only part of Ngāwhā and none of Teviot. We fill in the rest of each as a calculated estimate, so neither steps at the handover. <a href="/methods/other-embedded#named">Other embedded generation</a> explains how. This fill counts in the plant, its fuel and total generation. It doesn’t count in grid demand.</li>
+	<li><b>Glenbrook:</b> dispatch sees part of the plant, and its metered output runs about 1.47 times the dispatch figure. We show each as published, so Glenbrook can step down at the handover.</li>
+	<li><b>Kawerau (Onepu):</b> its meter is a whole site’s connection to the grid, and its metered output runs about 0.68 times the dispatch figure. We show each as published, so it can step up at the handover (see <a href="/methods/generation#onepu">Kawerau (Onepu)</a>).</li>
 </ul>
-<p>Dispatch half-hours, being 5-minute targets averaged, also reach slightly further at their extremes: a month’s highest half-hour of wind reads about 10 MW above the metered one nationally, hydro and demand about 20–25 MW. The site shows each as published rather than scaling one to the other, so where the history switches from metered to dispatch data, at the start of the month after the latest metered one, Ngāwhā steps down and Teviot drops out. <a href="/methods/records#official">Records</a> set in dispatch data are corrected for all of this before they count as provisional.</p>
-<p>Plant by plant, the two can differ more. On a chain dispatched as a block, the dispatch figures are the chain’s total split between stations, not each station’s output; the metered figures are the real ones. Glenbrook’s metered output is about 1.45 times its dispatch, which sees only part of the plant.</p>
+<p>Some river chains are <a href={ref('block')}>dispatched as a block</a>. One station’s dispatch figure on such a chain can differ from what it generated, while the chain’s total agrees with the meters.</p>
+<p>Dispatch data also reaches slightly further at its extremes. A month’s highest half-hour of wind reads about 10 MW above the metered figure nationally, and hydro and demand read about 20 to 25 MW above. We correct for these differences before a dispatch figure counts towards a <a href="/methods/records#official">provisional record</a>.</p>
 
-<h2 id="resolution">Resolution</h2>
-<ul>
-	<li>The 30-day view shows half-hours.</li>
-	<li>1 year and All show days, or weeks, months and years. Generation is shown as each period’s energy; demand, HVDC and prices as its average. Peak demand and peak generation come from each day’s highest half-hour.</li>
-	<li>Energy figures add up the half-hours, so they are the same at any interval.</li>
-</ul>
+<h3 id="resolution">Half-hours and longer intervals</h3>
+<p>The 30-day view shows half-hours. The 1-year and All views show days, or weeks, months and years. Generation is shown as each interval’s energy, and demand, HVDC transfer and prices as its average.</p>
+<p>Peak demand and peak generation come from each day’s highest half-hour. Energy figures add up the half-hours, so they are the same at any interval.</p>
 
-<h2 id="checks">Checks</h2>
-<ul>
-	<li>Against <a href={ref('mbie-elec')}>MBIE’s annual net generation</a> (how MBIE compiles it: <a href={ref('mbie-methods')}>Energy statistics: sources and methods</a>), which also counts industrial cogeneration and small embedded plants the EA’s metering doesn’t see: the total is 1.4–3.2% below MBIE in 2000–08 and 3.9–5.7% below in 2009–19; hydro is 1.3–2.9% below throughout; geothermal within ±5% from 2001.</li>
-	<li>Emissions follow the national inventory year to year (see <a href="/methods/emissions#checks">emissions</a>).</li>
-	<li>Metered demand matches the dispatch data’s island load within 1–2% where both exist.</li>
-</ul>
+<h2 id="interpretation">How to interpret it</h2>
+<p>A long line on the Tracker joins several kinds of data. National figures are consistent across the joins, but a few things change along the way.</p>
+<p>A step in January 2009 is the start of other embedded generation, not a change in the power system. Keep that in mind when comparing a total or a renewable share across that month. A step in one plant’s line within the last 10 weeks or so may be the handover to dispatch data.</p>
+<GoodFor rows={[
+	{ use: 'National generation and demand since 2009', level: 'good', verdict: 'Metered for most of the total, with other embedded generation added as a calculated estimate.' },
+	{ use: 'Comparing totals across January 2009', level: 'care', verdict: 'Totals step up by about 2% of generation that month.', why: 'Compare hydro, wind or thermal generation instead, because other embedded generation sits outside those fuels.' },
+	{ use: 'One plant, metered history', level: 'good', verdict: 'Metered, unless a meter is shared or the plant is shown whole.' },
+	{ use: 'One plant, recent weeks', level: 'ok', verdict: 'Dispatch data agrees closely for most plants.', why: 'Glenbrook, Kawerau (Onepu) and stations on block-dispatched chains can differ.' },
+	{ use: 'Local-network plants before January 2009', level: 'no', verdict: 'Only stations that Elenz also shows later are in the history before that month.' },
+]} />
 
-<h2 id="gaps">Known gaps</h2>
-<ul>
-	<li><b>Huntly, September 2020</b>: <code>Generation_MD</code> has no Huntly rows that month. The month uses the grid meter at <code>HLY2201</code> (<code>Grid_import</code>), which reads a few MW under the generators’ own meters because it is net of the station’s load, split between the Rankines, unit 5 and unit 6 by clearing it through their offers. Tested on the week before, where <code>Generation_MD</code> gives each unit, that split comes within about 13 MW for the Rankines and 5 MW for unit 5 on average (<a href={REPO + 'analysis/huntly_sep2020.py'}><code>analysis/huntly_sep2020.py</code></a>).</li>
-	<li><b>Matahina from October 2021</b>: no metered rows; the dispatch figures stand in.</li>
-	<li><b>Kawerau (Onepu), 2013 to 2019</b>: <code>Generation_MD</code> has no row for it until January 2020, and from then its figure is the same as <code>Grid_import</code> at <code>KAW0112</code> to the half-hour, so <code>Grid_import</code> stands in. Before 2013 very little went into the grid there (see <a href="/methods/generation#onepu">generation</a>).</li>
-	<li><b>Before April 1999</b>: <code>Embedded_generation</code> doesn’t yet have Rotokawa, Ngāwhā, Kaimai and Tararua, about 1–2% of generation in 1997–99. Geothermal in 1998–2000 is up to 15% below MBIE’s for that reason.</li>
-	<li><b>Highbank before October 2001</b>: no metered rows for it at all; it appears in <code>Embedded_generation</code> from then (25 MW).</li>
-	<li><b>Mill Creek, May 2014 to August 2015</b>: its first 16 months (60 MW of wind, commissioning from May 2014) aren’t in <code>Embedded_generation</code> or <code>Generation_MD</code>; they come from the EA’s reconciliation data, Meridian’s injection at Wilton.</li>
-	<li><b>Days the clocks change, before 2009</b>: <code>Generation_MD</code> numbers those days’ half-hours by the clock and leaves out one hour (the day’s last hour when the clocks go forward, one of the two 2–3 am hours when they go back). Each half-hour is put at its right time and the missing hour is filled from the half-hour next to it.</li>
-	<li><b>Grid imports before 2003</b>: incomplete (see <a href="/methods/demand#history">demand</a>), so the stations’ own metered generation stands in.</li>
-	<li><b>Owners</b>: today’s owners apply to the whole history.</li>
-	<li><b>Geothermal emissions before 2020</b> use 2020’s station factors, which probably understate them.</li>
-</ul>
+<h2 id="limitations"><span id="checks"></span>Accuracy and limitations</h2>
+<div class="tbl">
+	<table>
+		<thead><tr><th>Figure</th><th>Status</th><th>Typical accuracy</th></tr></thead>
+		<tbody>
+			<tr><td>Generation by plant and fuel, metered history</td><td>Metered</td><td>As published by the EA, apart from the corrections under A metered month</td></tr>
+			<tr><td>Generation by plant and fuel, recent dispatch data</td><td>Dispatch</td><td>National wind and hydro within 0.2% of metered output, September 2020 to September 2026</td></tr>
+			<tr><td>Grid demand, recent dispatch data</td><td>Dispatch</td><td>Within 1% of metered demand in each island, September 2020 to September 2026</td></tr>
+			<tr><td>Prices, history</td><td>Final price</td><td>As published by the EA</td></tr>
+			<tr><td>HVDC transfer after the latest published month</td><td>Calculated estimate</td><td>Mean error of about 10 MW (see <a href="/methods/hvdc#limitations">HVDC transfer</a>)</td></tr>
+			<tr><td>Embedded solar</td><td>Calculated estimate</td><td>About ±9% on clear days and ±19% under cloud (see <a href="/methods/embedded-solar#uncertainty">Embedded solar</a>)</td></tr>
+			<tr><td>Other embedded generation, newest weeks</td><td>Calculated estimate</td><td>A month’s average out by about 9% (see <a href="/methods/other-embedded#limitations">Other embedded generation</a>)</td></tr>
+			<tr><td>Total generation, from January 2009</td><td>Calculated estimate</td><td>The sum of the figures above, so it carries their errors</td></tr>
+		</tbody>
+	</table>
+</div>
+<p>We compare the history’s annual totals with <a href={ref('mbie-elec')}>MBIE’s net generation</a>, using the figures published on <a href={ref('figure-net')}>Figure.NZ</a>. MBIE also counts industrial cogeneration and small plant that the EA’s metered data doesn’t see, as <a href={ref('mbie-methods')}>its sources and methods</a> explain.</p>
+<div class="tbl">
+	<table>
+		<thead><tr><th>Years</th><th class="n">Elenz total below MBIE</th></tr></thead>
+		<tbody>
+			<tr><td>1998</td><td class="n">7.6%</td></tr>
+			<tr><td>1999–2008</td><td class="n">1.7–3.2%</td></tr>
+			<tr><td>2009–19</td><td class="n">1.6–2.6%</td></tr>
+			<tr><td>2020–24</td><td class="n">1.0–1.6%</td></tr>
+		</tbody>
+		<caption>Elenz’s total includes embedded solar and other embedded generation, and leaves out battery discharge.</caption>
+	</table>
+</div>
+<p>The gap has no step at 2009: it is 2.3% in 2008 and 2.0% in 2009. Before other embedded generation was added, it widened from 2.3% to 3.9% between those years. In 1998, the embedded generation meters are still incomplete.</p>
+<p>Emissions follow the national inventory from year to year (see <a href="/methods/emissions#checks">Emissions intensity</a>).</p>
+<p>Today’s owners apply to the whole history. <a href="/methods/groupings">Renewable share and groupings</a> explains what that means for the By owner view.</p>
 
-<p class="note">Code: <a href={REPO + 'ingest/history.py'}><code>ingest/history.py</code></a> (the history job), <a href={REPO + 'ingest/metered.py'}><code>ingest/metered.py</code></a> (metered months). Evidence: <a href={REPO + 'analysis/metered_check.py'}><code>analysis/metered_check.py</code></a>, <a href={REPO + 'analysis/README.md'}><code>analysis/README.md</code></a>.</p>
+<h2 id="coverage"><span id="gaps"></span>Historical coverage</h2>
+<p>Each row marks a change in the data or a known gap in it.</p>
+<div class="tbl">
+	<table>
+		<thead><tr><th>Period</th><th>What changes or is missing</th></tr></thead>
+		<tbody>
+			<tr><td>August 1997</td><td>The history starts, with metered generation for grid-connected stations.</td></tr>
+			<tr><td>August 1997 to March 1999</td><td>Embedded generation doesn’t yet have Rotokawa, Ngāwhā, Kaimai and Tararua, about 1–2% of generation. Geothermal generation in 1998 to 2000 is up to 15% below MBIE’s figure.</td></tr>
+			<tr><td>August 1997 to September 2008</td><td>Metered generation numbers the days the clocks change by the clock, and leaves out one hour. We put each half-hour at its right time and fill the missing hour from the half-hour next to it.</td></tr>
+			<tr><td>December 1997 to December 2002</td><td>38 months of HVDC flows hold only each end’s sending side (see <a href="/methods/hvdc#coverage">HVDC transfer</a>).</td></tr>
+			<tr><td>To April 2002</td><td>Highbank (25 MW) has no metered rows before October 2001, and its rows read next to nothing until April 2002.</td></tr>
+			<tr><td>To about 2003</td><td>Grid imports are incomplete, so the stations’ own metered generation stands in (see <a href="/methods/demand#history">Demand</a>).</td></tr>
+			<tr><td>January 2009</td><td>Metered generation starts covering stations on local networks. Other embedded generation starts, as a calculated estimate, about 2% of generation.</td></tr>
+			<tr><td>January 2013 to December 2019</td><td>Metered generation has no row for Kawerau (Onepu) until January 2020, so grid imports at <code>KAW0112</code> stand in. From January 2020 the two figures match to the half-hour.</td></tr>
+			<tr><td>August 2013</td><td>Embedded solar starts, as a calculated estimate.</td></tr>
+			<tr><td>May 2014 to August 2015</td><td>Mill Creek wind farm’s first 16 months aren’t in metered generation or embedded generation. They come from Meridian’s injection at Wilton in the reconciliation data.</td></tr>
+			<tr><td>September 2020</td><td>Metered generation has no Huntly rows. We use the grid meter at <code>HLY2201</code>, split between the Rankines, unit 5 and unit 6 by clearing it through their offers. Tested on the week before, the split came within about 13 MW for the Rankines and 5 MW for unit 5.</td></tr>
+			<tr><td>10 September 2020</td><td>Daily dispatch files start, so recent dispatch data is possible from here.</td></tr>
+			<tr><td>October 2021 onward</td><td>Metered generation has no rows for Matahina, so dispatch figures stand in.</td></tr>
+			<tr><td>1 November 2022</td><td>Real-time pricing starts, which changes how final prices are set (see <a href="/methods/prices#coverage">Wholesale prices</a>).</td></tr>
+			<tr><td>November 2026</td><td>Kawerau (Onepu) moved to geothermal from January 2013, and other embedded generation joined totals and shares from January 2009. Both changes moved published figures.</td></tr>
+		</tbody>
+	</table>
+</div>
+
+<h2 id="references">References</h2>
+<References slug="history" />

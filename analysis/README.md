@@ -134,7 +134,7 @@ fit (better in five of six months). Link loss between the ends ≈ 5.86e-5 × fl
 
 Early layouts (23 Oct 2026, `hvdc.VERSION` 2). Before 2003 the file has three layouts, month by month: four rows
 (`HVDC_BN/BS/HN/HS`: each end's northward and southward flow; Oct 1996 - Jan 1997), eight rows per pole (`DCP1_*`,
-`DCP2_*`; most months Feb 1997 - Oct 2000), and two rows, `HVDC_BN` and `HVDC_HS` only (39 months: Dec 1997, Aug 1998,
+`DCP2_*`; most months Feb 1997 - Oct 2000), and two rows, `HVDC_BN` and `HVDC_HS` only (38 months: Dec 1997, Aug 1998,
 Jun and Sep 1999, Feb-Sep 2000, Nov 2000 - Dec 2002; 2002 adds BEN3501/HAY3501, which repeat the same two). The
 two-row months meter only each end's sending side, so the old parser read Haywards as zero whenever power went north
 and Benmore as zero whenever it went south, which halved the mid-link transfer (Dec 1997: 367 MW average instead of
@@ -230,10 +230,14 @@ shares). Gaps: Huntly's Rankines and unit 5 have no Generation_MD rows for Sep 2
 1-9 Sep 2020 have no Huntly), Matahina none from Oct 2021 (dispatch fills).
 
 **Against MBIE's annual net generation** (Energy in New Zealand; MBIE also counts industrial cogeneration and small
-embedded plant the EA's metering doesn't see): total 1.4-3.2% below MBIE 2000-08 and 3.9-5.7% below 2009-19; hydro
-1.3-2.9% below throughout; geothermal within ±5% from 2001 (1998-2000 lack Rotokawa, Ngāwhā and Mokai before their
-meters start, up to 15% below); thermal 6-15% below (MBIE counts Glenbrook as coal and more cogeneration). The ~2%
-step in 2009 is in MBIE's thermal and geothermal series, not in the tracker's hydro or wind.
+embedded plant the EA's metering doesn't see). Re-measured on 6 Nov 2026 on the published daily history (BUILD 10), with
+MBIE's annual totals from Figure.NZ (figure.nz/chart/CSqp1BUnN4f8iyTp), the tracker's total being every source
+including embedded solar, other embedded generation and the named plants' fill, without battery discharge: 7.6% below
+in 1998, 1.7-3.2% below in 1999-2008, 1.6-2.6% below in 2009-19, 1.0-1.6% below in 2020-24. Without the layer the gap
+was 3.3-4.9% from 2009, with a step from 2.3% (2008) to 3.9% (2009); with it, 2.3% and 2.0%. Hydro 1.3-2.9% below and
+geothermal within ±5% from 2001 are the BUILD 6 figures (before Kawerau (Onepu) moved to geothermal); 1998-2000 lack
+Rotokawa, Ngāwhā and Mokai before their meters start, up to 15% below; thermal 6-15% below (MBIE counts Glenbrook as
+coal and more cogeneration). Hydro and wind have no step in 2009.
 
 **Emissions** (site factors, emissions.js) against the national inventory's "energy industries" (which also holds
 refining and gas processing, ~1.2 Mt): tracker coal + gas + diesel 4.4 Mt in 1998 against 5.6 - 1.2; 6.8 against 8.0 -
