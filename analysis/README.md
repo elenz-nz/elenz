@@ -432,6 +432,14 @@ above subtracted dispatch instead.
 - **Fuel:** from public documents per point (`facilities/embedded_points.csv`, with sources). Otherwise the
   registry's split (`facilities/embedded_registry_split.csv`, `embedded_split.py`: GUEHMT capacity by fuel at the
   latest month less dispatched plant, weighted by typical capacity factors; refresh yearly). Otherwise unclassified.
+- **Named plants in months without their metered data** (history.py BUILD 10, `embedded._rest`). Teviot's share of
+  its point's injection isn't steady: 0.69 of trader PUNZ in Sep 2026, 0.59 in Oct 2024, 0.06 in Dec 2024, almost
+  nothing in summer 2024 (Teviot runs with the season; the trader at `CYD0331` was PION until mid-2024). So a fixed
+  share won't do. With the month's reconciliation data, a named plant gets its point's leftover less the other plants'
+  usual output there (the blend of that point's average days). Sep 2026 replayed as a dispatch month (Ngāwhā cut to
+  55%, Teviot taken out): Ngāwhā's rest 24.1 MW (true 24.2), Teviot 17.4 MW (true 18.5), the layer 119.6 MW (118.5).
+  Without reconciliation data, the plant's own average day from its metered months (the blend), less what the
+  dispatch data has: the back-test above.
 
 ## Dispatch against metered, and records (`dispatch_vs_metered.py`, `dispatch_metered_fit.py`, 1 Nov 2026)
 

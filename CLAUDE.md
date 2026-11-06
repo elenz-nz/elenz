@@ -373,7 +373,15 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   arrays up to ~10 MW on local networks; registry capacity by Root NSP less dispatched farms, three types (small,
   large, ground), 35 irradiance points, Himawari
   satellite irradiance via Open-Meteo, PV model `pv.py`, calibration and uncertainty) and `hvdc.py` (metered HVDC
-  parsing and the fitted estimate). `analysis/` holds the development scripts and `analysis/README.md` the evidence
+  parsing and the fitted estimate). `embedded.py` (other embedded generation: non-solar plant on local networks that
+  isn't dispatched, from January 2009, design decision 6 Nov 2026): each month's EA reconciliation file (newest
+  revision; the last `REVISION_MONTHS` checked each run, names in progress.json `oemb_files`) kept in the state as
+  `O|<point> <trader>`, less what the month's layout already counts at each grid exit point (`facilities/embedded_points.csv`:
+  meters, exclusions, named plants, fuels and names from public documents; `embedded_registry_split.csv` for the rest,
+  else unclassified); written as an `oemb` block in hh/dd/day.json (by island and fuel; `named`: Ngāwhā's and Teviot's
+  output months without their metered data lack), outside the island series until the site shows it (plan in the
+  project doc "Other embedded generation plan"); months not yet covered are estimated from `hist/oemb/profiles.json`
+  (the blend of average days; evidence in analysis/README.md). `analysis/` holds the development scripts and `analysis/README.md` the evidence
   behind every constant in them.
 - `.github/workflows/update-data.yml`: runs `update.py` on GitHub (free because the repo is public). Triggered every
   5 minutes by the Worker's Cloudflare cron through the workflow_dispatch API, because GitHub's own schedule never

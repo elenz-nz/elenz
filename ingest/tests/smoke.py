@@ -365,5 +365,36 @@ check(abs(bl['AAA0331'].mean() - 8.0) < 1e-9 and emb.blend(None, prof) is prof, 
 check(emb.fuel_of('SVL0331') == {'bio': 1.0} and emb.fuel_of('BOB1101') == {'other': 1.0} and emb.name_of('ABY0111') == 'Opuha'
       and emb.name_of('SVL0331') == '', 'embedded: documented fuels, unclassified Bombay, names only where tied to the point')
 
+# the layer in history months (embedded.month_block): state columns, a metered month, a dispatch month, an estimate
+idx_e = o_e.index
+koe = pd.DataFrame({'O|KOE1101 NGAG': 6.0}, index=idx_e)
+g_e = emb.merge(pd.DataFrame({'x': 0.0}, index=idx_e), emb.state_columns(inj).join(koe, how='outer'))
+check(emb.has_recon(g_e) and 'O|AAA0331 XXXX' in g_e and 'O|AAA0331 SUNY' not in g_e and 'O|BBB0331 MERI' not in g_e
+      and not g_e.isna().any().any(), 'embedded: state keeps the non-solar series off generator networks, zeros filled')
+isl_e = lambda poc: 'NI' if poc.startswith('KOE') else 'SI'   # noqa: E731
+ngawha = lambda mw: {'name': 'Ngāwhā', 'fuel': 'geo', 'poc': ['KOE1101'], 's': [mw] * 96}   # noqa: E731
+prof_e = {}
+blk = emb.month_block(g_e, {**js_e, 'plants': js_e['plants'] + [ngawha(6.0)]}, '2025-12', True, prof_e, 'f1', isl=isl_e)
+tot = lambda b, side: sum(np.mean(v) for v in b[side].values())   # noqa: E731
+check(blk['src'] == 'recon' and abs(tot(blk, 'SI') - 6.0) < 1e-6 and abs(tot(blk, 'NI')) < 1e-6 and blk['named'] == {}
+      and prof_e['2025-12']['plants']['Ngāwhā'][0] == 6.0,
+      f'embedded: metered month, the whole named plant counted, nothing left at its point (SI {tot(blk, "SI"):.2f})')
+blk = emb.month_block(g_e, {**js_e, 'plants': js_e['plants'] + [ngawha(2.0)]}, '2026-01', False, prof_e, 'f2', isl=isl_e)
+check(abs(np.mean(blk['named']['Ngāwhā']) - 4.0) < 1e-6 and abs(tot(blk, 'NI')) < 1e-6 and abs(tot(blk, 'SI') - 6.0) < 1e-6,
+      'embedded: dispatch month, the named point\'s leftover goes to its plant (6 - 2 MW)')
+blk = emb.month_block(pd.DataFrame({'x': 0.0}, index=idx_e), {**js_e, 'plants': js_e['plants'] + [ngawha(2.0)]},
+                      '2026-02', False, prof_e, isl=isl_e)
+check(blk['src'] == 'estimate' and blk['from'] == ['2026-01'] and abs(tot(blk, 'SI') - 6.0) < 1e-6
+      and abs(np.mean(blk['named']['Ngāwhā']) - 4.0) < 1e-6,
+      'embedded: estimate from the average days, the plant\'s rest from its own metered average day')
+check(emb.month_block(g_e, js_e, '2008-12', True, {}, isl=isl_e) is None, 'embedded: nothing before 2009')
+isl_fake = {'price': [50] * 96, 'metered': [0] * 96, 'underlying': [0] * 96}
+dd_e = history.daily({**js_e, 'NI': isl_fake, 'SI': isl_fake, 'hvdcN': [0] * 96, 'plants': [],
+                      'meta': {'end': 0}, 'oemb': blk}, '2026-02')
+check(len(dd_e['oemb']['SI']['hydro']) == 2 and len(dd_e['oemb']['named']['Ngāwhā']) == 2, 'daily: other embedded by day')
+day_e = history.combine_days([dd, dd_e])
+check(len(day_e['oemb']['SI']['hydro']) == day_e['N'] and day_e['oemb']['SI']['hydro'][0] == 0,
+      'combine_days: other embedded joined, zero before it starts')
+
 print(f'\n{len(failures)} failed' if failures else '\nall passed')
 sys.exit(1 if failures else 0)
