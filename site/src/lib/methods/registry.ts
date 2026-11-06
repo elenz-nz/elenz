@@ -41,7 +41,7 @@ export const TOPICS: Topic[] = [
 	{
 		slug: 'other-embedded',
 		title: 'Other embedded generation',
-		summary: 'Small hydro, geothermal, landfill gas and wind on local networks that isn’t dispatched. Built from metered data from January 2005; the newest weeks repeat the latest published month.',
+		summary: 'Small hydro, geothermal, landfill gas and wind on local networks that isn’t dispatched. Built from metered data from January 2009; the newest weeks are a typical day from earlier months.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
 		estimate: true,
 		updated: '2026-11-06',
