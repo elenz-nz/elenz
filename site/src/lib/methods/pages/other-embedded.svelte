@@ -185,7 +185,7 @@
 	<table>
 		<thead><tr><th>Period</th><th>Status</th><th>What Elenz shows</th></tr></thead>
 		<tbody>
-			<tr><td>August 1997 to December 2008</td><td>Not shown</td><td>Nothing. No complete half-hourly record covers these plants. Ngāwhā and Teviot are in the metered history as plants throughout.</td></tr>
+			<tr><td>August 1997 to December 2008</td><td>Not shown</td><td>Nothing. No complete half-hourly record covers plants on local networks. Ngāwhā and Teviot are in the metered history as plants throughout.</td></tr>
 			<tr><td>January 2009 onward</td><td>Calculated estimate</td><td>The layer, about 93 MW over 2009, or 2.0% of generation. Totals and shares step up that month.</td></tr>
 			<tr><td>6 November 2026</td><td>Method change</td><td>The layer joined totals, shares and demand with embedded generation, and renewable-share records moved (see <a href="/methods/records#coverage">Records</a>).</td></tr>
 		</tbody>

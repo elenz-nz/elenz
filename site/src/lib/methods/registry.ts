@@ -503,7 +503,7 @@ export const REFERENCES: Reference[] = [
 	{
 		id: 'pioneer', title: 'Pioneer Energy', by: 'Wikipedia',
 		url: 'https://en.wikipedia.org/wiki/Pioneer_Energy_(NZ)',
-		use: 'Lists Pioneer Energy’s hydro and wind plants in the lower South Island.',
+		use: 'Lists Pioneer Energy’s hydro and wind plants.',
 		topics: ['other-embedded'],
 	},
 	{
