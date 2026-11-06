@@ -3,11 +3,13 @@
 // renewable share and emissions intensity are of that total less battery discharge.
 import { FUELS } from '#lib/tracker/fuels.js';
 import { efAt, geoFactor } from '#lib/tracker/emissions.js';
+import { withOemb } from '#lib/tracker/oemb.js';
 
 const GEN = FUELS.filter((f) => f.k !== 'hvdc');
 
 /** tracker.json -> { t, regions: { NZ, NI, SI }, hvdc: { mid, ni, si }, mix } for its newest interval. */
 export function summarise(D) {
+  withOemb(D);   // other embedded generation as island series (oemb, oembR, oembE)
   const j = D.N - 1;
   const at = (isl, k) => (D[isl][k] ? D[isl][k][j] ?? 0 : 0);
   const t = D.t0 + j * D.step;
@@ -25,6 +27,7 @@ export function summarise(D) {
       gen += x;
       if (f.k === 'batt') continue;
       base += x;
+      if (f.mixed) { ren += pick('oembR'); co2 += pick('oembE'); continue; }   // other embedded: its own renewable part and emissions
       if (f.ren) ren += x;
       co2 += x * efOf(f, isl);
     }
@@ -72,6 +75,7 @@ export function ring(mix, region, r) {
  * { t: [ms], layers: [{ ...fuel, v: [MW] }] } in stack order, fuels with no output dropped. Battery is discharge only
  * (each island's charging counted as zero, so the stack never dips below the axis); HVDC is left out. */
 export function recent(D, hours = 24, every = 3) {
+  withOemb(D);
   const n = Math.min(D.N, Math.round((hours * 3600000) / D.step) + 1);
   const idx = [];
   for (let j = D.N - 1; j >= D.N - n; j -= every) idx.unshift(j);

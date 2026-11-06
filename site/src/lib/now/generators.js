@@ -7,6 +7,7 @@ import { FUELS } from '#lib/tracker/fuels.js';
 import CAPACITY from '#lib/tracker/capacity.json';
 import PLANT_META from '#lib/tracker/plants.json';
 import { slug } from '#lib/site/viewurl.js';
+import { withOemb } from '#lib/tracker/oemb.js';
 
 const FUEL = Object.fromEntries(FUELS.map((f) => [f.k, f]));
 const META = /** @type {Record<string, { owner?: string, aka?: string[] }>} */ (PLANT_META);
@@ -23,7 +24,7 @@ function capacityNow(name, fallback, today) {
 /** @typedef {{ name: string, mw: number, cap: number | null }} Unit */
 /** @typedef {{ name: string, key: string, fuel: string, fuelName: string, tok: string, isl: string, owner: string,
  *   mw: number, cap: number | null, pct: number | null, charging: boolean, href: string, units: Unit[], part: string,
- *   aka: string[] }} Row */
+ *   aka: string[], est?: boolean }} Row */
 /** @typedef {{ by: string, asc: boolean }} SortKey */
 /** @typedef {{ fuel: string, island: string, owner: string, by: string, asc: boolean, then?: SortKey[], text: string, on: boolean }} Settings */
 
@@ -35,10 +36,15 @@ const STATION_GROUPS = new Set(['Waikaremoana']);
  * @param {any} D
  * @returns {Row[]} */
 export function generatorRows(D) {
+  withOemb(D);   // Ngāwhā's and Teviot's filled-in output in their own series, and other embedded generation by island
   const j = D.N - 1, today = TODAY();
   const plants = (D.plants || []).flatMap((p) => (STATION_GROUPS.has(p.name) && p.units?.length
     ? p.units.map((u) => ({ ...p, name: u.label || u.name, cap: u.cap, s: u.s, units: [], group: p.name }))
     : [p]));
+  // other embedded generation: one estimated row per island (no plant list, no capacity; oemb.js)
+  for (const isl of ['NI', 'SI']) {
+    if ((D[isl]?.oemb?.[j] ?? 0) > 0.5) plants.push({ name: `Other embedded generation · ${isl === 'NI' ? 'North' : 'South'} Island`, fuel: 'oemb', isl, cap: null, s: D[isl].oemb, est: true });
+  }
   return plants.map((p) => {
     const mw = p.s?.[j] ?? 0;
     const cap = p.group ? p.cap : capacityNow(p.name, p.cap, today);
@@ -48,7 +54,8 @@ export function generatorRows(D) {
       owner: META[p.group || p.name]?.owner || 'Other generators',
       mw, cap, pct: cap ? (mw / cap) * 100 : null,
       charging: p.fuel === 'batt' && mw < -0.5,
-      href: `/tracker?fuel=${p.fuel}&plant=${slug(p.group || p.name)}`,
+      href: p.est ? `/tracker?fuel=oemb&region=${p.isl}` : `/tracker?fuel=${p.fuel}&plant=${slug(p.group || p.name)}`,
+      est: !!p.est,
       units: (p.units || []).map((u) => ({ name: u.label || u.name, mw: u.s?.[j] ?? 0, cap: u.cap || null })),
       // a station shown whole lists its register plants (they carry a label); a plant on two buses, its connections
       part: (p.units || []).some((u) => u.label) ? 'units' : 'connections',

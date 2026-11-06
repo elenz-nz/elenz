@@ -12,6 +12,9 @@ export const FUELS = [
   { k: 'hydro', name: 'Hydro', tok: '--f-hydro', ren: 1 },
   { k: 'wind', name: 'Wind', tok: '--f-wind', ren: 1 },
   { k: 'solar', name: 'Solar, grid', tok: '--f-solar', ren: 1 },
+  // other embedded generation (oemb.js): mostly small hydro and landfill gas; part renewable, so its renewable share and
+  // emissions come from its own series (oembR, oembE), not from ren and ef
+  { k: 'oemb', name: 'Other embedded', tok: '--f-oemb', hatch: 1, tag: 'est.', mixed: 1 },
   { k: 'roof', name: 'Embedded solar', tok: '--f-solar', hatch: 1, ren: 1, tag: 'est.' },
   { k: 'batt', name: 'Battery', tok: '--f-batt', signed: 1 },
   { k: 'hvdc', name: 'HVDC', tok: '--f-hvdc', hatch: 1, signed: 1 },

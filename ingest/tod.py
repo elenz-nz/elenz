@@ -28,6 +28,28 @@ KEY = 'hist/tod.json'
 SKIP = {'roofU', 'metered', 'underlying', 'tiwai', 'hvdc'}   # not needed by the heat maps
 
 
+OEMB_REN = ('hydro', 'geo', 'wind', 'bio')
+
+
+def _with_oemb(js):
+    """The month's island series with other embedded generation folded in, as the site does (oemb.js): `oemb` (the
+    layer) and `oembR` (its renewable part) from 2009 (zero before), and the named plants' fill in their fuels."""
+    import embedded as emb   # history only
+    n = js['N']
+    num = lambda v: np.asarray([0.0 if x is None else x for x in v], dtype=float)   # noqa: E731
+    out = {isl: dict(js[isl]) for isl in ('NI', 'SI')}
+    oe = js.get('oemb') or {}
+    for isl in ('NI', 'SI'):
+        lay = {f: np.maximum(num(v), 0) for f, v in (oe.get(isl) or {}).items() if len(v) == n}
+        out[isl]['oemb'] = list(sum(lay.values(), np.zeros(n)))
+        out[isl]['oembR'] = list(sum((v for f, v in lay.items() if f in OEMB_REN), np.zeros(n)))
+    for plant, v in (oe.get('named') or {}).items():
+        fuel, isl = emb.named_info().get(plant, ('', ''))
+        if isl in out and fuel and len(v) == n:
+            out[isl][fuel] = list(num(out[isl].get(fuel) or [0] * n) + num(v))
+    return out
+
+
 def profile(js):
     """One month's half-hourly JSON (tracker layout) -> its average for each of the 48 half-hours of the day."""
     n = js['N']
@@ -40,8 +62,9 @@ def profile(js):
         return [None if not np.isfinite(x) else (round(float(x), dp) if dp else int(round(float(x)))) for x in m]
 
     out = {}
+    isl_series = _with_oemb(js)
     for isl in ('NI', 'SI'):
-        out[isl] = {k: mean(v, 2 if k == 'price' else 0) for k, v in js[isl].items()
+        out[isl] = {k: mean(v, 2 if k == 'price' else 0) for k, v in isl_series[isl].items()
                     if k not in SKIP and isinstance(v, list) and len(v) == n}
     nodes = {k: mean(v, 2) for k, v in (js.get('nodes') or {}).items() if isinstance(v, list) and len(v) == n}
     if nodes:
@@ -56,10 +79,12 @@ def update(store, fresh, months, room=lambda n: True, log=print):
     except ValueError:
         old = {}
     have = old.get('months', {}) if old.get('v') == VERSION else {}
+    # months from 2009 made before other embedded generation was folded in are read again (kept meanwhile)
+    stale = {m for m, P in have.items() if m >= '2009-01' and 'oemb' not in (P.get('NI') or {})}
     out = {m: have[m] for m in months if m in have}
     for m, js in fresh.items():
         out[m] = profile(js)
-    missing = [m for m in reversed(months) if m not in out][:READS]
+    missing = [m for m in reversed(months) if m not in out or m in stale][:READS]
     for m in missing:
         raw = store.get(f'hist/hh/{m}.json')
         if raw:
@@ -71,7 +96,7 @@ def update(store, fresh, months, room=lambda n: True, log=print):
         return
     body = json.dumps({'v': VERSION, 'months': dict(sorted(out.items()))}, separators=(',', ':'), allow_nan=False).encode()
     store.put(KEY, body, 'application/json')
-    left = len([m for m in months if m not in out])
+    left = len([m for m in months if m not in out or (m in stale and m not in missing)])
     log(f'time of day: {len(out)} months ({len(body) // 1024} KB)' + (f', {left} still to read' if left else ''))
 
 

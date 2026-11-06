@@ -4,7 +4,7 @@
 // Each record's id matches records.py. kind: 'hh' (a half-hour), 'month' (a calendar month) or 'run' (the longest
 // run of half-hours); fam: what makes it official (gen: metered generation and demand; price: final prices; hvdc:
 // metered HVDC), as in records.py; tok: its colour token; regions it is kept for, and what to say for the others.
-import { liveOemb, OEMB_REN } from '../tracker/oemb.js';
+import { withOemb } from '../tracker/oemb.js';
 
 export const RECORDS_URL = '/data/history/records.json';
 export const LIVE_URL = '/data/tracker.json';
@@ -286,24 +286,9 @@ function halfHours(D) {
     return out;
   };
   const z = new Array(n).fill(0);
-  // other embedded generation (records.py VERSION 7): named plants' fill joins their fuel (not demand); the layer
-  // counts in generation and the renewable share only
-  const oe = liveOemb(D);
-  const add = { NI: {}, SI: {} };
-  for (const p of oe?.named ?? []) {
-    if (!add[p.isl] || !GEN.includes(p.fuel)) continue;
-    const x = (add[p.isl][p.fuel] ??= new Float64Array(n));
-    for (let j = 0; j < n; j++) x[j] += p.s[j] ?? 0;
-  }
-  const a = (isl, key) => {
-    const base = D[isl][key] ?? z, x = add[isl]?.[key];
-    return x ? base.map((v, j) => (v ?? 0) + x[j]) : base;
-  };
-  const lay = (isl, ren) => {
-    const out = new Float64Array(n);
-    for (const [f, v] of Object.entries(oe?.layer?.[isl] ?? {})) if (!ren || OEMB_REN.includes(f)) for (let j = 0; j < n; j++) out[j] += Math.max(0, v[j]);
-    return out;
-  };
+  // other embedded generation (records.py VERSION 7; withOemb: the named plants' fill is in their fuels already): the
+  // layer counts in generation and the renewable share only
+  const a = (isl, key) => D[isl][key] ?? z;
   const out = {};
   for (const r of ['NZ', 'NI', 'SI']) {
     const fuel = (f) => (r === 'NZ' ? a('NI', f).map((x, j) => x + a('SI', f)[j]) : a(r, f));
@@ -311,7 +296,7 @@ function halfHours(D) {
     // the renewable share leaves battery discharge out (as records.py and the rest of the site)
     const gen = new Array(n).fill(0), ren = new Array(n).fill(0), fos = new Array(n).fill(0);
     const isls = r === 'NZ' ? ['NI', 'SI'] : [r];
-    const lg = isls.map((i) => lay(i, false)), lr = isls.map((i) => lay(i, true));
+    const lg = isls.map((i) => a(i, 'oemb')), lr = isls.map((i) => a(i, 'oembR'));
     for (let j = 0; j < n; j++) {
       for (const f of GEN) if (f !== 'batt') gen[j] += F[f][j];
       for (const f of REN) ren[j] += F[f][j];
@@ -341,7 +326,7 @@ function liveCheck(R, D) {
   const beats = {}, near = {};
   if (!R || !D || !D.N) return { beats, near };
   let H;
-  try { H = halfHours(adjustLive(D, R.adj)); } catch { return { beats, near }; }
+  try { H = halfHours(adjustLive(withOemb(D), R.adj)); } catch { return { beats, near }; }
   for (const d of DEFS) {
     if (d.kind !== 'hh' || d.fam !== 'gen' || !H.S[d.id]) continue;
     for (const r of d.regions) {
