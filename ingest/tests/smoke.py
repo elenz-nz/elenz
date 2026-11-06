@@ -396,5 +396,14 @@ day_e = history.combine_days([dd, dd_e])
 check(len(day_e['oemb']['SI']['hydro']) == day_e['N'] and day_e['oemb']['SI']['hydro'][0] == 0,
       'combine_days: other embedded joined, zero before it starts')
 
+# the live week (embedded.live_days in the history job, live_block in the live job)
+days_e = emb.live_days(prof_e, ['2026-02', '2026-03'], isl=isl_e)
+check(days_e['2026-02']['from'] == ['2026-01'] and abs(sum(np.mean(v) for v in days_e['2026-02']['SI'].values()) - 6.0) < 1e-6
+      and days_e['2026-02']['plants']['Ngāwhā'][0] == 6.0, 'embedded: typical days for the live week, layer and named plant')
+lb = emb.live_block(days_e, {**js_e, 'plants': js_e['plants'] + [ngawha(2.0)]})
+check(list(lb['days']) == ['2026-01'] or set(lb['days']) <= {'2026-01', '2026-02'}, 'embedded: live block names the months it covers')
+check(len(lb['named']['Ngāwhā']) == 96 and abs(np.mean(lb['named']['Ngāwhā']) - 4.0) < 1e-6 and emb.live_block({}, js_e) is None,
+      'embedded: live block fills in the named plant (typical 6 less dispatched 2 MW)')
+
 print(f'\n{len(failures)} failed' if failures else '\nall passed')
 sys.exit(1 if failures else 0)

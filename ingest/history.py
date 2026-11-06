@@ -40,7 +40,8 @@ and across all months:
                              them (records.py; published while the history is complete, only when something changed)
   hist/tod.json              each month's average for every half-hour of the day (tod.py): the heat maps' rows on All
   hist/oemb/profiles.json    other embedded generation's average day by grid exit point for the newest reconciliation
-                             months (embedded.py), for the months not yet covered and the live job
+                             months (embedded.py), for the months not yet covered
+  hist/oemb/live.json        the typical days the live job lays over its week (embedded.live_days): last month to next
 
 HVDC is metered (EMI HVDC_Flows) wherever published, about two weeks after each month, and estimated from the
 island balances before that (hvdc.py).
@@ -746,6 +747,17 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
     # other embedded generation's average days by month (for estimates here and in the live job), when they changed
     if json.dumps(prof, sort_keys=True) != prof_before and store.room(1 + 3):
         put_json(store, 'hist/oemb/profiles.json', {'months': prof, 'at': int(time.time() * 1000)})
+    # and the typical days the live job lays over its week, for the months it can touch (last month to next)
+    try:
+        today = datetime.now(NZ).date()
+        mo = [f'{(today.replace(day=1) + timedelta(days=d)):%Y-%m}' for d in (-1, 0, 32)]
+        isl_tab = mt.islands()
+        live = {'months': emb.live_days(prof, mo, isl=lambda poc: island_of(poc, isl_tab), log=log)}
+        old = json.loads(store.get('hist/oemb/live.json') or b'{}')
+        if live['months'] and live['months'] != old.get('months') and store.room(1 + 3):
+            put_json(store, 'hist/oemb/live.json', {**live, 'at': int(time.time() * 1000)})
+    except Exception as e:  # noqa: BLE001  never fatal: the live week goes without the layer
+        log(f'other embedded live days: skipped ({type(e).__name__}: {e})')
     # the /now price explainer's usual values (when history has moved on) and the newest day of offers (once a day)
     explain.update(store, log)
     # records (records.py): month summaries kept up to date; hist/records.json published while the history is

@@ -381,7 +381,10 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   else unclassified); written as an `oemb` block in hh/dd/day.json (by island and fuel; `named`: Ngāwhā's and Teviot's
   output months without their metered data lack), outside the island series until the site shows it (plan in the
   project doc "Other embedded generation plan"); months not yet covered are estimated from `hist/oemb/profiles.json`
-  (the blend of average days; evidence in analysis/README.md). `analysis/` holds the development scripts and `analysis/README.md` the evidence
+  (the blend of average days; evidence in analysis/README.md). The live week: the history job writes `hist/oemb/live.json`
+  (`live_days`: last month to next, the layer's typical day by island and fuel and each named plant's), and the live job
+  adds `oemb` to tracker.json (`live_block`: those typical days by month, which the site lays over the week, and `named`,
+  each named plant's typical day less what the live data has, per interval). `analysis/` holds the development scripts and `analysis/README.md` the evidence
   behind every constant in them.
 - `.github/workflows/update-data.yml`: runs `update.py` on GitHub (free because the repo is public). Triggered every
   5 minutes by the Worker's Cloudflare cron through the workflow_dispatch API, because GitHub's own schedule never

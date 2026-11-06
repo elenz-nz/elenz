@@ -417,9 +417,17 @@ def month_block(g, js, month, metered, prof, file=None, rows=None, split=None, i
         o = carry(other, grid) if other is not None else _frame({}, grid)
         rest = {} if metered else _rest(o, js, prof, month, nmap, recon=False)[1]
         out = {'src': 'estimate', 'from': used}
+    for side, fs in _by_island(o, rows, split, isl, log).items():
+        out[side] = {f: [round(float(x), 1) for x in v] for f, v in fs.items()}
+    out['named'] = {p: [round(float(x), 1) for x in np.asarray(v, float)] for p, v in rest.items()
+                    if float(np.sum(v)) > 0}
+    out['pts'] = {poc: round(float(o[poc].mean()), 2) for poc in sorted(o.columns) if o[poc].mean() >= 0.005}
+    return out
+
+
+def _by_island(o, rows, split, isl=None, log=print):
+    """MW by grid exit point -> {island: {fuel: array}}, fuels with no output left out."""
     isl = isl or (lambda poc: '')
-    for side in ('NI', 'SI'):
-        out[side] = {}
     unknown = set()
     fu = {side: pd.DataFrame(0.0, index=o.index, columns=list(FUELS)) for side in ('NI', 'SI')}
     for poc in o.columns:
@@ -431,9 +439,64 @@ def month_block(g, js, month, metered, prof, file=None, rows=None, split=None, i
             fu[side][f] += o[poc].fillna(0).to_numpy() * sh
     if unknown:
         log('other embedded: WARNING grid exit points with no island, left out:', sorted(unknown))
-    for side in ('NI', 'SI'):
-        out[side] = {f: [round(float(x), 1) for x in fu[side][f]] for f in FUELS if fu[side][f].abs().sum() > 0}
-    out['named'] = {p: [round(float(x), 1) for x in np.asarray(v, float)] for p, v in rest.items()
-                    if float(np.sum(v)) > 0}
-    out['pts'] = {poc: round(float(o[poc].mean()), 2) for poc in sorted(o.columns) if o[poc].mean() >= 0.005}
+    return {side: {f: fu[side][f].to_numpy() for f in FUELS if fu[side][f].abs().sum() > 0} for side in ('NI', 'SI')}
+
+
+# ---------- the live week (update.py) ----------
+#
+# The history job writes hist/oemb/live.json (live_days): for the months the live week can touch, the layer's typical
+# day by island and fuel and each named plant's, 48 half-hours each. The live job lays them over its week (live_block).
+
+def live_days(prof, months, rows=None, split=None, isl=None, log=print):
+    """{month: {from, NI: {fuel: [48]}, SI: {...}, plants: {name: [48]}}} for each month that has months to blend
+    from (the newest with reconciliation data before it and the same month a year earlier, as month_block)."""
+    rows = points() if rows is None else rows
+    split = registry_split() if split is None else split
+    out = {}
+    for m in months:
+        used = _used(prof, m)
+        if not used:
+            continue
+        other = blend(*[_prof_frame(prof[k]['other']) for k in used] + [None] * (2 - len(used)))
+        day = {'from': used}
+        for side, fs in _by_island(other.fillna(0), rows, split, isl, log).items():
+            day[side] = {f: [round(float(x), 2) for x in v] for f, v in fs.items()}
+        day['plants'] = {}
+        for name in named_points(rows).values():
+            have = {k: v for k, v in prof.items() if name in v.get('plants', {})}
+            ds = [_prof_frame({name: have[k]['plants'][name]}) for k in _used(have, m)]
+            if ds:
+                p = blend(ds[0], ds[1] if len(ds) > 1 else None)[name]
+                day['plants'][name] = [round(float(x), 2) for x in p.fillna(0)]
+        out[m] = day
+    return out
+
+
+def live_block(days, js):
+    """tracker.json's 'oemb' for the live week (js in the tracker layout, 5-minute steps), or None without typical days.
+      src: 'estimate'; days: {month: {from, NI, SI}}, the layer's typical day by island and fuel for each month the week
+      touches (48 half-hours from local midnight; the site lays them over the week, since the layer here doesn't follow
+      the live data); named: {plant: MW for each interval}, the named plants' typical day less what the live data has
+      for them (Ngāwhā less Ngāwhā B; all of Teviot), which does follow it."""
+    if not days:
+        return None
+    idx = pd.to_datetime(js['t0'] + np.arange(js['N']) * js['step'], unit='ms', utc=True)
+    local = idx.tz_convert(NZ)
+    month = local.strftime('%Y-%m')
+    slot = np.asarray(local.hour * 2 + local.minute // 30)
+    keys = sorted(days)
+    pick = {m: days.get(m) or days[max([k for k in keys if k <= m] or keys[:1])] for m in sorted(set(month))}
+    out = {'src': 'estimate', 'days': {m: {k: d[k] for k in ('from', 'NI', 'SI') if k in d} for m, d in pick.items()},
+           'named': {}}
+    names = {n for d in pick.values() for n in d.get('plants', {})}
+    for name in sorted(names):
+        est = np.zeros(len(idx))
+        for m, d in pick.items():
+            at = np.asarray(month == m)
+            if name in d.get('plants', {}):
+                est[at] = np.asarray(d['plants'][name])[slot[at]]
+        have = next((np.asarray(p['s'], float) for p in js['plants'] if p['name'] == name), np.zeros(len(idx)))
+        r = np.clip(est - np.nan_to_num(have), 0, None)
+        if r.sum() > 0:
+            out['named'][name] = [round(float(x), 1) for x in r]
     return out

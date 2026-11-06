@@ -22,6 +22,7 @@ from urllib.request import Request, urlopen
 import pandas as pd
 
 import emi_live
+import embedded
 import explain
 import rooftop
 import state as st
@@ -177,6 +178,14 @@ def main(log=print):
         js['explain'] = explain.live(js, *explain.load(store))
     except Exception as e:  # noqa: BLE001
         log(f'explain: left out ({type(e).__name__}: {e})')
+    # other embedded generation (embedded.py): the typical days the history job keeps, laid over the week; never fatal
+    try:
+        raw = store.get('hist/oemb/live.json')
+        oe = embedded.live_block(json.loads(raw)['months'], js) if raw else None
+        if oe:
+            js['oemb'] = oe
+    except Exception as e:  # noqa: BLE001
+        log(f'other embedded: left out ({type(e).__name__}: {e})')
     body = json.dumps(js, separators=(',', ':'), allow_nan=False).encode()
     store.put('state.csv.gz', st.dumps(s))
     # the version tag rides along in the same KV write: the Worker sends it as an ETag, so pages that already have
