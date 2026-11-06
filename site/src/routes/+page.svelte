@@ -170,7 +170,7 @@
 						<p>{p.blurb}</p>
 						<a class="go" href={p.href}>Open {p.name} →</a>
 					</div>
-					<a class="window js-only" href={p.window?.href ?? (p.href === '/records' && peekLink.rec ? peekLink.rec : p.href)} aria-label={p.window?.label ?? (p.href === '/records' && peekLink.rec ? 'Open the record shown' : `Open ${p.name}`)} tabindex="-1">
+					<a class="window js-only" data-handoff={p.href === '/articles' ? 'art' : undefined} href={p.window?.href ?? (p.href === '/records' && peekLink.rec ? peekLink.rec : p.href)} aria-label={p.window?.label ?? (p.href === '/records' && peekLink.rec ? 'Open the record shown' : `Open ${p.name}`)} tabindex="-1">
 						<span class="view">
 							{#if D && now}<Peek {D} {now} />{:else}<span class="ph">{error ? 'Preview unavailable' : 'Loading…'}</span>{/if}
 						</span>

@@ -172,7 +172,7 @@ Waipori = ["Deep Stream (Waipori A)", "Waipori (2A/3/4)"]
 # the weeks since the newest metered month), shown when the tracker drills into the plant. Evidence in
 # facilities/metered_plants.csv and analysis/README.md. Plant (shown name) -> note.
 [plant_metering]
-"Huntly Rankines" = "The metered history has one meter for units 1–4 together, so it shows them as one. The dispatch data (the live week and the weeks since the newest metered month) shows each unit.\nSeptember 2020: Generation_MD has no Huntly that month, so the history uses the grid meter for the whole station, split between units by their offers."
+"Huntly Rankines" = "Shown as Coal/gas: units 1, 2 and 4 can burn coal or gas, and the market data doesn't say which.\nThe metered history has one meter for units 1–4 together, so it shows them as one. The dispatch data (the live week and the weeks since the newest metered month) shows each unit.\nSeptember 2020: Generation_MD has no Huntly that month, so the history uses the grid meter for the whole station, split between units by their offers."
 "Huntly 5" = "September 2020: Generation_MD has no Huntly that month, so the history uses the grid meter for the whole station, split between units by their offers."
 "Huntly 6" = "September 2020: Generation_MD has no Huntly that month, so the history uses the grid meter for the whole station, split between units by their offers."
 "Arapuni" = "Before April 2011 the metered history has one figure for the whole station, under ARI1101. ARI1102 has its own figure from then, so the split by grid connection starts there."
@@ -187,4 +187,18 @@ Waipori = ["Deep Stream (Waipori A)", "Waipori (2A/3/4)"]
 "Kawerau (Te Ahi O Maui)" = "Since December 2025 one metered code at KAW2201 carries Te Ahi O Maui and TOPP2 together. The metered history splits it 35% Te Ahi O Maui, 65% TOPP2, by their shares in the dispatch data. The dispatch data (the live week and the weeks since the newest metered month) has each plant's own output."
 "Kawerau (TOPP2)" = "Since December 2025 one metered code at KAW2201 carries TOPP2 and Te Ahi O Maui together. The metered history splits it 65% TOPP2, 35% Te Ahi O Maui, by their shares in the dispatch data. The dispatch data (the live week and the weeks since the newest metered month) has each plant's own output."
 "Kawerau (Onepu)" = "This meter is a whole site's grid connection, not one generator's. It counts power going into the grid there, so it leaves out what the site uses itself and the power it takes from the grid at the same time. Generation_MD has no row for it before 2020, so 2013–2019 use the same figure from the grid meter (Grid_import). The dispatch data (the live week and the weeks since the newest metered month) reads higher."
-"Glenbrook Steel" = "Its metered output (meter points GLN0111 and GLN0332) runs about 1.47 times the dispatch data's figure, so expect a step where the metered history meets the dispatch weeks."
+"Glenbrook Steel" = "The register lists it as gas. We show it as waste heat: it runs on waste gas and heat from NZ Steel's ironmaking, not pipeline gas.\nIts metered output (meter points GLN0111 and GLN0332) runs about 1.47 times the dispatch data's figure, so expect a step where the metered history meets the dispatch weeks."
+"Kinleith" = "The register lists it as gas. We show it as bioenergy: Oji Fibre Solutions' cogeneration runs on wood waste and black liquor, with natural gas as a secondary fuel."
+"Kaiwaikawe Wind Farm" = "It isn't in the EA's plant register yet, so we add it from its dispatched unit (MPE1101 KWK0)."
+"Kōwhai Park Solar Farm" = "It isn't in the EA's plant register yet, so we add it from its dispatched unit (ISL0661 KPS0)."
+"Ruakākā Solar Farm" = "It isn't in the EA's plant register yet, so we add it from its dispatched unit (BRB0331 RUS0)."
+"Pātea" = "The dispatch data has three units, which we show as one plant to match the metered history. It moved from connection HWA1101 to OHG1101 in June 2026."
+"Kaimai" = "Its one dispatched unit, Kaimai 5, carries the whole scheme, so we show it under the scheme's name."
+"West Wind" = "It generates onto two buses (WWD1102 and WWD1103), so it can be split by grid connection. The dispatch data's West Wind 1 and 2 are one wind farm."
+"Roxburgh" = "It generates onto two buses (ROX2201 and ROX1101), so it can be split by grid connection."
+"Matahina" = "Metered generation has no rows for Matahina from October 2021, so dispatch figures stand in."
+"Mill Creek" = "Its first 16 months, May 2014 to August 2015, aren't in metered generation or embedded generation. They come from Meridian's injection at Wilton in the reconciliation data."
+"Highbank" = "It has no metered rows before October 2001, and its rows read next to nothing until April 2002."
+"Mangahao" = "At this point metered generation is net of local load, about 10% of Mangahao's gross output. Where the embedded generation meter reads more, we add the difference."
+"Cobb" = "At this point metered generation is net of local load, about 35% of Cobb's gross output. Where the embedded generation meter reads more, we add the difference."
+"Fonterra Dairy - Whareroa" = "At this point metered generation is net of local load, about 50% of Whareroa's gross output. Where the embedded generation meter reads more, we add the difference."

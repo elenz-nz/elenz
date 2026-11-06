@@ -421,7 +421,7 @@
 				<input type="search" class="mix-filter" id="mix-filter" aria-label="Filter the list" placeholder="Filter" hidden />
 				<div class="mix-tools" id="mix-tools" role="group" aria-label="Show in the chart" hidden><span>Show</span><button type="button" id="mix-all">All</button><button type="button" id="mix-none">None</button></div>
 				<table class="mix">
-					<thead><tr><th scope="col" id="col-name">Source</th><th scope="col" class="n" id="col-q">GWh</th><th scope="col" class="n">Share</th></tr></thead>
+					<thead><tr><th scope="col" id="col-name">Source</th><th scope="col" class="n" id="col-q">GWh</th><th scope="col" class="n" id="col-s">Share</th></tr></thead>
 					<tbody id="mix-body"></tbody>
 					<tfoot><tr><td id="tot-lbl">Total generation</td><td class="n" id="tot-q"></td><td class="n" id="tot-s">100%</td></tr></tfoot>
 				</table>

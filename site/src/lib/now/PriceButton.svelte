@@ -30,4 +30,8 @@
 	.why { max-width: 100%; box-sizing: border-box; }
 	/* narrow phones: the label and the arrow only, so "Islands split" fits its tile (test report NOW-08) */
 	@media (max-width: 420px) { .why .w { display: none; } }
+	/* and wherever the tile itself is narrow, as with six tiles across at 1,100-1,250 px (test report NOW-07, 6 Nov 2026):
+	   the tile is a container (/now's .kpi) */
+	@container (max-width: 215px) { .why .w { display: none; } }
+	@container (max-width: 150px) { .why { padding-inline: 6px; gap: 4px; font-size: 0.72rem; } }
 </style>
