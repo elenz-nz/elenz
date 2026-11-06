@@ -21,6 +21,7 @@ export type Topic = {
 	summary: string; // one sentence under the title and on the overview's cards: what the figure is, not what data it uses
 	shownOn: [string, string][]; // [label, href]: where the figure appears on the site
 	estimate?: boolean; // the figure is mainly a calculated estimate (a mark in the contents and on the overview's cards)
+	short?: string; // a shorter name for the contents list, where the title wouldn't fit beside its estimate mark
 	reviewed: string; // YYYY-MM-DD: the last review against the code
 	code: string[]; // repository paths this page describes, listed in its References section
 };
@@ -49,6 +50,7 @@ export const TOPICS: Topic[] = [
 	{
 		slug: 'other-embedded',
 		title: 'Other embedded generation',
+		short: 'Other embedded',
 		summary: 'Small hydro, landfill gas and other generation on local networks that the market doesn’t dispatch.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
 		estimate: true,

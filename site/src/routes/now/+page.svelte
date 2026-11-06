@@ -302,10 +302,11 @@
 	.hero h1 { margin: 0; font-size: 1.6rem; letter-spacing: -0.02em; line-height: 1.15; }
 	.lede { margin: 6px 0 0; color: var(--ink-2); max-width: 70ch; }
 	.lede a, .cta { color: var(--accent); font-weight: 600; }
-	.status { margin-left: 0; }
+	/* on the right, and when the heading wraps, on its own row against the right edge, so its panel opens on screen (test report TRK-11, 6 Nov 2026) */
+	.status { margin-left: auto; }
 
 	.kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
-	.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; display: grid; gap: 3px; align-content: start; min-width: 0; }
+	.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; display: grid; gap: 3px; align-content: start; min-width: 0; container-type: inline-size; }
 	.k-lbl { color: var(--ink-2); font-size: 0.8rem; font-weight: 600; }
 	.k-val { font-family: var(--font-data); font-size: 1.7rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; white-space: nowrap; }
 	.k-val small { font-family: var(--font-ui); font-size: 0.78rem; font-weight: 500; color: var(--muted); margin-left: 5px; letter-spacing: 0; }
