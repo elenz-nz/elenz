@@ -39,6 +39,14 @@ export const TOPICS: Topic[] = [
 		updated: '2026-11-01',
 	},
 	{
+		slug: 'other-embedded',
+		title: 'Other embedded generation',
+		summary: 'Small hydro, geothermal, landfill gas and wind on local networks that isn’t dispatched. Built from metered data from January 2005; the newest weeks repeat the latest published month.',
+		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
+		estimate: true,
+		updated: '2026-11-06',
+	},
+	{
 		slug: 'demand',
 		title: 'Demand',
 		summary: 'Electricity taken from the grid in each island, and with embedded solar added back for underlying demand.',
@@ -139,7 +147,7 @@ export const SOURCES: Source[] = [
 		what: 'Every 5-minute dispatch case: MW for each generating unit and load at every connection point, and the price at every node, including the island reference nodes.',
 		use: 'The live week: generation by unit, island load, prices. Also the inputs to the HVDC estimate and the price explainer.',
 		period: 'The last month or so', fresh: 'Usually 1–2 minutes after each interval starts', licence: CCBY,
-		topics: ['generation', 'demand', 'prices', 'hvdc', 'price-explainer', 'history', 'records'],
+		topics: ['generation', 'demand', 'prices', 'hvdc', 'price-explainer', 'history', 'records', 'other-embedded'],
 	},
 	{
 		id: 'dispatch', name: 'Dispatch prices and volumes', publisher: EA, dataset: 'DispatchAndPricing/NodalPricesAndVolumes',
@@ -147,7 +155,7 @@ export const SOURCES: Source[] = [
 		what: 'The same dispatch cases as the real-time feed, one file a day, for connection points with load or generation (no bus nodes).',
 		use: 'Fills gaps in the live week; history for the weeks since the latest metered month; plants the metering doesn’t have (batteries, new solar farms).',
 		period: 'From 10 Sep 2020', fresh: '1–4 days late', licence: CCBY,
-		topics: ['generation', 'demand', 'prices', 'history', 'records'],
+		topics: ['generation', 'demand', 'prices', 'history', 'records', 'other-embedded'],
 	},
 	{
 		id: 'final', name: 'Final energy prices', publisher: EA, dataset: 'DispatchAndPricing/FinalEnergyPrices',
@@ -196,7 +204,7 @@ export const SOURCES: Source[] = [
 		what: 'Half-hourly energy from each station, by connection point and generator code: grid-connected stations from August 1997, stations on local networks from January 2009.',
 		use: 'Generation by plant and fuel for every month it has been published.',
 		period: 'From Aug 1997', fresh: 'About 5–6 weeks after each month', licence: CCBY,
-		topics: ['generation', 'demand', 'history', 'capacity', 'records'],
+		topics: ['generation', 'demand', 'history', 'capacity', 'records', 'other-embedded'],
 	},
 	{
 		id: 'embedded', name: 'Embedded generation', publisher: EA, dataset: 'Metered_data/Embedded_generation',
@@ -204,7 +212,7 @@ export const SOURCES: Source[] = [
 		what: 'Half-hourly energy injected at connection points on local networks.',
 		use: 'Stations on local networks before 2009, and their gross output where Generation_MD records it net of local load.',
 		period: 'From Oct 1998 (most points from Apr 1999)', fresh: 'About 2 weeks after each month', licence: CCBY,
-		topics: ['generation', 'history', 'capacity', 'records'],
+		topics: ['generation', 'history', 'capacity', 'records', 'other-embedded'],
 	},
 	{
 		id: 'gridexport', name: 'Grid exports', publisher: EA, dataset: 'Metered_data/Grid_export',
@@ -242,17 +250,17 @@ export const SOURCES: Source[] = [
 		id: 'reconciliation', name: 'Reconciled injection and offtake', publisher: EA, dataset: 'Volumes/Reconciliation',
 		url: EMI + 'Volumes/Reconciliation',
 		what: 'Monthly files of metered injection and offtake by connection point, network, trader and half-hour.',
-		use: 'Mill Creek wind farm’s first 16 months (May 2014 to August 2015), which no other metered file has; checking the embedded solar model against metered exports, and the output of embedded solar farms; measuring the other embedded generation the dispatch data doesn’t see.',
-		period: 'Monthly', fresh: 'About a week after each month; revised at 7 and 14 months', licence: CCBY,
-		topics: ['embedded-solar', 'history', 'generation', 'demand'],
+		use: 'Mill Creek wind farm’s first 16 months (May 2014 to August 2015), which no other metered file has; checking the embedded solar model against metered exports, and the output of embedded solar farms; other embedded generation from January 2005.',
+		period: 'From Jan 2005', fresh: 'About 3–4 weeks after each month; revised about 3, 7 and 14 months later', licence: CCBY,
+		topics: ['embedded-solar', 'history', 'generation', 'demand', 'other-embedded'],
 	},
 	{
 		id: 'guehmt', name: 'Installed distributed generation', publisher: EA, dataset: 'Report GUEHMT',
 		url: 'https://www.emi.ea.govt.nz/Retail/Reports/GUEHMT',
-		what: 'Installed solar on local networks each month, from the registry, by grid exit point (Root NSP), for systems up to 10 kW and over 10 kW.',
-		use: 'Embedded solar capacity at each grid exit point.',
+		what: 'Installed distributed generation each month, from the registry, by grid exit point (Root NSP) and fuel; solar also by systems up to 10 kW and over 10 kW.',
+		use: 'Embedded solar capacity at each grid exit point; the split by fuel of other embedded generation where no public document states it.',
 		period: 'From Aug 2013', fresh: 'Monthly', licence: CCBY,
-		topics: ['embedded-solar', 'history', 'capacity'],
+		topics: ['embedded-solar', 'history', 'capacity', 'other-embedded'],
 	},
 	// ---------- weather ----------
 	{
