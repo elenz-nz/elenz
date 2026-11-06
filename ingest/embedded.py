@@ -217,6 +217,28 @@ def named_points(rows=None):
     return {r['poc']: r['plant'] for r in rows if r['role'] == 'named'}
 
 
+_NAMED_INFO = None
+
+
+def named_info(rows=None):
+    """{plant: (fuel, island)} for the named plants, from their rows in facilities/metered_plants.csv."""
+    global _NAMED_INFO
+    if _NAMED_INFO is None or rows is not None:
+        import metered as mt
+        from common import island_of
+        out = {}
+        for poc, plant in named_points(rows).items():
+            fuel = isl = ''
+            for r in mt.table():
+                if r['plant'] == plant:
+                    fuel, isl = fuel or r['fuel'], isl or r['isl']
+            out[plant] = (fuel, isl or island_of(poc, mt.islands()))
+        if rows is not None:
+            return out
+        _NAMED_INFO = out
+    return _NAMED_INFO
+
+
 def by_fuel(o, rows=None, split=None):
     """Half-hourly MW by fuel (columns FUELS), from the residual by grid exit point."""
     rows = points() if rows is None else rows

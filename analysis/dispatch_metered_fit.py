@@ -28,8 +28,8 @@ import pandas as pd
 ROOT = os.path.join(os.path.dirname(__file__), '..')
 NZ = 'Pacific/Auckland'
 # plants whose dispatch figure is systematically off their meter, and why (names as in tracker.json)
+# (Ngāwhā was here until 6 Nov 2026: its output beyond Ngāwhā B is now filled in, embedded.py's named plants)
 PLANTS = {
-    'Ngāwhā': 'only Ngāwhā B is dispatched; the meter has the whole station',
     'Glenbrook Steel': 'dispatch sees part of the plant',
     'Kawerau (Onepu)': 'the meter is the site’s grid connection, not a generator’s',
     'Te Rapa': 'the meter is net of the dairy factory’s own load (closed 2023)',
