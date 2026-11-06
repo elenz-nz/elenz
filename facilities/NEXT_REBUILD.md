@@ -26,3 +26,9 @@ generation, and clear the done items from this file.
 
 - Highbank before Oct 2001: no meter in `Generation_MD` or `Embedded_generation`, and reconciliation starts in 2005.
   Its capacity counts from its first metered month (`plant_capacity.csv`), and the history page lists the gap.
+
+## Noted for a later build
+
+- Nga Awa Pūrua: the plant's name in the data lacks its first macron (`overrides.toml`, `plant_capacity.csv`, the key in
+  `emissions.js`). The method pages show Ngā Awa Pūrua, and `capacity.svelte` maps the name for its table. Renaming it in
+  the data changes a fingerprinted file, so it waits for a build.
