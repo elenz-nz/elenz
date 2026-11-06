@@ -15,13 +15,18 @@ Stored (Cloudflare KV in GitHub Actions, data/store locally), one set per NZ cal
                              Himawari) at each rooftop solar point (facilities/rooftop_points.csv),
                              F|NI and F|SI = final prices at Haywards and Benmore (fi = 1 while only interim),
                              F|OTA, ... = final prices at the other [price_nodes],
-                             H|BEN, H|HAY = metered HVDC transfer northward at each end (MW, once published)
+                             H|BEN, H|HAY = metered HVDC transfer northward at each end (MW, once published),
+                             O|<point> <trader> = reconciled injection on local networks (embedded.py, from 2009; oq = 1
+                             once read)
   hist/hh/YYYY-MM.json       the month in the tracker.json layout, half-hourly (the website's 30-day view)
   hist/dd/YYYY-MM.json       daily averages for the month, plus each day's peak demand, peak generation and peak
                              dispatchable output (peak.disp: hydro, thermal, battery discharge; dispx without hydro), the spread of each island's half-hourly price (p10, p90, pmin, pmax, n500, n1000 = half-hours
                              over $500 and $1,000) and each fuel's revenue at its island's price (rv_<fuel>, $/h, so
                              rv / generation is the price it captured; batt_d = battery discharge only; batt_c and
                              rv_battc = battery charging and its cost, the price batteries paid)
+  Both have 'oemb' from Jan 2009: other embedded generation by island and fuel, and Ngāwhā's and Teviot's output the
+  site lacks in months without their metered data (embedded.month_block; kept out of the island series until the
+  site shows the layer)
 and across all months:
   hist/day.json              every day since 2020 (the 1-year and all-time views)
   hist/index.json            months stored, first and last time (published once the backfill has caught up)
@@ -34,6 +39,9 @@ and across all months:
   hist/rec/months.json.gz, hist/records.json   the Records pages: a summary of every month and the records drawn from
                              them (records.py; published while the history is complete, only when something changed)
   hist/tod.json              each month's average for every half-hour of the day (tod.py): the heat maps' rows on All
+  hist/oemb/profiles.json    other embedded generation's average day by grid exit point for the newest reconciliation
+                             months (embedded.py), for the months not yet covered
+  hist/oemb/live.json        the typical days the live job lays over its week (embedded.live_days): last month to next
 
 HVDC is metered (EMI HVDC_Flows) wherever published, about two weeks after each month, and estimated from the
 island balances before that (hvdc.py).
@@ -67,6 +75,7 @@ import warnings
 import numpy as np
 import pandas as pd
 
+import embedded as emb
 import explain
 import hvdc
 import metered as mt
@@ -75,7 +84,7 @@ import tod
 import rooftop
 import state as st
 from build_tracker import assemble, enc, enc_na
-from common import BLOB, FACILITIES, NZ, overrides
+from common import BLOB, FACILITIES, NZ, island_of, overrides
 from store import open_store
 from sync import DISPATCH
 
@@ -83,13 +92,13 @@ warnings.simplefilter("ignore", pd.errors.PerformanceWarning)  # wide monthly fr
 FINAL = 'Datasets/Wholesale/DispatchAndPricing/FinalEnergyPrices'
 HVDC_FLOWS = 'Datasets/Wholesale/Metered_data/HVDC_Flows'
 
-BUILD = 9                    # bump to rebuild every month's JSON after changing how it is built (2: final prices, 3: peak generation,
+BUILD = 10                   # bump to rebuild every month's JSON after changing how it is built (2: final prices, 3: peak generation,
                              # 4: satellite rooftop solar model by point, metered HVDC; 5: more price nodes, daily price
                              # spread and revenue by fuel, bioenergy and waste heat; 6: metered history back to Aug 1997,
                              # metered generation wherever published, plant groups; 7: Generation_MD's clock-numbered
                              # change days before 2009 renumbered (metered.straighten()), Mill Creek 2014-15, peak.disp)
                              # 8: Tekapo A and B's names, Huntly in September 2020; 9: Kawerau (Onepu), geothermal
-                             # from 2013
+                             # from 2013; 10: other embedded generation from 2009 (embedded.py), in its own block)
 GEN_FUELS = ('geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
 DISPATCHABLE = ('hydro', 'gas', 'coal', 'diesel', 'batt')   # as DISPATCHABLE in site/src/lib/tracker/series.js
 WRITE_BUDGET = 3000          # KV writes a day (UTC) for this job; a full rebuild needs ~800. Free plan: 280 (see above)
@@ -306,9 +315,10 @@ def add_final(s, m):
 
 # ---------- one month: state -> tracker-layout JSON and daily summary ----------
 
-def build_month(s, month, cap, log):
+def build_month(s, month, cap, log, prof=None, recon_file=None):
     """Half-hourly state for one month -> (hh JSON, dd JSON). Metered generation and demand wherever the month has
-    metered data (metered.py; dispatch fills in what the metering lacks), dispatch data otherwise."""
+    metered data (metered.py; dispatch fills in what the metering lacks), dispatch data otherwise. prof: the other
+    embedded layer's average days by month (embedded.month_block), read and updated; None leaves the layer out."""
     s = s.sort_index()
     if 'n' not in s:
         s['n'] = np.nan
@@ -341,6 +351,11 @@ def build_month(s, month, cap, log):
                   'final_prices': round(float(final.mean()), 4),
                   'source': 'metered' if met else 'dispatch',
                   'end': js['t0'] + (len(full) - 1) * js['step']}
+    if prof is not None:
+        isl_tab = mt.islands()
+        oe = emb.month_block(g, js, month, met, prof, recon_file, isl=lambda poc: island_of(poc, isl_tab), log=log)
+        if oe is not None:
+            js['oemb'] = oe
     return js, daily(js, month)
 
 
@@ -396,6 +411,10 @@ def daily(js, month):
         for r, arr in (('NZ', nz), ('NI', ni), ('SI', si)):
             peak.setdefault(r, {})[k] = enc(pd.Series(arr, index=day).groupby(level=0).max().reindex(days))
     out['peak'] = peak
+    if js.get('oemb'):
+        # other embedded generation (embedded.py): daily means, kept apart from the island series like the month's
+        oe = js['oemb']
+        out['oemb'] = {k: {f: mean(v, 1) for f, v in oe[k].items()} for k in ('NI', 'SI', 'named')}
     out['plants'] = []
     for p in js['plants']:
         q = {k: p[k] for k in ('name', 'fuel', 'isl', 'poc', 'cap')}
@@ -409,7 +428,8 @@ def daily(js, month):
 def combine_days(dds):
     """Monthly daily summaries (oldest first) -> one daily series for the whole history."""
     n = sum(len(d['t']) for d in dds)
-    out = {'t': [], 'h': [], 'hvdcN': [], 'NI': {}, 'SI': {}, 'nodes': {}, 'peak': {}, 'plants': []}
+    out = {'t': [], 'h': [], 'hvdcN': [], 'NI': {}, 'SI': {}, 'nodes': {}, 'peak': {}, 'plants': [],
+           'oemb': {'NI': {}, 'SI': {}, 'named': {}}}
     plants, pos = {}, 0
     for d in dds:
         m = len(d['t'])
@@ -425,6 +445,10 @@ def combine_days(dds):
             for k, v in kv.items():
                 out['peak'].setdefault(r, {}).setdefault(k, [0] * pos)
                 out['peak'][r][k] += v
+        for part, kv in d.get('oemb', {}).items():   # other embedded generation: zero before it starts
+            for k, v in kv.items():
+                out['oemb'][part].setdefault(k, [0] * pos)
+                out['oemb'][part][k] += v
         for p in d['plants']:
             key = (p['name'], p['fuel'], p['isl'])
             q = plants.get(key)
@@ -444,6 +468,9 @@ def combine_days(dds):
         pos += m
         for isl in ('NI', 'SI'):  # a series missing from a month (no output anywhere) is zero
             for k, v in out[isl].items():
+                v += [0] * (pos - len(v))
+        for kv in out['oemb'].values():
+            for v in kv.values():
                 v += [0] * (pos - len(v))
         for v in out['nodes'].values():  # a node price missing from a month is a gap
             v += [None] * (pos - len(v))
@@ -509,7 +536,7 @@ def mapping_hash():
     from common import overrides
     h = hashlib.sha256(f'build {BUILD}'.encode())
     for f in ('plant_register.csv', 'connection_points.csv', 'rooftop_points.csv', 'rooftop_nsp.csv',
-              'metered_plants.csv', 'metered_islands.csv'):
+              'metered_plants.csv', 'metered_islands.csv', 'embedded_points.csv', 'embedded_registry_split.csv'):
         with open(os.path.join(FACILITIES, f), 'rb') as fh:
             h.update(fh.read())
     for f in sorted(x for x in os.listdir(FACILITIES) if x.startswith('metered_fill_')):
@@ -590,11 +617,25 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
     stopped = ''
     repairs = 0
     icols = irr_cols()
+    # other embedded generation (embedded.py): each month's reconciliation file name (a revision has a new one), and
+    # the average days its estimates and the live job's come from
+    ofiles = dict(index.get('oemb_files', {}))
+    prof = json.loads(store.get('hist/oemb/profiles.json') or b'{}').get('months', {})
+    prof_before = json.dumps(prof, sort_keys=True)
+    y0 = yesterday.year * 12 + yesterday.month - 1 - emb.REVISION_MONTHS
+    rev_from = f'{y0 // 12}-{y0 % 12 + 1:02d}'
+    onames, orefetch = {}, set()
 
     for m in months_between(start or FIRST_MONTH, yesterday):
         month = f'{m:%Y-%m}'
         key = f'hist/state/{month}.csv.gz'
         rc = cap_total(cap, month)
+        if not stopped and month in ofiles and month >= rev_from:
+            # a recent month's reconciliation data is revised about 3, 7 and 14 months on: read it again when it is
+            onames[month] = emb.latest_name(get, month)
+            if onames[month] and onames[month] != ofiles[month]:
+                orefetch.add(month)
+                done.discard(month)
         if month in done and month in stored and caps_before.get(month) == rc:
             continue
         if stopped:
@@ -630,6 +671,14 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
                 got_m = True
         if s is None or s.empty:
             continue
+        # other embedded generation: the month's reconciliation data, once published (from LAYER_FROM)
+        got_o = False
+        if month >= emb.LAYER_FROM and (month in orefetch or not emb.has_recon(s)):
+            r = emb.fetch(get, month, onames.get(month))
+            if r is not None:
+                ofiles[month], cols = r
+                s = emb.merge(s, cols)
+                got_o = True
         dropped = [c for c in ('R|NI', 'R|SI') if c in s]   # BUILD 3's island-weighted reanalysis irradiance
         s = s.drop(columns=dropped)
         for c in icols:
@@ -656,7 +705,7 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
             continue
         priced = add_final(s, m)
         hv_metered = add_hvdc(s, m)
-        if new or fixed or priced or hv_metered or dropped or got_m:
+        if new or fixed or priced or hv_metered or dropped or got_m or got_o:
             store.put(key, dump_state(s))
             missing_r = len(irr_missing(s, icols))
             unpriced = int((s['F|NI'].isna() | (s['fi'] == 1)).sum())
@@ -664,7 +713,8 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
                 + ('; metered data' + (' (complete)' if mt.complete(s, m) else ' (part published)') if 'mg' in s else '')
                 + (f'; irradiance missing for {missing_r} trading periods' if missing_r else '')
                 + (f'; {unpriced} trading periods without final prices yet' if unpriced else '')
-                + ('; metered HVDC added' if hv_metered else ''))
+                + ('; metered HVDC added' if hv_metered else '')
+                + (f'; reconciliation data ({ofiles[month].rsplit("/", 1)[-1]})' if got_o else ''))
         hv_missing = s[['H|BEN', 'H|HAY']].isna().any().any()
         irr_n = len(irr_missing(s, icols))
         met_ok = mt.complete(s, m) or month_last < yesterday - timedelta(days=METERED_WAIT)
@@ -673,6 +723,7 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
                 and not s[['F|NI', 'F|SI']].isna().any().any() and not (s['fi'] == 1).any()
                 and (not hv_missing or month_last < yesterday - timedelta(days=90))
                 and met_ok
+                and (month < emb.LAYER_FROM or emb.has_recon(s) or month_last < yesterday - timedelta(days=METERED_WAIT))
                 and len(dispatch_days(s)) == len(list(month_days(m, yesterday)))):
             done.add(month)  # every day stored, metering, irradiance, final prices and HVDC complete, and the month long over
         # wait for irradiance before rebuilding a month with days of it missing (except the newest two days)
@@ -681,8 +732,9 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
             # stays in rebuild_left (or unbuilt): a later run fetches the irradiance, then builds it, rather than
             # spending KV writes building it twice
             continue
-        if new or fixed or priced or hv_metered or got_m or month in left or month not in stored or caps_before.get(month) != rc:
-            hh, dd = build_month(s, month, cap, lambda *a: log(f"  {month}:", *a))
+        if (new or fixed or priced or hv_metered or got_m or got_o or month in left or month not in stored
+                or caps_before.get(month) != rc):
+            hh, dd = build_month(s, month, cap, lambda *a: log(f"  {month}:", *a), prof, ofiles.get(month))
             put_json(store, f'hist/hh/{month}.json', hh)
             put_json(store, f'hist/dd/{month}.json', dd)
             changed_dd[month] = dd
@@ -692,6 +744,20 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
             left.discard(month)
             caps_before[month] = hh['meta']['roof_mw']
 
+    # other embedded generation's average days by month (for estimates here and in the live job), when they changed
+    if json.dumps(prof, sort_keys=True) != prof_before and store.room(1 + 3):
+        put_json(store, 'hist/oemb/profiles.json', {'months': prof, 'at': int(time.time() * 1000)})
+    # and the typical days the live job lays over its week, for the months it can touch (last month to next)
+    try:
+        first = datetime.now(NZ).date().replace(day=1)   # not 'today': main's 'today' keys the day's write count
+        mo = [f'{(first + timedelta(days=d)):%Y-%m}' for d in (-1, 0, 32)]
+        isl_tab = mt.islands()
+        live = {'months': emb.live_days(prof, mo, isl=lambda poc: island_of(poc, isl_tab), log=log)}
+        old = json.loads(store.get('hist/oemb/live.json') or b'{}')
+        if live['months'] and live['months'] != old.get('months') and store.room(1 + 3):
+            put_json(store, 'hist/oemb/live.json', {**live, 'at': int(time.time() * 1000)})
+    except Exception as e:  # noqa: BLE001  never fatal: the live week goes without the layer
+        log(f'other embedded live days: skipped ({type(e).__name__}: {e})')
     # the /now price explainer's usual values (when history has moved on) and the newest day of offers (once a day)
     explain.update(store, log)
     # records (records.py): month summaries kept up to date; hist/records.json published while the history is
@@ -708,7 +774,7 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
     # 'at': when this run saved it; the Worker's health check and the watchdog treat a stale index as expected while a
     # rebuild is under way (rebuild_left not empty, progress saved within two days)
     progress = {'months': months, 'done': sorted(done), 'rebuild_left': sorted(left), 'hash': mhash, 'roof_mw': caps_before,
-                'writes': {today: store.used + 1}, 'at': int(time.time() * 1000), 'hv': hvdc.VERSION}
+                'writes': {today: store.used + 1}, 'at': int(time.time() * 1000), 'hv': hvdc.VERSION, 'oemb_files': ofiles}
     if not changed_dd:
         # no month rebuilt, but a run can still have saved files (a month's state, the solar capacity table) or
         # finished months: record them, so the day's KV write count stays right and finished months aren't revisited
@@ -728,7 +794,7 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
     put_json(store, 'hist/day.json', day)
     index = {**progress, 'first': day['t'][0], 'end': end, 'built': int(time.time() * 1000)}
     index['writes'] = {today: store.used + 2}
-    put_json(store, 'hist/index.json', index)
+    put_json(store, 'hist/index.json', {k: v for k, v in index.items() if k != 'oemb_files'})   # the public copy
     put_json(store, 'hist/progress.json', index)
     log(f'history: {len(months)} months, {day["N"]} days to {pd.Timestamp(index["end"], unit="ms", tz="UTC").tz_convert(NZ)}, '
         f'{len(changed_dd)} months rebuilt in {time.time() - t_start:.0f} s, {store.used} KV writes today')

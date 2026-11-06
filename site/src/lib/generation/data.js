@@ -48,7 +48,12 @@ export function shares(S, region, mk) {
   const part = new Float64Array(n), tot = new Float64Array(n), pct = new Float64Array(n);
   for (let i = 0; i < n; i++) {
     let a = 0, b = 0;
-    for (const k of GEN) { if (k === 'batt') continue; const v = mwAt(S, k, region, i); b += v; if (parts.includes(k)) a += v; }
+    for (const k of GEN) {
+      if (k === 'batt') continue;
+      const v = mwAt(S, k, region, i); b += v;
+      if (parts.includes(k)) a += v;
+      else if (k === 'oemb' && mk === 'ren') a += mwAt(S, 'oembR', region, i);   // other embedded: its renewable part
+    }
     part[i] = a; tot[i] = b; pct[i] = b > 0 ? (100 * a) / b : NaN;
   }
   return { part, tot, pct };
@@ -123,6 +128,7 @@ export function heatMonthRows(months, region, mk, from, to, yearly = false) {
         any = true;
         const x = Math.max(0, v);
         b += x; if (parts.includes(f)) a += x;
+        else if (f === 'oemb' && mk === 'ren' && I.oembR) a += Math.max(0, I.oembR[k] ?? 0);
       }
     }
     if (!any) return NaN;
@@ -184,8 +190,10 @@ export function mixRows(S, region, from, to, prev, fine) {
     let peak = 0;
     if (fine) for (let i = 0; i < S.n; i++) peak = Math.max(peak, mwAt(S, f.k, region, i));
     const cap = capacityMWh(f.k, region, from, to);
-    tot += e; if (f.ren) ren += e; if (f.k !== 'batt') base += e;
-    if (prev) { totPrev += ep; if (f.ren) renPrev += ep; if (f.k !== 'batt') basePrev += ep; }
+    // other embedded generation: part renewable (oembR); no installed capacity, so no capacity factor
+    const er = f.mixed ? energy(S, 'oembR') : f.ren ? e : 0, epr = !prev ? 0 : f.mixed ? energy(prev, 'oembR') : f.ren ? ep : 0;
+    tot += e; ren += er; if (f.k !== 'batt') base += e;
+    if (prev) { totPrev += ep; renPrev += epr; if (f.k !== 'batt') basePrev += ep; }
     if (e < 0.5 && !(ep > 0.5)) continue;   // nothing from this fuel in either window
     rows.push({ f, e, ep, share: 0, avg: e / hours, peak: fine ? peak : NaN, cf: cap > 0 ? e / cap : NaN });
   }

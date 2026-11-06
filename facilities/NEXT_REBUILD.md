@@ -1,12 +1,14 @@
 # Waiting for the next full history rebuild
 
 These changes touch files in the history's rebuild fingerprint (`mapping_hash()` in `ingest/history.py`:
-`metered_plants.csv`, `overrides.toml` except its site-only tables, the register, the BUILD number), so pushing any of
+`metered_plants.csv`, `embedded_points.csv`, `embedded_registry_split.csv`, `overrides.toml` except its site-only
+tables, the register, the BUILD number), so pushing any of
 them starts a rebuild of every month (under an hour, in the next history run). Bundle them and push them together, and never
 while a rebuild is still running (check `/data/history/progress.json`: `rebuild_left` empty).
 
-The last rebuild (BUILD 9, 5 Nov 2026: Kawerau (Onepu), geothermal from 2013) took 26 minutes in one run (352 months, 795
-KV writes), reading 84 months' metered files again. Its items were checked on the published data and removed.
+The last rebuild (BUILD 10, 6 Nov 2026: other embedded generation from 2009) took 55 minutes in one run (353 months, 925
+KV writes), downloading 213 months' reconciliation files once; they are kept in the states, so later rebuilds don't
+download them again. Its items were checked on the published data and removed.
 
 ## Collecting a build
 

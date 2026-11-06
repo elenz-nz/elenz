@@ -279,6 +279,18 @@ d3 = R3['records']['demand_max']['NZ']
 check(d3['v'] == dm['v'] + 1000 and d3.get('since') == 3 and any(x['k'] == 'demand_max' and x['r'] == 'NZ' and x['ok'] for x in R3['resolved']),
       'records: confirmed when the metered month arrives (new, and listed as settled)')
 check(not rc.same(R2, R3) and rc.same(R3, {**R3, 'built': 0}), 'records: republished only when something changed')
+# other embedded generation (records VERSION 7): the layer counts in generation and the renewable share, not in fuel
+# records; a named plant's fill joins its fuel
+m_oe = copy.deepcopy(m_off)
+N_oe = m_oe['N']
+m_oe['oemb'] = {'src': 'recon', 'NI': {'hydro': [50.0] * N_oe, 'other': [50.0] * N_oe}, 'SI': {}, 'named': {'Ngāwhā': [20.0] * N_oe}}
+S0, S1 = rc.series(m_off), rc.series(m_oe)
+g0, r0 = np.nansum(S0['gen']['NI']), np.nansum(S0['renE']['NI'])
+check(abs(np.nansum(S1['gen']['NI']) - g0 - 120 * N_oe) < 1e-6 and abs(np.nansum(S1['renE']['NI']) - r0 - 70 * N_oe) < 1e-6,
+      'records: other embedded in generation and the renewable share (unclassified not renewable), named fill in its fuel')
+check(np.allclose(S1['hydro_max']['NI'], S0['hydro_max']['NI']) and np.allclose(S1['demand_max']['NI'], S0['demand_max']['NI']),
+      'records: fuel records leave the layer out; demand unchanged')
+check('SI' not in S1['ren_min'] and 'SI' in S1['ren_max'], 'records: no lowest renewable share for the South Island')
 # the current period so far (records.js pace): the newest day's period, each series' sum and count in half-hours
 pc = R['pace']
 dsum = pc['day']['sums']['NZ']['dem']
@@ -327,6 +339,83 @@ sm = of.summarise(off, hh_fake)
 j = sm['t'].index(int(pd.Timestamp('2026-10-16', tz='Pacific/Auckland').timestamp() * 1000))
 check(sm['lowO']['NZ'][j] == 0 and sm['lowC']['SI'][j] == 0 and sm['lowOx']['NI'][j] == 0 and sm['lowO']['SI'][j - 1] is None,
       'offered: daily lowest headroom (offered less output, never below zero; no offers, no figure)')
+
+# other embedded generation (embedded.py): a synthetic reconciliation file and month
+import gzip as _gzip  # noqa: E402
+
+import embedded as emb  # noqa: E402
+
+lines = ['PointOfConnection,Network,Island,Participant,TradingDate,TradingPeriod,TradingPeriodStartTime,FlowDirection,KilowattHours']
+for day in ('2026-01-05', '2026-01-06'):
+    for tp in range(1, 49):
+        hh = f'{(tp - 1) // 2:02d}:{30 * ((tp - 1) % 2):02d}'
+        sun = 1000 if 16 <= tp <= 36 else 0
+        for poc, net, tr, kwh in (('AAA0331', 'DUNE', 'XXXX', 2500), ('AAA0331', 'DUNE', 'SUNY', sun),
+                                  ('BBB0331', 'MERI', 'MERI', 5000), ('GLN0332', 'COUP', 'ALNT', 700),
+                                  ('HWB0331', 'DUNE', 'CNIR', 4000), ('AAA0331', 'DUNE', 'XXXX', 0)):
+            lines.append(f'{poc},{net},SI,{tr},{day},{tp},{hh},Injection,{kwh}')
+        lines.append(f'AAA0331,DUNE,SI,XXXX,{day},{tp},{hh},Offtake,9999')
+inj = emb.read_recon(_gzip.compress('\n'.join(lines).encode()))
+t0 = int(pd.Timestamp('2026-01-05', tz='Pacific/Auckland').timestamp() * 1000)
+js_e = {'t0': t0, 'step': 1_800_000, 'N': 96, 'plants': [
+    {'name': 'A hydro', 'fuel': 'hydro', 'poc': ['AAA0331'], 's': [1.0] * 96},
+    {'name': 'Deep Stream', 'fuel': 'hydro', 'poc': ['WPG0331'], 's': [6.0] * 96},
+    {'name': 'A farm', 'fuel': 'solar', 'poc': ['AAA0331'], 's': [9.0] * 96}]}
+o_e, s_e = emb.residual(inj, js_e)
+roles = s_e.role.to_dict()
+check(roles[('AAA0331', 'DUNE', 'SUNY')] == 'solar' and roles[('BBB0331', 'MERI', 'MERI')] == 'generator'
+      and roles[('GLN0332', 'COUP', 'ALNT')] == 'exclude' and roles[('AAA0331', 'DUNE', 'XXXX')] == 'other',
+      'embedded: series sorted into solar, generator network, excluded and other')
+check(abs(o_e['AAA0331'].mean() - 4.0) < 1e-9 and len(o_e) == 96 and not o_e.isna().any().any(),
+      f'embedded: injection less what is counted at the point (5 - 1 MW; solar plants not counted) ({o_e["AAA0331"].mean():.2f})')
+check(abs(o_e['HWB0331'].mean() - 2.0) < 1e-9, 'embedded: a metered point is counted at its grid exit point (8 - 6 MW)')
+prof = emb.profile(o_e)
+check(prof.shape == (48, o_e.shape[1]) and abs(emb.carry(prof, o_e.index)['AAA0331'].mean() - 4.0) < 1e-9,
+      'embedded: average day by half-hour, carried forward')
+bl = emb.blend(prof, prof * 3)
+check(abs(bl['AAA0331'].mean() - 8.0) < 1e-9 and emb.blend(None, prof) is prof, 'embedded: blend of the latest month and a year earlier')
+check(emb.fuel_of('SVL0331') == {'bio': 1.0} and emb.fuel_of('BOB1101') == {'other': 1.0} and emb.name_of('ABY0111') == 'Opuha'
+      and emb.name_of('SVL0331') == '', 'embedded: documented fuels, unclassified Bombay, names only where tied to the point')
+
+# the layer in history months (embedded.month_block): state columns, a metered month, a dispatch month, an estimate
+idx_e = o_e.index
+koe = pd.DataFrame({'O|KOE1101 NGAG': 6.0}, index=idx_e)
+g_e = emb.merge(pd.DataFrame({'x': 0.0}, index=idx_e), emb.state_columns(inj).join(koe, how='outer'))
+check(emb.has_recon(g_e) and 'O|AAA0331 XXXX' in g_e and 'O|AAA0331 SUNY' not in g_e and 'O|BBB0331 MERI' not in g_e
+      and not g_e.isna().any().any(), 'embedded: state keeps the non-solar series off generator networks, zeros filled')
+isl_e = lambda poc: 'NI' if poc.startswith('KOE') else 'SI'   # noqa: E731
+ngawha = lambda mw: {'name': 'Ngāwhā', 'fuel': 'geo', 'poc': ['KOE1101'], 's': [mw] * 96}   # noqa: E731
+prof_e = {}
+blk = emb.month_block(g_e, {**js_e, 'plants': js_e['plants'] + [ngawha(6.0)]}, '2025-12', True, prof_e, 'f1', isl=isl_e)
+tot = lambda b, side: sum(np.mean(v) for v in b[side].values())   # noqa: E731
+check(blk['src'] == 'recon' and abs(tot(blk, 'SI') - 6.0) < 1e-6 and abs(tot(blk, 'NI')) < 1e-6 and blk['named'] == {}
+      and prof_e['2025-12']['plants']['Ngāwhā'][0] == 6.0,
+      f'embedded: metered month, the whole named plant counted, nothing left at its point (SI {tot(blk, "SI"):.2f})')
+blk = emb.month_block(g_e, {**js_e, 'plants': js_e['plants'] + [ngawha(2.0)]}, '2026-01', False, prof_e, 'f2', isl=isl_e)
+check(abs(np.mean(blk['named']['Ngāwhā']) - 4.0) < 1e-6 and abs(tot(blk, 'NI')) < 1e-6 and abs(tot(blk, 'SI') - 6.0) < 1e-6,
+      'embedded: dispatch month, the named point\'s leftover goes to its plant (6 - 2 MW)')
+blk = emb.month_block(pd.DataFrame({'x': 0.0}, index=idx_e), {**js_e, 'plants': js_e['plants'] + [ngawha(2.0)]},
+                      '2026-02', False, prof_e, isl=isl_e)
+check(blk['src'] == 'estimate' and blk['from'] == ['2026-01'] and abs(tot(blk, 'SI') - 6.0) < 1e-6
+      and abs(np.mean(blk['named']['Ngāwhā']) - 4.0) < 1e-6,
+      'embedded: estimate from the average days, the plant\'s rest from its own metered average day')
+check(emb.month_block(g_e, js_e, '2008-12', True, {}, isl=isl_e) is None, 'embedded: nothing before 2009')
+isl_fake = {'price': [50] * 96, 'metered': [0] * 96, 'underlying': [0] * 96}
+dd_e = history.daily({**js_e, 'NI': isl_fake, 'SI': isl_fake, 'hvdcN': [0] * 96, 'plants': [],
+                      'meta': {'end': 0}, 'oemb': blk}, '2026-02')
+check(len(dd_e['oemb']['SI']['hydro']) == 2 and len(dd_e['oemb']['named']['Ngāwhā']) == 2, 'daily: other embedded by day')
+day_e = history.combine_days([dd, dd_e])
+check(len(day_e['oemb']['SI']['hydro']) == day_e['N'] and day_e['oemb']['SI']['hydro'][0] == 0,
+      'combine_days: other embedded joined, zero before it starts')
+
+# the live week (embedded.live_days in the history job, live_block in the live job)
+days_e = emb.live_days(prof_e, ['2026-02', '2026-03'], isl=isl_e)
+check(days_e['2026-02']['from'] == ['2026-01'] and abs(sum(np.mean(v) for v in days_e['2026-02']['SI'].values()) - 6.0) < 1e-6
+      and days_e['2026-02']['plants']['Ngāwhā'][0] == 6.0, 'embedded: typical days for the live week, layer and named plant')
+lb = emb.live_block(days_e, {**js_e, 'plants': js_e['plants'] + [ngawha(2.0)]})
+check(list(lb['days']) == ['2026-01'] or set(lb['days']) <= {'2026-01', '2026-02'}, 'embedded: live block names the months it covers')
+check(len(lb['named']['Ngāwhā']) == 96 and abs(np.mean(lb['named']['Ngāwhā']) - 4.0) < 1e-6 and emb.live_block({}, js_e) is None,
+      'embedded: live block fills in the named plant (typical 6 less dispatched 2 MW)')
 
 print(f'\n{len(failures)} failed' if failures else '\nall passed')
 sys.exit(1 if failures else 0)

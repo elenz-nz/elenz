@@ -139,10 +139,11 @@
 			<li>Chart buttons switch between MW and share, and between stacked and lines. “$ Price” adds the island price on a right-hand axis.</li>
 			{#if periodWord}<li>Each {periodWord} shows the energy produced, not average MW; a faded end is only partly covered.</li>{/if}
 			{#if island}<li>HVDC arriving sits on top. HVDC leaving and battery charging go below zero.</li>{/if}
-			<li>Embedded solar (yellow, hatched) is estimated. The live week is the market's 5-minute dispatch; earlier dates are metered output, which the EA publishes about six weeks behind.</li>
+			<li>Hatched layers are estimated: embedded solar, and other embedded generation (small hydro, landfill gas and more on local networks, from 2009).</li>
+			<li>The live week is the market's 5-minute dispatch; earlier dates are metered output, which the EA publishes about six weeks behind.</li>
 		</ul>
 		<p id="gen-note" hidden></p>
-		<p><a href="/methods/generation">How generation is built</a></p>
+		<p><a href="/methods/generation">How generation is built</a> · <a href="/methods/other-embedded">Other embedded generation</a></p>
 	{:else if id === 'price'}
 		<p>This shows the wholesale price of electricity at each island's reference point: Haywards for the North Island and Benmore for the South.</p>
 		<ul>
@@ -156,7 +157,7 @@
 		<p>This shows how much electricity {regionOf} used over the dates chosen.</p>
 		<ul>
 			<li>Solid line: electricity taken from the national grid, Tiwai smelter included.</li>
-			<li>Dashed line: with estimated embedded solar added back, closer to what homes and businesses actually used. The band around it is its uncertainty.</li>
+			<li>Dashed line: with estimated embedded generation added back (embedded solar, and other plant on local networks from 2009), closer to what homes and businesses actually used. The band around it is embedded solar's uncertainty.</li>
 			{#if periodWord}<li>The summary gives each day's peak half-hour.</li>{/if}
 		</ul>
 		<p><a href="/methods/demand">How demand is worked out</a></p>
@@ -180,7 +181,7 @@
 	{:else}
 		<p>This shows how much of {regionPos} electricity came from renewable sources such as hydro, geothermal, wind and solar.</p>
 		<ul>
-			<li>Embedded solar is included.</li>
+			<li>Embedded solar and other embedded generation are included (its unclassified part counts as not renewable).</li>
 			<li>Geothermal counts as renewable, although it releases some CO₂.</li>
 			<li>Battery output is left out, as it stores power made elsewhere.</li>
 		</ul>
@@ -367,7 +368,7 @@
 					{@render foldTitle('demand', 'Demand')}{@render info('demand')}
 					<div class="legends">
 						<span class="lg"><i style="--c:var(--ink)"></i>Metered <b id="v-met"></b></span>
-						<span class="lg"><i class="dash" style="--c:var(--ink-2)"></i>With embedded solar <b id="v-und"></b></span>
+						<span class="lg"><i class="dash" style="--c:var(--ink-2)"></i>With embedded generation <b id="v-und"></b></span>
 					</div>
 					{@render popBtn('demand', 'demand')}
 				</div>

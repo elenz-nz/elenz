@@ -3,7 +3,7 @@
   --bg: #f2f5f5; --surface: #fbfcfc; --ink: #132020; --ink-2: #3f4f4e; --muted: #667574;
   --line: #d6dfde; --grid: #e5ebeb; --land: #e1e8e8; --accent: #0d6275; --accent-soft: #d6e8eb; --warn-bg: #f6ecd9; --warn-ink: #6b4a0d;
   --f-coal: #4b4744; --f-gas: #d9731f; --f-geo: #a63a78; --f-hydro: #2f6db8; --f-wind: #2f9a78;
-  --f-solar: #c48e10; --f-batt: #7356c4; --f-hvdc: #71838f; --co2: #6d5a4c;
+  --f-solar: #c48e10; --f-oemb: #4f8aa3; --f-batt: #7356c4; --f-hvdc: #71838f; --co2: #6d5a4c;
   --o1: #f58025; --o2: #39a0b8; --o3: #e02030; --o4: #e2c400; --o5: #a8690c; --o6: #55605f;
   /* line palette (generation chart, lines view): eight hues checked for colour-blind separation on --surface */
   --l1: #2a78d6; --l2: #eb6834; --l3: #1baf7a; --l4: #eda100; --l5: #e87ba4; --l6: #008300; --l7: #6250d6; --l8: #e34948;
@@ -17,7 +17,7 @@
     --bg: #131c1c; --surface: #1a2424; --ink: #e1e9e9; --ink-2: #b3c1c0; --muted: #849493;
     --line: #2f3e3e; --grid: #243030; --land: #2e3d3d; --accent: #5cb5c8; --accent-soft: #163239; --warn-bg: #2e2412; --warn-ink: #e9c98a;
     --f-coal: #5f5a57; --f-gas: #cc7a2e; --f-geo: #c4508f; --f-hydro: #4f8bd6; --f-wind: #2fa883;
-    --f-solar: #bb8c18; --f-batt: #8a72d8; --f-hvdc: #7f909b; --co2: #a8927f;
+    --f-solar: #bb8c18; --f-oemb: #6fa8c2; --f-batt: #8a72d8; --f-hvdc: #7f909b; --co2: #a8927f;
     --o1: #f08a3c; --o2: #4fb3cb; --o3: #e5484d; --o4: #e0c51c; --o5: #c78a1a; --o6: #a9b4b3; --l1: #3987e5; --l2: #d95926; --l3: #199e70; --l4: #c98500; --l5: #d55181; --l6: #008300; --l7: #9085e9; --l8: #e66767;
     --f-diesel: #bf3a52; --f-bio: #8fb03c; --f-waste: #a88a74; --g-fossil: #a8693a; --g-ren: #2ea88a; --g-fast: #3c97c2; --g-vre: #9a9020; --g-resid: #5784d0;
     --p-ni: #e1e9e9; --p-si: #5cb5c8; --live-bg: #16301f; --live-ink: #8fd3a8;
@@ -28,7 +28,7 @@
   --bg: #131c1c; --surface: #1a2424; --ink: #e1e9e9; --ink-2: #b3c1c0; --muted: #849493;
   --line: #2f3e3e; --grid: #243030; --land: #2e3d3d; --accent: #5cb5c8; --accent-soft: #163239; --warn-bg: #2e2412; --warn-ink: #e9c98a;
   --f-coal: #5f5a57; --f-gas: #cc7a2e; --f-geo: #c4508f; --f-hydro: #4f8bd6; --f-wind: #2fa883;
-  --f-solar: #bb8c18; --f-batt: #8a72d8; --f-hvdc: #7f909b; --co2: #a8927f;
+  --f-solar: #bb8c18; --f-oemb: #6fa8c2; --f-batt: #8a72d8; --f-hvdc: #7f909b; --co2: #a8927f;
   --o1: #f08a3c; --o2: #4fb3cb; --o3: #e5484d; --o4: #e0c51c; --o5: #c78a1a; --o6: #a9b4b3; --l1: #3987e5; --l2: #d95926; --l3: #199e70; --l4: #c98500; --l5: #d55181; --l6: #008300; --l7: #9085e9; --l8: #e66767;
   --f-diesel: #bf3a52; --f-bio: #8fb03c; --f-waste: #a88a74; --g-fossil: #a8693a; --g-ren: #2ea88a; --g-fast: #3c97c2; --g-vre: #9a9020; --g-resid: #5784d0;
   --p-ni: #e1e9e9; --p-si: #5cb5c8; --live-bg: #16301f; --live-ink: #8fd3a8;

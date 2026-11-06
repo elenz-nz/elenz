@@ -4,6 +4,7 @@
 // Each record's id matches records.py. kind: 'hh' (a half-hour), 'month' (a calendar month) or 'run' (the longest
 // run of half-hours); fam: what makes it official (gen: metered generation and demand; price: final prices; hvdc:
 // metered HVDC), as in records.py; tok: its colour token; regions it is kept for, and what to say for the others.
+import { withOemb } from '../tracker/oemb.js';
 
 export const RECORDS_URL = '/data/history/records.json';
 export const LIVE_URL = '/data/tracker.json';
@@ -31,10 +32,12 @@ export const DEFS = [
   { id: 'demand_min', kind: 'hh', fam: 'gen', group: 'Demand', name: 'Lowest demand', sub: 'Lowest half-hour of grid demand', unit: 'MW', tok: '--ink', regions: ALL },
   { id: 'ren_max', kind: 'hh', fam: 'gen', group: 'Renewables', name: 'Highest renewable share', sub: 'Half-hour', unit: '%', dp: 1, tok: '--g-ren', regions: ALL },
   { id: 'ren_month_max', old: true, kind: 'month', fam: 'gen', group: 'Renewables', name: 'Highest renewable share', sub: 'Calendar month', unit: '%', dp: 1, tok: '--g-ren', regions: ALL },
-  { id: 'ren_min', kind: 'hh', fam: 'gen', group: 'Renewables', name: 'Lowest renewable share', sub: 'Half-hour', unit: '%', dp: 1, tok: '--g-ren', regions: ALL },
-  { id: 'ren_month_min', old: true, kind: 'month', fam: 'gen', group: 'Renewables', name: 'Lowest renewable share', sub: 'Calendar month', unit: '%', dp: 1, tok: '--g-ren', regions: ALL },
+  { id: 'ren_min', kind: 'hh', fam: 'gen', group: 'Renewables', name: 'Lowest renewable share', sub: 'Half-hour', unit: '%', dp: 1, tok: '--g-ren', regions: ['NZ', 'NI'],
+    na: { SI: 'The South Island’s generation is almost all renewable' } },
+  { id: 'ren_month_min', old: true, kind: 'month', fam: 'gen', group: 'Renewables', name: 'Lowest renewable share', sub: 'Calendar month', unit: '%', dp: 1, tok: '--g-ren', regions: ['NZ', 'NI'],
+    na: { SI: 'The South Island’s generation is almost all renewable' } },
   { id: 'ren_run', kind: 'run', fam: 'gen', group: 'Renewables', name: 'Longest run at 90% renewable or more', sub: 'Every half-hour in a row', unit: 'h', tok: '--g-ren', regions: ['NZ', 'NI'],
-    na: { SI: 'The South Island’s generation is all renewable' } },
+    na: { SI: 'The South Island’s generation is almost all renewable' } },
   { id: 'fossil_min', kind: 'hh', fam: 'gen', group: 'Renewables', name: 'Lowest fossil generation', sub: 'Rankines, gas, diesel and waste heat', unit: 'MW', tok: '--g-fossil', regions: ALL },
   { id: 'fossil_max', kind: 'hh', v: 4, fam: 'gen', group: 'Renewables', name: 'Most fossil generation', sub: 'Rankines, gas, diesel and waste heat', unit: 'MW', tok: '--g-fossil', regions: ['NZ', 'NI'],
     na: { SI: 'No fossil plant in the South Island' } },
@@ -283,6 +286,8 @@ function halfHours(D) {
     return out;
   };
   const z = new Array(n).fill(0);
+  // other embedded generation (records.py VERSION 7; withOemb: the named plants' fill is in their fuels already): the
+  // layer counts in generation and the renewable share only
   const a = (isl, key) => D[isl][key] ?? z;
   const out = {};
   for (const r of ['NZ', 'NI', 'SI']) {
@@ -290,10 +295,14 @@ function halfHours(D) {
     const F = Object.fromEntries(GEN.map((f) => [f, fuel(f).map((x) => Math.max(0, x))]));
     // the renewable share leaves battery discharge out (as records.py and the rest of the site)
     const gen = new Array(n).fill(0), ren = new Array(n).fill(0), fos = new Array(n).fill(0);
+    const isls = r === 'NZ' ? ['NI', 'SI'] : [r];
+    const lg = isls.map((i) => a(i, 'oemb')), lr = isls.map((i) => a(i, 'oembR'));
     for (let j = 0; j < n; j++) {
       for (const f of GEN) if (f !== 'batt') gen[j] += F[f][j];
       for (const f of REN) ren[j] += F[f][j];
       for (const f of FOSSIL) fos[j] += F[f][j];
+      for (const x of lg) gen[j] += x[j];
+      for (const x of lr) ren[j] += x[j];
     }
     const dem = r === 'NZ' ? a('NI', 'metered').map((x, j) => x + a('SI', 'metered')[j]) : a(r, 'metered');
     const G = avg(gen), Rn = avg(ren);
@@ -317,7 +326,7 @@ function liveCheck(R, D) {
   const beats = {}, near = {};
   if (!R || !D || !D.N) return { beats, near };
   let H;
-  try { H = halfHours(adjustLive(D, R.adj)); } catch { return { beats, near }; }
+  try { H = halfHours(adjustLive(withOemb(D), R.adj)); } catch { return { beats, near }; }
   for (const d of DEFS) {
     if (d.kind !== 'hh' || d.fam !== 'gen' || !H.S[d.id]) continue;
     for (const r of d.regions) {

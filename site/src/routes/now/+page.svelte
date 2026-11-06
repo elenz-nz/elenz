@@ -160,7 +160,7 @@
 				<span class="k-lbl">Demand</span>
 				<span class="k-val">{nz ? fmt(nz.demand) : '–'}<small>MW</small></span>
 				<!-- only while there is embedded solar to add (none at night: NOW-05) -->
-				<span class="k-sub">{#if nz && nz.roof >= 0.5}{fmt(nz.underlying)} MW with embedded solar <span class="tag">est.</span>{/if}</span>
+				<span class="k-sub">{#if nz && nz.roof >= 0.5}{fmt(nz.underlying)} MW with embedded generation <span class="tag">est.</span>{/if}</span>
 			</div>
 			<div class="kpi">
 				<span class="k-lbl">Renewable share</span>
@@ -222,7 +222,7 @@
 									<circle class="ring-bg" r={RING_R} />
 									{#each ringOf(R) as f}
 										<circle class="seg" r={RING_R} transform="rotate(-90)"
-											style="stroke:{f.hatch ? 'url(#hatch-roof)' : `var(${f.tok})`};stroke-dasharray:{f.len} {RING_C - f.len};stroke-dashoffset:{-f.start}">
+											style="stroke:{f.hatch ? `url(#hatch-${f.k})` : `var(${f.tok})`};stroke-dasharray:{f.len} {RING_C - f.len};stroke-dashoffset:{-f.start}">
 											<title>{`${name}: ${f.name} ${fmt(f.mw)} MW (${f.pct.toFixed(1)}%)`}</title>
 										</circle>
 									{/each}
@@ -232,9 +232,11 @@
 							{/each}
 						{/if}
 						<defs>
-							<pattern id="hatch-roof" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-								<rect width="4" height="4" class="hatch-bg" /><rect width="2" height="4" class="hatch-fg" />
-							</pattern>
+							{#each ['roof', 'oemb'] as k}
+								<pattern id="hatch-{k}" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)" style="--c:var({k === 'roof' ? '--f-solar' : '--f-oemb'})">
+									<rect width="4" height="4" class="hatch-bg" /><rect width="2" height="4" class="hatch-fg" />
+								</pattern>
+							{/each}
 						</defs>
 					</svg>
 					{#if now}
@@ -260,7 +262,7 @@
 			<div class="now-side">
 			{#if recNew.length}<RecordLine items={recNew} />{/if}
 			<section class="panel mix-panel" aria-labelledby="mix-h">
-				<div class="p-head"><h2 id="mix-h">Generation now</h2><span class="p-info"><InfoTip label="About this table"><p>This shows how much electricity each type of generation is supplying to New Zealand right now.</p><ul><li>Figures are the market's dispatch: the output each power station is told to run at, updated every 5 minutes.</li><li>Embedded solar (rooftops and small solar farms) is estimated from satellite cloud data.</li></ul><p><a href="/methods/generation">How generation is built</a></p></InfoTip></span></div>
+				<div class="p-head"><h2 id="mix-h">Generation now</h2><span class="p-info"><InfoTip label="About this table"><p>This shows how much electricity each type of generation is supplying to New Zealand right now.</p><ul><li>Figures are the market's dispatch: the output each power station is told to run at, updated every 5 minutes.</li><li>Embedded solar (rooftops and small solar farms) is estimated from satellite cloud data.</li><li>Other embedded generation (small hydro, landfill gas and more on local networks) is a typical day from recent months.</li></ul><p><a href="/methods/generation">How generation is built</a></p></InfoTip></span></div>
 				{#if now && nz}
 					<div class="stack" aria-hidden="true">
 						{#each now.mix as f}<span class:hatch={f.hatch} style="--c:var({f.tok});width:{(f.mw / nz.gen) * 100}%" title="{f.name} {fmt(f.mw)} MW"></span>{/each}
@@ -360,8 +362,8 @@
 	.seg:hover { stroke-width: 16; }
 	.ring-v { fill: var(--ink); font-family: var(--font-data); font-size: 14px; font-weight: 600; }
 	.ring-u { fill: var(--muted); font-family: var(--font-ui); font-size: 10px; }
-	.hatch-bg { fill: color-mix(in srgb, var(--f-solar) 30%, transparent); }
-	.hatch-fg { fill: var(--f-solar); }
+	.hatch-bg { fill: color-mix(in srgb, var(--c) 30%, transparent); }
+	.hatch-fg { fill: var(--c); }
 	.stack { display: flex; height: 8px; border-radius: 2px; overflow: hidden; background: var(--grid); }
 	.stack { height: 14px; margin: 2px 0 10px; }
 	.stack span { background: var(--c); height: 100%; }
