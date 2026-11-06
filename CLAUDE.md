@@ -392,7 +392,8 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   (Workers KV Storage: Edit). KV namespace id lives in `wrangler.jsonc`. A run with no new data saves nothing.
 - `.github/workflows/history.yml`: runs `history.py`, triggered every 6 hours by the Worker's second cron. The first
   run backfills ~2,200 daily files (resumes next run if it hits its time budget). KV writes: ~3 per changed month,
-  so a full rebuild of every month needs ~750 writes and takes one run (BUILD 8: 352 months in 13 minutes);
+  so a full rebuild of every month needs ~750 writes and takes one run (BUILD 8: 352 months in 13 minutes; BUILD 10,
+  which downloaded every month's reconciliation file into the states once, 55 minutes and 925 writes);
   it starts with the next history run (or by hand, Actions → History); never start one while another is running. The Worker starts the Offers workflow (`offers.yml`) with it.
 - `worker/index.js`: serves static assets, `/data/tracker.json` from KV (binding `DATA`), falling back to the
   bundled snapshot, and `/data/history/{index,day,hh/YYYY-MM}.json` from KV keys `hist/*`; rewrites the title,
@@ -592,7 +593,8 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
    item checked out on the published files on 27 Oct, the Offers workflow was rerun with "resummarise", and the old
    plant names were cleaned up. BUILD 8 (Tekapo A and B's names, Huntly in September 2020) ran on 3 Nov 2026 in one 13-minute
    run, and its items checked out on the published data. BUILD 9 (Kawerau (Onepu), geothermal from 2013) ran on 5 Nov 2026
-   in one 26-minute run; its items checked out and Offers was resummarised. See `facilities/NEXT_REBUILD.md` for how a
+   in one 26-minute run; its items checked out and Offers was resummarised. BUILD 10 (other embedded generation from 2009,
+   in its own `oemb` block) ran on 6 Nov 2026 in one 55-minute run; its items checked out (no resummarise needed). See `facilities/NEXT_REBUILD.md` for how a
    next build is collected.
 4. Pages: landing (`/`), live (`/now`, with the price explainer and Every generator right now), tracker (Generation and
    Prices tabs), Records (`/records`), Articles (`/articles`, published 15 Oct 2026 with the Winter 2026 review), About,
