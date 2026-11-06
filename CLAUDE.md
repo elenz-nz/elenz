@@ -357,8 +357,13 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   dispatch months and which ones were settled) is published while the history is complete, only when it changes. Official
   means metered generation (meta.source), final prices, metered HVDC. Dispatch months are corrected before they are
   compared (`facilities/dispatch_adjust.json`, published in records.json as `adj` for the live check in records.js):
-  Ngāwhā, Glenbrook and Kawerau (Onepu) scaled to their meters, each record's usual shift taken off; `prov` only beyond the
-  record by more than the margin `m`, `near` within it ("close to the record"). Prices set no provisional records. Clock-change days count like any other
+  Glenbrook and Kawerau (Onepu) scaled to their meters (Ngāwhā's rest is filled in instead, the `oemb` block's
+  `named`), each record's usual shift taken off; `prov` only beyond the
+  record by more than the margin `m`, `near` within it ("close to the record"). Prices set no provisional records.
+  Other embedded generation (records.py VERSION 7, 6 Nov 2026): the layer counts in generation and the renewable share
+  (its unclassified output not renewable), not in fuel records; Ngāwhā's and Teviot's fill joins their fuels, not demand
+  (dispatch demand already matches metered on average); the South Island has no lowest renewable share records (design
+  decision: its ~1 MW of unclassified output isn't fossil plant). No new records. Clock-change days count like any other
   (since BUILD 7; before it, Generation_MD's clock-numbered days before 2009 were left out).
   Try it on downloaded months: `python3 ingest/records.py <folder of YYYY-MM.json> [out.json]`.
   `offered.py` (its own workflow, `offers.yml`, started by the Worker with the history job every 6 hours): final

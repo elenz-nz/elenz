@@ -463,3 +463,14 @@ before any of that arrived). Run read-only in GitHub Actions against KV (a one-o
   percentile of what is left. The same for whole days, weeks and months. Leave-one-month-out: no provisional record
   clear of the margin went unconfirmed; of 161 real records, 113 provisional, 46 close (within the margin), 2 missed.
   Prices set no provisional records (final prices arrive the next day).
+- **Refit with other embedded generation (6 Nov 2026, records.py VERSION 7).** `dispatch_vs_metered.py` now builds the
+  dispatch version with the layer estimated (no reconciliation data; the blend from months at least two before) and
+  Ngāwhā's and Teviot's fill, so Ngāwhā left `PLANTS` (×1.80 no longer applies). Dispatch generation then reads 3 MW
+  under metered on average. Adding the fill to dispatch demand put it 24 MW above metered demand on average; without
+  it, -0.2 MW, so the fill counts in fuels only. Corrections: Glenbrook ×1.469, Kawerau (Onepu) ×0.681; demand and
+  most shifts unchanged; hydro's moved a few MW (Teviot), the renewable share's by 0.01-0.04 points. Back-test
+  (73 months): of 165 real records, none wrongly claimed after correction (27 raw), 2 missed, 49 of 320 close calls
+  confirmed. Records that change: only renewable-share ones (NZ highest half-hour 99.6% (20 Sep 2024) to 99.4%
+  (5 Sep 2026); NI 99.3 to 98.9%; highest month and day 0.2-0.5 points lower; the highest NZ week moves to 5 Jan 2026;
+  the 90%-renewable run half an hour shorter). The lowest-share records are before 2009 and don't move. The South Island's
+  lowest share would fall to 99.0% (8 Mar 2011) on ~1 MW of unclassified output, so it keeps no such record.
