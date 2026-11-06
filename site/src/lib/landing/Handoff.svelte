@@ -7,13 +7,14 @@
 	//      as it passes (build.svelte.js carries how far each part has built);
 	//   3. pass: as the dot reaches the end of the Tracker preview's line (TrackerPeek, data-handoff="to"), the line
 	//      starts growing back out from there over GROW ms, the stack filling in beneath it, while the dot flies on;
-	//   4. climb: the dot carries on to the Records preview (RecordsPeek, data-handoff="rec") and, once there, climbs
-	//      its staircase over CLIMB ms whatever the page does, drawing it as it goes (build.rec), and rests on the
-	//      record. It follows the path itself, so it climbs (or descends) whatever shape the record shown has;
-	//   5. lap: once it has climbed, and the Articles preview (data-handoff="art") is well up the screen (or the page
-	//      can't scroll further), it leaps onto that card's top-left corner and runs once round its outline, drawing it
-	//      as it goes, then the outline fades (LEAP, LAP and FADE ms, on its own clock like the climb; test report
-	//      HOME-02, 6 Nov 2026: stopping on Records made it read as the foot of the page).
+	//   4. record: the dot carries on to the start of the Records preview's staircase (RecordsPeek, data-handoff="rec"),
+	//      which then draws itself over CLIMB ms whatever the page does (build.rec), a small dot at its tip following the
+	//      path, so it climbs (or descends) whatever shape the record shown has, while the dot flies on with the scroll,
+	//      as at the Tracker. (Without an Articles preview the dot climbs the staircase itself and rests on the record.);
+	//   5. lap: at the Articles preview
+	//      (data-handoff="art") it runs once round the card's outline, drawing it, on its own clock (LAP), and the
+	//      outline fades (FADE) (test report HOME-02, 6 Nov 2026: stopping on Records made it read as the foot of the page,
+	//      and it needn't ride the record before moving on).
 	// Drawn in a fixed overlay between the two charts' positions on screen, read afresh each frame, so it starts on one
 	// and ends on the other wherever they are. Progress goes on <html>: --ho-lift (stage 1, the hero's fill fades),
 	// --ho (stage 3, the Tracker's stack fills in; 1 once landed) and data-ho while the line is away. Nothing happens
@@ -33,6 +34,7 @@
 
 	let path = $state('');
 	let lap = $state(''), lapO = $state(0);   // the Articles card's outline as the dot draws it, and its opacity
+	let pen = $state<Pt | null>(null);        // the small dot at the tip of the record as it draws itself
 	let dot = $state<{ x: number; y: number } | null>(null);
 	let tail = $state<{ x: number; y: number; r: number; o: number }[]>([]);
 	let ink = $state(0.55); // starts as faint as the horizon line, firms up to sit on the stack
@@ -46,8 +48,8 @@
 	const EASE = 70;   // ms: the time constant of the easing (63% of the way in 70 ms, ~95% in 200 ms)
 	const GROW = 900;  // ms: the Tracker's line growing out once the dot has passed its end
 	const CLIMB = 1600; // ms: the dot climbing the Records staircase, however fast or slow the page is scrolled
-	const LEAP = 650, LAP = 1700, FADE = 700;   // ms: from the record to the Articles card, once round it, its outline fading
-	const ART = LEAP + LAP + FADE;
+	const LAP = 1700, FADE = 700;   // ms: once round the Articles card, then its outline fading
+	const ART = LAP + FADE;
 	const ART_PAD = 5;  // px: the outline sits this far outside the card
 
 	onMount(() => {
@@ -141,6 +143,14 @@
 				}
 				return pts;
 			};
+			// then on to the Articles card's top-left corner, reached as it comes up past the middle of the screen (or at the
+			// foot of the page), where the lap round it starts
+			let cA = Infinity;
+			if (hasArt) {
+				const corner = { x: corners[0].x, y: corners[0].y + s };
+				cA = Math.min(Math.max(c0 + 220, corner.y - vh * 0.45), Math.max(c0 + 60, maxS - 1));
+				stops.push({ p: corner, at: cA });
+			}
 			// where the dot is (page coordinates) at scroll position v
 			const route = (v: number): Pt => {
 				let i = 0;
@@ -168,17 +178,16 @@
 			climb = hasRec ? step(climb, climbing, CLIMB) : 1;
 			const kC = smooth(grown);
 			const u = smooth(climb);
-			// the Articles leg starts once the climb is done and the card is well up the screen (or the page has ended)
-			const artGo = hasArt && climb >= 1 && (ar!.top + ar!.height * 0.5 < vh * 0.82 || s >= maxS - 2);
+			// the lap round the Articles card runs once the dot has reached its corner; scrolling back above winds it back
+			const artGo = hasArt && s >= cA - 1;
 			art = hasArt ? Math.max(0, Math.min(ART, art + (artGo ? dt : -dt * 2.5))) : 0;
-			const recEnd = hasRec ? { x: onRec(1).x, y: onRec(1).y - s } : null;
-			// the dot on the Articles leg at time a (ms): leaping from the record to the card's corner, then round it
-			const artAt = (a: number): Pt => a < LEAP ? lerp(recEnd!, corners[0], smooth(a / LEAP)) : tip(round(smooth((a - LEAP) / LAP)));
+			// the dot on the lap at time a (ms)
+			const artAt = (a: number): Pt => tip(round(smooth(a / LAP)));
 
-			// the dot's place on screen for this scroll position: flying (stages 2 and the flight to Records, eased) or
-			// climbing (on the staircase's own clock)
+			// the dot's place on screen for this scroll position: flying (eased), or round the Articles card (on its clock).
+			// Without an Articles preview it climbs the record, as before
 			const screen = (p: Pt) => ({ x: p.x, y: p.y - s });
-			const onStair = hasRec && (climbing || climb > 0);
+			const onStair = hasRec && !hasArt && (climbing || climb > 0);
 			const onArt = hasArt && art > 0;
 			const target = onArt ? artAt(art) : onStair ? screen(onRec(u)) : screen(route(s));
 			if (!shown) shown = { kA, ni: tNi, link: tLink, si: tSi, dx: 0, dy: 0 };
@@ -203,11 +212,13 @@
 
 			// the dot is out while it flies or climbs; once it rests on the record (or, with no Records preview, on the
 			// end of the Tracker's line) the page's own marks take over
-			const dotOut = s > 0 && (hasRec ? climb < 1 || (onArt && art < LEAP + LAP) : s < sC);
+			const dotOut = s > 0 && (hasArt ? s < cA - 1 || art < LAP : hasRec ? climb < 1 : s < sC);
 			// the outline the dot has drawn round the Articles card, fading once it's round
-			lap = onArt && art > LEAP ? 'M' + round(smooth((art - LEAP) / LAP)).map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join('L') : '';
-			lapO = art <= LEAP + LAP ? 0.9 : 0.9 * (1 - (art - LEAP - LAP) / FADE);
-			show = (s > 0 && (kAs < 1 || (kC > 0 && kC < 1))) || dotOut || (onArt && art < ART);
+			lap = onArt ? 'M' + round(smooth(art / LAP)).map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join('L') : '';
+			lapO = art <= LAP ? 0.9 : 0.9 * (1 - (art - LAP) / FADE);
+			// the record drawing itself behind the dot, with a small dot at its tip
+			pen = hasArt && climb > 0 && climb < 1 ? screen(onRec(u)) : null;
+			show = (s > 0 && (kAs < 1 || (kC > 0 && kC < 1))) || dotOut || (onArt && art < ART) || !!pen;
 			if (show) root.setAttribute('data-ho', ''); else root.removeAttribute('data-ho');
 			if (!show) return;
 
@@ -258,6 +269,7 @@
 		{#if path}<path d={path} style="stroke-opacity:{ink}" />{/if}
 		{#if lap}<path class="lap" d={lap} style="stroke-opacity:{lapO}" />{/if}
 		{#each tail as t}<circle class="t" cx={t.x} cy={t.y} r={t.r} style="opacity:{t.o}" />{/each}
+		{#if pen}<circle class="pen" cx={pen.x} cy={pen.y} r="3" />{/if}
 		{#if dot}<circle class="halo" cx={dot.x} cy={dot.y} r="9" /><circle cx={dot.x} cy={dot.y} r="4.5" />{/if}
 	</svg>
 {/if}
@@ -268,4 +280,5 @@
 	circle { fill: var(--accent); }
 	.halo { opacity: 0.18; }
 	.lap { stroke-width: 1.8; }
+	.pen { opacity: 0.85; }
 </style>

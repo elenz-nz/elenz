@@ -37,6 +37,14 @@
 	.rs-wrap { position: relative; display: inline-flex; }
 	.rs-pop { position: absolute; top: calc(100% + 6px); right: 0; z-index: 40; width: max-content; padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; box-shadow: 0 6px 20px rgb(0 0 0 / 0.25); }
 	.rs-pop[hidden] { display: none; }
+	/* it flashes an accent edge as it opens (shown again, its animation starts anew), so it's clear it has popped up
+	   (test report TRK-12, 6 Nov 2026) */
+	.rs-pop { animation: rs-flash 1.6s ease-out; }
+	@keyframes rs-flash {
+		0%, 30% { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 40%, transparent), 0 6px 20px rgb(0 0 0 / 0.25); }
+		100% { border-color: var(--line); box-shadow: 0 0 0 3px transparent, 0 6px 20px rgb(0 0 0 / 0.25); }
+	}
+	@media (prefers-reduced-motion: reduce) { .rs-pop { animation: none; } }
 	.rs-pop p { margin: 0 0 8px; font-size: 0.86rem; font-weight: 600; color: var(--ink); }
 	.rs-row { display: flex; gap: 6px; }
 	.rs-row button { height: 28px; padding: 0 12px; font: inherit; font-size: 0.8rem; font-weight: 600; border-radius: 4px; border: 1px solid var(--line); background: none; color: var(--ink); cursor: pointer; }
