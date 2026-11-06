@@ -285,6 +285,18 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   geothermal station's own factor by year; evidence in `analysis/emission_factors.py` and `analysis/README.md`).
   `src/lib/tracker/series.js` loads the history files and merges them with the live week (24 h/3 d/7 d use the
   live 5-minute data; 30 days uses half-hourly history; 1 year and All use daily history).
+  Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/tracker/oemb.js` `withOemb()` folds a
+  layout's `oemb` block into island series (`oemb` the layer, `oembR` its renewable part, `oembE` its emissions in t/h;
+  zero before 2009; the live block's typical days laid over the week by NZ local half-hour), adds it to `underlying`
+  (demand "with embedded generation") and adds the named plants' fill to their fuel and plant series (Teviot becomes a
+  plant in dispatch months), never to grid demand. It runs in `fromLayout`, `now.js`, `generators.js` and the records'
+  live check (idempotent: `oembDone`). In `fuels.js` the layer is the fuel `oemb` ("Other embedded", `--f-oemb`,
+  hatched, `est.`, `mixed`: its renewable share and emissions come from `oembR`/`oembE`, in tracker.js's totals,
+  now.js and generation/data.js); groupings: its own group in Simplified and Renewable vs fossil, Inflexible in
+  Flexibility, Synchronous in Inverter vs synchronous; by island like embedded solar in By site and By owner and when
+  drilled into (`ESTIMATED`, `estIslands`); left out of price captured (`CAP_FUELS`) and capacity factors (no
+  capacity); the Now page's generator list has a row per island (`est`). tod.py folds it in too and re-reads months
+  from 2009 made before it (`stale`).
 - "Every generator right now" on /now (`src/lib/now/Generators.svelte`, rows and settings in `src/lib/now/generators.js`):
   each plant in tracker.json's `plants` at the newest interval, MW against the installed capacity that applies today
   (`capacity.json`, else the register nameplate), fuel, island and owner (`plants.json`); stations shown whole and
