@@ -27,7 +27,7 @@
 			});
 			const last = p.rows[p.rows.length - 1][1];
 			if (last) text += `; closed ${when(dayAfter(last))}`;
-			return { name: p.name.replace(/^Nga Awa/, 'Ngā Awa'), fuel: FUEL[p.fuel] ?? p.fuel, isl: p.isl, text };
+			return { name: p.name, fuel: FUEL[p.fuel] ?? p.fuel, isl: p.isl, text };
 		})
 		.sort((a, b) => (a.fuel < b.fuel ? -1 : a.fuel > b.fuel ? 1 : a.name < b.name ? -1 : 1));
 </script>

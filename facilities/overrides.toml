@@ -67,6 +67,7 @@ HLY91 = "HLY11"  # Huntly battery
 "Ngāwhā B" = "Ngāwhā"     # OEC4; the metered history has the whole station (Ngāwhā A and B) as one
 "West Wind 1" = "West Wind"   # one farm on two connections (WWD1102, WWD1103), each sometimes carrying most of it
 "West Wind 2" = "West Wind"
+"Nga Awa Pūrua" = "Ngā Awa Pūrua"   # the register leaves off the first macron
 "Takapō A" = "Tekapo A"   # the register's spelling; the site keeps Tekapo (design decision, 30 Oct 2026)
 "Takapō B" = "Tekapo B"
 
@@ -166,7 +167,7 @@ Waipori = ["Deep Stream (Waipori A)", "Waipori (2A/3/4)"]
 "Waipipi" = ["Waverley Wind Farm"]                                  # Tilt Renewables, renamed before construction (2019)
 "Tauhara" = ["Tauhara 2", "Tauhara Stage 2"]                        # Contact, opened Nov 2024
 "Te Huka" = ["Tauhara One", "Centennial Drive binary"]
-"Nga Awa Pūrua" = ["Rotokawa II"]
+"Ngā Awa Pūrua" = ["Rotokawa II"]
 
 # Site only. What the metered history counts for a plant where it differs from the dispatch data (the live week and
 # the weeks since the newest metered month), shown when the tracker drills into the plant. Evidence in
