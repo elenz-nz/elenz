@@ -483,6 +483,12 @@ export const REFERENCES: Reference[] = [
 		topics: ['other-embedded'],
 	},
 	{
+		id: 'alpine-amp', title: 'Asset Management Plan 2026–2036', by: 'Alpine Energy', date: '2026',
+		url: 'https://www.alpineenergy.co.nz/__data/assets/pdf_file/0021/46605/AlpineEnergyAMP2026_Web_Final-3.pdf',
+		use: 'Says the Opuha irrigation scheme’s 7 MW hydro scheme is embedded in Alpine’s network in the Albury grid exit point region.',
+		topics: ['other-embedded'],
+	},
+	{
 		id: 'manawa-coast', title: 'Submission on the proposed Te Tai o Poutini Plan', by: 'Manawa Energy, submission 438', date: '2022',
 		url: 'https://ttpp.nz/wp-content/uploads/2023/04/Submission-438-Manawa-Energy.pdf',
 		use: 'Lists Manawa’s West Coast hydro schemes (Arnold, Kumara, Kaniere and McKays, and Wahapo), connected to the local distribution network.',

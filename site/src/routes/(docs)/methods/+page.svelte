@@ -28,7 +28,7 @@
 		['spot-price', 'Spot price', 'The wholesale market price at a node, before lines charges, retail margins and GST.'],
 		['system-operator', 'System operator', 'The organisation that runs the power system in real time. Transpower holds this role.'],
 		['trader', 'Trader', 'A retailer, generator or purchaser that buys electricity from the market or sells electricity to it.'],
-		['trading-period', 'Trading period', 'One of the market’s half-hours. Trading period 1 starts at midnight.'],
+		['trading-period', 'Trading period', 'One of the market’s half-hours, and the market’s own term for one. Trading period 1 starts at midnight, so an ordinary day has 48. Days the clocks change have 46 or 50.'],
 		['typical-day', 'Typical day', 'A grid exit point’s or plant’s average output for each half-hour of the day, taken from earlier months. Elenz uses it where the metered figures haven’t been published.'],
 		['unclassified', 'Unclassified', 'Other embedded generation whose fuel no public document or registry entry states. It counts in total generation but not as renewable.'],
 	];
@@ -62,7 +62,7 @@
 		<p>The <a href="/methods/sources">source register</a> lists all {SOURCES.length} datasets behind Elenz, then the <a href="/methods/sources#references">reports and references</a> that the method pages cite.</p>
 
 		<h2 id="status">What the status labels mean</h2>
-		<p>Every figure on these pages carries one of five labels. A calculated figure takes the weakest label of its inputs. The order, from strongest, is metered or final, then dispatch, then calculated estimate.</p>
+		<p>Every figure on these pages carries one of six labels. A calculated figure takes the weakest label of its inputs. The order, from strongest, is metered or final, then published, then dispatch, then calculated estimate.</p>
 		<div class="tbl">
 			<table>
 				<thead><tr><th>Label</th><th>Meaning</th><th>Examples</th></tr></thead>
@@ -70,6 +70,7 @@
 					<tr><td>Metered</td><td>Recorded by a meter and published by the EA.</td><td>Metered generation, grid exports and imports, HVDC flows.</td></tr>
 					<tr><td>Dispatch</td><td>A 5-minute figure from the market system, not a meter reading. It is a target for most plants, and a snapshot of output at the time for wind and solar.</td><td>Unit output and island load in the live week, dispatch prices.</td></tr>
 					<tr><td>Final price</td><td>The price the market settles on, as published by the EA. It is marked interim until it is confirmed.</td><td>Final energy prices.</td></tr>
+					<tr><td>Published</td><td>A figure another organisation reports, which isn’t a meter reading or a market price and which we haven’t worked out.</td><td>Register capacities, generator offers, Genesis’s coal share, the NZ Geothermal Association’s station factors.</td></tr>
 					<tr><td>Calculated</td><td>Arithmetic on other figures, with no added assumption.</td><td>Total generation, the island spread, capacity factors.</td></tr>
 					<tr><td>Calculated estimate</td><td>A figure that is modelled, fitted, assumed or filled in. Each method page says how it was made and how close it is.</td><td>Embedded solar, other embedded generation, HVDC transfer in the live week, emissions intensity, split meters, interpolated intervals.</td></tr>
 				</tbody>

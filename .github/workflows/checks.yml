@@ -29,6 +29,8 @@ jobs:
         run: ruff check ingest analysis --select E9,F63,F7,F82 --output-format github
       - name: Smoke test (live and history paths on a sample)
         run: python ingest/tests/smoke.py
+      - name: Method pages (the numbers they quote match the constants in the code)
+        run: python ingest/tests/method_constants.py
       - name: Installed capacity (every plant has a row; the site's copy is up to date)
         run: python ingest/capacity.py --check
 
@@ -40,6 +42,8 @@ jobs:
         working-directory: site
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0   # check-reviewed.js reads each file's history
       - uses: actions/setup-node@v5
         with:
           node-version: '22'
