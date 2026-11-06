@@ -67,31 +67,31 @@ export function mountTracker(D, hooks = {}) {
   const one = k => ({ id: k, name: FUEL[k].name, tok: FUEL[k].tok, f: [k] });
   const VIEWS = {
     detailed: { groups: null },
-    simple: { groups: [one('geo'), THERMAL, one('hydro'), one('wind'), { id: 'solar', name: 'Solar', tok: '--f-solar', f: ['solar', 'roof'] }] },
+    simple: { groups: [one('geo'), THERMAL, one('hydro'), one('wind'), { id: 'solar', name: 'Solar', tok: '--f-solar', f: ['solar', 'roof'] }, one('oemb')] },
     flex: { groups: [
-      { ...one('geo'), name: 'Inflexible', f: ['geo', 'bio', 'waste'] },   // geothermal runs flat out; cogeneration follows its mill or steelworks
+      { ...one('geo'), name: 'Inflexible', f: ['geo', 'bio', 'waste', 'oemb'] },   // geothermal runs flat out; cogeneration follows its mill or steelworks; small run-of-river hydro and landfill gas run as they can
       { ...one('coal'), name: 'Slow flexible' },    // Huntly's Rankine units: hours to start, slow to ramp
       { id: 'fast', name: 'Fast flexible', tok: '--g-fast', f: ['gas', 'diesel', 'hydro', 'batt'] },
       VRE('Variable'),
     ] },
-    rf: { groups: [REN, FOSSIL('Fossils')] },
+    rf: { groups: [REN, FOSSIL('Fossils'), one('oemb')] },   // other embedded generation is part renewable, part unclassified: a group of its own
     // views built from plants rather than fuels (see plantSets below)
     site: { by: 'site' }, scheme: { by: 'scheme' }, owner: { by: 'owner' },
     // inverter-based generation (wind and solar) against the synchronous machines (hydro, geothermal, thermal)
-    vre: { groups: [{ id: 'resid', name: 'Synchronous', tok: '--g-resid', f: ['geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro'] }, { ...VRE('Inverter-based'), f: ['wind', 'solar', 'roof', 'batt'] }] },
+    vre: { groups: [{ id: 'resid', name: 'Synchronous', tok: '--g-resid', f: ['geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'oemb'] }, { ...VRE('Inverter-based'), f: ['wind', 'solar', 'roof', 'batt'] }] },
   };
   const SIGNED = FUELS.filter(f => f.signed).map(f => f.k);
   // what each grouping shows, in a note under the generation chart
   // one line under the generation chart for the groupings that need it; the full definitions are on /methods/groupings
   const NOTES = {
     // every grouping has one (design decision, 1 Nov 2026)
-    detailed: "Each fuel on its own: geothermal, bioenergy, waste heat, coal/gas (Huntly's Rankine units), gas, diesel, hydro, wind, grid solar, embedded solar and batteries.",
-    site: 'Every plant as its own layer, largest first; batteries by site and embedded solar by island.',
+    detailed: "Each fuel on its own: geothermal, bioenergy, waste heat, coal/gas (Huntly's Rankine units), gas, diesel, hydro, wind, grid solar, embedded solar, other embedded generation and batteries.",
+    site: 'Every plant as its own layer, largest first; batteries by site, and embedded solar and other embedded generation by island.',
     scheme: 'Hydro only, by river scheme (Waikato, Waitaki, Clutha, Manapōuri and the rest), the largest at the base.',
-    simple: 'Five groups: geothermal, thermal, hydro, wind, and solar (grid-scale and embedded together).',
-    flex: 'Grouped by how readily each fuel can follow demand: inflexible, slow, fast and variable.',
-    rf: 'Renewables against fossil fuels. Geothermal counts as renewable, although it emits some CO₂.',
-    vre: 'Wind, solar and batteries, connected through inverters, against spinning hydro, geothermal and thermal plant.',
+    simple: 'Six groups: geothermal, thermal, hydro, wind, solar (grid-scale and embedded together) and other embedded generation.',
+    flex: 'Grouped by how readily each fuel can follow demand: inflexible, slow, fast and variable. Other embedded generation counts as inflexible.',
+    rf: 'Renewables against fossil fuels, with other embedded generation on its own (part renewable, part unclassified). Geothermal counts as renewable, although it emits some CO₂.',
+    vre: 'Wind, solar and batteries, connected through inverters, against spinning hydro, geothermal and thermal plant (other embedded generation with them: mostly small hydro).',
     owner: "Today's owners, applied to the whole history. Batteries count with their owner, with charging as one layer below zero.",
   };
   const groupById = id => (VIEWS[state.view].groups || []).find(g => g.id === id) || setById(id);
@@ -161,22 +161,25 @@ export function mountTracker(D, hooks = {}) {
     NZ.metered = add(M.NIs.metered, M.SIs.metered);
     NZ.underlying = add(M.NIs.underlying, M.SIs.underlying);
     NZ.roofU = add(M.NIs.roofU, M.SIs.roofU);   // the islands' errors share the calibration, so they add
+    NZ.oembR = add(M.NIs.oembR, M.SIs.oembR); NZ.oembE = add(M.NIs.oembE, M.SIs.oembE);   // other embedded: renewable part, emissions
     NZ.tiwai = M.SIs.tiwai;
     SRC = { NZ, NI: { ...M.NI, ...M.NIs }, SI: { ...M.SI, ...M.SIs } };
     present = {};
     for (const r of ['NZ', 'NI', 'SI']) present[r] = FUELS.filter(f => SRC[r][f.k].some(v => Math.abs(v) > 0.5)).map(f => f.k);
   }
   derive();
-  // Embedded solar has no plants: its drill-down shows each island's estimate instead (not drillable further).
-  const roofIslands = () => ['NI', 'SI'].map(isl => ({ name: `Embedded solar · ${isl === 'NI' ? 'North' : 'South'} Island`, fuel: 'roof', isl, poc: [], cap: null, roof: true,
-                                                       s: M[isl].roof, u: M[isl + 's'].roofU }));
+  // Embedded solar and other embedded generation have no plants: their drill-down shows each island's estimate
+  // instead (not drillable further). est: the fuel, for its hatching.
+  const ESTIMATED = ['roof', 'oemb'];
+  const estIslands = k => ['NI', 'SI'].map(isl => ({ name: `${FUEL[k].name} · ${isl === 'NI' ? 'North' : 'South'} Island`, fuel: k, isl, poc: [], cap: null, est: k,
+                                                     s: M[isl][k], u: k === 'roof' ? M[isl + 's'].roofU : null }));
   // Plants are listed largest first by installed MW (the most a plant has had in capacity.json, else its register
   // nameplate), so the order, and each plant's shade, stay the same whatever range is shown (design decision, 26 Oct 2026;
   // the loaded data's own order changed between the live week and history)
   const MAX_MW = new Map(CAPACITY.plants.map(p => [p.name, Math.max(0, ...p.rows.map(r => r[2] ?? 0))]));
   const sizeOf = p => MAX_MW.get(p.name) ?? p.cap ?? 0;
   const bySize = (a, b) => sizeOf(b) - sizeOf(a) || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
-  const plantsFor = (fuel, r = state.region) => (fuel === 'roof' ? roofIslands().filter(p => p.s.some(v => v > 0.5)) : M.plants)
+  const plantsFor = (fuel, r = state.region) => (ESTIMATED.includes(fuel) ? estIslands(fuel).filter(p => p.s.some(v => v > 0.5)) : M.plants)
     .filter(p => p.fuel === fuel && (r === 'NZ' || p.isl === r)).sort(bySize);
   const plantByName = name => M.plants.find(p => p.name === name);
 
@@ -373,6 +376,7 @@ export function mountTracker(D, hooks = {}) {
     const v = { n, avg, t: groups.map(([a]) => M.t[a]), hrs, fuels: {}, zoomed: zf != null };
     FUELS.forEach(f => v.fuels[f.k] = avg(S[f.k]));
     v.metered = avg(S.metered); v.underlying = avg(S.underlying); v.tiwai = avg(S.tiwai); v.roofU = avg(S.roofU);
+    v.oembR = avg(S.oembR); v.oembE = avg(S.oembE);
     // peak demand and generation: the highest 5-minute or half-hour value, which daily history keeps alongside its averages
     const pk = M.peak && M.peak[state.region];
     v.pkMet = max(pk ? pk.metered : S.metered);
@@ -404,6 +408,7 @@ export function mountTracker(D, hooks = {}) {
         if (f.k === 'hvdc') continue;
         const x = v.fuels[f.k][j];
         const o = own[f.k];
+        if (f.mixed) { if (x > 0) { tot += x; base += x; em += v.oembE[j]; re += v.oembR[j]; } continue; }   // other embedded: its own series
         const ef = o && o.mw[j] > 0 ? o.em[j] / o.mw[j] : efAt(f, v.t[j]);
         if (x > 0) { tot += x; if (f.k !== 'batt') { base += x; em += x * ef; if (f.ren) re += x; } }
       }
@@ -437,7 +442,7 @@ export function mountTracker(D, hooks = {}) {
       const ps = plantsFor(d.fuel), f = FUEL[d.fuel];
       // the largest plants get their own shade of the fuel colour; smaller ones share a muted fill but stay separate layers
       ps.forEach((p, i) => L.push({ id: p.name, name: p.name, tok: f.tok, shade: i < TOP ? i : null, muted: i >= TOP, signed: !!f.signed, s: V.avg(p.s), plant: p,
-                                    hatch: p.roof ? 'roof' : null, u: p.roof ? V.avg(p.u) : null, drill: p.roof ? null : { group: d.group, fuel: d.fuel, plant: p.name } }));
+                                    hatch: p.est || null, u: p.u ? V.avg(p.u) : null, drill: p.est ? null : { group: d.group, fuel: d.fuel, plant: p.name } }));
     } else if (d.group && setById(d.group)) {
       // a set's plants, each in a shade of its fuel colour, grouped by fuel in the summary
       // a hydro scheme's stations in river order, upstream first; other sets by fuel, then largest first
@@ -460,6 +465,7 @@ export function mountTracker(D, hooks = {}) {
       if (by === 'owner') {
         for (const x of sets) L.push(setLayer(x, null));
         if (present[r].includes('roof')) L.push({ ...fuelLayer('roof', null), name: 'Embedded solar (homes, businesses, small farms)' });
+        if (present[r].includes('oemb')) L.push({ ...fuelLayer('oemb', null), name: 'Other embedded generation' });
       } else {
         for (const f of FUELS) {
           if (!present[r].includes(f.k)) continue;
@@ -475,8 +481,8 @@ export function mountTracker(D, hooks = {}) {
             const small = new Set(mine.flatMap(x => x.plants));
             const ps = plantsFor(f.k).filter(p => !small.has(p));   // largest first (which plants get a row is by output)
             if (!ps.length) { L.push({ ...fuelLayer(f.k, null), section: f.k }); continue; }
-            // embedded solar's rows are its islands (as when drilling into it), hatched as an estimate
-            if (f.k === 'roof') { ps.forEach((p, i) => L.push({ id: 'p:' + p.name, name: p.name, tok: f.tok, shade: i, section: f.k, s: V.avg(p.s), plant: p, hatch: 'roof', u: V.avg(p.u), drill: null })); continue; }
+            // embedded solar's and other embedded generation's rows are their islands (as when drilling in), hatched as estimates
+            if (ESTIMATED.includes(f.k)) { ps.forEach((p, i) => L.push({ id: 'p:' + p.name, name: p.name, tok: f.tok, shade: i, section: f.k, s: V.avg(p.s), plant: p, hatch: f.k, u: p.u ? V.avg(p.u) : null, drill: null })); continue; }
             ps.forEach((p, i) => L.push({ id: 'p:' + p.name, name: p.name, tok: f.tok, shade: i, section: f.k, s: V.avg(p.s), plant: p,
                                           drill: { group: null, fuel: null, plant: p.name } }));
             for (const x of mine) L.push({ ...setLayer(x, null), light: true });
@@ -499,7 +505,7 @@ export function mountTracker(D, hooks = {}) {
         for (const k of ks) { const a = V.fuels[k], pos = FUEL[k].signed; for (let j = 0; j < V.n; j++) s[j] += pos ? Math.max(0, a[j]) : a[j]; }
         // a group of several fuels opens onto its fuels; a single-fuel group goes straight to its plants
         const drill = g.f.length > 1 ? { group: g.id, fuel: null, plant: null } : plantsFor(ks[0]).length ? { group: null, fuel: ks[0], plant: null } : null;
-        L.push({ id: 'g:' + g.id, name: g.name, tok: g.tok, tag: g.f.length > 1 && ks.includes('roof') ? 'incl. est.' : FUEL[ks[0]].tag, hatch: g.f.length === 1 && FUEL[ks[0]].hatch ? ks[0] : null, signed: false, s, drill });
+        L.push({ id: 'g:' + g.id, name: g.name, tok: g.tok, tag: g.f.length > 1 && ks.some(k => ESTIMATED.includes(k)) ? 'incl. est.' : FUEL[ks[0]].tag, hatch: g.f.length === 1 && FUEL[ks[0]].hatch ? ks[0] : null, signed: false, s, drill });
       }
       // a grouping that counts batteries' discharge in a group shows their charging on its own, below zero
       const battIn = groups.some(g => g.f.includes('batt'));
@@ -579,7 +585,7 @@ export function mountTracker(D, hooks = {}) {
   let C = {}, PAT = {};
   function readColours() {
     const cs = getComputedStyle(document.documentElement);
-    for (const t of ['--ink', '--ink-2', '--muted', '--line', '--grid', '--surface', '--accent', '--accent-soft', '--co2', '--p-ni', '--p-si', '--f-coal', '--f-gas', '--f-diesel', '--f-geo', '--f-bio', '--f-waste', '--f-hydro', '--f-wind', '--f-solar', '--f-batt', '--f-hvdc', '--g-fossil', '--g-ren', '--g-fast', '--g-vre', '--g-resid', '--o1', '--o2', '--o3', '--o4', '--o5', '--o6', '--l1', '--l2', '--l3', '--l4', '--l5', '--l6', '--l7', '--l8'])
+    for (const t of ['--ink', '--ink-2', '--muted', '--line', '--grid', '--surface', '--accent', '--accent-soft', '--co2', '--p-ni', '--p-si', '--f-coal', '--f-gas', '--f-diesel', '--f-geo', '--f-bio', '--f-waste', '--f-hydro', '--f-wind', '--f-solar', '--f-oemb', '--f-batt', '--f-hvdc', '--g-fossil', '--g-ren', '--g-fast', '--g-vre', '--g-resid', '--o1', '--o2', '--o3', '--o4', '--o5', '--o6', '--l1', '--l2', '--l3', '--l4', '--l5', '--l6', '--l7', '--l8'])
       C[t] = cs.getPropertyValue(t).trim();
     PAT = {};
     for (const f of FUELS) if (f.hatch) PAT[f.k] = hatchOf(C[f.tok]);
@@ -1072,7 +1078,7 @@ export function mountTracker(D, hooks = {}) {
     const unitTxt = {
       top: { site: 'MW, stacked by site', scheme: 'MW, hydro by scheme', owner: 'MW, stacked by owner' }[VIEWS[state.view].by]
         || (VIEWS[state.view].groups ? 'MW, stacked by group' : 'MW, stacked by fuel'),
-      fuel: setById(d.group) ? 'MW, stacked by plant' : 'MW, stacked by fuel', plant: d.fuel === 'roof' ? 'MW, estimated, by island' : 'MW, stacked by plant',
+      fuel: setById(d.group) ? 'MW, stacked by plant' : 'MW, stacked by fuel', plant: ESTIMATED.includes(d.fuel) ? 'MW, estimated, by island' : 'MW, stacked by plant',
       unit: V.layers.length > 1 ? `MW, by ${unitBy()}` : 'MW',
     }[lv];
     const per = { '1d': 'a day', '1w': 'a week', '1mo': 'a month', '1yr': 'a year' }[state.int];
@@ -1097,7 +1103,7 @@ export function mountTracker(D, hooks = {}) {
     if (up) {
       $('sum-level-txt').textContent = {
         fuel: () => `${groupById(d.group).name}${setById(d.group) ? ' plants' : ''} · ${REGION[state.region]}`,
-        plant: () => d.fuel === 'roof' ? `Embedded solar (estimated) · ${REGION[state.region]}` : `${FUEL[d.fuel].name} plants · ${REGION[state.region]}`,
+        plant: () => ESTIMATED.includes(d.fuel) ? `${FUEL[d.fuel].name} (estimated) · ${REGION[state.region]}` : `${FUEL[d.fuel].name} plants · ${REGION[state.region]}`,
         unit: () => V.layers.length > 1 ? `${d.plant} · by ${unitBy()}` : d.plant,
       }[lv]();
       $('sum-back').textContent = `‹ ${up.label === 'Generation' ? 'All sources' : up.label}`;
@@ -1170,7 +1176,7 @@ export function mountTracker(D, hooks = {}) {
     renderCrumbs();
     const body = $('mix-body'); body.innerHTML = '';
     $('col-name').textContent = { top: VIEWS[state.view].by === 'owner' ? 'Owner' : VIEWS[state.view].by === 'site' ? 'Site' : 'Source',
-      fuel: setById(state.drill.group) ? 'Plant' : 'Fuel', plant: state.drill.fuel === 'roof' ? 'Island' : 'Plant', unit: V.layers.length > 1 ? 'Connection' : 'Plant' }[level()];
+      fuel: setById(state.drill.group) ? 'Plant' : 'Fuel', plant: ESTIMATED.includes(state.drill.fuel) ? 'Island' : 'Plant', unit: V.layers.length > 1 ? 'Connection' : 'Plant' }[level()];
     const canHide = V.layers.length > 1;
     V.sections = [];
     let cur = null;
@@ -1318,8 +1324,9 @@ export function mountTracker(D, hooks = {}) {
       ['Price, North Island', money(V.pNI[j]), '/MWh'],
       ['Price, South Island', money(V.pSI[j]), '/MWh'],
       ['Demand, metered', fmt(V.metered[j]), long ? 'MW avg' : 'MW'],
-      ['With embedded solar', fmt(V.underlying[j]), long ? 'MW avg' : 'MW'],
+      ['With embedded generation', fmt(V.underlying[j]), long ? 'MW avg' : 'MW'],
       ['Embedded solar (est.)', fmt(V.fuels.roof[j]), (long ? 'MW avg' : 'MW') + (V.roofU[j] > 0.5 ? ` ± ${fmt(V.roofU[j])}` : '')],
+      V.fuels.oemb.some(x => x > 0.5) && ['Other embedded (est.)', fmt(V.fuels.oemb[j]), long ? 'MW avg' : 'MW'],
       long && ['Peak demand, metered', fmt(V.pkMet[j]), 'MW'],
       long && V.pkGen && ['Peak generation', fmt(V.pkGen[j]), 'MW'],
       ['HVDC', hvTxt(V.hvdc[j]), hvDir(V.hvdc[j])],
@@ -1867,7 +1874,7 @@ export function mountTracker(D, hooks = {}) {
       case 'cv-price':
         return head + row(C['--p-ni'], 'North Island · Haywards', money(V.pNI[j]), '/MWh') + row(C['--p-si'], 'South Island · Benmore', money(V.pSI[j]), '/MWh');
       case 'cv-demand':
-        return head + row(C['--ink'], 'Metered', fmt(V.metered[j]), mw) + row(C['--ink-2'], 'With embedded solar', fmt(V.underlying[j]), V.roofU[j] > 0.5 ? `${mw} ± ${fmt(V.roofU[j])}` : mw)
+        return head + row(C['--ink'], 'Metered', fmt(V.metered[j]), mw) + row(C['--ink-2'], 'With embedded generation', fmt(V.underlying[j]), V.roofU[j] > 0.5 ? `${mw} ± ${fmt(V.roofU[j])}` : mw)
           + (isLong() ? row(C['--muted'], 'Peak, metered', fmt(V.pkMet[j]), 'MW') : '');
       case 'cv-hvdc':
         return head + row(C['--f-hvdc'], 'Benmore ⇄ Haywards', hvTxt(V.hvdc[j]), hvDir(V.hvdc[j]));
@@ -2148,7 +2155,7 @@ export function mountTracker(D, hooks = {}) {
       // partial period's energy is what it generated so far, as the chart draws it
       const energy = isLong(), gu = energy ? eu().unit : 'MW', g = (v, j) => energy ? +en(v, j).toPrecision(6) : f1(v);
       const header = ['start_nz', 'start_utc', ...(energy ? ['hours'] : []), ...layers.map(l => `${l.name} (${gu})`), `${totalLabel()} (${gu})`,
-        'Price, North Island, Haywards ($/MWh)', 'Price, South Island, Benmore ($/MWh)', `Demand, metered (${u})`, `Demand with embedded solar (${u})`,
+        'Price, North Island, Haywards ($/MWh)', 'Price, South Island, Benmore ($/MWh)', `Demand, metered (${u})`, `Demand with embedded generation (${u})`,
         `HVDC transfer, northward (${u})`, 'Emissions intensity (g CO2e/kWh)', 'Renewable share (%)'];
       const rows = [];
       for (let j = 0; j < V.n; j++) {

@@ -29,8 +29,12 @@ provisional records: dispatch prices can be many times the final ones, which arr
 record is settled, `resolved` says which way it went for NEW_DAYS. The website checks the live week the same way.
 
 Definitions follow the rest of the site (src/lib/home/now.js): generation is each fuel's output summed, battery
-discharge only, no HVDC; the renewable share is of that total less battery discharge (geothermal, bioenergy, hydro, wind, grid and embedded
-solar); fossil generation is the Rankines (coal or gas), gas, diesel and waste heat; demand is metered grid demand;
+discharge only, no HVDC, plus other embedded generation from 2009 (embedded.py); the renewable share is of that total less
+battery discharge (geothermal, bioenergy, hydro, wind, grid and embedded solar, and other embedded generation's hydro,
+geothermal, wind and landfill gas; its unclassified output counts in the total only). Fuel records (hydro, wind,
+fossil) are the plants the site shows, not the layer, whose split by fuel is partly estimated; in months without their
+metered data, Ngāwhā's and Teviot's filled-in output (the layer block's `named`) counts in their fuels, as their
+metered output does (not in demand, which dispatch data already matches on average); fossil generation is the Rankines (coal or gas), gas, diesel and waste heat; demand is metered grid demand;
 prices are the island reference nodes (Haywards, Benmore), New Zealand's the higher of the two; HVDC is the mid-link
 transfer, northward positive. Embedded solar is modelled, so its records are estimates (the page says so).
 
@@ -45,15 +49,18 @@ import time
 import numpy as np
 import pandas as pd
 
+import embedded as emb
 from common import FACILITIES, NZ
 
-VERSION = 6                # bump when summarise() changes: every month's summary is remade (2: per-day sums for periods;
+VERSION = 7                # bump when summarise() changes: every month's summary is remade (2: per-day sums for periods;
                            # 3: renewable share without battery discharge; 4: most fossil, hydro high and low, lowest price;
                            # 5: info, the month's highest and lowest half-hour of demand with embedded solar added back;
-                           # 6: dispatch months corrected (dispatch_adjust.json))
+                           # 6: dispatch months corrected (dispatch_adjust.json); 7: other embedded generation in
+                           # generation and the renewable share, Ngāwhā's and Teviot's fill in their fuels)
 REGIONS = ('NZ', 'NI', 'SI')
 GEN = ('geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
 REN = ('geo', 'bio', 'hydro', 'wind', 'solar', 'roof')
+OEMB_REN = ('hydro', 'geo', 'wind', 'bio')   # other embedded generation's renewable fuels (not 'other', unclassified)
 FOSSIL = ('coal', 'gas', 'diesel', 'waste')
 LOW_PRICE = 5.0            # $/MWh: "near zero" (the price explainer's new-low threshold)
 REN_RUN = 90.0             # % renewable for the renewable run
@@ -69,7 +76,7 @@ HALF_HOURS = {
     'demand_max': ('max', 'gen', REGIONS, 0),
     'demand_min': ('min', 'gen', REGIONS, 0),
     'ren_max': ('max', 'gen', REGIONS, 1),
-    'ren_min': ('min', 'gen', REGIONS, 1),
+    'ren_min': ('min', 'gen', ('NZ', 'NI'), 1),   # the South Island's ~1 MW of unclassified output isn't fossil plant
     'fossil_min': ('min', 'gen', REGIONS, 0),
     'fossil_max': ('max', 'gen', REGIONS, 0),
     'hydro_max': ('max', 'gen', REGIONS, 0),
@@ -85,7 +92,7 @@ HALF_HOURS = {
 }
 MONTHS = {
     'ren_month_max': ('max', 'gen', REGIONS, 1),
-    'ren_month_min': ('min', 'gen', REGIONS, 1),
+    'ren_month_min': ('min', 'gen', ('NZ', 'NI'), 1),
     'wind_month_max': ('max', 'gen', REGIONS, 1),          # GWh
 }
 RUNS = {
@@ -166,6 +173,18 @@ def series(js):
     n = js['N']
     a = lambda isl, k: _arr(js[isl].get(k), n)   # noqa: E731
     fu = {isl: {f: a(isl, f) for f in GEN} for isl in ('NI', 'SI')}
+    # other embedded generation (embedded.py, from 2009; outside the island series in the files): the named plants'
+    # output the month's layout lacks (Ngāwhā's and Teviot's, months without their metered data) joins their fuel;
+    # the layer itself counts in generation and the renewable share only. Neither touches demand: dispatch demand
+    # already matches metered demand on average without the named plants' fill (with it, 24 MW high; 6 Nov 2026)
+    oe = js.get('oemb') or {}
+    for plant, v in (oe.get('named') or {}).items():
+        fuel, isl = emb.named_info().get(plant, ('', ''))
+        if fuel in GEN and isl in fu:
+            fu[isl][fuel] = fu[isl][fuel] + np.nan_to_num(_arr(v, n))
+    lay = {isl: {f: np.maximum(np.nan_to_num(_arr(v, n)), 0) for f, v in (oe.get(isl) or {}).items()}
+           for isl in ('NI', 'SI')}
+    lay['NZ'] = {f: lay['NI'].get(f, 0) + lay['SI'].get(f, 0) for f in set(lay['NI']) | set(lay['SI'])}
     fu['NZ'] = {f: fu['NI'][f] + fu['SI'][f] for f in GEN}
     nip, sip = a('NI', 'price'), a('SI', 'price')
     hv = _arr(js.get('hvdcN'), n)
@@ -175,8 +194,8 @@ def series(js):
         F = {f: np.maximum(v, 0) for f, v in fu[r].items()}   # as the site: each fuel's output, battery discharge only
         # the renewable share is of generation less battery discharge (as em6 and the site): that energy was generated,
         # and counted, once already when the battery charged
-        gen = sum(v for f, v in F.items() if f != 'batt')
-        ren = sum(F[f] for f in REN)
+        gen = sum(v for f, v in F.items() if f != 'batt') + sum(lay[r].values(), np.zeros(n))
+        ren = sum(F[f] for f in REN) + sum((v for f, v in lay[r].items() if f in OEMB_REN), np.zeros(n))
         share = np.where(gen > 0, 100 * ren / np.where(gen > 0, gen, 1), np.nan)
         dem = a('NI', 'metered') + a('SI', 'metered') if r == 'NZ' else a(r, 'metered')
         price = np.maximum(nip, sip) if r == 'NZ' else (nip if r == 'NI' else sip)

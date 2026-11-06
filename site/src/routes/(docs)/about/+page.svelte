@@ -60,7 +60,7 @@
 				'Generation stacked by fuel, or grouped by site, hydro scheme, owner, flexibility, renewable vs fossil, or inverter vs synchronous; in MW or as a share; stacked or as lines to compare sources. Drill down from a fuel to its plants and their units.',
 				'The island prices drawn over the generation chart if wanted, on a right-hand axis.',
 				'Wholesale prices at Haywards and Benmore.',
-				'Demand at the grid, and with embedded solar added back.',
+				'Demand at the grid, and with embedded generation added back.',
 				'HVDC transfer, emissions intensity and renewable share.',
 				'Energy, averages and peaks over the range in the summary table.',
 				'Share of generation over the range against the same dates a year earlier: renewables, wind, solar, inverter-based, hydro, gas or coal/gas.',

@@ -4,7 +4,9 @@ provisional records.
 Every stored month since Sep 2020 holds both the dispatch data and, once published, the metered data, final prices
 and metered HVDC. For each month that has its metering, this builds the month twice with history.build_month():
   met    as the site publishes it (metered generation and demand, final prices, metered HVDC)
-  disp   as the site had it before any of that arrived: dispatch data, dispatch prices, estimated HVDC
+  disp   as the site had it before any of that arrived: dispatch data, dispatch prices, estimated HVDC, and other
+         embedded generation estimated (no reconciliation data; the blend from months at least two before, about as
+         old as the newest reconciliation month is while a month is still on dispatch data)
 and saves, per month, each record series (records.series()) and each plant's half-hourly output from both.
 
 Read-only: the store's put is disabled. In GitHub Actions it reads KV (CF_ACCOUNT_ID, CF_API_TOKEN); locally,
@@ -18,7 +20,7 @@ and <out>/months.json. analysis/dispatch_metered_fit.py reads them.
 import json
 import os
 import sys
-from datetime import date
+from datetime import date, timedelta
 
 import numpy as np
 
@@ -52,8 +54,11 @@ def main():
     os.makedirs(out, exist_ok=True)
     store = ReadOnly(open_store())
     cap = json.loads(store.get('hist/roof_cap.json'))
-    months, done = hi.months_between(date.fromisoformat(first + '-01'), date.today()), []
+    f0 = date.fromisoformat(first + '-01')
+    # a year before the first month too, for other embedded generation's average days (not written out)
+    months, done = hi.months_between(date(f0.year - 1, f0.month, 1), date.today()), []
     real_complete = mt.complete
+    prof = {}
     for m0 in months:
         month = f'{m0:%Y-%m}'
         if last and month > last:
@@ -62,12 +67,16 @@ def main():
         if s is None or not real_complete(s, m0):
             print(month, 'no metered data: stop')
             break
-        met, _ = hi.build_month(s, month, cap, lambda *a: None)
-        # dispatch only: no metering, no final prices, no metered HVDC
-        drop = [c for c in s.columns if c.startswith(('F|', 'H|')) or c == 'fi']
+        two_before = f'{(m0.replace(day=1) - timedelta(days=32)):%Y-%m}'
+        lagged = {k: v for k, v in prof.items() if k <= two_before}
+        met, _ = hi.build_month(s, month, cap, lambda *a: None, prof, 'file')
+        if m0 < f0:
+            continue
+        # dispatch only: no metering, no final prices, no metered HVDC, no reconciliation data
+        drop = [c for c in s.columns if c.startswith(('F|', 'H|', 'O|')) or c in ('fi', 'oq')]
         mt.complete = lambda *a: False
         try:
-            disp, _ = hi.build_month(s.drop(columns=drop), month, cap, lambda *a: None)
+            disp, _ = hi.build_month(s.drop(columns=drop), month, cap, lambda *a: None, lagged)
         finally:
             mt.complete = real_complete
         if met['t0'] != disp['t0'] or met['N'] != disp['N']:

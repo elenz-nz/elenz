@@ -132,7 +132,7 @@
 					<tr class:off={Math.abs(r.mw) < 0.5}>
 						<td class="c-name">
 							<span class="dot" style="--c:var({r.tok})" title={r.fuelName}></span>
-							<a href={r.href} title="{r.name} in the tracker">{r.name}</a>
+							<a href={r.href} title="{r.name} in the tracker">{r.name}</a>{#if r.est}<small class="est"> est.</small>{/if}
 							{#if r.units.length > 1}
 								<button type="button" class="g-units" aria-expanded={open.has(r.key)} onclick={() => toggle(r.key)}
 									aria-label="{open.has(r.key) ? 'Hide' : 'Show'} {r.name}'s {r.part}">{r.units.length} {r.part}</button>
@@ -140,7 +140,7 @@
 						</td>
 						<td class="c-fuel">{r.fuelName}</td>
 						<td class="c-isl" title={r.isl === 'NI' ? 'North Island' : 'South Island'}>{r.isl}</td>
-						<td class="c-own">{r.owner}</td>
+						<td class="c-own">{r.est ? '–' : r.owner}</td>
 						<td class="n">{fmt(r.mw)}</td>
 						<td class="n c-pct">
 							<span class="pc" title={r.charging ? 'Charging' : undefined}><span>{pctText(r)}{#if r.charging}<small class="chg">charging</small>{/if}</span>{#if r.pct != null}<span class="pbar" class:charge={r.charging}><span style="--c:var({r.tok});width:{Math.min(100, Math.abs(r.pct))}%"></span></span>{/if}</span>
@@ -227,4 +227,5 @@
 		.g-ctl select { flex: 1 1 30%; min-width: 0; }
 		tfoot th { text-align: left; }
 	}
+	.est { color: var(--muted); font-size: 0.85em; }
 </style>

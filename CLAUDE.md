@@ -275,7 +275,7 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   funnel under it, narrowing from the window's width to the column's (`::after`, `--inset`). The browser tab's title says what the view shows (`describe`, set through `setTitle` in `#lib/site/view.js`, which sets it again when the page comes back into view or from the back/forward cache: Firefox on Android blanks a tab's title whenever the address changes and fills it in only when the page reports a new one, so `retitle()` nudges the title 0.3 s and 1.5 s after every address change; a page that changes its own address calls it; SITE-06), and the
   Worker puts the same title into the page title, og:title and og:url of `/tracker` and `/tracker/prices` for a linked view. The tracker page markup
   is in `src/routes/tracker/+page.svelte` (About and Data and methods share one layout with a contents sidebar (sticky; a "Contents" dropdown naming the page under
-  860 px, DOC-04, sticky too), the route group `src/routes/(docs)/`; About page: `src/routes/(docs)/about/+page.svelte`, short: why Elenz exists, what each page shows, where the data comes from in brief, support, contact; links to its old `#m-*` sections and `#controls` forward; the guide, `/guide` (`src/routes/(docs)/guide/+page.svelte`, team review DOC-01, 2 Nov 2026): how to use each page, with screenshots in light and dark (`src/lib/methods/Shot.svelte`; `site/static/guide`, made by `analysis/guide_shots.py`, which also writes their sizes, and how wide each is on the site so a small card isn't blown up, to `src/lib/methods/shots.json`; redo them when a layout they show changes). Method pages use the same pictures, only where they talk about that part of the site (DOC-03, 5 Nov 2026). Data and methods: `/methods` overview, `/methods/sources` every dataset, `/methods/<slug>` one page per series (generation, embedded-solar, demand, hvdc, prices, price-explainer, emissions, groupings, history); topics and datasets in `src/lib/methods/registry.ts` (each page's header and "Data used" box come from it, so a dataset is described once; reports, papers and announcements are `REFERENCES` there, linked from the claim with `ref('<id>')` and listed in the page's "References" box and on /methods/sources#references), bodies in `src/lib/methods/pages/<slug>.svelte`, styles in `methods.css`. The emissions and price explainer pages import their factors and rules from `emissions.js` and `explain.js`, so they stay in step; the other pages are prose: when a method changes, update its page and its `updated` date; shared
+  860 px, DOC-04, sticky too), the route group `src/routes/(docs)/`; About page: `src/routes/(docs)/about/+page.svelte`, short: why Elenz exists, what each page shows, where the data comes from in brief, support, contact; links to its old `#m-*` sections and `#controls` forward; the guide, `/guide` (`src/routes/(docs)/guide/+page.svelte`, team review DOC-01, 2 Nov 2026): how to use each page, with screenshots in light and dark (`src/lib/methods/Shot.svelte`; `site/static/guide`, made by `analysis/guide_shots.py`, which also writes their sizes, and how wide each is on the site so a small card isn't blown up, to `src/lib/methods/shots.json`; redo them when a layout they show changes). Method pages use the same pictures, only where they talk about that part of the site (DOC-03, 5 Nov 2026). Data and methods: `/methods` overview, `/methods/sources` every dataset, `/methods/<slug>` one page per series (generation, embedded-solar, other-embedded, demand, hvdc, prices, price-explainer, emissions, groupings, history); topics and datasets in `src/lib/methods/registry.ts` (each page's header and "Data used" box come from it, so a dataset is described once; reports, papers and announcements are `REFERENCES` there, linked from the claim with `ref('<id>')` and listed in the page's "References" box and on /methods/sources#references), bodies in `src/lib/methods/pages/<slug>.svelte`, styles in `methods.css`. The emissions and price explainer pages import their factors and rules from `emissions.js` and `explain.js`, so they stay in step; the other pages are prose: when a method changes, update its page and its `updated` date; shared
   masthead, footer (© line, data credits, link icons: fill in a `href` in its `LINKS` to show a social account), logo mark and the "Support Elenz" link to Buy Me a Coffee in `src/lib/site/`; site copy speaks as "we", never "I" or "me"); the canvas chart code is `src/lib/tracker/tracker.js` (vanilla JS, driven by
   element ids in the page; each chart is drawn once per view into an off-screen base, and moving the time line only
   copies the base back and draws the line, dots and time chip over it (`paint`), so scrubbing stays smooth on phones:
@@ -285,6 +285,18 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   geothermal station's own factor by year; evidence in `analysis/emission_factors.py` and `analysis/README.md`).
   `src/lib/tracker/series.js` loads the history files and merges them with the live week (24 h/3 d/7 d use the
   live 5-minute data; 30 days uses half-hourly history; 1 year and All use daily history).
+  Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/tracker/oemb.js` `withOemb()` folds a
+  layout's `oemb` block into island series (`oemb` the layer, `oembR` its renewable part, `oembE` its emissions in t/h;
+  zero before 2009; the live block's typical days laid over the week by NZ local half-hour), adds it to `underlying`
+  (demand "with embedded generation") and adds the named plants' fill to their fuel and plant series (Teviot becomes a
+  plant in dispatch months), never to grid demand. It runs in `fromLayout`, `now.js`, `generators.js` and the records'
+  live check (idempotent: `oembDone`). In `fuels.js` the layer is the fuel `oemb` ("Other embedded", `--f-oemb`,
+  hatched, `est.`, `mixed`: its renewable share and emissions come from `oembR`/`oembE`, in tracker.js's totals,
+  now.js and generation/data.js); groupings: its own group in Simplified and Renewable vs fossil, Inflexible in
+  Flexibility, Synchronous in Inverter vs synchronous; by island like embedded solar in By site and By owner and when
+  drilled into (`ESTIMATED`, `estIslands`); left out of price captured (`CAP_FUELS`) and capacity factors (no
+  capacity); the Now page's generator list has a row per island (`est`). tod.py folds it in too and re-reads months
+  from 2009 made before it (`stale`).
 - "Every generator right now" on /now (`src/lib/now/Generators.svelte`, rows and settings in `src/lib/now/generators.js`):
   each plant in tracker.json's `plants` at the newest interval, MW against the installed capacity that applies today
   (`capacity.json`, else the register nameplate), fuel, island and owner (`plants.json`); stations shown whole and
@@ -357,8 +369,13 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
   dispatch months and which ones were settled) is published while the history is complete, only when it changes. Official
   means metered generation (meta.source), final prices, metered HVDC. Dispatch months are corrected before they are
   compared (`facilities/dispatch_adjust.json`, published in records.json as `adj` for the live check in records.js):
-  Ngāwhā, Glenbrook and Kawerau (Onepu) scaled to their meters, each record's usual shift taken off; `prov` only beyond the
-  record by more than the margin `m`, `near` within it ("close to the record"). Prices set no provisional records. Clock-change days count like any other
+  Glenbrook and Kawerau (Onepu) scaled to their meters (Ngāwhā's rest is filled in instead, the `oemb` block's
+  `named`), each record's usual shift taken off; `prov` only beyond the
+  record by more than the margin `m`, `near` within it ("close to the record"). Prices set no provisional records.
+  Other embedded generation (records.py VERSION 7, 6 Nov 2026): the layer counts in generation and the renewable share
+  (its unclassified output not renewable), not in fuel records; Ngāwhā's and Teviot's fill joins their fuels, not demand
+  (dispatch demand already matches metered on average); the South Island has no lowest renewable share records (design
+  decision: its ~1 MW of unclassified output isn't fossil plant). No new records. Clock-change days count like any other
   (since BUILD 7; before it, Generation_MD's clock-numbered days before 2009 were left out).
   Try it on downloaded months: `python3 ingest/records.py <folder of YYYY-MM.json> [out.json]`.
   `offered.py` (its own workflow, `offers.yml`, started by the Worker with the history job every 6 hours): final

@@ -35,7 +35,7 @@ export const separated = (a, b) => { const d = Math.abs(a - b); return d > 10 &&
 // Each fuel's output × its island's reference price (a volume-weighted price). Embedded solar
 // isn't paid the spot price; batteries count discharge only, and their charging is a row of its own (CHARGING): the
 // price they paid, left out of the generation-weighted average.
-export const CAP_FUELS = FUELS.filter((f) => f.k !== 'roof' && f.k !== 'hvdc');
+export const CAP_FUELS = FUELS.filter((f) => f.k !== 'roof' && f.k !== 'oemb' && f.k !== 'hvdc');   // embedded generation isn't paid the spot price
 const BATT = FUELS.find((f) => f.k === 'batt');
 export const CHARGING = { k: 'battc', name: 'Battery (charging)', tok: BATT ? BATT.tok : '--f-batt', charging: true };
 

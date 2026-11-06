@@ -6,6 +6,8 @@
 // files, which arrive 1-4 days late, so the long views end with the live week averaged to half-hours or days. Built by ingest/history.py; layout as in tracker.json, with explicit times
 // (t) and hours per point (h) where the step isn't constant.
 
+import { withOemb } from './oemb.js';
+
 // ---------- New Zealand time (handles the NZST/NZDT change; offset cached per hour) ----------
 const NZ_PARTS = new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' });
 const offCache = new Map();
@@ -39,7 +41,8 @@ export const KEY = {
 };
 
 // roof: embedded solar (rooftops and small ground-mounted arrays, estimated); roofU: its uncertainty (one standard deviation, MW); zero in data built before it existed
-const SERIES = ['geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'roofU', 'batt', 'hvdc', 'metered', 'underlying', 'tiwai', 'price'];
+// oemb, oembR, oembE: other embedded generation, its renewable part and its emissions (oemb.js; zero before 2009)
+const SERIES = ['geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'roofU', 'oemb', 'oembR', 'oembE', 'batt', 'hvdc', 'metered', 'underlying', 'tiwai', 'price'];
 const F = (a, n) => (a ? Float64Array.from(a) : new Float64Array(n));
 // node prices (the Prices page) can have gaps: null in the files, NaN here
 const FN = (a, n) => (a ? Float64Array.from(a, v => (v == null ? NaN : v)) : new Float64Array(n).fill(NaN));
@@ -50,7 +53,7 @@ const mapNodes = (o, fn) => Object.fromEntries(Object.entries(o || {}).map(([k, 
 const plantKey = p => `${p.name}|${p.fuel}|${p.isl}`;
 
 // total generation per point, including embedded solar (output only: no HVDC, no battery charging), as the page sums it
-const GEN = ['geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt'];
+const GEN = ['geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'oemb', 'batt'];
 // dispatchable plant (the Generation tab's headroom chart; history's peak.disp is the same sum, and peak.dispx the
 // same without hydro, ingest/history.py)
 export const DISPATCHABLE = ['hydro', 'gas', 'coal', 'diesel', 'batt'];
@@ -65,6 +68,7 @@ export function genTotal(S, region, fuels = GEN) {
 
 /** tracker.json or a history file -> segment: Float64Array series with times t and hours per point h. */
 export function fromLayout(D) {
+  withOemb(D);   // other embedded generation: its block folded into island series (oemb, oembR, oembE)
   const n = D.N;
   const t = D.t ? Float64Array.from(D.t) : Float64Array.from({ length: n }, (_, i) => D.t0 + i * D.step);
   const h = D.h ? Float64Array.from(D.h) : new Float64Array(n).fill(D.step / 36e5);

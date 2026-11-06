@@ -217,6 +217,28 @@ def named_points(rows=None):
     return {r['poc']: r['plant'] for r in rows if r['role'] == 'named'}
 
 
+_NAMED_INFO = None
+
+
+def named_info(rows=None):
+    """{plant: (fuel, island)} for the named plants, from their rows in facilities/metered_plants.csv."""
+    global _NAMED_INFO
+    if _NAMED_INFO is None or rows is not None:
+        import metered as mt
+        from common import island_of
+        out = {}
+        for poc, plant in named_points(rows).items():
+            fuel = isl = ''
+            for r in mt.table():
+                if r['plant'] == plant:
+                    fuel, isl = fuel or r['fuel'], isl or r['isl']
+            out[plant] = (fuel, isl or island_of(poc, mt.islands()))
+        if rows is not None:
+            return out
+        _NAMED_INFO = out
+    return _NAMED_INFO
+
+
 def by_fuel(o, rows=None, split=None):
     """Half-hourly MW by fuel (columns FUELS), from the residual by grid exit point."""
     rows = points() if rows is None else rows
@@ -477,7 +499,7 @@ def live_block(days, js):
       src: 'estimate'; days: {month: {from, NI, SI}}, the layer's typical day by island and fuel for each month the week
       touches (48 half-hours from local midnight; the site lays them over the week, since the layer here doesn't follow
       the live data); named: {plant: MW for each interval}, the named plants' typical day less what the live data has
-      for them (Ngāwhā less Ngāwhā B; all of Teviot), which does follow it."""
+      for them (Ngāwhā less Ngāwhā B; all of Teviot), which does follow it; info: {plant: [fuel, island]}."""
     if not days:
         return None
     idx = pd.to_datetime(js['t0'] + np.arange(js['N']) * js['step'], unit='ms', utc=True)
@@ -499,4 +521,5 @@ def live_block(days, js):
         r = np.clip(est - np.nan_to_num(have), 0, None)
         if r.sum() > 0:
             out['named'][name] = [round(float(x), 1) for x in r]
+    out['info'] = {name: list(named_info().get(name, ('', ''))) for name in out['named']}
     return out
