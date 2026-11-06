@@ -240,9 +240,9 @@
 		<thead><tr><th>Figure</th><th>Status</th><th>Typical accuracy</th></tr></thead>
 		<tbody>
 			<tr><td>Emissions intensity, all periods</td><td>Calculated estimate</td><td>Huntly’s emissions within ±5% of Genesis’s reports in 20 of 23 quarters, and −0.4% over the whole period</td></tr>
-			<tr><td>Rankine coal share, from July 2020</td><td>Published by Genesis</td><td>A quarterly figure for the three units together</td></tr>
+			<tr><td>Rankine coal share, from July 2020</td><td>Published</td><td>Genesis’s quarterly figure for the three units together</td></tr>
 			<tr><td>Rankine coal share, before July 2020</td><td>Calculated estimate</td><td>Within a few points of Genesis’s share in most quarters where both exist</td></tr>
-			<tr><td>Geothermal factors, 2020 onward</td><td>Published by the NZGA and Contact</td><td>Station averages for a year</td></tr>
+			<tr><td>Geothermal factors, 2020 onward</td><td>Published</td><td>The NZGA’s and Contact’s station averages for a year</td></tr>
 			<tr><td>Geothermal factors, before 2020</td><td>Calculated estimate</td><td>Use 2020’s figures, which probably understate them, because reinjection was less common</td></tr>
 		</tbody>
 	</table>

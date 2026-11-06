@@ -92,7 +92,7 @@
 		<Shot name="records-list" alt="Heading for a record: tiles for records that could fall soon, with a Show all button." caption="Heading for a record, at the top of the page." />
 		<dl>
 			<dt>The lists</dt>
-			<dd>Heading for a record and New and provisional sit at the top. Under them, All-time records has the region picker and the period buttons, from a trading period to a year; Milestones and By month show New Zealand and each island side by side, and By month’s TP and Day buttons switch between trading periods and whole days. Point at a row to light up the same record in each region’s card, and click to hold it.</dd>
+			<dd>Heading for a record and New and provisional sit at the top. Under them, All-time records has the region picker and the period buttons, from a <a href="/methods#trading-period">trading period</a> to a year; Milestones and By month show New Zealand and each island side by side, and By month’s TP and Day buttons switch between trading periods and whole days. Point at a row to light up the same record in each region’s card, and click to hold it.</dd>
 			<dt>A record’s page</dt>
 			<dd>Hover a chart to read it, and click to pin a point: the pin stays while you hover elsewhere, so two points can be compared. Click it again or press Escape to let go. Drag across a chart to zoom in; Reset zoom goes back.</dd>
 			<dt>Share and Download</dt>

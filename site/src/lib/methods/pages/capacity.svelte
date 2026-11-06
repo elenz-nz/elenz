@@ -149,7 +149,7 @@
 			<tr><td>Installed capacity, register rows</td><td>Published</td><td>As published by the EA</td></tr>
 			<tr><td>Installed capacity, corrected rows</td><td>Calculated estimate</td><td>Each row names its source, and the uncertain rows are listed below</td></tr>
 			<tr><td>Capacity factors</td><td>Calculated</td><td>Take the status of the output they use</td></tr>
-			<tr><td>Offered capacity</td><td>Calculated</td><td>Summed from final offers as published by the EA</td></tr>
+			<tr><td>Offered capacity</td><td>Published</td><td>Summed from final offers as published by the EA</td></tr>
 			<tr><td>Spare dispatchable capacity</td><td>Calculated</td><td>Overstates the margin, for the reasons below</td></tr>
 		</tbody>
 	</table>
