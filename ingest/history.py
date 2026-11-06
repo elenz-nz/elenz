@@ -749,8 +749,8 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
         put_json(store, 'hist/oemb/profiles.json', {'months': prof, 'at': int(time.time() * 1000)})
     # and the typical days the live job lays over its week, for the months it can touch (last month to next)
     try:
-        today = datetime.now(NZ).date()
-        mo = [f'{(today.replace(day=1) + timedelta(days=d)):%Y-%m}' for d in (-1, 0, 32)]
+        first = datetime.now(NZ).date().replace(day=1)   # not 'today': main's 'today' keys the day's write count
+        mo = [f'{(first + timedelta(days=d)):%Y-%m}' for d in (-1, 0, 32)]
         isl_tab = mt.islands()
         live = {'months': emb.live_days(prof, mo, isl=lambda poc: island_of(poc, isl_tab), log=log)}
         old = json.loads(store.get('hist/oemb/live.json') or b'{}')
