@@ -89,7 +89,7 @@
 	</table>
 </div>
 <p>A typical day here is made as for the layer: the plant’s own metered average for each half-hour of the day, from the latest metered month and the same month a year earlier, averaged together.</p>
-<p>Because these are plants Elenz shows, the filled-in output also counts in grid demand, as it does in the metered history (see <a href="/methods/demand">Demand</a>). Other embedded generation doesn’t: it is added only to demand with embedded generation.</p>
+<p>The filled-in output counts in the plant’s fuel, in total generation and in the renewable share, as the metered output does. It doesn’t change grid demand: demand from the dispatch data already matches the metered demand on average, and adding it put demand about 24 MW too high. Other embedded generation doesn’t change grid demand either: it is added only to demand with embedded generation (see <a href="/methods/demand">Demand</a>).</p>
 
 <h3 id="fuel">Fuel</h3>
 <p>Where a public document states the fuel at a grid exit point, we use it. Otherwise we split the grid exit point’s output by the <a href={sourceHref('guehmt')}>registry of installed distributed generation</a>. We take the capacity of each fuel there, less any dispatched plant at that point, and weight it by a typical capacity factor:</p>
