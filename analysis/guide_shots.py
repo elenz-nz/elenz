@@ -52,7 +52,13 @@ def context(browser, theme, **kw):
             path = route.request.url.split('/data/', 1)[1]
             if path not in cache:
                 req = urllib.request.Request(f'{LIVE}/data/{path}', headers={'User-Agent': 'Mozilla/5.0'})
-                cache[path] = urllib.request.urlopen(req, timeout=60).read()
+                for attempt in range(4):
+                    try:
+                        cache[path] = urllib.request.urlopen(req, timeout=60).read()
+                        break
+                    except OSError:
+                        if attempt == 3:
+                            raise
             route.fulfill(status=200, content_type='application/json', body=cache[path])
         ctx.route('**/data/**', data)
     return ctx

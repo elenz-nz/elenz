@@ -26,7 +26,7 @@ const urls = (): Url[] => [
 	{ path: '/privacy' },
 	{ path: '/methods' },
 	{ path: '/methods/sources' },
-	...TOPICS.map((t) => ({ path: `/methods/${t.slug}`, lastmod: t.updated }))
+	...TOPICS.map((t) => ({ path: `/methods/${t.slug}`, lastmod: t.reviewed }))
 ];
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');

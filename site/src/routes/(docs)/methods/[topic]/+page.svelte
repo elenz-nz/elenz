@@ -1,14 +1,13 @@
 <script lang="ts">
-	// One series' method: header and "Data used" from the registry, then the page's own body (#lib/methods/pages).
+	// One figure's method: header from the registry, then the page's own body (#lib/methods/pages), which follows the
+	// standard structure and places Data sources and References itself.
 	import Preview from '#lib/site/Preview.svelte';
-	import { TOPICS, body, longDate, refsFor, reportHref, sourceHref, sourcesFor, topic } from '#lib/methods/registry.js';
+	import { TOPICS, body, longDate, reportHref, topic } from '#lib/methods/registry.js';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 	const t = $derived(topic(data.slug)!);
 	const Body = $derived(body(data.slug));
-	const used = $derived(sourcesFor(data.slug));
-	const refs = $derived(refsFor(data.slug));
 	const i = $derived(TOPICS.findIndex((x) => x.slug === data.slug));
 	const prev = $derived(i > 0 ? TOPICS[i - 1] : null);
 	const next = $derived(i < TOPICS.length - 1 ? TOPICS[i + 1] : null);
@@ -23,50 +22,22 @@
 <main class="mt-page" aria-labelledby="mt-h">
 	<header class="mt-head">
 		<p class="mt-kicker"><a href="/methods">Data and methods</a></p>
-		<h1 id="mt-h">{t.title}{#if t.estimate}<span class="est-tag">Includes estimates</span>{/if}</h1>
+		<h1 id="mt-h">{t.title}</h1>
 		<p class="mt-lede">{t.summary}</p>
 		<p class="mt-meta">
 			<span>Shown on {#each t.shownOn as [label, href], j}{j ? (j === t.shownOn.length - 1 ? ' and ' : ', ') : ''}<a {href}>{label}</a>{/each}</span>
-			<span>Checked against the code {longDate(t.updated)}</span>
+			<span>Reviewed against the code on {longDate(t.reviewed)}</span>
 		</p>
 	</header>
-
-	{#if used.length}
-		<section class="mt-data" aria-labelledby="mt-data-h">
-			<h2 id="mt-data-h">Data used</h2>
-			<ul>
-				{#each used as s (s.id)}
-					<li>
-						<span class="nm"><a href={sourceHref(s.id)}>{s.name}</a>{#if s.check}<span class="chk">Check</span>{/if}<small>{s.publisher}</small></span>
-						<span class="use">{s.use}<small>{s.period} · {s.fresh}</small></span>
-					</li>
-				{/each}
-			</ul>
-		</section>
-	{/if}
 
 	<div class="mt-body">
 		{#if Body}<Body />{/if}
 	</div>
 
-	{#if refs.length}
-		<section class="mt-data" aria-labelledby="mt-refs-h">
-			<h2 id="mt-refs-h">References</h2>
-			<ul>
-				{#each refs as r (r.id)}
-					<li>
-						<span class="nm"><a href={r.url} target="_blank" rel="noopener">{r.title}</a><small>{r.by}{r.date ? `, ${r.date}` : ''}</small></span>
-						<span class="use">{r.use}</span>
-					</li>
-				{/each}
-			</ul>
-		</section>
-	{/if}
-
 	<p class="mt-report">Spotted a problem with this page, or know a better source? <a href={reportHref(t.title, `/methods/${t.slug}`)}>Email us about it</a></p>
 
 	<nav class="mt-pn" aria-label="More methods">
 		{#if prev}<a class="prev" href="/methods/{prev.slug}"><small>Previous</small>{prev.title}</a>{/if}
-		{#if next}<a class="next" href="/methods/{next.slug}"><small>Next</small>{next.title}</a>{:else}<a class="next" href="/methods/sources"><small>Next</small>Every data source</a>{/if}
+		{#if next}<a class="next" href="/methods/{next.slug}"><small>Next</small>{next.title}</a>{:else}<a class="next" href="/methods/sources"><small>Next</small>Source register</a>{/if}
 	</nav>
 </main>

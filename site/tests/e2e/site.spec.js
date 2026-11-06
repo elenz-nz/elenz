@@ -139,6 +139,17 @@ test.describe('while the data loads', () => {
   }
 });
 
+test('a method page keeps its calculations behind a button', async ({ page }) => {
+  await page.goto('/methods/hvdc');
+  const button = page.getByText('Show calculations');
+  const formula = page.locator('.calc .formula').first();
+  await expect(formula).toBeHidden();
+  await button.click();
+  await expect(formula).toBeVisible();
+  await page.getByText('Hide calculations').click();
+  await expect(formula).toBeHidden();
+});
+
 test('All offers no daily interval on the Prices tab', async ({ page }) => {
   await page.goto('/tracker/prices');
   await page.locator('[aria-labelledby="p-lb-range"] button', { hasText: 'ALL' }).click();
