@@ -33,8 +33,8 @@ discharge only, no HVDC, plus other embedded generation from 2009 (embedded.py);
 battery discharge (geothermal, bioenergy, hydro, wind, grid and embedded solar, and other embedded generation's hydro,
 geothermal, wind and landfill gas; its unclassified output counts in the total only). Fuel records (hydro, wind,
 fossil) are the plants the site shows, not the layer, whose split by fuel is partly estimated; in months without their
-metered data, Ngāwhā's and Teviot's filled-in output (the layer block's `named`) counts in their fuels and in demand,
-as their metered output does; fossil generation is the Rankines (coal or gas), gas, diesel and waste heat; demand is metered grid demand;
+metered data, Ngāwhā's and Teviot's filled-in output (the layer block's `named`) counts in their fuels, as their
+metered output does (not in demand, which dispatch data already matches on average); fossil generation is the Rankines (coal or gas), gas, diesel and waste heat; demand is metered grid demand;
 prices are the island reference nodes (Haywards, Benmore), New Zealand's the higher of the two; HVDC is the mid-link
 transfer, northward positive. Embedded solar is modelled, so its records are estimates (the page says so).
 
@@ -56,7 +56,7 @@ VERSION = 7                # bump when summarise() changes: every month's summar
                            # 3: renewable share without battery discharge; 4: most fossil, hydro high and low, lowest price;
                            # 5: info, the month's highest and lowest half-hour of demand with embedded solar added back;
                            # 6: dispatch months corrected (dispatch_adjust.json); 7: other embedded generation in
-                           # generation and the renewable share, Ngāwhā's and Teviot's fill in their fuels and demand)
+                           # generation and the renewable share, Ngāwhā's and Teviot's fill in their fuels)
 REGIONS = ('NZ', 'NI', 'SI')
 GEN = ('geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
 REN = ('geo', 'bio', 'hydro', 'wind', 'solar', 'roof')
@@ -174,15 +174,14 @@ def series(js):
     a = lambda isl, k: _arr(js[isl].get(k), n)   # noqa: E731
     fu = {isl: {f: a(isl, f) for f in GEN} for isl in ('NI', 'SI')}
     # other embedded generation (embedded.py, from 2009; outside the island series in the files): the named plants'
-    # output the month's layout lacks (Ngāwhā's and Teviot's, months without their metered data) joins their fuel and
-    # grid demand, as their metered output does; the layer itself counts in generation and the renewable share only
+    # output the month's layout lacks (Ngāwhā's and Teviot's, months without their metered data) joins their fuel;
+    # the layer itself counts in generation and the renewable share only. Neither touches demand: dispatch demand
+    # already matches metered demand on average without the named plants' fill (with it, 24 MW high; 6 Nov 2026)
     oe = js.get('oemb') or {}
-    dem_add = {'NI': np.zeros(n), 'SI': np.zeros(n)}
     for plant, v in (oe.get('named') or {}).items():
         fuel, isl = emb.named_info().get(plant, ('', ''))
         if fuel in GEN and isl in fu:
             fu[isl][fuel] = fu[isl][fuel] + np.nan_to_num(_arr(v, n))
-            dem_add[isl] = dem_add[isl] + np.nan_to_num(_arr(v, n))
     lay = {isl: {f: np.maximum(np.nan_to_num(_arr(v, n)), 0) for f, v in (oe.get(isl) or {}).items()}
            for isl in ('NI', 'SI')}
     lay['NZ'] = {f: lay['NI'].get(f, 0) + lay['SI'].get(f, 0) for f in set(lay['NI']) | set(lay['SI'])}
@@ -198,8 +197,7 @@ def series(js):
         gen = sum(v for f, v in F.items() if f != 'batt') + sum(lay[r].values(), np.zeros(n))
         ren = sum(F[f] for f in REN) + sum((v for f, v in lay[r].items() if f in OEMB_REN), np.zeros(n))
         share = np.where(gen > 0, 100 * ren / np.where(gen > 0, gen, 1), np.nan)
-        dem = (a('NI', 'metered') + a('SI', 'metered') + dem_add['NI'] + dem_add['SI'] if r == 'NZ'
-               else a(r, 'metered') + dem_add[r])
+        dem = a('NI', 'metered') + a('SI', 'metered') if r == 'NZ' else a(r, 'metered')
         price = np.maximum(nip, sip) if r == 'NZ' else (nip if r == 'NI' else sip)
         S = {
             'demand_max': dem, 'demand_min': dem,

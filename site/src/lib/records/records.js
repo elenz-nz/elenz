@@ -4,6 +4,7 @@
 // Each record's id matches records.py. kind: 'hh' (a half-hour), 'month' (a calendar month) or 'run' (the longest
 // run of half-hours); fam: what makes it official (gen: metered generation and demand; price: final prices; hvdc:
 // metered HVDC), as in records.py; tok: its colour token; regions it is kept for, and what to say for the others.
+import { liveOemb, OEMB_REN } from '../tracker/oemb.js';
 
 export const RECORDS_URL = '/data/history/records.json';
 export const LIVE_URL = '/data/tracker.json';
@@ -285,17 +286,38 @@ function halfHours(D) {
     return out;
   };
   const z = new Array(n).fill(0);
-  const a = (isl, key) => D[isl][key] ?? z;
+  // other embedded generation (records.py VERSION 7): named plants' fill joins their fuel (not demand); the layer
+  // counts in generation and the renewable share only
+  const oe = liveOemb(D);
+  const add = { NI: {}, SI: {} };
+  for (const p of oe?.named ?? []) {
+    if (!add[p.isl] || !GEN.includes(p.fuel)) continue;
+    const x = (add[p.isl][p.fuel] ??= new Float64Array(n));
+    for (let j = 0; j < n; j++) x[j] += p.s[j] ?? 0;
+  }
+  const a = (isl, key) => {
+    const base = D[isl][key] ?? z, x = add[isl]?.[key];
+    return x ? base.map((v, j) => (v ?? 0) + x[j]) : base;
+  };
+  const lay = (isl, ren) => {
+    const out = new Float64Array(n);
+    for (const [f, v] of Object.entries(oe?.layer?.[isl] ?? {})) if (!ren || OEMB_REN.includes(f)) for (let j = 0; j < n; j++) out[j] += Math.max(0, v[j]);
+    return out;
+  };
   const out = {};
   for (const r of ['NZ', 'NI', 'SI']) {
     const fuel = (f) => (r === 'NZ' ? a('NI', f).map((x, j) => x + a('SI', f)[j]) : a(r, f));
     const F = Object.fromEntries(GEN.map((f) => [f, fuel(f).map((x) => Math.max(0, x))]));
     // the renewable share leaves battery discharge out (as records.py and the rest of the site)
     const gen = new Array(n).fill(0), ren = new Array(n).fill(0), fos = new Array(n).fill(0);
+    const isls = r === 'NZ' ? ['NI', 'SI'] : [r];
+    const lg = isls.map((i) => lay(i, false)), lr = isls.map((i) => lay(i, true));
     for (let j = 0; j < n; j++) {
       for (const f of GEN) if (f !== 'batt') gen[j] += F[f][j];
       for (const f of REN) ren[j] += F[f][j];
       for (const f of FOSSIL) fos[j] += F[f][j];
+      for (const x of lg) gen[j] += x[j];
+      for (const x of lr) ren[j] += x[j];
     }
     const dem = r === 'NZ' ? a('NI', 'metered').map((x, j) => x + a('SI', 'metered')[j]) : a(r, 'metered');
     const G = avg(gen), Rn = avg(ren);

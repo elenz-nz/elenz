@@ -279,6 +279,18 @@ d3 = R3['records']['demand_max']['NZ']
 check(d3['v'] == dm['v'] + 1000 and d3.get('since') == 3 and any(x['k'] == 'demand_max' and x['r'] == 'NZ' and x['ok'] for x in R3['resolved']),
       'records: confirmed when the metered month arrives (new, and listed as settled)')
 check(not rc.same(R2, R3) and rc.same(R3, {**R3, 'built': 0}), 'records: republished only when something changed')
+# other embedded generation (records VERSION 7): the layer counts in generation and the renewable share, not in fuel
+# records; a named plant's fill joins its fuel
+m_oe = copy.deepcopy(m_off)
+N_oe = m_oe['N']
+m_oe['oemb'] = {'src': 'recon', 'NI': {'hydro': [50.0] * N_oe, 'other': [50.0] * N_oe}, 'SI': {}, 'named': {'Ngāwhā': [20.0] * N_oe}}
+S0, S1 = rc.series(m_off), rc.series(m_oe)
+g0, r0 = np.nansum(S0['gen']['NI']), np.nansum(S0['renE']['NI'])
+check(abs(np.nansum(S1['gen']['NI']) - g0 - 120 * N_oe) < 1e-6 and abs(np.nansum(S1['renE']['NI']) - r0 - 70 * N_oe) < 1e-6,
+      'records: other embedded in generation and the renewable share (unclassified not renewable), named fill in its fuel')
+check(np.allclose(S1['hydro_max']['NI'], S0['hydro_max']['NI']) and np.allclose(S1['demand_max']['NI'], S0['demand_max']['NI']),
+      'records: fuel records leave the layer out; demand unchanged')
+check('SI' not in S1['ren_min'] and 'SI' in S1['ren_max'], 'records: no lowest renewable share for the South Island')
 # the current period so far (records.js pace): the newest day's period, each series' sum and count in half-hours
 pc = R['pace']
 dsum = pc['day']['sums']['NZ']['dem']

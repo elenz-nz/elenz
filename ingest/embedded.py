@@ -499,7 +499,7 @@ def live_block(days, js):
       src: 'estimate'; days: {month: {from, NI, SI}}, the layer's typical day by island and fuel for each month the week
       touches (48 half-hours from local midnight; the site lays them over the week, since the layer here doesn't follow
       the live data); named: {plant: MW for each interval}, the named plants' typical day less what the live data has
-      for them (Ngāwhā less Ngāwhā B; all of Teviot), which does follow it."""
+      for them (Ngāwhā less Ngāwhā B; all of Teviot), which does follow it; info: {plant: [fuel, island]}."""
     if not days:
         return None
     idx = pd.to_datetime(js['t0'] + np.arange(js['N']) * js['step'], unit='ms', utc=True)
@@ -521,4 +521,5 @@ def live_block(days, js):
         r = np.clip(est - np.nan_to_num(have), 0, None)
         if r.sum() > 0:
             out['named'][name] = [round(float(x), 1) for x in r]
+    out['info'] = {name: list(named_info().get(name, ('', ''))) for name in out['named']}
     return out
