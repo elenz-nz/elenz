@@ -123,6 +123,8 @@
 <h3>February to April 1998</h3>
 <p>HVDC transfer north averaged <strong>835 MW</strong> over these 3 months, the highest of any 3 months in a row since August 1997. March 1998 averaged 862 MW, the highest of any month. <a href="/tracker?range=1y&int=1mo&end=1998-12-31&fold=price,ren,demand,co2">Open the Generation tab with the HVDC transfer chart below for 1998</a>.</p>
 
+<p>Transfer north has climbed again this year. On metered flows, September 2026 averaged 673 MW, the third-highest month since 2013. The EA hasn’t published metered flows for October yet, so its 659 MW is a calculated estimate from dispatch data. Counting that estimate, August to October averaged about <strong>665 MW</strong>, the highest of any 3 months in a row since the 3 months to January 2003. On the same basis, 1 to 6 November averaged about 704 MW, more than any whole month since January 2007. <a href="/tracker?range=1y&int=1mo&fold=price,ren,demand,co2">Open the Generation tab with the HVDC transfer chart below for the past year</a>.</p>
+
 <Figure caption={`Average net HVDC transfer each month, August 1997 to ${hvdcEnd}, north above the line and south below, with February to April 1998 shaded`} source="EA metered HVDC flows (HVDC_Flows), at mid-link. In 38 months from December 1997 to December 2002, the receiving side is a calculated estimate. February to April 1998 is metered at both ends.">
 	<Lines xs={hvdcX} series={[{ name: 'Net transfer', tok: '--f-hvdc', values: D.hvdc_monthly, thin: true }]} xzero={false} xticks={[2000, 2005, 2010, 2015, 2020, 2025]}
 		xfmt={String} titleFmt={monthName} fmt={way} ytick={(v) => `${num(Math.abs(v))} MW`} ytop="North" ybottom="South" left={66} height={260}
