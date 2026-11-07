@@ -89,7 +89,7 @@ def peaks(day):
     best = defaultdict(float)
     for t, v in zip(day['t'], day['peak']['NZ']['metered']):
         y = local(t).year
-        if v and v > best[y] and y >= FIRST_YEAR:
+        if v and y >= FIRST_YEAR and v > best[y]:   # year first, so a year before FIRST_YEAR never gets a 0 entry
             best[y] = v
     years = sorted(best)
     return years, [int(best[y]) for y in years]
@@ -146,11 +146,13 @@ def main():
         y = int(first[:4])
         if v > best.get(y, (-1e9,))[0]:
             best[y] = (v, first)
-    J['hvdc_years'] = sorted(best)
-    J['hvdc_best3'] = [best[y][0] for y in J['hvdc_years']]
+    J['hvdc_months'], J['hvdc_monthly'] = ms, [round(v) for v in means]   # the monthly line, Feb-Apr 1998 shaded
     F['hvdc_best3_next'] = sorted(((v, y) for y, (v, _) in best.items() if y != 1998), reverse=True)[:3]
 
     J['peak_years'], J['peaks'] = peaks(day)
+    J['peak_record'] = [max(J['peaks'][:i + 1]) for i in range(len(J['peaks']))]   # the record at each year's end
+    F['peak_record_steps'] = [(y, v) for i, (y, v) in enumerate(zip(J['peak_years'], J['peak_record']))
+                              if not i or v > J['peak_record'][i - 1]]
     F['peak_top'] = sorted(zip(J['peaks'], J['peak_years']), reverse=True)[:3]
     d = rec['records']['demand_max']['NZ']
     F['demand_record'] = (d['v'], stamp(d['t']))
