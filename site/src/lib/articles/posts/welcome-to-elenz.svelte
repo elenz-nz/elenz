@@ -15,6 +15,7 @@
 	import Record from '#lib/articles/Record.svelte';
 	import Stats from '#lib/articles/Stats.svelte';
 	import Columns from '#lib/articles/charts/Columns.svelte';
+	import Lines from '#lib/articles/charts/Lines.svelte';
 	import TimeStack from '#lib/articles/charts/TimeStack.svelte';
 	import { num } from '#lib/articles/charts/util.js';
 	import D from '#lib/articles/data/welcome-to-elenz.json';
@@ -34,8 +35,15 @@
 	];
 	const everyFifth = (ys: number[]) => ys.map((y) => (y % 5 === 0 ? String(y) : null));
 
-	const hvdcColors = D.hvdc_years.map((y) => (y === 1998 ? '--accent' : '--f-hvdc'));
-	const hvdcTops = D.hvdc_best3.map((v, i) => (D.hvdc_years[i] === 1998 ? `${num(Math.round(v))} MW` : null));
+	const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+	// months as fractional years: 1998.0 is January 1998
+	const hvdcX = D.hvdc_months.map((m) => Number(m.slice(0, 4)) + (Number(m.slice(5, 7)) - 1) / 12);
+	const monthName = (v: number) => {
+		const k = Math.round(v * 12);
+		return `${MONTHS[k % 12]} ${Math.floor(k / 12)}`;
+	};
+	const way = (v: number) => `${num(Math.abs(v))} MW ${v < 0 ? 'south' : 'north'}`;
+	const hvdcEnd = monthName(hvdcX[hvdcX.length - 1]);
 
 	const x = D.xmas;
 	const fuels = x.fuels as Table;
@@ -52,8 +60,7 @@
 		{ k: 'batt', name: 'Battery', tok: '--f-batt' },
 	].map((f) => ({ name: f.name, tok: f.tok, values: fuels[f.k] }));
 
-	const peakColors = D.peak_years.map((y) => (y === 2026 ? '--accent' : '--f-hvdc'));
-	const peakTops = D.peaks.map((v, i) => (D.peak_years[i] === 2026 ? num(v) : null));
+	const peakLast = D.peaks.length - 1;
 </script>
 
 <p>Elenz shows New Zealand’s electricity system as it runs: what is generating, what it costs, how much is flowing between the islands and how much of it is renewable. The figures update every 5 minutes, and the history goes back to August 1997.</p>
@@ -116,9 +123,12 @@
 <h3>February to April 1998</h3>
 <p>HVDC transfer north averaged <strong>835 MW</strong> over these 3 months, the highest of any 3 months in a row since August 1997. March 1998 averaged 862 MW, the highest of any month. <a href="/tracker?range=1y&int=1mo&end=1998-12-31&fold=price,ren,demand,co2">Open the Generation tab with the HVDC transfer chart below for 1998</a>.</p>
 
-<Figure caption="The highest 3 months in a row of net HVDC transfer north, by the year they start in, August 1997 to September 2026" source="EA metered HVDC flows (HVDC_Flows), at mid-link. In 38 months from December 1997 to December 2002, the receiving side is a calculated estimate. February to April 1998 is metered at both ends.">
-	<Columns cats={D.hvdc_years.map(String)} xlabels={everyFifth(D.hvdc_years)} series={[{ name: 'Average transfer north', tok: '--f-hvdc', values: D.hvdc_best3 }]} colors={hvdcColors} tops={hvdcTops}
-		unit="MW" height={230} fmt={(v) => `${num(Math.round(v))} MW`} label="Year" />
+<p>Transfer north has climbed again this year. On metered flows, September 2026 averaged 673 MW, the third-highest month since 2013. The EA hasn’t published metered flows for October yet, so its 659 MW is a calculated estimate from dispatch data. Counting that estimate, August to October averaged about <strong>665 MW</strong>, the highest of any 3 months in a row since the 3 months to January 2003. On the same basis, 1 to 6 November averaged about 704 MW, more than any whole month since January 2007. <a href="/tracker?range=1y&int=1mo&fold=price,ren,demand,co2">Open the Generation tab with the HVDC transfer chart below for the past year</a>.</p>
+
+<Figure caption={`Average net HVDC transfer each month, August 1997 to ${hvdcEnd}, north above the line and south below, with February to April 1998 shaded`} source="EA metered HVDC flows (HVDC_Flows), at mid-link. In 38 months from December 1997 to December 2002, the receiving side is a calculated estimate. February to April 1998 is metered at both ends.">
+	<Lines xs={hvdcX} series={[{ name: 'Net transfer', tok: '--f-hvdc', values: D.hvdc_monthly, thin: true }]} xzero={false} xticks={[2000, 2005, 2010, 2015, 2020, 2025]}
+		xfmt={String} titleFmt={monthName} fmt={way} ytick={(v) => `${num(Math.abs(v))} MW`} ytop="North" ybottom="South" left={66} height={260}
+		band={{ from: 1998 + 1 / 12, to: 1998 + 3 / 12, label: 'February to April 1998', series: 0 }} table label="Month" />
 </Figure>
 
 <h3>Christmas 2025</h3>
@@ -134,9 +144,11 @@
 <h3>6 August 2026</h3>
 <p>Grid demand reached <a href="/records/demand_max"><strong>7,387 MW</strong></a> in the half-hour from 7:30 am, the highest peak in the dataset. The <a href="/articles/winter-2026">Winter 2026 review</a> covers that week in detail.</p>
 
-<Figure caption="The highest half-hour of grid demand in each calendar year since 1998, with 2026 so far" source="EA metered data, half-hourly averages">
-	<Columns cats={D.peak_years.map(String)} xlabels={everyFifth(D.peak_years)} series={[{ name: 'Peak demand', tok: '--f-hvdc', values: D.peaks }]} colors={peakColors} tops={peakTops}
-		unit="MW" height={230} fmt={(v) => `${num(v)} MW`} label="Year" />
+<Figure caption="The highest half-hour of grid demand in each calendar year since 1998, with 2026 so far, and the record as it stood at the end of each year" source="EA metered data, half-hourly averages">
+	<Lines xs={D.peak_years} series={[{ name: 'Highest half-hour in the year', tok: '--muted', values: D.peaks, dots: true }, { name: 'Record', tok: '--accent', values: D.peak_record, step: true }]}
+		xzero={false} xticks={[2000, 2005, 2010, 2015, 2020, 2025]} xfmt={String} fmt={(v) => `${num(v)} MW`} ytick={(v) => `${num(v)} MW`} left={66} height={260} yzero={false}
+		marks={[{ i: peakLast, series: 0, label: `${num(D.peaks[peakLast])} MW` }]} table label="Year"
+		legend={[{ name: 'Highest half-hour in the year', tok: '--muted', kind: 'dot' }, { name: 'Record', tok: '--accent', kind: 'line' }]} />
 </Figure>
 
 <h2>Where the numbers come from</h2>

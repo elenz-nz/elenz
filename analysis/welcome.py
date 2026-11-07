@@ -85,11 +85,37 @@ def hvdc_months(day):
     return months, [round(sums[m][0] / sums[m][1], 1) for m in months], sums
 
 
+def hvdc_recent(day):
+    """The latest months' average transfer north, past the last month with final data: calculated estimates from dispatch
+    data (hvdc.estimate) until the EA publishes the metered flows. Ranked against every month and 3 months in a row."""
+    final_to = local(fetch('records.json')['final_to']['hvdc'])
+    sums = defaultdict(lambda: [0.0, 0.0])
+    for t, h, v in zip(day['t'], day['h'], day['hvdcN']):
+        if v is not None:
+            s = sums[local(t).strftime('%Y-%m')]
+            s[0] += v * h
+            s[1] += h
+    ms = sorted(sums)
+    avg = {m: sums[m][0] / sums[m][1] for m in ms}
+    whole = ms[:-1]   # the last month is still running
+    last_day = local(day['t'][-1]).strftime('%d %b %Y')
+    three = {ms[i + 2]: sum(sums[m][0] for m in ms[i:i + 3]) / sum(sums[m][1] for m in ms[i:i + 3]) for i in range(len(whole) - 2)}
+    end = whole[-1]
+    return {
+        'months': {m: (round(avg[m]), 'estimate' if m > final_to.strftime('%Y-%m') else 'metered') for m in ms[-6:]},
+        'running_month_to': last_day,
+        'three_to_' + end: round(three[end]),
+        'last_three_above': max((e for e, v in three.items() if v > three[end] and e != end), default=None),
+        'running_month_beats_every_whole_month_since': max((m for m in whole if avg[m] > avg[ms[-1]]), default=None),
+        'month_ranks_since_2013_06': [(m, round(avg[m])) for m in sorted((m for m in whole if m >= '2013-06'), key=lambda m: -avg[m])[:6]],
+    }
+
+
 def peaks(day):
     best = defaultdict(float)
     for t, v in zip(day['t'], day['peak']['NZ']['metered']):
         y = local(t).year
-        if v and v > best[y] and y >= FIRST_YEAR:
+        if v and y >= FIRST_YEAR and v > best[y]:   # year first, so a year before FIRST_YEAR never gets a 0 entry
             best[y] = v
     years = sorted(best)
     return years, [int(best[y]) for y in years]
@@ -146,11 +172,14 @@ def main():
         y = int(first[:4])
         if v > best.get(y, (-1e9,))[0]:
             best[y] = (v, first)
-    J['hvdc_years'] = sorted(best)
-    J['hvdc_best3'] = [best[y][0] for y in J['hvdc_years']]
+    J['hvdc_months'], J['hvdc_monthly'] = ms, [round(v) for v in means]   # the monthly line, Feb-Apr 1998 shaded
+    F['hvdc_recent'] = hvdc_recent(day)
     F['hvdc_best3_next'] = sorted(((v, y) for y, (v, _) in best.items() if y != 1998), reverse=True)[:3]
 
     J['peak_years'], J['peaks'] = peaks(day)
+    J['peak_record'] = [max(J['peaks'][:i + 1]) for i in range(len(J['peaks']))]   # the record at each year's end
+    F['peak_record_steps'] = [(y, v) for i, (y, v) in enumerate(zip(J['peak_years'], J['peak_record']))
+                              if not i or v > J['peak_record'][i - 1]]
     F['peak_top'] = sorted(zip(J['peaks'], J['peak_years']), reverse=True)[:3]
     d = rec['records']['demand_max']['NZ']
     F['demand_record'] = (d['v'], stamp(d['t']))
