@@ -1,4 +1,7 @@
-# Analysis behind the embedded solar and HVDC estimates
+# Analysis behind Elenz's estimates
+
+The evidence behind the embedded solar, HVDC, emission factor, metered history, price explainer, installed capacity,
+other embedded generation and record correction figures. Sections are dated.
 
 "Embedded solar" on the site (data key `roof`): solar on local networks that isn't dispatched, rooftops and
 ground-mounted arrays up to ~10 MW. Earlier notes below say "rooftop" for the same thing.
