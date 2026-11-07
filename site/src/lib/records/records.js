@@ -672,11 +672,22 @@ export function pace(R, D) {
         const tgt = rec.prov && beats(rec.prov.v, rec.v) ? rec.prov : rec;
         const ref = tgt.curve?.[Math.min(steps, tgt.curve.length) - 1];
         if (ref == null) continue;
-        const f = figureSoFar(c, d, r, tgt.v);
+        // a close dispatch figure beyond the record (records.json `near`): the period has to be ahead of it too
+        // (design decision, 7 Nov 2026). Against its curve at the same point once records.py has made one; until
+        // then against its final figure. `near` is corrected (the record's usual shift taken off), so the figure so
+        // far is corrected the same way before the comparison.
+        const nr = tgt === rec && rec.near && beats(rec.near.v, rec.v) ? rec.near : null;
+        const [shift] = nr ? adjOf(R, d.id, r, period) : [0];
+        const f = figureSoFar(c, d, r, nr ? nr.v + shift : tgt.v);
         if (!f) continue;
         const { v, need } = f;
         if (!beats(v, ref)) continue;
-        out.push({ d, region: r, period, start, hours, elapsed, steps, v, ref, best: tgt.v, bestT: tgt.t, provBest: tgt !== rec, need });
+        if (nr) {
+          const nref = nr.curve?.[Math.min(steps, nr.curve.length) - 1];
+          if (nref != null ? !beats(v, nref) : !beats(v - shift, nr.v)) continue;
+        }
+        out.push({ d, region: r, period, start, hours, elapsed, steps, v, ref, best: tgt.v, bestT: tgt.t, provBest: tgt !== rec,
+          close: nr ? { t: nr.t, v: nr.v } : null, need });
       }
     }
   }
@@ -763,6 +774,6 @@ export function needText(p) {
   // a share above 100%
   if ((!min && need <= 0) || (min && d.unit === '%' && need >= 100)) return 'It is far enough ahead to hold whatever the rest brings.';
   // "only" when the rest can ease off from the pace so far; otherwise it has to do better than it has
-  if (min) return need >= p.v ? `The rest can average up to ${fmt(d, need, p.period)} and still beat it.` : `The rest has to average under ${fmt(d, need, p.period)} to beat it.`;
-  return need <= p.v ? `The rest needs only ${fmt(d, need, p.period)} to beat it.` : `The rest has to average ${fmt(d, need, p.period)} to beat it.`;
+  if (min) return need >= p.v ? `The rest can average up to ${fmt(d, need, p.period)} and still beat ${p.close ? 'both' : 'it'}.` : `The rest has to average under ${fmt(d, need, p.period)} to beat ${p.close ? 'both' : 'it'}.`;
+  return need <= p.v ? `The rest needs only ${fmt(d, need, p.period)} to beat ${p.close ? 'both' : 'it'}.` : `The rest has to average ${fmt(d, need, p.period)} to beat ${p.close ? 'both' : 'it'}.`;
 }
