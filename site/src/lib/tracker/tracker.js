@@ -108,6 +108,11 @@ export function mountTracker(D, hooks = {}) {
   // other names a plant has had or goes by ([plant_aka] and the register names of a station shown whole): the list's
   // filter finds a plant by them, and its drill-down lists them with what its metered history counts ([plant_metering])
   const akaOf = name => PLANT_META[name]?.aka || [];
+  // the note shown when drilled into an estimated layer (ESTIMATED), with its method page
+  const EST_NOTE = {
+    roof: { text: 'Solar on local networks that the market doesn’t dispatch, most of it on rooftops. No meter measures it: we model it from the capacity installed on each network and satellite irradiance, so it carries a ± range.', href: '/methods/embedded-solar' },
+    oemb: { text: 'Small hydro, landfill gas and other generation on local networks that the market doesn’t dispatch, from January 2009. Metered months use each grid exit point’s metered injection; the newest weeks use a typical day, so they don’t follow rain or outages.', href: '/methods/other-embedded' },
+  };
   const meteredOf = name => PLANT_META[name]?.metered || '';
   // by site: every plant its own layer, so the list has every site (test report GRP-03, 28 Oct 2026; it was the
   // plants making up 95% of each fuel, at most 12, and an "Other ..." row)
@@ -718,8 +723,25 @@ export function mountTracker(D, hooks = {}) {
     const uy = Math.max(ys[k], top + 3) + 12;
     ys.forEach((y, i) => { if (i !== k && Math.abs(y - uy) < 11) skip.add(i); });
     ctx.save(); ctx.font = UNIT_FONT; ctx.fillStyle = C['--muted']; ctx.textAlign = align; ctx.textBaseline = 'middle';
+    const uw = ctx.measureText(unit).width;
     ctx.fillText(unit, x, uy); ctx.restore();
+    ctx._unit = { text: unit, x: align === 'right' ? x - uw : x, y: uy, w: uw };   // where it went, for flashUnit
     return skip;
+  }
+  // the generation chart's unit flashes a ring when it changes (MW to GWh or TWh, %, as the interval or MW/% changes),
+  // like Scale to this view's key: a box laid over the canvas for the flash, then removed (test report TRK-01, 6 Nov 2026)
+  function flashUnit(cv, u) {
+    if (exportScale || !u) return;
+    const was = cv._unitText;
+    cv._unitText = u.text;
+    if (!was || was === u.text || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    cv.parentElement.querySelector('.unit-flash')?.remove();
+    const el = document.createElement('span');
+    el.className = 'unit-flash';
+    el.setAttribute('aria-hidden', 'true');
+    Object.assign(el.style, { left: `${cv.offsetLeft + u.x - 4}px`, top: `${cv.offsetTop + u.y - 9}px`, width: `${u.w + 8}px`, height: '18px' });
+    el.addEventListener('animationend', () => el.remove());
+    cv.parentElement.appendChild(el);
   }
   function drawAxis(ctx, X, bottom, x0, x1) {
     ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.font = FONT;
@@ -853,6 +875,7 @@ export function mountTracker(D, hooks = {}) {
       if (-mn >= 0.6 * step) dom = both; else dom.lo = mn * 1.2;
     }
     const F = frame(c, dom, pct ? v => (Number.isInteger(v) ? v : v.toFixed(1)) + '%' : energy ? v => (Math.abs(v - Math.round(v)) < 1e-9 ? fmt(v) : String(+v.toFixed(2))) : v => fmt(v), { axis: true, unit: pct ? '%' : energy ? eu().unit : 'MW' });
+    flashUnit($('cv-gen'), ctx._unit);
     const { X, Y } = F;
     if (lines) {
       // up to eight lines: 2 px with a ring of the panel colour so crossings read; more: thinner, no ring.
@@ -1109,12 +1132,16 @@ export function mountTracker(D, hooks = {}) {
       $('sum-back').textContent = `‹ ${up.label === 'Generation' ? 'All sources' : up.label}`;
       $('sum-back').onclick = () => drillTo(up.to);
     }
-    // a plant's other names, and what its metered history counts where that differs from the dispatch data
+    // a plant's other names, and its plant notes ([plant_metering]: what its metered history counts where that differs
+    // from the dispatch data, and where the site shows it differently from the register); drilled into an estimated
+    // layer, what it is and a link to its method page (test report TRK-01, 6 Nov 2026)
     const aka = lv === 'unit' ? akaOf(d.plant) : [], metered = lv === 'unit' ? meteredOf(d.plant) : '';
+    const est = lv !== 'top' && lv !== 'fuel' && ESTIMATED.includes(d.fuel) ? EST_NOTE[d.fuel] : null;
     const pn = $('plant-note');
-    pn.hidden = !aka.length && !metered;
-    pn.innerHTML = (aka.length ? `<p><b>Also known as</b> ${aka.map(esc).join(', ')}</p>` : '')
-      + (metered ? `<p><b>Metered history</b></p><ul>${metered.split('\n').map(x => `<li>${esc(x)}</li>`).join('')}</ul><p><a href="/methods/generation#whole">More</a></p>` : '');
+    pn.hidden = !aka.length && !metered && !est;
+    pn.innerHTML = (est ? `<p><b>Calculated estimate</b></p><p>${esc(est.text)}</p><p><a href="${est.href}">How it’s estimated</a></p>` : '')
+      + (aka.length ? `<p><b>Also known as</b> ${aka.map(esc).join(', ')}</p>` : '')
+      + (metered ? `<p><b>Plant notes</b></p><ul>${metered.split('\n').map(x => `<li>${esc(x)}</li>`).join('')}</ul><p><a href="/methods/generation#whole">More</a></p>` : '');
   }
   // Long lists (the site view, a fuel's plants) get a filter box; the site view groups its rows under collapsible
   // fuel headings with subtotals. Section headings toggle open; their colour square hides every row in them.
@@ -1230,6 +1257,20 @@ export function mountTracker(D, hooks = {}) {
     return lv === 'top' ? (hydroOnly() ? 'Total hydro' : 'Total generation') : lv === 'fuel' ? `Total ${groupById(d.group).name.toLowerCase()}`
       : lv === 'plant' ? `Total ${FUEL[d.fuel].name.toLowerCase()}` : `Total ${d.plant}`;
   }
+  // drilled into one plant, the list's last column is each row's output against its capacity (the capacity factor
+  // over a range, output against capacity at a time) rather than its share, which for a plant alone is always 100%
+  // (test report GRP-03, 6 Nov 2026). Only where every row has a capacity: a plant shown as one row, or units that
+  // each have their own; never for batteries (signed).
+  function cfCaps() {
+    if (level() !== 'unit' || !V.layers.length || V.layers.some(l => l.signed)) return null;
+    const cap = capacityOf();
+    if (!cap) return null;
+    if (V.layers.length === 1) return new Map([[V.layers[0], cap]]);
+    return V.layers.every(l => l.cap) ? new Map(V.layers.map(l => [l, l.cap])) : null;
+  }
+  const capOf = (caps, l) => caps.get(l) ?? (l.members ? l.members.reduce((a, m) => a + (caps.get(m) || 0), 0) : 0);
+  const pctTxt = f => (f === f && isFinite(f) ? (f * 100).toFixed(1) + '%' : '—');
+  function syncShareHead() { const c = !!cfCaps(); $('col-s').textContent = c ? 'Of capacity' : 'Share'; $('col-s').title = c ? 'Output against installed capacity (the capacity factor over a range)' : ''; }
   function plantRows(range, j) {
     if (level() !== 'unit') return [];
     const p = plantByName(state.drill.plant), cap = capacityOf();
@@ -1246,6 +1287,7 @@ export function mountTracker(D, hooks = {}) {
 
   function updateSummary() {
     const j = state.hover, r = state.region, layers = V.layers;
+    syncShareHead();
     $('tot-lbl').textContent = totalLabel();
     if (j == null) {
       const R = RANGES[state.range], p0 = lp(V.t[0] ?? M.END);
@@ -1270,13 +1312,16 @@ export function mountTracker(D, hooks = {}) {
       const tw = Math.abs(tot) >= 1e4, en = v => gwh(tw ? v / 1000 : v).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
       $('col-q').textContent = tw ? 'TWh' : 'GWh';
       for (const x of V.sections) if (x.row) E.set(x, x.members.reduce((a, m) => a + E.get(m), 0));
+      const caps = cfCaps(); let hAll = 0; for (let i = 0; i < V.n; i++) hAll += V.hrs[i];
+      const cf = (e, c) => (c && hAll ? e * 1000 / (c * hAll) : NaN);   // e in GWh, c in MW
       for (const l of [...layers, ...V.sections.filter(x => x.row)]) {
         const e = E.get(l);
         l.cells.q.textContent = en(e);
+        if (caps) { const f = cf(e, capOf(caps, l)); l.cells.s.textContent = pctTxt(f); l.cells.b.style.transform = `scaleX(${f === f ? Math.max(0, Math.min(1, f)) : 0})`; continue; }
         l.cells.s.textContent = l.signed ? signedTxt(l, e, true) : tot > 0 ? (e / tot * 100).toFixed(1) + '%' : '—';
         l.cells.b.style.transform = `scaleX(${l.signed || tot <= 0 ? 0 : Math.max(0, e / tot)})`;
       }
-      $('tot-q').textContent = en(tot); $('tot-s').textContent = layers.some(l => l.signed) && !topIsAll() ? 'net' : '100%';
+      $('tot-q').textContent = en(tot); $('tot-s').textContent = caps ? pctTxt(cf(tot, capacityOf())) : layers.some(l => l.signed) && !topIsAll() ? 'net' : '100%';
       let pn = 0, ps = 0, pk = 0, pkg = 0, hv = 0, em = 0, gw = 0, re = 0, hs = 0, mt = 0, ud = 0;
       for (let i = 0; i < V.n; i++) {
         const w = V.hrs[i]; hs += w; pn += V.pNI[i] * w; ps += V.pSI[i] * w; hv += V.hvdc[i] * w; mt += V.metered[i] * w; ud += V.underlying[i] * w;
@@ -1312,13 +1357,15 @@ export function mountTracker(D, hooks = {}) {
     $('col-q').textContent = genUnit();
     let tot = 0;
     if (topIsAll()) tot = V.gen[j]; else for (const l of layers) tot += l.signed ? l.s[j] : Math.max(0, l.s[j]);
+    const caps = cfCaps();
     for (const l of [...layers, ...V.sections.filter(x => x.row)]) {
       const v = l.members ? l.members.reduce((a, m) => a + m.s[j], 0) : l.s[j];
       l.cells.q.textContent = genVal(v, j);
+      if (caps) { const c = capOf(caps, l), f = c ? v / c : NaN; l.cells.s.textContent = pctTxt(f); l.cells.b.style.transform = `scaleX(${f === f ? Math.max(0, Math.min(1, f)) : 0})`; continue; }
       l.cells.s.textContent = l.signed ? signedTxt(l, v, false) : tot > 0.5 ? (v / tot * 100).toFixed(1) + '%' : '—';
       l.cells.b.style.transform = `scaleX(${l.signed || tot <= 0.5 ? 0 : Math.max(0, v / tot)})`;
     }
-    $('tot-q').textContent = genVal(tot, j); $('tot-s').textContent = layers.some(l => l.signed) && !topIsAll() ? '' : '100%';
+    $('tot-q').textContent = genVal(tot, j); $('tot-s').textContent = caps ? pctTxt(tot / capacityOf()) : layers.some(l => l.signed) && !topIsAll() ? '' : '100%';
     setSys([
       ...plantRows(false, j),
       ['Price, North Island', money(V.pNI[j]), '/MWh'],
@@ -2039,6 +2086,14 @@ export function mountTracker(D, hooks = {}) {
     }
     return Array.from(sum, (x, k) => (hrs[k] ? x / hrs[k] : NaN));
   }
+  // while the slider is dragged the summary's sub-line keeps the tallest height it has had, so a stretch whose times
+  // take a third line doesn't make the list below jump at every step; letting go releases it (test report TRK-12, 6 Nov 2026)
+  let subHeld = 0;
+  function holdSub(on) {
+    const el = $('sum-sub');
+    if (!on) { subHeld = 0; el.style.minHeight = ''; return; }
+    requestAnimationFrame(() => { const h = el.offsetHeight; if (h > subHeld) { subHeld = h; el.style.minHeight = `${h}px`; } });
+  }
   // measured from the range the drag began on, so a stretch that crosses midnight and needs a wider range for a moment hands it back
   const slideAt = () => ({ range: slideRange ?? state.range, latest: latestT(), first: firstDay() });
   slider = mountSlider($('gen-slider'), {
@@ -2065,6 +2120,7 @@ export function mountTracker(D, hooks = {}) {
     go(from, to, final) {
       sliding = !final;
       stepEnd = undefined;
+      holdSub(!final);
       const v = spanView(from, to, slideAt());
       if (final) slideRange = null;
       state.zoom = v.zoom;

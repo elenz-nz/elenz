@@ -352,6 +352,7 @@
 			},
 			go(from: number, to: number, final: boolean) {
 				sliding = !final;
+				dragging = !final;
 				const v = spanView(from, to, slideAt());
 				if (final) slideRange = null;
 				zoom = v.zoom; range = v.range; endT = v.end;
@@ -529,7 +530,11 @@
 			const t0 = view.t[0], t1 = view.t[view.n - 1];
 			if (view.zoomed) {
 				const end = view.S.t[view.S.n - 1] + view.S.h[view.S.n - 1] * 36e5;
-				return [zoom?.span && endT === null ? `Last ${zoom.span} hour${zoom.span > 1 ? 's' : ''}` : 'Zoomed in', `${clock(t0)} – ${clock(end)} ${dayLabel(end)} · averages`];
+				// a window the slider has moved keeps its range's name, as on the Generation tab (test report PRC-01, 6 Nov
+				// 2026); the times say where it sits, with both days when it crosses midnight
+				const span = dayLabel(t0) === dayLabel(end) ? `${clock(t0)} – ${clock(end)} ${dayLabel(end)}` : `${clock(t0)} ${dayLabel(t0)} – ${clock(end)} ${dayLabel(end)}`;
+				const title = zoom?.span && endT === null ? `Last ${zoom.span} hour${zoom.span > 1 ? 's' : ''}` : movedWindow ? R.label.replace(/^./, (c) => c.toUpperCase()) : 'Zoomed in';
+				return [title, `${span} · averages`];
 			}
 			if (R.days == null) return [`Since ${dateLabel(t0)}`, `to ${dateLabel(t1)} · averages`];
 			if (endT === null) return [`Last ${R.label}`, `to ${clock(t1)} ${dayLabel(t1)} · averages`];
@@ -635,6 +640,14 @@
 	});
 	const sepNow = $derived(view && view.mode === 'time' && at >= 0 ? view.sep[at] : null);
 	const head = $derived(heading(at));
+	// while the slider is dragged the sub-line keeps the tallest height it has had, so the list below doesn't jump as the
+	// times take a third line; letting go releases it (test report TRK-12, 6 Nov 2026; as on the Generation tab)
+	let subEl = $state<HTMLElement>(), subHeld = $state(0), dragging = $state(false);
+	$effect(() => {
+		void head;
+		if (!dragging) { subHeld = 0; return; }
+		requestAnimationFrame(() => { const h = subEl?.offsetHeight ?? 0; if (h > subHeld) subHeld = h; });
+	});
 
 	// over the whole range: averages, highs and spikes (Haywards and Benmore), and price captured by fuel
 	// what the cards under the charts cover, said on each (the controls are far above)
@@ -1037,7 +1050,7 @@
 				<div class="sum-head">
 					<div>
 						<div class="sum-when">{head[0]}</div>
-						<div class="sum-sub">{head[1]}</div>
+						<div class="sum-sub" bind:this={subEl} style:min-height={subHeld ? `${subHeld}px` : null}>{head[1]}</div>
 					</div>
 					<button type="button" class="ctl-btn" bind:this={helpBtn} aria-expanded={helpOpen} aria-controls="p-help" title="How to use the charts and this list" onclick={() => (helpOpen = !helpOpen)}>
 						<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h7M12 4h2M2 12h3M8 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /><circle cx="10.5" cy="4" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /><circle cx="6.5" cy="12" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>How to

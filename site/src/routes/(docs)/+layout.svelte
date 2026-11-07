@@ -42,7 +42,9 @@
 		<p>How each figure is built</p>
 		<ul>
 			{#each TOPICS as t (t.slug)}
-				<li><a href="/methods/{t.slug}" aria-current={cur(`/methods/${t.slug}`)}>{t.title}{#if t.estimate}&#8288;<span class="est-dot" title="Includes estimates"></span>{/if}</a></li>
+				{@const name = t.short ?? t.title}
+				{@const cut = name.lastIndexOf(' ') + 1}
+				<li><a href="/methods/{t.slug}" aria-current={cur(`/methods/${t.slug}`)}>{#if t.estimate}{name.slice(0, cut)}<span class="nw">{name.slice(cut)}<span class="est-dot" title="Includes estimates"></span></span>{:else}{name}{/if}</a></li>
 			{/each}
 		</ul>
 	</div>

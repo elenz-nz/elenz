@@ -14,7 +14,8 @@ transfer and emissions, every 5 minutes and back to 1997. Built on free Electric
 | `/records` | The highest and lowest half-hours, days, weeks, months, years and runs since 1997 for NZ and each island, each with its own page (how it grew, the period it fell in); provisional records from the live week and periods heading for a record |
 | `/articles` | Quarterly reviews, records and analysis |
 | `/about` | What Elenz is, what each page shows, support and contact |
-| `/methods` | Data and methods: every dataset used, and a page per series with its calculation, checks and limits |
+| `/guide` | Using Elenz: how to use each page, with screenshots |
+| `/methods` | Data and methods: the source register (every dataset and reference used), and a page per figure with its data, calculation, accuracy and coverage |
 | `/privacy` | What the site collects (cookie-free analytics, settings kept in your browser) |
 
 ## How it fits together
@@ -39,7 +40,9 @@ and for plants the metering lacks. Prices in history are the EA's final prices.
 
 Embedded solar is modelled (`ingest/rooftop.py`, `ingest/pv.py`: installed capacity from the EA registry less
 dispatched farms, Himawari satellite irradiance, ERA5 before 2016). HVDC is metered where published, otherwise
-estimated (`ingest/hvdc.py`). Emissions are calculated in the browser (`site/src/lib/tracker/emissions.js`: Huntly's
+estimated (`ingest/hvdc.py`). Other embedded generation (small hydro, landfill gas and other plant on local networks
+that isn't dispatched) is estimated from January 2009 from the EA's reconciliation data (`ingest/embedded.py`).
+Emissions are calculated in the browser (`site/src/lib/tracker/emissions.js`: Huntly's
 Rankines by Genesis's quarterly coal share, geothermal per station by year). `analysis/` holds the scripts and
 evidence behind every estimate (`analysis/README.md`).
 
@@ -49,7 +52,8 @@ evidence behind every estimate (`analysis/README.md`).
 | `worker/` | The Cloudflare Worker: serves the site and the data from KV, and starts the GitHub jobs on a schedule |
 | `ingest/` | Python jobs that download EMI data and build the JSON the website reads |
 | `facilities/` | Hand-maintained corrections to the EA plant register, the metered plant table, and the embedded solar points and capacity |
-| `analysis/` | Development scripts and the evidence for the solar, HVDC, emission factor and metered history estimates, and the data behind each article |
+| `analysis/` | Development scripts and the evidence for the solar, other embedded generation, HVDC, emission factor and metered history estimates, and the data behind each article |
+| `docs/` | The style guide for everything public on the site (`docs/style-guide.md`) |
 | `data/` | Downloaded raw data. Not committed; recreate it with the ingest scripts |
 
 ## Running it on your own computer
@@ -83,7 +87,9 @@ variable. `.emi_key` is git-ignored; never commit the key.
 
 ```
 python3 ingest/tests/smoke.py              # live and history paths on committed sample data, no network
+python3 ingest/tests/method_constants.py   # figures on the method pages still match the code
 cd site && npm run check && npm test && npm run build && npm run check:previews
+cd worker && npm ci && npm test            # the Worker in Cloudflare's runtime
 ```
 
 `main` is protected: changes go in through a pull request, which can merge only once these checks pass. Every merge
@@ -105,10 +111,13 @@ Run the same job on your own computer with `python3 ingest/update.py` (it uses `
 **History:** `.github/workflows/history.yml` runs `ingest/history.py` every 6 hours. It builds each month from metered
 data once the EA publishes it, adds newly published daily dispatch files and final prices, and writes per-month
 half-hourly files and one daily file to KV, plus the records (`ingest/records.py`), the heat maps' monthly averages
-(`ingest/tod.py`) and the price explainer's usual values (`ingest/explain.py`). `.github/workflows/offers.yml`, started
-with it, reduces the EA's daily generator offers to offered capacity by plant (`ingest/offered.py`). A full rebuild of every month since 1997 takes about 15 minutes; bump `BUILD` in `history.py`
-after changing how months are built. Changes to the plant register, `facilities/overrides.toml` or
-`facilities/metered_plants.csv` trigger a rebuild automatically.
+(`ingest/tod.py`), the price explainer's usual values (`ingest/explain.py`) and other embedded generation
+(`ingest/embedded.py`). `.github/workflows/offers.yml`, started
+with it, reduces the EA's daily generator offers to offered capacity by plant (`ingest/offered.py`). A full rebuild of every month since 1997 takes under an hour, in one run; bump `BUILD` in `history.py`
+after changing how months are built. Changes to the plant register, `facilities/overrides.toml` (apart from its
+site-only tables), `facilities/metered_plants.csv`, `facilities/embedded_points.csv` or
+`facilities/embedded_registry_split.csv` trigger a rebuild automatically, so they are collected and merged together
+(`facilities/NEXT_REBUILD.md`).
 
 **Secrets:** repository secrets `EMI_KEY`, `CF_ACCOUNT_ID` and `CF_API_TOKEN` (Workers KV: Edit); Worker secret
 `GITHUB_TOKEN` (fine-grained, this repository only, Actions read/write). The token expires, so renew it yearly or the

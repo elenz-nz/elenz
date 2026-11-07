@@ -188,6 +188,7 @@
 						<p>These are records that could fall soon: a day, week, month or year still running that is ahead of its record's pace.</p>
 						<ul>
 							<li>Listed once half the period has gone, for as long as it stays ahead.</li>
+							<li>Where the dispatch data has a close figure above the record, the period has to be ahead of that too.</li>
 							<li>One tile per record: New Zealand's where it's on pace, otherwise an island's.</li>
 							<li>From live dispatch data, so provisional until the period ends and the metered data confirms it.</li>
 						</ul>

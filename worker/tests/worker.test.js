@@ -129,7 +129,8 @@ test('/data/health is 503 with the reasons when something is wrong', async () =>
   await healthy();
   await saveLive(Date.now() - 60 * 60e3);
   await kv.put('hist/index.json', JSON.stringify({ end: Date.now() - 6 * 864e5 }));
-  await kv.put('cron-status', JSON.stringify({ result: 'GitHub said HTTP 401: Bad credentials', at: new Date().toISOString() }));
+  await kv.put('cron-status', JSON.stringify({ result: 'GitHub said HTTP 401: Bad credentials', at: new Date().toISOString(),
+    since: new Date(Date.now() - 20 * 60e3).toISOString() }));
   const r = await get('/data/health');
   const { problems } = await r.json();
   assert.equal(r.status, 503);
@@ -137,6 +138,15 @@ test('/data/health is 503 with the reasons when something is wrong', async () =>
   assert.match(problems[0], /60 minutes old/);
   assert.match(problems[1], /6\.0 days behind/);
   assert.match(problems[2], /HTTP 401/);
+});
+
+test('/data/health lets a failed start pass until failures have lasted 15 minutes', async () => {
+  await healthy();
+  const at = new Date().toISOString();
+  await kv.put('cron-status', JSON.stringify({ result: 'GitHub said HTTP 500: ', at, since: new Date(Date.now() - 5 * 60e3).toISOString() }));
+  assert.equal((await get('/data/health')).status, 200);
+  await kv.put('cron-status', JSON.stringify({ result: 'GitHub said HTTP 500: ', at, since: new Date(Date.now() - 16 * 60e3).toISOString() }));
+  assert.equal((await get('/data/health')).status, 503);
 });
 
 test('/data/health and /data/status.json answer 503 when KV refuses reads', async () => {
@@ -209,6 +219,27 @@ test('an answer other than 204 from GitHub is recorded', async () => {
   githubAnswer = () => new Response('Bad credentials', { status: 401 });
   await fire(LIVE_CRON, 5);
   assert.equal((await kv.get('cron-status', 'json')).result, 'GitHub said HTTP 401: Bad credentials');
+});
+
+test('a server error from GitHub is tried once more', async () => {
+  let calls = 0;
+  githubAnswer = () => (++calls === 1 ? new Response('', { status: 500 }) : new Response(null, { status: 204 }));
+  await fire(LIVE_CRON, 5);
+  assert.deepEqual(started(), ['update-data.yml', 'update-data.yml']);
+  assert.equal((await kv.get('cron-status', 'json')).result, 'ok');
+});
+
+test('a failure keeps the time it began while it goes on, and clears when a start works', async () => {
+  githubAnswer = () => new Response('Bad credentials', { status: 401 });
+  await fire(LIVE_CRON, 5);
+  const first = await kv.get('cron-status', 'json');
+  assert.ok(first.since);
+  githubAnswer = () => new Response('Not Found', { status: 404 });
+  await fire(LIVE_CRON, 15);
+  assert.equal((await kv.get('cron-status', 'json')).since, first.since);
+  githubAnswer = () => new Response(null, { status: 204 });
+  await fire(LIVE_CRON, 20);
+  assert.equal((await kv.get('cron-status', 'json')).since, undefined);
 });
 
 test('no GitHub token: no job is attempted and the reason is recorded', async () => {

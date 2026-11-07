@@ -40,7 +40,8 @@
 "river":0
 },
 "Cobb":{
-"owner":"Contact"
+"owner":"Contact",
+"metered":"At this point metered generation is net of local load, about 35% of Cobb's gross output. Where the embedded generation meter reads more, we add the difference."
 },
 "Coleridge":{
 "owner":"Contact"
@@ -58,14 +59,15 @@
 "owner":"Other generators"
 },
 "Fonterra Dairy - Whareroa":{
-"owner":"Nova"
+"owner":"Nova",
+"metered":"At this point metered generation is net of local load, about 50% of Whareroa's gross output. Where the embedded generation meter reads more, we add the difference."
 },
 "Glenbrook Steel":{
 "owner":"Other generators",
 "aka":[
 "NZ Steel Glenbrook"
 ],
-"metered":"Its metered output (meter points GLN0111 and GLN0332) runs about 1.47 times the dispatch data's figure, so expect a step where the metered history meets the dispatch weeks."
+"metered":"The register lists it as gas. We show it as waste heat: it runs on waste gas and heat from NZ Steel's ironmaking, not pipeline gas.\nIts metered output (meter points GLN0111 and GLN0332) runs about 1.47 times the dispatch data's figure, so expect a step where the metered history meets the dispatch weeks."
 },
 "Glenbrook-Ohurua Battery":{
 "owner":"Contact"
@@ -74,7 +76,8 @@
 "owner":"Meridian"
 },
 "Highbank":{
-"owner":"Contact"
+"owner":"Contact",
+"metered":"It has no metered rows before October 2001, and its rows read next to nothing until April 2002."
 },
 "Huntly 5":{
 "owner":"Genesis",
@@ -95,16 +98,18 @@
 },
 "Huntly Rankines":{
 "owner":"Genesis",
-"metered":"The metered history has one meter for units 1–4 together, so it shows them as one. The dispatch data (the live week and the weeks since the newest metered month) shows each unit.\nSeptember 2020: Generation_MD has no Huntly that month, so the history uses the grid meter for the whole station, split between units by their offers."
+"metered":"Shown as Coal/gas: units 1, 2 and 4 can burn coal or gas, and the market data doesn't say which.\nThe metered history has one meter for units 1–4 together, so it shows them as one. The dispatch data (the live week and the weeks since the newest metered month) shows each unit.\nSeptember 2020: Generation_MD has no Huntly that month, so the history uses the grid meter for the whole station, split between units by their offers."
 },
 "Junction Road":{
 "owner":"Nova"
 },
 "Kaimai":{
-"owner":"Contact"
+"owner":"Contact",
+"metered":"Its one dispatched unit, Kaimai 5, carries the whole scheme, so we show it under the scheme's name."
 },
 "Kaiwaikawe Wind Farm":{
-"owner":"Mercury"
+"owner":"Mercury",
+"metered":"It isn't in the EA's plant register yet, so we add it from its dispatched unit (MPE1101 KWK0)."
 },
 "Kaiwera Downs (Stage 2)":{
 "owner":"Mercury"
@@ -144,7 +149,8 @@
 "owner":"Other generators"
 },
 "Kinleith":{
-"owner":"Oji Fibre Solutions"
+"owner":"Oji Fibre Solutions",
+"metered":"The register lists it as gas. We show it as bioenergy: Oji Fibre Solutions' cogeneration runs on wood waste and black liquor, with natural gas as a secondary fuel."
 },
 "Kohirā Solar Farm":{
 "owner":"Other generators",
@@ -156,7 +162,8 @@
 "owner":"Contact",
 "aka":[
 "Christchurch Airport Solar Farm"
-]
+],
+"metered":"It isn't in the EA's plant register yet, so we add it from its dispatched unit (ISL0661 KPS0)."
 },
 "Kūmara":{
 "owner":"Contact"
@@ -174,7 +181,8 @@
 "river":0
 },
 "Mangahao":{
-"owner":"Contact"
+"owner":"Contact",
+"metered":"At this point metered generation is net of local load, about 10% of Mangahao's gross output. Where the embedded generation meter reads more, we add the difference."
 },
 "Maraetai":{
 "owner":"Mercury",
@@ -184,13 +192,15 @@
 "Matahina":{
 "owner":"Contact",
 "scheme":"Rangitaiki",
-"river":2
+"river":2,
+"metered":"Metered generation has no rows for Matahina from October 2021, so dispatch figures stand in."
 },
 "McKee":{
 "owner":"Nova"
 },
 "Mill Creek":{
-"owner":"Meridian"
+"owner":"Meridian",
+"metered":"Its first 16 months, May 2014 to August 2015, aren't in metered generation or embedded generation. They come from Meridian's injection at Wilton in the reconciliation data."
 },
 "Mokai":{
 "owner":"Other generators"
@@ -245,7 +255,8 @@
 ]
 },
 "Pātea":{
-"owner":"Contact"
+"owner":"Contact",
+"metered":"The dispatch data has three units, which we show as one plant to match the metered history. It moved from connection HWA1101 to OHG1101 in June 2026."
 },
 "Rangipo":{
 "owner":"Genesis",
@@ -270,13 +281,15 @@
 "Roxburgh":{
 "owner":"Contact",
 "scheme":"Clutha",
-"river":1
+"river":1,
+"metered":"It generates onto two buses (ROX2201 and ROX1101), so it can be split by grid connection."
 },
 "Ruakākā Energy Park":{
 "owner":"Meridian"
 },
 "Ruakākā Solar Farm":{
-"owner":"Meridian"
+"owner":"Meridian",
+"metered":"It isn't in the EA's plant register yet, so we add it from its dispatched unit (BRB0331 RUS0)."
 },
 "Southdown":{
 "owner":"Mercury",
@@ -432,7 +445,8 @@
 "river":5
 },
 "West Wind":{
-"owner":"Meridian"
+"owner":"Meridian",
+"metered":"It generates onto two buses (WWD1102 and WWD1103), so it can be split by grid connection. The dispatch data's West Wind 1 and 2 are one wind farm."
 },
 "Whakamaru":{
 "owner":"Mercury",
