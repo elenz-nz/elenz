@@ -136,7 +136,7 @@ export const GEO_DEFAULT = 57;   // fleet average, CY2023: for anything unmatche
 const GEO_PLANT = {
   'Wairakei': 'wairakei', 'Te Mihi 1': 'te_mihi', 'Te Mihi 2': 'te_mihi', 'Poihipi': 'poihipi', 'Ōhaaki': 'ohaaki',
   'Te Huka': 'te_huka', 'Te Huka 3': 'te_huka_3', 'Tauhara': 'tauhara', 'Rotokawa': 'rotokawa',
-  'Ngā Awa Pūrua': 'nga_awa_purua', 'Nga Awa Pūrua': 'nga_awa_purua',   // the second until BUILD 11 has run
+  'Ngā Awa Pūrua': 'nga_awa_purua',
   'Mokai': 'mokai', 'Ngā Tamariki': 'ngatamariki', 'Kawerau': 'kawerau_kgl',
   'Kawerau (Te Ahi O Maui)': 'te_ahi_o_maui', 'Kawerau (TOPP2)': 'topp2', 'Ngāwhā B': 'ngawha_oec4',
   // names since BUILD 6 (Oct 2026): stations the metered history sees whole (overrides.toml [plant_groups], [plant_names])
