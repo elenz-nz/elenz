@@ -793,6 +793,13 @@ def build(sums, old=None, read_month=None, now_ms=None):
                     curve = period_curve(all_days, read_m, p, k, r, tgt['t'])
                     if curve:
                         tgt['curve'] = curve
+                    # a close dispatch figure beyond the record: the current period has to be ahead of it too
+                    # (design decision, 7 Nov 2026), so it gets its own curve
+                    nr = rec.get('near')
+                    if nr and _better(kind, nr['v'], rec['v']):
+                        curve = period_curve(all_days, read_m, p, k, r, nr['t'])
+                        if curve:
+                            nr['curve'] = curve
                     out['periods'][p][k][r] = rec
     out['pace'] = pace_sums(sums)
     for k, (fam, regions) in RUNS.items():

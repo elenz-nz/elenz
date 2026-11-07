@@ -320,7 +320,7 @@
 			{#if onPace}
 				<section class="pace" aria-label="Heading for a record">
 					<span class="tag pacetag">On record pace</span>
-					<p><b>{soFar(onPace)}: {fmt(d, onPace.v, per)} {paceAt(onPace)}</b>, ahead of the record {periodOf(per).word} ({periodWhen(onPace.bestT, per)}{onPace.provBest ? ', provisional' : ''}), which had {fmt(d, onPace.ref, per)} at the same point and finished at {fmt(d, onPace.best, per)}. {cap(toGo(onPace))}. {needText(onPace)}
+					<p><b>{soFar(onPace)}: {fmt(d, onPace.v, per)} {paceAt(onPace)}</b>, ahead of the record {periodOf(per).word} ({periodWhen(onPace.bestT, per)}{onPace.provBest ? ', provisional' : ''}), which had {fmt(d, onPace.ref, per)} at the same point and finished at {fmt(d, onPace.best, per)}.{#if onPace.close} It is also ahead of the close figure in the dispatch data ({periodWhen(onPace.close.t, per)}, {fmt(d, onPace.close.v, per)}).{/if} {cap(toGo(onPace))}. {needText(onPace)}
 						From dispatch data, so provisional until the metered data confirms it.</p>
 				</section>
 			{/if}

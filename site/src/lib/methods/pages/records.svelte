@@ -94,7 +94,7 @@ Close to the record: corrected figure is within the margin of the record, either
 <p>A record is marked New for {NEW_DAYS} days after it first appears in the official records, as long as its period ended within about {NEW_LAG} days of that. A rebuild of the history that moves an old record doesn’t make it new.</p>
 
 <h3 id="pace">On record pace</h3>
-<p>Once half of the current day, week, month or year has gone, Elenz lists any record it is on pace to break. A period is on pace when its average so far is ahead of where the record period was at the same point. Weeks, months and years compare whole days, and a day compares whole half-hours.</p>
+<p>Once half of the current day, week, month or year has gone, Elenz lists any record it is on pace to break. A period is on pace when its average so far is ahead of where the record period was at the same point. Weeks, months and years compare whole days, and a day compares whole half-hours. When the dispatch data has a figure close to the record and above it, the current period must be ahead of that figure too, so a period that can only match the close figure isn’t listed.</p>
 <p>Periods still under way can combine metered and dispatch data, so they are provisional. The rest of the period can still change the result, so Elenz says what the rest would need to average to beat the record outright.</p>
 <Shot name="records-list" alt="Heading for a record: tiles for records that could fall soon, with a Show all button." caption="Heading for a record, at the top of the Records page." />
 
