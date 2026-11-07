@@ -21,10 +21,13 @@ import { readQuery, writeQuery, describe, SITE_URL } from '../site/src/lib/site/
 
 const WORKFLOWS = 'https://api.github.com/repos/elenz-nz/elenz/actions/workflows';
 const HISTORY_CRON = '40 */6 * * *'; // must match wrangler.jsonc
+const RETRY_MS = 3000;   // wait before trying a failed dispatch again
 // history files the site may request: the index, all days, one half-hourly file per month, the records, and the
 // offered capacity (ingest/offered.py: one file per month and all days)
 // /data/health: the same limits as the GitHub watchdog (watchdog.yml)
-const HEALTH = { liveMinutes: 45, historyDays: 5, rebuildDays: 12 };   // history may lag up to rebuildDays during a rebuild
+const HEALTH = { liveMinutes: 45, historyDays: 5, rebuildDays: 12, triggerMinutes: 15 };   // history may lag up to rebuildDays during a rebuild
+// GitHub now and then answers one dispatch with HTTP 500 (4 Nov 2026 22:45 NZDT, 6 Nov 05:15, 7 Nov 12:45) and takes the
+// next one 5 minutes later, so a failed start is retried once, and reported only once failures have lasted triggerMinutes
 const HISTORY_FILE = /^\/data\/history\/(index\.json|progress\.json|day\.json|records\.json|records-detail\.json|hh\/\d{4}-\d{2}\.json|tod\.json|off\/(?:\d{4}-\d{2}|days)\.json)$/;
 
 // ---------- link previews for the tracker's pages ----------
@@ -124,7 +127,8 @@ async function serve(request, env, url) {
     else if (now - end > HEALTH.liveMinutes * 60e3) problems.push(`live data is ${Math.round((now - end) / 60e3)} minutes old`);
     if (!index || !index.end) problems.push('history index missing');
     else if (now - index.end > histLimit) problems.push(`history is ${((now - index.end) / 864e5).toFixed(1)} days behind`);
-    if (cron && cron.result !== 'ok') problems.push(`the Worker could not start the live job: ${cron.result}`);
+    const failingFor = cron && cron.result !== 'ok' ? now - Date.parse(cron.since || cron.at) : 0;
+    if (failingFor >= HEALTH.triggerMinutes * 60e3) problems.push(`the Worker could not start the live job: ${cron.result}`);
     const body = {
       ok: !problems.length, problems,
       live_minutes_old: end ? Math.round((now - end) / 60e3) : null,
@@ -192,8 +196,13 @@ async function scheduled(event, env) {
   const history = event.cron === HISTORY_CRON;
   const workflow = history ? 'history.yml' : 'update-data.yml';
   const statusKey = history ? 'cron-status-history' : 'cron-status';
-  const dispatch = async (wf) => {
+  const dispatch = async (wf, retry = true) => {
     if (!env.GITHUB_TOKEN) return 'GITHUB_TOKEN secret not set';
+    const again = async (failed) => {
+      if (!retry) return failed;
+      await new Promise((r) => setTimeout(r, RETRY_MS));
+      return dispatch(wf, false);
+    };
     try {
       const r = await fetch(`${WORKFLOWS}/${wf}/dispatches`, {
         method: 'POST',
@@ -205,9 +214,11 @@ async function scheduled(event, env) {
         },
         body: JSON.stringify({ ref: 'main' }),
       });
-      return r.status === 204 ? 'ok' : `GitHub said HTTP ${r.status}: ${(await r.text()).slice(0, 300)}`;
+      if (r.status === 204) return 'ok';
+      const failed = `GitHub said HTTP ${r.status}: ${(await r.text()).slice(0, 300)}`;
+      return r.status >= 500 ? again(failed) : failed;   // a server error is usually gone a moment later
     } catch (e) {
-      return `could not reach GitHub: ${e && e.message}`;   // recorded below, so /data/health reports it
+      return again(`could not reach GitHub: ${e && e.message}`);   // recorded below, so /data/health reports it
     }
   };
   const result = await dispatch(workflow);
@@ -227,7 +238,9 @@ async function scheduled(event, env) {
       const now = new Date().toISOString();
       const prev = await env.DATA.get(statusKey, 'json');
       if (history || !prev || prev.result !== result || Date.parse(now) - Date.parse(prev.at) > 3600e3) {
-        await env.DATA.put(statusKey, JSON.stringify({ at: now, cron: event.cron, result }));
+        // since: when the failures began (kept while they go on), so one failed start isn't reported as an outage
+        const since = result === 'ok' ? undefined : (prev && prev.result !== 'ok' && (prev.since || prev.at)) || now;
+        await env.DATA.put(statusKey, JSON.stringify({ at: now, cron: event.cron, result, since }));
       }
     } catch (e) {
       console.log(`could not save the trigger status: ${e && e.message}`);   // the jobs have already been started

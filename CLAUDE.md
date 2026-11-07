@@ -400,7 +400,7 @@ when writing or changing any page, chart note or label, and keep it up to date w
   the only CSP rule, so scripts and styles aren't restricted; Permissions-Policy must leave `screen-wake-lock` and
   `web-share` alone for Keep screen on and Share). Its `scheduled` handler
   dispatches the GitHub jobs (live every 5 minutes, history every 6 hours, watchdog every 15 minutes) (Worker secret `GITHUB_TOKEN`: fine-grained,
-  elenz only, Actions read/write; it expires, so renew it yearly). Workers Paid since 3 Nov 2026 (US$5 a month: 10 million requests, 10 million KV reads and 1 million KV writes a month included; static files free). Back on the free plan (100,000 requests and KV reads a day, 1,000 KV writes a day; the live job uses ~600), `WRITE_BUDGET` must return to 280 in `history.py` and 100 in `offered.py`.
+  elenz only, Actions read/write; it expires, so renew it yearly). A start GitHub refuses with a server error (or can't be reached) is tried once more 3 s later (`RETRY_MS`), and `/data/health` and the watchdog report failed starts only once they have gone on for 15 minutes (`since` in `cron-status`, `triggerMinutes`, `TRIGGER_MINUTES`): GitHub dropped a single call with HTTP 500 about once a day in early Nov 2026, the next one 5 minutes later working, and each set off a 5-minute alert. Workers Paid since 3 Nov 2026 (US$5 a month: 10 million requests, 10 million KV reads and 1 million KV writes a month included; static files free). Back on the free plan (100,000 requests and KV reads a day, 1,000 KV writes a day; the live job uses ~600), `WRITE_BUDGET` must return to 280 in `history.py` and 100 in `offered.py`.
 - `facilities/rooftop_points.csv`, `rooftop_nsp.csv` (irradiance points and NSP → point; regenerate with
   `analysis/make_points.py`), `rooftop_capacity.json` (capacity snapshot the live job uses until the history job
   has stored `hist/roof_cap.json`).
@@ -470,7 +470,8 @@ when writing or changing any page, chart note or label, and keep it up to date w
 - The live feed sometimes stalls for ~30 minutes and then catches up (24 Oct 2026: 6:30-7:05 and 8:30-9:05 am NZDT):
   "latest" stays put, then the missed cases arrive late and sparse (19:40 UTC published ~20:05, with 19:35, 19:50 and
   19:55 never appearing). The alerts (`/data/health`, the watchdog) wait 45 minutes so these pass quietly; the site
-  shows Delayed meanwhile. Issues must stay enabled on the repo: the watchdog reports through them (they were off
+  shows Delayed meanwhile. Longer stalls do set them off: about 50 minutes from 11:05-11:15 am NZDT on both 4 and 5 Nov
+  2026, with the live job running every 5 minutes and finding nothing new (issues #71, #73). Issues must stay enabled on the repo: the watchdog reports through them (they were off
   after the move to elenz-nz, so the watchdog run itself failed on 24 Oct).
 - Tiwai is shown as ordinary demand (design decision, 21 Oct 2026): no separate summary row or record. The data still
   carries `tiwai` (T, MT), unused by the site, in case it's wanted again.
