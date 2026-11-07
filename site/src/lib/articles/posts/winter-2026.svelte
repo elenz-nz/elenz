@@ -177,7 +177,7 @@
 
 <p>Wind had its best winter of the six, 1,118 GWh, up 30% on last year, with its highest trading period, 1,078 MW, on 31 August. New farms supplied 105 GWh of the increase. Kaiwera Downs stage 2 in Southland first generated in April and gave 96 GWh at up to 121 MW, more than doubling South Island wind output. Kaiwaikawe in Northland joined the market in mid-July and added 9 GWh. Existing farms supplied the other 150 GWh or so, led by Turitea, up 39 GWh.</p>
 
-<p>Geothermal also had its best winter, 2,642 GWh, 7% more than in 2025. Eastland Generation's TOPP2 station at Kawerau, generating since December, added 105 GWh. Ngā Tamariki now runs at up to 136 MW, against 88 MW a year ago, and gave 95 GWh more. Tauhara, in its third winter, gave 49 GWh more. Several older stations gave a little less.</p>
+<p>Geothermal also had its best winter, 2,699 GWh, 8% more than in 2025. Eastland Generation's TOPP2 station at Kawerau, generating since December, added 105 GWh. Ngā Tamariki now runs at up to 136 MW, against 88 MW a year ago, and gave 95 GWh more. Tauhara, in its third winter, gave 49 GWh more. Several older stations gave a little less.</p>
 
 <p>With water plentiful in the south and little fuel being burnt, prices were the lowest of the six winters: Haywards averaged $56/MWh and Benmore $47/MWh, against $133 and $131 last winter and more than $360 in 2024.</p>
 
