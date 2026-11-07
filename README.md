@@ -124,7 +124,7 @@ site-only tables), `facilities/metered_plants.csv`, `facilities/embedded_points.
 updates stop.
 
 **Monitoring:** `/data/status.json` shows the last trigger result for each job, and `/data/history/progress.json`
-the history job's progress. `/data/health` returns 200 while live data is under 45 minutes old (the EA's feed sometimes stalls for ~30 minutes and catches up) and history under
+the history job's progress. `/data/health` returns 200 while live data is under 60 minutes old (the EA's feed sometimes stalls for 30-50 minutes and catches up) and history under
 5 days behind (12 during a rebuild), and 503 with the reasons otherwise; an outside uptime monitor checks it.
 `.github/workflows/watchdog.yml` opens a `stale-data` issue on the same conditions and closes it on recovery.
 

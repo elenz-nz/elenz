@@ -438,7 +438,7 @@ when writing or changing any page, chart note or label, and keep it up to date w
   Browser tests (design decision, 2 Nov 2026; `site/playwright.config.js`, `site/tests/e2e/site.spec.js`): Playwright opens the built site in Chromium, Firefox and WebKit (Safari's engine) and at two phone sizes, through the site's own links as well as direct visits and refreshes, and with JavaScript off. They use the snapshot bundled at `static/data/tracker.json` (no history files), not the live site, so a fix can still merge while the live site is down; check only what the snapshot can show. WebKit here is new, so old Safari is covered by `check-css.js` alone. A new page or card with its own fault worth guarding gets a test; put the bug back once to see the test fail. To run them in a Claude session: `npx playwright test --project=chromium --project=phone-chrome` after a build (only Chromium is installed there; `@playwright/test` is pinned to that browser's version, so bump them together).
   Worker tests (`worker/tests/worker.test.js`; `cd worker && npm ci && npm test`): the Worker in Cloudflare's own runtime (Miniflare, with a local KV store and a small stand-in for the static site): ETags, history names, `/data/health`, link previews, noindex, security headers, KV refusing reads and the crons. `worker/package.json` holds only these test tools, so the site's install stays small. `_headers` itself isn't read there: check static files' headers on a preview. A change to what the Worker does gets a test.
 - `.github/workflows/watchdog.yml`: checks the live site every 15 minutes; opens an issue labelled `stale-data`
-  (GitHub emails it to the Elenz team) when live data is over 45 minutes old, history over 5 days behind, or the Worker
+  (GitHub emails it to the Elenz team) when live data is over 60 minutes old, history over 5 days behind, or the Worker
   can't start a job, and closes it when the data recovers.
 - `data/`: raw downloads, git-ignored.
 
@@ -469,9 +469,10 @@ when writing or changing any page, chart note or label, and keep it up to date w
 - About 8% of 5-minute intervals have no dispatch case in either source. They are interpolated and the page says so.
 - The live feed sometimes stalls for ~30 minutes and then catches up (24 Oct 2026: 6:30-7:05 and 8:30-9:05 am NZDT):
   "latest" stays put, then the missed cases arrive late and sparse (19:40 UTC published ~20:05, with 19:35, 19:50 and
-  19:55 never appearing). The alerts (`/data/health`, the watchdog) wait 45 minutes so these pass quietly; the site
-  shows Delayed meanwhile. Longer stalls do set them off: about 50 minutes from 11:05-11:15 am NZDT on both 4 and 5 Nov
-  2026, with the live job running every 5 minutes and finding nothing new (issues #71, #73). Issues must stay enabled on the repo: the watchdog reports through them (they were off
+  19:55 never appearing). The alerts (`/data/health`, the watchdog) wait 60 minutes so these pass quietly; the site
+  shows Delayed meanwhile. The wait was 45 minutes until 7 Nov 2026 (design decision): stalls of about 50 minutes from
+  11:05-11:15 am NZDT on both 4 and 5 Nov 2026, with the live job running every 5 minutes and finding nothing new, set
+  it off (issues #71, #73). Issues must stay enabled on the repo: the watchdog reports through them (they were off
   after the move to elenz-nz, so the watchdog run itself failed on 24 Oct).
 - Tiwai is shown as ordinary demand (design decision, 21 Oct 2026): no separate summary row or record. The data still
   carries `tiwai` (T, MT), unused by the site, in case it's wanted again.
@@ -542,7 +543,7 @@ when writing or changing any page, chart note or label, and keep it up to date w
   code in `src/lib/tracker/*.js` and `src/lib/home/now.js` is untyped JavaScript and gave ~800 false alarms).
 - GitHub's own schedules (the backups in the three workflows) fire only now and then (9 scheduled runs in two days,
   checked 15 Oct 2026), so they don't protect against the Worker's cron stopping: nothing outside Cloudflare alerts
-  if it does. `/data/health` (Worker) covers that: 200 while live data is under 45 minutes old and history under 5
+  if it does. `/data/health` (Worker) covers that: 200 while live data is under 60 minutes old and history under 5
   days behind, 503 with the reasons otherwise; an outside uptime monitor checks it every 5 minutes and emails the Elenz team.
   During a full rebuild the index is republished only at the end, so both checks allow up to
   12 days while `hist/progress.json` shows months left and was saved in the last two days.

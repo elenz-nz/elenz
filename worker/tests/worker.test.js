@@ -127,7 +127,7 @@ test('/data/health is 200 while the data is fresh', async () => {
 
 test('/data/health is 503 with the reasons when something is wrong', async () => {
   await healthy();
-  await saveLive(Date.now() - 60 * 60e3);
+  await saveLive(Date.now() - 75 * 60e3);
   await kv.put('hist/index.json', JSON.stringify({ end: Date.now() - 6 * 864e5 }));
   await kv.put('cron-status', JSON.stringify({ result: 'GitHub said HTTP 401: Bad credentials', at: new Date().toISOString(),
     since: new Date(Date.now() - 20 * 60e3).toISOString() }));
@@ -135,7 +135,7 @@ test('/data/health is 503 with the reasons when something is wrong', async () =>
   const { problems } = await r.json();
   assert.equal(r.status, 503);
   assert.equal(problems.length, 3);
-  assert.match(problems[0], /60 minutes old/);
+  assert.match(problems[0], /75 minutes old/);
   assert.match(problems[1], /6\.0 days behind/);
   assert.match(problems[2], /HTTP 401/);
 });

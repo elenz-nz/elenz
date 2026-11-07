@@ -25,9 +25,10 @@ const RETRY_MS = 3000;   // wait before trying a failed dispatch again
 // history files the site may request: the index, all days, one half-hourly file per month, the records, and the
 // offered capacity (ingest/offered.py: one file per month and all days)
 // /data/health: the same limits as the GitHub watchdog (watchdog.yml)
-const HEALTH = { liveMinutes: 45, historyDays: 5, rebuildDays: 12, triggerMinutes: 15 };   // history may lag up to rebuildDays during a rebuild
+const HEALTH = { liveMinutes: 60, historyDays: 5, rebuildDays: 12, triggerMinutes: 15 };   // history may lag up to rebuildDays during a rebuild
 // GitHub now and then answers one dispatch with HTTP 500 (4 Nov 2026 22:45 NZDT, 6 Nov 05:15, 7 Nov 12:45) and takes the
-// next one 5 minutes later, so a failed start is retried once, and reported only once failures have lasted triggerMinutes
+// next one 5 minutes later, so a failed start is retried once, and reported only once failures have lasted triggerMinutes.
+// liveMinutes was 45 until 7 Nov 2026: the EMI feed stalled for ~50 minutes late on the mornings of 4 and 5 Nov
 const HISTORY_FILE = /^\/data\/history\/(index\.json|progress\.json|day\.json|records\.json|records-detail\.json|hh\/\d{4}-\d{2}\.json|tod\.json|off\/(?:\d{4}-\d{2}|days)\.json)$/;
 
 // ---------- link previews for the tracker's pages ----------
