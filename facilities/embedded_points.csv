@@ -17,7 +17,7 @@ HBK0661,,meter,ASB0661,,,,"analysis/embedded_backtest.py match: half-hourly corr
 GLN0111,,meter,GLN0332,,,,"analysis/embedded_backtest.py match: half-hourly correlation with the reconciliation series","Glenbrook's old embedded meter code (to 2008), reported under GLN0332"
 WHL0661,,meter,NMA0331,,,,"analysis/embedded_backtest.py match","White Hill's old embedded meter code (2007-08), reported under NMA0331"
 GLN0332,,exclude,,,,,"analysis/README.md","Glenbrook: its meter runs about 1.45 x dispatch, a known difference, not missing plant"
-ABY0111,,fuel,,Opuha,hydro,A,https://www.alpineenergy.co.nz/__data/assets/pdf_file/0013/3073/MASTER-Major-Network-Asset-Management-Plan-2015-to-2025.pdf,"Alpine Energy AMP 2015-25 s2.2.4, Opuha Power Station under Albury GXP; Alpine disclosures: embedded generation from Opuha Dam, surplus exported at Albury"
+ABY0111,,fuel,,Opuha,hydro,A,https://www.alpineenergy.co.nz/__data/assets/pdf_file/0021/46605/AlpineEnergyAMP2026_Web_Final-3.pdf,"Alpine Energy AMP 2026-36, Albury GXP region: the Opuha scheme's 7 MW hydro embedded in Alpine's network at 33 kV"
 CML0331,,fuel,,Roaring Meg,hydro,A,EA plant register (DispatchedGenerationPlant.csv),"in the register at CML0331, but no dispatch in Sep 2026"
 HWB0331,,fuel,,Waipori,hydro,A,https://static.transpower.co.nz/public/uncontrolled_docs/Waipori-PDA-External-Report.pdf,"Waipori embedded into the Halfway Bush GXP through Aurora's 33 kV lines; the stations' output that dispatch lacks"
 KUM0661,,fuel,,Kūmara,hydro,A,EA plant register; https://ttpp.nz/wp-content/uploads/2023/04/Submission-438-Manawa-Energy.pdf,"Kūmara scheme beyond its dispatched unit"

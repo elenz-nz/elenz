@@ -27,8 +27,11 @@ generation, and clear the done items from this file.
 - Highbank before Oct 2001: no meter in `Generation_MD` or `Embedded_generation`, and reconciliation starts in 2005.
   Its capacity counts from its first metered month (`plant_capacity.csv`), and the history page lists the gap.
 
-## Noted for a later build
+## In this build (BUILD 11)
 
-- Nga Awa Pūrua: the plant's name in the data lacks its first macron (`overrides.toml`, `plant_capacity.csv`, the key in
-  `emissions.js`). The method pages show Ngā Awa Pūrua, and `capacity.svelte` maps the name for its table. Renaming it in
-  the data changes a fingerprinted file, so it waits for a build.
+1. **Ngā Awa Pūrua's name.** The register leaves off the first macron, so `[plant_names]` now gives the plant its right
+   name, in `metered_plants.csv` and `plant_capacity.csv` too. Afterwards check the plant appears once on the tracker
+   across the whole history, with its capacity factor and emissions. Then take the old `Nga Awa Pūrua` key out of
+   `GEO_PLANT` in `emissions.js`, which stays only until the rebuild has run.
+2. **Opuha's source.** `embedded_points.csv` now cites Alpine Energy's 2026 asset management plan, because the 2015 plan's
+   address no longer opens. Nothing in the data changes.
