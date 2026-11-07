@@ -374,8 +374,8 @@ when writing or changing any page, chart note or label, and keep it up to date w
   `O|<point> <trader>`, less what the month's layout already counts at each grid exit point (`facilities/embedded_points.csv`:
   meters, exclusions, named plants, fuels and names from public documents; `embedded_registry_split.csv` for the rest,
   else unclassified); written as an `oemb` block in hh/dd/day.json (by island and fuel; `named`: Ngāwhā's and Teviot's
-  output months without their metered data lack), outside the island series until the site shows it (plan in the
-  project doc "Other embedded generation plan"); months not yet covered are estimated from `hist/oemb/profiles.json`
+  output months without their metered data lack), kept outside the island series (the site folds it in with
+  `withOemb`, see "Other embedded generation on the site" above); months not yet covered are estimated from `hist/oemb/profiles.json`
   (the blend of average days; evidence in analysis/README.md). The live week: the history job writes `hist/oemb/live.json`
   (`live_days`: last month to next, the layer's typical day by island and fuel and each named plant's), and the live job
   adds `oemb` to tracker.json (`live_block`: those typical days by month, which the site lays over the week, and `named`,
@@ -494,7 +494,7 @@ when writing or changing any page, chart note or label, and keep it up to date w
   after each month); the live week and newer history use `hvdc.estimate`, fitted to the metered flows (~10 MW
   mean error). The NI series is what arrives at Haywards, the SI series what leaves Benmore, `hvdcN` mid-link.
 - Daily dispatch files start on 10 Sep 2020 (`Pre1November2022Archive` holds solver case files, not volumes), about
-  11 MB a day. Earlier history would need `Generation_MD` (metered, from 1997) and final prices.
+  11 MB a day. Earlier history comes from `Generation_MD` (metered, from 1997) and final prices.
 - The register's dated rows matter for history: `register()` keeps retired units (Taranaki Combined Cycle) and
   old connections (Pātea on HWA1101), latest row winning. A unit idle all window is left out of its plant.
 - Installed distributed solar (EMI report GUEHMT) was 1,270 MW in Sep 2026, but ~410 MW of it is dispatched solar
@@ -589,16 +589,18 @@ when writing or changing any page, chart note or label, and keep it up to date w
    plant names were cleaned up. BUILD 8 (Tekapo A and B's names, Huntly in September 2020) ran on 3 Nov 2026 in one 13-minute
    run, and its items checked out on the published data. BUILD 9 (Kawerau (Onepu), geothermal from 2013) ran on 5 Nov 2026
    in one 26-minute run; its items checked out and Offers was resummarised. BUILD 10 (other embedded generation from 2009,
-   in its own `oemb` block) ran on 6 Nov 2026 in one 55-minute run; its items checked out (no resummarise needed). See `facilities/NEXT_REBUILD.md` for how a
-   next build is collected.
+   in its own `oemb` block) ran on 6 Nov 2026 in one 55-minute run; its items checked out (no resummarise needed). BUILD 11 (Ngā Awa Pūrua's name, Opuha's
+   source) is being collected on the branch `next-rebuild` (draft PR #89) and waits for the Elenz team to say go. See
+   `facilities/NEXT_REBUILD.md` for how a next build is collected.
 4. Pages: landing (`/`), live (`/now`, with the price explainer and Every generator right now), tracker (Generation and
-   Prices tabs), Records (`/records`), Articles (`/articles`, published 15 Oct 2026 with the Winter 2026 review), About,
-   Data and methods (`/methods`) and Privacy. Stale-data watchdog, uptime monitor, Cloudflare Web Analytics and a Buy
-   Me a Coffee link are in place. The site isn't announced yet (Beta note).
+   Prices tabs), Records (`/records`), Articles (`/articles`, published 15 Oct 2026 with the Winter 2026 review; "Welcome
+   to Elenz" published 7 Nov 2026), About, Using Elenz (`/guide`), Data and methods (`/methods`) and Privacy. Stale-data
+   watchdog, uptime monitor, Cloudflare Web Analytics and a Buy Me a Coffee link are in place. User acceptance testing
+   finished on 7 Nov 2026. The site isn't announced yet (Beta note).
 5. Then the brief's build order: plant pages (`/plants/<slug>`), map, hydro panel, offer stacks and downloads.
 
 Recurring upkeep: add Genesis's Rankine coal share to `emissions.js` each quarter (performance report ~3 weeks
-after quarter end; FY27 Q1 due late Oct 2026); add each year's NZGA geothermal figures (NZ Geothermal Workshop,
+after quarter end; FY27 Q1 (23%) added 24 Oct 2026, FY27 Q2 due late Jan 2027); add each year's NZGA geothermal figures (NZ Geothermal Workshop,
 November) and Contact's station figures (`GEO_CONTACT`, green borrowing update report, about September); renew the Worker's `GITHUB_TOKEN` before it expires (~Oct 2027).
 
 Terms: the EA confirmed by email (21 Oct 2026) that the EMI datasets and the API are CC BY 4.0, covering republishing,
