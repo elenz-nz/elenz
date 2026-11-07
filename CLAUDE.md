@@ -591,7 +591,7 @@ when writing or changing any page, chart note or label, and keep it up to date w
    run, and its items checked out on the published data. BUILD 9 (Kawerau (Onepu), geothermal from 2013) ran on 5 Nov 2026
    in one 26-minute run; its items checked out and Offers was resummarised. BUILD 10 (other embedded generation from 2009,
    in its own `oemb` block) ran on 6 Nov 2026 in one 55-minute run; its items checked out (no resummarise needed). BUILD 11 (Ngā Awa Pūrua's name, Opuha's
-   source) is being collected on the branch `next-rebuild` (draft PR #89) and waits for the Elenz team to say go. See
+   source) ran on 7 Nov 2026 in one 10-minute run, and its items checked out. See
    `facilities/NEXT_REBUILD.md` for how a next build is collected.
 4. Pages: landing (`/`), live (`/now`, with the price explainer and Every generator right now), tracker (Generation and
    Prices tabs), Records (`/records`), Articles (`/articles`, published 15 Oct 2026 with the Winter 2026 review; "Welcome
