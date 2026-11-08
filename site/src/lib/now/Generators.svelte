@@ -34,9 +34,10 @@
 	const filtered = $derived(!!(s.fuel || s.island || s.owner || s.text.trim() || s.on));
 	const visible = $derived(all || filtered ? shown : shown.slice(0, SHOW));
 	const total = $derived(shown.reduce((a, r) => a + r.mw, 0));
-	const running = $derived(rows.filter((r) => r.mw >= 0.5).length);
+	const running = $derived(rows.filter((r) => r.mw >= 0.05).length);
 
-	const fmt = (v: number) => Math.round(v).toLocaleString('en-NZ').replace('-', '−');
+	// one decimal below 10 MW, whole MW above, zero as 0: as the tracker shows generation (design decision, 9 Nov 2026)
+	const fmt = (v: number) => (Math.abs(v) < 9.95 && Math.round(Math.abs(v) * 10) > 0 ? v.toFixed(1) : Math.round(v).toLocaleString('en-NZ')).replace('-', '−');
 	// a charging battery shows how hard it is charging, as a share of its MW rating, below zero
 	const pctText = (r: { pct: number | null; charging: boolean }) => (r.pct == null ? '–' : r.charging ? `−${Math.round(-r.pct)}%` : `${Math.round(Math.max(0, r.pct))}%`);
 	// a click sorts by that column (again: the other way); Shift-click adds it as the next key, or turns an added one
@@ -129,7 +130,7 @@
 			</thead>
 			<tbody>
 				{#each visible as r (r.key + r.isl)}
-					<tr class:off={Math.abs(r.mw) < 0.5}>
+					<tr class:off={Math.abs(r.mw) < 0.05}>
 						<td class="c-name">
 							<span class="dot" style="--c:var({r.tok})" title={r.fuelName}></span>
 							<a href={r.href} title="{r.name} in the tracker">{r.name}</a>{#if r.est}<small class="est"> est.</small>{/if}

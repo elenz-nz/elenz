@@ -53,7 +53,7 @@ export function generatorRows(D) {
       name: p.name, key: slug(p.name), fuel: p.fuel, fuelName: f.name, tok: f.tok, isl: p.isl,
       owner: META[p.group || p.name]?.owner || 'Other generators',
       mw, cap, pct: cap ? (mw / cap) * 100 : null,
-      charging: p.fuel === 'batt' && mw < -0.5,
+      charging: p.fuel === 'batt' && mw < -0.05,
       href: p.est ? `/tracker?fuel=oemb&region=${p.isl}` : `/tracker?fuel=${p.fuel}&plant=${slug(p.group || p.name)}`,
       est: !!p.est,
       units: (p.units || []).map((u) => ({ name: u.label || u.name, mw: u.s?.[j] ?? 0, cap: u.cap || null })),
@@ -118,7 +118,7 @@ const norm = (x) => String(x).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCa
 export function pick(rows, s) {
   const text = norm(s.text.trim());
   const out = rows.filter((r) => (!s.fuel || r.fuel === s.fuel) && (!s.island || r.isl === s.island) &&
-    (!s.owner || slug(r.owner) === s.owner) && (!text || [r.name, ...(r.aka || [])].some((n) => norm(n).includes(text))) && (!s.on || Math.abs(r.mw) >= 0.5));
+    (!s.owner || slug(r.owner) === s.owner) && (!text || [r.name, ...(r.aka || [])].some((n) => norm(n).includes(text))) && (!s.on || Math.abs(r.mw) >= 0.05));
   // the sort keys in turn (Shift-click adds one); fuel, island and owner group the list, and within the last group
   // the largest MW comes first (test report NOW-10)
   const val = (by, r) => (by === 'name' ? norm(r.name) : by === 'pct' ? r.pct : by === 'fuel' ? norm(r.fuelName)
