@@ -108,7 +108,8 @@ RPO2201,rangipo,Rangipo,hydro,,,,,,,
 SFD2201,stratford,Stratford,gas,,,,,,,Taranaki Combined Cycle and the peakers
 STK0661,cobb,Cobb,hydro,,,,,,,
 STK0661,*,Cobb,hydro,,,,,,,
-SWN2201,southdown,Southdown,gas,,,,,,,
+SWN2201,southdown,Southdown,gas,,,2015-12,,,,
+SWN2201,southdown,Southdown Battery,batt,,2016-01,,,,,the station's code carries on as the battery's after Southdown closed (output Sep 2018 - May 2022)
 TAB0331,te_huka_3,Te Huka 3,geo,,,,,,,
 TAB0331,*,Te Huka 3,geo,,,,,,,
 TAB2201,Tauhara,Tauhara,geo,,,,,,,

@@ -159,6 +159,7 @@ These follow the data.govt.nz style guide, except for clock times, where a space
 | Thousands | 1,270 MW | 1270 MW |
 | Percentages | 12%, with percentage points where needed | per cent, 12 % |
 | Ranges in tables | 120–165 MW | 120-165 MW |
+| Generation figures on the tracker | One decimal below 10 MW (0.6 MW, 4.3 MW), whole MW from 10 MW (12 MW); zero as 0 | 0.60 MW, 12.0 MW |
 | Units | A space before the unit: 54.1 kg CO₂e/GJ | 54.1kg/GJ |
 | Prices | $100/MWh, which is 10c a kWh | 10 c/kWh, 10 cents a kWh |
 | Emissions | g CO₂e/kWh and t CO₂e/MWh | g/kWh or t/MWh on first mention |

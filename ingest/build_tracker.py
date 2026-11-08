@@ -77,6 +77,17 @@ def enc(s, dp=0):
     return [round(float(v), dp) if dp else int(round(float(v))) for v in s]
 
 
+def enc_mw(s):
+    """MW series: one decimal below 10 MW (so a 1 MW battery or a small plant doesn't round to 0), whole MW above;
+    a whole number is written without its decimal, so zeros stay short (design decision, 9 Nov 2026)."""
+    out = []
+    for v in s:
+        v = float(v)
+        r = round(v, 1) if abs(v) < 9.95 else round(v)
+        out.append(int(r) if r == int(r) else r)
+    return out
+
+
 def enc_na(s, dp=2):
     """Like enc, but a missing value is written as null (the page leaves a gap) rather than failing."""
     return [None if v != v else round(float(v), dp) for v in s]
@@ -255,7 +266,7 @@ def assemble(s, full, roof, log=print, metered=None):
     t0 = int(full[0].timestamp() * 1000)
     js = {'t0': t0, 'step': int(full.freq.nanos // 1_000_000), 'N': len(full), 'hvdcN': enc(hv)}
     for isl in ['NI', 'SI']:
-        js[isl] = {k: enc(v, 2 if k == 'price' else 0) for k, v in out[isl].items()}
+        js[isl] = {k: enc(v, 2) if k == 'price' else enc_mw(v) for k, v in out[isl].items()}
     if nodes:
         js['nodes'] = {k: enc_na(v) for k, v in nodes.items()}
 
@@ -273,7 +284,7 @@ def assemble(s, full, roof, log=print, metered=None):
         caps = [cap[tuple(k.split(' '))] for k in us if tuple(k.split(' ')) in cap]
         pocs = sorted({k.split(' ')[0] for k in us})
         pcap = round(sum(caps)) if caps else (round(plant_cap[pname]) if pname in plant_cap else None)
-        entry = {'name': pname, 'fuel': f, 'isl': isl, 'poc': pocs, 'cap': pcap, 's': enc(total)}
+        entry = {'name': pname, 'fuel': f, 'isl': isl, 'poc': pocs, 'cap': pcap, 's': enc_mw(total)}
         if pname in group_names:
             # a station shown as one plant: its register plants as units; metered output (station total) as one
             by = {}
@@ -282,7 +293,7 @@ def assemble(s, full, roof, log=print, metered=None):
                 by.setdefault(m, []).append((k, v))
             entry['units'] = [{'name': m if m != 'All units' else f'{pname} (all units)', 'label': SPELLING.get(m, m),
                                'cap': (sum(cap.get(tuple(k.split(' ')), 0) for k, _ in kv) or None) if m != 'All units' else pcap,
-                               's': enc(sum(v for _, v in kv))} for m, kv in sorted(by.items())]
+                               's': enc_mw(sum(v for _, v in kv))} for m, kv in sorted(by.items())]
         elif len(pocs) > 1:  # a plant on more than one bus (Arapuni, Roxburgh) can be split by grid connection
             by = {}
             for k, v in us.items():
@@ -290,7 +301,7 @@ def assemble(s, full, roof, log=print, metered=None):
             # each connection's nameplate: the register units this plant has there (present or not)
             conn_cap = lambda poc: sum(c for (p, u), c in cap.items() if p == poc and groups.get(names.get((p, u)), names.get((p, u))) == pname)
             entry['units'] = [{'name': poc, 'cap': round(conn_cap(poc)) or None,
-                               's': enc(sum(v for _, v in kv))} for poc, kv in sorted(by.items())]
+                               's': enc_mw(sum(v for _, v in kv))} for poc, kv in sorted(by.items())]
         plants.append(entry)
     plants.sort(key=lambda p: (p['fuel'], -sum(p['s'])))
     js['plants'] = plants
