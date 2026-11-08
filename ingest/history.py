@@ -92,14 +92,15 @@ warnings.simplefilter("ignore", pd.errors.PerformanceWarning)  # wide monthly fr
 FINAL = 'Datasets/Wholesale/DispatchAndPricing/FinalEnergyPrices'
 HVDC_FLOWS = 'Datasets/Wholesale/Metered_data/HVDC_Flows'
 
-BUILD = 11                   # bump to rebuild every month's JSON after changing how it is built (2: final prices, 3: peak generation,
+BUILD = 12                   # bump to rebuild every month's JSON after changing how it is built (2: final prices, 3: peak generation,
                              # 4: satellite rooftop solar model by point, metered HVDC; 5: more price nodes, daily price
                              # spread and revenue by fuel, bioenergy and waste heat; 6: metered history back to Aug 1997,
                              # metered generation wherever published, plant groups; 7: Generation_MD's clock-numbered
                              # change days before 2009 renumbered (metered.straighten()), Mill Creek 2014-15, peak.disp)
                              # 8: Tekapo A and B's names, Huntly in September 2020; 9: Kawerau (Onepu), geothermal
                              # from 2013; 10: other embedded generation from 2009 (embedded.py), in its own block;
-                             # 11: Ngā Awa Pūrua's name, Opuha's source)
+                             # 11: Ngā Awa Pūrua's name, Opuha's source; 12: Southdown's metered code as the battery
+                             # from 2016)
 GEN_FUELS = ('geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
 DISPATCHABLE = ('hydro', 'gas', 'coal', 'diesel', 'batt')   # as DISPATCHABLE in site/src/lib/tracker/series.js
 WRITE_BUDGET = 3000          # KV writes a day (UTC) for this job; a full rebuild needs ~800. Free plan: 280 (see above)

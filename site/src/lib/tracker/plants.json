@@ -296,7 +296,8 @@
 "metered":"The metered history has one meter for the original cogeneration plant and unit 5 together. Southdown closed in January 2016, before the dispatch data starts."
 },
 "Southdown Battery":{
-"owner":"Mercury"
+"owner":"Mercury",
+"metered":"Generation_MD keeps the old station's code (SWN2201, \"southdown\", gas) for the battery after the station closed, so the metered history counts it as the battery from 2016. Its output there starts in September 2018. Before the dispatch data starts (10 Sep 2020) the history has its discharge only, not its charging."
 },
 "Stratford":{
 "owner":"Contact",
