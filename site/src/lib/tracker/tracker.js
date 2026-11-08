@@ -837,7 +837,10 @@ export function mountTracker(D, hooks = {}) {
   }
   const en = (v, j) => v * V.hrs[j] / eu().div;                       // a point's average MW as energy in the view's unit
   const enFmt = v => { const a = Math.abs(v); return a >= 100 || a === 0 ? fmt(v) : v.toFixed(a >= 10 ? 1 : 2); };
-  const genVal = (v, j) => energyMode() ? enFmt(en(v, j)) : fmt(v);  // a generation figure at point j, as the chart shows it
+  // MW for a generation figure: one decimal below 10 MW, so small plants (a 1 MW battery, a 5 MW wind farm) don't read
+  // as 0 or jump in whole MW; whole MW above (design decision, 9 Nov 2026). Zero stays "0".
+  const mwTxt = v => { const a = Math.abs(v); return a < 9.95 && Math.round(a * 10) > 0 ? v.toFixed(1) : fmt(v); };
+  const genVal = (v, j) => energyMode() ? enFmt(en(v, j)) : mwTxt(v);  // a generation figure at point j, as the chart shows it
   const genUnit = () => energyMode() ? eu().unit : 'MW';
   // Stacked (the default) or lines (chart=lines): each source as its own line from zero, so plants or fuels can be
   // compared directly (team request, 26 Oct 2026). Lines keep the stack's units (MW, energy, %) and its axis rules.
@@ -1251,7 +1254,7 @@ export function mountTracker(D, hooks = {}) {
   const hvTxt = v => Math.abs(v) < 1 ? '0' : `${fmt(Math.abs(v))}`;
   const hvDir = v => Math.abs(v) < 1 ? '' : v > 0 ? 'MW north' : 'MW south';
   const signedTxt = (l, v, range) => range ? (l.id === 'hvdc' ? (v >= 0 ? 'net in' : 'net out') : 'net')
-    : l.id === 'hvdc' ? (Math.abs(v) < 1 ? '—' : v > 0 ? 'import' : 'export') : (Math.abs(v) < 1 ? 'idle' : v > 0 ? 'output' : 'charging');
+    : l.id === 'hvdc' ? (Math.abs(v) < 1 ? '—' : v > 0 ? 'import' : 'export') : (Math.abs(v) < 0.05 ? 'idle' : v > 0 ? 'output' : 'charging');
   function totalLabel() {
     const lv = level(), d = state.drill;
     return lv === 'top' ? (hydroOnly() ? 'Total hydro' : 'Total generation') : lv === 'fuel' ? `Total ${groupById(d.group).name.toLowerCase()}`
@@ -1907,7 +1910,7 @@ export function mountTracker(D, hooks = {}) {
     if (!l) return head + row(C['--ink'], totalLabel(), genVal(tot, j), gu);
     const v = l.s[j];
     const uj = l.id === 'roof' ? V.roofU[j] : l.u ? l.u[j] : 0, pm = uj > 0.5 ? ` ± ${fmt(uj)}` : '';
-    if (pctMode() && !l.signed) return head + row(colourOf(l), l.name, pctOf(v, j).toFixed(1) + '%', `of all generation · ${fmt(v)} ${mw}${pm}`, !!l.hatch);
+    if (pctMode() && !l.signed) return head + row(colourOf(l), l.name, pctOf(v, j).toFixed(1) + '%', `of all generation · ${mwTxt(v)} ${mw}${pm}`, !!l.hatch);
     const pmE = energyMode() && uj > 0.5 ? ` ± ${genVal(uj, j)}` : pm;
     const extra = l.signed ? `${gu} · ${signedTxt(l, v, false)}` : `${gu}${pmE}${tot > 0.5 ? ` · ${(v / tot * 100).toFixed(1)}%` : ''}`;
     return head + row(colourOf(l), l.name, genVal(v, j), extra, !!l.hatch);

@@ -83,7 +83,7 @@ import records
 import tod
 import rooftop
 import state as st
-from build_tracker import assemble, enc, enc_na
+from build_tracker import assemble, enc, enc_mw, enc_na
 from common import BLOB, FACILITIES, NZ, island_of, overrides
 from store import open_store
 from sync import DISPATCH
@@ -100,7 +100,7 @@ BUILD = 12                   # bump to rebuild every month's JSON after changing
                              # 8: Tekapo A and B's names, Huntly in September 2020; 9: Kawerau (Onepu), geothermal
                              # from 2013; 10: other embedded generation from 2009 (embedded.py), in its own block;
                              # 11: Ngā Awa Pūrua's name, Opuha's source; 12: Southdown's metered code as the battery
-                             # from 2016)
+                             # from 2016, MW series to one decimal below 10 MW (enc_mw))
 GEN_FUELS = ('geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'batt')
 DISPATCHABLE = ('hydro', 'gas', 'coal', 'diesel', 'batt')   # as DISPATCHABLE in site/src/lib/tracker/series.js
 WRITE_BUDGET = 3000          # KV writes a day (UTC) for this job; a full rebuild needs ~800. Free plan: 280 (see above)
@@ -367,11 +367,12 @@ def daily(js, month):
     day = t.tz_convert(NZ).normalize()
     days = day.unique()
     mean = lambda arr, dp=0: enc(pd.Series(arr, index=day, dtype=float).groupby(level=0).mean().reindex(days), dp)
+    mw = lambda arr: enc_mw(pd.Series(arr, index=day, dtype=float).groupby(level=0).mean().reindex(days))
     out = {'month': month, 'end': js['meta']['end'], 't': [int(d.tz_convert('UTC').timestamp() * 1000) for d in days],
            'h': [float(x) for x in pd.Series(0.5, index=day).groupby(level=0).sum().reindex(days)],
            'hvdcN': mean(js['hvdcN'])}
     for isl in ('NI', 'SI'):
-        out[isl] = {k: mean(v, 2 if k == 'price' else 0) for k, v in js[isl].items()}
+        out[isl] = {k: mean(v, 2) if k == 'price' else mw(v) for k, v in js[isl].items()}
         # the day's half-hourly price spread, and revenue by fuel at the island price (the Prices page)
         price = pd.Series(js[isl]['price'], index=day, dtype=float)
         g = price.groupby(level=0)
@@ -388,10 +389,10 @@ def daily(js, month):
                 # charging (the net battery output below zero) and what it cost at the island price, for the Prices
                 # page's Battery (charging) row; then discharge only for the battery's own revenue
                 chg = np.maximum(-gen, 0)
-                out[isl]['batt_c'] = mean(chg)
+                out[isl]['batt_c'] = mw(chg)
                 out[isl]['rv_battc'] = mean(chg * p)
                 gen = np.maximum(gen, 0)   # discharge only
-                out[isl]['batt_d'] = mean(gen)
+                out[isl]['batt_d'] = mw(gen)
             out[isl][f'rv_{f}'] = mean(gen * p)
     if js.get('nodes'):
         out['nodes'] = {k: enc_na(pd.Series(v, index=day, dtype=float).groupby(level=0).mean().reindex(days))
@@ -420,9 +421,9 @@ def daily(js, month):
     out['plants'] = []
     for p in js['plants']:
         q = {k: p[k] for k in ('name', 'fuel', 'isl', 'poc', 'cap')}
-        q['s'] = mean(p['s'])
+        q['s'] = mw(p['s'])
         if 'units' in p:
-            q['units'] = [{**{k: u[k] for k in ('name', 'cap', 'label') if k in u}, 's': mean(u['s'])} for u in p['units']]
+            q['units'] = [{**{k: u[k] for k in ('name', 'cap', 'label') if k in u}, 's': mw(u['s'])} for u in p['units']]
         out['plants'].append(q)
     return out
 
@@ -485,9 +486,9 @@ def combine_days(dds):
                 name = poc[0] if len(poc) == 1 else f"{q['name']} (all units)"
                 q['units'].setdefault(name, {'name': name, 'cap': None, 's': np.zeros(n)})['s'][at:at + m] = s
         entry = {k: q[k] for k in ('name', 'fuel', 'isl', 'poc', 'cap')}
-        entry['s'] = enc(q['s'])
+        entry['s'] = enc_mw(q['s'])
         if len(q['units']) > 1:
-            entry['units'] = [{**{k: u[k] for k in ('name', 'cap', 'label') if k in u}, 's': enc(u['s'])}
+            entry['units'] = [{**{k: u[k] for k in ('name', 'cap', 'label') if k in u}, 's': enc_mw(u['s'])}
                               for u in sorted(q['units'].values(), key=lambda u: u['name'])]
         out['plants'].append(entry)
     out['plants'].sort(key=lambda p: (p['fuel'], -sum(p['s'])))

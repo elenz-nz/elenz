@@ -33,6 +33,17 @@ Check afterwards: `hist/hh/2019-06.json` has Southdown Battery with output and n
 `hist/hh/2021-06.json` has Southdown Battery once and no Southdown (gas) entry; North Island gas in 2018-22 is up to
 about 0.2 MW lower (a month's average). Offers needs no resummarise (gas and battery headroom shift by under 1 MW; run it if in doubt).
 
+### 2. MW series to one decimal below 10 MW
+
+Design decision, 9 Nov 2026: plant, unit and island MW series are stored to one decimal below 10 MW and in whole MW
+from 10 MW (`enc_mw` in build_tracker.py; the hh, dd and day files and tracker.json), so a small plant doesn't round to
+0 on daily data (Southdown Battery averaged about 0.17 MW a day at most). Prices, revenue, peaks and counts are
+unchanged. The tracker shows generation figures the same way (`mwTxt` in tracker.js). The live tracker.json picks it up
+as soon as this merges.
+
+Check afterwards: `hist/day.json`'s Southdown Battery has daily values like 0.1-0.2 in 2019; the file has grown by no
+more than about 5% (it was 8.8 MB served on 9 Nov 2026); the Generation tab on 1Y and All loads as before on a phone.
+
 ## Collecting a build
 
 Gather fingerprinted changes on a branch named `next-rebuild` with `BUILD` bumped and a draft pull request, each change
