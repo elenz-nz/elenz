@@ -8,5 +8,9 @@
 	"devDependencies": {
 		"esbuild": "0.28.2",
 		"miniflare": "4.20260730.0"
+	},
+	"overrides": {
+		"undici": "7.30.2",
+		"sharp": "0.35.5"
 	}
 }
