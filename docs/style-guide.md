@@ -27,7 +27,7 @@ reader meets the plain explanation first and the technical detail second.
 | How a figure is made and how far to trust it | The method page |
 | What each dataset is | The source register, once |
 | What each market term means | The glossary (`/methods#glossary`), once |
-| Bug history, test reports and design decisions | `CLAUDE.md`, `analysis/README.md` and pull requests |
+| Bug history, test reports and design decisions | `docs/architecture.md`, `docs/data-notes.md`, `analysis/README.md` and pull requests |
 | Planned work | The Elenz team's own notes. Public pages describe what Elenz does today. |
 
 ## Evidence
