@@ -33,6 +33,10 @@ absence alone proves nothing.
 A Claude session can't push until the repository is attached with push access (`add_repo`, owner `elenz-nz`, repo
 `elenz`, access `push`); a push refused with "not in this session's authorized repository set" (HTTP 403) means that
 step was skipped, not that anything is wrong with the repository or its token.
+Commit as `Goyilee <207005500+Goyilee@users.noreply.github.com>` (`git -c user.name=... -c user.email=... commit`):
+GitHub's email privacy setting refuses a push carrying any other address ("push declined due to email privacy
+restrictions"). A Claude session can't create tags or releases, delete branches or take a pull request out of draft;
+give the Elenz team step-by-step instructions for those.
 
 Preview links (since 24 Oct 2026): Cloudflare Workers Builds builds every other branch with `npx wrangler preview`
 (Worker Previews, open beta), so each pushed branch gets its own address, `https://<branch>-elenz.elenz.workers.dev`
