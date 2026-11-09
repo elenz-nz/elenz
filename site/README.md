@@ -1,7 +1,7 @@
 # Elenz website
 
 SvelteKit (Svelte 5) with `adapter-static`: every page is prerendered and served by the Worker in `../worker/`.
-See the root `README.md` and `CLAUDE.md` for how the data gets here.
+See the root `README.md` and `docs/architecture.md` for how the data gets here.
 
 | Page | Route | Main files |
 | --- | --- | --- |

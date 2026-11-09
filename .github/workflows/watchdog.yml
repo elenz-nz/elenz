@@ -27,7 +27,7 @@ concurrency:
 
 env:
   SITE: https://elenz.co.nz
-  LIVE_MINUTES: '60'   # 45 until 7 Nov 2026: the EMI feed's ~50-minute stalls set it off (CLAUDE.md)
+  LIVE_MINUTES: '60'   # 45 until 7 Nov 2026: the EMI feed's ~50-minute stalls set it off (docs/data-notes.md)
   HISTORY_DAYS: '5'
   REBUILD_DAYS: '12'   # allowed while a full history rebuild is under way (see the history check below)
   TRIGGER_MINUTES: '15'   # a failed start is reported once failures have lasted this long (GitHub drops one now and then)
