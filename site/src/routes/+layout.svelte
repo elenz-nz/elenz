@@ -27,7 +27,12 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+	<!-- favicon.ico for browsers and tools that skip SVG icons (older Safari, link unfurlers); the SVG wins where it
+	     works. apple-touch-icon.png (180 px, on white: iOS fills transparency with black) for Add to Home Screen.
+	     Both made from favicon.svg; see docs/architecture.md -->
+	<link rel="icon" href="/favicon.ico" sizes="32x32" />
+	<link rel="icon" href={favicon} type="image/svg+xml" />
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 	<!-- one address per page for search engines: elenz.co.nz, never www. or workers.dev, and no view settings -->
 	<link rel="canonical" href={SITE_URL + page.url.pathname} />
 </svelte:head>

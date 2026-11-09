@@ -148,6 +148,12 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   (`src/routes/(docs)/privacy/+page.svelte`, in the About/methods sidebar). The privacy page describes what the code
   does (Cloudflare Web Analytics, the browser storage keys, fonts, the email setup): update it and its date if any of
   that changes. Method pages also have their own report line (`reportHref` in the methods registry).
+- Icons (design decision, 9 Nov 2026): the logo mark `src/lib/assets/favicon.svg` is the tab icon where SVG icons
+  work; `static/favicon.ico` (16, 32, 48 px) is the fallback for older Safari and for tools that ask for `/favicon.ico`
+  directly (link unfurlers, feed readers, raw `/data/*` views), and `static/apple-touch-icon.png` (180 px, on white
+  because iOS fills transparency with black) is the iOS home-screen and Favourites icon. All three are linked in
+  `src/routes/+layout.svelte`. After changing the SVG, remake the other two with `analysis/site_icons.py`;
+  `tests/icons.test.js` checks the files and the links. No web manifest yet.
 - Fonts: Schibsted Grotesk (text) and IBM Plex Mono (figures) are bundled from the `@fontsource/*` packages, imported in
   `src/routes/+layout.svelte`; the site makes no requests to Google.
 - `/sitemap.xml` (`src/routes/sitemap.xml/+server.ts`, prerendered from the same registries as the pages; listed in
