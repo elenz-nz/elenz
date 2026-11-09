@@ -1,14 +1,16 @@
 <script lang="ts">
-	// How a record grew: a step line from the first data to today, one step each time it was broken, the current
-	// record marked, and a provisional one (dashed) beyond it. Hover shows the record at that date; a click, tap or
+	// How a record grew: a step line from the first data to the chart's right edge, one step each time it was broken,
+	// the current record marked, and a provisional one (dashed) beyond it. Hover shows the record at that date; a click, tap or
 	// touch drag pins it (it stays after the finger lifts; Release, another click on it, a tap outside the chart or
 	// Escape lets go). On touch the tooltip sits above the chart, clear of the finger. A mouse drag across the chart
 	// zooms into that span (at least two months; the axes follow); Reset zoom or Escape goes back. bg: the best of
 	// each month (or year) through the history, drawn faintly behind the record line (records.py build_detail), so the
 	// near misses show; the tooltip gives the record in force at the pointer's date and that month's best. The month
-	// (or year) still running is drawn as it stands so far across the whole period (the chart's dates run on to its
-	// end), dotted, in a hatched band (a wash like the tracker's partial periods didn't show on a single line; design
-	// decision, 25 Oct 2026), and the tooltip there says "so far" and how long is left ("6 days to go"). Month and year
+	// (or year) still running sits in a hatched band over its whole span (the chart's dates run on to its end; a wash
+	// like the tracker's partial periods didn't show on a single line; design decision, 25 Oct 2026), its figure so far
+	// dotted only up to the latest data, while the record (or provisional record) runs on to the right edge: the record
+	// stands until it is broken, the figure so far is unfinished (test report, 9 Nov 2026). The tooltip there says
+	// "so far" and how long is left ("6 days to go"). Month and year
 	// records leave the running period out of `bg` (it isn't whole), so the page passes its figure so far as `now` ({ t: its start, v }). info (demand records only): the same line for demand with embedded solar
 	// added back, drawn dashed above the faint line for information (embedded solar is modelled, so it is never a
 	// record), with infoNow for its running period and infoLabel naming it in the tooltip. The page's ⓘ beside the heading explains the chart; zoom and pin are bound
@@ -52,8 +54,8 @@
 	}
 	const bgIn = $derived(within(bg, now));
 	const infoIn = $derived(within(info, infoNow));
-	// the period still running: the faint line's last month (or year), if it ends after the data; drawn across its
-	// whole span, dotted in a hatched band, and the chart's dates run on to its end
+	// the period still running: the faint line's last month (or year), if it ends after the data; a hatched band over
+	// its whole span (the chart's dates run on to its end), its dotted line only up to the latest data (t1)
 	const cur = $derived.by(() => {
 		const b = bgIn[bgIn.length - 1];
 		if (!b || b[1] == null) return null;
@@ -95,7 +97,7 @@
 	const path = $derived.by(() => {
 		let d = `M${x(steps[0][0]).toFixed(1)} ${y(steps[0][1]).toFixed(1)}`;
 		for (const [t, v] of steps.slice(1)) d += ` H${x(t).toFixed(1)} V${y(v).toFixed(1)}`;
-		return d + (prov ? ` H${x(prov.t).toFixed(1)}` : ` H${x(t1).toFixed(1)}`);
+		return d + (prov ? ` H${x(prov.t).toFixed(1)}` : ` H${x(tx).toFixed(1)}`);
 	});
 	// x labels: years, or months when zoomed in (every 1, 2, 3 or 6 months; January carries the year)
 	const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -123,7 +125,7 @@
 		}
 		return d;
 	}
-	// the running period goes on its own (dotted, in the hatched band), joined to the one before it
+	// the running period goes on its own (dotted, in the hatched band, up to the latest data), joined to the one before it
 	const running = (list: { t: number; v: number | null; to: number }[]) => !!cur && list.length > 0 && list[list.length - 1].t === cur.t;
 	const bgPath = $derived(flat(running(segs) ? segs.slice(0, -1) : segs));
 	const infoPath = $derived(flat(running(isegs) ? isegs.slice(0, -1) : isegs));
@@ -132,7 +134,7 @@
 		const c = list[list.length - 1], prev = list.length > 1 ? list[list.length - 2] : null;
 		if (c.v == null) return '';
 		const y0 = prev && prev.v != null && prev.to >= c.t ? y(prev.v) : y(c.v);
-		return `M${x(c.t).toFixed(1)} ${y0.toFixed(1)} V${y(c.v).toFixed(1)} H${x(c.to).toFixed(1)}`;
+		return `M${x(c.t).toFixed(1)} ${y0.toFixed(1)} V${y(c.v).toFixed(1)} H${x(Math.min(c.to, Math.max(t1, c.t))).toFixed(1)}`;
 	}
 	const infoCur = $derived(curOf(isegs));
 	// the running period, joined to the one before it, dotted
@@ -224,13 +226,14 @@
 
 {#snippet marks(r: NonNullable<ReturnType<typeof readAt>>, pinned: boolean)}
 	<line x1={x(r.t)} x2={x(r.t)} y1={T} y2={H - B} class="cursor" class:pinned />
-	{#if !r.ahead}<circle cx={x(r.t)} cy={y(r.p[1])} r="4" style="fill:var({tok})" />{/if}
-	{#if r.bg}<circle cx={x(r.t)} cy={y(r.bg.v as number)} r="3.5" class="hole bg-dot" style="stroke:var({tok})" />{/if}
-	{#if r.inf}<circle cx={x(r.t)} cy={y(r.inf.v as number)} r="3" class="hole bg-dot info-dot" style="stroke:var({tok})" />{/if}
+	<circle cx={x(r.t)} cy={y(r.p[1])} r="4" style="fill:var({tok})" />
+	<!-- past the latest data the figure so far isn't drawn, so its dots aren't either (the tooltip still gives it) -->
+	{#if r.bg && !r.ahead}<circle cx={x(r.t)} cy={y(r.bg.v as number)} r="3.5" class="hole bg-dot" style="stroke:var({tok})" />{/if}
+	{#if r.inf && !r.ahead}<circle cx={x(r.t)} cy={y(r.inf.v as number)} r="3" class="hole bg-dot info-dot" style="stroke:var({tok})" />{/if}
 {/snippet}
 {#snippet tipOf(r: NonNullable<ReturnType<typeof readAt>>, isHeld: boolean)}
 	{@const fx = x(r.t) / W}
-	{@const ty = r.ahead && r.bg ? y(r.bg.v as number) : y(r.p[1])}
+	{@const ty = y(r.p[1])}
 	{#if isHeld}
 		<div class="tip held" bind:this={heldTip} style="left:{fx * 100}%;top:{(ty / H) * 100}%" class:flip={fx > 0.7} aria-hidden="true">{@render lines(r)}</div>
 	{:else}
@@ -277,7 +280,7 @@
 			{/if}
 			<path d={path} fill="none" style="stroke:var({tok})" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray={dashed ? '6 3' : undefined} />
 			{#if prov}
-				<path d="M{x(prov.t)} {y(last[1])} V{y(prov.v)} H{x(t1)}" fill="none" style="stroke:var({tok})" stroke-width="2" stroke-dasharray="4 4" />
+				<path d="M{x(prov.t)} {y(last[1])} V{y(prov.v)} H{x(tx)}" fill="none" style="stroke:var({tok})" stroke-width="2" stroke-dasharray="4 4" />
 				<circle cx={x(prov.t)} cy={y(prov.v)} r="5" class="hole" style="stroke:var({tok})" />
 			{/if}
 			<circle cx={x(last[0])} cy={y(last[1])} r="5" style="fill:var({tok})" />
