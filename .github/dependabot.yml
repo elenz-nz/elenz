@@ -1,0 +1,40 @@
+# Monthly version updates, one grouped pull request per place. Security updates come
+# separately whenever an alert appears (turned on in the repository's settings).
+# Python is left out: ingest/requirements.txt is locked to hashes and refreshed by hand
+# from ingest/requirements.in (see CLAUDE.md).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: npm
+    directory: /site
+    schedule:
+      interval: monthly
+    groups:
+      site:
+        patterns: ["*"]
+        update-types: [minor, patch]
+    ignore:
+      # Major versions are done by hand, with their own testing.
+      - dependency-name: "*"
+        update-types: [version-update:semver-major]
+      # Pinned to the Chromium installed in Claude sessions; bump the two together.
+      - dependency-name: "@playwright/test"
+
+  - package-ecosystem: npm
+    directory: /worker
+    schedule:
+      interval: monthly
+    groups:
+      worker:
+        patterns: ["*"]
+        update-types: [minor, patch]
+    ignore:
+      - dependency-name: "*"
+        update-types: [version-update:semver-major]
