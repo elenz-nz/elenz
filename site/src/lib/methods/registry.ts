@@ -590,8 +590,8 @@ export const REFERENCES: Reference[] = [
 	},
 	// ---------- solar ----------
 	{
-		id: 'dg-capacity', title: 'Batteries in Installed distributed generation trends', by: 'EMI forum, Electricity Authority',
-		url: 'https://forum.emi.ea.govt.nz/thread/batteries-in-installed-distributed-generation-trends/',
+		id: 'dg-capacity', title: 'Installed distributed generation trends: More information', by: 'Electricity Authority',
+		url: 'https://www.emi.ea.govt.nz/r/dacri',
 		use: 'Says the registry’s capacity field is meant to hold the lesser of summed generation capacity and the inverter or injection limit.',
 		topics: ['embedded-solar'],
 	},
