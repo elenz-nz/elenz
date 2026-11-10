@@ -98,9 +98,9 @@
 </script>
 
 <svelte:head>
-	<title>About · ELENZ</title>
-	<meta name="description" content="What Elenz is, what each page shows, and how to support it." />
-	<Preview title="About ELENZ" description="What Elenz is, what each page shows, and how to support it." path="/about" />
+	<title>About ELENZ · New Zealand's electricity, live</title>
+	<meta name="description" content="About Elenz, a free and open tracker of New Zealand's electricity: what each page shows, where the data comes from and how to support it." />
+	<Preview title="About ELENZ" description="About Elenz, a free and open tracker of New Zealand's electricity: what each page shows, where the data comes from and how to support it." path="/about" />
 </svelte:head>
 
 <main class="mt-page" aria-labelledby="mt-h">

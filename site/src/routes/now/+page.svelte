@@ -121,8 +121,8 @@
 
 <svelte:head>
 	<title>ELENZ · New Zealand's electricity, right now</title>
-	<meta name="description" content="New Zealand's electricity right now: demand, prices, the generation mix, renewable share, emissions and the HVDC link, live from the Electricity Authority's market data." />
-	<Preview title="New Zealand's electricity, right now · ELENZ" description="New Zealand's electricity right now: demand, prices, the generation mix, renewable share, emissions and the HVDC link, live from the Electricity Authority's market data." path="/now" />
+	<meta name="description" content="New Zealand's electricity right now: demand, prices, the generation mix, renewable share, emissions and the HVDC link, live." />
+	<Preview title="New Zealand's electricity, right now · ELENZ" description="New Zealand's electricity right now: demand, prices, the generation mix, renewable share, emissions and the HVDC link, live." path="/now" />
 </svelte:head>
 
 <div class="wrap wide">

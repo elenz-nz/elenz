@@ -1,5 +1,5 @@
-// After `npm run build`: every public page has its link-preview tags (src/lib/site/Preview.svelte) and its image
-// exists. Pages marked noindex (drafts, the preview card itself) are skipped. Run by `npm run check:previews` and in
+// After `npm run build`: every public page has its link-preview tags (src/lib/site/Preview.svelte), its image
+// exists and its description is a length search engines show whole (about 110 to 160 characters). Pages marked noindex (drafts, the preview card itself) are skipped. Run by `npm run check:previews` and in
 // .github/workflows/checks.yml.
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
@@ -10,6 +10,7 @@ const meta = (html, key) => {
   const m = html.match(new RegExp(`<meta (?:property|name)="${key}" content="([^"]*)"`));
   return m ? m[1] : null;
 };
+const DESC = [110, 160];
 let bad = 0, n = 0;
 for (const file of pages(BUILD).sort()) {
   const html = readFileSync(file, 'utf8'), page = '/' + relative(BUILD, file).replace(/(index)?\.html$/, '');
@@ -22,6 +23,10 @@ for (const file of pages(BUILD).sort()) {
   else if (img && !existsSync(join(BUILD, img.slice(SITE.length).split('?')[0]))) problems.push(`og:image file missing: ${img.slice(SITE.length)}`);
   const url = meta(html, 'og:url');
   if (url && url !== SITE + page.replace(/\/$/, '') && !(page === '/' && url === SITE + '/')) problems.push(`og:url is ${url}`);
+  // the description shown in search results: long enough to say what the page is, short enough not to be cut off
+  const desc = (meta(html, 'description') ?? '').replace(/&#39;|&amp;|&quot;/g, "'");
+  if (desc.length < DESC[0] || desc.length > DESC[1]) problems.push(`description is ${desc.length} characters (keep it between ${DESC[0]} and ${DESC[1]})`);
+  if (meta(html, 'og:description') !== meta(html, 'description')) problems.push('og:description differs from the description');
   if (problems.length) { bad++; console.log(`${page}: ${problems.join('; ')}`); }
 }
 console.log(`${n} public pages checked, ${bad} with problems`);

@@ -16,9 +16,9 @@
 
 <svelte:head>
 	<title>{a.title} · ELENZ</title>
-	<meta name="description" content={a.dek} />
+	<meta name="description" content={a.description ?? a.dek} />
 	<!-- the article's cover, or the site's card for one without -->
-	<Preview title={a.title} description={a.dek} path="/articles/{a.slug}" type="article" image={a.image || undefined} alt={a.image ? `Cover of “${a.title}”` : undefined} />
+	<Preview title={a.title} description={a.description ?? a.dek} path="/articles/{a.slug}" type="article" image={a.image || undefined} alt={a.image ? `Cover of “${a.title}”` : undefined} />
 	{#if noindex(a)}<meta name="robots" content="noindex" />{/if}
 </svelte:head>
 

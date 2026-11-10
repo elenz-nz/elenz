@@ -26,6 +26,11 @@ export type Topic = {
 	code: string[]; // repository paths this page describes, listed in its References section
 };
 
+// A topic's description for search results and link previews: its summary, with a closing sentence where the summary
+// alone is shorter than search engines like (about 110 to 160 characters; scripts/check-previews.js checks).
+const TAILS = [' Where the figures come from, how Elenz works them out and what they can’t tell you.', ' How Elenz works it out, and what it can’t tell you.'];
+export const describe = (t: Topic) => (t.summary.length >= 110 ? t.summary : t.summary + (TAILS.find((x) => t.summary.length + x.length <= 160) ?? ''));
+
 // the last review of the overview and the source register, which have no topic of their own
 export const REVIEWED = '2026-11-06';
 

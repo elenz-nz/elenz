@@ -246,8 +246,8 @@
 
 <svelte:head>
 	<title>{fullName(d)} · Records · ELENZ</title>
-	<meta name="description" content="New Zealand's electricity record for {fullName(d).toLowerCase()} since 1997, for New Zealand and each island: the record, how it grew, and the day it fell." />
-	<Preview title="{fullName(d)} · New Zealand electricity records" description="New Zealand's electricity record for {fullName(d).toLowerCase()} since 1997, for New Zealand and each island: the record, how it grew, and the day it fell." path="/records/{data.id}" />
+	<meta name="description" content="New Zealand's electricity record for {fullName(d).toLowerCase()} since 1997, nationally and by island: how it grew and the day it fell." />
+	<Preview title="{fullName(d)} · New Zealand electricity records" description="New Zealand's electricity record for {fullName(d).toLowerCase()} since 1997, nationally and by island: how it grew and the day it fell." path="/records/{data.id}" />
 </svelte:head>
 
 <div class="wrap">

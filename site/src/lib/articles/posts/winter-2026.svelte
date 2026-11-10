@@ -2,6 +2,7 @@
 	export const meta = {
 		title: 'Winter 2026: a record peak, a dry north and a full south',
 		dek: 'Demand set a new high in an August cold snap, South Island water flowed north in record amounts, and new solar farms set records in mid-winter. Thermal generation fell to its smallest winter share.',
+		description: "Winter 2026 in New Zealand's electricity: record peak demand in an August cold snap, record flows north, solar records and the smallest thermal share.",
 		date: '2026-10-15',
 		kind: 'Quarterly review',
 		image: '/articles/winter-2026.png',

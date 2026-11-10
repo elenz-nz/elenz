@@ -172,6 +172,14 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   drawn at `/og/card` (noindex, disallowed in robots.txt) and saved by `analysis/site_card_png.py` (redo it now and
   then; it isn't dated). `npm run check:previews` (`scripts/check-previews.js`, after the build, in checks.yml) fails
   if a public page (not noindex) lacks any tag or its image. A new page needs a `<Preview>`.
+- Descriptions and caching (site audit, 11 Nov 2026): each public page's `<meta name="description">` is 110 to 160
+  characters, the length search results show whole, and its og:description is the same text (`check-previews.js` fails
+  otherwise). A method page's is its summary plus a closing sentence where the summary is short (`describe` in
+  `src/lib/methods/registry.ts`); an article's is its dek, or `description` in its meta where the dek is too short or
+  long. The visible summary and dek don't change for this. Built scripts and styles (`/_app/immutable/*`, named by a
+  hash of their contents) are sent `Cache-Control: public, max-age=31536000, immutable` (`site/static/_headers`), so
+  a returning visitor doesn't ask for them again; pages and every other file keep Cloudflare's default
+  (`max-age=0, must-revalidate`), so a new build shows at once.
 
 ## Ingest
 

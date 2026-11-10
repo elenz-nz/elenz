@@ -2,6 +2,7 @@
 	export const meta = {
 		title: 'Welcome to Elenz',
 		dek: "A free, live view of New Zealand's electricity system, with history back to August 1997.",
+		description: "Welcome to Elenz, a free, live view of New Zealand's electricity system: generation, prices, demand and records, with history back to August 1997.",
 		date: '2026-11-07',
 		kind: 'Guide',
 		image: '/og/elenz.png',

@@ -25,6 +25,7 @@ export const SERIES: { [key: string]: { name: string; dek: string } } = {};
 export type Meta = {
 	title: string;
 	dek: string; // one-sentence summary under the title and on the index
+	description?: string; // for search results and link previews, where the dek is too short or long for them (about 110 to 160 characters)
 	date: string; // publication date, YYYY-MM-DD (NZ)
 	kind: Kind;
 	draft?: boolean;

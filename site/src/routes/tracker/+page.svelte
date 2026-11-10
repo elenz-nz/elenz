@@ -214,8 +214,8 @@
 
 <svelte:head>
 	<title>Tracker · ELENZ</title>
-	<meta name="description" content="New Zealand's electricity generation by fuel, plant, owner or hydro scheme, with wholesale prices, demand, HVDC transfer and emissions, from the last 24 hours back to 1997." />
-	<Preview title="Electricity generation, prices and demand · ELENZ Tracker" description="New Zealand's electricity generation by fuel, plant, owner or hydro scheme, with wholesale prices, demand, HVDC transfer and emissions, from the last 24 hours back to 1997." path="/tracker" />
+	<meta name="description" content="New Zealand's electricity generation by fuel, plant, owner or hydro scheme, with prices, demand, HVDC transfer and emissions, live and back to 1997." />
+	<Preview title="Electricity generation, prices and demand · ELENZ Tracker" description="New Zealand's electricity generation by fuel, plant, owner or hydro scheme, with prices, demand, HVDC transfer and emissions, live and back to 1997." path="/tracker" />
 </svelte:head>
 
 <div class="wrap wide">
