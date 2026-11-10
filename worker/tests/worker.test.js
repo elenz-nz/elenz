@@ -173,7 +173,7 @@ test('an odd address can neither break the page nor reach its markup', async () 
 
 test('every response carries the security headers, the same list as _headers', async () => {
   const want = await (await get('/test/security-headers')).json();
-  const file = readFileSync(join(here, '../../site/static/_headers'), 'utf8').split('\n/*\n')[1];
+  const file = readFileSync(join(here, '../../site/static/_headers'), 'utf8').split('\n/*\n')[1].split('\n\n')[0]; // the /* block only: other blocks (caching) follow it
   const listed = Object.fromEntries(file.trim().split('\n').map((l) => l.trim().split(/: (.*)/s).slice(0, 2)));
   assert.deepEqual(listed, want);
   await saveLive();
