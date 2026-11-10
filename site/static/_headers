@@ -12,3 +12,9 @@ https://:preview.elenz.workers.dev/*
   Referrer-Policy: strict-origin-when-cross-origin
   Strict-Transport-Security: max-age=2592000
   X-Content-Type-Options: nosniff
+
+# SvelteKit's built scripts and styles carry a hash of their contents in their names, so a file at one address never
+# changes: browsers may keep them for a year without asking again. Everything else keeps Cloudflare's default (check
+# with the server on every use), so a new build shows at once.
+/_app/immutable/*
+  Cache-Control: public, max-age=31536000, immutable

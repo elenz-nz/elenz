@@ -6,6 +6,7 @@
 	import { REPO, REVIEWED, SOURCES, TOPICS, longDate } from '#lib/methods/registry.js';
 
 	const LEDE = 'Where every figure on Elenz comes from, how it is calculated and checked, and what it can’t tell you.';
+	const DESC = LEDE.replace(/\.$/, ', with a page for each figure and a glossary.'); // for search results and link previews
 	const GLOSSARY: [string, string, string][] = [
 		['block-dispatch', 'Block dispatch', 'Dispatching a group of stations on one river as a single total. The dispatch figure for one station may not be what it generated.'],
 		['capacity-factor', 'Capacity factor', 'A plant’s actual output as a share of what it would produce at full capacity over the same time.'],
@@ -36,8 +37,8 @@
 
 <svelte:head>
 	<title>Data and methods · ELENZ</title>
-	<meta name="description" content={LEDE} />
-	<Preview title="Data and methods · ELENZ" description={LEDE} path="/methods" />
+	<meta name="description" content={DESC} />
+	<Preview title="Data and methods · ELENZ" description={DESC} path="/methods" />
 </svelte:head>
 
 <main class="mt-page" aria-labelledby="mt-h">

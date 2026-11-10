@@ -2,7 +2,7 @@
 	// One figure's method: header from the registry, then the page's own body (#lib/methods/pages), which follows the
 	// standard structure and places Data sources and References itself.
 	import Preview from '#lib/site/Preview.svelte';
-	import { TOPICS, body, longDate, reportHref, topic } from '#lib/methods/registry.js';
+	import { TOPICS, body, describe, longDate, reportHref, topic } from '#lib/methods/registry.js';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -15,8 +15,8 @@
 
 <svelte:head>
 	<title>{t.title} · Data and methods · ELENZ</title>
-	<meta name="description" content={t.summary} />
-	<Preview title="{t.title} · Data and methods · ELENZ" description={t.summary} path="/methods/{data.slug}" />
+	<meta name="description" content={describe(t)} />
+	<Preview title="{t.title} · Data and methods · ELENZ" description={describe(t)} path="/methods/{data.slug}" />
 </svelte:head>
 
 <main class="mt-page" aria-labelledby="mt-h">

@@ -3,11 +3,11 @@
 	// tracker's How to panels are one line each and link here (test reports GRP-06, CHT-13): keep them in step.
 	import Preview from '#lib/site/Preview.svelte';
 	import Shot from '#lib/methods/Shot.svelte';
-	const DESC = 'How to use Elenz: every control on the tracker, the Now page and Records, with tips.';
+	const DESC = 'How to use Elenz: every control on the tracker, the Now page and Records, with tips for reading, sharing and downloading the charts.';
 </script>
 
 <svelte:head>
-	<title>Guide · ELENZ</title>
+	<title>Guide to using the tracker · ELENZ</title>
 	<meta name="description" content={DESC} />
 	<Preview title="Using Elenz" description={DESC} path="/guide" />
 </svelte:head>

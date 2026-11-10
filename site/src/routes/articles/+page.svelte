@@ -9,8 +9,8 @@
 
 <svelte:head>
 	<title>Articles · ELENZ</title>
-	<meta name="description" content="Records, quarterly reviews and analysis of New Zealand's electricity system, from Electricity Authority data." />
-	<Preview title="Articles · ELENZ" description="Records, quarterly reviews and analysis of New Zealand's electricity system, from Electricity Authority data." path="/articles" />
+	<meta name="description" content="Records, quarterly reviews, guides and analysis of New Zealand's electricity system, from Electricity Authority data." />
+	<Preview title="Articles · ELENZ" description="Records, quarterly reviews, guides and analysis of New Zealand's electricity system, from Electricity Authority data." path="/articles" />
 	{#if noindex()}<meta name="robots" content="noindex" />{/if}
 </svelte:head>
 

@@ -788,8 +788,8 @@
 
 <svelte:head>
 	<title>Prices · Tracker · ELENZ</title>
-	<meta name="description" content="New Zealand wholesale electricity prices at six grid nodes, every 5 minutes: the gap between the islands, HVDC transfer, the price each fuel earned, and price ranges and spikes back to 1997." />
-	<Preview title="Wholesale electricity prices · ELENZ Tracker" description="New Zealand wholesale electricity prices at six grid nodes, every 5 minutes: the gap between the islands, HVDC transfer, the price each fuel earned, and price ranges and spikes back to 1997." path="/tracker/prices" />
+	<meta name="description" content="New Zealand wholesale electricity prices at six grid nodes, every 5 minutes: the gap between the islands, the price each fuel earned, and spikes back to 1997." />
+	<Preview title="Wholesale electricity prices · ELENZ Tracker" description="New Zealand wholesale electricity prices at six grid nodes, every 5 minutes: the gap between the islands, the price each fuel earned, and spikes back to 1997." path="/tracker/prices" />
 </svelte:head>
 
 <div class="wrap wide">
