@@ -377,6 +377,13 @@ check(abs(bl['AAA0331'].mean() - 8.0) < 1e-9 and emb.blend(None, prof) is prof, 
 check(emb.fuel_of('SVL0331') == {'bio': 1.0} and emb.fuel_of('BOB1101') == {'other': 1.0} and emb.name_of('ABY0111') == 'Opuha'
       and emb.name_of('SVL0331') == '', 'embedded: documented fuels, unclassified Bombay, names only where tied to the point')
 
+# a file with offtake rows only (October 2026's first version) counts as not published yet, in both readers
+_off = _gzip.compress('\n'.join([lines[0]] + [x for x in lines[1:] if x.endswith(',Offtake,9999')]).encode())
+_get_off = lambda u: b'<Name>R/ReconciledInjectionAndOfftake_202601_x.csv.gz</Name>' if 'comp=list' in u else _off   # noqa: E731
+import metered as _mt  # noqa: E402
+check(emb.fetch(_get_off, '2026-01') is None
+      and _mt.fetch_recon(_get_off, pd.Timestamp('2026-01-01'), [{'poc': 'AAA0331', 'code': 'R:XXXX'}], lambda *a: None) is None,
+      'embedded: a reconciliation file with no injection rows is treated as not published yet')
 # the layer in history months (embedded.month_block): state columns, a metered month, a dispatch month, an estimate
 idx_e = o_e.index
 koe = pd.DataFrame({'O|KOE1101 NGAG': 6.0}, index=idx_e)
