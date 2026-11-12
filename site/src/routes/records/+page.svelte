@@ -12,7 +12,7 @@
 	import InfoTip from '#lib/site/InfoTip.svelte';
 	import RecordIcon from '#lib/records/RecordIcon.svelte';
 	import { energy, pace, soFar, paceAt, periodWhen,
-		LISTED as DEFS, PERIODS, PERIOD_KEYS, periodOf, periodSub, GROUPS, REGIONS, LIVE_URL, MONTHS, get, notShown, parts, when, step, fmt, recentAll, topCards, CARD_GROUPS, cardGroupLabel, milestones, provisional,
+		LISTED as DEFS, PERIODS, PERIOD_KEYS, periodOf, periodSub, GROUPS, REGIONS, LIVE_URL, MONTHS, get, notShown, parts, when, step, fmt, recentAll, topCards, CARD_GROUPS, cardGroupLabel, milestones, provisional, headline,
 		liveBeats, liveNear, loadRecords, fullName, dayOf, clock, yearOf, isNew
 	} from '#lib/records/records.js';
 
@@ -99,7 +99,7 @@
 	const regionName = $derived(REGIONS.find((x) => x.id === region)!.name);
 
 	// link: the record's page
-	type Row = { d: any; rec: any; na: string | null; prov: any; isNew: boolean; p: string; link: string | null };
+	type Row = { d: any; rec: any; top: any; na: string | null; prov: any; isNew: boolean; p: string; link: string | null };
 	// every row for this region and period; records that can't apply here (a South Island renewable share that is always
 	// 100%, fossil records where there's no fossil plant, a "most sent south" year when no year was) are left out, and
 	// so are groups left empty (test report REC-03, 31 Oct 2026); a record still being worked out keeps its row
@@ -113,7 +113,8 @@
 				const na = notShown(d, region, rec, R, p);
 				const prov = na ? null : p === 'tp' ? provisional(R, live, d.id, region) : (rec?.prov ?? null);
 				const link = na ? null : href(d.id);
-				return { d, rec, na, prov, p, link, isNew: !na && isNew(rec, p) };
+				// a provisional record leads its row, tagged, with the official one as the record before it (design decision, 12 Nov 2026)
+				return { d, rec, top: headline(rec, prov), na, prov, p, link, isNew: !na && !prov && isNew(rec, p) };
 			}).filter((row) => !row.na || /^Being worked out/.test(row.na)),
 		})).filter((g) => g.rows.length);
 	});
@@ -279,7 +280,7 @@
 							<li>The region menu and the period buttons pick the list.</li>
 							<li>Day to year records are the period's average MW, with its energy beside it.</li>
 							<li>Official to: the last day the EA's metered data covers. It arrives 5–6 weeks after each month; final prices arrive a day or two after.</li>
-							<li>Dashed edge: a newer record from dispatch data, provisional until the metered month confirms it.</li>
+							<li>“Provisional” and a dashed edge: the figure is from dispatch data, until the metered month confirms it. The official record is under Previous record.</li>
 							<li>Embedded solar records are estimates, as embedded solar is modelled.</li>
 							<li>Open a record for its history and the period it fell in.</li>
 						</ul>
@@ -320,7 +321,7 @@
 									{@const d = row.d}
 									{@const rec = row.rec}
 									<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions (the name is the row's link for keyboards) -->
-									<tr class:na={!!row.na} class:prov={!!(row.prov && rec)} class:go={!!row.link} title={row.prov && rec ? 'A provisional record beyond this one: see its page' : undefined}
+									<tr class:na={!!row.na} class:prov={!!(row.prov && rec)} class:go={!!row.link} title={row.prov && rec ? 'Provisional, from dispatch data: the official record is beside it' : undefined}
 										onclick={row.link ? (e) => rowClick(e, row.link!) : undefined}>
 										<th scope="row">
 											<svelte:element this={row.link ? 'a' : 'span'} class="r-name" href={row.link ?? undefined}>
@@ -329,6 +330,7 @@
 													<span class="nm">{d.name}</span>
 													{#if d.est}<span class="tag est">Estimate</span>{/if}
 													{#if row.isNew}<span class="tag new">New</span>{/if}
+													{#if row.prov && rec}<span class="tag provtag">Provisional</span>{/if}
 													<small>{periodSub(d, row.p)}</small>
 												</span>
 											</svelte:element>
@@ -336,9 +338,10 @@
 										{#if row.na}
 											<td colspan="4" class="na-note">{row.na}</td>
 										{:else}
-											<td class="n val">{parts(d, rec.v, row.p).n}<small>{parts(d, rec.v, row.p).u}</small>{#if energy(d, rec.t, rec.v, row.p)}<span class="en">{energy(d, rec.t, rec.v, row.p)}</span>{/if}</td>
-											<td>{when(d, rec, false, row.p)}</td>
-											<td class="muted">{d.kind === 'run' ? (rec.top?.[1] ? `${parts(d, rec.top[1][1]).n} hours, ${dayOf(rec.top[1][0])}` : '') : step(d, rec.prev, row.p)}</td>
+											{@const top = row.top}
+											<td class="n val">{parts(d, top.v, row.p).n}<small>{parts(d, top.v, row.p).u}</small>{#if energy(d, top.t, top.v, row.p)}<span class="en">{energy(d, top.t, top.v, row.p)}</span>{/if}</td>
+											<td>{when(d, top, false, row.p)}</td>
+											<td class="muted">{row.prov ? (d.kind === 'run' ? `${parts(d, rec.v).n} hours, ${dayOf(rec.t)}` : step(d, [rec.t, rec.v], row.p)) : d.kind === 'run' ? (rec.top?.[1] ? `${parts(d, rec.top[1][1]).n} hours, ${dayOf(rec.top[1][0])}` : '') : step(d, rec.prev, row.p)}</td>
 											<td><Spark steps={row.prov ? [...rec.steps, [row.prov.t, row.prov.v]] : rec.steps} end={R.end} tok={d.tok} dashed={!!d.est} hollow={!!row.prov} /></td>
 										{/if}
 									</tr>
@@ -486,6 +489,7 @@
 	.tag { display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em; padding: 1px 7px; border-radius: 4px; background: var(--grid); color: var(--ink-2); margin-left: 6px; vertical-align: 1px; white-space: nowrap; }
 	.tag.new { background: var(--warn-bg); color: var(--warn-ink); }
 	.tag.est { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+	.tag.provtag { background: transparent; border: 1px dashed var(--warn-ink); color: var(--warn-ink); }
 
 	.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 10px; }
 	.card { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; display: grid; gap: 8px; align-content: start; color: inherit; text-decoration: none; }

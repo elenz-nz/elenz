@@ -1,7 +1,7 @@
 // Tests for the records' live-week check (src/lib/records/records.js): run with `npm test`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { liveBeats, liveNear, adjustLive, close, recent } from '#lib/records/records.js';
+import { liveBeats, liveNear, adjustLive, close, recent, headline, paceRest, def } from '#lib/records/records.js';
 
 // a live week of 5-minute data: two hours, wind steady at `w` MW in the North Island
 function live(w, extra = {}) {
@@ -71,4 +71,20 @@ test('cards: every region and period, most notable first; the first four one per
   assert.equal(new Set(top.map((c) => c.d.id)).size, top.length, 'one per record');
   assert.ok(top.filter((c) => c.d.group === 'Wind and solar').length <= 2, 'two per group at most');
   assert.ok(top.some((c) => c.d.id === 'wind_max'), 'a big jump ranks high');
+});
+
+test('a provisional record leads, with the official record as the one before it', () => {
+  const rec = { t: 1, v: 900, n: 4, prev: [0, 880], steps: [[0, 880], [1, 900]], ctx: { demand: 1 } };
+  assert.equal(headline(rec, null), rec);
+  const top = headline(rec, { t: 5, v: 910, src: 'live' });
+  assert.deepEqual([top.t, top.v, top.prev, top.n, top.prov], [5, 910, [1, 900], 5, true]);
+  assert.equal(top.official, rec);
+  assert.equal(top.ctx, undefined);
+  assert.equal(top.steps, rec.steps);
+});
+
+test('the pace note ends with what is left and what the rest needs', () => {
+  const p = { d: def('wind_max'), period: 'day', hours: 24, elapsed: 16, v: 600, need: 500, close: null };
+  assert.equal(paceRest(p), 'With 8 hours to go the rest needs only 500 MW avg to beat it.');
+  assert.equal(paceRest({ ...p, need: null }), '8 hours to go.');
 });

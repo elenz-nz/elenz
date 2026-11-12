@@ -359,7 +359,7 @@ Every ⓘ beside a title (`InfoTip`) follows one pattern, so they read alike acr
 7. **Plain words and NZ English.** Explain a term the first time a note uses it (dispatch, node, capacity factor, inverter-based). Keep the same words everywhere. Give prices a feel: $100/MWh is 10c a kWh, before lines and retail charges.
 8. **Same chart, same note.** HVDC transfer reads the same on both tracker tabs.
 9. **Phone-sized:** about 70 words in any one view.
-10. **Estimates and provisional figures stated as plain facts** ("estimated", "provisional"), not apologies.
+10. **Estimates and provisional figures stated as plain facts** ("estimated", "provisional"), not apologies. A status note on a page (On record pace, Provisional, Close) gives the figures, when it will be settled and one link to the method section; the reasoning stays on the method page.
 11. **Lowercase for ordinary things** (wholesale price, generation), capitals only for names (Haywards, the EA, Huntly).
 12. **Works in light and dark mode:** no "paler" or "darker" for colour scales. "Fainter colour" reads right in both.
 13. **A data state** (no offers yet, not built yet) belongs on the chart itself (a banner, shading, a legend key), not in the ⓘ. The Generation chart's ⓘ ends with the grouping's own note (`NOTES` in tracker.js, one for every grouping, the grouping's name in bold, not capitals).

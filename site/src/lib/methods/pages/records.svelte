@@ -81,7 +81,7 @@
 	<li>We take off each record’s usual shift: how far a month’s highest or lowest half-hour, day, week or month in dispatch data usually sits from the metered one. Wind’s highest half-hour, for example, reads about 10 MW high nationally.</li>
 	<li>We set a margin for what is left, which is how far the corrected figure strays nine months in ten. It is about 10 MW for peak wind, 25–50 MW for demand, and 0.3–0.6 percentage points for the renewable share.</li>
 </ol>
-<p>A corrected figure beyond the record by more than the margin is a provisional record. It is shown with when the metered data is due, and is confirmed or dropped when that data arrives. A corrected figure within the margin, either side, is close to the record. Elenz says which way a provisional record went for {NEW_DAYS} days.</p>
+<p>A corrected figure beyond the record by more than the margin is a provisional record. It becomes the main figure on the record’s page and in the records list, marked Provisional, with the official record beside it and when the metered data is due. It is confirmed or dropped when that data arrives. A corrected figure within the margin, either side, is close to the record. Elenz says which way a provisional record went for {NEW_DAYS} days.</p>
 <Calculations>
 	<p class="formula">Corrected figure = dispatch figure, with Glenbrook and Kawerau (Onepu) scaled, − usual shift
 Provisional record: corrected figure is beyond the record by more than the margin

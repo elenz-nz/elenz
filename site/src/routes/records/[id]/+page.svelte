@@ -15,7 +15,7 @@
 	import CopyLink from '#lib/site/CopyLink.svelte';
 	import { stamp } from '#lib/site/viewurl.js';
 	import {
-		LISTED, PERIODS, PERIOD_KEYS, periodOf, periodSub, periodWhen, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, liveBeats, energy, pace, soFar, toGo, needText, paceAt, periodNow, figureSoFar, loadDetail, liveNear, close, bgOf, udemOf, periodSeries, periodAxis,
+		LISTED, PERIODS, PERIOD_KEYS, periodOf, periodSub, periodWhen, REGIONS, LIVE_URL, MONTHS, def, get, notShown, parts, fmt, when, step, fullName, provisional, headline, paceRest, liveBeats, energy, pace, soFar, toGo, needText, paceAt, periodNow, figureSoFar, loadDetail, liveNear, close, bgOf, udemOf, periodSeries, periodAxis,
 		loadRecords, trimZeros, periodHours, meteredDue, clock, dayOf, dayLong, monthOf, yearOf, daysBetween, runLength, isNew as isNewRec
 	} from '#lib/records/records.js';
 	import type { PageProps } from './$types';
@@ -119,22 +119,24 @@
 	const prov = $derived(R && !na ? (per === 'tp' ? provisional(R, live, d.id, region) : (rec?.prov ?? null)) : null);
 	// a dispatch figure within the margin of the record, either side: too close for dispatch data to call
 	const near_ = $derived(R && !na && !prov ? close(R, live, near, d.id, region, per) : null);
-	const isNew = $derived(isNewRec(rec, per));
+	// the record the page leads with: the provisional one when there is one, marked as such (design decision, 12 Nov
+	// 2026); `rec` stays the official record, for the charts of the period it fell in
+	const top = $derived(headline(rec, prov));
+	const isNew = $derived(!prov && isNewRec(rec, per));
 	const regionName = $derived(REGIONS.find((x) => x.id === region)!.name);
 	const f = (v: number) => fmt(d, v, per);
 	const axisFmt = (v: number) => (d.unit === '$' ? '$' + Math.round(v).toLocaleString('en-NZ') : d.unit === '%' ? `${+v.toFixed(1)}%` : Math.round(v).toLocaleString('en-NZ'));
-	const cap = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
 	const ymd = (t: number) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Pacific/Auckland' }).format(t);
 	const others = $derived(LISTED.filter((x) => x.group === d.group && x.id !== d.id));
 
 	// when the record was set: the end of its period (a year record stands from the year's end, not its start), the
 	// end of its half-hour or month, or of its run
 	const recEnd = $derived.by(() => {
-		if (!rec) return 0;
-		if (d.kind === 'run') return rec.t + rec.v * 36e5;
-		if (per !== 'tp') return rec.t + periodHours(rec.t, per) * 36e5;
-		if (d.kind === 'month') return rec.t + periodHours(rec.t, 'month') * 36e5;
-		return rec.t + 1800e3;
+		if (!top) return 0;
+		if (d.kind === 'run') return top.t + top.v * 36e5;
+		if (per !== 'tp') return top.t + periodHours(top.t, per) * 36e5;
+		if (d.kind === 'month') return top.t + periodHours(top.t, 'month') * 36e5;
+		return top.t + 1800e3;
 	});
 	// the two charts' zoom and pinned point, for Reset zoom and Release in their headings
 	let growZoom = $state<[number, number] | null>(null);
@@ -155,7 +157,7 @@
 			`${n === 0 ? (tr ? `First above zero in ${yearOf(trimZeros(rec.steps)[0][0])}` : 'Not broken since the data began') : `Broken ${n} ${n === 1 ? 'time' : 'times'} since ${since}`}.`,
 			...(bg ? [`Faint line: ${what}. The ${unit} still running sits in a hatched band with a dotted line; hover there for its figure so far and how long is left.`] : []),
 			...(udem ? [`Dashed line: the same with estimated embedded solar added back, showing what ${region === 'NZ' ? 'the country' : 'the island'} used including rooftops and small arrays. It’s for information, not a record (from August 2013; zero before).`] : []),
-			...(prov ? ['Dashed step: provisional, from dispatch data.'] : []),
+			...(prov ? ['Dashed step: the provisional record, from dispatch data.'] : []),
 			'Hover or tap for the record at any date; click to pin it. Drag to zoom; “Reset zoom” or Escape goes back.',
 		];
 		return { lead: `This shows how the record has ${low ? 'fallen' : 'climbed'} over time; each step is a new record.`, items };
@@ -163,7 +165,7 @@
 
 	// one more figure from the record's half-hour, the one that says most about it
 	const extra = $derived.by(() => {
-		const c = rec?.ctx;
+		const c = top?.ctx;
 		if (!c || d.kind !== 'hh' || per !== 'tp') return null;
 		if (d.id.startsWith('demand')) return c.ren != null ? { k: 'Renewable share then', v: `${c.ren.toFixed(1)}%` } : null;
 		if (d.id.startsWith('ren') || d.id.startsWith('fossil') || d.id === 'hydro_max') return { k: 'Demand then', v: `${c.demand.toLocaleString('en-NZ')} MW` };
@@ -172,29 +174,33 @@
 		if (d.id.startsWith('hvdc')) return { k: 'Haywards price then', v: `$${Math.round(c.hay).toLocaleString('en-NZ')}/MWh` };
 		return null;
 	});
-	const history = $derived(rec?.steps ? rec.steps.slice(-8).reverse().map((s: [number, number], i: number) => {
-		const before = rec.steps[rec.steps.length - 2 - i];
-		return { t: s[0], v: s[1], by: before ? Math.abs(s[1] - before[1]) : null, first: !before };
-	}) : []);
+	const history = $derived.by(() => {
+		if (!rec?.steps) return [];
+		const steps: [number, number][] = prov ? [...rec.steps, [prov.t, prov.v]] : rec.steps;
+		return steps.slice(-8).reverse().map((s, i) => {
+			const before = steps[steps.length - 2 - i];
+			return { t: s[0], v: s[1], by: before ? Math.abs(s[1] - before[1]) : null, first: !before, prov: !!prov && i === 0 };
+		});
+	});
 	const moy = $derived(R && d.kind !== 'run' && per === 'tp' ? (R.moy?.[d.id]?.[region] ?? []) : []);
 
 	// sharing (records are made to be shared): Share opens the phone's share sheet with the record's image, a line about
 	// it and its link (or the link alone where images can't be shared); on computers it copies the link. Download saves
 	// the image (shareImage.js, 1200 x 630).
-	const en = $derived(rec ? energy(d, rec.t, rec.v, per) : '');
+	const en = $derived(top ? energy(d, top.t, top.v, per) : '');
 	const fileName = $derived(`elenz-record-${d.id}${per !== 'tp' ? '-' + per : ''}-${region.toLowerCase()}.png`);
-	const shareText = $derived(rec ? `${isNew ? 'New record: ' : ''}${fullName(d)}${per !== 'tp' ? ` (${periodOf(per).label.toLowerCase()})` : ''}, ${regionName}: ${f(rec.v)}${en ? ` (${en})` : ''}, ${d.kind === 'run' ? runLength(rec.v) + ' from ' : ''}${when(d, rec, false, per)}.` : '');
+	const shareText = $derived(top ? `${prov ? 'Provisional record: ' : isNew ? 'New record: ' : ''}${fullName(d)}${per !== 'tp' ? ` (${periodOf(per).label.toLowerCase()})` : ''}, ${regionName}: ${f(top.v)}${en ? ` (${en})` : ''}, ${d.kind === 'run' ? runLength(top.v) + ' from ' : ''}${when(d, top, false, per)}.` : '');
 	const canShare = typeof navigator !== 'undefined' && !!navigator.share && typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
 	async function image(): Promise<Blob | null> {
 		const c = document.createElement('canvas');
-		await drawRecord(c, { d, region, rec, end: R.end, isNew, period: per });
+		await drawRecord(c, { d, region, rec: top, end: R.end, isNew, period: per });
 		return await new Promise((ok) => c.toBlob(ok, 'image/png'));
 	}
 	// The image is drawn ahead (a moment after the record shows), so the share sheet opens straight from the tap:
 	// phones refuse a share that waits on drawing first (test report SHR-03, 31 Oct 2026). If it isn't ready, or
 	// the theme changed, the line and link go without it.
 	let prepared = $state.raw<{ key: string; file: File } | null>(null);
-	const imageKey = () => `${fileName}|${rec?.t}|${rec?.v}|${isNew}|${pageIsDark()}`;
+	const imageKey = () => `${fileName}|${top?.t}|${top?.v}|${isNew}|${pageIsDark()}`;
 	$effect(() => {
 		if (!canShare || !rec || !R) return;
 		const key = imageKey();
@@ -296,32 +302,36 @@
 		{:else if na || !rec}
 			<section class="panel"><p>{na ?? 'No record yet'} ({regionName}).</p><p><a href="/records">All records</a></p></section>
 		{:else}
-			<section class="panel hero-rec" aria-label="The record">
+			<section class="panel hero-rec" aria-label={prov ? 'The provisional record' : 'The record'}>
 				<div class="big">
-					<span class="lbl">{regionName}{#if isNew} <span class="tag new">New</span>{/if}</span>
-					<span class="val">{parts(d, rec.v, per).n}<small>{parts(d, rec.v, per).u}</small></span>
+					<span class="lbl">{regionName}{#if prov} <span class="tag provtag in-lbl">Provisional</span>{:else if isNew} <span class="tag new">New</span>{/if}</span>
+					<span class="val">{parts(d, top.v, per).n}<small>{parts(d, top.v, per).u}</small></span>
 					{#if en}<span class="en">{en} over the {periodOf(per).word}</span>{/if}
-					<span class="when">{d.kind === 'run' ? runLength(rec.v) + ', ' : ''}{when(d, rec, true, per)}</span>
+					<span class="when">{d.kind === 'run' ? runLength(top.v) + ', ' : ''}{when(d, top, true, per)}</span>
 				</div>
 				<dl class="stats">
-					{#if d.kind === 'run'}
+					{#if prov}
+						<div><dt>Official record</dt><dd>{f(rec.v)}</dd><dd class="s">{d.kind === 'run' ? `from ${dayOf(rec.t)}` : per !== 'tp' ? periodWhen(rec.t, per) : d.kind === 'month' ? monthOf(rec.t) : dayOf(rec.t)}{energy(d, rec.t, rec.v, per) ? ` · ${energy(d, rec.t, rec.v, per)}` : ''}</dd></div>
+					{:else if d.kind === 'run'}
 						{#if rec.top?.[1]}<div><dt>Next longest</dt><dd>{parts(d, rec.top[1][1]).n} hours</dd><dd class="s">from {dayOf(rec.top[1][0])}</dd></div>{/if}
 					{:else if rec.prev}
 						<div><dt>Previous record</dt><dd>{f(rec.prev[1])}</dd><dd class="s">{per !== 'tp' ? periodWhen(rec.prev[0], per) : d.kind === 'month' ? monthOf(rec.prev[0]) : dayOf(rec.prev[0])}{energy(d, rec.prev[0], rec.prev[1], per) ? ` · ${energy(d, rec.prev[0], rec.prev[1], per)}` : ''}</dd></div>
 					{/if}
-					{#if !rec.ongoing}
-						<div><dt>Has stood for</dt><dd>{daysBetween(recEnd, Date.now()).toLocaleString('en-NZ')} days</dd><dd class="s">since {dayOf(recEnd)}</dd></div>
+					{#if !top.ongoing}
+						<div><dt>Has stood for</dt><dd>{Math.max(0, daysBetween(recEnd, Date.now())).toLocaleString('en-NZ')} days</dd><dd class="s">since {dayOf(recEnd)}</dd></div>
 					{/if}
-					<div><dt>Broken</dt><dd>{rec.n} {rec.n === 1 ? 'time' : 'times'}</dd><dd class="s">since {monthOf(R.first)}</dd></div>
+					<div><dt>Broken</dt><dd>{top.n} {top.n === 1 ? 'time' : 'times'}</dd><dd class="s">since {monthOf(R.first)}</dd></div>
 					{#if extra}<div><dt>{extra.k}</dt><dd>{extra.v}</dd></div>{/if}
 				</dl>
 			</section>
 
+			<!-- the three notes keep to the figures and one link to the method (test report, 12 Nov 2026: they said too
+			     much) -->
 			{#if onPace}
 				<section class="pace" aria-label="Heading for a record">
 					<span class="tag pacetag">On record pace</span>
-					<p><b>{soFar(onPace)}: {fmt(d, onPace.v, per)} {paceAt(onPace)}</b>, ahead of the record {periodOf(per).word} ({periodWhen(onPace.bestT, per)}{onPace.provBest ? ', provisional' : ''}), which had {fmt(d, onPace.ref, per)} at the same point and finished at {fmt(d, onPace.best, per)}.{#if onPace.close} It is also ahead of the close figure in the dispatch data ({periodWhen(onPace.close.t, per)}, {fmt(d, onPace.close.v, per)}).{/if} {cap(toGo(onPace))}. {needText(onPace)}
-						From dispatch data, so provisional until the metered data confirms it.</p>
+					<p><b>{soFar(onPace)}: {fmt(d, onPace.v, per)} {paceAt(onPace)}</b>, ahead of the {onPace.provBest ? 'provisional record' : 'record'} {periodOf(per).word} ({periodWhen(onPace.bestT, per)}, {fmt(d, onPace.best, per)}).{#if onPace.close} It is also ahead of the close figure ({periodWhen(onPace.close.t, per)}, {fmt(d, onPace.close.v, per)}).{/if} {paceRest(onPace)}
+						<a href="/methods/records#pace">How record pace works</a></p>
 				</section>
 			{/if}
 
@@ -330,16 +340,18 @@
 					<span class="tag provtag">Provisional</span>
 					<p>{prov.src === 'live' ? 'Live data shows' : 'Dispatch data shows'} <b>{f(prov.v)}</b>
 						{per === 'day' ? `on ${dayOf(prov.t)}` : per === 'week' ? `in the week of ${dayOf(prov.t)}` : per === 'month' ? `in ${monthOf(prov.t)}` : per === 'year' ? `in ${yearOf(prov.t)}`
-							: d.kind === 'hh' ? `in the ${clock(prov.t)} half-hour on ${dayOf(prov.t)}` : d.kind === 'run' ? `from ${dayOf(prov.t)}` : `in ${monthOf(prov.t)}`},
-						beyond the record by more than dispatch data usually strays from the meters (corrected for how it compares with them). Since 2020 every such record has been confirmed; the EA’s metered data settles it around {meteredDue(per === 'week' ? prov.t + 6.5 * 864e5 : per === 'year' ? Date.UTC(+yearOf(prov.t), 11, 15) : prov.t)}.</p>
+							: d.kind === 'hh' ? `in the ${clock(prov.t)} half-hour on ${dayOf(prov.t)}` : d.kind === 'run' ? `from ${dayOf(prov.t)}` : `in ${monthOf(prov.t)}`}.
+						The EA’s metered data settles it around {meteredDue(per === 'week' ? prov.t + 6.5 * 864e5 : per === 'year' ? Date.UTC(+yearOf(prov.t), 11, 15) : prov.t)}.
+						<a href="/methods/records#official">How provisional records work</a></p>
 				</section>
 			{:else if near_}
 				<section class="prov near" aria-label="Close to the record">
 					<span class="tag provtag">Close</span>
 					<p>{near_.src === 'live' ? 'Live data shows' : 'Dispatch data shows'} <b>{f(near_.v)}</b>
 						{per === 'day' ? `on ${dayOf(near_.t)}` : per === 'week' ? `in the week of ${dayOf(near_.t)}` : per === 'month' ? `in ${monthOf(near_.t)}` : per === 'year' ? `in ${yearOf(near_.t)}`
-							: `in the ${clock(near_.t)} half-hour on ${dayOf(near_.t)}`},
-						within {f(near_.m)} of the record (corrected for how dispatch data compares with the meters). That is too close for dispatch data to call; the EA’s metered data settles it around {meteredDue(per === 'week' ? near_.t + 6.5 * 864e5 : per === 'year' ? Date.UTC(+yearOf(near_.t), 11, 15) : near_.t)}.</p>
+							: d.kind === 'hh' ? `in the ${clock(near_.t)} half-hour on ${dayOf(near_.t)}` : d.kind === 'run' ? `from ${dayOf(near_.t)}` : `in ${monthOf(near_.t)}`},
+						within {f(near_.m)} of the record. The EA’s metered data settles it around {meteredDue(per === 'week' ? near_.t + 6.5 * 864e5 : per === 'year' ? Date.UTC(+yearOf(near_.t), 11, 15) : near_.t)}.
+						<a href="/methods/records#official">How close figures work</a></p>
 				</section>
 			{/if}
 
@@ -359,7 +371,7 @@
 				{#if per !== 'tp'}
 					<section class="panel" aria-labelledby="day-h">
 						<!-- the period in the title, the rest in the ⓘ, as on the other charts (test report REC-05, 26 Oct 2026) -->
-						<div class="p-head"><div class="ttl-row"><h2 id="day-h">The {periodOf(per).word} it fell <span class="h-when">{periodWhen(rec.t, per, true)}</span></h2><InfoTip label="About this chart"><p>This shows the {periodOf(per).word} the record was set: {parts(d, rec.v, per).n} {parts(d, rec.v, per).u}{en ? ` (${en})` : ''}{d.unit === '%' ? ' of its generation renewable' : ''}{rec.prev ? `, beating ${f(rec.prev[1])} (${periodWhen(rec.prev[0], per)})` : ''}.</p><ul><li>Dashed line: the record’s average.</li><li>“Open in the tracker” shows what happened through it.</li></ul><p><a href="/methods/records#periods">How records work</a></p></InfoTip></div><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
+						<div class="p-head"><div class="ttl-row"><h2 id="day-h">The {periodOf(per).word} {prov ? 'the official record' : 'it'} fell <span class="h-when">{periodWhen(rec.t, per, true)}</span></h2><InfoTip label="About this chart"><p>This shows the {periodOf(per).word} the record was set: {parts(d, rec.v, per).n} {parts(d, rec.v, per).u}{en ? ` (${en})` : ''}{d.unit === '%' ? ' of its generation renewable' : ''}{rec.prev ? `, beating ${f(rec.prev[1])} (${periodWhen(rec.prev[0], per)})` : ''}.</p><ul><li>Dashed line: the record’s average.</li><li>“Open in the tracker” shows what happened through it.</li></ul><p><a href="/methods/records#periods">How records work</a></p></InfoTip></div><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
 						{#if ser && serAxis}
 							<DayChart day={ser} t={-1} tok={d.tok} fmt={axisFmt} full={f} xticks={serAxis.ticks} tipAt={serAxis.tip} labAt={serAxis.lab} bind:zoom={dayZoom} avg={rec.v} avgLabel="Average {f(rec.v)}"
 								label="{fullName(d)} through {periodWhen(rec.t, per, true)}, {per === 'day' ? 'half-hourly' : per === 'week' ? 'hourly' : per === 'month' ? 'daily' : 'weekly'}, averaging {f(rec.v)}" />
@@ -368,7 +380,7 @@
 				{:else if d.kind === 'hh' && rec.ctx}
 					{@const c = rec.ctx}
 					<section class="panel" aria-labelledby="day-h">
-						<div class="p-head"><div class="ttl-row"><h2 id="day-h">The day it fell <span class="h-when">{dayLong(rec.t)}, {clock(rec.t)}</span></h2><InfoTip label="About this chart"><p>This shows the day the record half-hour was set, {regionName === 'New Zealand' ? 'across New Zealand' : `in the ${regionName}`}.</p><ul><li>The figures under the chart are for the {clock(rec.t)} half-hour.</li><li>Metered generation and demand, and final prices.</li><li>“Open in the tracker” shows the whole day there.</li></ul><p><a href="/methods/records#half-hours">How records work</a></p></InfoTip></div><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
+						<div class="p-head"><div class="ttl-row"><h2 id="day-h">The day {prov ? 'the official record' : 'it'} fell <span class="h-when">{dayLong(rec.t)}, {clock(rec.t)}</span></h2><InfoTip label="About this chart"><p>This shows the day the record half-hour was set, {regionName === 'New Zealand' ? 'across New Zealand' : `in the ${regionName}`}.</p><ul><li>The figures under the chart are for the {clock(rec.t)} half-hour.</li><li>Metered generation and demand, and final prices.</li><li>“Open in the tracker” shows the whole day there.</li></ul><p><a href="/methods/records#half-hours">How records work</a></p></InfoTip></div><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
 						<DayChart day={c.day} t={rec.t} tok={d.tok} fmt={axisFmt} bind:zoom={dayZoom} label="{fullName(d)} through {dayLong(rec.t)}, half-hourly, peaking at {f(rec.v)} at {clock(rec.t)}" />
 						<dl class="facts">
 							<div><dt>Demand</dt><dd>{c.demand.toLocaleString('en-NZ')} MW</dd></div>
@@ -398,11 +410,11 @@
 							<thead><tr><th scope="col">{per !== 'tp' ? periodOf(per).label : d.kind === 'month' ? 'Month' : 'Half-hour'}</th><th scope="col" class="n">Record</th>{#if en}<th scope="col" class="n">Energy</th>{/if}<th scope="col" class="n">{d.id.endsWith('_min') ? 'Down' : 'Up'}</th></tr></thead>
 							<tbody>
 								{#each history as h}
-									<tr><td>{per !== 'tp' ? periodWhen(h.t, per) : d.kind === 'month' ? monthOf(h.t) : `${clock(h.t)}, ${dayOf(h.t)}`}</td><td class="n">{f(h.v)}</td>{#if en}<td class="n">{energy(d, h.t, h.v, per)}</td>{/if}<td class="n muted">{h.first ? 'first' : d.unit === '%' ? (h.by ?? 0).toFixed(1) : parts(d, h.by ?? 0).n}</td></tr>
+									<tr><td>{per !== 'tp' ? periodWhen(h.t, per) : d.kind === 'month' ? monthOf(h.t) : `${clock(h.t)}, ${dayOf(h.t)}`}{#if h.prov} <span class="tag provtag sm">Provisional</span>{/if}</td><td class="n">{f(h.v)}</td>{#if en}<td class="n">{energy(d, h.t, h.v, per)}</td>{/if}<td class="n muted">{h.first ? 'first' : d.unit === '%' ? (h.by ?? 0).toFixed(1) : parts(d, h.by ?? 0).n}</td></tr>
 								{/each}
 							</tbody>
 						</table>
-						{#if rec.n > 8}<p class="note">The {rec.n - 7} before these are on the chart above.</p>{/if}
+						{#if top.n > 8}<p class="note">The {top.n - 7} before these are on the chart above.</p>{/if}
 					{/if}
 				</section>
 			</div>
@@ -462,6 +474,8 @@
 	.tag.new { background: var(--warn-bg); color: var(--warn-ink); }
 	.tag.est { background: transparent; border: 1px solid var(--line); color: var(--muted); }
 	.tag.provtag { background: transparent; border: 1px dashed var(--warn-ink); color: var(--warn-ink); margin-left: 0; }
+	.tag.provtag.in-lbl, .tag.provtag.sm { margin-left: 6px; }
+	.pace a, .prov a { color: var(--accent); white-space: nowrap; }
 
 	.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px; min-width: 0; display: grid; gap: 10px; align-content: start; }
 	.panel p { margin: 0; }

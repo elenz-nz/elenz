@@ -368,6 +368,17 @@ export function close(R, live, near, id, region, period = 'tp') {
   return near?.[id]?.[region] ?? get(R, id, region)?.near ?? null;
 }
 
+/** The record to lead with (design decision, 12 Nov 2026): a provisional record, when there is one, is the main figure,
+ *  marked provisional, and the official record becomes the one before it. Returns the record itself when there is no
+ *  provisional one; otherwise a copy with the provisional time and value, `prov: true`, `official` (the record on final
+ *  data), `prev` the official [t, v], one more break, and no context (that is the official half-hour's). In the test
+ *  over 73 months no provisional record went unconfirmed (analysis/README.md). */
+export function headline(rec, prov) {
+  if (!rec || !prov) return rec;
+  return { ...rec, t: prov.t, v: prov.v, prev: [rec.t, rec.v], n: (rec.n ?? 0) + 1, ctx: undefined, ongoing: !!prov.ongoing,
+    top: rec.top ? [[prov.t, prov.v, !!prov.ongoing], ...rec.top] : rec.top, since: undefined, prov: true, official: rec, src: prov.src };
+}
+
 /** The provisional record for an id and region: the live week's if it beats the history's, else the history's. */
 export function provisional(R, live, id, region) {
   return live?.[id]?.[region] ?? get(R, id, region)?.prov ?? null;
@@ -764,6 +775,11 @@ export function hoursToGo(h) {
   if (h < 1) { const x = Math.max(1, Math.round(h * 60)); return `${x} minute${x === 1 ? '' : 's'} to go`; }
   if (h < 36) { const x = Math.round(h); return `${x} hour${x === 1 ? '' : 's'} to go`; }
   const x = Math.round(h / 24); return `${x} day${x === 1 ? '' : 's'} to go`;
+}
+/** The pace note's last sentence: "With 8 hours to go the rest can average up to 49 MW avg and still beat both." */
+export function paceRest(p) {
+  const need = needText(p), left = toGo(p);
+  return need ? `With ${left} ${need.charAt(0).toLowerCase()}${need.slice(1)}` : `${left.charAt(0).toUpperCase()}${left.slice(1)}.`;
 }
 /** The pace line's second sentence: what the rest of the period can average and still beat the record. */
 export function needText(p) {
