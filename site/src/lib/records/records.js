@@ -345,7 +345,7 @@ function liveCheck(R, D) {
       const v = Math.round((best.v - shift) * f) / f, gap = min ? rec.v - v : v - rec.v;
       const better = (a, b) => (min ? a < b : a > b);
       if (gap > m && (!rec.prov || better(v, rec.prov.v))) (beats[d.id] ??= {})[r] = { t: best.t, v, m, src: 'live' };
-      else if (m > 0 && Math.abs(gap) <= m && !rec.prov) (near[d.id] ??= {})[r] = { t: best.t, v, m, src: 'live' };
+      else if (m > 0 && Math.abs(gap) <= m && !rec.prov && !sameShown(d, v, rec.v)) (near[d.id] ??= {})[r] = { t: best.t, v, m, src: 'live' };
     }
   }
   return { beats, near };
@@ -368,17 +368,50 @@ export function close(R, live, near, id, region, period = 'tp') {
   return near?.[id]?.[region] ?? get(R, id, region)?.near ?? null;
 }
 
+/** The record to lead with (design decision, 12 Nov 2026): a provisional record, when there is one, is the main figure,
+ *  marked provisional, and the official record becomes the one before it. Returns the record itself when there is no
+ *  provisional one; otherwise a copy with the provisional time and value, `prov: true`, `official` (the record on final
+ *  data), `prev` the official [t, v], one more break, and no context (that is the official half-hour's). In the test
+ *  over 73 months no provisional record went unconfirmed (analysis/README.md). */
+export function headline(rec, prov) {
+  if (!rec || !prov) return rec;
+  return { ...rec, t: prov.t, v: prov.v, prev: [rec.t, rec.v], n: (rec.n ?? 0) + 1, ctx: undefined, ongoing: !!prov.ongoing,
+    top: rec.top ? [[prov.t, prov.v, !!prov.ongoing], ...rec.top] : rec.top, since: undefined, prov: true, official: rec, src: prov.src };
+}
+
 /** The provisional record for an id and region: the live week's if it beats the history's, else the history's. */
 export function provisional(R, live, id, region) {
   return live?.[id]?.[region] ?? get(R, id, region)?.prov ?? null;
 }
 
 /** Fetch the records file; null if it isn't published yet (404) or can't be read. */
+/** Do two figures read the same on the page ("99.2%" and "99.2%", "1,148 MW" and "1,148 MW")? */
+export const sameShown = (d, a, b, period = 'tp') => fmt(d, a, period) === fmt(d, b, period);
+
+/** A dispatch figure has to differ from the record as shown, by at least the last digit on the page (0.1 of a point for
+ *  a share, 1 MW), to be close to it or provisional: one that reads the same says nothing either way (design decision,
+ *  12 Nov 2026). Takes such `near` and `prov` entries out of records.json as it is loaded. */
+export function dropTies(R) {
+  const each = (group, period) => {
+    for (const [id, regions] of Object.entries(group ?? {})) {
+      const d = def(id);
+      if (!d) continue;
+      for (const rec of Object.values(regions ?? {})) {
+        for (const k of ['near', 'prov']) if (rec?.[k] && sameShown(d, rec[k].v, rec.v, period)) delete rec[k];
+      }
+    }
+  };
+  if (!R) return R;
+  each(R.records, 'tp'); each(R.months, 'tp'); each(R.runs, 'tp');
+  for (const [period, group] of Object.entries(R.periods ?? {})) each(group, period);
+  return R;
+}
+
 export async function loadRecords(fetchFn = fetch) {
   try {
     const r = await fetchFn(RECORDS_URL);
     if (!r.ok) return null;
-    return await r.json();
+    return dropTies(await r.json());
   } catch {
     return null;
   }
@@ -482,8 +515,8 @@ export function recent(R, live, now = Date.now(), near = null) {
 const STATUS_W = { new: 3, prov: 2, near: 1, settled: 0.8 };
 const PERIOD_W = { tp: 1, year: 1, month: 0.9, week: 0.75, day: 0.65 };
 export const CARD_GROUPS = [...PERIOD_KEYS, 'run'];
-/** A card group's heading: "Trading period", "Day" ... "Runs". */
-export const cardGroupLabel = (k) => (k === 'run' ? 'Runs' : periodOf(k).label);
+/** A card group's heading: "Trading period records", "Day records" ... "Run records". */
+export const cardGroupLabel = (k) => `${k === 'run' ? 'Run' : periodOf(k).label} records`;
 
 /** The record's usual step: the median change over its last ten new records (null with fewer than two). */
 function usualStep(steps) {
@@ -764,6 +797,11 @@ export function hoursToGo(h) {
   if (h < 1) { const x = Math.max(1, Math.round(h * 60)); return `${x} minute${x === 1 ? '' : 's'} to go`; }
   if (h < 36) { const x = Math.round(h); return `${x} hour${x === 1 ? '' : 's'} to go`; }
   const x = Math.round(h / 24); return `${x} day${x === 1 ? '' : 's'} to go`;
+}
+/** The pace note's last sentence: "With 8 hours to go the rest can average up to 49 MW avg and still beat both." */
+export function paceRest(p) {
+  const need = needText(p), left = toGo(p);
+  return need ? `With ${left} ${need.charAt(0).toLowerCase()}${need.slice(1)}` : `${left.charAt(0).toUpperCase()}${left.slice(1)}.`;
 }
 /** The pace line's second sentence: what the rest of the period can average and still beat the record. */
 export function needText(p) {

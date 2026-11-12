@@ -1,7 +1,7 @@
 // Tests for the records' live-week check (src/lib/records/records.js): run with `npm test`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { liveBeats, liveNear, adjustLive, close, recent } from '#lib/records/records.js';
+import { liveBeats, liveNear, adjustLive, close, recent, headline, paceRest, def, dropTies } from '#lib/records/records.js';
 
 // a live week of 5-minute data: two hours, wind steady at `w` MW in the North Island
 function live(w, extra = {}) {
@@ -29,6 +29,8 @@ test('within the margin either side it is close to the record, not provisional',
     assert.equal(liveNear(R, live(w)).wind_max.NI.v, w - 10, `${w} MW`);
   }
   assert.deepEqual(liveNear(R, live(895)), {});
+  // a figure that reads the same as the record isn't close to it
+  assert.deepEqual(liveNear(R, live(910)), {});
   const near = liveNear(R, live(908));
   assert.equal(close(R, {}, near, 'wind_max', 'NI').v, 898);
   assert.equal(recent(R, {}, Date.now(), near)[0].near.v, 898);
@@ -71,4 +73,31 @@ test('cards: every region and period, most notable first; the first four one per
   assert.equal(new Set(top.map((c) => c.d.id)).size, top.length, 'one per record');
   assert.ok(top.filter((c) => c.d.group === 'Wind and solar').length <= 2, 'two per group at most');
   assert.ok(top.some((c) => c.d.id === 'wind_max'), 'a big jump ranks high');
+});
+
+test('a provisional record leads, with the official record as the one before it', () => {
+  const rec = { t: 1, v: 900, n: 4, prev: [0, 880], steps: [[0, 880], [1, 900]], ctx: { demand: 1 } };
+  assert.equal(headline(rec, null), rec);
+  const top = headline(rec, { t: 5, v: 910, src: 'live' });
+  assert.deepEqual([top.t, top.v, top.prev, top.n, top.prov], [5, 910, [1, 900], 5, true]);
+  assert.equal(top.official, rec);
+  assert.equal(top.ctx, undefined);
+  assert.equal(top.steps, rec.steps);
+});
+
+test('the pace note ends with what is left and what the rest needs', () => {
+  const p = { d: def('wind_max'), period: 'day', hours: 24, elapsed: 16, v: 600, need: 500, close: null };
+  assert.equal(paceRest(p), 'With 8 hours to go the rest needs only 500 MW avg to beat it.');
+  assert.equal(paceRest({ ...p, need: null }), '8 hours to go.');
+});
+
+test('a close or provisional figure that reads the same as the record is dropped', () => {
+  const X = dropTies({
+    records: { ren_max: { NZ: { t: 1, v: 99.2, near: { t: 2, v: 99.2 } }, NI: { t: 1, v: 99.0, near: { t: 2, v: 99.1 } } } },
+    periods: { day: { wind_max: { NZ: { t: 1, v: 600, prov: { t: 2, v: 600 } }, NI: { t: 1, v: 500, prov: { t: 2, v: 520 } } } } },
+  });
+  assert.equal(X.records.ren_max.NZ.near, undefined);
+  assert.equal(X.records.ren_max.NI.near.v, 99.1);
+  assert.equal(X.periods.day.wind_max.NZ.prov, undefined);
+  assert.equal(X.periods.day.wind_max.NI.prov.v, 520);
 });

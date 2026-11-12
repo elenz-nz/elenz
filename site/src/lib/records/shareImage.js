@@ -37,7 +37,8 @@ function mark(ctx, x, y, s) {
   r(22.5, 17, 5, 10, '--f-geo'); r(22.5, 11, 5, 5, '--f-hydro'); r(22.5, 6, 5, 4, '--f-solar');
 }
 
-/** Draw a record onto a canvas (1200 x 630). isNew: say "New record". */
+/** Draw a record onto a canvas (1200 x 630). isNew: say "New record". A provisional record (records.js headline:
+ *  rec.prov, rec.official) says "Provisional record", names the official one and ends its line dashed and hollow. */
 export async function drawRecord(canvas, { d, region, rec, end, isNew, period = 'tp', dark = pageIsDark() }) {
   C = dark ? DARK : LIGHT;
   try { await document.fonts.ready; } catch { /* fonts are a nicety */ }
@@ -49,12 +50,13 @@ export async function drawRecord(canvas, { d, region, rec, end, isNew, period = 
   mark(ctx, 64, 50, 46);
   ctx.fillStyle = C.ink; ctx.font = `800 30px ${UI}`; ctx.textBaseline = 'middle';
   ctx.fillText('ELENZ', 122, 74);
-  const tag = isNew ? 'New record' : 'Record';
+  const prov = !!rec.prov && !!rec.official;
+  const tag = prov ? 'Provisional record' : isNew ? 'New record' : 'Record';
   ctx.font = `600 22px ${UI}`;
   const tw = ctx.measureText(tag).width + 36;
-  ctx.fillStyle = isNew ? C.warnBg : C.tagBg;
+  ctx.fillStyle = isNew || prov ? C.warnBg : C.tagBg;
   ctx.beginPath(); ctx.roundRect(1136 - tw, 52, tw, 44, 22); ctx.fill();
-  ctx.fillStyle = isNew ? C.warnInk : C.ink2; ctx.fillText(tag, 1136 - tw + 18, 75);
+  ctx.fillStyle = isNew || prov ? C.warnInk : C.ink2; ctx.fillText(tag, 1136 - tw + 18, 75);
 
   const regionName = REGIONS.find((r) => r.id === region)?.name ?? region;
   ctx.textBaseline = 'alphabetic';
@@ -73,15 +75,15 @@ export async function drawRecord(canvas, { d, region, rec, end, isNew, period = 
   ctx.fillText(when(d, rec, false, period) + (en ? ` · ${en}` : ''), 64, 270 + size);
   if (rec.prev) {
     ctx.fillStyle = C.muted; ctx.font = `400 24px ${UI}`;
-    ctx.fillText(`Previous record ${step(d, rec.prev, period)}${enPrev ? ` (${enPrev})` : ''}`, 64, 312 + size);
+    ctx.fillText(`${prov ? 'Official record' : 'Previous record'} ${step(d, rec.prev, period)}${enPrev ? ` (${enPrev})` : ''}`, 64, 312 + size);
   }
 
   // progression: a step line in the right-hand block
   const steps = rec.steps ?? [];
   if (steps.length > 1) {
     const X0 = 760, X1 = 1136, Y0 = 200, Y1 = 500;
-    const a = steps[0][0], b = Math.max(end ?? 0, steps[steps.length - 1][0]);
-    const vs = steps.map((s) => s[1]);
+    const a = steps[0][0], b = Math.max(end ?? 0, steps[steps.length - 1][0], prov ? rec.t : 0);
+    const vs = [...steps.map((s) => s[1]), ...(prov ? [rec.v] : [])];
     let lo = Math.min(...vs), hi = Math.max(...vs);
     if (lo >= 0 && lo < 0.5 * hi) lo = 0;
     if (hi === lo) hi = lo + 1;
@@ -94,10 +96,18 @@ export async function drawRecord(canvas, { d, region, rec, end, isNew, period = 
     ctx.beginPath(); ctx.moveTo(x(steps[0][0]), y(steps[0][1]));
     let pv = steps[0][1];
     for (const [t, v] of steps.slice(1)) { ctx.lineTo(x(t), y(pv)); ctx.lineTo(x(t), y(v)); pv = v; }
-    ctx.lineTo(x(b), y(steps[steps.length - 1][1]));
-    ctx.stroke(); ctx.setLineDash([]);
     const l = steps[steps.length - 1];
-    ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x(l[0]), y(l[1]), 11, 0, 2 * Math.PI); ctx.fill();
+    ctx.lineTo(x(prov ? rec.t : b), y(l[1]));
+    ctx.stroke(); ctx.setLineDash([]);
+    if (prov) {
+      // the provisional step: dashed up (or down) from the official record, ending in a hollow point
+      ctx.setLineDash([10, 8]);
+      ctx.beginPath(); ctx.moveTo(x(rec.t), y(l[1])); ctx.lineTo(x(rec.t), y(rec.v)); ctx.lineTo(x(b), y(rec.v)); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = C.bg; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(x(rec.t), y(rec.v), 10, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+    } else {
+      ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x(l[0]), y(l[1]), 11, 0, 2 * Math.PI); ctx.fill();
+    }
     ctx.fillStyle = C.muted; ctx.font = `400 20px ${DATA}`;
     ctx.fillText(new Date(a).getUTCFullYear().toString(), X0, Y1 + 42);
     ctx.textAlign = 'right'; ctx.fillText(new Date(b).getUTCFullYear().toString(), X1, Y1 + 42); ctx.textAlign = 'left';
@@ -108,6 +118,6 @@ export async function drawRecord(canvas, { d, region, rec, end, isNew, period = 
   ctx.fillStyle = C.muted; ctx.font = `400 22px ${UI}`;
   ctx.fillText('elenz.co.nz/records', 64, 594);
   ctx.textAlign = 'right';
-  ctx.fillText(`Data: Electricity Authority, CC BY 4.0${d.est ? ' · estimate' : ''}`, 1136, 594);
+  ctx.fillText(`Data: Electricity Authority, CC BY 4.0${d.est ? ' · estimate' : ''}${prov ? ' · provisional' : ''}`, 1136, 594);
   ctx.textAlign = 'left';
 }
