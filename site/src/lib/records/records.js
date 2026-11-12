@@ -493,8 +493,8 @@ export function recent(R, live, now = Date.now(), near = null) {
 const STATUS_W = { new: 3, prov: 2, near: 1, settled: 0.8 };
 const PERIOD_W = { tp: 1, year: 1, month: 0.9, week: 0.75, day: 0.65 };
 export const CARD_GROUPS = [...PERIOD_KEYS, 'run'];
-/** A card group's heading: "Trading period", "Day" ... "Runs". */
-export const cardGroupLabel = (k) => (k === 'run' ? 'Runs' : periodOf(k).label);
+/** A card group's heading: "Trading period records", "Day records" ... "Run records". */
+export const cardGroupLabel = (k) => `${k === 'run' ? 'Run' : periodOf(k).label} records`;
 
 /** The record's usual step: the median change over its last ten new records (null with fewer than two). */
 function usualStep(steps) {

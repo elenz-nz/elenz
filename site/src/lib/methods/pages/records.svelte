@@ -29,7 +29,7 @@
 <aside class="mt-caveats" aria-label="Key caveats">
 	<p class="k">Key caveats</p>
 	<ul>
-		<li>A record from dispatch data stays provisional until metered data confirms it. “All-time” means since August 1997.</li>
+		<li>A provisional record is from dispatch data and leads until metered data confirms or drops it. “All-time” means since August 1997.</li>
 		<li>From January 2009, renewable-share records include other embedded generation, which is a calculated estimate.</li>
 		<li>Embedded solar records are modelled, not metered.</li>
 	</ul>
@@ -74,14 +74,30 @@
 	</table>
 </div>
 
-<h3 id="official">Official and provisional</h3>
-<p>A record is official once it rests on final data. Newer figures are dispatch data, which is a target for most plants and a snapshot of output at the time for wind and solar. Dispatch and metered figures agree closely on average, but not quite at the extremes that make records. We therefore correct dispatch data in three steps before comparing it with a record.</p>
+<h3 id="provisional"><span id="official"></span>Provisional and close records</h3>
+<p>The newest figures on Elenz haven’t been measured yet, so a record set in the last few weeks can’t be called official straight away. Until it can, it is shown as provisional or close.</p>
+<p>The final word on what each power station generated is the EA’s metered data. It arrives five to six weeks after each month ends. A record that rests on it is official.</p>
+<p>For the weeks since, there is only dispatch data: the output each plant was told to aim for, and a snapshot of output for wind and solar. It is there straight away, and over a month it matches the meters closely. It isn’t a measurement, though, and it is least exact at the highest and lowest moments, which is where records are set. A month’s highest half-hour of wind, for example, usually reads about 10 MW higher in dispatch data than on the meters.</p>
+<p>So when dispatch data shows a figure near or past a record, the meters may or may not agree. We adjust the figure for the differences we know about, then look at how far it is from the record.</p>
+<div class="tbl">
+	<table>
+		<thead><tr><th>Status</th><th>What it means</th><th>How it is shown</th></tr></thead>
+		<tbody>
+			<tr><td>Official</td><td>The record rests on metered data and final prices.</td><td>As the record.</td></tr>
+			<tr><td>Provisional</td><td>Dispatch data is past the record by more than it usually strays from the meters, so we expect the meters to confirm it.</td><td>As the main figure, marked Provisional, with the official record beside it.</td></tr>
+			<tr><td>Close</td><td>Dispatch data is within its usual error of the record, just past it or just short. It is too close to call.</td><td>As a note on the record’s page. The official record stays the main figure.</td></tr>
+		</tbody>
+	</table>
+</div>
+<p>In a test over 73 months, the meters confirmed every provisional record, and 49 of 320 close figures turned out to be records, about one in seven. That is why a provisional record leads and a close figure doesn’t. <a href="#limitations">Accuracy and limitations</a> has the test.</p>
+<p>Both are shown with when the metered data is due. When it arrives, a provisional record becomes official or is dropped, and Elenz says which way it went for {NEW_DAYS} days.</p>
+<p>The adjustment has three steps.</p>
 <ol>
 	<li>We scale the two plants that dispatch reads consistently off to their meters. Glenbrook is multiplied by 1.469, and Kawerau (Onepu) by 0.681. Ngāwhā and Teviot aren’t scaled, because their missing output is <a href="/methods/other-embedded#named">filled in</a>.</li>
 	<li>We take off each record’s usual shift: how far a month’s highest or lowest half-hour, day, week or month in dispatch data usually sits from the metered one. Wind’s highest half-hour, for example, reads about 10 MW high nationally.</li>
 	<li>We set a margin for what is left, which is how far the corrected figure strays nine months in ten. It is about 10 MW for peak wind, 25–50 MW for demand, and 0.3–0.6 percentage points for the renewable share.</li>
 </ol>
-<p>A corrected figure beyond the record by more than the margin is a provisional record. It becomes the main figure on the record’s page and in the records list, marked Provisional, with the official record beside it and when the metered data is due. It is confirmed or dropped when that data arrives. A corrected figure within the margin, either side, is close to the record. Elenz says which way a provisional record went for {NEW_DAYS} days.</p>
+<p>A corrected figure beyond the record by more than the margin is a provisional record. A corrected figure within the margin, either side, is close to the record.</p>
 <Calculations>
 	<p class="formula">Corrected figure = dispatch figure, with Glenbrook and Kawerau (Onepu) scaled, − usual shift
 Provisional record: corrected figure is beyond the record by more than the margin

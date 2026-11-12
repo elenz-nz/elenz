@@ -342,7 +342,7 @@
 						{per === 'day' ? `on ${dayOf(prov.t)}` : per === 'week' ? `in the week of ${dayOf(prov.t)}` : per === 'month' ? `in ${monthOf(prov.t)}` : per === 'year' ? `in ${yearOf(prov.t)}`
 							: d.kind === 'hh' ? `in the ${clock(prov.t)} half-hour on ${dayOf(prov.t)}` : d.kind === 'run' ? `from ${dayOf(prov.t)}` : `in ${monthOf(prov.t)}`}.
 						The EA’s metered data settles it around {meteredDue(per === 'week' ? prov.t + 6.5 * 864e5 : per === 'year' ? Date.UTC(+yearOf(prov.t), 11, 15) : prov.t)}.
-						<a href="/methods/records#official">How provisional records work</a></p>
+						<a href="/methods/records#provisional">How provisional records work</a></p>
 				</section>
 			{:else if near_}
 				<section class="prov near" aria-label="Close to the record">
@@ -351,7 +351,7 @@
 						{per === 'day' ? `on ${dayOf(near_.t)}` : per === 'week' ? `in the week of ${dayOf(near_.t)}` : per === 'month' ? `in ${monthOf(near_.t)}` : per === 'year' ? `in ${yearOf(near_.t)}`
 							: d.kind === 'hh' ? `in the ${clock(near_.t)} half-hour on ${dayOf(near_.t)}` : d.kind === 'run' ? `from ${dayOf(near_.t)}` : `in ${monthOf(near_.t)}`},
 						within {f(near_.m)} of the record. The EA’s metered data settles it around {meteredDue(per === 'week' ? near_.t + 6.5 * 864e5 : per === 'year' ? Date.UTC(+yearOf(near_.t), 11, 15) : near_.t)}.
-						<a href="/methods/records#official">How close figures work</a></p>
+						<a href="/methods/records#provisional">How close figures work</a></p>
 				</section>
 			{/if}
 

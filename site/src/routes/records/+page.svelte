@@ -221,7 +221,7 @@
 							<li>Dotted border: close to the record, too close for dispatch data to call either way.</li>
 							<li>Struck through: a provisional record the metered data didn't confirm.</li>
 						</ul>
-						<p><a href="/methods/records#official">How records work</a></p>
+						<p><a href="/methods/records#provisional">How provisional and close records work</a></p>
 					</InfoTip></div>
 					<div class="sec-ctl">
 						{#if cardsAll}<label for="card-region" class="vh">Region</label>
