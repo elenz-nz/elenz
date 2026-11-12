@@ -203,6 +203,10 @@ def fetch_recon(get, m, rows, log=print):
         return None
     d = pd.read_csv(io.BytesIO(gzip.decompress(raw)), usecols=['PointOfConnection', 'Participant', 'TradingDate',
                                                                 'TradingPeriod', 'FlowDirection', 'KilowattHours'])
+    if not (d.FlowDirection == 'Injection').any():
+        # offtake only (October 2026's first version): not published yet, so the month is fetched again
+        log(f'  {tag}: reconciliation file has no injection rows yet')
+        return None
     want = {(r['poc'], r['code'][2:]) for r in rows}
     pairs = np.array([(p, t) in want for p, t in zip(d.PointOfConnection, d.Participant)], dtype=bool)
     d = d[(d.FlowDirection == 'Injection').to_numpy() & pairs]

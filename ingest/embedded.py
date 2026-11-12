@@ -309,6 +309,11 @@ def fetch(get, month, name=None):
     if raw is None:
         return None
     inj = read_recon(raw)
+    if inj.empty:
+        # a file with no injection rows (October 2026's first version held offtake only) counts as not published yet:
+        # the month keeps its estimate and the file is read again each run until a version with injection arrives
+        print(f'  {month}: reconciliation file has no injection rows yet ({name.rsplit("/", 1)[-1]})')
+        return None
     a, b = month_bounds(month)
     inj = inj[(inj.t >= a) & (inj.t < b)]
     return name, state_columns(inj)

@@ -135,7 +135,11 @@ What we've learned about the EA's data and the services the site uses: feed timi
   fills the hour from its neighbour (BUILD 7).
 - Rankine coal share before FY21 (emissions.js): MBIE quarterly generation from coal less Glenbrook's metered output
   (MBIE counts Glenbrook as coal), over the Rankines' metered output; reproduces Genesis's FY21-25 figures closely.
-
+- A month's first `ReconciledInjectionAndOfftake` file can arrive with offtake rows only: October 2026's
+  (`..._202610_20261107_155428`, 27 MB against the usual 30–33 MB, first seen 10 Nov 2026) held 5.2 million offtake
+  rows and no injection. `embedded.fetch` and `metered.fetch_recon` treat such a file as not published yet (test
+  report, 12 Nov 2026: the history job failed on it for seven runs): the month keeps its estimate and the file is read
+  again each run until a version with injection arrives.
 
 ## History builds
 
