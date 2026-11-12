@@ -23,7 +23,9 @@ Glenbrook; Kawerau (Onepu)) and dispatch half-hours, being instant targets avera
 extremes. So a dispatch month is judged on corrected figures (facilities/dispatch_adjust.json, from
 analysis/dispatch_metered_fit.py): those plants scaled to their meters, then each record's usual shift taken off. It is
 a provisional record only when it beats the official one by more than the record's margin `m` (how far a month
-usually strays after correction); within `m` either side it is `near` ("close to the record"). Replayed over Sep 2020 -
+usually strays after correction); within `m` either side it is `near` ("close to the record"); a figure that reads
+the same as the record is neither. A provisional half-hour record carries its own `ctx` (its day, from the corrected
+dispatch month) and the detail file a provisional period record's own series (`period_prov`). Replayed over Sep 2020 -
 Sep 2026, no provisional record clear of the margin failed to be confirmed (30 did, uncorrected). Prices never set
 provisional records: dispatch prices can be many times the final ones, which arrive the next day. When a provisional
 record is settled, `resolved` says which way it went for NEW_DAYS. The website checks the live week the same way.
@@ -358,6 +360,8 @@ def _beyond(kind, cand, best, m):
     if cand is None or best is None:
         return None
     gap = cand - best if kind == 'max' else best - cand
+    if gap == 0:   # reads the same as the record (both are kept at the precision the site shows): says nothing either
+        return None   # way, so it is neither close nor provisional (design decision, 12 Nov 2026)
     if m <= 0:   # nothing to judge it by (prices, HVDC, modelled solar; a record that never moves): beaten or not
         return 'prov' if gap > 0 else None
     return 'prov' if gap > m else 'near' if gap >= -m else None
@@ -753,6 +757,19 @@ def build(sums, old=None, read_month=None, now_ms=None):
                 c = context(js, k, r, rec['t']) if js else None
                 if c:
                     rec['ctx'] = c
+            pv = rec.get('prov')
+            if pv:   # the provisional record's own day, for its page's chart (design decision, 13 Nov 2026)
+                was = (old.get('records', {}).get(k, {}).get(r) or {}).get('prov') or {}
+                if was.get('t') == pv['t'] and was.get('ctx'):
+                    pv['ctx'] = was['ctx']
+                else:
+                    try:
+                        js = month_of(pv['t'])
+                        c = context(adjusted(js), k, r, pv['t']) if js else None
+                    except Exception:  # noqa: BLE001  the provisional record stands without its chart
+                        c = None
+                    if c:
+                        pv['ctx'] = c
             out['records'][k][r] = rec
             out['moy'][k][r] = by_month_of_year(sums, k, r, kind, fam)
     for k, (kind, fam, regions, _) in MONTHS.items():
@@ -876,6 +893,8 @@ def period_series(days, read_month, p, k, r, start):
         if not js:
             return None
         n, t0, step = js['N'], js['t0'], js['step']
+        if not official(js['meta'])['gen']:   # a dispatch month (a provisional record's period): corrected as its summary is
+            js = adjusted(js)
         sums = series(js)['sums'].get(r, {})
         for i in range(n):
             rows.append((t0 + i * step, {key: [float(a[i]), 1] for key, a in sums.items() if a is not None and a[i] == a[i]}))
@@ -901,6 +920,7 @@ def build_detail(sums, rec, read_month=None):
         against `months` (or `years`), the faint line behind each progression, showing the near misses;
     period: the record period itself for its chart, {period: {id: {region: {t, t0, step, v}}}} (t: the record's start,
         so the page can tell it belongs to the record it shows);
+    period_prov: the same for a provisional record's period, from dispatch data with the plant corrections;
     udem: for the demand records, the same as bg for demand with embedded solar added back (half-hours from each
         month's summary `info`; days to years as the period's average demand plus its average embedded solar), drawn
         dashed above the faint line for information only: embedded solar is modelled, so it is never a record."""
@@ -967,14 +987,17 @@ def build_detail(sums, rec, read_month=None):
         if m not in cache and read_month:
             cache[m] = read_month(m)
         return cache.get(m)
-    per = {}
+    per, per_prov = {}, {}
     for p in PERIODS:
         for k, regions in (rec.get('periods') or {}).get(p, {}).items():
             for r, x in regions.items():
-                ser = period_series(days, read_m, p, k, r, x['t'])
-                if ser and any(v is not None for v in ser['v']):
-                    per.setdefault(p, {}).setdefault(k, {})[r] = {'t': x['t'], **ser}
-    return {'v': VERSION, 'months': months, 'years': years, 'bg': bg, 'udem': udem, 'period': per}
+                for into, at in ((per, x), (per_prov, x.get('prov'))):
+                    if not at:
+                        continue
+                    ser = period_series(days, read_m, p, k, r, at['t'])
+                    if ser and any(v is not None for v in ser['v']):
+                        into.setdefault(p, {}).setdefault(k, {})[r] = {'t': at['t'], **ser}
+    return {'v': VERSION, 'months': months, 'years': years, 'bg': bg, 'udem': udem, 'period': per, 'period_prov': per_prov}
 
 
 def same(a, b):

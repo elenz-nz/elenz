@@ -122,6 +122,9 @@
 	// the record the page leads with: the provisional one when there is one, marked as such (design decision, 12 Nov
 	// 2026); `rec` stays the official record, for the charts of the period it fell in
 	const top = $derived(headline(rec, prov));
+	// a provisional period record's own series, when the detail file has it
+	const provSer = $derived(per !== 'tp' && prov ? periodSeries(det, d.id, per, region, prov, 'period_prov') : null);
+	const provAxis = $derived(provSer ? periodAxis(per, provSer) : null);
 	const isNew = $derived(!prov && isNewRec(rec, per));
 	const regionName = $derived(REGIONS.find((x) => x.id === region)!.name);
 	const f = (v: number) => fmt(d, v, per);
@@ -368,30 +371,38 @@
 			</section>
 
 			<div class="two">
-				{#if per !== 'tp'}
-					<section class="panel" aria-labelledby="day-h">
-						<!-- the period in the title, the rest in the ⓘ, as on the other charts (test report REC-05, 26 Oct 2026) -->
-						<div class="p-head"><div class="ttl-row"><h2 id="day-h">The {periodOf(per).word} {prov ? 'the official record' : 'it'} fell <span class="h-when">{periodWhen(rec.t, per, true)}</span></h2><InfoTip label="About this chart"><p>This shows the {periodOf(per).word} the record was set: {parts(d, rec.v, per).n} {parts(d, rec.v, per).u}{en ? ` (${en})` : ''}{d.unit === '%' ? ' of its generation renewable' : ''}{rec.prev ? `, beating ${f(rec.prev[1])} (${periodWhen(rec.prev[0], per)})` : ''}.</p><ul><li>Dashed line: the record’s average.</li><li>“Open in the tracker” shows what happened through it.</li></ul><p><a href="/methods/records#periods">How records work</a></p></InfoTip></div><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
-						{#if ser && serAxis}
-							<DayChart day={ser} t={-1} tok={d.tok} fmt={axisFmt} full={f} xticks={serAxis.ticks} tipAt={serAxis.tip} labAt={serAxis.lab} bind:zoom={dayZoom} avg={rec.v} avgLabel="Average {f(rec.v)}"
-								label="{fullName(d)} through {periodWhen(rec.t, per, true)}, {per === 'day' ? 'half-hourly' : per === 'week' ? 'hourly' : per === 'month' ? 'daily' : 'weekly'}, averaging {f(rec.v)}" />
-						{/if}
-					</section>
-				{:else if d.kind === 'hh' && rec.ctx}
-					{@const c = rec.ctx}
-					<section class="panel" aria-labelledby="day-h">
-						<div class="p-head"><div class="ttl-row"><h2 id="day-h">The day {prov ? 'the official record' : 'it'} fell <span class="h-when">{dayLong(rec.t)}, {clock(rec.t)}</span></h2><InfoTip label="About this chart"><p>This shows the day the record half-hour was set, {regionName === 'New Zealand' ? 'across New Zealand' : `in the ${regionName}`}.</p><ul><li>The figures under the chart are for the {clock(rec.t)} half-hour.</li><li>Metered generation and demand, and final prices.</li><li>“Open in the tracker” shows the whole day there.</li></ul><p><a href="/methods/records#half-hours">How records work</a></p></InfoTip></div><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(rec.t)}>Open in the tracker</a></div></div>
-						<DayChart day={c.day} t={rec.t} tok={d.tok} fmt={axisFmt} bind:zoom={dayZoom} label="{fullName(d)} through {dayLong(rec.t)}, half-hourly, peaking at {f(rec.v)} at {clock(rec.t)}" />
-						<dl class="facts">
-							<div><dt>Demand</dt><dd>{c.demand.toLocaleString('en-NZ')} MW</dd></div>
-							<div><dt>Generation</dt><dd>{c.gen.toLocaleString('en-NZ')} MW</dd></div>
-							{#if c.ren != null}<div><dt>Renewable</dt><dd>{c.ren.toFixed(1)}%</dd></div>{/if}
-							<div><dt>Prices</dt><dd>HAY ${Math.round(c.hay).toLocaleString('en-NZ')} · BEN ${Math.round(c.ben).toLocaleString('en-NZ')}</dd></div>
-							{#if c.hvdc != null}<div><dt>HVDC</dt><dd>{Math.abs(c.hvdc).toLocaleString('en-NZ')} MW {c.hvdc > 0 ? 'north' : c.hvdc < 0 ? 'south' : ''}</dd></div>{/if}
-							{#if c.top?.length}<div class="wide"><dt>Biggest {d.id === 'wind_max' ? 'wind farms' : 'solar farms'}</dt><dd>{c.top.map((p: [string, number]) => `${p[0]} ${p[1]} MW`).join(', ')}</dd></div>{/if}
-						</dl>
-					</section>
-				{/if}
+			<!-- the period the record fell in: the provisional record's own when the data has it (design decision,
+			     13 Nov 2026), else the official record's, saying so beside a provisional one -->
+			{#if per !== 'tp'}
+				{@const own = !!prov && !!provSer}
+				{@const at = own ? prov : rec}
+				{@const s = own ? provSer : ser}
+				{@const ax = own ? provAxis : serAxis}
+				<section class="panel" aria-labelledby="day-h">
+					<!-- the period in the title, the rest in the ⓘ, as on the other charts (test report REC-05, 26 Oct 2026) -->
+					<div class="p-head"><div class="ttl-row"><h2 id="day-h">The {periodOf(per).word} {prov && !own ? 'the official record' : 'it'} fell <span class="h-when">{periodWhen(at.t, per, true)}</span></h2><InfoTip label="About this chart">{#if own}<p>This shows the {periodOf(per).word} of the provisional record: {parts(d, at.v, per).n} {parts(d, at.v, per).u}{en ? ` (${en})` : ''}{d.unit === '%' ? ' of its generation renewable' : ''}, against the official record of {f(rec.v)} ({periodWhen(rec.t, per)}).</p><ul><li>Dispatch data, so provisional until the metered data confirms it.</li><li>Dashed line: the provisional record’s average.</li><li>“Open in the tracker” shows what happened through it.</li></ul>{:else}<p>This shows the {periodOf(per).word} the record was set: {parts(d, rec.v, per).n} {parts(d, rec.v, per).u}{!prov && en ? ` (${en})` : ''}{d.unit === '%' ? ' of its generation renewable' : ''}{rec.prev ? `, beating ${f(rec.prev[1])} (${periodWhen(rec.prev[0], per)})` : ''}.</p><ul><li>Dashed line: the record’s average.</li><li>“Open in the tracker” shows what happened through it.</li></ul>{/if}<p><a href="/methods/records#periods">How records work</a></p></InfoTip></div><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(at.t)}>Open in the tracker</a></div></div>
+					{#if s && ax}
+						<DayChart day={s} t={-1} tok={d.tok} fmt={axisFmt} full={f} xticks={ax.ticks} tipAt={ax.tip} labAt={ax.lab} bind:zoom={dayZoom} avg={at.v} avgLabel="Average {f(at.v)}"
+							label="{fullName(d)} through {periodWhen(at.t, per, true)}, {per === 'day' ? 'half-hourly' : per === 'week' ? 'hourly' : per === 'month' ? 'daily' : 'weekly'}, averaging {f(at.v)}{own ? ', provisional' : ''}" />
+					{/if}
+				</section>
+			{:else if d.kind === 'hh' && (prov?.ctx || rec.ctx)}
+				{@const own = !!prov?.ctx}
+				{@const at = own ? prov : rec}
+				{@const c = at.ctx}
+				<section class="panel" aria-labelledby="day-h">
+					<div class="p-head"><div class="ttl-row"><h2 id="day-h">The day {prov && !own ? 'the official record' : 'it'} fell <span class="h-when">{dayLong(at.t)}, {clock(at.t)}</span></h2><InfoTip label="About this chart"><p>This shows the day the {own ? 'provisional record' : 'record'} half-hour was set, {regionName === 'New Zealand' ? 'across New Zealand' : `in the ${regionName}`}.</p><ul><li>The figures under the chart are for the {clock(at.t)} half-hour.</li>{#if own}<li>Dispatch data and dispatch prices, so provisional. The record’s figure also has its usual shift taken off, so it can sit a little off the chart.</li>{:else}<li>Metered generation and demand, and final prices.</li>{/if}<li>“Open in the tracker” shows the whole day there.</li></ul><p><a href="/methods/records#half-hours">How records work</a></p></InfoTip></div><div class="ctls"><ChartControls zoomed={!!dayZoom} onreset={() => (dayZoom = null)} /><a class="link" href={trackerHref(at.t)}>Open in the tracker</a></div></div>
+					<DayChart day={c.day} t={at.t} tok={d.tok} fmt={axisFmt} bind:zoom={dayZoom} label="{fullName(d)} through {dayLong(at.t)}, half-hourly, peaking at {f(at.v)} at {clock(at.t)}{own ? ', provisional' : ''}" />
+					<dl class="facts">
+						<div><dt>Demand</dt><dd>{c.demand.toLocaleString('en-NZ')} MW</dd></div>
+						<div><dt>Generation</dt><dd>{c.gen.toLocaleString('en-NZ')} MW</dd></div>
+						{#if c.ren != null}<div><dt>Renewable</dt><dd>{c.ren.toFixed(1)}%</dd></div>{/if}
+						<div><dt>Prices</dt><dd>HAY ${Math.round(c.hay).toLocaleString('en-NZ')} · BEN ${Math.round(c.ben).toLocaleString('en-NZ')}</dd></div>
+						{#if c.hvdc != null}<div><dt>HVDC</dt><dd>{Math.abs(c.hvdc).toLocaleString('en-NZ')} MW {c.hvdc > 0 ? 'north' : c.hvdc < 0 ? 'south' : ''}</dd></div>{/if}
+						{#if c.top?.length}<div class="wide"><dt>Biggest {d.id === 'wind_max' ? 'wind farms' : 'solar farms'}</dt><dd>{c.top.map((p: [string, number]) => `${p[0]} ${p[1]} MW`).join(', ')}</dd></div>{/if}
+					</dl>
+				</section>
+			{/if}
 
 				<section class="panel" aria-labelledby="prev-h">
 					{#if d.kind === 'run'}

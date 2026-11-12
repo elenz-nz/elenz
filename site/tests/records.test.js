@@ -1,7 +1,7 @@
 // Tests for the records' live-week check (src/lib/records/records.js): run with `npm test`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { liveBeats, liveNear, adjustLive, close, recent, headline, paceRest, def, dropTies } from '#lib/records/records.js';
+import { liveBeats, liveNear, adjustLive, close, recent, headline, paceRest, def, dropTies, periodSeries } from '#lib/records/records.js';
 
 // a live week of 5-minute data: two hours, wind steady at `w` MW in the North Island
 function live(w, extra = {}) {
@@ -100,4 +100,12 @@ test('a close or provisional figure that reads the same as the record is dropped
   assert.equal(X.records.ren_max.NI.near.v, 99.1);
   assert.equal(X.periods.day.wind_max.NZ.prov, undefined);
   assert.equal(X.periods.day.wind_max.NI.prov.v, 520);
+});
+
+test('a provisional period record has its own series in the detail', () => {
+  const det = { period: { week: { solar_max: { SI: { t: 1, v: [1] } } } }, period_prov: { week: { solar_max: { SI: { t: 5, v: [2] } } } } };
+  assert.deepEqual(periodSeries(det, 'solar_max', 'week', 'SI', { t: 1 }).v, [1]);
+  assert.deepEqual(periodSeries(det, 'solar_max', 'week', 'SI', { t: 5 }, 'period_prov').v, [2]);
+  assert.equal(periodSeries(det, 'solar_max', 'week', 'SI', { t: 6 }, 'period_prov'), null);
+  assert.equal(periodSeries({ period: det.period }, 'solar_max', 'week', 'SI', { t: 5 }, 'period_prov'), null);
 });
