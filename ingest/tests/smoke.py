@@ -261,6 +261,15 @@ p2 = R2['records']['demand_max']['NZ'].get('prov')
 sh, mg = rc._adj('demand_max', 'NZ')
 check(p2 is not None and p2['v'] == dm['v'] + 1000 - round(sh) and R2['records']['demand_max']['NZ']['v'] == dm['v'],
       'records: dispatch month sets a provisional record only, its usual shift taken off')
+mn = rc.pd.Timestamp(m_new['t0'], unit='ms', tz='UTC').tz_convert(rc.NZ).strftime('%Y-%m')
+read2 = lambda m: m_new if m == mn else m_off   # noqa: E731  by the month the timestamps fall in
+p2c = rc.build([s_off, s_new], R, read2, now_ms=2)['records']['demand_max']['NZ']['prov']
+check('ctx' in p2c and p2c['ctx']['demand'] == dm['v'] + 1000, 'records: the provisional record carries its own day for the chart')
+d_new = int(rc._period_start(p2c['t'], 'day'))
+D2 = rc.build_detail([s_off, s_new], {'periods': {'day': {'demand_max': {'NZ': {'t': int(rc._period_start(dm['t'], 'day')), 'prov': {'t': d_new}}}}}}, read2)
+sp = D2['period_prov'].get('day', {}).get('demand_max', {}).get('NZ') or {}
+check(sp.get('t') == d_new and any(v is not None for v in sp.get('v', [])) and 'demand_max' in D2['period'].get('day', {}),
+      'records: the detail holds a provisional period record\'s own series beside the official one')
 # a dispatch month only just above the record: within the margin, so close to it, not a provisional record
 m_near = copy.deepcopy(m_off)
 m_near['t0'], m_near['meta'] = m_new['t0'], {**m_new['meta']}
@@ -272,6 +281,8 @@ dn = Rn['records']['demand_max']['NZ']
 check('prov' not in dn and dn.get('near') and dn['near']['m'] == mg, 'records: within the margin is close to the record, not provisional')
 check(all('prov' not in x and 'near' not in x for x in Rn['records']['price_max'].values()), 'records: dispatch prices never set a provisional record')
 check(rc._beyond('max', 100.0, 100.0, 0.0) is None and rc._beyond('max', 100.1, 100.0, 0.0) == 'prov', 'records: no margin, no close: a tie is not close')
+check(rc._beyond('max', 99.2, 99.2, 0.3) is None and rc._beyond('max', 99.3, 99.2, 0.3) == 'near' and rc._beyond('min', 99.1, 99.2, 0.3) == 'near',
+      'records: a figure that reads the same as the record is neither close nor provisional')
 check(Rn['adj']['plants'] and Rn['adj']['hh']['wind_max']['NZ']['m'] > 0, 'records: corrections published for the site')
 m_new['meta']['source'] = 'metered'
 R3 = rc.build([s_off, rc.summarise(m_new)], R2, lambda m: m_new if m == '2026-11' else m_off, now_ms=3)

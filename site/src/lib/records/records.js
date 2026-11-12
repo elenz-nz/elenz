@@ -449,9 +449,10 @@ export function bgEnd(t, year) {
   const p = Object.fromEntries(P_NZ.formatToParts(t + 6 * 36e5).map((x) => [x.type, +x.value]));
   return year ? nzMidnight(p.year + 1, 0, 1) : nzMidnight(p.year, p.month, 1);
 }
-/** The record period's own series, if the detail has it for this record: { t, t0, step, v }. */
-export function periodSeries(det, id, period, region, rec) {
-  const x = det?.period?.[period]?.[id]?.[region];
+/** The record period's own series, if the detail has it for this record: { t, t0, step, v }. `from`: 'period' (the
+ *  official record's) or 'period_prov' (a provisional record's, from dispatch data). */
+export function periodSeries(det, id, period, region, rec, from = 'period') {
+  const x = det?.[from]?.[period]?.[id]?.[region];
   return x && rec && x.t === rec.t ? x : null;
 }
 const F2 = {
