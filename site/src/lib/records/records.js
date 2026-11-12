@@ -345,7 +345,7 @@ function liveCheck(R, D) {
       const v = Math.round((best.v - shift) * f) / f, gap = min ? rec.v - v : v - rec.v;
       const better = (a, b) => (min ? a < b : a > b);
       if (gap > m && (!rec.prov || better(v, rec.prov.v))) (beats[d.id] ??= {})[r] = { t: best.t, v, m, src: 'live' };
-      else if (m > 0 && Math.abs(gap) <= m && !rec.prov) (near[d.id] ??= {})[r] = { t: best.t, v, m, src: 'live' };
+      else if (m > 0 && Math.abs(gap) <= m && !rec.prov && !sameShown(d, v, rec.v)) (near[d.id] ??= {})[r] = { t: best.t, v, m, src: 'live' };
     }
   }
   return { beats, near };
@@ -385,11 +385,33 @@ export function provisional(R, live, id, region) {
 }
 
 /** Fetch the records file; null if it isn't published yet (404) or can't be read. */
+/** Do two figures read the same on the page ("99.2%" and "99.2%", "1,148 MW" and "1,148 MW")? */
+export const sameShown = (d, a, b, period = 'tp') => fmt(d, a, period) === fmt(d, b, period);
+
+/** A dispatch figure has to differ from the record as shown, by at least the last digit on the page (0.1 of a point for
+ *  a share, 1 MW), to be close to it or provisional: one that reads the same says nothing either way (design decision,
+ *  12 Nov 2026). Takes such `near` and `prov` entries out of records.json as it is loaded. */
+export function dropTies(R) {
+  const each = (group, period) => {
+    for (const [id, regions] of Object.entries(group ?? {})) {
+      const d = def(id);
+      if (!d) continue;
+      for (const rec of Object.values(regions ?? {})) {
+        for (const k of ['near', 'prov']) if (rec?.[k] && sameShown(d, rec[k].v, rec.v, period)) delete rec[k];
+      }
+    }
+  };
+  if (!R) return R;
+  each(R.records, 'tp'); each(R.months, 'tp'); each(R.runs, 'tp');
+  for (const [period, group] of Object.entries(R.periods ?? {})) each(group, period);
+  return R;
+}
+
 export async function loadRecords(fetchFn = fetch) {
   try {
     const r = await fetchFn(RECORDS_URL);
     if (!r.ok) return null;
-    return await r.json();
+    return dropTies(await r.json());
   } catch {
     return null;
   }
