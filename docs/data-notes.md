@@ -87,6 +87,12 @@ What we've learned about the EA's data and the services the site uses: feed timi
   skips or patches them instead of failing.
 - Open-Meteo rate-limits some shared addresses (HTTP 429). The history job stores missing irradiance as blank and
   retries it on later runs (up to `IRR_MONTHS_PER_RUN` months a run).
+- Open-Meteo outages (test report, 13 Nov 2026): the satellite feed fell about five hours behind from 18:35 UTC on
+  12 Nov and the forecast service answered 503 or timed out, so live embedded solar read zero around midday. The live
+  job now keeps the stored forecast when a forecast fetch fails, tries a failed fetch again after
+  `IRRADIANCE_RETRY` (10 minutes) and asks for two forecast days (one ends at midnight UTC, about 1 pm NZDT). With
+  neither feed for more than two hours and no stored forecast, embedded solar still shows as zero; the week's values
+  are worked out again from the satellite once it returns.
 - Final prices (`FinalEnergyPrices`): `ByMonth/YYYYMM_FinalEnergyPrices.csv` for past months (~10 MB, every node),
   `YYYYMMDD_FinalEnergyPrices.csv` daily for the last year, `_I` suffix while interim (the last day or two, and
   occasionally days under review, e.g. 31 Aug and 1 Sep 2026). Trading period k starts (k−1) half-hours after local

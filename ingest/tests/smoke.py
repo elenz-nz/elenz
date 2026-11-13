@@ -435,5 +435,48 @@ check(list(lb['days']) == ['2026-01'] or set(lb['days']) <= {'2026-01', '2026-02
 check(len(lb['named']['Ngāwhā']) == 96 and abs(np.mean(lb['named']['Ngāwhā']) - 4.0) < 1e-6 and emb.live_block({}, js_e) is None,
       'embedded: live block fills in the named plant (typical 6 less dispatched 2 MW)')
 
+# ---------- live irradiance: a failed forecast fetch keeps the stored forecast ----------
+import rooftop as _rt  # noqa: E402
+import update as _up  # noqa: E402
+
+
+class _Store(dict):
+    get = dict.get
+
+    def put(self, k, v, _type=None):
+        self[k] = v
+
+
+_now = pd.Timestamp.now(tz='UTC').floor('10min')
+_old = pd.DataFrame({'G|x': [100.0, 120.0]}, index=[_now - pd.Timedelta(hours=5), _now - pd.Timedelta(hours=4, minutes=50)])
+_fc = pd.DataFrame({'G|x': [300.0, 310.0]}, index=[_now - pd.Timedelta(minutes=15), _now + pd.Timedelta(hours=20)])
+_st = _Store({'irradiance.json': _rt.irr_dumps(_old, _fc, 0)})
+_sat0, _fc0 = _rt.satellite, _rt.forecast
+
+
+def _down(*a, **k):
+    raise OSError('service overloaded')
+
+
+_rt.satellite, _rt.forecast = (lambda *a, **k: _old), _down
+_s, _f = _up.irradiance(_st, lambda *a: None)
+_again = _up.IRRADIANCE_MAX_AGE - (_time.time() - _rt.irr_loads(_st['irradiance.json'])[2])
+check(_f is not None and len(_f) == 2 and _rt.irr_loads(_st['irradiance.json'])[1] is not None,
+      'irradiance: a failed forecast fetch keeps the stored forecast')
+check(0 < _again <= _up.IRRADIANCE_RETRY + 5, f'irradiance: a failed fetch is tried again within {_up.IRRADIANCE_RETRY // 60} minutes')
+_fresh = pd.DataFrame({'G|x': [500.0]}, index=[_now - pd.Timedelta(minutes=40)])
+_st = _Store({'irradiance.json': _rt.irr_dumps(_old, _fc, 0)})
+_rt.satellite = lambda *a, **k: _fresh
+_s, _f = _up.irradiance(_st, lambda *a: None)
+check(_f is None and _s.index.max() == _fresh.index.max(), 'irradiance: the forecast is let go once the satellite has caught up')
+_urls = []
+_rt.forecast = _fc0
+try:
+    _rt.forecast(lambda u: _urls.append(u) or b'x')
+except Exception:
+    pass
+check(_urls and 'forecast_days=2' in _urls[0], 'irradiance: the forecast fallback runs past midnight UTC')
+_rt.satellite = _sat0
+
 print(f'\n{len(failures)} failed' if failures else '\nall passed')
 sys.exit(1 if failures else 0)

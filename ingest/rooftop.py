@@ -381,11 +381,12 @@ def output(irr, times, cap):
 
 def forecast(get, past_days=8):
     """Fallback when the satellite feed is down: Open-Meteo's forecast service (15-minute model irradiance, with
-    its own recent past) for every point, in the same layout as satellite()."""
+    its own recent past) for every point, in the same layout as satellite(). Two forecast days, because one ends
+    at midnight UTC (about 1 pm in New Zealand) and the estimate then had nothing until the next refresh."""
     pts, _ = points()
     lat = ','.join(str(p[2]) for p in pts)
     lon = ','.join(str(p[3]) for p in pts)
-    locs = json.loads(get(f'{FORECAST}?latitude={lat}&longitude={lon}&past_days={past_days}&forecast_days=1'
+    locs = json.loads(get(f'{FORECAST}?latitude={lat}&longitude={lon}&past_days={past_days}&forecast_days=2'
                           '&minutely_15=shortwave_radiation,diffuse_radiation&timezone=GMT'))
     if isinstance(locs, dict):
         locs = [locs]
