@@ -459,16 +459,33 @@ def _down(*a, **k):
 
 
 _rt.satellite, _rt.forecast = (lambda *a, **k: _old), _down
-_s, _f = _up.irradiance(_st, lambda *a: None)
+_s, _f, _at = _up.irradiance(_st, lambda *a: None)
 _again = _up.IRRADIANCE_MAX_AGE - (_time.time() - _rt.irr_loads(_st['irradiance.json'])[2])
 check(_f is not None and len(_f) == 2 and _rt.irr_loads(_st['irradiance.json'])[1] is not None,
       'irradiance: a failed forecast fetch keeps the stored forecast')
 check(0 < _again <= _up.IRRADIANCE_RETRY + 5, f'irradiance: a failed fetch is tried again within {_up.IRRADIANCE_RETRY // 60} minutes')
 _fresh = pd.DataFrame({'G|x': [500.0]}, index=[_now - pd.Timedelta(minutes=40)])
+_fc2 = pd.DataFrame({'G|x': [320.0]}, index=[_now + pd.Timedelta(hours=30)])
 _st = _Store({'irradiance.json': _rt.irr_dumps(_old, _fc, 0)})
-_rt.satellite = lambda *a, **k: _fresh
-_s, _f = _up.irradiance(_st, lambda *a: None)
-check(_f is None and _s.index.max() == _fresh.index.max(), 'irradiance: the forecast is let go once the satellite has caught up')
+_rt.satellite, _rt.forecast = (lambda *a, **k: _fresh), (lambda *a, **k: _fc2)
+_s, _f, _at = _up.irradiance(_st, lambda *a: None)
+check(_s.index.max() == _fresh.index.max() and len(_f) == 1 and _at and abs(_at - _time.time()) < 60
+      and _rt.irr_fc_at(_st['irradiance.json']) == _at,
+      'irradiance: with the satellite up to date a forecast is still fetched and held in reserve')
+_st = _Store({'irradiance.json': _rt.irr_dumps(_fresh, _fc2, 0, _time.time() - 600)})
+_rt.forecast = _down
+_s, _f, _at = _up.irradiance(_st, lambda *a: None)
+check(_f is not None and _time.time() - _rt.irr_loads(_st['irradiance.json'])[2] < 60,
+      'irradiance: a reserve forecast fetched in the last three hours is not asked for again')
+# the live file says when daylight has no irradiance at all, and how fresh the reserve forecast is (the watchdog reads both)
+_jg = bt.build(s, (None, None, None), log=lambda *a: None)
+_cols = {f'{k}|{p[0]}': 400.0 if k == 'G' else 150.0 for p in _rt.points()[0] for k in 'GD'}
+_fcs = pd.DataFrame(_cols, index=pd.date_range(s.index.min() - pd.Timedelta(hours=1), s.index.max() + pd.Timedelta(hours=1), freq='15min'))
+_jf = bt.build(s, (None, _fcs, 1_800_000_000), log=lambda *a: None)
+check(_jg['meta']['roof_gap'] is True and _jg['meta']['fc_at'] is None and _jg['NI']['roof'][-1] == 0,
+      'live: daylight with no irradiance is flagged (roof_gap)')
+check(_jf['meta']['roof_gap'] is False and _jf['meta']['fc_at'] == 1_800_000_000_000 and _jf['meta']['fc_end'] > _jf['meta']['end']
+      and _jf['NI']['roof'][-1] > 0, 'live: the forecast fills in, with its fetch time and reach in the meta')
 _urls = []
 _rt.forecast = _fc0
 try:

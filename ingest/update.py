@@ -35,6 +35,7 @@ WAIT = 200            # seconds a run waits for the interval that has just begun
 POLL = 15             # seconds between checks while waiting
 IRRADIANCE_MAX_AGE = 1800     # one store write per refresh: 48 a day
 IRRADIANCE_RETRY = 600        # after a failed satellite or forecast fetch, try again this soon
+FORECAST_MAX_AGE = 3 * 3600   # the reserve forecast is fetched this often while the satellite is up to date
 # The extra price nodes ([price_nodes]) were added on 16 Oct 2026: intervals stored from the API before then are
 # fetched again, newest first, up to NODE_BACKFILL a run when there are no gaps to fill, so the week gains them.
 # Self-expiring: those intervals leave the 7-day window by 24 Oct 2026, and this then does nothing.
@@ -65,12 +66,16 @@ def fetch(url, timeout=60):
 
 
 def irradiance(store, log):
-    """(satellite, forecast fallback) irradiance for the rooftop solar points, refreshed every half hour."""
+    """(satellite, forecast, when the forecast was fetched) irradiance for the embedded solar points. The satellite
+    is refreshed every half hour. The forecast is the fallback: fetched at every refresh while the satellite is
+    more than two hours behind, and otherwise every FORECAST_MAX_AGE so a day or more of it is always in the
+    store before it is needed (design decision, 13 Nov 2026, after an outage took both services at once)."""
     raw = store.get('irradiance.json')
-    sat = fc = fetched = None
+    sat = fc = fetched = fc_at = None
     if raw:
         try:
             sat, fc, fetched = rooftop.irr_loads(raw)
+            fc_at = rooftop.irr_fc_at(raw)
         except Exception:
             pass   # the older city-based format: replaced below
     if fetched is None or time.time() - fetched > IRRADIANCE_MAX_AGE:
@@ -83,25 +88,27 @@ def irradiance(store, log):
             log('satellite irradiance refresh failed:', e)
         latest = new_sat.dropna(how='all').index.max() if new_sat is not None and not new_sat.empty else None
         behind = latest is None or latest < pd.Timestamp.now(tz='UTC') - pd.Timedelta(hours=2)
-        if behind:
+        if behind or fc is None or fc_at is None or time.time() - fc_at > FORECAST_MAX_AGE:
             try:
                 new_fc = rooftop.forecast(fetch)
-                log('satellite irradiance missing or more than two hours old: using the forecast service as well')
+                log('satellite irradiance missing or more than two hours old: using the forecast service as well' if behind
+                    else 'forecast irradiance refreshed (held in reserve)')
             except Exception as e:
                 failed = True
                 log('forecast irradiance failed' + (': keeping the stored forecast' if fc is not None else '') + ':', e)
         if new_sat is not None or new_fc is not None:
             sat = new_sat if new_sat is not None else sat
             # a failed forecast fetch keeps the stored forecast (test report, 13 Nov 2026: it was dropped, and
-            # embedded solar read zero at midday); once the satellite has caught up the forecast is let go
-            fc = new_fc if new_fc is not None else (fc if behind else None)
+            # embedded solar read zero at midday)
+            if new_fc is not None:
+                fc, fc_at = new_fc, time.time()
             # after a failed fetch try again in IRRADIANCE_RETRY, not a full half hour
             stamp = time.time() - (IRRADIANCE_MAX_AGE - IRRADIANCE_RETRY if failed else 0)
-            store.put('irradiance.json', rooftop.irr_dumps(sat, fc, stamp), 'application/json')
+            store.put('irradiance.json', rooftop.irr_dumps(sat, fc, stamp, fc_at), 'application/json')
             log('irradiance refreshed' + (f' (satellite to {latest})' if latest is not None else ''))
     if sat is None and fc is None:
         log('no irradiance data yet: rooftop solar shows as zero')
-    return sat, fc
+    return sat, fc, fc_at
 
 
 def capacity(store):

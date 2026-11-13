@@ -398,14 +398,15 @@ def forecast(get, past_days=8):
     return pd.DataFrame(cols).dropna(how='all')
 
 
-def irr_dumps(sat, fc=None, fetched=None):
-    """Satellite (and fallback forecast) irradiance -> compact JSON bytes for the store."""
+def irr_dumps(sat, fc=None, fetched=None, fc_at=None):
+    """Satellite (and fallback forecast) irradiance -> compact JSON bytes for the store. fc_at: when the forecast
+    was last fetched (seconds since 1970), for the watchdog's check that it is still being refreshed."""
     def pack(df):
         if df is None or df.empty:
             return None
         ms = (df.index - pd.Timestamp(0, tz='UTC')) // pd.Timedelta(milliseconds=1)
         return {'t': [int(x) for x in ms], 'c': {k: [None if v != v else int(round(v)) for v in df[k]] for k in df}}
-    return json.dumps({'fetched': fetched, 'sat': pack(sat), 'fc': pack(fc)}, separators=(',', ':')).encode()
+    return json.dumps({'fetched': fetched, 'fc_at': fc_at, 'sat': pack(sat), 'fc': pack(fc)}, separators=(',', ':')).encode()
 
 
 def irr_loads(raw):
@@ -417,6 +418,14 @@ def irr_loads(raw):
         return pd.DataFrame({k: pd.Series(v, dtype=float).values for k, v in x['c'].items()},
                             index=pd.to_datetime(x['t'], unit='ms', utc=True))
     return unpack(d.get('sat')), unpack(d.get('fc')), d.get('fetched')
+
+
+def irr_fc_at(raw):
+    """When the stored forecast was last fetched (seconds since 1970), or None."""
+    try:
+        return json.loads(raw).get('fc_at')
+    except Exception:
+        return None
 
 
 def live(sat, fc, full, cap):
