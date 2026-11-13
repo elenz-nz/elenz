@@ -7,6 +7,10 @@
 #             files 1-4 days late, so a few days' lag is normal)
 #   trigger:  the Worker's calls to GitHub (/data/status.json) have failed for TRIGGER_MINUTES (it retries once;
 #             GitHub drops a single call now and then, and the next one 5 minutes later works)
+#   solar:    embedded solar's irradiance (the live file's meta): daylight with none at all (roof_gap), the reserve
+#             forecast not refreshed for FORECAST_HOURS (the live job fetches it every 3 hours and it reaches at
+#             least a day ahead, so this comes well before the estimate runs out of data), or the satellite more
+#             than SATELLITE_HOURS behind (the estimate is then running on the forecast)
 #
 # The Worker runs this every 15 minutes (workflow_dispatch); the schedule below is a backup in case the Worker
 # itself has stopped.
@@ -30,6 +34,8 @@ env:
   LIVE_MINUTES: '60'   # 45 until 7 Nov 2026: the EMI feed's ~50-minute stalls set it off (docs/data-notes.md)
   HISTORY_DAYS: '5'
   REBUILD_DAYS: '12'   # allowed while a full history rebuild is under way (see the history check below)
+  FORECAST_HOURS: '6'    # the reserve irradiance forecast is fetched every 3 hours (FORECAST_MAX_AGE in ingest/update.py)
+  SATELLITE_HOURS: '6'   # the satellite normally runs about 45 minutes behind; the forecast stands in after 2 hours
   TRIGGER_MINUTES: '15'   # a failed start is reported once failures have lasted this long (GitHub drops one now and then)
 
 jobs:
@@ -59,6 +65,20 @@ jobs:
             if (live.error) problems.push(`The live data file can't be read (${live.error}).`);
             else if (now - live.meta.end > process.env.LIVE_MINUTES * 60e3)
               problems.push(`Live data is ${ago(now - live.meta.end)} old (newest interval ${nz(live.meta.end)}).`);
+            // embedded solar's irradiance: keys the live job writes since 13 Nov 2026 (skipped on an older file)
+            if (!live.error && live.meta && 'fc_at' in live.meta) {
+              const m = live.meta, H = 3600e3;
+              const reach = m.fc_end && m.fc_end > now ? `the stored forecast reaches ${nz(m.fc_end)}` : 'no stored forecast reaches past now';
+              const fcOld = !m.fc_at || now - m.fc_at > process.env.FORECAST_HOURS * H;
+              const satOld = !m.sat_end || now - m.sat_end > process.env.SATELLITE_HOURS * H;
+              if (m.roof_gap)
+                problems.push(`Embedded solar has no irradiance data and shows as zero (satellite ${m.sat_end ? `to ${nz(m.sat_end)}` : 'missing'}; ${reach}).`);
+              else if (fcOld)
+                problems.push(`The irradiance forecast behind embedded solar ${m.fc_at ? `was last refreshed ${ago(now - m.fc_at)} ago` : 'has never been fetched'}: ${reach}. ` +
+                  (satOld ? 'The satellite is behind too, so embedded solar has no data after that.' : 'The satellite is up to date, so nothing shows yet; it matters if the satellite stops as well.'));
+              if (satOld && !m.roof_gap)
+                problems.push(`Satellite irradiance is ${m.sat_end ? `${ago(now - m.sat_end)} behind` : 'missing'}: embedded solar is running on forecast irradiance.`);
+            }
             const hist = await get('/data/history/index.json');
             // while the history job rebuilds every month (months left, progress saved in the last two days), the index
             // is republished only at the end, so it may lag up to REBUILD_DAYS

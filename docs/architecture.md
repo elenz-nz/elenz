@@ -279,8 +279,9 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   session has). Python isn't included: `ingest/requirements.txt` is refreshed by hand. Security updates arrive
   separately whenever an alert appears; like any pull request they merge only once the checks pass.
 - `.github/workflows/watchdog.yml`: checks the live site every 15 minutes; opens an issue labelled `stale-data`
-  (GitHub emails it to the Elenz team) when live data is over 60 minutes old, history over 5 days behind, or the Worker
-  can't start a job, and closes it when the data recovers.
+  (GitHub emails it to the Elenz team) when live data is over 60 minutes old, history over 5 days behind, the Worker
+  can't start a job, or embedded solar's irradiance is failing (the reserve forecast not refreshed for 6 hours, the
+  satellite 6 hours behind, or daylight with no irradiance at all: `docs/data-notes.md`), and closes it when the data recovers.
 
 ## Worker
 

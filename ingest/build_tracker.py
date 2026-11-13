@@ -14,6 +14,7 @@ import pandas as pd
 
 from common import FACILITIES, OUT, RAW_API, RAW_DAILY, REF, connection_islands, island_of, overrides
 import hvdc
+import pv
 import rooftop
 import state as st
 
@@ -116,13 +117,19 @@ def runs(mask):
 
 
 def build(state, irr, cap=None, log=print):
-    """irr: (satellite, forecast fallback) irradiance DataFrames (rooftop.irr_loads); cap: rooftop capacity by point."""
+    """irr: (satellite, forecast fallback[, when the forecast was fetched]) irradiance (update.irradiance);
+    cap: rooftop capacity by point."""
     real = state[~state.src.isin(['empty', 'partial'])]   # incomplete cases are interpolated like missing ones
     last = real.index.max()
     full = pd.date_range(last - pd.Timedelta(minutes=5 * (WINDOW - 1)), last, freq='5min')
     s = real[real.index >= full[0]].reindex(full)  # missing intervals become NaN rows, interpolated below
-    sat, fc = irr
+    sat, fc, fc_at = (tuple(irr) + (None,))[:3]
     roof, n_now = rooftop.live(sat, fc, full, cap or default_capacity())
+    # daylight with no irradiance from the satellite, its carried-forward index or the forecast: the estimate has
+    # nothing to work from (it shows as zero); the watchdog raises it
+    lit = float(pv.clearsky_ghi(pv.sun(full[-1:] + pd.Timedelta(minutes=2.5), -41.0, 174.0)[0])[0]) > 20
+    roof_gap = bool(lit and all(roof[i].iloc[-1] != roof[i].iloc[-1] for i in ('NI', 'SI')))
+    fc_end = fc.dropna(how='all').index.max() if fc is not None and not fc.empty else None
     js = assemble(s, full, roof, log)
     src = s.src.dropna()
     api_t = src[src == 'api'].index
@@ -132,6 +139,9 @@ def build(state, irr, cap=None, log=print):
                   'filled': runs(s.src.isna().to_numpy()),
                   'api_from': int(api_t.min().timestamp() * 1000) if len(api_t) else None,
                   'sat_end': int(sat_end.timestamp() * 1000) if sat_end is not None else None,
+                  'fc_at': int(fc_at * 1000) if fc_at else None,
+                  'fc_end': int(fc_end.timestamp() * 1000) if fc_end is not None else None,
+                  'roof_gap': roof_gap,
                   'built': int(pd.Timestamp.now(tz='UTC').timestamp() * 1000)}
     log(f'built {len(full)} intervals ({int(s.src.notna().sum())} with data) to {last}, {len(js["plants"])} plants; '
         f'embedded solar now {js["NI"]["roof"][-1] + js["SI"]["roof"][-1]} MW'
