@@ -131,7 +131,8 @@
 		<p><a href="/methods">Data and methods</a> explains each series in full: every source, every calculation, how it was checked, and what it can’t tell you.</p>
 
 		<h2 id="code">Open code</h2>
-		<p>The code behind the site, including every correction made to the EA’s data and the analysis behind each estimate, is on <a href="https://github.com/elenz-nz/elenz">GitHub</a>.</p>
+		<p>The code behind the site, including every correction made to the EA’s data and the analysis behind each estimate, is on <a href="https://github.com/elenz-nz/elenz">GitHub</a> under the MIT licence.</p>
+		<p>Our charts, figures, data downloads and writing are free to reuse under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>: credit “Elenz (elenz.co.nz), from Electricity Authority data”. The Elenz name and logo aren’t covered, so please don’t use them for your own work.</p>
 
 		<h2 id="support">Support Elenz</h2>
 		<p>Elenz is free and has no ads. If you find it useful, your support helps us keep it running and improving.</p>

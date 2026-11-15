@@ -146,4 +146,11 @@ October 2026 that this covers republishing and derived data, with attribution).
 Irradiance: Himawari satellite data (JMA/JAXA) via Open-Meteo, CC BY 4.0; ERA5 reanalysis (Copernicus) via
 Open-Meteo for 2013–15. Coal share of Huntly's Rankines before FY21 from MBIE energy statistics, CC BY 4.0.
 
-The code has no licence file yet, so all rights are reserved.
+Licences for what we publish:
+
+- **Code:** MIT licence (see `LICENSE`), copyright Elenz contributors.
+- **Data, charts and text** that Elenz derives or writes (the site's data files, downloads, chart images, articles
+  and method pages): [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Credit "Elenz (elenz.co.nz), from
+  Electricity Authority data".
+- **The Elenz name and logo** are not covered by either licence, so a fork or copy should use its own.
+- Data from others (above) stays under its own terms, with its own credit.
