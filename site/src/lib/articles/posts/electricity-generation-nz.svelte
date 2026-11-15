@@ -1,11 +1,10 @@
 <script module lang="ts">
 	export const meta = {
 		title: 'Electricity generation in New Zealand: where the power comes from',
-		dek: 'Hydro, geothermal and wind made almost nine-tenths of New Zealand’s electricity in the 12 months to October 2026, and 95.3% of it was renewable, the highest of any 12 months since 1997.',
+		dek: 'Hydro, geothermal and wind made almost 90% of New Zealand’s electricity in the 12 months to October 2026, and 95.3% of it was renewable, the highest of any 12 months since 1997.',
 		description: 'How New Zealand generates its electricity: hydro, geothermal, wind, solar, gas and coal, by island and by month, from the latest 12 months of data.',
-		date: '2026-11-15',
+		date: '2026-11-16',
 		kind: 'Guide',
-		draft: true,
 	} as const;
 </script>
 
@@ -158,7 +157,7 @@
 </Figure>
 
 <p>The South Island’s generation is 92.2% hydro, and almost all of the rest is wind, solar and small embedded hydro. It has no gas or coal stations, so its renewable share rounds to 100%. The North Island has the country’s geothermal, most of its wind and all of its gas and coal. Its renewable share was 91.3%.</p>
-<p>The HVDC link joins the two islands’ grids under Cook Strait. It sent a net 3.7 TWh north over the 12 months, about 18% of the South Island’s generation, and its net flow was northward on 346 of the 365 days. October’s transfer is a calculated estimate until the EA publishes metered flows for the month. Compare the <a href="/tracker?{YEAR}&region=NI">North Island</a> and the <a href="/tracker?{YEAR}&region=SI">South Island</a> over the 12 months.</p>
+<p>The HVDC link joins the two islands’ grids under Cook Strait. It sent a net 3.7 TWh north over the 12 months, about 18% of the South Island’s generation, and its net flow was northward on 346 of the 365 days. Compare the <a href="/tracker?{YEAR}&region=NI">North Island</a> and the <a href="/tracker?{YEAR}&region=SI">South Island</a> over the 12 months.</p>
 
 <h2>Through the year</h2>
 <p>The mix shifts with the seasons. The renewable share was lowest from March to June 2026, when gas generation rose to 235 GWh in April and the renewable share fell to 91.4%. In September 2026 it reached <strong>98.0%</strong>, the <a href="/records/ren_max?period=month">highest of any month</a> since 1997.</p>
@@ -197,7 +196,7 @@
 </ul>
 
 <Note title="How these figures are made">
-	<p>Grid generation is the EA’s metered data. Embedded solar is modelled from installed capacity and satellite sunshine. Other embedded generation comes from the EA’s reconciliation data, and October 2026’s is a calculated estimate until the EA publishes that month’s file. The renewable share counts hydro, geothermal, wind, solar, bioenergy and the renewable part of other embedded generation. Gas, coal/gas, diesel and waste heat aren’t renewable.</p>
+	<p>Grid generation is the EA’s metered data. Embedded solar is modelled from installed capacity and satellite sunshine. Other embedded generation comes from the EA’s reconciliation data. The renewable share counts hydro, geothermal, wind, solar, bioenergy and the renewable part of other embedded generation. Gas, coal/gas, diesel and waste heat aren’t renewable.</p>
 	<p>Other embedded generation is counted from January 2009, so the shares for earlier years leave it out. That doesn’t affect the record: the highest 12-month renewable share before 2009 was 77.5%. MBIE compiles its figures differently, so its yearly totals and ours aren’t identical.</p>
 </Note>
 
