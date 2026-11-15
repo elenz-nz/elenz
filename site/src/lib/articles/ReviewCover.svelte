@@ -3,11 +3,16 @@
 	// review's title. Drawn light or dark to match the site, in that mode's fuel colours
 	// (cover.css). Link previews use the dark version as a PNG; the landing page has a light one too (analysis/cover_png.py).
 	//   <ReviewCover data={cover} season="Winter" year={2026} range="1 June – 31 August 2026" />
+	// Other articles give their own kicker, title and label in place of the season and year, e.g. a guide over a year:
+	//   <ReviewCover data={cover} kicker="GUIDE" title="95.3% renewable" range="..." label="..." />
 	// data: site/src/lib/articles/covers/<slug>.json, written by analysis/review_cover.py.
 	import './cover.css';
-	let { data, season, year, range }: {
-		data: { days: string[]; fuels: Record<string, number[]> }; season: string; year: number; range: string;
+	let { data, season = '', year = 0, range, kicker = 'QUARTERLY REVIEW', title = '', label = '' }: {
+		data: { days: string[]; fuels: Record<string, number[]> }; season?: string; year?: number; range: string;
+		kicker?: string; title?: string; label?: string;
 	} = $props();
+	const heading = $derived(title || `${season} ${year}`);
+	const aria = $derived(label || `${season} ${year} quarterly review: each day's generation over the quarter, stacked by fuel`);
 
 	const W = 1200, H = 630, BASE = 630, TALL = 330;   // columns grow from the bottom edge, the tallest day TALL px
 	const C: Record<string, string> = {
@@ -19,7 +24,7 @@
 	const totals = $derived(data.days.map((_, i) => ORDER.reduce((a, k) => a + (data.fuels[k]?.[i] ?? 0), 0)));
 	const k = $derived(TALL / Math.max(...totals));
 	const step = $derived(W / n);
-	const bw = $derived(step - 2);   // 2px gap between days
+	const bw = $derived(step - (n > 120 ? 0.6 : 2));   // 2px gap between days; less over a year, so days stay solid
 
 	type Seg = { x: number; y: number; h: number; fill: string; top: boolean };
 	const segs = $derived.by((): Seg[] => {
@@ -38,7 +43,7 @@
 </script>
 
 <figure class="cover cv">
-	<svg viewBox="0 0 {W} {H}" role="img" aria-label="{season} {year} quarterly review: each day's generation over the quarter, stacked by fuel">
+	<svg viewBox="0 0 {W} {H}" role="img" aria-label={aria}>
 		<defs>
 			<linearGradient id="cv-bg" x1="0" y1="0" x2="1" y2="1">
 				<stop offset="0" style="stop-color: var(--cv-bg-1)" />
@@ -67,8 +72,8 @@
 		</g>
 		<text x="130" y="96" class="word">ELENZ</text>
 
-		<text x="72" y="168" class="kicker">QUARTERLY REVIEW</text>
-		<text x="68" y="252" class="title">{season} {year}</text>
+		<text x="72" y="168" class="kicker">{kicker}</text>
+		<text x="68" y="252" class="title">{heading}</text>
 		<text x="72" y="296" class="range">{range}</text>
 
 		<text x={W - 72} y="96" class="note" text-anchor="end">Each column is one day's generation, by fuel</text>
