@@ -88,6 +88,29 @@ Chart type (design decision, 29 Oct 2026): Stacked (default) or Lines (`#seg-cha
 
 Price over the generation chart (`#btn-price`, `state.price`, address `price=on`; off by default, design decision): both island prices for NZ, the island's own on an island's chart, on a right axis with the Prices tab's spike-proof scale (`priceScale` from `#lib/prices/data.js`), thin and dashed (Haywards long dashes, Benmore short) so they don't read as generation lines. While it's on every chart's right margin widens (`padR()`) so the time axes stay lined up. Both are kept with the grouping in localStorage `elenz-view`.
 
+### Embedded solar with no estimate
+
+Design decision, 13 Nov 2026 (built 16 Nov): where a live-week interval is in daylight and has no irradiance from the
+satellite, its carried-forward index or the forecast (after bridging gaps of up to 30 minutes), the live file carries
+no value rather than zero. `rooftop.live` adds each island's daylight (`NIlit`, `SIlit`: clear-sky irradiance above
+20 W/m² at any of its points, `rooftop.daylight`); `assemble()` then writes `roof`, `roofU` and `underlying` as null
+there (`enc_mw` writes NaN as null). At night a missing value is still zero. History has no daylight key, so it is
+unchanged. `explain.py` counts a null as zero.
+
+On the site, `series.js` `fromLayout` turns the nulls into `roofNA` (1 where missing; averages give the share of a
+period without an estimate; zero in history) and `underlying` NaN; `roof` and `roofU` count as zero, so stacks and
+energy totals leave it out. The tracker sets the renewable share and emissions intensity NaN at any point with
+`roofNA` above 0 (both would be of too little generation); lines, bands and areas break at NaN (`runsOf`), readouts
+say "No estimate" (in the summary's table across the figure and share columns, out of the flow, `tr.na`, so no row
+grows and the page doesn't jump as the cursor crosses a gap: test report, 16 Nov 2026), the point's heading and tooltip
+say "no embedded solar estimate", a range's heading says for how long ("embedded solar missing for 5.5 h"), and range averages of those three figures leave the missing time out. The CSV leaves those cells empty. The lower
+cards' shares are NaN there (`shares().na`, left out of `shareOver`). `now.js` `summarise` gives null `roof`, `roofU`,
+`underlying`, `ren` and `co2` for an island whose newest interval has none (New Zealand's if either has none); Now says
+"No estimate" and the landing page drops the renewable share from its rotating figure. The records' live check
+(`halfHours`, `liveSums`) leaves such intervals out of the renewable share and embedded solar, so they can't set a
+provisional record. Tests: `ingest/tests/smoke.py` (live), `site/tests/roofgap.test.js`, and the two "no embedded
+solar estimate" browser tests.
+
 ### Folded charts
 
 Folded charts (design decision, 29 Oct 2026): each chart under generation (price, renewable share, demand, HVDC, emissions: the two folded by default sit together at the top, design decision) folds to one line from its title (`foldTitle` in the page, a button with aria-expanded; `state.fold`, `syncFold` in tracker.js; `.chart.folded` in tracker.css): the heading, ⓘ and legend values stay (they follow the time line), the canvas and enlarge button go, and a folded chart isn't drawn (`unfolded` in drawAll/paintAll; its ResizeObserver redraws when it opens). All five start folded (`FOLD_DEFAULT` in viewurl.js; design decision, cleaner, above all on portrait phones; price and renewable share are also on $ Price and the share card); the prerendered page has them folded so the load doesn't jump. A folded line shows its figures at the time line with their unit (there's no axis), or the range's average (net for HVDC) when nothing is hovered, "avg"/"net" in `.pre`; under 560 px it stays on one line, the series names hidden (`font-size: 0` on `.lg`). Address key `fold` (the folded ones, e.g. `fold=price,ren`, `fold=none` for all open; absent: the default, all), kept in `elenz-view`. "All charts shown" in Downloads leaves folded charts out; the CSV keeps every column.

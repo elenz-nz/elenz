@@ -94,6 +94,48 @@ for (const path of Object.keys(SHOWS)) {
   });
 }
 
+// the live week's embedded solar with no estimate (null: daylight with no irradiance, design decision 13 Nov 2026): the
+// last hour of the bundled tracker.json blanked as the live job writes it; the pages say "No estimate" and draw a gap
+const withoutRoof = async (page, n = 12) => {
+  await page.route(/\/data\/tracker\.json/, async (r) => {
+    const D = await (await r.fetch()).json();
+    for (const isl of ['NI', 'SI']) for (const k of ['roof', 'roofU', 'underlying']) if (D[isl][k]) for (let j = D.N - n; j < D.N; j++) D[isl][k][j] = null;
+    await r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(D) });
+  });
+};
+test('with no embedded solar estimate, Now says so rather than show zero', async ({ page }) => {
+  await withoutRoof(page);
+  await page.goto('/now');
+  const tile = (name) => page.locator('.kpi', { has: page.locator('.k-lbl', { hasText: name }) });
+  await expect(tile('Embedded solar').locator('.k-val')).toHaveText('No estimate');
+  await expect(tile('Renewable share').locator('.k-val')).toHaveText('No estimate');
+  await expect(tile('Emissions intensity').locator('.k-val')).toHaveText('No estimate');
+});
+test('with no embedded solar estimate, the tracker draws and says how long it lacks one', async ({ page }) => {
+  await withoutRoof(page);
+  await page.goto('/tracker');
+  await expect(page.locator('#sum-sub')).toContainText('embedded solar missing for 1 h');
+  await expect(page.locator('#sys')).toContainText('Renewable share');
+});
+// "No estimate" in the summary's table mustn't make the page jump as the cursor crosses the gap
+test('crossing the gap leaves the page where it was', async ({ page }, testInfo) => {
+  test.skip(isPhone(testInfo), 'a mouse hover');
+  await withoutRoof(page, 144);   // the last 12 hours
+  await page.goto('/tracker');
+  await expect(page.locator('#sum-sub')).toContainText('embedded solar missing');
+  const cv = page.locator('#cv-gen'), b = await cv.boundingBox();
+  const below = async (f) => {
+    await page.mouse.move(b.x + b.width * f, b.y + b.height / 2);
+    await expect(page.locator('#sum-sub')).toContainText('TP');
+    // where the cards below start, and the height of every row in the summary's table
+    return page.evaluate(() => [document.querySelector('.lower').getBoundingClientRect().top + scrollY,
+      ...[...document.querySelectorAll('#summary tr')].map((r) => Math.round(r.getBoundingClientRect().height))]);
+  };
+  const out = await below(0.3), gap = await below(0.85);
+  await expect(page.locator('#sum-sub')).toContainText('no embedded solar estimate');
+  expect(gap).toEqual(out);
+});
+
 // a finger that lands on the map and then scrolls the page leaves no pointerleave, so a mouse can't show this fault (a
 // real mouse clears the tooltip anyway): the pointer event is sent to the cell directly, with nothing there to leave
 test('a heat map tooltip clears when the page scrolls', async ({ page }) => {

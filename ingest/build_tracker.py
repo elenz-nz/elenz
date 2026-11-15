@@ -80,10 +80,14 @@ def enc(s, dp=0):
 
 def enc_mw(s):
     """MW series: one decimal below 10 MW (so a 1 MW battery or a small plant doesn't round to 0), whole MW above;
-    a whole number is written without its decimal, so zeros stay short (design decision, 9 Nov 2026)."""
+    a whole number is written without its decimal, so zeros stay short (design decision, 9 Nov 2026); a missing value
+    is written as null."""
     out = []
     for v in s:
         v = float(v)
+        if v != v:   # missing: the live week's embedded solar where daylight has no irradiance (assemble())
+            out.append(None)
+            continue
         r = round(v, 1) if abs(v) < 9.95 else round(v)
         out.append(int(r) if r == int(r) else r)
     return out
@@ -144,7 +148,7 @@ def build(state, irr, cap=None, log=print):
                   'roof_gap': roof_gap,
                   'built': int(pd.Timestamp.now(tz='UTC').timestamp() * 1000)}
     log(f'built {len(full)} intervals ({int(s.src.notna().sum())} with data) to {last}, {len(js["plants"])} plants; '
-        f'embedded solar now {js["NI"]["roof"][-1] + js["SI"]["roof"][-1]} MW'
+        + ('embedded solar now ' + (f'{js["NI"]["roof"][-1] + js["SI"]["roof"][-1]} MW' if None not in (js['NI']['roof'][-1], js['SI']['roof'][-1]) else 'not estimated (no irradiance)'))
         + (f' (satellite to {sat_end}, {n_now} intervals carried forward)' if sat_end is not None else ' (no satellite data)'))
     return js
 
@@ -257,12 +261,17 @@ def assemble(s, full, roof, log=print, metered=None):
         hay = hay.where(~ok, s['H|HAY'])
         hv = hv.where(~ok, (s['H|BEN'] + s['H|HAY']) / 2)
     for isl in ['NI', 'SI']:
-        # short gaps in irradiance are bridged; anything else without irradiance shows as zero, never extrapolated
-        r = roof[isl].interpolate(limit_area='inside', limit=6).fillna(0).clip(lower=0)
+        # short gaps in irradiance are bridged (up to 30 minutes), never extrapolated. The rest: zero at night; in
+        # daylight, where the live estimate says when it is light (rooftop.live's '<isl>lit'), no value at all, so the
+        # page shows a gap rather than zero, and demand with embedded generation has none either (design decision,
+        # 13 Nov 2026). History has no such key: its irradiance is complete, and anything missing stays zero.
+        r0 = roof[isl].interpolate(limit_area='inside', limit=6)
+        none = (r0.isna() & roof[isl + 'lit'].astype(bool)) if isl + 'lit' in roof else pd.Series(False, index=r0.index)
+        r = r0.fillna(0).clip(lower=0).mask(none)
         out[isl]['roof'] = r
         out[isl]['underlying'] = out[isl]['metered'] + r
         if isl + 'u' in roof:
-            out[isl]['roofU'] = roof[isl + 'u'].interpolate(limit_area='inside', limit=6).fillna(0).clip(lower=0)
+            out[isl]['roofU'] = roof[isl + 'u'].interpolate(limit_area='inside', limit=6).fillna(0).clip(lower=0).mask(none)
     out['NI']['hvdc'] = hay
     out['SI']['hvdc'] = -ben
     # more price nodes (the Prices page): gaps up to 12 points bridged, longer ones left empty (intervals filled from

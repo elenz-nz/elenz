@@ -397,6 +397,10 @@ button.sw-btn:hover { border-color: var(--ink-2); }
 tr.off .drill, tr.off .nm, tr.off td.n { color: var(--muted); }
 tr.off .sw { background: transparent; box-shadow: inset 0 0 0 1.5px var(--c); }
 .share { display: grid; justify-items: end; gap: 2px; }
+/* a row with no estimate (embedded solar in the live week): its words sit across the figure and share columns,
+   out of the flow, so the columns keep their width and the row its height */
+tr.na .share { position: relative; }
+tr.na [data-s] { position: absolute; right: 0; white-space: nowrap; color: var(--muted); }
 .bar { height: 3px; border-radius: 2px; background: var(--c); justify-self: stretch; transform-origin: right; }
 /* Sidebar: filter box and collapsible fuel sections */
 .mix-filter { font: inherit; font-size: 0.82rem; width: 100%; padding: 5px 9px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); color: var(--ink); }

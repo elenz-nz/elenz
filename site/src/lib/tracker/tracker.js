@@ -166,6 +166,7 @@ export function mountTracker(D, hooks = {}) {
     NZ.metered = add(M.NIs.metered, M.SIs.metered);
     NZ.underlying = add(M.NIs.underlying, M.SIs.underlying);
     NZ.roofU = add(M.NIs.roofU, M.SIs.roofU);   // the islands' errors share the calibration, so they add
+    NZ.roofNA = M.NIs.roofNA.map((v, i) => Math.max(v, M.SIs.roofNA[i]));   // no embedded solar estimate in either island
     NZ.oembR = add(M.NIs.oembR, M.SIs.oembR); NZ.oembE = add(M.NIs.oembE, M.SIs.oembE);   // other embedded: renewable part, emissions
     NZ.tiwai = M.SIs.tiwai;
     SRC = { NZ, NI: { ...M.NI, ...M.NIs }, SI: { ...M.SI, ...M.SIs } };
@@ -381,6 +382,10 @@ export function mountTracker(D, hooks = {}) {
     const v = { n, avg, t: groups.map(([a]) => M.t[a]), hrs, fuels: {}, zoomed: zf != null };
     FUELS.forEach(f => v.fuels[f.k] = avg(S[f.k]));
     v.metered = avg(S.metered); v.underlying = avg(S.underlying); v.tiwai = avg(S.tiwai); v.roofU = avg(S.roofU);
+    // points with no embedded solar estimate for any of their time (the live week, daylight without irradiance):
+    // demand with embedded generation is NaN already; the renewable share and emissions intensity are set NaN below
+    v.roofNA = avg(S.roofNA); v.gapH = 0;
+    for (let j = 0; j < n; j++) v.gapH += v.roofNA[j] * hrs[j];
     v.oembR = avg(S.oembR); v.oembE = avg(S.oembE);
     // peak demand and generation: the highest 5-minute or half-hour value, which daily history keeps alongside its averages
     const pk = M.peak && M.peak[state.region];
@@ -418,6 +423,8 @@ export function mountTracker(D, hooks = {}) {
         if (x > 0) { tot += x; if (f.k !== 'batt') { base += x; em += x * ef; if (f.ren) re += x; } }
       }
       v.gen[j] = tot; v.genR[j] = base; v.co2[j] = base ? em / base * 1000 : 0; v.ren[j] = base ? re / base * 100 : 0;
+      // without embedded solar both shares would be of too little generation, so neither is given (a gap, not a guess)
+      if (v.roofNA[j] > 0) { v.co2[j] = NaN; v.ren[j] = NaN; }
     }
     return v;
   }
@@ -759,21 +766,39 @@ export function mountTracker(D, hooks = {}) {
       if (mk.yr != null) lastYr = mk.yr;
     }
   }
+  // a missing value (NaN: no embedded solar estimate there) leaves a gap: lines, bands and areas are drawn in runs
+  function runsOf(arr) {
+    const out = []; let a = -1;
+    for (let j = 0; j <= V.n; j++) {
+      const ok = j < V.n && arr[j] === arr[j];
+      if (ok && a < 0) a = j; else if (!ok && a >= 0) { out.push([a, j]); a = -1; }
+    }
+    return out;
+  }
   function line(ctx, X, Y, arr, color, width = 1.75, dash) {
     ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = width; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     if (dash) ctx.setLineDash(dash);
-    ctx.beginPath(); for (let j = 0; j < V.n; j++) { const x = X(j), y = Y(arr[j]); j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.stroke(); ctx.restore();
+    ctx.beginPath();
+    for (const [a, b] of runsOf(arr)) for (let j = a; j < b; j++) { const x = X(j), y = Y(arr[j]); j > a ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+    ctx.stroke(); ctx.restore();
   }
   function band(ctx, X, Y, lo, hi, fill) {
     ctx.fillStyle = fill; ctx.beginPath();
-    for (let j = 0; j < V.n; j++) { const x = X(j), y = Y(hi[j]); j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
-    for (let j = V.n - 1; j >= 0; j--) ctx.lineTo(X(j), Y(lo[j]));
-    ctx.closePath(); ctx.fill();
+    for (const [a, b] of runsOf(hi)) {
+      for (let j = a; j < b; j++) { const x = X(j), y = Y(hi[j]); j > a ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+      for (let j = b - 1; j >= a; j--) ctx.lineTo(X(j), Y(lo[j]));
+      ctx.closePath();
+    }
+    ctx.fill();
   }
   function area(ctx, X, Y, arr, base, fill) {
-    ctx.fillStyle = fill; ctx.beginPath(); ctx.moveTo(X(0), Y(base));
-    for (let j = 0; j < V.n; j++) ctx.lineTo(X(j), Y(arr[j]));
-    ctx.lineTo(X(V.n - 1), Y(base)); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = fill; ctx.beginPath();
+    for (const [a, b] of runsOf(arr)) {
+      ctx.moveTo(X(a), Y(base));
+      for (let j = a; j < b; j++) ctx.lineTo(X(j), Y(arr[j]));
+      ctx.lineTo(X(b - 1), Y(base)); ctx.closePath();
+    }
+    ctx.fill();
   }
   function cursor(ctx, F) {
     if (state.hover == null) return;
@@ -781,6 +806,7 @@ export function mountTracker(D, hooks = {}) {
     ctx.strokeStyle = pin ? C['--accent'] : C['--ink-2']; ctx.lineWidth = pin ? 1.5 : 1; ctx.beginPath(); ctx.moveTo(x, F.top); ctx.lineTo(x, F.bottom); ctx.stroke();
   }
   function dot(ctx, x, y, color) {
+    if (y !== y) return;
     ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
     ctx.lineWidth = 2; ctx.strokeStyle = C['--surface']; ctx.stroke();
   }
@@ -1044,7 +1070,7 @@ export function mountTracker(D, hooks = {}) {
   function drawDemand() {
     const c = setup($('cv-demand')), { ctx } = c;
     let mn = Infinity, mx = 0;
-    for (let j = 0; j < V.n; j++) { mx = Math.max(mx, V.underlying[j], V.metered[j]); mn = Math.min(mn, V.metered[j]); }
+    for (let j = 0; j < V.n; j++) { mx = Math.max(mx, V.underlying[j] === V.underlying[j] ? V.underlying[j] : 0, V.metered[j]); mn = Math.min(mn, V.metered[j]); }
     const dom = nice(mn * 0.95, mx * 1.02, ticksFor('cv-demand', 3));
     const F = frame(c, dom, v => fmt(v), { axis: true, unit: 'MW' }), { X, Y } = F;
     // the embedded solar estimate's uncertainty (± one standard deviation) as a band around the dashed line
@@ -1067,7 +1093,7 @@ export function mountTracker(D, hooks = {}) {
   }
   function drawCo2() {
     const c = setup($('cv-co2')), { ctx } = c;
-    let mx = 0; for (let j = 0; j < V.n; j++) mx = Math.max(mx, V.co2[j]);
+    let mx = 0; for (let j = 0; j < V.n; j++) if (V.co2[j] === V.co2[j]) mx = Math.max(mx, V.co2[j]);
     const dom = nice(0, Math.max(mx, 10) * 1.1, ticksFor('cv-co2', 2));
     const F = frame(c, dom, v => fmt(v), { axis: true, unit: 'g/kWh' }), { X, Y } = F;
     area(ctx, X, Y, V.co2, 0, alpha(C['--co2'], 0.28));
@@ -1076,7 +1102,7 @@ export function mountTracker(D, hooks = {}) {
   }
   function drawRen() {
     const c = setup($('cv-ren')), { ctx } = c;
-    let mn = 100; for (let j = 0; j < V.n; j++) mn = Math.min(mn, V.ren[j]);
+    let mn = 100; for (let j = 0; j < V.n; j++) if (V.ren[j] === V.ren[j]) mn = Math.min(mn, V.ren[j]);
     const lo = Math.max(0, Math.floor((mn - 4) / 10) * 10);
     const big = !!$('cv-ren').closest('.popped'), st = 100 - lo <= 25 ? 5 : 100 - lo <= 50 ? 10 : 20;
     const dom = { lo, hi: 100, ticks: big ? Array.from({ length: Math.floor((100 - lo) / st) + 1 }, (_, i) => lo + i * st)
@@ -1273,6 +1299,18 @@ export function mountTracker(D, hooks = {}) {
   }
   const capOf = (caps, l) => caps.get(l) ?? (l.members ? l.members.reduce((a, m) => a + (caps.get(m) || 0), 0) : 0);
   const pctTxt = f => (f === f && isFinite(f) ? (f * 100).toFixed(1) + '%' : '—');
+  // a figure that needs embedded solar where there is no estimate of it (the live week, daylight without irradiance)
+  const NO_EST = 'No estimate';
+  const est = (v, f) => (v === v ? f(v) : NO_EST);
+  const pct1 = v => v.toFixed(1) + '%';
+  // said beside a point's time, and under a range's heading, when part of it has no embedded solar estimate
+  const gapNote = j => (V.roofNA[j] > 0 ? ' · no embedded solar estimate' : '');
+  function gapRangeNote() {
+    const h = V.gapH;
+    if (!(h > 0)) return '';
+    const m = Math.round(h * 60);
+    return ` · embedded solar missing for ${m < 60 ? `${m} min` : `${(m / 60).toFixed(m < 600 ? 1 : 0).replace(/\.0$/, '')} h`}`;
+  }
   function syncShareHead() { const c = !!cfCaps(); $('col-s').textContent = c ? 'Of capacity' : 'Share'; $('col-s').title = c ? 'Output against installed capacity (the capacity factor over a range)' : ''; }
   function plantRows(range, j) {
     if (level() !== 'unit') return [];
@@ -1319,18 +1357,23 @@ export function mountTracker(D, hooks = {}) {
       const cf = (e, c) => (c && hAll ? e * 1000 / (c * hAll) : NaN);   // e in GWh, c in MW
       for (const l of [...layers, ...V.sections.filter(x => x.row)]) {
         const e = E.get(l);
+        if (l.row) l.row.classList.remove('na');
         l.cells.q.textContent = en(e);
         if (caps) { const f = cf(e, capOf(caps, l)); l.cells.s.textContent = pctTxt(f); l.cells.b.style.transform = `scaleX(${f === f ? Math.max(0, Math.min(1, f)) : 0})`; continue; }
         l.cells.s.textContent = l.signed ? signedTxt(l, e, true) : tot > 0 ? (e / tot * 100).toFixed(1) + '%' : '—';
         l.cells.b.style.transform = `scaleX(${l.signed || tot <= 0 ? 0 : Math.max(0, e / tot)})`;
       }
       $('tot-q').textContent = en(tot); $('tot-s').textContent = caps ? pctTxt(cf(tot, capacityOf())) : layers.some(l => l.signed) && !topIsAll() ? 'net' : '100%';
-      let pn = 0, ps = 0, pk = 0, pkg = 0, hv = 0, em = 0, gw = 0, re = 0, hs = 0, mt = 0, ud = 0;
+      // demand with embedded generation, emissions intensity and the renewable share are averaged over the time that
+      // has an embedded solar estimate (hu, gw); the heading says how long that leaves out
+      let pn = 0, ps = 0, pk = 0, pkg = 0, hv = 0, em = 0, gw = 0, re = 0, hs = 0, mt = 0, ud = 0, hu = 0;
       for (let i = 0; i < V.n; i++) {
-        const w = V.hrs[i]; hs += w; pn += V.pNI[i] * w; ps += V.pSI[i] * w; hv += V.hvdc[i] * w; mt += V.metered[i] * w; ud += V.underlying[i] * w;
+        const w = V.hrs[i]; hs += w; pn += V.pNI[i] * w; ps += V.pSI[i] * w; hv += V.hvdc[i] * w; mt += V.metered[i] * w;
+        if (V.underlying[i] === V.underlying[i]) { ud += V.underlying[i] * w; hu += w; }
         pk = Math.max(pk, V.pkMet[i]); if (V.pkGen) pkg = Math.max(pkg, V.pkGen[i]);
-        em += V.co2[i] * V.genR[i] * w; re += V.ren[i] * V.genR[i] * w; gw += V.genR[i] * w;
+        if (V.ren[i] === V.ren[i]) { em += V.co2[i] * V.genR[i] * w; re += V.ren[i] * V.genR[i] * w; gw += V.genR[i] * w; }
       }
+      if (V.gapH > 0) $('sum-sub').textContent += gapRangeNote();
       const hvNet = Math.abs(hv) >= 1e6 ? ['HVDC, net transfer', (Math.abs(hv) / 1e6).toFixed(2), hv >= 0 ? 'TWh north' : 'TWh south']
         : ['HVDC, net transfer', (Math.abs(hv) / 1000).toFixed(1), hv >= 0 ? 'GWh north' : 'GWh south'];
       setSys([
@@ -1340,15 +1383,15 @@ export function mountTracker(D, hooks = {}) {
         ['Peak demand, metered', fmt(pk), 'MW'],
         V.pkGen && ['Peak generation', fmt(pkg), 'MW'],
         hvNet,
-        ['Emissions intensity', fmt(em / gw), 'g/kWh'],
-        ['Renewable share', (re / gw).toFixed(1) + '%', ''],
+        ['Emissions intensity', est(em / gw, fmt), gw ? 'g/kWh' : ''],
+        ['Renewable share', est(re / gw, pct1), ''],
       ]);
       for (const id of ['v-gen', 'v-pni', 'v-psi', 'v-met', 'v-und', 'v-hv', 'v-co2', 'v-ren']) $(id).textContent = '';
       // a folded chart's line has no chart to hover, so away from the time line it shows the range's figure
-      if (hs > 0 && gw > 0) {
+      if (hs > 0) {
         // "avg"/"net" is its own element, so phones can leave it out (tracker.css); every part is a number we made
-        const rest = { price: [['v-pni', 'avg', money(pn / hs)], ['v-psi', 'avg', money(ps / hs)]], demand: [['v-met', 'avg', `${fmt(mt / hs)} MW`], ['v-und', 'avg', `${fmt(ud / hs)} MW`]],
-          hvdc: [['v-hv', 'net', `${hvNet[1]} ${hvNet[2]}`]], co2: [['v-co2', 'avg', `${fmt(em / gw)} g/kWh`]], ren: [['v-ren', 'avg', `${(re / gw).toFixed(1)}%`]] };
+        const rest = { price: [['v-pni', 'avg', money(pn / hs)], ['v-psi', 'avg', money(ps / hs)]], demand: [['v-met', 'avg', `${fmt(mt / hs)} MW`], ['v-und', 'avg', est(ud / hu, v => `${fmt(v)} MW`)]],
+          hvdc: [['v-hv', 'net', `${hvNet[1]} ${hvNet[2]}`]], co2: [['v-co2', 'avg', est(em / gw, v => `${fmt(v)} g/kWh`)]], ren: [['v-ren', 'avg', est(re / gw, pct1)]] };
         for (const k of state.fold) for (const [id, pre, t] of rest[k] || []) $(id).innerHTML = `<small class="pre">${pre} </small>${esc(t)}`;
       }
       return;
@@ -1356,13 +1399,18 @@ export function mountTracker(D, hooks = {}) {
     const [when, sub] = heading(j), long = isLong();
     $('sum-when').textContent = when;
     // a partial last period says where its data stops here too, not only in the mouse tooltip: touch has none (TRK-04)
-    $('sum-sub').textContent = j === V.n - 1 && V.partial ? `${sub} · ${partialTo()}` : sub;
+    $('sum-sub').textContent = (j === V.n - 1 && V.partial ? `${sub} · ${partialTo()}` : sub) + gapNote(j);
     $('col-q').textContent = genUnit();
     let tot = 0;
     if (topIsAll()) tot = V.gen[j]; else for (const l of layers) tot += l.signed ? l.s[j] : Math.max(0, l.s[j]);
     const caps = cfCaps();
     for (const l of [...layers, ...V.sections.filter(x => x.row)]) {
       const v = l.members ? l.members.reduce((a, m) => a + m.s[j], 0) : l.s[j];
+      // no estimate: said across the figure and share columns without widening them (tr.na in tracker.css), so the
+      // rows keep their height and nothing below moves as the cursor crosses the gap
+      const na = l.id === 'roof' && V.roofNA[j] > 0;
+      if (l.row) l.row.classList.toggle('na', na);
+      if (na) { l.cells.q.textContent = ''; l.cells.s.textContent = NO_EST; l.cells.b.style.transform = 'scaleX(0)'; continue; }
       l.cells.q.textContent = genVal(v, j);
       if (caps) { const c = capOf(caps, l), f = c ? v / c : NaN; l.cells.s.textContent = pctTxt(f); l.cells.b.style.transform = `scaleX(${f === f ? Math.max(0, Math.min(1, f)) : 0})`; continue; }
       l.cells.s.textContent = l.signed ? signedTxt(l, v, false) : tot > 0.5 ? (v / tot * 100).toFixed(1) + '%' : '—';
@@ -1374,14 +1422,15 @@ export function mountTracker(D, hooks = {}) {
       ['Price, North Island', money(V.pNI[j]), '/MWh'],
       ['Price, South Island', money(V.pSI[j]), '/MWh'],
       ['Demand, metered', fmt(V.metered[j]), long ? 'MW avg' : 'MW'],
-      ['With embedded generation', fmt(V.underlying[j]), long ? 'MW avg' : 'MW'],
-      ['Embedded solar (est.)', fmt(V.fuels.roof[j]), (long ? 'MW avg' : 'MW') + (V.roofU[j] > 0.5 ? ` ± ${fmt(V.roofU[j])}` : '')],
+      V.roofNA[j] > 0 ? ['With embedded generation', NO_EST, ''] : ['With embedded generation', fmt(V.underlying[j]), long ? 'MW avg' : 'MW'],
+      V.roofNA[j] > 0 ? ['Embedded solar (est.)', NO_EST, '']
+        : ['Embedded solar (est.)', fmt(V.fuels.roof[j]), (long ? 'MW avg' : 'MW') + (V.roofU[j] > 0.5 ? ` ± ${fmt(V.roofU[j])}` : '')],
       V.fuels.oemb.some(x => x > 0.5) && ['Other embedded (est.)', fmt(V.fuels.oemb[j]), long ? 'MW avg' : 'MW'],
       long && ['Peak demand, metered', fmt(V.pkMet[j]), 'MW'],
       long && V.pkGen && ['Peak generation', fmt(V.pkGen[j]), 'MW'],
       ['HVDC', hvTxt(V.hvdc[j]), hvDir(V.hvdc[j])],
-      ['Emissions intensity', fmt(V.co2[j]), 'g/kWh'],
-      ['Renewable share', V.ren[j].toFixed(1) + '%', ''],
+      ['Emissions intensity', est(V.co2[j], fmt), V.co2[j] === V.co2[j] ? 'g/kWh' : ''],
+      ['Renewable share', est(V.ren[j], pct1), ''],
     ]);
     // the figure above the chart is what the chart shows: hidden layers and HVDC left out (the summary keeps the whole)
     let shown = tot;
@@ -1390,9 +1439,9 @@ export function mountTracker(D, hooks = {}) {
     $('v-pni').textContent = money(V.pNI[j]); $('v-psi').textContent = money(V.pSI[j]);
     // a folded chart has no axis to carry the unit, so its figures say it
     const u = (k, unit) => state.fold.has(k) ? ' ' + unit : '';
-    $('v-met').textContent = fmt(V.metered[j]) + u('demand', 'MW'); $('v-und').textContent = fmt(V.underlying[j]) + u('demand', 'MW');
+    $('v-met').textContent = fmt(V.metered[j]) + u('demand', 'MW'); $('v-und').textContent = est(V.underlying[j], v => fmt(v) + u('demand', 'MW'));
     $('v-hv').textContent = `${hvTxt(V.hvdc[j])}${u('hvdc', 'MW')} ${V.hvdc[j] > 0.5 ? 'north' : V.hvdc[j] < -0.5 ? 'south' : ''}`;
-    $('v-co2').textContent = fmt(V.co2[j]) + u('co2', 'g/kWh'); $('v-ren').textContent = V.ren[j].toFixed(1) + '%';
+    $('v-co2').textContent = est(V.co2[j], v => fmt(v) + u('co2', 'g/kWh')); $('v-ren').textContent = est(V.ren[j], pct1);
   }
 
   // ---------- orchestration ----------
@@ -1909,6 +1958,7 @@ export function mountTracker(D, hooks = {}) {
     const gu = genUnit();
     if (!l) return head + row(C['--ink'], totalLabel(), genVal(tot, j), gu);
     const v = l.s[j];
+    if (l.id === 'roof' && V.roofNA[j] > 0) return head + row(colourOf(l), l.name, NO_EST, 'no irradiance data', !!l.hatch);
     const uj = l.id === 'roof' ? V.roofU[j] : l.u ? l.u[j] : 0, pm = uj > 0.5 ? ` ± ${fmt(uj)}` : '';
     if (pctMode() && !l.signed) return head + row(colourOf(l), l.name, pctOf(v, j).toFixed(1) + '%', `of all generation · ${mwTxt(v)} ${mw}${pm}`, !!l.hatch);
     const pmE = energyMode() && uj > 0.5 ? ` ± ${genVal(uj, j)}` : pm;
@@ -1918,20 +1968,21 @@ export function mountTracker(D, hooks = {}) {
   const priceRows = j => state.price ? priceSeries().map(([name, a, col]) => row(col, name, a[j] === a[j] ? money(a[j]) : '–', '/MWh')).join('') : '';
   function tipHtml(cv, j, e) {
     const pn = partialNote(j);
-    const mw = isLong() ? 'MW avg' : 'MW', head = `<div class="tip-t">${esc(chip(j))}</div>` + (pn ? `<div class="tip-n">${esc(pn)}</div>` : '');
+    const mw = isLong() ? 'MW avg' : 'MW', head = `<div class="tip-t">${esc(chip(j))}</div>` + (pn ? `<div class="tip-n">${esc(pn)}</div>` : '')
+      + (V.roofNA[j] > 0 ? '<div class="tip-n">No embedded solar estimate: no irradiance data</div>' : '');
     switch (cv.id) {
       case 'cv-gen': return genTip(j, e, head) + priceRows(j);
       case 'cv-price':
         return head + row(C['--p-ni'], 'North Island · Haywards', money(V.pNI[j]), '/MWh') + row(C['--p-si'], 'South Island · Benmore', money(V.pSI[j]), '/MWh');
       case 'cv-demand':
-        return head + row(C['--ink'], 'Metered', fmt(V.metered[j]), mw) + row(C['--ink-2'], 'With embedded generation', fmt(V.underlying[j]), V.roofU[j] > 0.5 ? `${mw} ± ${fmt(V.roofU[j])}` : mw)
+        return head + row(C['--ink'], 'Metered', fmt(V.metered[j]), mw) + row(C['--ink-2'], 'With embedded generation', est(V.underlying[j], fmt), V.underlying[j] !== V.underlying[j] ? '' : V.roofU[j] > 0.5 ? `${mw} ± ${fmt(V.roofU[j])}` : mw)
           + (isLong() ? row(C['--muted'], 'Peak, metered', fmt(V.pkMet[j]), 'MW') : '');
       case 'cv-hvdc':
         return head + row(C['--f-hvdc'], 'Benmore ⇄ Haywards', hvTxt(V.hvdc[j]), hvDir(V.hvdc[j]));
       case 'cv-co2':
-        return head + row(C['--co2'], 'Generation mix', fmt(V.co2[j]), 'g CO₂e/kWh');
+        return head + row(C['--co2'], 'Generation mix', est(V.co2[j], fmt), V.co2[j] === V.co2[j] ? 'g CO₂e/kWh' : '');
       default:
-        return head + row(C['--accent'], 'Renewable share', V.ren[j].toFixed(1) + '%');
+        return head + row(C['--accent'], 'Renewable share', est(V.ren[j], pct1));
     }
   }
   function showTip(cv, j, e) {
@@ -2209,7 +2260,8 @@ export function mountTracker(D, hooks = {}) {
     // the view's data: every source shown, then prices, demand, HVDC, emissions and renewable share, one row per point
     csv() {
       const L = this.links(), layers = V.layers.filter(l => !state.hidden.has(l.id)), u = isLong() ? 'MW average' : 'MW';
-      const f1 = v => Math.round(v * 10) / 10, f2 = v => Math.round(v * 100) / 100;
+      // a value with no embedded solar estimate behind it is left empty
+      const f1 = v => (v === v ? Math.round(v * 10) / 10 : ''), f2 = v => (v === v ? Math.round(v * 100) / 100 : '');
       // generation in the chart's own unit: energy (MWh, GWh or TWh) for days and longer, as the chart shows it; a
       // partial period's energy is what it generated so far, as the chart draws it
       const energy = isLong(), gu = energy ? eu().unit : 'MW', g = (v, j) => energy ? +en(v, j).toPrecision(6) : f1(v);
@@ -2220,7 +2272,7 @@ export function mountTracker(D, hooks = {}) {
       for (let j = 0; j < V.n; j++) {
         let tot = 0;
         if (topIsAll()) tot = V.gen[j]; else for (const l of layers) tot += l.signed ? l.s[j] : Math.max(0, l.s[j]);
-        rows.push([nzTime(V.t[j]), utcTime(V.t[j]), ...(energy ? [f2(V.hrs[j])] : []), ...layers.map(l => g(l.s[j], j)), g(tot, j), f2(V.pNI[j]), f2(V.pSI[j]),
+        rows.push([nzTime(V.t[j]), utcTime(V.t[j]), ...(energy ? [f2(V.hrs[j])] : []), ...layers.map(l => (l.id === 'roof' && V.roofNA[j] > 0 ? '' : g(l.s[j], j))), g(tot, j), f2(V.pNI[j]), f2(V.pSI[j]),
           f1(V.metered[j]), f1(V.underlying[j]), f1(V.hvdc[j]), f1(V.co2[j]), f1(V.ren[j])]);
       }
       const text = csvText([

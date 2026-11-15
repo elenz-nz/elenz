@@ -482,8 +482,23 @@ _jg = bt.build(s, (None, None, None), log=lambda *a: None)
 _cols = {f'{k}|{p[0]}': 400.0 if k == 'G' else 150.0 for p in _rt.points()[0] for k in 'GD'}
 _fcs = pd.DataFrame(_cols, index=pd.date_range(s.index.min() - pd.Timedelta(hours=1), s.index.max() + pd.Timedelta(hours=1), freq='15min'))
 _jf = bt.build(s, (None, _fcs, 1_800_000_000), log=lambda *a: None)
-check(_jg['meta']['roof_gap'] is True and _jg['meta']['fc_at'] is None and _jg['NI']['roof'][-1] == 0,
+check(_jg['meta']['roof_gap'] is True and _jg['meta']['fc_at'] is None and _jg['NI']['roof'][-1] is None,
       'live: daylight with no irradiance is flagged (roof_gap)')
+# with no irradiance at all: no value in daylight (a gap on the page, not zero), zero at night; demand with embedded
+# generation and the uncertainty have no value where embedded solar has none, and the file is still valid JSON
+_lit = _rt.daylight(pd.date_range(pd.to_datetime(_jg['t0'], unit='ms', utc=True), periods=_jg['N'], freq='5min') + pd.Timedelta(minutes=2.5))
+check(all((v is None) == bool(l) for isl in ('NI', 'SI') for v, l in zip(_jg[isl]['roof'], _lit[isl]))
+      and all(v == 0 for isl in ('NI', 'SI') for v, l in zip(_jg[isl]['roof'], _lit[isl]) if not l)
+      and _lit['NI'].any() and (~_lit['NI']).any(),
+      'live: embedded solar without irradiance is null in daylight and zero at night')
+check(all((u is None) == (r is None) and (d is None) == (r is None) for isl in ('NI', 'SI')
+          for r, u, d in zip(_jg[isl]['roof'], _jg[isl]['roofU'], _jg[isl]['underlying']))
+      and json.loads(json.dumps(_jg, allow_nan=False))['NI']['roof'][-1] is None,
+      'live: demand with embedded generation and the uncertainty are null where embedded solar is')
+_fcw = pd.DataFrame(_cols, index=pd.date_range(s.index.max() - pd.Timedelta(days=8), s.index.max() + pd.Timedelta(hours=1), freq='15min'))
+_jw = bt.build(s, (None, _fcw, 1_800_000_000), log=lambda *a: None)
+check(all(v is not None for isl in ('NI', 'SI') for k in ('roof', 'underlying') for v in _jw[isl][k]),
+      'live: with irradiance every interval has a value')
 check(_jf['meta']['roof_gap'] is False and _jf['meta']['fc_at'] == 1_800_000_000_000 and _jf['meta']['fc_end'] > _jf['meta']['end']
       and _jf['NI']['roof'][-1] > 0, 'live: the forecast fills in, with its fetch time and reach in the meta')
 _urls = []
