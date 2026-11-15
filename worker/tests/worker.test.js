@@ -14,6 +14,19 @@ const here = fileURLToPath(new URL('.', import.meta.url));
 const HISTORY_CRON = '40 */6 * * *', LIVE_CRON = '*/5 * * * *';
 const PAGE = '<!doctype html><html><head><title>Tracker</title><meta property="og:title" content="Tracker">'
   + '<meta property="og:url" content="https://elenz.co.nz/tracker"></head><body>Tracker</body></html>';
+// a record page as prerendered: the site's card in its preview tags (Preview.svelte)
+const RECORD_PAGE = '<!doctype html><html><head><title>Peak demand</title><meta property="og:title" content="Peak demand · New Zealand electricity records">'
+  + '<meta property="og:url" content="https://elenz.co.nz/records/demand_max">'
+  + '<meta property="og:image" content="https://elenz.co.nz/og/elenz.png?p=records-demand_max">'
+  + '<meta property="og:image:width" content="2400"><meta property="og:image:height" content="1260">'
+  + '<meta property="og:image:alt" content="ELENZ"></head><body>Record</body></html>';
+const CARD = new Uint8Array([137, 80, 78, 71, 1, 2, 3]);   // stands in for static/og/elenz.png
+// a records file with one record: New Zealand's peak demand, which grew in three steps
+const RECORDS = {
+  v: 99, first: 870350400000, end: 1794652200000, final_to: { gen: 1793442600000 },
+  records: { demand_max: { NZ: { t: 1785958200000, v: 7387, n: 3, prev: [1785871800000, 7223],
+    steps: [[870350400000, 3726], [1785871800000, 7223], [1785958200000, 7387]] } } },
+};
 
 // a stand-in for KV refusing every read and write (a request header picks it), as it does past a daily limit
 const ENTRY = `
@@ -30,8 +43,12 @@ export default {
 let dir, mf, kv;
 let github = [], githubAnswer = () => new Response(null, { status: 204 });
 const start = (bindings = {}) => new Miniflare({
-  modules: true,
-  script: readFileSync(join(dir, 'worker.mjs'), 'utf8'),
+  modules: [
+    { type: 'ESModule', path: join(dir, 'worker.mjs'), contents: readFileSync(join(dir, 'worker.mjs'), 'utf8') },
+    // resvg's WebAssembly stays a module of its own, as wrangler bundles it (og.js)
+    { type: 'CompiledWasm', path: join(dir, 'vendor/resvg/index_bg.wasm'), contents: readFileSync(join(here, '../vendor/resvg/index_bg.wasm')) },
+  ],
+  modulesRoot: dir,
   compatibilityDate: '2026-07-01',
   kvNamespaces: ['DATA'],
   bindings,
@@ -40,6 +57,8 @@ const start = (bindings = {}) => new Miniflare({
       const { pathname } = new URL(request.url);
       if (pathname === '/tracker') return new Response(PAGE, { headers: { 'content-type': 'text/html' } });
       if (pathname === '/data/tracker.json') return Response.json({ snapshot: true });
+      if (pathname.startsWith('/records/')) return new Response(RECORD_PAGE, { headers: { 'content-type': 'text/html' } });
+      if (pathname === '/og/elenz.png') return new Response(CARD, { headers: { 'content-type': 'image/png' } });
       return new Response('not found', { status: 404 });
     },
   },
@@ -51,6 +70,7 @@ before(async () => {
   await build({
     stdin: { contents: ENTRY, resolveDir: here, loader: 'js' }, bundle: true, format: 'esm', platform: 'neutral',
     outfile: join(dir, 'worker.mjs'), logLevel: 'error',
+    loader: { '.ttf': 'binary' }, external: ['*.wasm'],   // as wrangler.jsonc's rules: fonts as data, wasm compiled
   });
   mf = start({ GITHUB_TOKEN: 'test-token' });
   kv = await mf.getKVNamespace('DATA');
@@ -258,4 +278,50 @@ test('the jobs still start when KV refuses to record the outcome', async () => {
     await fire(LIVE_CRON, 5, refused);
     assert.deepEqual(started(), ['update-data.yml']);
   } finally { await refused.dispose(); }
+});
+
+// ---------- record pages' preview images (og.js) ----------
+
+const ogImage = (html) => html.match(/property="og:image" content="([^"]+)"/)?.[1];
+
+test('a record page names its own preview image, which changes with the record', async () => {
+  await kv.put('hist/records.json', JSON.stringify(RECORDS));
+  const html = await (await get('/records/demand_max')).text();
+  const img = ogImage(html);
+  assert.match(img, /^https:\/\/elenz\.co\.nz\/og\/records\/demand_max\.png\?v=[a-z0-9]+$/);
+  assert.match(html, /property="og:title" content="Record: Peak demand, New Zealand, 7,387 MW · ELENZ"/);
+  assert.match(html, /property="og:image:width" content="1200"/);
+  // a new record gives a new image address, so link previews fetch it again
+  await kv.put('hist/records.json', JSON.stringify({ ...RECORDS, records: { demand_max: { NZ: { ...RECORDS.records.demand_max.NZ, v: 7400 } } } }));
+  assert.notEqual(ogImage(await (await get('/records/demand_max')).text()), img);
+});
+
+test('a record page keeps the site card when there are no records to read', async () => {
+  const html = await (await get('/records/demand_max')).text();
+  assert.equal(ogImage(html), 'https://elenz.co.nz/og/elenz.png?p=records-demand_max');
+  const down_ = await (await get('/records/demand_max', down)).text();
+  assert.equal(ogImage(down_), 'https://elenz.co.nz/og/elenz.png?p=records-demand_max');
+});
+
+test('the record image is a 1200 x 630 PNG, kept long only at its current address', async () => {
+  await kv.put('hist/records.json', JSON.stringify(RECORDS));
+  const img = new URL(ogImage(await (await get('/records/demand_max')).text()));
+  const r = await get(img.pathname + img.search);
+  assert.equal(r.status, 200);
+  assert.equal(r.headers.get('content-type'), 'image/png');
+  assert.equal(r.headers.get('cache-control'), 'public, max-age=31536000, immutable');
+  const png = new Uint8Array(await r.arrayBuffer());
+  assert.deepEqual([...png.slice(1, 4)].map((c) => String.fromCharCode(c)).join(''), 'PNG');
+  const view = new DataView(png.buffer);
+  assert.deepEqual([view.getUint32(16), view.getUint32(20)], [1200, 630]);
+  const stale = await get('/og/records/demand_max.png?v=old');
+  assert.equal(stale.headers.get('cache-control'), 'public, max-age=600');
+  await stale.arrayBuffer();
+});
+
+test('an unknown record or no records gives the site card', async () => {
+  for (const path of ['/og/records/not_a_record.png', '/og/records/demand_max.png']) {
+    const r = await get(path);
+    assert.deepEqual(new Uint8Array(await r.arrayBuffer()), CARD, path);
+  }
 });

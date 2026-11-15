@@ -18,6 +18,7 @@
 //             shared with the pages). The pages are prerendered, so they can't do it themselves.
 //  tests:     worker/tests/worker.test.js runs this file in Cloudflare's own runtime (cd worker && npm ci && npm test).
 import { readQuery, writeQuery, describe, SITE_URL } from '../site/src/lib/site/viewurl.js';
+import { RECORD_PAGE, RECORD_IMAGE, recordPage, recordImage } from './og.js';
 
 const WORKFLOWS = 'https://api.github.com/repos/elenz-nz/elenz/actions/workflows';
 const HISTORY_CRON = '40 */6 * * *'; // must match wrangler.jsonc
@@ -89,9 +90,9 @@ const unavailable = () => new Response('{"error":"not available right now"}', {
 });
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    return finish(await serve(request, env, url), url);
+    return finish(await serve(request, env, url, ctx), url);
   },
 
   async scheduled(event, env) {
@@ -99,7 +100,7 @@ export default {
   },
 };
 
-async function serve(request, env, url) {
+async function serve(request, env, url, ctx) {
   if (url.pathname === '/data/health' && env.DATA) {
     // for an outside uptime monitor: 200 while the data is fresh, 503 (with the reasons) when it isn't. Unlike the
     // GitHub watchdog, it doesn't depend on the Worker's cron, so it also catches the cron itself stopping.
@@ -190,6 +191,9 @@ async function serve(request, env, url) {
   }
   const tab = PREVIEW_TABS[url.pathname];
   if (tab && request.method === 'GET') return withPreview(await env.ASSETS.fetch(request), tab, url);
+  // a record page names its own preview image, which the Worker draws (og.js)
+  if (request.method === 'GET' && RECORD_IMAGE.test(url.pathname)) return recordImage(request, env, url, ctx);
+  if (request.method === 'GET' && RECORD_PAGE.test(url.pathname)) return recordPage(await env.ASSETS.fetch(request), env, url);
   return env.ASSETS.fetch(request);
 }
 
