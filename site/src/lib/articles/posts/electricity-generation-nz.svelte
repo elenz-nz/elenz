@@ -5,12 +5,16 @@
 		description: 'How New Zealand generates its electricity: hydro, geothermal, wind, solar, gas and coal, by island and by month, from the latest 12 months of data.',
 		date: '2026-11-16',
 		kind: 'Guide',
+		image: '/articles/electricity-generation-nz.png',
+		imageLight: '/articles/electricity-generation-nz-light.png',
 	} as const;
 </script>
 
 <script lang="ts">
 	// Figures from analysis/generation_nz.py, which also writes the chart data in ../data/electricity-generation-nz.json.
 	import Figure from '#lib/articles/Figure.svelte';
+	import ReviewCover from '#lib/articles/ReviewCover.svelte';
+	import cover from '#lib/articles/covers/electricity-generation-nz.json';
 	import Note from '#lib/articles/Note.svelte';
 	import Stats from '#lib/articles/Stats.svelte';
 	import HBars from '#lib/articles/charts/HBars.svelte';
@@ -93,6 +97,10 @@
 
 	const YEAR = 'range=1y&end=2026-10-31';
 </script>
+
+<ReviewCover data={cover} kicker="ELECTRICITY GENERATION IN NEW ZEALAND" title="95.3% renewable"
+	range="1 November 2025 – 31 October 2026 · 44.1 TWh"
+	label="Electricity generation in New Zealand, 1 November 2025 to 31 October 2026: each day's generation stacked by fuel" />
 
 <p>New Zealand generated <strong>44.1 TWh</strong> of electricity in the 12 months to October 2026. Hydro supplied 57.8% of it, geothermal 22.3% and wind 9.3%. Solar supplied 3.8%, two-thirds of it from rooftops and other small systems. Gas, diesel and Huntly’s Rankine units, which burn coal or gas, together supplied 3.5%.</p>
 
