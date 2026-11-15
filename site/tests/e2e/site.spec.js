@@ -114,8 +114,26 @@ test('with no embedded solar estimate, Now says so rather than show zero', async
 test('with no embedded solar estimate, the tracker draws and says how long it lacks one', async ({ page }) => {
   await withoutRoof(page);
   await page.goto('/tracker');
-  await expect(page.locator('#sum-sub')).toContainText('no embedded solar estimate for 1 h');
+  await expect(page.locator('#sum-sub')).toContainText('embedded solar missing for 1 h');
   await expect(page.locator('#sys')).toContainText('Renewable share');
+});
+// "No estimate" in the summary's table mustn't make the page jump as the cursor crosses the gap
+test('crossing the gap leaves the page where it was', async ({ page }, testInfo) => {
+  test.skip(isPhone(testInfo), 'a mouse hover');
+  await withoutRoof(page, 144);   // the last 12 hours
+  await page.goto('/tracker');
+  await expect(page.locator('#sum-sub')).toContainText('embedded solar missing');
+  const cv = page.locator('#cv-gen'), b = await cv.boundingBox();
+  const below = async (f) => {
+    await page.mouse.move(b.x + b.width * f, b.y + b.height / 2);
+    await expect(page.locator('#sum-sub')).toContainText('TP');
+    // where the cards below start, and the height of every row in the summary's table
+    return page.evaluate(() => [document.querySelector('.lower').getBoundingClientRect().top + scrollY,
+      ...[...document.querySelectorAll('#summary tr')].map((r) => Math.round(r.getBoundingClientRect().height))]);
+  };
+  const out = await below(0.3), gap = await below(0.85);
+  await expect(page.locator('#sum-sub')).toContainText('no embedded solar estimate');
+  expect(gap).toEqual(out);
 });
 
 // a finger that lands on the map and then scrolls the page leaves no pointerleave, so a mouse can't show this fault (a

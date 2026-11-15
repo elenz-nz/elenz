@@ -101,8 +101,9 @@ On the site, `series.js` `fromLayout` turns the nulls into `roofNA` (1 where mis
 period without an estimate; zero in history) and `underlying` NaN; `roof` and `roofU` count as zero, so stacks and
 energy totals leave it out. The tracker sets the renewable share and emissions intensity NaN at any point with
 `roofNA` above 0 (both would be of too little generation); lines, bands and areas break at NaN (`runsOf`), readouts
-say "No estimate", the point's heading and tooltip say "no embedded solar estimate", a range's heading says for how
-long, and range averages of those three figures leave the missing time out. The CSV leaves those cells empty. The lower
+say "No estimate" (in the summary's table across the figure and share columns, out of the flow, `tr.na`, so no row
+grows and the page doesn't jump as the cursor crosses a gap: test report, 16 Nov 2026), the point's heading and tooltip
+say "no embedded solar estimate", a range's heading says for how long ("embedded solar missing for 5.5 h"), and range averages of those three figures leave the missing time out. The CSV leaves those cells empty. The lower
 cards' shares are NaN there (`shares().na`, left out of `shareOver`). `now.js` `summarise` gives null `roof`, `roofU`,
 `underlying`, `ren` and `co2` for an island whose newest interval has none (New Zealand's if either has none); Now says
 "No estimate" and the landing page drops the renewable share from its rotating figure. The records' live check

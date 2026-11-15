@@ -1309,7 +1309,7 @@ export function mountTracker(D, hooks = {}) {
     const h = V.gapH;
     if (!(h > 0)) return '';
     const m = Math.round(h * 60);
-    return ` · no embedded solar estimate for ${m < 60 ? `${m} min` : `${(m / 60).toFixed(m < 600 ? 1 : 0).replace(/\.0$/, '')} h`}`;
+    return ` · embedded solar missing for ${m < 60 ? `${m} min` : `${(m / 60).toFixed(m < 600 ? 1 : 0).replace(/\.0$/, '')} h`}`;
   }
   function syncShareHead() { const c = !!cfCaps(); $('col-s').textContent = c ? 'Of capacity' : 'Share'; $('col-s').title = c ? 'Output against installed capacity (the capacity factor over a range)' : ''; }
   function plantRows(range, j) {
@@ -1357,6 +1357,7 @@ export function mountTracker(D, hooks = {}) {
       const cf = (e, c) => (c && hAll ? e * 1000 / (c * hAll) : NaN);   // e in GWh, c in MW
       for (const l of [...layers, ...V.sections.filter(x => x.row)]) {
         const e = E.get(l);
+        if (l.row) l.row.classList.remove('na');
         l.cells.q.textContent = en(e);
         if (caps) { const f = cf(e, capOf(caps, l)); l.cells.s.textContent = pctTxt(f); l.cells.b.style.transform = `scaleX(${f === f ? Math.max(0, Math.min(1, f)) : 0})`; continue; }
         l.cells.s.textContent = l.signed ? signedTxt(l, e, true) : tot > 0 ? (e / tot * 100).toFixed(1) + '%' : '—';
@@ -1405,7 +1406,11 @@ export function mountTracker(D, hooks = {}) {
     const caps = cfCaps();
     for (const l of [...layers, ...V.sections.filter(x => x.row)]) {
       const v = l.members ? l.members.reduce((a, m) => a + m.s[j], 0) : l.s[j];
-      if (l.id === 'roof' && V.roofNA[j] > 0) { l.cells.q.textContent = NO_EST; l.cells.s.textContent = ''; l.cells.b.style.transform = 'scaleX(0)'; continue; }
+      // no estimate: said across the figure and share columns without widening them (tr.na in tracker.css), so the
+      // rows keep their height and nothing below moves as the cursor crosses the gap
+      const na = l.id === 'roof' && V.roofNA[j] > 0;
+      if (l.row) l.row.classList.toggle('na', na);
+      if (na) { l.cells.q.textContent = ''; l.cells.s.textContent = NO_EST; l.cells.b.style.transform = 'scaleX(0)'; continue; }
       l.cells.q.textContent = genVal(v, j);
       if (caps) { const c = capOf(caps, l), f = c ? v / c : NaN; l.cells.s.textContent = pctTxt(f); l.cells.b.style.transform = `scaleX(${f === f ? Math.max(0, Math.min(1, f)) : 0})`; continue; }
       l.cells.s.textContent = l.signed ? signedTxt(l, v, false) : tot > 0.5 ? (v / tot * 100).toFixed(1) + '%' : '—';
