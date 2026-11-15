@@ -7,6 +7,7 @@ How each part of the site, the data jobs and the Worker works, and the design de
 - [Site build and hosting](#site-build-and-hosting)
 - [Landing page](#landing-page)
 - [Now](#now)
+- [Dashboards](#dashboards)
 - [Articles](#articles)
 - [Records](#records)
 - [Tracker](#tracker)
@@ -29,6 +30,38 @@ How each part of the site, the data jobs and the Worker works, and the design de
 ## Now
 
 `/now` the live page (`src/routes/now/+page.svelte`: live figures, the island map with each island's mix ring, the generation mix now, from tracker.json's newest interval via `src/lib/home/now.js`; island outlines in `src/lib/home/nzmap.js`, made by `analysis/make_nz_map.py`; under the price tiles the price explainer, "Why is the price high?": rules and wording in `src/lib/now/explain.js`, drawn by `src/lib/now/PriceExplainer.svelte`, from tracker.json's `explain` block (see `ingest/explain.py`); quiet, highlighted or open by itself, rules tested in `analysis/price_triggers.py`; opened from a button in the wholesale price tile (`PriceButton.svelte`, lit when highlighted), the card drops down under the tiles; its explanation is always two paragraphs, the general one (how prices get like this) then what's going on now ("Currently, ..."); each reason is a pair of bars, now over its recent level; reasons include plants running well below the past week (`BELOW`, an outage stand-in from the live week's per-plant series), a held state after a short jump says so, and when nothing pushes the price up it says what it can't see; a record the live data beat today is a small link above Generation now (`RecordLine.svelte`), only on the day it was set; Keep screen on glows slowly while on; on a preview link, `/now?sim=up|high|split|apart|jump|low` shows the explainer at a price that may not come along during testing (`src/lib/now/simulate.js`, loaded only away from elenz.co.nz, with a banner on the page; NOW-08)).
+
+## Dashboards
+
+Two live dashboards, on test since 16 Nov 2026: unlinked, `noindex` and out of the sitemap until the Elenz team decides to
+publish them (then: a `<Preview>`, a sitemap entry, a link from the site, and drop `noindex`). Both read tracker.json and
+poll it as `/now` does (`#lib/site/poll.js`).
+
+`/dashboard`, the big-number dashboard (`src/routes/dashboard/+page.svelte`, `src/lib/dashboard/`): one or two large live
+values and up to four small ones over a background, for a wall screen, a spare tablet or a phone. Every value is in
+`values.js` (keys, groups for the picker's tabs, the regions and measures each can show, and how it is worked out, from
+`summarise()` in `#lib/home/now.js`, the generator rows of `#lib/now/generators.js` and tracker.json's `explain` block);
+plants are added from the generator rows, largest first. A value needing embedded solar says "No estimate" when there is
+none. Layouts (`layout.js`) are written `key:region:measure` (`hydro:SI:cf`, `hvdc`, `p_benmore::cf`) in the address
+(`?bg=…&big=…&small=…`, so a link opens that layout) and kept in localStorage `elenz-dashboard` (on `/privacy`); an address
+with a layout wins. `kiosk=1` shows the screen alone (the "wall-screen link"). `Stage.svelte` draws the screen, sized by
+container query units; on phones (≤ 640 px) the tiles stack. Backgrounds: Horizon and Horizon light draw the last 24 hours
+of generation, Live mix the mix now; the drawn scenes are SVG in `backgrounds.js`, loaded only when picked; Cook Strait's
+cable runs the way the HVDC is flowing and Aurora's turbines turn with the wind; all still under reduced motion. Full
+screen uses the browser's full screen where it can, the page's own otherwise. Design from the big-number mockup (15 Nov
+2026). Tests: `tests/dashboard.test.js`, and the dashboards block in `tests/e2e/site.spec.js`.
+
+`/landscape`, the power landscape, a kids' dashboard (`src/routes/landscape/+page.svelte`, `src/lib/landscape/`): an
+animated storybook New Zealand on a canvas, ported from the prototype (13 Nov 2026) with its drawing unchanged. `feed.js`
+turns tracker.json into New Zealand's last 24 hours (islands added; other embedded generation with its renewable part;
+embedded solar with no estimate keeps the last estimate for the picture and is marked `roofNA`, so the numbers under it say
+"No estimate"); `dials.js` turns the feed into 0–1 dials (bands in `BAND`, provisional, see its header), the sun and the
+season; `scene.js` draws and runs the page's controls (Right now, Replay 24 h, Play with dials, full screen), finding its
+elements by id inside the page. The installed capacities for the wind and battery dials come from the generator rows.
+Fredoka (the kids' face) is bundled with `@fontsource/fredoka` and loaded on this page only. Still to do from the
+production plan (post-launch ideas doc): pop-ups beside their subject, the phone layout, drawing the still parts once, the
+kids' wording and a fact check of each dial against the method pages. Tests: `tests/landscape.test.js` and the dashboards
+block in `tests/e2e/site.spec.js`.
 
 ## Articles
 

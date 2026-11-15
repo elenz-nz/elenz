@@ -421,3 +421,50 @@ test.describe('with JavaScript off', () => {
     });
   }
 });
+
+// the dashboards (not linked yet, noindex): the big-number dashboard and the power landscape
+test.describe('dashboards', () => {
+  test('the big-number dashboard opens the layout in its address and keeps a change in it', async ({ page }) => {
+    await page.goto('/dashboard?bg=aurora&big=gen:NZ&small=hydro:NZ:pct,hvdc');
+    await expect(page.locator('.stage .tile.big')).toHaveCount(1);
+    await expect(page.locator('.stage .tile.small')).toHaveCount(2);
+    await expect(page.locator('.stage .tile.big .num')).not.toHaveText('–');
+    const customise = page.getByRole('button', { name: 'Customise' });   // open on wide screens, closed on phones
+    if (await customise.getAttribute('aria-pressed') !== 'true') await customise.click();
+    await page.getByRole('button', { name: 'Cook Strait' }).click();
+    await expect(page).toHaveURL(/bg=strait/);
+    // a value picked from the list replaces the tile's
+    await page.getByRole('button', { name: /^Small 2: HVDC transfer/ }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Prices' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: /^Price at Ōtāhuhu/ }).click();
+    await expect(page.getByRole('dialog')).toBeHidden();
+    await expect(page).toHaveURL(/small=hydro:NZ:pct,price_ota/);
+    await expect(page.locator('.stage .tile.small').nth(1)).toContainText('Price at Ōtāhuhu');
+    // kept in this browser: the bare address opens it again
+    await page.goto('/dashboard');
+    await expect(page.locator('.stage .tile.small').nth(1)).toContainText('Price at Ōtāhuhu');
+  });
+
+  test('the wall-screen link shows the screen alone', async ({ page }) => {
+    await page.goto('/dashboard?bg=mix&big=gen:NZ,ren:NZ&small=&kiosk=1');
+    await expect(page.locator('.stage .tile.big')).toHaveCount(2);
+    await expect(page.locator('.mast-wrap')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Customise' })).toHaveCount(0);
+  });
+
+  test('the power landscape draws from the live data', async ({ page }) => {
+    await page.goto('/landscape');
+    await expect(page.locator('#k-gen')).toHaveText(/MW$/);
+    await expect(page.locator('#dtable .drow')).toHaveCount(9);
+    await page.getByRole('button', { name: 'Replay 24 h' }).click();
+    await expect(page.locator('#scrub')).toBeVisible();
+  });
+
+  for (const path of ['/dashboard', '/landscape']) {
+    test(`${path} fits a phone's screen`, async ({ page }, testInfo) => {
+      test.skip(!isPhone(testInfo), 'phones only');
+      await page.goto(path);
+      await expect.poll(() => page.evaluate(sticksOut), { message: 'what sticks out past the side of the screen' }).toBe('');
+    });
+  }
+});

@@ -1,6 +1,6 @@
 <script lang="ts">
 	// What the site collects. Keep it true to the code: Cloudflare Web Analytics and Umami (app.html), the browser storage keys
-	// (elenz-theme, elenz-view, elenz-prices, elenz-gen-lower, elenz-awake, and the tracker's per-tab sessionStorage), fonts bundled
+	// (elenz-theme, elenz-view, elenz-prices, elenz-gen-lower, elenz-awake, elenz-dashboard, and the tracker's per-tab sessionStorage), fonts bundled
 	// with the site, the email setup (Cloudflare Email Routing to Gmail, replies through Brevo). Change the date when
 	// any of that changes.
 	import Preview from '#lib/site/Preview.svelte';
@@ -26,7 +26,7 @@
 		<p>Elenz counts visits with two services, Cloudflare Web Analytics and Umami. They record which pages are viewed, the site a visitor came from, their country, and the kind of browser and device; Umami also records how long a page stays open. Neither uses cookies or follows anyone from site to site. Umami uses your IP address only to work out your country, and doesn’t store it. We see only totals, never individual visitors. If your browser is set to send Do Not Track, Umami doesn’t count your visit.</p>
 
 		<h2 id="browser">What stays in your browser</h2>
-		<p>So the site opens the way you left it, your browser remembers your light or dark choice, your last region, range, interval and chart settings on the tracker, and whether you asked the Now page to keep the screen on. These are kept in your browser’s own storage, never sent anywhere, and you can remove them by clearing this site’s data in your browser.</p>
+		<p>So the site opens the way you left it, your browser remembers your light or dark choice, your last region, range, interval and chart settings on the tracker, whether you asked the Now page to keep the screen on, and the layout you chose for the dashboard. These are kept in your browser’s own storage, never sent anywhere, and you can remove them by clearing this site’s data in your browser.</p>
 
 		<h2 id="hosting">Hosting</h2>
 		<p>The site runs on Cloudflare. Like any web host, Cloudflare handles your IP address to deliver pages and protect the site from attacks. We don’t store visitors’ IP addresses. Everything the pages need, including their fonts, comes from elenz.co.nz itself; the only other requests are the two visit counters, Cloudflare’s and Umami’s.</p>
