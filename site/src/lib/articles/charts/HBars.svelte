@@ -6,11 +6,12 @@
 
 	type Row = { label: string; value: number; tok: string; note?: string };
 	let {
-		rows, fmt = (v: number) => String(v), legend = [], label = 'Row', valueLabel = 'Value', tickFmt = undefined, table = true, labelWidth = undefined,
+		rows, fmt = (v: number) => String(v), legend = [], label = 'Row', valueLabel = 'Value', tickFmt = undefined, table = true, labelWidth = undefined, max = undefined,
 	}: {
 		rows: Row[]; fmt?: (v: number) => string; legend?: LegendItem[]; label?: string; valueLabel?: string;
 		tickFmt?: (v: number) => string; table?: boolean;
 		labelWidth?: number;   // room for the row labels on phones (default 104)
+		max?: number;          // the axis's top, where values can't pass a limit (e.g. 100 for a percentage of capacity)
 	} = $props();
 
 	let w = $state(680);
@@ -20,7 +21,7 @@
 	const pw = $derived(Math.max(80, w - m.l - m.r));
 	const ph = $derived(rows.length * rowH);
 	// a little headroom past the longest bar on each side, so its value label fits inside the plot
-	const ext = $derived(nice(Math.min(0, ...rows.map((r) => r.value)) * 1.25, Math.max(0, ...rows.map((r) => r.value)) * 1.25, 5));
+	const ext = $derived(nice(Math.min(0, ...rows.map((r) => r.value)) * 1.25, max ?? Math.max(0, ...rows.map((r) => r.value)) * 1.25, 5));
 	const x = $derived(linear(ext[0], ext[1], 0, pw));
 	const xt = $derived(ticks(ext[0], ext[1], narrow ? 4 : 6));
 	let hover = $state(-1);
