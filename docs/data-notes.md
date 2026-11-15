@@ -91,8 +91,9 @@ What we've learned about the EA's data and the services the site uses: feed timi
   12 Nov and the forecast service answered 503 or timed out, so live embedded solar read zero around midday. The live
   job now keeps the stored forecast when a forecast fetch fails, tries a failed fetch again after
   `IRRADIANCE_RETRY` (10 minutes) and asks for two forecast days (one ends at midnight UTC, about 1 pm NZDT). With
-  neither feed for more than two hours and no stored forecast, embedded solar still shows as zero; the week's values
-  are worked out again from the satellite once it returns. Since then (design decision, 13 Nov 2026) the live job
+  neither feed for more than two hours and no stored forecast, embedded solar has no estimate (since 16 Nov 2026; it
+  showed as zero before): see "Embedded solar with no estimate" in `docs/architecture.md`. The week's values are worked
+  out again from the satellite once it returns. Since then (design decision, 13 Nov 2026) the live job
   also fetches the forecast every three hours while the satellite is up to date (`FORECAST_MAX_AGE`) and keeps it
   in `irradiance.json`, so the fallback is already in the store when it is needed: it reaches to the end of the next
   UTC day, 24 to 48 hours past its fetch. The live file's meta carries `sat_end`, `fc_at` (when the forecast was

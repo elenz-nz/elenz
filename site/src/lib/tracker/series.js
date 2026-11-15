@@ -41,8 +41,11 @@ export const KEY = {
 };
 
 // roof: embedded solar (rooftops and small ground-mounted arrays, estimated); roofU: its uncertainty (one standard deviation, MW); zero in data built before it existed
+// roofNA: 1 where the live week has no embedded solar estimate (null in tracker.json: daylight with no irradiance),
+// so averages give the share of a period without one; roof and roofU count as zero there and underlying is NaN.
+// History is always complete (zero).
 // oemb, oembR, oembE: other embedded generation, its renewable part and its emissions (oemb.js; zero before 2009)
-const SERIES = ['geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'roofU', 'oemb', 'oembR', 'oembE', 'batt', 'hvdc', 'metered', 'underlying', 'tiwai', 'price'];
+const SERIES = ['geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'hydro', 'wind', 'solar', 'roof', 'roofU', 'roofNA', 'oemb', 'oembR', 'oembE', 'batt', 'hvdc', 'metered', 'underlying', 'tiwai', 'price'];
 const F = (a, n) => (a ? Float64Array.from(a) : new Float64Array(n));
 // node prices (the Prices page) can have gaps: null in the files, NaN here
 const FN = (a, n) => (a ? Float64Array.from(a, v => (v == null ? NaN : v)) : new Float64Array(n).fill(NaN));
@@ -72,7 +75,11 @@ export function fromLayout(D) {
   const n = D.N;
   const t = D.t ? Float64Array.from(D.t) : Float64Array.from({ length: n }, (_, i) => D.t0 + i * D.step);
   const h = D.h ? Float64Array.from(D.h) : new Float64Array(n).fill(D.step / 36e5);
-  const isl = s => Object.fromEntries(islKeys(s).map(k => [k, F(s[k], n)]));
+  const isl = s => {
+    const o = Object.fromEntries(islKeys(s).map(k => [k, F(s[k], n)]));
+    if (s?.roof?.includes(null)) { o.roofNA = Float64Array.from(s.roof, v => (v == null ? 1 : 0)); o.underlying = FN(s.underlying, n); }
+    return o;
+  };
   const peak = D.peak ? Object.fromEntries(Object.entries(D.peak).map(([r, o]) => [r, Object.fromEntries(Object.entries(o).map(([k, v]) => [k, F(v, n)]))])) : null;
   return {
     n, t, h, NI: isl(D.NI), SI: isl(D.SI), hvdcN: F(D.hvdcN, n), peak, nodes: mapNodes(D.nodes, v => FN(v, n)),

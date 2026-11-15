@@ -196,6 +196,7 @@ Every figure carries one of six labels. The overview publishes them at `/methods
 - Say how an estimate was made: "modelled" for a physical model, "fitted" for a statistical fit, "assumed" for an adopted factor and "filled" for a gap. The label stays Calculated estimate.
 - Never put metered and estimated figures in the same sentence without labelling each one.
 - Keep the visual markers: hatching on charts and "est." in readouts.
+- Where a live figure needs embedded solar and there is no estimate of it (no irradiance in daylight), write "No estimate" in the readout, not zero or a symbol, and leave a gap in the chart.
 
 ## Market terms
 

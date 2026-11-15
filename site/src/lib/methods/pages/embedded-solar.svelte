@@ -10,7 +10,7 @@
 	<p class="k">Key caveats</p>
 	<ul>
 		<li>This figure is a calculated estimate and has never been measured. Its uncertainty is about ±9% on clear days and ±19% under cloud.</li>
-		<li>The satellite runs about 45 minutes behind real time, so the live figure carries the latest cloud cover forward over the last hour.</li>
+		<li>The satellite runs about 45 minutes behind real time, so the live figure carries the latest cloud cover forward over the last hour. With no irradiance at all in daylight, the live figure is <a href="#no-estimate">left blank</a>, not shown as zero.</li>
 		<li>Rooftop orientations are assumptions, and local cloud can make a regional half-hour materially wrong.</li>
 	</ul>
 	<p><a href="#limitations">Accuracy and limitations</a> has the detail.</p>
@@ -51,7 +51,8 @@
 <h3 id="sun">3. How much sun</h3>
 <p>Irradiance is the sunshine reaching the ground. From 2016, we use Himawari satellite irradiance at each point, with global and diffuse values every 10 minutes. Each value is the mean of the 10 minutes before it, and the data arrives about 45 minutes behind real time.</p>
 <p>For intervals the satellite hasn’t reached, we carry the latest clear-sky index forward for up to 2 hours. The clear-sky index is measured sunshine divided by the sunshine under a clear sky. Each interval then uses its own clear-sky sunshine, multiplied by that index. If the satellite falls more than 2 hours behind or stops, forecast irradiance stands in until it returns.</p>
-<p>The satellite leaves the low-sun hours and a couple of housekeeping slots each day blank. We fill these from the nearest valid clear-sky index and bridge short gaps. Anything longer shows as zero.</p>
+<p>The satellite leaves the low-sun hours and a couple of housekeeping slots each day blank. We fill these from the nearest valid clear-sky index and bridge gaps of up to 30 minutes.</p>
+<p id="no-estimate">In the live week, a daylight interval with no irradiance from the satellite or the forecast has no estimate. The charts leave a gap there and the readouts say “No estimate”, rather than show zero. Demand with embedded generation, the renewable share and emissions intensity have no figure for that interval either, because each would leave embedded solar out. Totals of generation over a period count it as zero, and the summary says how long had no estimate. At night embedded solar is zero whether or not there is irradiance. In the history, irradiance is complete, so this doesn’t arise.</p>
 <p>Before 2016, we use ERA5 reanalysis, which is hourly on a grid of about 30 km. It suits daily and monthly totals, but is smoother within the day. Only 6 to 40 MW was installed in those years.</p>
 
 <h3 id="model">4. From sunshine to output</h3>

@@ -289,6 +289,15 @@ function halfHours(D) {
   // other embedded generation (records.py VERSION 7; withOemb: the named plants' fill is in their fuels already): the
   // layer counts in generation and the renewable share only
   const a = (isl, key) => D[isl][key] ?? z;
+  // half-hours where an island has no embedded solar estimate for any of its intervals (null: daylight without
+  // irradiance) give no renewable share or embedded solar figure (NaN) rather than one that counts it as zero
+  const noRoof = (isl) => {
+    const r = D[isl].roof, o = new Array(m).fill(false);
+    if (r) for (let i = 0; i < m; i++) for (let q = 0; q < k; q++) if (r[j0 + i * k + q] === null) o[i] = true;
+    return o;
+  };
+  const NA = { NI: noRoof('NI'), SI: noRoof('SI') };
+  NA.NZ = NA.NI.map((x, i) => x || NA.SI[i]);
   const out = {};
   for (const r of ['NZ', 'NI', 'SI']) {
     const fuel = (f) => (r === 'NZ' ? a('NI', f).map((x, j) => x + a('SI', f)[j]) : a(r, f));
@@ -308,8 +317,8 @@ function halfHours(D) {
     const G = avg(gen), Rn = avg(ren);
     const S = {
       demand_max: avg(dem), demand_min: avg(dem),
-      ren_max: G.map((g, i) => (g > 0 ? (100 * Rn[i]) / g : NaN)), fossil_min: avg(fos),
-      wind_max: avg(F.wind), solar_max: avg(F.solar), roof_max: avg(F.roof), hydro_max: avg(F.hydro),
+      ren_max: G.map((g, i) => (g > 0 && !NA[r][i] ? (100 * Rn[i]) / g : NaN)), fossil_min: avg(fos),
+      wind_max: avg(F.wind), solar_max: avg(F.solar), roof_max: avg(F.roof).map((v, i) => (NA[r][i] ? NaN : v)), hydro_max: avg(F.hydro),
     };
     S.ren_min = S.ren_max;
     S.fossil_max = S.fossil_min;
@@ -675,6 +684,9 @@ function liveSums(D, from, to) {
         dem: at(s, 'metered', j), gen: GEN.reduce((a, f) => a + (f === 'batt' ? 0 : F[f]), 0), ren: REN.reduce((a, f) => a + F[f], 0),
         fossil: FOSSIL.reduce((a, f) => a + F[f], 0), hydro: F.hydro, wind: F.wind, solar: F.solar, roof: F.roof, price: at(s, 'price', j),
       };
+      // no embedded solar estimate (null: daylight without irradiance): the interval leaves the renewable share (both
+      // its parts) and embedded solar's figure out, rather than counting embedded solar as zero
+      if (at(s, 'roof', j) === null) isl[s].gen = isl[s].ren = isl[s].roof = null;
     }
     for (const s of ['NI', 'SI']) for (const [k, v] of Object.entries(isl[s])) add(s, k, v);
     const a = isl.NI, b = isl.SI;

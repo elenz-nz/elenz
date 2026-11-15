@@ -59,8 +59,9 @@
 	type Fact = { k: string; n: string; v: string; l: string; v2?: string; l2?: string; c: string };
 	const facts = $derived.by((): Fact[] => {
 		if (!now || !nz) return [];
+		// the renewable share is left out while there is no embedded solar estimate (no irradiance data)
 		const hv = now.hvdc.mid, out: Fact[] = [
-			{ k: 'ren', n: 'Renewable share', v: `${nz.ren.toFixed(1)}%`, l: 'renewable', c: '--g-ren' },
+			...(nz.ren == null ? [] : [{ k: 'ren', n: 'Renewable share', v: `${nz.ren.toFixed(1)}%`, l: 'renewable', c: '--g-ren' }]),
 			{ k: 'price', n: 'Wholesale price', v: money(now.regions.NI.price ?? 0), l: '/MWh at Haywards', v2: money(now.regions.SI.price ?? 0), l2: 'at Benmore', c: '--accent' },
 			Math.abs(hv) < 1
 				? { k: 'hvdc', n: 'HVDC', v: '0 MW', l: 'on the HVDC link', c: '--f-hvdc' }

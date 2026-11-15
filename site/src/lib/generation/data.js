@@ -42,10 +42,12 @@ function mwAt(S, k, region, i) {
 }
 
 /** Per point: total generation and the metric's part of it, in MW. Shares are of generation less battery discharge
- *  (as em6): that energy was generated, and counted, once already when the battery charged. */
+ *  (as em6): that energy was generated, and counted, once already when the battery charged. A point of the live week
+ *  with no embedded solar estimate (roofNA, series.js) has no share (NaN), since its total would leave embedded solar
+ *  out; na marks those points. */
 export function shares(S, region, mk) {
   const parts = METRIC[mk].parts, n = S.n;
-  const part = new Float64Array(n), tot = new Float64Array(n), pct = new Float64Array(n);
+  const part = new Float64Array(n), tot = new Float64Array(n), pct = new Float64Array(n), na = new Uint8Array(n);
   for (let i = 0; i < n; i++) {
     let a = 0, b = 0;
     for (const k of GEN) {
@@ -55,8 +57,9 @@ export function shares(S, region, mk) {
       else if (k === 'oemb' && mk === 'ren') a += mwAt(S, 'oembR', region, i);   // other embedded: its renewable part
     }
     part[i] = a; tot[i] = b; pct[i] = b > 0 ? (100 * a) / b : NaN;
+    if (isls(region).some((isl) => S[isl].roofNA?.[i] > 0)) { na[i] = 1; pct[i] = NaN; }
   }
-  return { part, tot, pct };
+  return { part, tot, pct, na };
 }
 
 const INT_KEY = { '30m': KEY.hh, '1d': KEY.day, '1w': KEY.week, '1mo': KEY.month, '1yr': KEY.year };
@@ -81,12 +84,13 @@ export function alignYearAgo(t, prev, values) {
   return out;
 }
 
-/** Energy-weighted share over a segment: the metric's MWh over all generation's. */
+/** Energy-weighted share over a segment: the metric's MWh over all generation's (points with no embedded solar
+ *  estimate left out). */
 export function shareOver(S, region, mk) {
   if (!S || !S.n) return NaN;
-  const { part, tot } = shares(S, region, mk);
+  const { part, tot, na } = shares(S, region, mk);
   let a = 0, b = 0;
-  for (let i = 0; i < S.n; i++) { a += part[i] * S.h[i]; b += tot[i] * S.h[i]; }
+  for (let i = 0; i < S.n; i++) if (!na[i]) { a += part[i] * S.h[i]; b += tot[i] * S.h[i]; }
   return b > 0 ? (100 * a) / b : NaN;
 }
 

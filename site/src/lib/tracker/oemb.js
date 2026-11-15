@@ -53,7 +53,8 @@ export function withOemb(D) {
       const r = OEMB_REN.includes(f), ef = EF[f] ?? 0;
       for (let j = 0; j < n; j++) { const x = Math.max(0, v[j] ?? 0); tot[j] += x; if (r) ren[j] += x; em[j] += x * ef; }
     }
-    if (D[isl].underlying) D[isl].underlying = D[isl].underlying.map((x, j) => (x ?? 0) + tot[j]);
+    // null: the live week's embedded solar has no estimate there (no irradiance in daylight), so neither has this
+    if (D[isl].underlying) D[isl].underlying = D[isl].underlying.map((x, j) => (x === null ? null : (x ?? 0) + tot[j]));
   }
   for (const [name, s] of Object.entries(D.oemb.named ?? {})) {
     const [fuel, isl] = D.oemb.info?.[name]?.[0] ? D.oemb.info[name] : NAMED[name] ?? ['', ''];

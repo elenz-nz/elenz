@@ -1,6 +1,9 @@
 // The home page's figures: the newest interval of tracker.json, by island and for New Zealand.
 // Totals follow the tracker: generation is the sum of each fuel's output (battery discharge only, no HVDC), the
 // renewable share and emissions intensity are of that total less battery discharge.
+// Where the newest interval has no embedded solar estimate (null in tracker.json: daylight with no irradiance), that
+// island's roof, roofU and underlying are null, and so are its renewable share and emissions intensity (and New
+// Zealand's, if either island has none): the pages say "No estimate" rather than show a figure that leaves it out.
 import { FUELS } from '#lib/tracker/fuels.js';
 import { efAt, geoFactor } from '#lib/tracker/emissions.js';
 import { withOemb } from '#lib/tracker/oemb.js';
@@ -33,17 +36,19 @@ export function summarise(D) {
     }
     return { fuels, gen, ren: base > 0 ? (ren / base) * 100 : 0, co2: base > 0 ? (co2 / base) * 1000 : 0 };
   };
-  const isl = (r) => ({
+  const none = (r) => D[r].roof?.[j] === null;   // no embedded solar estimate now
+  const blank = (o, gap) => (gap ? { ...o, ren: null, co2: null, underlying: null, roof: null, roofU: null } : o);
+  const isl = (r) => blank({
     ...region((k) => at(r, k), r),
     demand: at(r, 'metered'), underlying: at(r, 'underlying'), price: at(r, 'price'),
     roof: at(r, 'roof'), roofU: at(r, 'roofU'),
-  });
+  }, none(r));
   const NI = isl('NI'), SI = isl('SI');
-  const NZ = {
+  const NZ = blank({
     ...region((k) => at('NI', k) + at('SI', k)),
     demand: NI.demand + SI.demand, underlying: NI.underlying + SI.underlying, tiwai: at('SI', 'tiwai'),
     roof: NI.roof + SI.roof, roofU: NI.roofU + SI.roofU,
-  };
+  }, none('NI') || none('SI'));
   // the generation mix: fuels with output, largest first; battery only while discharging
   const mix = GEN.map((f) => ({ ...f, mw: NZ.fuels[f.k] })).filter((f) => f.mw > 0.5).sort((a, b) => b.mw - a.mw);
   return {

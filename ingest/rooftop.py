@@ -428,6 +428,17 @@ def irr_fc_at(raw):
         return None
 
 
+def daylight(times, min_ghi=20):
+    """{'NI': bool array, 'SI': bool array}: at `times` (UTC), whether the sun is up enough at any of the island's
+    points (clear-sky irradiance above min_ghi W/m²) for embedded solar to be more than zero."""
+    pts, _ = points()
+    times = pd.DatetimeIndex(times)
+    out = {'NI': np.zeros(len(times), bool), 'SI': np.zeros(len(times), bool)}
+    for _pid, isl, lat, lon in pts:
+        out[isl] |= pv.clearsky_ghi(pv.sun(times, lat, lon)[0]) > min_ghi
+    return out
+
+
 def live(sat, fc, full, cap):
     """Rooftop solar MW (and uncertainty) for the live 5-minute intervals starting at `full` (UTC): satellite,
     then the latest clear-sky index carried forward (up to two hours), then the forecast fallback."""
@@ -443,4 +454,8 @@ def live(sat, fc, full, cap):
     ahead = (mid > last) if last is not None else np.ones(len(mid), bool)
     for isl in ('NI', 'SI'):
         res[isl + 'u'] = res[isl + 'u'].where(~ahead, np.sqrt(res[isl + 'u'] ** 2 + (UNCERTAINTY['nowcast'] * res[isl]) ** 2))
-    return {k: pd.Series(v.values, index=full) for k, v in res.items()}, n_now
+    out = {k: pd.Series(v.values, index=full) for k, v in res.items()}
+    # daylight by island: where it is light and there is no irradiance, the live file has no estimate (assemble())
+    for isl, lit in daylight(mid).items():
+        out[isl + 'lit'] = pd.Series(lit, index=full)
+    return out, n_now

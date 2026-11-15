@@ -50,7 +50,7 @@
 </Calculations>
 
 <h3 id="embedded">Demand with embedded generation</h3>
-<p>Demand with embedded generation is grid demand plus the two layers that don’t pass through the grid: <a href="/methods/embedded-solar">embedded solar</a> from August 2013, and <a href="/methods/other-embedded">other embedded generation</a> from January 2009. Both are calculated estimates.</p>
+<p>Demand with embedded generation is grid demand plus the two layers that don’t pass through the grid: <a href="/methods/embedded-solar">embedded solar</a> from August 2013, and <a href="/methods/other-embedded">other embedded generation</a> from January 2009. Both are calculated estimates. In the live week, an interval with <a href="/methods/embedded-solar#no-estimate">no embedded solar estimate</a> has no figure for demand with embedded generation, so the dashed line has a gap there.</p>
 <p>Ngāwhā and Teviot are filled in as generation in recent weeks and the live week, but that fill isn’t added to demand of either kind. Dispatch demand already matches metered demand to within 0.2 MW on average, and adding the fill put it about 24 MW too high.</p>
 <Calculations>
 	<p class="formula">Demand with embedded generation = grid demand + embedded solar + other embedded generation</p>

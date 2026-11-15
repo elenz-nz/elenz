@@ -49,7 +49,7 @@ export const TOPICS: Topic[] = [
 		summary: 'Solar on local networks that the market doesn’t dispatch, most of it on rooftops.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
 		estimate: true,
-		reviewed: '2026-11-06',
+		reviewed: '2026-11-16',
 		code: ['ingest/rooftop.py', 'ingest/pv.py', 'facilities/rooftop_points.csv', 'facilities/rooftop_capacity.json', 'analysis/rooftop_exports.py', 'analysis/README.md'],
 	},
 	{
@@ -67,7 +67,7 @@ export const TOPICS: Topic[] = [
 		title: 'Demand',
 		summary: 'The electricity taken from the national grid in each island, and demand with embedded generation added back.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
-		reviewed: '2026-11-06',
+		reviewed: '2026-11-16',
 		code: ['ingest/metered.py', 'ingest/build_tracker.py', 'site/src/lib/tracker/oemb.js', 'analysis/README.md'],
 	},
 	{

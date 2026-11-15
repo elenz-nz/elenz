@@ -22,8 +22,9 @@
 	const LIVE_MINUTES = 15;
 
 	type Fuel = { k: string; name: string; tok: string; hatch?: number; tag?: string; mw: number };
-	type Region = { fuels: Record<string, number>; gen: number; ren: number; co2: number; demand: number; underlying: number;
-		price?: number; roof: number; roofU: number; tiwai?: number };
+	// ren, co2, underlying, roof and roofU are null while there is no embedded solar estimate (no irradiance data)
+	type Region = { fuels: Record<string, number>; gen: number; ren: number | null; co2: number | null; demand: number; underlying: number | null;
+		price?: number; roof: number | null; roofU: number | null; tiwai?: number };
 	type Now = { t: number; end: number; regions: { NZ: Region; NI: Region; SI: Region }; hvdc: { mid: number; ni: number; si: number }; mix: Fuel[] };
 
 	let now = $state<Now | null>(null);
@@ -160,12 +161,17 @@
 				<span class="k-lbl">Demand</span>
 				<span class="k-val">{nz ? fmt(nz.demand) : '–'}<small>MW</small></span>
 				<!-- only while there is embedded solar to add (none at night: NOW-05) -->
-				<span class="k-sub">{#if nz && nz.roof >= 0.5}{fmt(nz.underlying)} MW with embedded generation <span class="tag">est.</span>{/if}</span>
+				<span class="k-sub">{#if nz && nz.roof != null && nz.underlying != null && nz.roof >= 0.5}{fmt(nz.underlying)} MW with embedded generation <span class="tag">est.</span>{/if}</span>
 			</div>
 			<div class="kpi">
 				<span class="k-lbl">Renewable share</span>
-				<span class="k-val">{nz ? nz.ren.toFixed(1) : '–'}<small>%</small></span>
-				<span class="k-sub">of generation</span>
+				{#if nz && nz.ren == null}
+					<span class="k-val k-none">No estimate</span>
+					<span class="k-sub">no embedded solar estimate</span>
+				{:else}
+					<span class="k-val">{nz && nz.ren != null ? nz.ren.toFixed(1) : '–'}<small>%</small></span>
+					<span class="k-sub">of generation</span>
+				{/if}
 			</div>
 			<div class="kpi" class:k-up={ex && ex.tier !== 'quiet' && (ex.variant === 'high' || ex.variant === 'split')} class:k-low={ex && ex.tier !== 'quiet' && ex.variant === 'low'}>
 				<span class="k-lbl">Wholesale price</span>
@@ -182,13 +188,18 @@
 			</div>
 			<div class="kpi">
 				<span class="k-lbl">Emissions intensity</span>
-				<span class="k-val">{nz ? fmt(nz.co2) : '–'}<small>g CO₂e/kWh</small></span>
+				{#if nz && nz.co2 == null}<span class="k-val k-none">No estimate</span>{:else}<span class="k-val">{nz && nz.co2 != null ? fmt(nz.co2) : '–'}<small>g CO₂e/kWh</small></span>{/if}
 				<span class="k-sub"><a class="k-link" href="/methods/emissions">CO₂ per kWh generated</a></span>
 			</div>
 			<div class="kpi">
 				<span class="k-lbl">Embedded solar <span class="tag">est.</span></span>
-				<span class="k-val">{nz ? fmt(nz.roof) : '–'}<small>MW{nz && nz.roofU > 0.5 ? ` ± ${fmt(nz.roofU)}` : ''}</small></span>
-				<span class="k-sub">rooftops and small arrays on local networks</span>
+				{#if nz && nz.roof == null}
+					<span class="k-val k-none">No estimate</span>
+					<span class="k-sub">no irradiance data at the moment</span>
+				{:else}
+					<span class="k-val">{nz && nz.roof != null ? fmt(nz.roof) : '–'}<small>MW{nz && nz.roofU && nz.roofU > 0.5 ? ` ± ${fmt(nz.roofU)}` : ''}</small></span>
+					<span class="k-sub">rooftops and small arrays on local networks</span>
+				{/if}
 			</div>
 		</section>
 
@@ -251,7 +262,7 @@
 									<dt>Generation</dt><dd>{fmt(R.gen)} <small>MW</small></dd>
 									<dt>Demand</dt><dd>{fmt(R.demand)} <small>MW</small></dd>
 									<dt>Price <span class="node-code">{node}</span></dt><dd>{money(R.price ?? 0)} <small>/MWh</small></dd>
-									<dt>Renewables</dt><dd>{R.ren.toFixed(1)}<small>%</small></dd>
+									<dt>Renewables</dt><dd>{#if R.ren == null}No estimate{:else}{R.ren.toFixed(1)}<small>%</small>{/if}</dd>
 								</dl>
 							</div>
 						{/each}
@@ -313,6 +324,8 @@
 	.k-val.prices { display: grid; gap: 2px; font-size: 1.25rem; }
 	.k-val .isl { font-family: var(--font-ui); font-size: 0.72rem; font-weight: 700; color: var(--muted); margin-right: 7px; letter-spacing: 0.04em; }
 	.k-sub { color: var(--muted); font-size: 0.76rem; }
+	/* no embedded solar estimate: said in words, at a size that fits the tile */
+	.k-val.k-none { font-family: var(--font-ui); font-size: 1.1rem; font-weight: 500; color: var(--muted); letter-spacing: 0; }
 	/* the price tile follows the explainer when it is highlighted or open */
 	.kpi.k-up { border-color: color-mix(in srgb, var(--warn-ink) 45%, var(--line)); background: color-mix(in srgb, var(--warn-bg) 55%, var(--surface)); }
 	.kpi.k-low { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }

@@ -66,7 +66,7 @@ def factors(js):
         S = js[isl]
         get = lambda k: _arr(S[k]) if k in S else np.zeros(n)   # noqa: E731
         out[f'{isl}_wind'] = get('wind')
-        out[f'{isl}_solar'] = get('solar') + get('roof')
+        out[f'{isl}_solar'] = get('solar') + np.nan_to_num(get('roof'))   # no estimate (null in daylight): as zero here
         out[f'{isl}_hydro'] = get('hydro')
         out[f'{isl}_thermal'] = get('coal') + get('gas') + get('diesel')
         out[f'{isl}_demand'] = get('metered')
