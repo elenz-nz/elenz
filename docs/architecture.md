@@ -48,17 +48,23 @@ needing embedded solar says "No estimate" when there is none. Layouts (`layout.j
 layout wins. `kiosk=1` shows the screen alone (the "wall-screen link"). Simple shows the numbers and Live or Delayed;
 Detailed (the default) adds the time and the line under each value.
 `Stage.svelte` draws the screen. Its sizes are hundredths of its own measured width (`--u`), not container query units,
-which need Safari 16. On wide screens the cards sit at the foot with a margin round them, in two large columns and four
-small ones whether or not each is filled, so fewer cards keep their size (test report, 16 Nov 2026: on a PC and a TV
-they had stretched across the screen). A value and unit too wide for their card shrink to fit (`fit`, down to 35%).
+which need Safari 16. On wide screens the cards sit in the middle with a margin round them (test report, 16 Nov 2026:
+at the foot they sat too low), in two large columns and four small ones whether or not each is filled, so fewer cards
+keep their size (test report, 16 Nov 2026: on a PC and a TV they had stretched across the screen). Cards, buttons and
+panels follow the site's own (4 px corners; the header buttons as Keep screen on, the copy buttons as the site's Copy). A value and unit too wide for their card shrink to fit (`fit`, down to 35%).
 Screens 640 px wide or less stack the cards, with the credit at the foot of the screen. Full screen uses the browser's
 full screen where it can, the page's own otherwise, with an X that fades after 3 seconds without the mouse or a touch.
 Backgrounds: Horizon and Horizon light draw the last 24 hours of generation, Live mix the mix now, Plain colour a flat
-colour (eight ready-made or any picked; the ink turns dark on light colours, `plainPalette()`); the drawn scenes are SVG
-in `backgrounds.js`, loaded only when picked. Contours (Ruapehu, Tongariro and Ngauruhoe), Cook Strait's coastline,
-Lines at sunset (a 220 kV double-circuit lattice line) and the Alps' snow are made by `analysis/dashboard_backgrounds.py`
-from LINZ's 8 m contour-interpolated DEM (CC BY 4.0; credited on the screen and on /methods/sources): rerun it rather
-than editing the SVG. Cook Strait's cable runs the way the HVDC is flowing and Aurora's turbines turn with the wind; all
+colour (twelve ready-made, dark to light, or any picked; the ink is light or dark, whichever stands out more,
+`plainPalette()`). Any colour is picked with the page's own picker (`ColourPick.svelte`: colour, strength and shade
+sliders and a hex box), not the browser's, whose dialog differs on every system (design decision, 16 Nov 2026); the
+screen follows a slider as it moves and the address and storage are written when it is let go. The drawn scenes are
+SVG in `backgrounds.js`, loaded only when picked, and keep their main feature clear of the centred cards. Contours
+(Ruapehu), Cook Strait's coastline, Lines at sunset (a 220 kV double-circuit lattice line) and the Alps' snow are made
+by `analysis/dashboard_backgrounds.py` from LINZ's 8 m contour-interpolated DEM (CC BY 4.0; credited on the screen and
+on /methods/sources): rerun it rather than editing the SVG (`--look <name>` draws one to /tmp without touching
+`backgrounds.js`). Cook Strait's overland lines are routed over land only (the cheapest path on the DEM's grid, dearer
+near the coast), from Benmore's direction to Fighting Bay and from Oteranga Bay to Haywards, where the line stops. Cook Strait's cable runs the way the HVDC is flowing and Aurora's turbines turn with the wind; all
 still under reduced motion. Design from the big-number mockup (15 Nov 2026). Tests: `tests/dashboard.test.js`, and the
 dashboards block in `tests/e2e/site.spec.js`.
 

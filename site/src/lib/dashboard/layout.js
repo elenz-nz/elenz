@@ -20,23 +20,46 @@ export const BACKGROUNDS = [
   { k: 'mix', name: 'Live mix', ink: '#f4f7f6', sub: '#c2cdcb', tile: 'rgba(5,10,12,.6)', edge: 'rgba(255,255,255,.1)', sw: 'linear-gradient(90deg,#4f8bd6 58%,#2fa883 58% 75%,#c4508f 75% 88%,#bb8c18 88%)' },
 ];
 
-// Plain colour: a flat background; ready-made colours, or any picked (col, six hex digits)
+// Plain colour: a flat background; ready-made colours from dark to light, or any picked (col, six hex digits)
 export const PLAIN = [
-  { c: '0e2a2c', name: 'Deep teal' }, { c: '0b1a33', name: 'Midnight' }, { c: '1c1f24', name: 'Charcoal' }, { c: '000000', name: 'Black' },
-  { c: '14301f', name: 'Bush' }, { c: '2c1a35', name: 'Plum' }, { c: '4a1f14', name: 'Rust' }, { c: 'f2efe8', name: 'Paper' },
+  { c: '000000', name: 'Black' }, { c: '2a2f36', name: 'Charcoal' }, { c: '0b1a33', name: 'Midnight' }, { c: '0e2a2c', name: 'Deep teal' },
+  { c: '1f5f8b', name: 'Ocean' }, { c: '1e6b4f', name: 'Bush' }, { c: '5b3a9e', name: 'Purple' }, { c: 'b4432f', name: 'Brick' },
+  { c: 'e0a526', name: 'Gold' }, { c: '8fd0e6', name: 'Sky' }, { c: 'c9e7d4', name: 'Mint' }, { c: 'f2efe8', name: 'Paper' },
 ];
 const HEX = /^[0-9a-f]{6}$/i;
-/** Ink, secondary ink, card fill and card edge that read on a plain colour: light on dark colours, dark on light. */
-export function plainPalette(hex) {
-  const h = HEX.test(hex) ? hex : PLAIN[0].c;
+const DARK_INK = '#132020';
+const lum = (h) => {
   const lin = (i) => { const v = parseInt(h.slice(i, i + 2), 16) / 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
-  const lum = 0.2126 * lin(0) + 0.7152 * lin(2) + 0.0722 * lin(4);
-  return lum < 0.3
-    ? { ink: '#f4f7f6', sub: 'rgba(244,247,246,.7)', tile: 'rgba(0,0,0,.24)', edge: 'rgba(255,255,255,.1)' }
-    : { ink: '#132020', sub: 'rgba(19,32,32,.68)', tile: 'rgba(255,255,255,.55)', edge: 'rgba(19,32,32,.12)' };
+  return 0.2126 * lin(0) + 0.7152 * lin(2) + 0.0722 * lin(4);
+};
+/** Ink, secondary ink, card fill and card edge that read on a plain colour: light or dark ink, whichever stands out
+ * more from it. */
+export function plainPalette(hex) {
+  const h = HEX.test(hex) ? hex : DEFAULT.col;
+  const L = lum(h);
+  return 1.05 / (L + 0.05) >= (L + 0.05) / (lum(DARK_INK.slice(1)) + 0.05)
+    ? { ink: '#f4f7f6', sub: 'rgba(244,247,246,.72)', tile: 'rgba(0,0,0,.24)', edge: 'rgba(255,255,255,.12)' }
+    : { ink: DARK_INK, sub: 'rgba(19,32,32,.7)', tile: 'rgba(255,255,255,.5)', edge: 'rgba(19,32,32,.12)' };
 }
 
-export const DEFAULT = Object.freeze({ bg: 'horizon', col: PLAIN[0].c, view: 'detailed', big: ['gen:NZ', 'ren:NZ'], small: ['wind:NZ:mw', 'price:NI', 'hvdc', 'co2:NZ'] });
+/** Six hex digits as hue (0 to 360), saturation and lightness (0 to 100), for the colour picker's sliders. */
+export function toHsl(hex) {
+  const h = HEX.test(hex) ? hex : DEFAULT.col;
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2, d = max - min;
+  if (!d) return { h: 0, s: 0, l: Math.round(l * 100) };
+  const s = d / (1 - Math.abs(2 * l - 1));
+  const hue = max === r ? ((g - b) / d + 6) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return { h: Math.round(hue * 60), s: Math.round(s * 100), l: Math.round(l * 100) };
+}
+/** Hue, saturation and lightness back to six hex digits. */
+export function fromHsl({ h, s, l }) {
+  const S = s / 100, L = l / 100, a = S * Math.min(L, 1 - L);
+  const f = (n) => { const k = (n + h / 30) % 12; return Math.round(255 * (L - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)))); };
+  return [f(0), f(8), f(4)].map((v) => v.toString(16).padStart(2, '0')).join('');
+}
+
+export const DEFAULT = Object.freeze({ bg: 'horizon', col: '0e2a2c', view: 'detailed', big: ['gen:NZ', 'ren:NZ'], small: ['wind:NZ:mw', 'price:NI', 'hvdc', 'co2:NZ'] });
 export const MAX_BIG = 2, MAX_SMALL = 4;
 // values offered first when a layout grows a tile
 export const POOL = ['demand:NZ', 'hydro:NZ:mw', 'wind:NZ:mw', 'price:NI', 'hvdc', 'co2:NZ', 'tiwai', 'allsolar:NZ:mw', 'geo:NZ:mw', 'ren:NZ', 'gen:NZ'];

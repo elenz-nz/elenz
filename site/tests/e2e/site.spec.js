@@ -455,6 +455,30 @@ test.describe('dashboards', () => {
       .filter((r) => { const n = r.querySelector('.num'); return n.scrollWidth > n.clientWidth + 1; }).length)).toBe(0);
   });
 
+  test('the cards sit in the middle of the screen', async ({ page }) => {
+    await page.goto('/dashboard?bg=aurora&big=gen:NZ&small=hvdc&kiosk=1');
+    await expect(page.locator('.stage .tile.big .num')).not.toHaveText('–');
+    // how far the cards' middle is from the screen's, as a share of its height (measured again until the layout settles)
+    await expect.poll(() => page.evaluate(() => {
+      const st = document.querySelector('.stage').getBoundingClientRect(), c = document.querySelector('.stage .cards').getBoundingClientRect();
+      return Math.abs((c.top + c.height / 2) - (st.top + st.height / 2)) / st.height;
+    })).toBeLessThan(0.06);
+  });
+
+  test("Plain colour's own picker changes the screen, and the address once it's let go", async ({ page }, testInfo) => {
+    test.skip(isPhone(testInfo), 'desktop only: the panel starts closed on phones');
+    await page.goto('/dashboard?bg=plain&col=1f5f8b&big=gen:NZ&small=');
+    await page.getByRole('button', { name: 'Pick any colour' }).click();
+    const code = page.getByRole('textbox', { name: /Colour code/ });
+    await expect(code).toHaveValue('#1f5f8b');
+    await code.fill('#e0a526');
+    await code.blur();
+    await expect(page.locator('.stage .plain')).toHaveAttribute('style', /rgb\(224, 165, 38\)/);
+    await expect(page).toHaveURL(/col=e0a526/);
+    // light colours get dark ink
+    await expect(page.locator('.stage')).toHaveAttribute('style', /--ink: ?#132020/);
+  });
+
   test('the wall-screen link shows the screen alone', async ({ page }) => {
     await page.goto('/dashboard?bg=mix&big=gen:NZ,ren:NZ&small=&kiosk=1');
     await expect(page.locator('.stage .tile.big')).toHaveCount(2);

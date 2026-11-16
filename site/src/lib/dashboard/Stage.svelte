@@ -108,36 +108,38 @@
 			<b>elenz</b>
 			<span class="live" class:late={!fresh}><i></i>{live}</span>
 		</div>
-		<div class="bigrow">
-			{#each big as t}
-				<div class="tile big" class:txt={t.txt}>
-					<div class="lab"><i style="background:{t.c}"></i><span>{t.label}{#if t.region}<em>{' · '}{RN[t.region]}</em>{/if}{#if t.est && !t.none}<span class="etag">est.</span>{/if}</span></div>
-					<div class="row" class:none={t.none} use:fit={t.v + t.u}><span class="num">{t.v}</span>{#if t.u}<span class="unit">{t.u}</span>{/if}</div>
-					{#if !simple}<div class="sub">{t.s}</div>{/if}
-				</div>
-			{/each}
-		</div>
-		{#if small.length}
-			<div class="smallrow">
-				{#each small as t}
-					<div class="tile small" class:txt={t.txt}>
-						<div class="lab"><i style="background:{t.c}"></i><span>{t.label}{#if t.region}<em>{' · '}{t.region}</em>{/if}{#if t.est && !t.none}<span class="etag">est.</span>{/if}</span></div>
+		<div class="cards">
+			<div class="bigrow">
+				{#each big as t}
+					<div class="tile big" class:txt={t.txt}>
+						<div class="lab"><i style="background:{t.c}"></i><span>{t.label}{#if t.region}<em>{' · '}{RN[t.region]}</em>{/if}{#if t.est && !t.none}<span class="etag">est.</span>{/if}</span></div>
 						<div class="row" class:none={t.none} use:fit={t.v + t.u}><span class="num">{t.v}</span>{#if t.u}<span class="unit">{t.u}</span>{/if}</div>
 						{#if !simple}<div class="sub">{t.s}</div>{/if}
 					</div>
 				{/each}
 			</div>
-		{/if}
+			{#if small.length}
+				<div class="smallrow">
+					{#each small as t}
+						<div class="tile small" class:txt={t.txt}>
+							<div class="lab"><i style="background:{t.c}"></i><span>{t.label}{#if t.region}<em>{' · '}{t.region}</em>{/if}{#if t.est && !t.none}<span class="etag">est.</span>{/if}</span></div>
+							<div class="row" class:none={t.none} use:fit={t.v + t.u}><span class="num">{t.v}</span>{#if t.u}<span class="unit">{t.u}</span>{/if}</div>
+							{#if !simple}<div class="sub">{t.s}</div>{/if}
+						</div>
+					{/each}
+				</div>
+			{/if}
+		</div>
 		<div class="foot">Elenz (elenz.co.nz), from Electricity Authority data{#if 'credit' in info && bg !== 'plain'}{' · '}{info.credit}{/if}</div>
 	</div>
 </div>
 
 <style>
-	.stage { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 14px; background: #131c1c; color: var(--ink);
+	.stage { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 4px; background: #131c1c; color: var(--ink);
 		font-family: var(--font-ui); }
 	.bg, .bg :global(svg), .plain { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
-	/* wide screens: the cards sit at the foot of the screen, with room around them; two large columns and four small
+	/* wide screens: the cards sit in the middle of the screen, with room around them; two large columns and four small
 	   ones whether or not each is filled, so fewer cards stay the same size */
 	.fg { position: absolute; inset: 0; display: flex; flex-direction: column; gap: calc(1.5 * var(--u)); padding: calc(4.2 * var(--u)) calc(5.6 * var(--u)) calc(2.4 * var(--u)); }
 	.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: calc(1 * var(--u)) calc(2 * var(--u)); }
@@ -145,11 +147,13 @@
 	.live { display: inline-flex; align-items: center; gap: calc(0.7 * var(--u)); font: 500 calc(1.15 * var(--u)) var(--font-data); color: var(--sub); font-variant-numeric: tabular-nums; }
 	.live i { width: calc(0.7 * var(--u)); height: calc(0.7 * var(--u)); border-radius: 50%; background: #3fd18b; box-shadow: 0 0 0 calc(0.3 * var(--u)) rgba(63, 209, 139, 0.18); }
 	.live.late i { background: #e0b44c; box-shadow: 0 0 0 calc(0.3 * var(--u)) rgba(224, 180, 76, 0.18); }
-	.bigrow { margin-top: auto; display: grid; gap: calc(1.6 * var(--u)); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.cards { margin-block: auto; display: grid; gap: calc(1.5 * var(--u)); }
+	.bigrow { display: grid; gap: calc(1.6 * var(--u)); grid-template-columns: repeat(2, minmax(0, 1fr)); }
 	.smallrow { display: grid; gap: calc(1.2 * var(--u)); grid-template-columns: repeat(4, minmax(0, 1fr)); }
 	.foot { margin-top: calc(0.6 * var(--u)); font-size: calc(0.9 * var(--u)); color: var(--sub); opacity: 0.85; }
 
-	.tile { min-width: 0; background: var(--tile); border: 1px solid var(--edge); border-radius: calc(1.2 * var(--u)); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+	/* the site's cards: near-square corners (4 px on a laptop), scaled with the screen */
+	.tile { min-width: 0; background: var(--tile); border: 1px solid var(--edge); border-radius: max(4px, calc(0.4 * var(--u))); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
 	.tile.big { padding: calc(1.5 * var(--u)) calc(1.9 * var(--u)) calc(1.6 * var(--u)); --nf: calc(7.2 * var(--u)); --uf: calc(1.9 * var(--u)); }
 	.tile.small { padding: calc(1 * var(--u)) calc(1.3 * var(--u)) calc(1.1 * var(--u)); --nf: calc(2.9 * var(--u)); --uf: calc(1 * var(--u)); }
 	.tile.big.txt { --nf: calc(4.6 * var(--u)); } .tile.small.txt { --nf: calc(2 * var(--u)); }
@@ -171,15 +175,16 @@
 	.sub { color: var(--sub); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 	.big .sub { font-size: calc(1.2 * var(--u)); margin-top: calc(0.3 * var(--u)); } .small .sub { font-size: calc(0.9 * var(--u)); margin-top: calc(0.15 * var(--u)); }
 
-	/* phones, upright (a screen 640 px wide or less): the cards stack under the top line and the credit keeps to the
-	   foot of the screen */
+	/* phones, upright (a screen 640 px wide or less): the cards stack in the middle and the credit keeps to the foot of
+	   the screen */
 	.stage.narrow { aspect-ratio: auto; min-height: 70vh; display: flex; }
 	.narrow .fg { position: relative; flex: 1; gap: calc(3 * var(--u)); padding: calc(5 * var(--u)) calc(5 * var(--u)) calc(4 * var(--u)); }
 	.narrow .top b { font-size: calc(6 * var(--u)); }.narrow .live { font-size: calc(3 * var(--u)); gap: calc(2 * var(--u)); }.narrow .live i { width: calc(2 * var(--u)); height: calc(2 * var(--u)); }
-	.narrow .bigrow { margin-top: calc(8 * var(--u)); grid-template-columns: minmax(0, 1fr); gap: calc(3 * var(--u)); }
+	.narrow .cards { gap: calc(3 * var(--u)); padding-block: calc(4 * var(--u)); }
+	.narrow .bigrow { grid-template-columns: minmax(0, 1fr); gap: calc(3 * var(--u)); }
 	.narrow .smallrow { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: calc(3 * var(--u)); }
-	.narrow .foot { margin-top: auto; padding-top: calc(3 * var(--u)); font-size: calc(2.6 * var(--u)); }
-	.narrow .tile { border-radius: calc(4 * var(--u)); }
+	.narrow .foot { font-size: calc(2.6 * var(--u)); }
+	.narrow .tile { border-radius: max(4px, calc(1.2 * var(--u))); }
 	.narrow .tile.big { padding: calc(4.5 * var(--u)) calc(5 * var(--u)); --nf: calc(16 * var(--u)); --uf: calc(4.6 * var(--u)); }.narrow .tile.big.txt { --nf: calc(9 * var(--u)); }.narrow .tile.big .row.none { --nf: calc(7 * var(--u)); }
 	.narrow .tile.small { padding: calc(3.5 * var(--u)) calc(4 * var(--u)); --nf: calc(8 * var(--u)); --uf: calc(3 * var(--u)); }.narrow .tile.small.txt { --nf: calc(5 * var(--u)); }.narrow .tile.small .row.none { --nf: calc(4.5 * var(--u)); }
 	.narrow .big .lab { font-size: calc(3.8 * var(--u)); gap: calc(2 * var(--u)); }.narrow .big .lab i { width: calc(2.6 * var(--u)); height: calc(2.6 * var(--u)); }

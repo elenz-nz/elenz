@@ -8,6 +8,7 @@
 	import Masthead from '#lib/site/Masthead.svelte';
 	import KeepAwake from '#lib/now/KeepAwake.svelte';
 	import Stage from '#lib/dashboard/Stage.svelte';
+	import ColourPick from '#lib/dashboard/ColourPick.svelte';
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
 	import { recent } from '#lib/home/now.js';
 	import { generatorRows } from '#lib/now/generators.js';
@@ -50,8 +51,10 @@
 	});
 
 	// ---------- changing the layout ----------
-	function set(next: { bg: string; col: string; view: string; big: string[]; small: string[] }) {
+	// persist false: the screen follows (a colour slider moving) but the address and the stored layout wait for the end
+	function set(next: { bg: string; col: string; view: string; big: string[]; small: string[] }, persist = true) {
 		layout = clean(next);
+		if (!persist) return;
 		save(layout);
 		const url = location.pathname + toQuery(layout, { kiosk: kiosk ? '1' : '' });
 		Promise.resolve().then(() => replaceState(url, {})).catch(() => history.replaceState(history.state, '', url));
@@ -64,6 +67,9 @@
 	const specOf = (slot: string) => (slot[0] === 'b' ? layout.big : layout.small)[Number(slot.slice(1))];
 	const slotName = (slot: string) => (slot[0] === 'b' ? 'Large ' : 'Small ') + (Number(slot.slice(1)) + 1);
 	const slots = $derived([...layout.big.map((_: string, i: number) => 'b' + i), ...layout.small.map((_: string, i: number) => 's' + i)]);
+
+	let mixing = $state(false);     // Plain colour's own picker open
+	const custom = $derived(layout.bg === 'plain' && !PLAIN.some((p) => p.c === layout.col));
 
 	// ---------- the value picker ----------
 	let picking = $state<string | null>(null);
@@ -194,16 +200,16 @@
 		<header class="dhead">
 			<div>
 				<h1>Dashboard</h1>
-				<p class="lede">Big live numbers for a wall screen, a spare tablet or your phone. Pick what it shows and the background; the link keeps your choice.</p>
+				<p class="lede">Live values for a wall screen, a spare tablet or your phone. Customise it, then copy the link or bookmark the page to get it back.</p>
 			</div>
 			<div class="acts">
 				<KeepAwake />
 				<button type="button" class="btn" aria-pressed={panel} onclick={() => (panel = !panel)}>
-					<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none" /><circle cx="16" cy="7" r="2.2" stroke="currentColor" stroke-width="2" fill="none" /><circle cx="10" cy="17" r="2.2" stroke="currentColor" stroke-width="2" fill="none" /></svg>
+					<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none" /><circle cx="16" cy="7" r="2.2" stroke="currentColor" stroke-width="2" fill="none" /><circle cx="10" cy="17" r="2.2" stroke="currentColor" stroke-width="2" fill="none" /></svg>
 					Customise
 				</button>
 				<button type="button" class="btn" onclick={goFull}>
-					<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" /></svg>
+					<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" /></svg>
 					Full screen
 				</button>
 			</div>
@@ -258,11 +264,14 @@
 									<button type="button" class="dot" style="background:#{p.c}" aria-label={p.name} title={p.name}
 										aria-pressed={layout.bg === 'plain' && layout.col === p.c} onclick={() => set({ ...layout, bg: 'plain', col: p.c })}></button>
 								{/each}
-								<label class="dot pickc" title="Pick any colour" class:on={layout.bg === 'plain' && !PLAIN.some((p) => p.c === layout.col)}>
-									<span class="sr">Pick any colour</span>
-									<input type="color" value={'#' + layout.col} oninput={(e) => set({ ...layout, bg: 'plain', col: (e.currentTarget as HTMLInputElement).value.slice(1) })} />
-								</label>
+								<button type="button" class="dot pickc" class:on={custom} aria-expanded={mixing} aria-controls="cpick" title="Pick any colour" aria-label="Pick any colour"
+									onclick={() => { mixing = !mixing; if (mixing && layout.bg !== 'plain') set({ ...layout, bg: 'plain' }); }}></button>
 							</div>
+							{#if mixing}
+								<div id="cpick">
+									<ColourPick value={layout.col} oninput={(c) => set({ ...layout, bg: 'plain', col: c }, false)} onchange={(c) => set({ ...layout, bg: 'plain', col: c })} />
+								</div>
+							{/if}
 						</div>
 					</section>
 				</div>
@@ -295,7 +304,7 @@
 					<div class="share">
 						<button type="button" class="btn" onclick={() => copy('layout')}>{copied === 'layout' ? 'Link copied' : 'Copy link to this layout'}</button>
 						<button type="button" class="btn" onclick={() => copy('kiosk')}>{copied === 'kiosk' ? 'Link copied' : 'Copy wall-screen link'}</button>
-						<p class="hint">Your layout is kept in this browser. A link opens this exact layout; the wall-screen link shows the screen alone, with no buttons.</p>
+						<p class="hint">This browser keeps your layout. A link opens it anywhere; the wall-screen link shows the screen alone, with no buttons.</p>
 					</div>
 				</section>
 			</div>
@@ -337,15 +346,16 @@
 <style>
 	.dash main { display: grid; gap: 16px; }
 	.dhead { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 20px; }
-	.dhead h1 { margin: 0; font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
-	.lede { margin: 4px 0 0; color: var(--ink-2); max-width: 64ch; }
+	.dhead h1 { margin: 0; font-size: 1.6rem; letter-spacing: -0.02em; line-height: 1.15; }
+	.lede { margin: 6px 0 0; color: var(--ink-2); max-width: 70ch; }
 	.acts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-	.btn { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 0.85rem; font-weight: 600; min-height: 34px; padding: 0 13px; border-radius: 6px;
-		border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
-	.btn:hover { border-color: var(--ink-2); }
+	/* the site's buttons: as Keep screen on beside them, and the copy buttons as the site's Copy */
+	.btn { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 0.74rem; font-weight: 500; min-height: 30px; padding: 3px 10px 3px 8px; border-radius: 4px;
+		border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); cursor: pointer; white-space: nowrap; }
+	.btn:hover { color: var(--ink); border-color: var(--ink-2); }
 	.btn[aria-pressed='true'] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 	.btn:focus-visible, .pick:focus-visible, .bgsw:focus-visible, .opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-	.tstatus { margin: 0; color: var(--warn-ink); background: var(--warn-bg); padding: 8px 12px; border-radius: 6px; }
+	.tstatus { margin: 0; color: var(--warn-ink); background: var(--warn-bg); padding: 8px 12px; border-radius: 4px; }
 
 	.stagewrap { position: relative; }
 	.stagewrap.full { position: fixed; inset: 0; z-index: 100; background: #0b1212; display: grid; }
@@ -359,42 +369,45 @@
 
 	.panels { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
 	.col { flex: 1 1 320px; min-width: 0; display: grid; gap: 16px; }
-	.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 10px; min-width: 0; }
+	.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px; display: grid; gap: 10px; min-width: 0; }
 	.panel.vals { flex: 2 1 520px; }
 	.panel h2 { margin: 0; font-size: 1rem; font-weight: 700; }
 	.hint { margin: 0; font-size: 0.82rem; color: var(--muted); }
 	.opts { display: flex; flex-wrap: wrap; gap: 12px 28px; }
 	.opt-g { display: grid; gap: 6px; justify-items: start; }
 	.plainrow { display: grid; gap: 6px; padding-top: 4px; }
-	.dots { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-	.dot { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line); cursor: pointer; padding: 0; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06); }
+	.dots { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+	.dot { width: 28px; height: 28px; border-radius: 4px; border: 1px solid var(--line); cursor: pointer; padding: 0; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06); }
 	.dot[aria-pressed='true'], .dot.on { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent); }
-	.dot:focus-visible, .pickc:focus-within { outline: 2px solid var(--accent); outline-offset: 3px; }
-	.pickc { position: relative; overflow: hidden; background: conic-gradient(#e0524a, #e6c35c, #2fa883, #4f8bd6, #8a72d8, #e0524a); }
-	.pickc input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; padding: 0; }
-	.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+	.dot:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+	#cpick { margin-top: 4px; }
+	.pickc { background: conic-gradient(#e0524a, #e6c35c, #2fa883, #4f8bd6, #8a72d8, #e0524a); }
+	.pickc[aria-expanded='true'] { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ink-2); }
+	.pickc.on { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent); }
 	.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
-	.bgsw { display: grid; gap: 6px; text-align: left; font: inherit; font-size: 0.82rem; font-weight: 600; color: var(--ink-2); padding: 6px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; }
-	.bgsw span { display: block; height: 46px; border-radius: 5px; }
+	.bgsw { display: grid; gap: 6px; text-align: left; font: inherit; font-size: 0.8rem; font-weight: 600; color: var(--ink-2); padding: 6px; border-radius: 4px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; }
+	.bgsw span { display: block; height: 46px; border-radius: 3px; }
 	.bgsw[aria-pressed='true'] { border-color: var(--accent); color: var(--ink); box-shadow: 0 0 0 1px var(--accent); }
 	.vhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; }
 	.slot { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 6px 12px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
 	.nm { font-size: 0.8rem; font-weight: 600; color: var(--muted); }
-	.pick { display: flex; align-items: center; gap: 8px; min-width: 0; font: inherit; font-size: 0.9rem; font-weight: 600; text-align: left; padding: 7px 10px; border-radius: 6px;
+	.pick { display: flex; align-items: center; gap: 8px; min-width: 0; font: inherit; font-size: 0.86rem; font-weight: 600; text-align: left; padding: 7px 10px; border-radius: 4px;
 		border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; }
 	.pick:hover { border-color: var(--ink-2); }
 	.pick i, .opt i { flex: none; width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
 	.pick span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 	.pick small { margin-left: auto; font: 0.8rem var(--font-data); color: var(--muted); white-space: nowrap; }
 	.pick svg { flex: none; color: var(--muted); }
-	.sopts { grid-column: 2; display: flex; flex-wrap: wrap; gap: 6px; }
+	.sopts { grid-column: 2; display: flex; flex-wrap: wrap; gap: 8px 20px; padding-top: 2px; }
 	.share { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; border-top: 1px solid var(--line); padding-top: 12px; }
+	.share .btn { font-size: 0.8rem; font-weight: 600; color: var(--accent); padding: 3px 12px; }
+	.share .btn:hover { background: var(--accent-soft); border-color: var(--accent); }
 	.note { margin: 0; font-size: 0.85rem; color: var(--muted); }
 
 	.overlay { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 16px; }
 	.scrim { position: absolute; inset: 0; border: 0; background: rgba(5, 12, 12, 0.55); cursor: default; }
 	.sheet { position: relative; width: min(720px, 100%); max-height: min(80vh, 760px); display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 12px;
-		background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 12px; padding: 16px; box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.6); }
+		background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 16px; box-shadow: 0 18px 50px rgb(0 0 0 / 0.28); }
 	.sh-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 	.sh-head h2 { margin: 0; font-size: 1.05rem; }
 	.btn.x { padding: 0 8px; }
@@ -402,7 +415,7 @@
 	.lists { overflow: auto; display: grid; gap: 8px; align-content: start; }
 	.lists h3 { margin: 6px 0 0; font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
 	.list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 6px; }
-	.opt { display: flex; justify-content: space-between; align-items: center; gap: 10px; font: inherit; font-size: 0.86rem; text-align: left; padding: 8px 10px; border-radius: 6px;
+	.opt { display: flex; justify-content: space-between; align-items: center; gap: 10px; font: inherit; font-size: 0.86rem; text-align: left; padding: 8px 10px; border-radius: 4px;
 		border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; min-width: 0; }
 	.opt > span { display: inline-flex; align-items: center; gap: 7px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 	.opt small { font: 0.76rem var(--font-data); color: var(--muted); white-space: nowrap; }
@@ -412,6 +425,6 @@
 		.slot { grid-template-columns: minmax(0, 1fr); }
 		.sopts { grid-column: 1; }
 		.overlay { padding: 0; align-items: end; }
-		.sheet { border-radius: 12px 12px 0 0; max-height: 86vh; }
+		.sheet { border-radius: 4px 4px 0 0; max-height: 86vh; }
 	}
 </style>

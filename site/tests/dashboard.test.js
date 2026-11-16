@@ -2,7 +2,7 @@
 // browser's storage, and its values follow /now, including "No estimate" where embedded solar has none.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { clean, fromQuery, toQuery, resize, plainPalette, DEFAULT } from '#lib/dashboard/layout.js';
+import { clean, fromQuery, toQuery, resize, plainPalette, toHsl, fromHsl, PLAIN, DEFAULT } from '#lib/dashboard/layout.js';
 import { context, catalogue, resolve } from '#lib/dashboard/values.js';
 
 // an hour of 5-minute data; the North Island's embedded solar has no estimate in the newest interval when `gap`
@@ -43,6 +43,18 @@ test('a plain colour and the simple view survive the address; a bad colour falls
   // light ink on dark colours, dark ink on light ones
   assert.equal(plainPalette('000000').ink, '#f4f7f6');
   assert.equal(plainPalette('f2efe8').ink, '#132020');
+  assert.equal(plainPalette('e0a526').ink, '#132020');   // gold: dark ink stands out more
+  assert.equal(plainPalette('b4432f').ink, '#f4f7f6');   // brick: light ink
+});
+
+test("the colour picker's sliders go to a colour and back", () => {
+  for (const { c } of PLAIN) {
+    const back = fromHsl(toHsl(c));
+    for (const i of [0, 2, 4]) assert.ok(Math.abs(parseInt(back.slice(i, i + 2), 16) - parseInt(c.slice(i, i + 2), 16)) <= 3, `${c} came back as ${back}`);
+  }
+  assert.deepEqual(toHsl('ff0000'), { h: 0, s: 100, l: 50 });
+  assert.equal(fromHsl({ h: 120, s: 100, l: 25 }), '008000');
+  assert.equal(fromHsl({ h: 0, s: 0, l: 100 }), 'ffffff');
 });
 
 test('growing a row adds values not already shown', () => {
