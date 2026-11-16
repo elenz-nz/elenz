@@ -12,6 +12,7 @@
 	import '#lib/landscape/landscape.css';
 	import Masthead from '#lib/site/Masthead.svelte';
 	import Preview from '#lib/site/Preview.svelte';
+	import KeepAwake from '#lib/now/KeepAwake.svelte';
 	import { startHeartbeat } from '#lib/site/heartbeat.js';
 	import { track, trackOnLoad } from '#lib/site/track.js';
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
@@ -28,6 +29,16 @@
 	let prefs = $state(clean(null));
 	let sharing = $state(false);
 	let copied = $state('');
+	let opts = $state(false);
+	let optsWrap = $state<HTMLElement>();
+
+	// Picture options is a drop-down: a click outside it or Esc closes it (Esc puts the focus back on its button)
+	function outside(e: PointerEvent) { if (opts && optsWrap && !optsWrap.contains(e.target as Node)) opts = false; }
+	function esc(e: KeyboardEvent) {
+		if (e.key !== 'Escape' || !opts) return;
+		opts = false;
+		(document.getElementById('opts-btn') as HTMLElement | null)?.focus();
+	}
 
 	// a changed view is kept in this browser and in the address (not in history: Back still leaves the page)
 	function keep(p: ReturnType<typeof clean>) {
@@ -85,6 +96,8 @@
 	<Preview title="Power landscape · ELENZ" description={DESC} path="/landscape" image="/og/landscape.png?v=1" alt="The Elenz power landscape: a storybook New Zealand whose wind turbines, rivers and sun follow the live grid" />
 </svelte:head>
 
+<svelte:window onpointerdown={outside} onkeydown={esc} />
+
 <div class="wrap" class:kiosk>
 	{#if !kiosk}<Masthead />{/if}
 	<main class="ls" class:kiosk bind:this={root}>
@@ -104,13 +117,32 @@
 				<button type="button" id="m-replay" aria-pressed="false">Replay 24 h</button>
 				<button type="button" id="m-play" aria-pressed="false">Play with dials</button>
 			</div>
-			<button type="button" class="btn" id="labels-btn" aria-pressed="true">Names on</button>
-			<button type="button" class="btn" id="hud-btn" aria-pressed="true">Numbers on</button>
-			<button type="button" class="btn" id="cards-btn" aria-pressed="true">Cards on</button>
-			<button type="button" class="btn" id="birds-btn" aria-pressed="true">Birds on</button>
-			<button type="button" class="btn" id="calm-btn" aria-pressed="false">Low motion off</button>
-			<button type="button" class="btn" id="fs-btn">Full screen</button>
-			<button type="button" class="btn" aria-expanded={sharing} aria-controls="ls-share" onclick={() => (sharing = !sharing)}>Share</button>
+			<div class="acts">
+				<KeepAwake />
+				<div class="opts-wrap" bind:this={optsWrap}>
+					<button type="button" class="btn" id="opts-btn" aria-expanded={opts} aria-controls="ls-opts" onclick={() => (opts = !opts)}>
+						<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none" /><circle cx="16" cy="7" r="2.2" stroke="currentColor" stroke-width="2" fill="none" /><circle cx="10" cy="17" r="2.2" stroke="currentColor" stroke-width="2" fill="none" /></svg>
+						Picture options
+						<svg class="chev" viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none" /></svg>
+					</button>
+					<!-- the switches; scene.js sets each one's aria-pressed from the view (applyPrefs) -->
+					<div class="opts" id="ls-opts" hidden={!opts}>
+						<p class="opts-h" id="opts-show">On the picture</p>
+						<div role="group" aria-labelledby="opts-show">
+							<button type="button" class="opt" id="labels-btn" aria-pressed="true">Place names<small>the name over each station</small></button>
+							<button type="button" class="opt" id="hud-btn" aria-pressed="true">Numbers<small>MW, renewable share and the fuel bar</small></button>
+							<button type="button" class="opt" id="cards-btn" aria-pressed="true">Pop-up cards<small>little notes about what’s happening</small></button>
+							<button type="button" class="opt" id="birds-btn" aria-pressed="true">Birds</button>
+						</div>
+						<p class="opts-h" id="opts-move">Movement</p>
+						<div role="group" aria-labelledby="opts-move">
+							<button type="button" class="opt" id="calm-btn" aria-pressed="false">Low motion<small>slows everything down</small></button>
+						</div>
+					</div>
+				</div>
+				<button type="button" class="btn" id="fs-btn">Full screen</button>
+				<button type="button" class="btn" aria-expanded={sharing} aria-controls="ls-share" onclick={() => (sharing = !sharing)}>Share</button>
+			</div>
 			<div class="scrub" id="scrub" hidden>
 				<button type="button" class="btn" id="pp" aria-label="Pause replay">Pause</button>
 				<input id="scrub-in" type="range" min="0" max="287" step="0.05" value="0" aria-label="Time in the last 24 hours" />
@@ -149,17 +181,12 @@
 				<button type="button" class="fsb" id="fs-menu-btn" aria-label="Options" aria-expanded="false" aria-controls="fsmenu"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none" /></svg></button>
 				<button type="button" class="fsb" id="fs-x" aria-label="Exit full screen"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none" /></svg></button>
 				<div class="fsmenu" id="fsmenu" hidden>
-					<!-- each takes its name from the page button it mirrors (scene.js, syncMenu) -->
-					<!-- svelte-ignore a11y_consider_explicit_label -->
-					<button type="button" class="btn" data-for="labels-btn"></button>
-					<!-- svelte-ignore a11y_consider_explicit_label -->
-					<button type="button" class="btn" data-for="hud-btn"></button>
-					<!-- svelte-ignore a11y_consider_explicit_label -->
-					<button type="button" class="btn" data-for="cards-btn"></button>
-					<!-- svelte-ignore a11y_consider_explicit_label -->
-					<button type="button" class="btn" data-for="birds-btn"></button>
-					<!-- svelte-ignore a11y_consider_explicit_label -->
-					<button type="button" class="btn" data-for="calm-btn"></button>
+					<!-- each mirrors the page's switch named in data-for (scene.js, syncMenu) -->
+					<button type="button" class="opt" data-for="labels-btn" aria-pressed="true">Place names</button>
+					<button type="button" class="opt" data-for="hud-btn" aria-pressed="true">Numbers</button>
+					<button type="button" class="opt" data-for="cards-btn" aria-pressed="true">Pop-up cards</button>
+					<button type="button" class="opt" data-for="birds-btn" aria-pressed="true">Birds</button>
+					<button type="button" class="opt" data-for="calm-btn" aria-pressed="false">Low motion</button>
 				</div>
 			</div>
 		</div>

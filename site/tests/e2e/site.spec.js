@@ -530,14 +530,35 @@ test.describe('dashboards', () => {
     await expect(page.locator('#how-wind')).toBeHidden();
     await page.locator('.dmore').first().click();
     await expect(page.locator('#how-wind')).toBeVisible();
-    await expect(page.locator('#cards-btn')).toHaveText('Cards on');
+    await expect(page.locator('#cards-btn')).toHaveAttribute('aria-pressed', 'true');
     await page.getByRole('button', { name: 'Replay 24 h' }).click();
-    await expect(page.locator('#cards-btn')).toHaveText('Cards off');
+    await expect(page.locator('#cards-btn')).toHaveAttribute('aria-pressed', 'false');
     await page.locator('#speed button', { hasText: '3 min' }).click();
     await expect(page).toHaveURL(/mode=replay/);
     await expect(page).toHaveURL(/speed=3/);
     await page.getByRole('button', { name: 'Right now' }).click();
-    await expect(page.locator('#cards-btn')).toHaveText('Cards on');
+    await expect(page.locator('#cards-btn')).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test("the landscape's switches sit in Picture options, beside Keep screen on", async ({ page }) => {
+    await page.goto('/landscape');
+    await expect(page.locator('#k-gen')).toHaveText(/MW$/);
+    await expect(page.locator('.controls').getByRole('button', { name: /Keep screen on/ })).toBeVisible();
+    const opts = page.getByRole('button', { name: 'Picture options' });
+    await expect(page.locator('#ls-opts')).toBeHidden();
+    await opts.click();
+    await expect(page.locator('#ls-opts')).toBeVisible();
+    await page.locator('#labels-btn').click();
+    await expect(page.locator('#labels-btn')).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.locator('#labels')).toBeHidden();
+    await expect(page).toHaveURL(/names=0/);
+    await expect(page.locator('#ls-opts')).toBeVisible();   // stays open for the next switch
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#ls-opts')).toBeHidden();
+    await expect(opts).toBeFocused();
+    await opts.click();
+    await page.locator('h1').click();
+    await expect(page.locator('#ls-opts')).toBeHidden();
   });
 
   test("the landscape's wall-screen link shows the picture alone, in the linked view", async ({ page }) => {
