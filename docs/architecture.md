@@ -94,8 +94,14 @@ take the site's shapes (4 px corners, the site's buttons and segmented control),
 numbers, birds, low motion, cards, replay speed) is in the address and kept in this browser (`prefs.js`, localStorage
 `elenz-landscape`, on /privacy); Share copies a link to it or a wall-screen link (`kiosk=1`: the picture alone, a replay
 starting again 6 s after it ends). The pop-up cards are off in the replay and on otherwise unless the viewer chooses;
-the replay takes 1, 3 or 10 minutes for the day; each dial's notes fold under More info; the play-mode season slider
-stops at spring (December's look comes only with the date). Smoothness (test report, 16 Nov 2026): the canvas is capped
+the replay takes 1, 3 or 10 minutes for the day; the play-mode season slider stops at spring (December's look comes
+only with the date). The dials carry no notes on the page (test report, 17 Nov 2026: it's for playing with and seeing
+what happens): what each changes and its minimum and maximum are a table in Using Elenz (`/guide#landscape-dials`), kept
+in step with `BAND` in dials.js. Play with dials (same report: nothing showed there were sliders below): the page takes
+the class `play`, which puts the dials straight under the picture, three to a row (two under 900 px; name, value and
+slider stacked on phones), and shrinks the picture so both fit on the screen (`--pw` in landscape.css); choosing the mode
+scrolls the page there unless they're already in view (`showDials` in the page), and the pop-up says the sliders are under
+the picture. Not on a wall screen or in full screen. Smoothness (test report, 16 Nov 2026): the canvas is capped
 at about 2.4 million pixels (a 4K TV would otherwise draw up to 9 million a frame and drop frames), frame times are
 smoothed, the clock and labels are only written when they change, and the clouds drift slowly. Still layers (test report,
 17 Nov 2026: a steady low frame rate): the parts that don't move (the sky's colour with the sun's glow, the mountains, the

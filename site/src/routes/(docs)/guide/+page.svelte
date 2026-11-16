@@ -122,7 +122,7 @@
 			<dt>Right now, Replay 24 h, Play with dials</dt>
 			<dd>Right now shows the latest data. Replay 24 h plays the last day back: Pause stops it, the slider moves through it, and A day in sets how long the day takes, 1, 3 or 10 minutes. Play with dials hands the picture over: move the sliders under it and watch the scene change.</dd>
 			<dt>The dials behind the scene</dt>
-			<dd>Under the picture, each part of the scene has its dial and its value. More info says what the dial changes in the picture and how it’s worked out.</dd>
+			<dd>Under the picture, each part of the scene has its dial and its value. On Play with dials they become sliders, just under the picture, which shrinks so the picture and the sliders fit on the screen together.</dd>
 			<dt>Picture options</dt>
 			<dd>Picture options opens a list of switches: Place names, Numbers, Pop-up cards (the little notes about what’s happening) and Birds, each ticked while it’s on, and Low motion, which slows everything down. In full screen, the ☰ button in the corner has the same switches.</dd>
 			<dt>Keep screen on</dt>
@@ -130,6 +130,25 @@
 			<dt>Share and wall screens</dt>
 			<dd>Share copies a link to this view (the mode, what’s on the picture and the replay speed), or a wall-screen link that shows the picture alone. A wall-screen link on Replay 24 h plays the day again each time it ends. This browser keeps your view too.</dd>
 		</dl>
+
+		<h3 id="landscape-dials">What each dial changes</h3>
+		<p>Each dial runs from its minimum to its maximum, worked out from the live data; the picture changes as it moves.</p>
+		<div class="tbl">
+			<table>
+				<thead><tr><th>Dial</th><th>What it changes in the picture</th><th>Minimum and maximum</th></tr></thead>
+				<tbody>
+					<tr><td>Wind</td><td>How fast the turbines turn, how fast the clouds drift and how much the grass sways. In a strong wind the birds start to struggle, and near the maximum the kererū is blown away; the tūī rides back downwind faster.</td><td>No wind to 1,270 MW, about the most the wind farms reach.</td></tr>
+					<tr><td>Hydro</td><td>How fast and wide the river runs, and the spray at the dam.</td><td>1,400–4,600 MW, the range hydro output really moves in.</td></tr>
+					<tr><td>Geothermal</td><td>How much steam rises from the station, steady day and night.</td><td>Halfway at 900 MW and full at 1,180 MW: always a healthy plume, with none only if the stations stop.</td></tr>
+					<tr><td>Cloud cover</td><td>How many clouds there are, how grey they are, and how bright the sun is.</td><td>Clear sky to overcast, from embedded solar against what a clear sky would give at that time of day. The last daytime value holds overnight.</td></tr>
+					<tr><td>Time of day</td><td>Where the sun or moon is, the colour of the sky and the lit windows. House lights go out one by one from 9:30 pm, leaving one window lit by 1 am.</td><td>NZ clock time; the sun’s height is worked out for the middle of New Zealand.</td></tr>
+					<tr><td>Solar</td><td>The shine on the solar farm’s panels and on the house roofs.</td><td>None to 1,360 MW of grid-connected and embedded solar together; the farm and the roofs each follow their own part.</td></tr>
+					<tr><td>Gas and coal</td><td>Smoke from the chimneys, with none at the minimum.</td><td>30 MW or less (the small plants that never stop) to 600 MW.</td></tr>
+					<tr><td>Battery</td><td>The arrow and sparks, running in while the batteries charge and out while they discharge.</td><td>Left: charging at full power. Middle: resting. Right: discharging at full power.</td></tr>
+					<tr><td>Season</td><td>Snow, the braided river and the lake level; spring flowers, brown summer paddocks, autumn leaves, Matariki in winter and Christmas lights in December.</td><td>Summer, autumn, winter, spring or December, from the date.</td></tr>
+				</tbody>
+			</table>
+		</div>
 
 		<h2 id="everywhere">Everywhere</h2>
 		<dl>

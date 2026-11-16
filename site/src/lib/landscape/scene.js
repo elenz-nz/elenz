@@ -1040,31 +1040,18 @@ const MIXF = [['geo','Geothermal'],['hydro','Hydro'],['wind','Wind'],['solar','S
 $('vstack').innerHTML = MIXF.map(([k]) => `<div data-k="${k}" style="background:var(--f-${k === 'roof' ? 'solar' : k});${k === 'roof' ? 'filter:brightness(1.25)' : ''}"></div>`).join('');
 $('vlabs').innerHTML = MIXF.map(([k]) => `<span data-k="${k}"></span>`).join('');
 $('mix').innerHTML = MIXF.map(([k]) => `<div data-k="${k}" style="background:var(--f-${k === 'roof' ? 'solar' : k});${k === 'roof' ? 'opacity:.6' : ''}"></div>`).join('');
-// what each dial does, and what sets its minimum and maximum (the dials themselves run 0 to 1 in dials.js; the page
-// shows minimum and maximum instead: test report, 16 Nov 2026)
+// The dials, under the picture: a bar and a value each, or a slider in Play with dials. What each one changes in the
+// picture, and its minimum and maximum, are in Using Elenz (/guide#landscape-dials), not on this page: it's for
+// playing with and seeing what happens (test report, 17 Nov 2026). Keep that table in step with BAND in dials.js.
 const DIALS = [
-  ['wind', 'Wind', '--f-wind', 'Turbine speed, cloud drift, grass sway; in a strong wind the birds start to struggle, and near the maximum the kererū is blown away. The tūī’s ride back downwind gets faster.', 'Min: no wind. Max: 1,270 MW (about the most the fleet reaches).'],
-  ['hydro', 'Hydro', '--f-hydro', 'River flow speed, width and dam spray.', 'Min: 1,400 MW. Max: 4,600 MW (the range hydro really works in).'],
-  ['geo', 'Geothermal', '--f-geo', 'How much steam rises from the station. Steady day and night.', 'Halfway at 900 MW, max at 1,180 MW: always a healthy plume, none only if the stations stop.'],
-  ['cloud', 'Cloud cover', '--f-solar', 'Number and greyness of clouds, how bright the sun is.', 'Min: clear sky. Max: overcast. Rooftop solar against what a clear sky would give (held overnight).'],
-  ['time', 'Time of day', '--f-solar', 'Sun or moon position, sky colour and lit windows; house lights go out one by one from 9:30 pm, leaving a single window lit by 1 am.', 'NZ clock time; the sun’s height is worked out for the centre of NZ.'],
-  ['solar', 'Solar', '--f-solar', 'Shine on the solar farm’s panels and on the house roofs.', 'Min: none. Max: 1,360 MW of grid and rooftop solar together; the farm and the roofs each follow their own share.'],
-  ['thermal', 'Gas and coal', '--f-gas', 'Smoke from the chimneys; none at the minimum.', 'Min: 30 MW or less (the small plants that never stop). Max: 600 MW.'],
-  ['batt', 'Battery', '--f-batt', 'Arrow and sparks run in when charging and out when discharging.', 'Left: charging at full power. Middle: resting. Right: discharging at full power.'],
-  ['season', 'Season', '--f-hydro', 'Snow, the braided river and the lake level; spring flowers, brown summer paddocks, autumn leaves, Matariki in winter and Christmas lights in December.', 'Summer, autumn, winter, spring or December, from the date.'],
+  ['wind', 'Wind', '--f-wind'], ['hydro', 'Hydro', '--f-hydro'], ['geo', 'Geothermal', '--f-geo'], ['cloud', 'Cloud cover', '--f-solar'],
+  ['time', 'Time of day', '--f-solar'], ['solar', 'Solar', '--f-solar'], ['thermal', 'Gas and coal', '--f-gas'], ['batt', 'Battery', '--f-batt'],
+  ['season', 'Season', '--f-hydro'],
 ];
-// what each dial does and how it's worked out stays folded under More info until asked for (test report, 16 Nov 2026).
 // The season slider stops at spring: December's Christmas look comes with the date, not the slider.
-$('dtable').innerHTML = DIALS.map(([k, name, c, does, how]) => `<div class="drow"><div class="dname"><i style="background:var(${c})"></i>${name}</div>
-  <div class="dbody"><div class="dline"><div class="dbar${k === 'batt' ? ' mid' : ''}"><b id="bar-${k}" style="background:var(${c})"></b></div><span class="dval" id="val-${k}">–</span>
-  <button type="button" class="dmore" aria-expanded="false" aria-controls="how-${k}">More info</button></div>
-  <input id="sl-${k}" type="range" min="${k === 'batt' ? -1 : 0}" max="${k === 'time' ? 24 : k === 'season' ? 3 : 1}" step="${k === 'time' ? .05 : k === 'season' ? 1 : .01}" aria-label="${name}" hidden>
-  <div class="dhow" id="how-${k}" hidden>${does} <span style="font-family:var(--font-data)">${how}</span></div></div></div>`).join('');
-for (const b of root.querySelectorAll('.dmore')) b.onclick = () => {
-  const open = b.getAttribute('aria-expanded') !== 'true';
-  b.setAttribute('aria-expanded', String(open)); b.textContent = open ? 'Less info' : 'More info';
-  $(b.getAttribute('aria-controls')).hidden = !open;
-};
+$('dtable').innerHTML = DIALS.map(([k, name, c]) => `<div class="drow"><div class="dname"><i style="background:var(${c})"></i>${name}</div>
+  <div class="dbody"><div class="dline"><div class="dbar${k === 'batt' ? ' mid' : ''}"><b id="bar-${k}" style="background:var(${c})"></b></div><span class="dval" id="val-${k}">–</span></div>
+  <input id="sl-${k}" type="range" min="${k === 'batt' ? -1 : 0}" max="${k === 'time' ? 24 : k === 'season' ? 3 : 1}" step="${k === 'time' ? .05 : k === 'season' ? 1 : .01}" aria-label="${name}" hidden></div></div>`).join('');
 
 function updateText(d) {
   const s = d._s;
@@ -1112,10 +1099,10 @@ function setMode(m, keepCards = false) {
   if (m === 'replay') { pos = 0; playing = true; endWait = 0; $('pp').textContent = 'Pause'; say(`Replaying the last 24 hours, one day in ${minutes(prefs.speed)}.`, '--f-hydro'); }
   if (m === 'play') {
     for (const [k] of DIALS) { const v = k in manual ? manual[k] : cur[k]; manual[k] = v; $('sl-' + k).value = v; }
-    say('You’re in charge! Move the sliders and watch the scene.', '--f-wind');
+    say('You’re in charge! Move the sliders under the picture and watch the scene.', '--f-wind');
   }
   $('dials-lede').textContent = m === 'play'
-    ? 'Each slider sets one dial directly. On the real page these come from the live feed.'
+    ? 'Move a slider and watch its part of the picture change.'
     : 'Each part of the picture follows one dial, somewhere between its minimum and maximum, worked out from the live feed.';
 }
 // the switches under Picture options and the replay speed, set from prefs; every change goes back to the page

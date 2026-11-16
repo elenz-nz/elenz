@@ -115,12 +115,29 @@
 .ls .dbar b { position: absolute; top: 0; bottom: 0; left: 0; }
 .ls .dbar.mid b { left: 50%; }
 .ls .dval { font-family: var(--font-data); font-size: 12.5px; min-width: 15ch; text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); }
-.ls .dmore { flex: none; font: inherit; font-size: 0.74rem; font-weight: 500; min-height: 26px; padding: 1px 8px; border-radius: 4px; border: 1px solid var(--line);
-  background: var(--surface); color: var(--accent); cursor: pointer; white-space: nowrap; }
-.ls .dmore:hover, .ls .dmore[aria-expanded="true"] { border-color: var(--accent); background: var(--accent-soft); }
-.ls .dhow { font-size: 13px; color: var(--muted); }
 .ls .dbody input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+/* Play with dials (test report, 17 Nov 2026): the sliders move up to just under the picture, three to a row, and the
+   picture shrinks so that it and every slider fit on the screen together (290 px is the panel, the gaps and a margin).
+   The page scrolls there when the mode is chosen (+page.svelte, showDials). Not on a wall screen or in full screen. */
+.ls.play .kid, .ls.play .ls-foot { order: 1; }
+.ls.play { --pw: min(100%, max(420px, calc((100vh - 290px) * 1000 / 640))); }   /* 100% is worked out where it's used */
+.ls.play:not(.kiosk) .scene:not(:fullscreen) .stage { width: var(--pw); justify-self: center; }
+.ls.play:not(.kiosk) .scene:not(:fullscreen) .toasts { left: calc((100% - var(--pw)) / 2 + 12px); right: calc((100% - var(--pw)) / 2 + 12px); }
+.ls.play:not(.kiosk) .scene.hud-on:not(:fullscreen) .toasts { left: calc((100% - var(--pw)) / 2 + var(--pw) * .27); }
+.ls.play .dials { width: var(--pw); justify-self: center; box-sizing: border-box; gap: 6px; padding: 10px 14px 12px; }
+.ls.play .dials p.lede { font-size: 13px; }
+.ls.play .dtable { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px 24px; }
+.ls.play .drow { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 8px; padding: 4px 0 2px; border-top: 1px solid var(--line); }
+.ls.play .drow > *, .ls.play .dbody, .ls.play .dline { display: contents; }
+.ls.play .dname { display: flex; padding: 0; border: 0; white-space: nowrap; }
+.ls.play .dbar { display: none; }
+.ls.play .dval { min-width: 0; font-size: 12px; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ls.play .dbody input[type="range"] { grid-column: 1 / -1; margin: 2px 0 0; }
+@media (max-width: 900px) { .ls.play .dtable { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 16px; } }
+
 .ls .ls-foot { font-size: 12.5px; color: var(--muted); max-width: 80ch; margin: 0; }
+.ls .ls-foot a { color: inherit; }
 .ls .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 @media (max-width: 640px) {
@@ -129,6 +146,9 @@
   .ls .dname { border-top: 1px solid var(--line); padding-bottom: 0 !important; }
   .ls .dbody { border-top: 0 !important; padding-top: 4px !important; }
   .ls .dval { min-width: 0; }
+  .ls.play .dname { border-top: 0 !important; padding: 0 !important; font-size: 14px; }
+  .ls.play .drow { grid-template-columns: minmax(0, 1fr); }   /* name, then its value, then the slider */
+  .ls.play .dval { text-align: left; font-size: 11.5px; }
   .ls .speed-l { margin-left: 0; }
   .ls .acts { position: relative; }
   .ls .opts-wrap { position: static; }   /* the drop-down spans the row of buttons, not just past its own */

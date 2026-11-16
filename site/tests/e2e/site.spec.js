@@ -524,12 +524,9 @@ test.describe('dashboards', () => {
     await expect(page.locator('#scrub')).toBeVisible();
   });
 
-  test("the landscape's dials fold their notes, and the replay has its own speed and cards setting", async ({ page }) => {
+  test("the landscape's replay has its own speed and cards setting", async ({ page }) => {
     await page.goto('/landscape');
     await expect(page.locator('#k-gen')).toHaveText(/MW$/);
-    await expect(page.locator('#how-wind')).toBeHidden();
-    await page.locator('.dmore').first().click();
-    await expect(page.locator('#how-wind')).toBeVisible();
     await expect(page.locator('#cards-btn')).toHaveAttribute('aria-pressed', 'true');
     await page.getByRole('button', { name: 'Replay 24 h' }).click();
     await expect(page.locator('#cards-btn')).toHaveAttribute('aria-pressed', 'false');
@@ -538,6 +535,20 @@ test.describe('dashboards', () => {
     await expect(page).toHaveURL(/speed=3/);
     await page.getByRole('button', { name: 'Right now' }).click();
     await expect(page.locator('#cards-btn')).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test('Play with dials brings its sliders onto the screen with the picture', async ({ page }) => {
+    await page.goto('/landscape');
+    await expect(page.locator('#k-gen')).toHaveText(/MW$/);
+    await expect(page.locator('.dmore')).toHaveCount(0);   // the dials' notes are in Using Elenz, not on the page
+    await page.getByRole('button', { name: 'Play with dials' }).click();
+    await expect(page.locator('#sl-wind')).toBeVisible();
+    await expect(page.locator('#sl-wind')).toBeInViewport();
+    await expect(page.locator('#stage')).toBeInViewport();
+    await expect(page.locator('#dials-h')).toHaveText('Your dials');
+    // the sliders come straight after the picture, before the numbers
+    const [dials, tiles] = await Promise.all(['.dials', '.kid'].map((s) => page.locator(s).evaluate((e) => e.getBoundingClientRect().top)));
+    expect(dials).toBeLessThan(tiles);
   });
 
   test("the landscape's switches sit in Picture options, beside Keep screen on", async ({ page }) => {
