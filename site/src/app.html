@@ -7,6 +7,33 @@
 			// apply the reader's saved light/dark choice before the page paints
 			try { var t = localStorage.getItem('elenz-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
 		</script>
+		<script>
+			// Opting out (design decision, 16 Nov 2026; on /privacy): any address with ?exclude-me saves umami.disabled, which
+			// Umami and the heartbeat (#lib/site/heartbeat.js) both honour, so this browser isn't counted from this page on;
+			// ?include-me removes it. Here, before Umami's script loads, so the page that sets it isn't counted either. The
+			// word comes out of the address and a short note says what happened. Cloudflare Web Analytics still counts.
+			(function () {
+				try {
+					var u = new URL(location.href), p = u.searchParams;
+					var out = p.has('exclude-me'), back = p.has('include-me');
+					if (!out && !back) return;
+					if (out) localStorage.setItem('umami.disabled', '1'); else localStorage.removeItem('umami.disabled');
+					p.delete('exclude-me'); p.delete('include-me');
+					history.replaceState(history.state, '', u.pathname + u.search + u.hash);
+					var say = out
+						? 'This browser is now left out of Elenz’s visit counts (Umami and the screen count). To be counted again, open elenz.co.nz/?include-me'
+						: 'This browser is counted in Elenz’s visit counts again.';
+					document.addEventListener('DOMContentLoaded', function () {
+						var n = document.createElement('p');
+						n.id = 'optout-note'; n.setAttribute('role', 'status'); n.textContent = say; n.title = 'Click to close';
+						n.style.cssText = 'position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:1000;max-width:min(92vw,520px);margin:0;padding:10px 14px;border-radius:6px;border:1px solid var(--line,#ccc);background:var(--surface,#fff);color:var(--ink,#111);font:14px/1.4 system-ui,sans-serif;box-shadow:0 2px 12px rgba(0,0,0,.18);cursor:pointer';
+						n.onclick = function () { n.remove(); };
+						document.body.appendChild(n);
+						setTimeout(function () { n.remove(); }, 12000);
+					});
+				} catch (e) {}
+			})();
+		</script>
 		<!-- with JavaScript off, anything marked js-only (empty charts, "Loading") goes, leaving each page's plain line
 		     (RES-04). It lives here, not in a page: Svelte builds a page's markup itself on a click between pages, and Chrome
 		     then treats a <style> inside <noscript> as a real style, hiding the charts for everyone. -->

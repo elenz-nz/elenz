@@ -3,16 +3,19 @@
 // Worker stores each beat in Workers Analytics Engine (worker/index.js), which is part of Workers Paid, so screens
 // left open don't use Umami's allowance. Described on /privacy.
 //
-// Like Umami, it counts only on elenz.co.nz (not previews or local builds) and not where the browser sends Do Not Track.
+// Like Umami, it counts only on elenz.co.nz (not previews or local builds), not where the browser sends Do Not Track,
+// and not in a browser that has opted out: `umami.disabled` in its storage, set by ?exclude-me (src/app.html) or by hand.
 import { BEAT_URL, BEAT_EVERY, beatBody, newBeatId } from './beat.js';
 import { SITE_URL } from './viewurl.js';
 
 const SITE_HOST = new URL(SITE_URL).hostname;
 
-/** Whether this visit is counted: on the real site, and Do Not Track not set. */
+/** Whether this visit is counted: on the real site, Do Not Track not set, and not opted out (as Umami decides it). */
 export function counting(loc = location, nav = navigator, win = window) {
   const dnt = nav.doNotTrack ?? win.doNotTrack ?? nav.msDoNotTrack;
-  return loc.hostname === SITE_HOST && dnt !== '1' && dnt !== 'yes';
+  let optedOut = false;
+  try { optedOut = !!win.localStorage?.getItem('umami.disabled'); } catch { /* storage blocked: nothing to honour */ }
+  return loc.hostname === SITE_HOST && dnt !== '1' && dnt !== 'yes' && !optedOut;
 }
 
 /** Start beating for `page`; returns a function that stops it. `kiosk`: opened from a wall-screen link. */

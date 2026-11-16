@@ -250,7 +250,13 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   and `data-do-not-track` honours the browser's setting. Neither shows whether a screen is left open (Umami reports time
   on page when a tab is hidden or closed), so Now and the dashboards also send a heartbeat to the Worker (Worker
   section). A few Umami events count how the dashboards are used (`#lib/site/track.js`, which lists them; keep them few,
-  since each counts against the plan). The browser tests block both scripts.
+  since each counts against the plan; Support Elenz and Report a problem clicks are two of them). The browser tests block
+  both scripts.
+  Opting out (design decision, 16 Nov 2026): an inline script at the top of `src/app.html` turns any address with
+  `?exclude-me` into `umami.disabled` in the browser's storage, before Umami's script loads; `?include-me` removes it.
+  It takes the word out of the address and shows a short note (`#optout-note`). Umami's script and the heartbeat
+  (`counting()` in `heartbeat.js`) both skip a browser with it, so it also keeps the Elenz team's own devices out of the
+  counts. Cloudflare Web Analytics can't be told. Described on `/privacy#opt-out`; browser test in `tests/e2e/site.spec.js`.
 - Icons (design decision, 9 Nov 2026): the logo mark `src/lib/assets/favicon.svg` is the tab icon where SVG icons
   work; `static/favicon.ico` (16, 32, 48 px) is the fallback for older Safari and for tools that ask for `/favicon.ico`
   directly (link unfurlers, feed readers, raw `/data/*` views), and `static/apple-touch-icon.png` (180 px, on white
@@ -401,7 +407,7 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
 - Heartbeats (design decision, 16 Nov 2026): while `/now`, `/dashboard` or `/landscape` is open, it posts a beat to
   `/data/beat` when it opens and every 5 minutes after, on screen or hidden (`src/lib/site/heartbeat.js`; the message,
   read by both sides, in `src/lib/site/beat.js`: page, a random ID per page load never stored, minutes open, on screen
-  or hidden, wall-screen link or not). It is sent only on elenz.co.nz and not under Do Not Track, as Umami. The Worker
+  or hidden, wall-screen link or not). It is sent only on elenz.co.nz, not under Do Not Track and not from a browser that has opted out (`umami.disabled`), as Umami. The Worker
   checks it and writes one row to Workers Analytics Engine (binding `BEATS`, dataset `elenz_beats` in wrangler.jsonc,
   made by the first write; included in Workers Paid, 10 million rows a month, a screen open all month ~8,600): index1 the
   ID, blob1 the page, blob2 `visible` or `hidden`, blob3 `kiosk` or `page`, blob4 the country, double1 minutes open. It
