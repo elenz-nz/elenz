@@ -1,5 +1,6 @@
 <script lang="ts">
-	// What the site collects. Keep it true to the code: Cloudflare Web Analytics and Umami (app.html), the browser storage keys
+	// What the site collects. Keep it true to the code: Cloudflare Web Analytics and Umami (app.html) with Umami's events
+	// (#lib/site/track.js), the heartbeat from Now and the dashboards (#lib/site/beat.js, worker/index.js), the browser storage keys
 	// (elenz-theme, elenz-view, elenz-prices, elenz-gen-lower, elenz-awake, elenz-dashboard, elenz-landscape, and the tracker's per-tab sessionStorage), fonts bundled
 	// with the site, the email setup (Cloudflare Email Routing to Gmail, replies through Brevo). Change the date when
 	// any of that changes.
@@ -23,7 +24,8 @@
 
 	<div class="mt-body">
 		<h2 id="visits">Counting visits</h2>
-		<p>Elenz counts visits with two services, Cloudflare Web Analytics and Umami. They record which pages are viewed, the site a visitor came from, their country, and the kind of browser and device; Umami also records how long a page stays open. Neither uses cookies or follows anyone from site to site. Umami uses your IP address only to work out your country, and doesn’t store it. We see only totals, never individual visitors. If your browser is set to send Do Not Track, Umami doesn’t count your visit.</p>
+		<p>Elenz counts visits with two services, Cloudflare Web Analytics and Umami. They record which pages are viewed, the site a visitor came from, their country, and the kind of browser and device; Umami also records how long a page stays open. Neither uses cookies or follows anyone from site to site. Umami uses your IP address only to work out your country, and doesn’t store it. We see only totals, never individual visitors. Umami also counts a few actions on the dashboards, such as opening a wall-screen link or changing a dashboard’s layout. If your browser is set to send Do Not Track, Umami doesn’t count your visit.</p>
+		<p id="screens">The Now page, the dashboard and the power landscape are often left open on a screen, which visit counters can’t see. While one is open, it tells our host, Cloudflare, every 5 minutes that it is still open: which of the three pages it is, whether it’s on screen or hidden, whether it came from a wall-screen link, and how many minutes it has been open. Each opened page gets a random number, forgotten when it closes, so we can tell how long a screen stays open but not whose it is; Cloudflare adds your country. Nothing is kept in your browser, and nothing is sent if your browser sends Do Not Track.</p>
 
 		<h2 id="browser">What stays in your browser</h2>
 		<p>So the site opens the way you left it, your browser remembers your light or dark choice, your last region, range, interval and chart settings on the tracker, whether you asked the Now page to keep the screen on, the layout you chose for the dashboard, and the view you chose for the power landscape. These are kept in your browser’s own storage, never sent anywhere, and you can remove them by clearing this site’s data in your browser.</p>

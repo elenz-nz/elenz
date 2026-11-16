@@ -32,10 +32,15 @@ const RECORDS = {
 const ENTRY = `
 import worker, { SECURITY_HEADERS } from ${JSON.stringify(join(here, '../index.js'))};
 const refuse = new Proxy({}, { get: () => async () => { throw new Error('KV refused'); } });
+// a stand-in for Workers Analytics Engine: the rows written, read back (and cleared) at /test/beats
+const beats = [];
+const BEATS = { writeDataPoint(row) { beats.push(row); } };
 export default {
   fetch(request, env, ctx) {
-    if (new URL(request.url).pathname === '/test/security-headers') return Response.json(SECURITY_HEADERS);
-    return worker.fetch(request, request.headers.has('x-test-kv-down') ? { ...env, DATA: refuse } : env, ctx);
+    const path = new URL(request.url).pathname;
+    if (path === '/test/security-headers') return Response.json(SECURITY_HEADERS);
+    if (path === '/test/beats') return Response.json(beats.splice(0));
+    return worker.fetch(request, request.headers.has('x-test-kv-down') ? { ...env, DATA: refuse, BEATS } : { ...env, BEATS }, ctx);
   },
   scheduled(event, env, ctx) { return worker.scheduled(event, env.TEST_KV_DOWN ? { ...env, DATA: refuse } : env, ctx); },
 };`;
@@ -324,4 +329,46 @@ test('an unknown record or no records gives the site card', async () => {
     const r = await get(path);
     assert.deepEqual(new Uint8Array(await r.arrayBuffer()), CARD, path);
   }
+});
+
+// ---------- heartbeats (POST /data/beat, stored in Workers Analytics Engine) ----------
+const ID = '0123456789abcdef';
+const beatOf = (body, host = 'https://elenz.co.nz') => mf.dispatchFetch(host + '/data/beat', { method: 'POST', body: typeof body === 'string' ? body : JSON.stringify(body), headers: { 'content-type': 'text/plain' } });
+const stored = async () => (await mf.dispatchFetch('https://elenz.co.nz/test/beats')).json();
+
+test('a heartbeat from the site is stored: page, on screen or hidden, kiosk, country and minutes open', async () => {
+  await stored();
+  const r = await beatOf({ p: 'dashboard', s: ID, m: 35, v: 0, k: 1 });
+  assert.equal(r.status, 204);
+  assert.equal(r.headers.get('cache-control'), 'no-store');
+  const rows = await stored();
+  assert.equal(rows.length, 1);
+  assert.deepEqual(rows[0].indexes, [ID]);
+  assert.deepEqual(rows[0].blobs.slice(0, 3), ['dashboard', 'hidden', 'kiosk']);
+  assert.equal(typeof rows[0].blobs[3], 'string');
+  assert.deepEqual(rows[0].doubles, [35]);
+  await beatOf({ p: 'now', s: ID, m: 0, v: 1, k: 0 });
+  assert.deepEqual((await stored())[0].blobs.slice(0, 3), ['now', 'visible', 'page']);
+});
+
+test('anything else posted to /data/beat is dropped, and still answered 204', async () => {
+  await stored();
+  for (const bad of [
+    { p: 'tracker', s: ID, m: 0, v: 1, k: 0 },            // not a page that beats
+    { p: 'now', s: 'not-an-id', m: 0, v: 1, k: 0 },       // the ID isn't 16 hex digits
+    { p: 'now', s: ID, m: -5, v: 1, k: 0 },               // minutes below zero
+    { p: 'now', s: ID, m: 1.5, v: 1, k: 0 },              // not whole minutes
+    { p: 'now', s: ID, m: 0, v: 2, k: 0 },
+    'not json', '', 'x'.repeat(500),
+  ]) assert.equal((await beatOf(bad)).status, 204, JSON.stringify(bad).slice(0, 40));
+  assert.deepEqual(await stored(), []);
+  const g = await get('/data/beat');
+  assert.equal(g.status, 405);
+});
+
+test('a preview link stores no heartbeats', async () => {
+  await stored();
+  const r = await beatOf({ p: 'now', s: ID, m: 5, v: 1, k: 0 }, 'https://beat-test-elenz.elenz.workers.dev');
+  assert.equal(r.status, 204);
+  assert.deepEqual(await stored(), []);
 });

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import InfoTip from '#lib/site/InfoTip.svelte';
 	import Preview from '#lib/site/Preview.svelte';
+	import { startHeartbeat } from '#lib/site/heartbeat.js';
 	import { onMount } from 'svelte';
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
 	import Masthead from '#lib/site/Masthead.svelte';
@@ -116,7 +117,8 @@
 		};
 		const poll = setInterval(check, CHECK_EVERY);
 		document.addEventListener('visibilitychange', check);
-		return () => { clearInterval(poll); document.removeEventListener('visibilitychange', check); mq.removeEventListener('change', fit); };
+		const stopBeat = startHeartbeat('now');
+		return () => { clearInterval(poll); document.removeEventListener('visibilitychange', check); mq.removeEventListener('change', fit); stopBeat(); };
 	});
 </script>
 
@@ -134,7 +136,7 @@
 		<section class="hero" aria-labelledby="home-h">
 			<div>
 				<h1 id="home-h">New Zealand's electricity, right now</h1>
-				<p class="lede"><a href="/tracker">Open the tracker</a> for history back to 1997.</p>
+				<p class="lede">On a wall screen? Try the <a href="/dashboard">big-number dashboard</a> or the <a href="/landscape">power landscape</a> for kids.</p>
 				<noscript><p class="lede">The live figures need JavaScript turned on. <a href="/methods">Data and methods</a> and <a href="/about">About</a> work without it.</p></noscript>
 			</div>
 			<div class="status js-only">

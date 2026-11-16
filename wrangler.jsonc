@@ -32,6 +32,9 @@
   "rules": [{ "type": "Data", "globs": ["**/*.ttf"], "fallthrough": true }],
   // Workers KV namespace "elenz-data": the GitHub jobs write tracker.json (ingest/update.py) and hist/* (ingest/history.py) here
   "kv_namespaces": [{ "binding": "DATA", "id": "dd69ad9aae3343c8b3ca5722ddf45548" }],
+  // Workers Analytics Engine (included in Workers Paid): the heartbeat from /now and the dashboards, POST /data/beat
+  // (worker/index.js). The dataset is made by the first write. Previews store nothing: the Worker writes only on elenz.co.nz.
+  "analytics_engine_datasets": [{ "binding": "BEATS", "dataset": "elenz_beats" }],
   // Worker Previews (each branch's preview link, built by `wrangler preview`): the same KV namespace, so a preview shows
   // the live data. Safe because only the scheduled handler writes to KV, and previews run no crons.
   "previews": {

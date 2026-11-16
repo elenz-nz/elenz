@@ -16,6 +16,8 @@ const urls = (): Url[] => [
 	{ path: '/now' },
 	{ path: '/tracker' },
 	{ path: '/tracker/prices' },
+	{ path: '/dashboard' },
+	{ path: '/landscape' },
 	{ path: '/records' },
 	...DEFS.filter((d) => !d.old).map((d) => ({ path: `/records/${d.id}` })),
 	...(ARTICLES_PUBLIC

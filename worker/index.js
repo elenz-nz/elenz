@@ -16,9 +16,13 @@
 //             wrangler.jsonc), which puts what a linked view shows into the page title, og:title and og:url, e.g.
 //             "Wind generation · North Island · 7 days to 18 Oct 2026", from its address (site/src/lib/site/viewurl.js,
 //             shared with the pages). The pages are prerendered, so they can't do it themselves.
+//  beats:     POST /data/beat, the heartbeat from /now, /dashboard and /landscape while they're open (every 5 minutes,
+//             site/src/lib/site/beat.js), written to Workers Analytics Engine (binding BEATS, dataset elenz_beats) so the
+//             Elenz team can see how many screens are left open, and when. Only on elenz.co.nz; anything else posted is dropped.
 //  tests:     worker/tests/worker.test.js runs this file in Cloudflare's own runtime (cd worker && npm ci && npm test).
 import { readQuery, writeQuery, describe, SITE_URL } from '../site/src/lib/site/viewurl.js';
 import { RECORD_PAGE, RECORD_IMAGE, recordPage, recordImage } from './og.js';
+import { BEAT_URL, readBeat } from '../site/src/lib/site/beat.js';
 
 const WORKFLOWS = 'https://api.github.com/repos/elenz-nz/elenz/actions/workflows';
 const HISTORY_CRON = '40 */6 * * *'; // must match wrangler.jsonc
@@ -46,6 +50,30 @@ function withPreview(res, tab, url) {
     .on('meta[property="og:title"]', { element(el) { el.setAttribute('content', title); } })
     .on('meta[property="og:url"]', { element(el) { el.setAttribute('content', SITE_URL + url.pathname + (qs ? '?' + qs : '')); } })
     .transform(res);
+}
+
+// ---------- heartbeats ----------
+// One row per beat in Workers Analytics Engine (included in Workers Paid: 10 million rows a month; a screen open all
+// month is ~8,600). Columns: index1 the page load's random ID; blob1 page, blob2 'visible' or 'hidden', blob3 'kiosk' or
+// 'page', blob4 the visitor's country (Cloudflare's two letters, as the visit counters record); double1 minutes open.
+// How to read them: docs/architecture.md (Worker). Always answers 204, so a page learns nothing from the reply.
+const noContent = () => new Response(null, { status: 204, headers: { 'cache-control': 'no-store' } });
+async function beat(request, env, url) {
+  if (request.method !== 'POST') return new Response(null, { status: 405, headers: { allow: 'POST' } });
+  if (url.hostname !== SITE_HOST || !env.BEATS || Number(request.headers.get('content-length') || 0) > 200) return noContent();
+  const b = readBeat(await request.text());
+  if (b) {
+    try {
+      env.BEATS.writeDataPoint({
+        indexes: [b.id],
+        blobs: [b.page, b.visible ? 'visible' : 'hidden', b.kiosk ? 'kiosk' : 'page', (request.cf && request.cf.country) || ''],
+        doubles: [b.minutes],
+      });
+    } catch (e) {
+      console.log(`heartbeat not stored: ${e && e.message}`);
+    }
+  }
+  return noContent();
 }
 
 // ---------- security headers ----------
@@ -101,6 +129,7 @@ export default {
 };
 
 async function serve(request, env, url, ctx) {
+  if (url.pathname === BEAT_URL) return beat(request, env, url);
   if (url.pathname === '/data/health' && env.DATA) {
     // for an outside uptime monitor: 200 while the data is fresh, 503 (with the reasons) when it isn't. Unlike the
     // GitHub watchdog, it doesn't depend on the Worker's cron, so it also catches the cron itself stopping.

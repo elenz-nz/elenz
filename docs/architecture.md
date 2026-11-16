@@ -33,9 +33,16 @@ How each part of the site, the data jobs and the Worker works, and the design de
 
 ## Dashboards
 
-Two live dashboards, on test since 16 Nov 2026: unlinked, `noindex` and out of the sitemap until the Elenz team decides to
-publish them (then: a `<Preview>`, a sitemap entry, a link from the site, and drop `noindex`). Both read tracker.json and
-poll it as `/now` does (`#lib/site/poll.js`).
+Two live dashboards, on test from 16 Nov 2026 and published the same day: linked from a line under Now's heading ("On a
+wall screen? ..."), each with a section in Using Elenz (`/guide#dashboard`, `/guide#landscape`, with a screenshot each
+from `analysis/guide_shots.py --dashboards`) and an entry under About's Site pages; in the sitemap; each has its own
+link-preview image, a picture of the real page on live data (`static/og/dashboard.png`, 2400 x 1260, the wall-screen view
+on Lines at sunset; `static/og/landscape.png`, 1200 x 630, kept small because the painted scene is ~3 MB at twice that
+and 256 colours shift the fuel colours), made by `analysis/dashboard_og_png.py`; the pages ask for them with `?v=<n>`,
+bumped when one is redone. The top menu stays as it is (design decision, 16 Nov 2026). Both read tracker.json and poll it
+as `/now` does (`#lib/site/poll.js`), and both, like `/now`, send the heartbeat (Worker section) while open. Umami events
+(`#lib/site/track.js`): `wall-screen-open` and `wall-screen-copy` on both, `layout-change` on the dashboard (at most one
+a minute), `landscape-mode` on the landscape.
 
 `/dashboard`, the big-number dashboard (`src/routes/dashboard/+page.svelte`, `src/lib/dashboard/`): one or two large live
 values and up to four small ones over a background, for a wall screen, a spare tablet or a phone. Every value is in
@@ -241,8 +248,9 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   visits and load speed; Umami (Umami Cloud, free Hobby plan, 100k events a month) adds time on page, referrers and,
   later, a few custom events. Umami's `data-domains="elenz.co.nz"` keeps previews and local builds out of the counts,
   and `data-do-not-track` honours the browser's setting. Neither shows whether a screen is left open (Umami reports time
-  on page when a tab is hidden or closed), so a heartbeat from Now and the dashboards to Workers Analytics Engine is
-  planned once the dashboards are live. The browser tests block both scripts.
+  on page when a tab is hidden or closed), so Now and the dashboards also send a heartbeat to the Worker (Worker
+  section). A few Umami events count how the dashboards are used (`#lib/site/track.js`, which lists them; keep them few,
+  since each counts against the plan). The browser tests block both scripts.
 - Icons (design decision, 9 Nov 2026): the logo mark `src/lib/assets/favicon.svg` is the tab icon where SVG icons
   work; `static/favicon.ico` (16, 32, 48 px) is the fallback for older Safari and for tools that ask for `/favicon.ico`
   directly (link unfurlers, feed readers, raw `/data/*` views), and `static/apple-touch-icon.png` (180 px, on white
@@ -262,7 +270,7 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   charts, `legendOf`, `csvText`); the Generation tab's files are made in tracker.js (`image('gen' | 'all')`, `csv()`),
   the Prices tab's in its page. The link is the live view while live, otherwise its dates and any pinned point.
 - Link previews: every public page puts `src/lib/site/Preview.svelte` in its `<svelte:head>` (og:title, og:description,
-  og:url, og:image, the large-image card). Articles use their cover PNG; every other page the site's card,
+  og:url, og:image, the large-image card). Articles use their cover PNG, and the two dashboards their own (Dashboards); every other page the site's card,
   `static/og/elenz.png` (2400 x 1260; each page asks for it as `?p=<page>`, since LinkedIn served some pages a thumbnail of one shared address): `src/lib/site/SiteCard.svelte` (the mark and name over a week of generation, cover style)
   drawn at `/og/card` (noindex, disallowed in robots.txt) and saved by `analysis/site_card_png.py` (redo it now and
   then; it isn't dated). `npm run check:previews` (`scripts/check-previews.js`, after the build, in checks.yml) fails
@@ -389,6 +397,26 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   `web-share` alone for Keep screen on and Share). Its `scheduled` handler
   dispatches the GitHub jobs (live every 5 minutes, history every 6 hours, watchdog every 15 minutes) (Worker secret `GITHUB_TOKEN`: fine-grained,
   elenz only, Actions read/write; it expires, so renew it yearly). A start GitHub refuses with a server error (or can't be reached) is tried once more 3 s later (`RETRY_MS`), and `/data/health` and the watchdog report failed starts only once they have gone on for 15 minutes (`since` in `cron-status`, `triggerMinutes`, `TRIGGER_MINUTES`): GitHub dropped a single call with HTTP 500 about once a day in early Nov 2026, the next one 5 minutes later working, and each set off a 5-minute alert. Workers Paid since 3 Nov 2026 (US$5 a month: 10 million requests, 10 million KV reads and 1 million KV writes a month included; static files free). Back on the free plan (100,000 requests and KV reads a day, 1,000 KV writes a day; the live job uses ~600), `WRITE_BUDGET` must return to 280 in `history.py` and 100 in `offered.py`.
+
+- Heartbeats (design decision, 16 Nov 2026): while `/now`, `/dashboard` or `/landscape` is open, it posts a beat to
+  `/data/beat` when it opens and every 5 minutes after, on screen or hidden (`src/lib/site/heartbeat.js`; the message,
+  read by both sides, in `src/lib/site/beat.js`: page, a random ID per page load never stored, minutes open, on screen
+  or hidden, wall-screen link or not). It is sent only on elenz.co.nz and not under Do Not Track, as Umami. The Worker
+  checks it and writes one row to Workers Analytics Engine (binding `BEATS`, dataset `elenz_beats` in wrangler.jsonc,
+  made by the first write; included in Workers Paid, 10 million rows a month, a screen open all month ~8,600): index1 the
+  ID, blob1 the page, blob2 `visible` or `hidden`, blob3 `kiosk` or `page`, blob4 the country, double1 minutes open. It
+  writes nothing on other hosts (previews) and answers 204 whatever is posted (405 to anything but POST). Described on
+  `/privacy#screens`. Worker tests: the heartbeat block; site: `tests/heartbeat.test.js`.
+  **Reading them:** `analysis/open_screens.py` prints the screens open on each page hour by hour (NZ time), how many
+  were on screen and how many came from a wall-screen link, then how long screens stayed open. It needs a Cloudflare API
+  token that can read analytics. To make one: Cloudflare dashboard → the profile icon (top right) → My Profile → API
+  Tokens → Create Token → Create Custom Token (Get started); name it "Elenz analytics read"; Permissions: Account,
+  Account Analytics, Read; Account Resources: Include, the Elenz account; Continue to summary → Create Token, and copy
+  it (it's shown once; keep it in a password manager, never in the repo). The account ID is on the Workers & Pages
+  overview, on the right. Then `CF_ACCOUNT_ID=<id> CF_ANALYTICS_TOKEN=<token> python3 analysis/open_screens.py 7` for
+  the last 7 days. The same query works with curl against
+  `https://api.cloudflare.com/client/v4/accounts/<id>/analytics_engine/sql` (the SQL is in the script). Rows are kept
+  three months.
 
 ## Facilities
 

@@ -2,10 +2,14 @@
 	// /dashboard: the big-number dashboard, for a wall screen, a spare tablet or a phone. One or two large live values
 	// and up to four small ones over a background, each picked from every live figure Elenz has (dashboard/values.js).
 	// The layout is in the address and kept in this browser (dashboard/layout.js); `kiosk=1` shows the screen alone.
-	// Not linked from the site yet and kept out of search engines (noindex) while it is tested.
+	// Linked from /now and /guide since 16 Nov 2026, with its own link-preview image (static/og/dashboard.png,
+	// analysis/dashboard_og_png.py). Sends a heartbeat while open (#lib/site/heartbeat.js).
 	import { onMount, tick } from 'svelte';
 	import { replaceState } from '$app/navigation';
 	import Masthead from '#lib/site/Masthead.svelte';
+	import Preview from '#lib/site/Preview.svelte';
+	import { startHeartbeat } from '#lib/site/heartbeat.js';
+	import { track, throttled, trackOnLoad } from '#lib/site/track.js';
 	import KeepAwake from '#lib/now/KeepAwake.svelte';
 	import Stage from '#lib/dashboard/Stage.svelte';
 	import ColourPick from '#lib/dashboard/ColourPick.svelte';
@@ -16,6 +20,7 @@
 	import { BACKGROUNDS, PLAIN, DEFAULT, clean, fromQuery, toQuery, load, save, resize } from '#lib/dashboard/layout.js';
 
 	const DATA_URL = '/data/tracker.json';
+	const DESC = "A live dashboard of New Zealand's electricity for a wall screen or a phone: pick the big numbers and the background.";
 	const LIVE_MINUTES = 15;
 
 	let x = $state.raw<ReturnType<typeof context> | null>(null);
@@ -51,11 +56,13 @@
 	});
 
 	// ---------- changing the layout ----------
+	const layoutEvent = throttled();   // an Umami event, at most one a minute (#lib/site/track.js)
 	// persist false: the screen follows (a colour slider moving) but the address and the stored layout wait for the end
 	function set(next: { bg: string; col: string; view: string; big: string[]; small: string[] }, persist = true) {
 		layout = clean(next);
 		if (!persist) return;
 		save(layout);
+		layoutEvent('layout-change', { bg: layout.bg, view: layout.view, big: layout.big.length, small: layout.small.length });
 		const url = location.pathname + toQuery(layout, { kiosk: kiosk ? '1' : '' });
 		Promise.resolve().then(() => replaceState(url, {})).catch(() => history.replaceState(history.state, '', url));
 	}
@@ -133,6 +140,7 @@
 	let copied = $state('');
 	async function copy(which: 'layout' | 'kiosk') {
 		const url = location.origin + location.pathname + toQuery(layout, { kiosk: which === 'kiosk' ? '1' : '' });
+		if (which === 'kiosk') track('wall-screen-copy', { page: 'dashboard' });
 		try { await navigator.clipboard.writeText(url); copied = which; }
 		catch { window.prompt('Copy this link:', url); }
 		setTimeout(() => (copied = ''), 2200);
@@ -142,6 +150,8 @@
 		const q = new URLSearchParams(location.search);
 		kiosk = q.get('kiosk') === '1';
 		layout = fromQuery(location.search) ?? load() ?? clean(DEFAULT);
+		const stopBeat = startHeartbeat('dashboard', { kiosk });
+		if (kiosk) trackOnLoad('wall-screen-open', { page: 'dashboard' });
 		if (matchMedia('(max-width: 640px)').matches) panel = false;
 		const fsChange = () => { if (!document.fullscreenElement) full = false; };
 		const moved = () => { if (full) wake(); };
@@ -172,6 +182,7 @@
 		const poll = setInterval(check, CHECK_EVERY);
 		document.addEventListener('visibilitychange', check);
 		return () => {
+			stopBeat();
 			clearInterval(poll);
 			document.removeEventListener('visibilitychange', check);
 			document.removeEventListener('fullscreenchange', fsChange);
@@ -185,8 +196,8 @@
 
 <svelte:head>
 	<title>ELENZ · Dashboard</title>
-	<meta name="description" content="A live dashboard of New Zealand's electricity for a wall screen or a phone: pick the big numbers and the background." />
-	<meta name="robots" content="noindex" />
+	<meta name="description" content={DESC} />
+	<Preview title="Dashboard · ELENZ" description={DESC} path="/dashboard" image="/og/dashboard.png?v=1" size={[2400, 1260]} alt="The Elenz dashboard: New Zealand's electricity as big live numbers on a wall screen" />
 </svelte:head>
 
 {#if kiosk}

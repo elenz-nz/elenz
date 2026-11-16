@@ -90,6 +90,14 @@
 			],
 		},
 		{
+			name: 'Dashboards', href: '/dashboard',
+			lede: 'Live figures for a wall screen, a spare tablet or a phone.',
+			items: [
+				'The dashboard: one or two large values and up to four small ones, from any live figure, over a background you choose.',
+				'The power landscape, for kids: a storybook New Zealand where the wind, rivers, sun and steam follow the live data, with a replay of the last 24 hours.',
+			],
+		},
+		{
 			name: 'Articles', href: '/articles',
 			lede: 'Quarterly reviews and analysis built on the same data.',
 			items: ['Each article lists the data behind its figures.'],
