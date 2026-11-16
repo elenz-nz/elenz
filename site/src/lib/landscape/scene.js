@@ -3,13 +3,16 @@
 // update never makes anything jump. Also here: the names on the picture, the pop-ups, the numbers under it, the dials
 // table and the page's buttons, all found inside `root` by id (the markup is in routes/landscape/+page.svelte).
 //
-// Ported from the prototype (Elenz Power Landscape, 13 Nov 2026) with its drawing unchanged; still to do from the
+// Ported from the prototype (Elenz Power Landscape, 13 Nov 2026); the view's settings come from prefs.js. Still to do from the
 // production plan: pop-ups beside their subject, the phone layout, and drawing the still parts once.
 import { clamp, lerp, sun, hourOf, lateness, sampleAt, SEASONS, SEASON_F, seasonIdx, seasonOf, snowAmt, meltAmt, lakeAmt,
   springAmt, autumnAmt, winterAmt, dryAmt, redAmt, isXmas, BAND, makeDials } from './dials.js';
+import { clean, cardsOn } from './prefs.js';
 
-/** Draws the scene in `root` from `feed` (feed.js) until destroy(); setFeed() takes each new feed. */
-export function mountScene(root, feed) {
+/** Draws the scene in `root` from `feed` (feed.js) until destroy(); setFeed() takes each new feed. opts: `prefs`, the
+ * view to open with (prefs.js); `onPrefs(prefs)`, called when the viewer changes it; `loop`, replay again from the
+ * start after the end (the wall-screen link). */
+export function mountScene(root, feed, opts = {}) {
 let D = feed;
 const at = x => sampleAt(D, x);
 const dialsFrom = makeDials({ get batt() { return D.cap?.batt; } });
@@ -18,7 +21,8 @@ const $ = id => root.querySelector('#' + id);
 const fmtTime = ms => new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', hour: 'numeric', minute: '2-digit', hour12: true }).format(ms).replace(' ', ' ');
 const fmtDay = ms => new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', weekday: 'short', day: 'numeric', month: 'short' }).format(ms);
 // ---------- modes ----------
-let mode = 'now', playing = true, pos = D.n - 1, showLabels = true, showBirds = true, calm = false;
+const prefs = clean(opts.prefs);
+let mode = prefs.mode, playing = true, pos = D.n - 1, showLabels = prefs.names, showBirds = prefs.birds, calm = prefs.calm;
 const manual = { wind: .5, hydro: .45, cloud: .2, time: 12, thermal: .1, geo: .86, batt: 0 };
 let target = dialsFrom(at(D.n - 1));
 const cur = Object.assign({}, target);
@@ -27,10 +31,17 @@ const cur = Object.assign({}, target);
 const cv = $('cv'), ctx = cv.getContext('2d');
 const W = 1000, H = 640;
 let scale = 1;
+// The drawing is redone every frame, so its pixels are capped (about 2.4 million: 1,920 x 1,230): a full-screen TV at
+// two or three device pixels per CSS pixel would otherwise draw up to 9 million a frame, drop frames, and the turbines
+// and birds would jump (test report, 16 Nov 2026). The picture is soft-edged, so the cap doesn't show.
+const MAX_PX = 2.4e6;
 function resize() {
-  const r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 3);
-  cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+  const r = cv.getBoundingClientRect();
+  let dpr = Math.min(window.devicePixelRatio || 1, 3);
+  if (r.width * r.height * dpr * dpr > MAX_PX) dpr = Math.sqrt(MAX_PX / Math.max(1, r.width * r.height));
+  cv.width = Math.max(1, Math.round(r.width * dpr)); cv.height = Math.max(1, Math.round(r.height * dpr));
   scale = cv.width / W;
+  $('stage').style.setProperty('--u', r.width / 100 + 'px');   // 1% of the picture's width, for the numbers on it
 }
 const ro = new ResizeObserver(resize); ro.observe(cv);
 resize();
@@ -222,7 +233,7 @@ function cloudLayer(d, dt) {
   const shade = d.cloud > .65 ? (d.cloud - .65) / .35 : 0;
   const night = clamp((-d.sun) / 8), dusk = clamp(1 - Math.abs(d.sun - 2) / 9);
   for (const c of clouds) {
-    c.x += dt * (6 + d.wind * 70) * (0.6 + c.s * .5);
+    c.x += dt * (1.2 + d.wind * 11) * (0.6 + c.s * .5);   // slow: a minute or more to cross even in a strong wind
     if (c.x > W + 160) c.x = -200;
     const vis = clamp(n - c.k);
     if (vis <= 0) continue;
@@ -996,10 +1007,18 @@ const DIALS = [
   ['batt', 'Battery', '--f-batt', 'Arrow and sparks run in when charging and out when discharging.', 'Battery MW ÷ installed (− = charging)'],
   ['season', 'Season', '--f-hydro', 'Snow, the braided river and the lake level; spring flowers, brown summer paddocks, autumn leaves, Matariki in winter and Christmas lights in December.', 'Summer, autumn, winter, spring or December, from the date'],
 ];
+// what each dial does and how it's worked out stays folded under More info until asked for (test report, 16 Nov 2026).
+// The season slider stops at spring: December's Christmas look comes with the date, not the slider.
 $('dtable').innerHTML = DIALS.map(([k, name, c, does, how]) => `<div class="drow"><div class="dname"><i style="background:var(${c})"></i>${name}</div>
-  <div class="dbody"><div class="dline"><div class="dbar${k === 'batt' ? ' mid' : ''}"><b id="bar-${k}" style="background:var(${c})"></b></div><span class="dval" id="val-${k}">–</span></div>
-  <input id="sl-${k}" type="range" min="${k === 'batt' ? -1 : 0}" max="${k === 'time' ? 24 : k === 'season' ? 4 : 1}" step="${k === 'time' ? .05 : k === 'season' ? 1 : .01}" aria-label="${name}" hidden>
-  <div class="dhow">${does} <span style="font-family:var(--font-data)">${how}</span></div></div></div>`).join('');
+  <div class="dbody"><div class="dline"><div class="dbar${k === 'batt' ? ' mid' : ''}"><b id="bar-${k}" style="background:var(${c})"></b></div><span class="dval" id="val-${k}">–</span>
+  <button type="button" class="dmore" aria-expanded="false" aria-controls="how-${k}">More info</button></div>
+  <input id="sl-${k}" type="range" min="${k === 'batt' ? -1 : 0}" max="${k === 'time' ? 24 : k === 'season' ? 3 : 1}" step="${k === 'time' ? .05 : k === 'season' ? 1 : .01}" aria-label="${name}" hidden>
+  <div class="dhow" id="how-${k}" hidden>${does} <span style="font-family:var(--font-data)">${how}</span></div></div></div>`).join('');
+for (const b of root.querySelectorAll('.dmore')) b.onclick = () => {
+  const open = b.getAttribute('aria-expanded') !== 'true';
+  b.setAttribute('aria-expanded', String(open)); b.textContent = open ? 'Less info' : 'More info';
+  $(b.getAttribute('aria-controls')).hidden = !open;
+};
 
 function updateText(d) {
   const s = d._s;
@@ -1033,14 +1052,17 @@ function updateText(d) {
 }
 
 // ---------- mode switching ----------
-function setMode(m) {
-  mode = m;
+const minutes = n => `${n} minute${n === 1 ? '' : 's'}`;
+function setMode(m, keepCards = false) {
+  mode = prefs.mode = m;
+  if (!keepCards) prefs.cards = null;      // each mode opens with its own cards setting: off in the replay, on otherwise
   for (const k of ['now', 'replay', 'play']) $('m-' + k).setAttribute('aria-pressed', String(k === m));
   $('scrub').hidden = m !== 'replay';
   for (const [k] of DIALS) $('sl-' + k).hidden = m !== 'play';
   queue.length = 0; $('toasts').innerHTML = '';
+  applyPrefs();
   if (m === 'now') { pos = D.n - 1; hello(); }
-  if (m === 'replay') { pos = 0; playing = true; $('pp').textContent = 'Pause'; say('Replaying the last 24 hours, one day in a minute.', '--f-hydro'); }
+  if (m === 'replay') { pos = 0; playing = true; endWait = 0; $('pp').textContent = 'Pause'; say(`Replaying the last 24 hours, one day in ${minutes(prefs.speed)}.`, '--f-hydro'); }
   if (m === 'play') {
     for (const [k] of DIALS) { const v = k in manual ? manual[k] : cur[k]; manual[k] = v; $('sl-' + k).value = v; }
     say('You’re in charge! Move the sliders and watch the scene.', '--f-wind');
@@ -1049,30 +1071,42 @@ function setMode(m) {
     ? 'Each slider sets one dial directly. On the real page these come from the live feed.'
     : 'Each part of the picture listens to one number between 0 and 1, worked out from the live feed. The scene eases towards each new value, so a 5-minute update never makes anything jump.';
 }
-$('m-now').onclick = () => setMode('now');
-$('m-replay').onclick = () => setMode('replay');
-$('m-play').onclick = () => setMode('play');
-$('pp').onclick = () => { playing = !playing; $('pp').textContent = playing ? 'Pause' : 'Play'; $('pp').setAttribute('aria-label', playing ? 'Pause replay' : 'Play replay'); };
+// the on/off buttons and the replay speed, set from prefs; every change goes back to the page (opts.onPrefs) to keep
+const toggle = (id, on, word) => { const b = $(id); b.setAttribute('aria-pressed', String(on)); b.textContent = `${word} ${on ? 'on' : 'off'}`; };
+let showCards = true, showHud = true;
+function applyPrefs() {
+  showLabels = prefs.names; showHud = prefs.numbers; showBirds = prefs.birds; calm = prefs.calm; showCards = cardsOn(prefs);
+  $('labels').hidden = !showLabels; $('hud').hidden = !showHud; $('toasts').hidden = !showCards;
+  root.querySelector('.scene').classList.toggle('hud-on', showHud);
+  toggle('labels-btn', showLabels, 'Names'); toggle('hud-btn', showHud, 'Numbers'); toggle('cards-btn', showCards, 'Cards');
+  toggle('birds-btn', showBirds, 'Birds'); toggle('calm-btn', calm, 'Low motion');
+  for (const b of root.querySelectorAll('#speed button')) b.setAttribute('aria-pressed', String(+b.dataset.min === prefs.speed));
+  syncMenu();
+}
+const changed = () => { applyPrefs(); opts.onPrefs?.(Object.assign({}, prefs)); };
+$('m-now').onclick = () => { setMode('now'); changed(); };
+$('m-replay').onclick = () => { setMode('replay'); changed(); };
+$('m-play').onclick = () => { setMode('play'); changed(); };
+$('pp').onclick = () => { playing = !playing; endWait = 0; if (playing && pos >= D.n - 1) pos = 0; $('pp').textContent = playing ? 'Pause' : 'Play'; $('pp').setAttribute('aria-label', playing ? 'Pause replay' : 'Play replay'); };
 $('scrub-in').oninput = e => { pos = +e.target.value; };
+for (const b of root.querySelectorAll('#speed button')) b.onclick = () => { prefs.speed = +b.dataset.min; changed(); };
 $('fs-btn').onclick = async () => { // the picture alone, filling the screen; Esc (or Back on a TV remote) leaves it
   const el = root.querySelector('.scene');
   try { if (document.fullscreenElement) await document.exitFullscreen(); else await (el.requestFullscreen ? el.requestFullscreen() : el.webkitRequestFullscreen()); }
   catch (e) { $('fs-btn').textContent = 'Full screen isn’t available here'; setTimeout(() => { $('fs-btn').textContent = 'Full screen'; }, 2600); }
 };
-$('calm-btn').onclick = () => { calm = !calm; $('calm-btn').setAttribute('aria-pressed', String(calm)); $('calm-btn').textContent = calm ? 'Low motion on' : 'Low motion off'; };
-$('birds-btn').onclick = () => { showBirds = !showBirds; $('birds-btn').setAttribute('aria-pressed', String(showBirds)); $('birds-btn').textContent = showBirds ? 'Birds on' : 'Birds off'; };
+$('calm-btn').onclick = () => { prefs.calm = !prefs.calm; changed(); };
+$('birds-btn').onclick = () => { prefs.birds = !prefs.birds; changed(); };
+$('cards-btn').onclick = () => { prefs.cards = !cardsOn(prefs); changed(); };
+$('hud-btn').onclick = () => { prefs.numbers = !prefs.numbers; changed(); };
+$('labels-btn').onclick = () => { prefs.names = !prefs.names; changed(); };
 // in full screen the page's buttons are out of sight, so a menu in the corner mirrors them
-const syncMenu = () => { for (const b of root.querySelectorAll('#fsmenu [data-for]')) { const src = $(b.dataset.for); b.textContent = src.textContent; b.setAttribute('aria-pressed', src.getAttribute('aria-pressed')); } };
+function syncMenu() { for (const b of root.querySelectorAll('#fsmenu [data-for]')) { const src = $(b.dataset.for); b.textContent = src.textContent; b.setAttribute('aria-pressed', src.getAttribute('aria-pressed')); } }
 for (const b of root.querySelectorAll('#fsmenu [data-for]')) b.onclick = () => { $(b.dataset.for).click(); syncMenu(); };
 $('fs-menu-btn').onclick = () => { const open = $('fsmenu').hidden; syncMenu(); $('fsmenu').hidden = !open; $('fs-menu-btn').setAttribute('aria-expanded', String(open)); };
 $('fs-x').onclick = () => { if (document.fullscreenElement) document.exitFullscreen(); };
 const onFs = () => { $('fsmenu').hidden = true; $('fs-menu-btn').setAttribute('aria-expanded', 'false'); };
 document.addEventListener('fullscreenchange', onFs);
-let showCards = true;
-$('cards-btn').onclick = () => { showCards = !showCards; $('toasts').hidden = !showCards; $('cards-btn').setAttribute('aria-pressed', String(showCards)); $('cards-btn').textContent = showCards ? 'Cards on' : 'Cards off'; };
-let showHud = true; root.querySelector('.scene').classList.add('hud-on');
-$('hud-btn').onclick = () => { showHud = !showHud; $('hud').hidden = !showHud; root.querySelector('.scene').classList.toggle('hud-on', showHud); $('hud-btn').setAttribute('aria-pressed', String(showHud)); $('hud-btn').textContent = showHud ? 'Numbers on' : 'Numbers off'; };
-$('labels-btn').onclick = () => { showLabels = !showLabels; $('labels').hidden = !showLabels; $('labels-btn').setAttribute('aria-pressed', String(showLabels)); $('labels-btn').textContent = showLabels ? 'Names on' : 'Names off'; };
 for (const [k] of DIALS) $('sl-' + k).oninput = e => { manual[k] = +e.target.value; };
 const playDials = ['wind','hydro','geo','cloud','sun','solar','roof','thermal','batt'];
 for (const k of playDials) if (k !== 'sun' && !(k in manual)) manual[k] = cur[k];
@@ -1080,15 +1114,22 @@ manual.season = seasonIdx(seasonOf(D.t0 + (D.n - 1) * D.step));
 let DAY0 = D.t0 + (D.n - 1) * D.step - hourOf(D.t0 + (D.n - 1) * D.step) * 36e5; // midnight (NZ) of the feed's last day
 
 // ---------- loop ----------
-let last = performance.now(), lastIdx = D.n - 1;
+let last = performance.now(), lastIdx = D.n - 1, endWait = 0, sdt = 1 / 60;
 let raf = 0, dead = false;
+const shown = {};   // text last written to each element: only a change touches the page, not every frame
+const show = (id, text) => { if (shown[id] !== text) { shown[id] = text; $(id).textContent = text; } };
 function tick(now) {
   if (dead) return;
-  const dt = Math.min((now - last) / 1000, .1); last = now; const slow = calm ? .3 : 1; clock += reduced ? 0 : dt * slow; rclock += reduced ? 0 : dt; // low motion: everything runs at under a third speed
+  // frame times are smoothed, so one late frame doesn't throw the turbines and birds forward (test report, 16 Nov 2026)
+  const raw = Math.min((now - last) / 1000, .1); last = now; sdt += (raw - sdt) * .2; const dt = Math.min(sdt, .066); const slow = calm ? .3 : 1; clock += reduced ? 0 : dt * slow; rclock += reduced ? 0 : dt; // low motion: everything runs at under a third speed
   if (mode === 'replay') {
     const before = pos;
-    if (playing) pos += dt * 288 / 60;
-    if (pos >= D.n - 1) { pos = D.n - 1; playing = false; $('pp').textContent = 'Play'; }
+    if (playing) pos += dt * (D.n - 1) / (60 * prefs.speed);       // the whole day in prefs.speed minutes
+    if (pos >= D.n - 1) {
+      pos = D.n - 1;
+      if (opts.loop && playing) { endWait += dt; if (endWait > 6) { pos = 0; endWait = 0; } }   // a wall screen replays again
+      else if (playing) { playing = false; $('pp').textContent = 'Play'; }
+    }
     if (Math.floor(pos) !== Math.floor(before) && pos > before) events(Math.floor(before), Math.floor(pos));
     $('scrub-in').value = pos;
   }
@@ -1100,9 +1141,9 @@ function tick(now) {
   } else target = dialsFrom(at(pos));
   const t = mode === 'play' ? DAY0 + manual.time * 36e5 : at(pos).t;
   const tShow = mode === 'replay' ? Math.floor(t / 18e5) * 18e5 : t; // in replay the clock ticks in half hours
-  $('scrub-out').textContent = fmtTime(tShow);
-  $('h-day').hidden = mode === 'play'; $('h-time').textContent = fmtTime(tShow); $('h-day').textContent = fmtDay(tShow);
-  $('when').textContent = mode === 'play' ? `Your own dials · ${fmtTime(t)}` : `${fmtDay(tShow)} · ${fmtTime(tShow)} NZ time`;
+  show('scrub-out', fmtTime(tShow));
+  $('h-day').hidden = mode === 'play'; show('h-time', fmtTime(tShow)); show('h-day', fmtDay(tShow));
+  show('when', mode === 'play' ? `Your own dials · ${fmtTime(t)}` : `${fmtDay(tShow)} · ${fmtTime(tShow)} NZ time`);
   const ease = reduced ? 1 : 1 - Math.exp(-dt / (mode === 'replay' ? .35 : .9));
   for (const k of playDials) cur[k] = lerp(cur[k], target[k], ease);
   cur.sunH = target.sunH; cur.town = target.town; cur.late = target.late; cur.time = target.time; cur.season = lerp(cur.season, target.season, ease); cur._gen = target._gen; cur._ren = target._ren; cur._s = target._s;
@@ -1112,8 +1153,8 @@ function tick(now) {
   if (!dead) raf = requestAnimationFrame(tick);
 }
 updateText(cur);
-hello();
 $('scrub-in').max = String(D.n - 1);
+setMode(prefs.mode, true);
 raf = requestAnimationFrame(tick);
 
 // ---------- new data, and leaving the page ----------

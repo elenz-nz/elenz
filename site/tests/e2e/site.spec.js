@@ -495,6 +495,31 @@ test.describe('dashboards', () => {
     await expect(page.locator('#scrub')).toBeVisible();
   });
 
+  test("the landscape's dials fold their notes, and the replay has its own speed and cards setting", async ({ page }) => {
+    await page.goto('/landscape');
+    await expect(page.locator('#k-gen')).toHaveText(/MW$/);
+    await expect(page.locator('#how-wind')).toBeHidden();
+    await page.locator('.dmore').first().click();
+    await expect(page.locator('#how-wind')).toBeVisible();
+    await expect(page.locator('#cards-btn')).toHaveText('Cards on');
+    await page.getByRole('button', { name: 'Replay 24 h' }).click();
+    await expect(page.locator('#cards-btn')).toHaveText('Cards off');
+    await page.locator('#speed button', { hasText: '3 min' }).click();
+    await expect(page).toHaveURL(/mode=replay/);
+    await expect(page).toHaveURL(/speed=3/);
+    await page.getByRole('button', { name: 'Right now' }).click();
+    await expect(page.locator('#cards-btn')).toHaveText('Cards on');
+  });
+
+  test("the landscape's wall-screen link shows the picture alone, in the linked view", async ({ page }) => {
+    await page.goto('/landscape?mode=replay&names=0&kiosk=1');
+    await expect(page.locator('#stage')).toBeVisible();
+    await expect(page.locator('.controls')).toBeHidden();
+    await expect(page.locator('.dials')).toBeHidden();
+    await expect(page.locator('#labels')).toBeHidden();
+    await expect(page.locator('#m-replay')).toHaveAttribute('aria-pressed', 'true');
+  });
+
   for (const path of ['/dashboard', '/landscape']) {
     test(`${path} fits a phone's screen`, async ({ page }, testInfo) => {
       test.skip(!isPhone(testInfo), 'phones only');

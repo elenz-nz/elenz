@@ -78,7 +78,16 @@ embedded solar with no estimate keeps the last estimate for the picture and is m
 "No estimate"); `dials.js` turns the feed into 0–1 dials (bands in `BAND`, provisional, see its header), the sun and the
 season; `scene.js` draws and runs the page's controls (Right now, Replay 24 h, Play with dials, full screen), finding its
 elements by id inside the page. The installed capacities for the wind and battery dials come from the generator rows.
-Fredoka (the kids' face) is bundled with `@fontsource/fredoka` and loaded on this page only. Still to do from the
+Fredoka (the kids' face) is bundled with `@fontsource/fredoka` and loaded on this page only; cards, buttons and panels
+take the site's shapes (4 px corners, the site's buttons and segmented control), and sizes on the picture follow `--u`
+(1% of its width, set by scene.js) rather than container query units, which need Safari 16. The view (mode, names,
+numbers, birds, low motion, cards, replay speed) is in the address and kept in this browser (`prefs.js`, localStorage
+`elenz-landscape`, on /privacy); Share copies a link to it or a wall-screen link (`kiosk=1`: the picture alone, a replay
+starting again 6 s after it ends). The pop-up cards are off in the replay and on otherwise unless the viewer chooses;
+the replay takes 1, 3 or 10 minutes for the day; each dial's notes fold under More info; the play-mode season slider
+stops at spring (December's look comes only with the date). Smoothness (test report, 16 Nov 2026): the canvas is capped
+at about 2.4 million pixels (a 4K TV would otherwise draw up to 9 million a frame and drop frames), frame times are
+smoothed, the clock and labels are only written when they change, and the clouds drift slowly. Still to do from the
 production plan (post-launch ideas doc): pop-ups beside their subject, the phone layout, drawing the still parts once, the
 kids' wording and a fact check of each dial against the method pages. Tests: `tests/landscape.test.js` and the dashboards
 block in `tests/e2e/site.spec.js`.

@@ -3,7 +3,8 @@
 	// river runs faster with hydro, the turbines turn with the wind, the sun hides behind cloud as embedded solar drops.
 	// The scene and its controls are in #lib/landscape/scene.js, the dials in dials.js, the feed in feed.js; this page
 	// fetches tracker.json as /now does and hands each new interval over. Not linked from the site yet and kept out
-	// of search engines (noindex) while it is tested.
+	// of search engines (noindex) while it is tested. The view (mode, what shows, replay speed) is in the address and kept
+	// in this browser (prefs.js); `kiosk=1` shows the picture alone for a wall screen, replaying again if it's a replay.
 	import { onMount } from 'svelte';
 	import '@fontsource/fredoka/500.css';
 	import '@fontsource/fredoka/600.css';
@@ -12,13 +13,33 @@
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
 	import { generatorRows } from '#lib/now/generators.js';
 	import { feedFrom } from '#lib/landscape/feed.js';
+	import { clean, fromQuery, toQuery, load as loadPrefs, save as savePrefs, SPEEDS } from '#lib/landscape/prefs.js';
 
 	const DATA_URL = '/data/tracker.json';
 	let root = $state<HTMLElement>();
 	let error = $state('');
 	let ready = $state(false);
+	let kiosk = $state(false);
+	let prefs = $state(clean(null));
+	let sharing = $state(false);
+	let copied = $state('');
+
+	// a changed view is kept in this browser and in the address (not in history: Back still leaves the page)
+	function keep(p: ReturnType<typeof clean>) {
+		prefs = p;
+		savePrefs(p);
+		try { history.replaceState(history.state, '', location.pathname + toQuery(p, { kiosk: kiosk ? '1' : '' })); } catch { /* the view still works */ }
+	}
+	async function copy(which: 'view' | 'kiosk') {
+		const url = location.origin + location.pathname + toQuery(prefs, { kiosk: which === 'kiosk' ? '1' : '' });
+		try { await navigator.clipboard.writeText(url); copied = which; } catch { prompt('Copy this link:', url); }
+		setTimeout(() => (copied = ''), 2200);
+	}
 
 	onMount(() => {
+		const q = new URLSearchParams(location.search);
+		kiosk = q.get('kiosk') === '1';
+		prefs = fromQuery(q) ?? loadPrefs();
 		let scene: { setFeed(f: any): void; destroy(): void } | null = null;
 		let due = 0, stamp = 0, gone = false;
 		async function load() {
@@ -36,7 +57,7 @@
 			else {
 				const { mountScene } = await import('#lib/landscape/scene.js');
 				if (gone) return;
-				scene = mountScene(root!, feed);
+				scene = mountScene(root!, feed, { prefs, onPrefs: keep, loop: kiosk });
 				ready = true;
 			}
 			error = '';
@@ -55,9 +76,9 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<div class="wrap">
-	<Masthead />
-	<main class="ls" bind:this={root}>
+<div class="wrap" class:kiosk>
+	{#if !kiosk}<Masthead />{/if}
+	<main class="ls" class:kiosk bind:this={root}>
 		<div class="ls-head">
 			<div>
 				<h1>Power landscape</h1>
@@ -69,7 +90,7 @@
 		<noscript><p>The power landscape needs JavaScript turned on.</p></noscript>
 
 		<div class="controls js-only" role="group" aria-label="Scene controls">
-			<div class="ls-seg" role="group" aria-label="Mode">
+			<div class="seg" role="group" aria-label="Mode">
 				<button type="button" id="m-now" aria-pressed="true">Right now</button>
 				<button type="button" id="m-replay" aria-pressed="false">Replay 24 h</button>
 				<button type="button" id="m-play" aria-pressed="false">Play with dials</button>
@@ -80,12 +101,26 @@
 			<button type="button" class="btn" id="birds-btn" aria-pressed="true">Birds on</button>
 			<button type="button" class="btn" id="calm-btn" aria-pressed="false">Low motion off</button>
 			<button type="button" class="btn" id="fs-btn">Full screen</button>
+			<button type="button" class="btn" aria-expanded={sharing} aria-controls="ls-share" onclick={() => (sharing = !sharing)}>Share</button>
 			<div class="scrub" id="scrub" hidden>
 				<button type="button" class="btn" id="pp" aria-label="Pause replay">Pause</button>
 				<input id="scrub-in" type="range" min="0" max="287" step="0.05" value="0" aria-label="Time in the last 24 hours" />
 				<output id="scrub-out">--:--</output>
+				<span class="speed-l" id="speed-l">A day in</span>
+				<div class="seg" id="speed" role="group" aria-labelledby="speed-l">
+					{#each SPEEDS as m (m)}<button type="button" data-min={m} aria-pressed={m === 1}>{m} min</button>{/each}
+				</div>
 			</div>
 		</div>
+		{#if sharing}
+			<div class="ls-share" id="ls-share">
+				<p>A link opens this view anywhere: the mode, what's on the picture and the replay speed. This browser keeps it too. The wall-screen link shows the picture alone, with no buttons{prefs.mode === 'replay' ? ', and replays the day again each time it ends' : ''}.</p>
+				<div class="share-b">
+					<button type="button" class="btn go" onclick={() => copy('view')}>{copied === 'view' ? 'Link copied' : 'Copy link to this view'}</button>
+					<button type="button" class="btn go" onclick={() => copy('kiosk')}>{copied === 'kiosk' ? 'Link copied' : 'Copy wall-screen link'}</button>
+				</div>
+			</div>
+		{/if}
 
 		<div class="scene js-only">
 			<div class="stage" id="stage">
@@ -100,6 +135,7 @@
 				</div>
 			</div>
 			<div class="toasts" id="toasts" aria-live="polite"></div>
+			<p class="kcredit">Elenz (elenz.co.nz), from Electricity Authority data</p>
 			<div class="fsbar" id="fsbar">
 				<button type="button" class="fsb" id="fs-menu-btn" aria-label="Options" aria-expanded="false" aria-controls="fsmenu"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none" /></svg></button>
 				<button type="button" class="fsb" id="fs-x" aria-label="Exit full screen"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none" /></svg></button>
