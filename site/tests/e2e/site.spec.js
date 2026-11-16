@@ -457,6 +457,7 @@ test.describe('dashboards', () => {
 
   test('the cards sit in the middle of the screen', async ({ page }) => {
     await page.goto('/dashboard?bg=aurora&big=gen:NZ&small=hvdc&kiosk=1');
+    await expect(page.locator('.stage .tile.big')).toHaveCount(1);   // the address's layout, not the page's first paint
     await expect(page.locator('.stage .tile.big .num')).not.toHaveText('–');
     // how far the cards' middle is from the screen's, as a share of its height (measured again until the layout settles)
     await expect.poll(() => page.evaluate(() => {
