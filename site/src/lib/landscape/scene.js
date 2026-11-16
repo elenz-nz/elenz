@@ -28,7 +28,8 @@ let target = dialsFrom(at(D.n - 1));
 const cur = Object.assign({}, target);
 
 // ---------- canvas ----------
-const cv = $('cv'), ctx = cv.getContext('2d');
+const cv = $('cv'), mainCtx = cv.getContext('2d');
+let ctx = mainCtx;   // what the drawing functions draw on: the canvas, or a still layer while one is redrawn (still())
 const W = 1000, H = 640;
 let scale = 1;
 // The drawing is redone every frame, so its pixels are capped (about 2.4 million: 1,920 x 1,230): a full-screen TV at
@@ -45,6 +46,29 @@ function resize() {
 }
 const ro = new ResizeObserver(resize); ro.observe(cv);
 resize();
+
+// Still layers (test report, 17 Nov 2026: the picture moved smoothly but at a low, steady frame rate on some screens,
+// because all of it was painted again each frame). The parts that don't move, the sky's colour with the sun's glow,
+// the mountains, the ridge, the front paddocks, and the vignette with its grain, are painted once into a layer of their
+// own and copied in each frame. A layer is painted again only when its key changes: the canvas size, the light (N), the
+// season, the sky's colours, where the sun is. In the replay at dusk that can be every frame, which costs no more than
+// before. This about doubled the frame rate in testing.
+function layerOf() { const c = document.createElement('canvas'); return { c, g: c.getContext('2d'), key: '' }; }
+const layers = { sky: layerOf(), mount: layerOf(), ridge: layerOf(), fore: layerOf(), finish: layerOf() };
+/** Draws scene rows y0..y1 (in the land's coordinates, after the S shift) with draw(), from layer L when key matches. */
+function still(L, key, y0, y1, draw) {
+  const top = Math.floor(scale * (y0 - S)), h = Math.max(1, Math.ceil(scale * (y1 - S)) - top);
+  key += '|' + cv.width + 'x' + h;
+  if (L.key !== key) {
+    if (L.c.width !== cv.width || L.c.height !== h) { L.c.width = cv.width; L.c.height = h; } else { L.g.setTransform(1, 0, 0, 1, 0, 0); L.g.clearRect(0, 0, L.c.width, h); }
+    L.g.setTransform(scale, 0, 0, scale, 0, -scale * S - top);
+    ctx = L.g; try { draw(); } finally { ctx = mainCtx; }
+    L.key = key;
+  }
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(L.c, 0, top); ctx.restore();
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';   // as the painted functions leave them, for what comes next
+}
+const q = (v, step) => Math.round(v / step);   // a value in a layer's key, rounded so tiny drifts don't repaint it
 
 const hex = c => c[0] === '#' ? [parseInt(c.slice(1,3),16), parseInt(c.slice(3,5),16), parseInt(c.slice(5,7),16)] : c.match(/\d+/g).slice(0, 3).map(Number);
 const mix = (a, b, t) => { const A = hex(a), B = hex(b); return `rgb(${A.map((v,i) => Math.round(lerp(v, B[i], clamp(t)))).join(',')})`; };
@@ -169,9 +193,21 @@ function sky(d) {
   else { top = '#3f8fdc'; bot = '#c9e8f5'; }
   const grey = e > 0 ? d.cloud * .55 : 0;
   skyTop = mix(top, '#8a97a3', grey); skyBot = mix(bot, '#c3cbd2', grey);
-  const g = ctx.createLinearGradient(0, 0, 0, 440 - S);
-  g.addColorStop(0, skyTop); g.addColorStop(.55, mix(skyTop, skyBot, .55)); g.addColorStop(1, skyBot);
-  ctx.fillStyle = g; ctx.fillRect(0, 0, W, 460);
+  // the sky's colour and the sun's glow change slowly: a still layer (the stars, sun and clouds go on top, moving)
+  const sg = sunGlow(d);
+  ctx.translate(0, -S);
+  still(layers.sky, `${skyTop}|${skyBot}|${sg ? `${q(sg.x, .5)}|${q(sg.y, .5)}|${q(sg.low, .01)}|${q(sg.bright, .01)}` : '-'}`, S, 600 + S, () => {
+    ctx.translate(0, S);
+    const g = ctx.createLinearGradient(0, 0, 0, 440 - S);
+    g.addColorStop(0, skyTop); g.addColorStop(.55, mix(skyTop, skyBot, .55)); g.addColorStop(1, skyBot);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, 460);
+    if (sg) {
+      const { x, y, low, bright } = sg, glow = ctx.createRadialGradient(x, y, 10, x, y, 150 + low * 60);
+      glow.addColorStop(0, mixA('#ffe890', '#ffb060', low, .6 * bright)); glow.addColorStop(.4, mixA('#ffe890', '#ff9a60', low, .22 * bright)); glow.addColorStop(1, 'rgba(255,220,130,0)');
+      ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, 210, 0, 7); ctx.fill();
+    }
+  });
+  ctx.setTransform(scale, 0, 0, scale, 0, 0);
   const night = clamp((-e - 2) / 8);
   if (night > 0) {
     ctx.fillStyle = '#fff';
@@ -186,16 +222,16 @@ function sky(d) {
     ctx.globalAlpha = 1;
   }
 }
+// where the sun is and how it looks, or null once it has set; its glow is painted with the sky (sky)
+function sunGlow(d) {
+  const e = d.sun; if (e <= -6) return null;
+  return { x: 500 - 470 * Math.sin(clamp(d.sunH / 100, -1, 1) * Math.PI / 2), y: 400 - S - clamp(e / 65, -0.1, 1) * 262, bright: 1 - d.cloud * .7, low: clamp(1 - e / 18) };
+}
 function sunAndMoon(d) {
-  const e = d.sun;
-  if (e > -6) {
-    const x = 500 - 470 * Math.sin(clamp(d.sunH / 100, -1, 1) * Math.PI / 2);
-    const y = 400 - S - clamp(e / 65, -0.1, 1) * 262;
-    const bright = 1 - d.cloud * .7, low = clamp(1 - e / 18);
+  const e = d.sun, sg = sunGlow(d);
+  if (sg) {
+    const { x, y, bright, low } = sg;
     const core = mix(mix('#ffd84d', '#ff9a3d', low * .8), '#f2e9c4', d.cloud * .6);
-    const glow = ctx.createRadialGradient(x, y, 10, x, y, 150 + low * 60);
-    glow.addColorStop(0, mixA('#ffe890', '#ffb060', low, .6 * bright)); glow.addColorStop(.4, mixA('#ffe890', '#ff9a60', low, .22 * bright)); glow.addColorStop(1, 'rgba(255,220,130,0)');
-    ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, 210, 0, 7); ctx.fill();
     ctx.save(); ctx.translate(x, y); ctx.rotate(clock * .12);
     ctx.fillStyle = mixA('#ffdb66', '#ffa955', low, .9 * bright);
     for (let i = 0; i < 12; i++) { ctx.rotate(Math.PI / 6); const l = (i % 2 ? 13 : 20) * bright + 3 * Math.sin(clock * 2 + i); ctx.beginPath(); ctx.moveTo(-4, 43); ctx.quadraticCurveTo(0, 46 + l * 1.5, 0, 46 + l); ctx.quadraticCurveTo(0, 46 + l * 1.5, 4, 43); ctx.fill(); }
@@ -881,12 +917,11 @@ function grass(d) {
   }
 }
 
-const grainTile = (() => {
+const grainTile = (() => { // light specks, and fainter dark ones so white snow and cloud stay clean, as with the overlay
   const c = document.createElement('canvas'); c.width = c.height = 160; const g = c.getContext('2d'), im = g.createImageData(160, 160), r = rng(7);
-  for (let i = 0; i < im.data.length; i += 4) { const v = r() * 255 | 0; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 15; }
+  for (let i = 0; i < im.data.length; i += 4) { const v = r() * 2 - 1; im.data[i] = im.data[i + 1] = im.data[i + 2] = v > 0 ? 255 : 0; im.data[i + 3] = Math.abs(v) * (v > 0 ? 13 : 4) | 0; }
   g.putImageData(im, 0, 0); return c;
 })();
-let grainPat = null;
 function finish(d) {
   const e = d.sun, dusk = clamp(1 - Math.abs(e - 3) / 10), shade = e > 0 ? clamp((d.cloud - .55) / .45) : 0;
   if (dusk > 0) { ctx.fillStyle = `rgba(255,140,80,${.2 * dusk})`; ctx.fillRect(0, 0, W, H); }       // golden light at sunrise and sunset
@@ -897,10 +932,16 @@ function finish(d) {
     for (let i = 0; i < 46; i++) { const x = (i * 127.3 + rainPh * slant * 4) % 1100 - 50, y = (i * 71.7 + rainPh * 300 * (.8 + (i % 5) * .08)) % 720 - 40; ctx.moveTo(x, y); ctx.lineTo(x + slant * .3, y + 8); }
     ctx.stroke();
   }
+  // the vignette and the grain never change: one layer, copied over the picture (finishLayer)
+  ctx.translate(0, -S); still(layers.finish, '', S, H + S, finishLayer); ctx.setTransform(scale, 0, 0, scale, 0, 0);
+}
+function finishLayer() {
+  ctx.translate(0, S);   // back to the picture's own coordinates
   const v = ctx.createRadialGradient(500, 300, 330, 500, 320, 700); v.addColorStop(0, 'rgba(10,24,40,0)'); v.addColorStop(1, 'rgba(10,24,40,.3)');
   ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
-  grainPat = grainPat || ctx.createPattern(grainTile, 'repeat');
-  ctx.globalCompositeOperation = 'overlay'; ctx.fillStyle = grainPat; ctx.fillRect(0, 0, W, H); ctx.globalCompositeOperation = 'source-over';
+  // The grain was an 'overlay' blend over the whole picture every frame, which is slow to paint (GPUs read back every
+  // pixel). Now it's light and dark specks painted plainly over the vignette, close to the same look.
+  ctx.fillStyle = ctx.createPattern(grainTile, 'repeat'); ctx.fillRect(0, 0, W, H);
 }
 
 function frame(dt, rdt = dt) { // dt is slowed in low motion; rdt is real time, for birds, sheep, turbines and the dam's falling water
@@ -913,11 +954,14 @@ function frame(dt, rdt = dt) { // dt is slowed in low motion; rdt is real time, 
   spring = springAmt(d.season); autumn = autumnAmt(d.season); dry = dryAmt(d.season); red = redAmt(d.season); xmas = isXmas(d.season); winterSky = winterAmt(d.season);
   sky(d); sunAndMoon(d); rainbow(d, m); cloudLayer(d, m);
   ctx.translate(0, -S);
-  mountains(d); lake(d); ridge(d);
+  const land = `${q(N, .004)}|${q(dry, .01)}`;
+  still(layers.mount, `${land}|${skyBot}|${q(snowAlps, .5)}|${q(snowRua, .5)}`, 140, 492, () => mountains(d));
+  lake(d);
+  still(layers.ridge, land, 322, 494, () => ridge(d));
   if (spring > .02) flowers(190, 250);
   SHEEP.slice(0, 8).forEach(([x, y], i) => sheep(x, y, .8, i));
   for (const [x, y, s] of TURBINES) turbine(x, y, s, d);
-  foreground(d);
+  still(layers.fore, land, 418, BOT + 12, () => foreground(d));
   if (spring > .02) flowers(0, 190);
   SHEEP.slice(8).forEach(([x, y], i) => sheep(x, y, y > 600 ? 1.55 : 1.1, i + 8));
   river(d, m); dam(d);

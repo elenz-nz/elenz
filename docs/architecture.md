@@ -97,9 +97,14 @@ starting again 6 s after it ends). The pop-up cards are off in the replay and on
 the replay takes 1, 3 or 10 minutes for the day; each dial's notes fold under More info; the play-mode season slider
 stops at spring (December's look comes only with the date). Smoothness (test report, 16 Nov 2026): the canvas is capped
 at about 2.4 million pixels (a 4K TV would otherwise draw up to 9 million a frame and drop frames), frame times are
-smoothed, the clock and labels are only written when they change, and the clouds drift slowly. Still to do from the
-production plan (post-launch ideas doc): pop-ups beside their subject, the phone layout, drawing the still parts once, the
-kids' wording and a fact check of each dial against the method pages. Tests: `tests/landscape.test.js` and the dashboards
+smoothed, the clock and labels are only written when they change, and the clouds drift slowly. Still layers (test report,
+17 Nov 2026: a steady low frame rate): the parts that don't move (the sky's colour with the sun's glow, the mountains, the
+ridge, the front paddocks, the vignette and grain) are painted once into off-screen canvases (`still()` in scene.js) and
+copied in each frame, painted again only when their key changes (canvas size, light, season, sky colours, the sun's
+place). The grain is plain light and dark specks rather than an `overlay` blend, which made the browser read back every
+pixel each frame. About twice the frame rate in testing (software drawing, 1280 px wide: 25 to 56 fps; at 2x pixels 15
+to 38), with the picture unchanged but for the grain. Still to do from the production plan (post-launch ideas doc):
+pop-ups beside their subject, the phone layout, the kids' wording and a fact check of each dial against the method pages. Tests: `tests/landscape.test.js` and the dashboards
 block in `tests/e2e/site.spec.js`.
 
 ## Articles
