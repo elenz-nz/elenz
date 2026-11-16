@@ -187,59 +187,97 @@ def strait():
 
 
 def pylons():
-    """A 220 kV double-circuit steel lattice line receding into a sunset: tapered legs, X-braced panels, three crossarms
-    each side (the middle one longest), an earth-wire peak, insulator strings, and conductors sagging between towers."""
+    """A 220 kV double-circuit steel lattice line receding into a sunset, after a photo of a New Zealand line: a narrow
+    lattice column with legs splaying out below the lowest crossarm, three crossarms each side (a little longer lower
+    down), vertical insulator strings, and a short earth-wire arm on top. Every tower is the same tower scaled towards
+    one vanishing point on the horizon, so each conductor and earth wire runs from the same point on one tower to the
+    same point on the next, and the line runs on towards the viewer (off the frame) the same way. The near ground is
+    drawn over the towers' feet, so none stands in the air."""
     C = '#140c1e'
     f = lambda v: ('%.1f' % v).rstrip('0').rstrip('.')
-    def tower(x, base, Ht):
-        g = []; ins_d = []; sw = max(0.6, Ht / 260)
-        L = lambda pts: g.append('M' + ' L'.join(f'{f(a)} {f(b)}' for a, b in pts))
-        y = lambda t: base - t * Ht
-        hw = lambda t: (0.16 - 0.12 * min(t, 0.58) / 0.58) * Ht if t <= 0.58 else 0.04 * Ht
-        ts = [0, 0.08, 0.17, 0.27, 0.38, 0.5, 0.58, 0.64, 0.7, 0.76, 0.82, 0.88, 0.94]
-        L([(x - hw(t), y(t)) for t in ts] + [(x - 0.02 * Ht, y(1.0))]); L([(x + hw(t), y(t)) for t in ts] + [(x + 0.02 * Ht, y(1.0))])
+    V = (330, 772)                 # the vanishing point, at the sun on the horizon
+    B0, H0 = (1300, 880), 700      # the nearest tower's base and height
+    ARMS = ((0.54, 0.152), (0.72, 0.139), (0.896, 0.126))    # crossarm height and reach, share of the tower's height
+    EARTH = (0.985, 0.09)
+    INS = 0.065                    # insulator length
+    def leg_hw(t):                 # half-width of the body at height t
+        return 0.10 - (0.10 - 0.033) * t / 0.42 if t <= 0.42 else 0.033 - (0.033 - 0.024) * (t - 0.42) / 0.565
+    def scale(k):
+        return 1 / (1 + 0.8 * k)
+    def place(k):
+        r = scale(k)
+        bx, by = V[0] + (B0[0] - V[0]) * r, V[1] + (B0[1] - V[1]) * r
+        return bx, by, H0 * r
+    def to_xy(k, u, t):            # local (u across, t up, both as shares of the height) to the picture
+        bx, by, H = place(k)
+        return bx + u * H, by - t * H
+    def attach(k):
+        """The tower's wire points: six conductors at the insulators' feet, then two earth wires at the top arm's tips."""
+        pts = [to_xy(k, sd * reach, t - INS) for t, reach in ARMS for sd in (-1, 1)]
+        return pts + [to_xy(k, sd * EARTH[1], EARTH[0]) for sd in (-1, 1)]
+    def tower(k):
+        bx, by, H = place(k)
+        sw = max(0.5, H / 300)
+        g = []; ins = []
+        P = lambda u, t: f'{f(bx + u * H)} {f(by - t * H)}'
+        L = lambda pts: g.append('M' + ' L'.join(P(u, t) for u, t in pts))
+        fine = H > 140
+        legs = [0, 0.09, 0.18, 0.26, 0.34, 0.42] if fine else [0, 0.14, 0.28, 0.42]
+        col = ([0.42, 0.48, 0.54, 0.575, 0.63, 0.68, 0.72, 0.755, 0.81, 0.855, 0.896, 0.931, 0.985] if fine
+               else [0.42, 0.54, 0.63, 0.72, 0.81, 0.896, 0.985])
+        ts = legs + col[1:]
+        for sd in (-1, 1):
+            L([(sd * leg_hw(t), t) for t in ts])
         for a, b in zip(ts, ts[1:]):
-            L([(x - hw(a), y(a)), (x + hw(b), y(b))]); L([(x + hw(a), y(a)), (x - hw(b), y(b))]); L([(x - hw(b), y(b)), (x + hw(b), y(b))])
-        tips = []
-        for t, span in ((0.64, 0.2), (0.76, 0.25), (0.88, 0.21)):
-            top = y(t); bot = y(t - 0.045); inner = hw(t)
-            for s in (-1, 1):
-                tip = (x + s * (inner + span * Ht), top)
-                L([(x + s * inner, top), tip, (x + s * inner, bot)])
-                for k in range(1, 4):
-                    L([(x + s * (inner + span * Ht * k / 4), top), (x + s * (inner + span * Ht * (k - 0.5) / 4), top + (bot - top) * (1 - (k - 0.5) / 4))])
-                ins = 0.05 * Ht
-                ins_d.append(f'M{f(tip[0])} {f(tip[1] + 0.006 * Ht)} L{f(tip[0])} {f(tip[1] + ins)}')
-                tips.append((tip[0], tip[1] + ins))
-        pk = y(1.0)
-        L([(x - 0.02 * Ht, pk), (x, pk - 0.02 * Ht), (x + 0.02 * Ht, pk)])
-        for s in (-1, 1):
-            L([(x + s * 0.02 * Ht, pk), (x + s * 0.07 * Ht, pk - 0.005 * Ht), (x + s * 0.02 * Ht, pk + 0.02 * Ht)])
-        ew = [(x - 0.07 * Ht, pk - 0.005 * Ht), (x + 0.07 * Ht, pk - 0.005 * Ht)]
-        disc = max(0.8, Ht / 200)
-        svg = (f'<path d="{"".join(g)}" fill="none" stroke="{C}" stroke-width="{f(sw)}" stroke-linejoin="round" stroke-linecap="round"></path>'
-               f'<path d="{"".join(ins_d)}" fill="none" stroke="{C}" stroke-width="{f(sw * 3.2)}" stroke-dasharray="{f(disc)} {f(disc * 0.55)}"></path>')
-        return svg, tips, ew
-    towers = [(1380, 872, 640), (980, 812, 400), (735, 786, 262), (580, 772, 178), (478, 764, 124), (410, 760, 88)]
-    out = []; att = []
-    for x, b, Ht in towers:
-        s, tips, ew = tower(x, b, Ht); out.append(s); att.append((tips, ew))
+            L([(-leg_hw(a), a), (leg_hw(b), b)]); L([(leg_hw(a), a), (-leg_hw(b), b)]); L([(-leg_hw(b), b), (leg_hw(b), b)])
+        top = EARTH[0]
+        # the peak: the column closes in a little above the earth-wire arm
+        L([(-leg_hw(top), top + 0.012), (0, top + 0.026), (leg_hw(top), top + 0.012)])
+        for t, reach in ARMS + (EARTH,):
+            depth = 0.035 if t < 0.95 else 0.012
+            for sd in (-1, 1):
+                w = leg_hw(t)
+                L([(sd * w, t), (sd * reach, t), (sd * w, t + depth)])          # bottom chord, then top chord back to the body
+                n = 3 if fine else 1
+                for m in range(n):
+                    a = w + (reach - w) * m / n; b = w + (reach - w) * (m + 0.5) / n
+                    ta = t + depth * (1 - (a - w) / (reach - w)); tb = t
+                    L([(sd * a, ta), (sd * b, tb)])
+                    c = w + (reach - w) * (m + 1) / n
+                    tc = t + depth * (1 - (c - w) / (reach - w))
+                    L([(sd * b, tb), (sd * c, tc)])
+                if t < 0.95:
+                    ins.append(f'M{P(sd * reach, t)} L{P(sd * reach, t - INS)}')
+        disc = max(0.7, H / 230)
+        return (f'<path d="{"".join(g)}" fill="none" stroke="{C}" stroke-width="{f(sw)}" stroke-linejoin="round" stroke-linecap="round"></path>'
+                f'<path d="{"".join(ins)}" fill="none" stroke="{C}" stroke-width="{f(sw * 2.2)}" stroke-dasharray="{f(disc * 0.8)} {f(disc * 0.6)}"></path>')
+    N = 12
     def sag(p, q, k):
         (x1, y1), (x2, y2) = p, q
-        return f'M{f(x1)} {f(y1)} Q{f((x1 + x2) / 2)} {f((y1 + y2) / 2 + k * abs(x2 - x1))} {f(x2)} {f(y2)}'
+        return f'M{f(x1)} {f(y1)} Q{f((x1 + x2) / 2)} {f((y1 + y2) / 2 + k * math.hypot(x2 - x1, y2 - y1))} {f(x2)} {f(y2)}'
     wires = []
-    for (ta, ea), (tb, eb) in zip(att, att[1:]):
-        wires += [sag(p, q, 0.07) for p, q in zip(ta, tb)] + [sag(p, q, 0.05) for p, q in zip(ea, eb)]
-    wires += [sag(p, (1700, p[1] + 40), 0.06) for p in att[0][0] + att[0][1]]
+    for k in range(-1, N - 1):     # k = -1: the next tower, behind the viewer, off the frame
+        a, b = attach(k), attach(k + 1)
+        wires += [sag(p, q, 0.05 if i < 6 else 0.04) for i, (p, q) in enumerate(zip(a, b))]
+    # the near ground: its edge runs just above each tower's base, so the feet are in the grass
+    edge = []
+    for x in range(0, 1601, 20):
+        r = max(0.0, (x - V[0]) / (B0[0] - V[0]))
+        y = V[1] + (B0[1] - V[1]) * r - 0.012 * H0 * r - 3 * abs(math.sin(x * 0.011)) - 2
+        edge.append((x, y))
+    ground = 'M' + ' L'.join(f'{x} {f(y)}' for x, y in edge) + ' L1600 900 L0 900 Z'
+    far = ('<path d="M0 778 C 120 760, 240 768, 330 764 C 470 758, 620 776, 780 770 C 980 762, 1180 784, 1400 776 S 1560 770, 1600 772 '
+           'L1600 900 L0 900 Z" fill="#3a2038" fill-opacity=".85"></path>')
     return ('<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">'
             '<defs><linearGradient id="pysky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a1238"></stop><stop offset=".45" stop-color="#5a2a5c"></stop>'
             '<stop offset=".72" stop-color="#d4664c"></stop><stop offset=".86" stop-color="#f2a85a"></stop><stop offset="1" stop-color="#f7cf7a"></stop></linearGradient>'
             '<radialGradient id="pysun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffe2a0" stop-opacity=".8"></stop><stop offset="1" stop-color="#ffe2a0" stop-opacity="0"></stop></radialGradient></defs>'
-            '<rect width="1600" height="900" fill="url(#pysky)"></rect><circle cx="260" cy="760" r="210" fill="url(#pysun)"></circle><circle cx="260" cy="772" r="62" fill="#ffd98a" fill-opacity=".9"></circle>'
-            '<path d="M0 800 C 160 770, 300 778, 420 770 C 560 760, 700 790, 860 782 C 1040 772, 1200 800, 1600 786 L1600 900 L0 900 Z" fill="#3a2038" fill-opacity=".85"></path>'
-            '<path d="M0 840 C 300 822, 700 850, 1000 838 S 1400 852, 1600 836 L1600 900 L0 900 Z" fill="#241426"></path>'
-            f'<path d="{"".join(wires)}" fill="none" stroke="{C}" stroke-width="1.6" stroke-opacity=".9"></path>' + ''.join(out) +
-            '<path d="M0 878 C 400 862, 900 886, 1600 868 L1600 900 L0 900 Z" fill="#140c1e"></path></svg>')
+            f'<rect width="1600" height="900" fill="url(#pysky)"></rect><circle cx="{V[0]}" cy="{V[1] - 4}" r="210" fill="url(#pysun)"></circle><circle cx="{V[0]}" cy="{V[1] + 6}" r="58" fill="#ffd98a" fill-opacity=".9"></circle>'
+            + far +
+            f'<path d="{"".join(wires)}" fill="none" stroke="{C}" stroke-width="1.4" stroke-opacity=".9"></path>' +
+            ''.join(tower(k) for k in reversed(range(N))) +
+            f'<path d="{ground}" fill="#241426"></path>'
+            '<path d="M0 892 C 400 884, 900 896, 1600 886 L1600 900 L0 900 Z" fill="#140c1e"></path></svg>')
 
 
 def alps(old):
