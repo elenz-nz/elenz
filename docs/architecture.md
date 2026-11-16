@@ -173,8 +173,14 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
 - Footer extras (`src/lib/site/SiteFooter.svelte`): "Report a problem" (`ReportLink.svelte`: an email to hello@elenz.co.nz
   with the page title and full address, so the view, filled in when clicked) and a link to `/privacy`
   (`src/routes/(docs)/privacy/+page.svelte`, in the About/methods sidebar). The privacy page describes what the code
-  does (Cloudflare Web Analytics, the browser storage keys, fonts, the email setup): update it and its date if any of
+  does (Cloudflare Web Analytics and Umami, the browser storage keys, fonts, the email setup): update it and its date if any of
   that changes. Method pages also have their own report line (`reportHref` in the methods registry).
+- Analytics (design decision, 16 Nov 2026): two cookieless counters in `src/app.html`. Cloudflare Web Analytics gives
+  visits and load speed; Umami (Umami Cloud, free Hobby plan, 100k events a month) adds time on page, referrers and,
+  later, a few custom events. Umami's `data-domains="elenz.co.nz"` keeps previews and local builds out of the counts,
+  and `data-do-not-track` honours the browser's setting. Neither shows whether a screen is left open (Umami reports time
+  on page when a tab is hidden or closed), so a heartbeat from Now and the dashboards to Workers Analytics Engine is
+  planned once the dashboards are live. The browser tests block both scripts.
 - Icons (design decision, 9 Nov 2026): the logo mark `src/lib/assets/favicon.svg` is the tab icon where SVG icons
   work; `static/favicon.ico` (16, 32, 48 px) is the fallback for older Safari and for tools that ask for `/favicon.ico`
   directly (link unfurlers, feed readers, raw `/data/*` views), and `static/apple-touch-icon.png` (180 px, on white

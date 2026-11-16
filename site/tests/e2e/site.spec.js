@@ -6,12 +6,12 @@
 import { test as base, expect } from '@playwright/test';
 
 // any uncaught error in the page fails the test. WebKit also reports cancelled requests as page errors ("... due to access
-// control checks"), such as a data file cut off by a refresh; those aren't faults. The analytics script is blocked so
+// control checks"), such as a data file cut off by a refresh; those aren't faults. The analytics scripts are blocked so
 // the tests reach nothing outside the build.
 const test = base.extend({
   page: async ({ page }, use) => {
     const errors = [];
-    await page.route(/cloudflareinsights\.com/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
+    await page.route(/cloudflareinsights\.com|umami\.is/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
     page.on('pageerror', (e) => { if (!/access control checks|ResizeObserver loop/.test(e.message)) errors.push(e.message); });
     await use(page);
     expect(errors, 'uncaught errors in the page').toEqual([]);
@@ -152,7 +152,7 @@ test('a heat map tooltip clears when the page scrolls', async ({ page }) => {
 // SvelteKit's own router can't decode this address and stops there (an uncaught URIError, so `base`, not `test`), which
 // leaves the page as prerendered: it must still read properly and its links must still work.
 base('a badly encoded address shows the not-found page', async ({ page }) => {
-  await page.route(/cloudflareinsights\.com/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
+  await page.route(/cloudflareinsights\.com|umami\.is/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
   await page.route('**/records/bad%E0%A4%A', (r) => r.fulfill({ path: 'build/404.html', status: 404, contentType: 'text/html' }));
   await page.goto('/records/bad%E0%A4%A');
   await expect(page.getByRole('heading', { name: /can’t find that page/ })).toBeVisible();
