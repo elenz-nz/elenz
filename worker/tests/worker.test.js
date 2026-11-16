@@ -47,6 +47,7 @@ export default {
 
 let dir, mf, kv;
 let github = [], githubAnswer = () => new Response(null, { status: 204 });
+let sql = [], sqlAnswer = () => Response.json({ data: [] });   // stands in for Cloudflare's Analytics Engine SQL API
 const start = (bindings = {}) => new Miniflare({
   modules: [
     { type: 'ESModule', path: join(dir, 'worker.mjs'), contents: readFileSync(join(dir, 'worker.mjs'), 'utf8') },
@@ -67,7 +68,13 @@ const start = (bindings = {}) => new Miniflare({
       return new Response('not found', { status: 404 });
     },
   },
-  outboundService: (request) => { github.push(request.url); return githubAnswer(); },
+  outboundService: async (request) => {
+    if (new URL(request.url).hostname === 'api.cloudflare.com') {
+      sql.push({ url: request.url, auth: request.headers.get('authorization'), body: await request.text() });
+      return sqlAnswer();
+    }
+    github.push(request.url); return githubAnswer();
+  },
 });
 
 before(async () => {
@@ -371,4 +378,61 @@ test('a preview link stores no heartbeats', async () => {
   const r = await beatOf({ p: 'now', s: ID, m: 5, v: 1, k: 0 }, 'https://beat-test-elenz.elenz.workers.dev');
   assert.equal(r.status, 204);
   assert.deepEqual(await stored(), []);
+});
+
+// ---------- /data/screens: the private page of open screens ----------
+// two heartbeat rows in the same hour (20:00 on 16 Nov, NZ time) for one dashboard screen (seen, then hidden), and a Now
+// page that stayed hidden
+const ROWS = [
+  { hour: '2026-11-16 07:00:00', page: 'dashboard', id: 'aaaa', shown: 'visible', opened: 'kiosk', country: 'NZ', minutes: '55', beats: '6' },
+  { hour: '2026-11-16 07:00:00', page: 'dashboard', id: 'aaaa', shown: 'hidden', opened: 'kiosk', country: 'NZ', minutes: '58', beats: '1' },
+  { hour: '2026-11-16 07:00:00', page: 'now', id: 'bbbb', shown: 'hidden', opened: 'page', country: 'AU', minutes: '5', beats: '2' },
+];
+const KEY = 'test-key-0123456789';
+let mfKey;
+const screensGet = (q, m = mfKey) => m.dispatchFetch('https://elenz.co.nz/data/screens' + q);
+
+test('/data/screens is a 404 without its key, or when no key is set at all', async () => {
+  mfKey ??= start({ SCREENS_KEY: KEY, CF_ACCOUNT_ID: 'acct123', CF_ANALYTICS_TOKEN: 'tok-abc' });
+  for (const q of ['', '?key=', '?key=wrong', `?key=${KEY}x`]) assert.equal((await screensGet(q)).status, 404, q);
+  assert.equal((await screensGet(`?key=${KEY}`, mf)).status, 404);   // the main test Worker has no SCREENS_KEY
+  assert.equal(sql.length, 0, 'nothing asked of Cloudflare without the key');
+});
+
+test('/data/screens with its key asks the SQL API and draws the screens open', async () => {
+  sql = []; sqlAnswer = () => Response.json({ data: ROWS });
+  const r = await screensGet(`?key=${KEY}&days=30`);
+  assert.equal(r.status, 200);
+  assert.equal(r.headers.get('cache-control'), 'no-store');
+  assert.match(r.headers.get('x-robots-tag'), /noindex/);
+  const page = await r.text();
+  assert.equal(sql.length, 1);
+  assert.equal(sql[0].url, 'https://api.cloudflare.com/client/v4/accounts/acct123/analytics_engine/sql');
+  assert.equal(sql[0].auth, 'Bearer tok-abc');
+  assert.match(sql[0].body, /FROM elenz_beats/);
+  assert.match(sql[0].body, /INTERVAL '30' DAY/);
+  assert.ok(!page.includes('tok-abc'), 'the token never reaches the page');
+  assert.match(page, /Mon 16 Nov, 20:00/);
+  // that hour: the dashboard open 1, on screen 1, from a wall-screen link 1; Now open 1, on screen 0, wall 0
+  assert.match(page, /<td>1 · 1 · 1<\/td>/);
+  assert.match(page, /<td>1 · <span class="zero">0<\/span> · <span class="zero">0<\/span><\/td>/);
+  assert.match(page, /58 min/);              // the dashboard screen's time open
+  assert.match(page, /NZ 1/);
+  assert.match(page, /aria-current="page">Last 30 days/);
+});
+
+test('/data/screens says what is missing or wrong, in words', async () => {
+  const noToken = start({ SCREENS_KEY: KEY, CF_ACCOUNT_ID: 'acct123' });
+  try {
+    const r = await screensGet(`?key=${KEY}`, noToken);
+    assert.equal(r.status, 503);
+    assert.match(await r.text(), /Add CF_ANALYTICS_TOKEN/);
+  } finally { await noToken.dispose(); }
+  sqlAnswer = () => Response.json({ errors: [{ message: 'Authentication error' }] }, { status: 403 });
+  const r = await screensGet(`?key=${KEY}`);
+  assert.equal(r.status, 502);
+  assert.match(await r.text(), /refused the token/);
+  sqlAnswer = () => Response.json({ data: [] });
+  assert.match(await (await screensGet(`?key=${KEY}&days=1`)).text(), /No heartbeats in this range yet/);
+  await mfKey.dispose(); mfKey = undefined;
 });

@@ -407,16 +407,19 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   ID, blob1 the page, blob2 `visible` or `hidden`, blob3 `kiosk` or `page`, blob4 the country, double1 minutes open. It
   writes nothing on other hosts (previews) and answers 204 whatever is posted (405 to anything but POST). Described on
   `/privacy#screens`. Worker tests: the heartbeat block; site: `tests/heartbeat.test.js`.
-  **Reading them:** `analysis/open_screens.py` prints the screens open on each page hour by hour (NZ time), how many
-  were on screen and how many came from a wall-screen link, then how long screens stayed open. It needs a Cloudflare API
-  token that can read analytics. To make one: Cloudflare dashboard → the profile icon (top right) → My Profile → API
-  Tokens → Create Token → Create Custom Token (Get started); name it "Elenz analytics read"; Permissions: Account,
-  Account Analytics, Read; Account Resources: Include, the Elenz account; Continue to summary → Create Token, and copy
-  it (it's shown once; keep it in a password manager, never in the repo). The account ID is on the Workers & Pages
-  overview, on the right. Then `CF_ACCOUNT_ID=<id> CF_ANALYTICS_TOKEN=<token> python3 analysis/open_screens.py 7` for
-  the last 7 days. The same query works with curl against
-  `https://api.cloudflare.com/client/v4/accounts/<id>/analytics_engine/sql` (the SQL is in the script). Rows are kept
-  three months.
+  **Reading them:** Cloudflare's dashboard has no view of an Analytics Engine dataset (it is read through the SQL API),
+  so the Worker draws a private page, `/data/screens?key=<SCREENS_KEY>` (`worker/screens.js`, design decision 16 Nov
+  2026): for the last 24 hours, 7, 30 or 90 days, each page's screens (one opening of a page), how many came from a
+  wall-screen link, median and longest time open and countries; the average screens open in each NZ hour of the day;
+  and hour by hour, the screens open, on screen and from a wall-screen link. It needs three Worker settings, added in the
+  Cloudflare dashboard (Workers & Pages → elenz → Settings → Variables and Secrets; `keep_vars` keeps them through
+  deploys): `SCREENS_KEY` (secret, a long random string of letters and digits; without it, or with the wrong one, the
+  address answers 404), `CF_ANALYTICS_TOKEN` (secret: a Cloudflare API token with Account → Account Analytics → Read
+  and nothing else, made under My Profile → API Tokens → Create Token → Custom token) and `CF_ACCOUNT_ID` (text: the
+  long ID after `dash.cloudflare.com/` in the address bar). The page is `no-store` and `noindex`; a missing setting, a
+  refused token or no beats yet each get a sentence saying so. `analysis/open_screens.py` runs the same query from a
+  computer (`CF_ACCOUNT_ID=... CF_ANALYTICS_TOKEN=... python3 analysis/open_screens.py 7`). Rows are kept three months.
+  Worker tests: the `/data/screens` block, with a stand-in for the SQL API.
 
 ## Facilities
 

@@ -19,10 +19,12 @@
 //  beats:     POST /data/beat, the heartbeat from /now, /dashboard and /landscape while they're open (every 5 minutes,
 //             site/src/lib/site/beat.js), written to Workers Analytics Engine (binding BEATS, dataset elenz_beats) so the
 //             Elenz team can see how many screens are left open, and when. Only on elenz.co.nz; anything else posted is dropped.
+//  screens:   GET /data/screens?key=..., a private page of those heartbeats for the Elenz team (worker/screens.js).
 //  tests:     worker/tests/worker.test.js runs this file in Cloudflare's own runtime (cd worker && npm ci && npm test).
 import { readQuery, writeQuery, describe, SITE_URL } from '../site/src/lib/site/viewurl.js';
 import { RECORD_PAGE, RECORD_IMAGE, recordPage, recordImage } from './og.js';
 import { BEAT_URL, readBeat } from '../site/src/lib/site/beat.js';
+import { SCREENS_URL, screens } from './screens.js';
 
 const WORKFLOWS = 'https://api.github.com/repos/elenz-nz/elenz/actions/workflows';
 const HISTORY_CRON = '40 */6 * * *'; // must match wrangler.jsonc
@@ -130,6 +132,7 @@ export default {
 
 async function serve(request, env, url, ctx) {
   if (url.pathname === BEAT_URL) return beat(request, env, url);
+  if (url.pathname === SCREENS_URL) return screens(request, env, url);
   if (url.pathname === '/data/health' && env.DATA) {
     // for an outside uptime monitor: 200 while the data is fresh, 503 (with the reasons) when it isn't. Unlike the
     // GitHub watchdog, it doesn't depend on the Worker's cron, so it also catches the cron itself stopping.
