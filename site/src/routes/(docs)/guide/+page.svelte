@@ -123,8 +123,10 @@
 			<dd>Right now shows the latest data. Replay 24 h plays the last day back: Pause stops it, the slider moves through it, and A day in sets how long the day takes, 1, 3 or 10 minutes. Play with dials hands the picture over: move the sliders under it and watch the scene change.</dd>
 			<dt>The dials behind the scene</dt>
 			<dd>Under the picture, each part of the scene has its dial and its value. More info says what the dial changes in the picture and how it’s worked out.</dd>
-			<dt>What’s on the picture</dt>
-			<dd>Names, Numbers, Cards and Birds switch each on or off; the cards are the little notes that pop up about what’s happening. Low motion slows everything down. In full screen, the ☰ button in the corner has the same switches.</dd>
+			<dt>Picture options</dt>
+			<dd>Picture options opens a list of switches: Place names, Numbers, Pop-up cards (the little notes about what’s happening) and Birds, each ticked while it’s on, and Low motion, which slows everything down. In full screen, the ☰ button in the corner has the same switches.</dd>
+			<dt>Keep screen on</dt>
+			<dd>Stops the display sleeping while the page is open, as on Now and the dashboard; with a wall-screen link, set the device’s own screen timeout instead.</dd>
 			<dt>Share and wall screens</dt>
 			<dd>Share copies a link to this view (the mode, what’s on the picture and the replay speed), or a wall-screen link that shows the picture alone. A wall-screen link on Replay 24 h plays the day again each time it ends. This browser keeps your view too.</dd>
 		</dl>

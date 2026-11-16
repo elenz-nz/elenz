@@ -1074,15 +1074,16 @@ function setMode(m, keepCards = false) {
     ? 'Each slider sets one dial directly. On the real page these come from the live feed.'
     : 'Each part of the picture follows one dial, somewhere between its minimum and maximum, worked out from the live feed.';
 }
-// the on/off buttons and the replay speed, set from prefs; every change goes back to the page (opts.onPrefs) to keep
-const toggle = (id, on, word) => { const b = $(id); b.setAttribute('aria-pressed', String(on)); b.textContent = `${word} ${on ? 'on' : 'off'}`; };
+// the switches under Picture options and the replay speed, set from prefs; every change goes back to the page
+// (opts.onPrefs) to keep. The switches keep their names; aria-pressed says whether each is on (a tick in the box).
+const toggle = (id, on) => { $(id).setAttribute('aria-pressed', String(on)); };
 let showCards = true, showHud = true;
 function applyPrefs() {
   showLabels = prefs.names; showHud = prefs.numbers; showBirds = prefs.birds; calm = prefs.calm; showCards = cardsOn(prefs);
   $('labels').hidden = !showLabels; $('hud').hidden = !showHud; $('toasts').hidden = !showCards;
   root.querySelector('.scene').classList.toggle('hud-on', showHud);
-  toggle('labels-btn', showLabels, 'Names'); toggle('hud-btn', showHud, 'Numbers'); toggle('cards-btn', showCards, 'Cards');
-  toggle('birds-btn', showBirds, 'Birds'); toggle('calm-btn', calm, 'Low motion');
+  toggle('labels-btn', showLabels); toggle('hud-btn', showHud); toggle('cards-btn', showCards);
+  toggle('birds-btn', showBirds); toggle('calm-btn', calm);
   for (const b of root.querySelectorAll('#speed button')) b.setAttribute('aria-pressed', String(+b.dataset.min === prefs.speed));
   syncMenu();
 }
@@ -1104,7 +1105,7 @@ $('cards-btn').onclick = () => { prefs.cards = !cardsOn(prefs); changed(); };
 $('hud-btn').onclick = () => { prefs.numbers = !prefs.numbers; changed(); };
 $('labels-btn').onclick = () => { prefs.names = !prefs.names; changed(); };
 // in full screen the page's buttons are out of sight, so a menu in the corner mirrors them
-function syncMenu() { for (const b of root.querySelectorAll('#fsmenu [data-for]')) { const src = $(b.dataset.for); b.textContent = src.textContent; b.setAttribute('aria-pressed', src.getAttribute('aria-pressed')); } }
+function syncMenu() { for (const b of root.querySelectorAll('#fsmenu [data-for]')) b.setAttribute('aria-pressed', $(b.dataset.for).getAttribute('aria-pressed')); }
 for (const b of root.querySelectorAll('#fsmenu [data-for]')) b.onclick = () => { $(b.dataset.for).click(); syncMenu(); };
 $('fs-menu-btn').onclick = () => { const open = $('fsmenu').hidden; syncMenu(); $('fsmenu').hidden = !open; $('fs-menu-btn').setAttribute('aria-expanded', String(open)); };
 $('fs-x').onclick = () => { if (document.fullscreenElement) document.exitFullscreen(); };

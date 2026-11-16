@@ -84,7 +84,10 @@ turns tracker.json into New Zealand's last 24 hours (islands added; other embedd
 embedded solar with no estimate keeps the last estimate for the picture and is marked `roofNA`, so the numbers under it say
 "No estimate"); `dials.js` turns the feed into 0–1 dials (bands in `BAND`, provisional, see its header), the sun and the
 season; `scene.js` draws and runs the page's controls (Right now, Replay 24 h, Play with dials, full screen), finding its
-elements by id inside the page. The installed capacities for the wind and battery dials come from the generator rows.
+elements by id inside the page. The controls (test report, 16 Nov 2026): the mode on the left; on the right Keep screen on
+(`KeepAwake.svelte`, as on /now and /dashboard), Picture options, Full screen and Share. Picture options is a drop-down
+of switches (names, numbers, cards, birds, low motion), each a button whose `aria-pressed` scene.js sets and CSS draws as
+a ticked box; the page closes it on a click outside or Esc. The full-screen ☰ menu has the same switches. The installed capacities for the wind and battery dials come from the generator rows.
 Fredoka (the kids' face) is bundled with `@fontsource/fredoka` and loaded on this page only; cards, buttons and panels
 take the site's shapes (4 px corners, the site's buttons and segmented control), and sizes on the picture follow `--u`
 (1% of its width, set by scene.js) rather than container query units, which need Safari 16. The view (mode, names,
