@@ -17,5 +17,9 @@
 		<div style="display: contents">%sveltekit.body%</div>
 		<!-- Cloudflare Web Analytics: visitor counts, no cookies; the token is public by design -->
 		<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "052b4d2063e946d8ba41bb6f5f953c10"}'></script>
+		<!-- Umami (cloud.umami.is, free Hobby plan): page views, time on page, referrers; no cookies. data-domains keeps
+		     previews and local builds out of the counts; data-do-not-track honours the browser's Do Not Track setting.
+		     The website ID is public by design. -->
+		<script defer src="https://cloud.umami.is/script.js" data-website-id="3c608b8c-c219-4908-a32d-4db391b24025" data-domains="elenz.co.nz" data-do-not-track="true"></script>
 	</body>
 </html>
