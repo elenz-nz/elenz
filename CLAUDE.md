@@ -53,12 +53,6 @@ When a change is something the Elenz team should see before it goes live, open t
 link, and once they've approved it merge it directly (by then its checks have passed, so auto-merge would be refused,
 see above); turn on auto-merge instead only if a check is still running.
 
-## Beta note (remove when the site is announced)
-
-Until the site is announced every page shows a thin "Beta" line above the masthead (`site/src/lib/site/Masthead.svelte`,
-`.beta-note` in `site/src/lib/tracker/tracker.css`). It has no end date: the Elenz team decides when to announce. Then
-delete the markup, the styles (keeping `.mast-wrap` is harmless) and this section.
-
 ## Writing for the site
 
 `docs/style-guide.md` is the style guide for everything public on the site: voice, terms, dates and numbers, status
@@ -134,7 +128,7 @@ Each is explained in `docs/architecture.md`.
 ## Status
 
 Live at https://elenz.co.nz: live data every 5 minutes, history since Aug 1997 (BUILD 12, 9 Nov 2026). The tag
-`v0.9.0` (9 Nov 2026) marks the version that passed user acceptance testing. The site isn't announced yet (Beta note).
+`v0.9.0` (9 Nov 2026) marks the version that passed user acceptance testing.
 Next: plant pages (`/plants/<slug>`), the map, a hydro panel, offer stacks and downloads.
 
 Recurring upkeep: add Genesis's Rankine coal share to `emissions.js` each quarter (performance report ~3 weeks

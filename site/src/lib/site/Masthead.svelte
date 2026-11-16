@@ -28,8 +28,6 @@
 </script>
 
 <div class="mast-wrap">
-<!-- BETA NOTE: remove when the site is announced, with `.beta-note` in tracker.css (see CLAUDE.md, "Beta note") -->
-<p class="beta-note"><strong>Beta</strong><span>Elenz is still being tested<span class="bn-more">, so some figures and pages may change</span>.</span><a href="mailto:hello@elenz.co.nz?subject=Elenz%20feedback">Send feedback</a></p>
 <header class="masthead" class:bare={!brand}>
 	{#if brand}
 	<a class="brand" href="/">
