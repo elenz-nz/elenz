@@ -82,7 +82,7 @@
 		<div class="ls-head">
 			<div>
 				<h1>Power landscape</h1>
-				<p>Where New Zealand's electricity is coming from right now, as a picture. The wind, the rivers, the sun and the steam all follow the live data.</p>
+				<p>Where New Zealand's electricity comes from, right now. Everything in the picture follows the real grid.</p>
 			</div>
 			<div class="when" id="when">Loading…</div>
 		</div>
@@ -163,7 +163,7 @@
 
 		<section class="dials js-only" aria-labelledby="dials-h">
 			<h2 id="dials-h">The dials behind the scene</h2>
-			<p class="lede" id="dials-lede">Each part of the picture follows one dial, somewhere between its minimum and maximum, worked out from the live feed. The scene eases towards each new value, so a 5-minute update never makes anything jump.</p>
+			<p class="lede" id="dials-lede">Each part of the picture follows one dial, somewhere between its minimum and maximum, worked out from the live feed.</p>
 			<div class="dtable" id="dtable"></div>
 		</section>
 

@@ -1072,7 +1072,7 @@ function setMode(m, keepCards = false) {
   }
   $('dials-lede').textContent = m === 'play'
     ? 'Each slider sets one dial directly. On the real page these come from the live feed.'
-    : 'Each part of the picture follows one dial, somewhere between its minimum and maximum, worked out from the live feed. The scene eases towards each new value, so a 5-minute update never makes anything jump.';
+    : 'Each part of the picture follows one dial, somewhere between its minimum and maximum, worked out from the live feed.';
 }
 // the on/off buttons and the replay speed, set from prefs; every change goes back to the page (opts.onPrefs) to keep
 const toggle = (id, on, word) => { const b = $(id); b.setAttribute('aria-pressed', String(on)); b.textContent = `${word} ${on ? 'on' : 'off'}`; };
