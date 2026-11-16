@@ -3,7 +3,7 @@
 	// tracker's How to panels are one line each and link here (test reports GRP-06, CHT-13): keep them in step.
 	import Preview from '#lib/site/Preview.svelte';
 	import Shot from '#lib/methods/Shot.svelte';
-	const DESC = 'How to use Elenz: every control on the tracker, the Now page and Records, with tips for reading, sharing and downloading the charts.';
+	const DESC = 'How to use Elenz: every control on the tracker, Now, Records and the two dashboards, with tips for reading, sharing and downloading the charts.';
 </script>
 
 <svelte:head>
@@ -100,6 +100,34 @@
 		</dl>
 
 		<Shot name="record-compare" alt="How the record grew, with a pinned point and its tooltip beside a second point under the pointer." caption="A pinned point, in the accent colour, beside the point under the pointer." />
+
+		<h2 id="dashboard">Dashboard</h2>
+		<p>The <a href="/dashboard">dashboard</a> shows one or two large live values and up to four small ones over a background, for a wall screen, a spare tablet or a phone. Its figures are the Now page’s, updated every 5 minutes.</p>
+		<Shot name="dashboard" alt="The dashboard: two large values and four small ones over the Horizon background, with the Layout, Background and Values settings under it." caption="The dashboard with its settings open." />
+		<dl>
+			<dt>Customise it</dt>
+			<dd>Customise shows or hides the settings under the screen. In Layout, choose how many large and small values to show, and Simple (the numbers alone) or Detailed (the time, and a line under each value). In Background, pick a scene or a plain colour; the last dot mixes any colour.</dd>
+			<dt>Pick the values</dt>
+			<dd>In Values, select one to choose another, from System, Prices, By fuel, Plants or Fun facts. Some then offer a region (NZ, NI, SI) or how to show them: MW, % of generation or % of capacity.</dd>
+			<dt>Keep it and share it</dt>
+			<dd>This browser keeps your layout. Copy link to this layout gives an address that opens it anywhere, or bookmark the page.</dd>
+			<dt>Put it on a wall screen</dt>
+			<dd>Copy wall-screen link gives the screen alone, with no buttons: open it in the wall screen’s browser and turn on that browser’s full screen (F11 on most computers). On the page itself, Full screen does the same; the X in the corner leaves it, and fades after 3 seconds. Keep screen on stops the display sleeping while the page is open; with a wall-screen link, set the device’s own screen timeout instead.</dd>
+		</dl>
+
+		<h2 id="landscape">Power landscape</h2>
+		<p>The <a href="/landscape">power landscape</a> is New Zealand’s electricity for kids: a storybook landscape where the turbines turn with the wind, the river runs with hydro, the sun hides behind cloud as embedded solar drops and the chimneys smoke when gas and coal are running. Everything in the picture follows the live data.</p>
+		<Shot name="landscape" alt="The power landscape: wind turbines on a ridge, a hydro dam and river, a geothermal station, solar panels and a town, with the mode buttons above it." caption="The power landscape on Right now." />
+		<dl>
+			<dt>Right now, Replay 24 h, Play with dials</dt>
+			<dd>Right now shows the latest data. Replay 24 h plays the last day back: Pause stops it, the slider moves through it, and A day in sets how long the day takes, 1, 3 or 10 minutes. Play with dials hands the picture over: move the sliders under it and watch the scene change.</dd>
+			<dt>The dials behind the scene</dt>
+			<dd>Under the picture, each part of the scene has its dial and its value. More info says what the dial changes in the picture and how it’s worked out.</dd>
+			<dt>What’s on the picture</dt>
+			<dd>Names, Numbers, Cards and Birds switch each on or off; the cards are the little notes that pop up about what’s happening. Low motion slows everything down. In full screen, the ☰ button in the corner has the same switches.</dd>
+			<dt>Share and wall screens</dt>
+			<dd>Share copies a link to this view (the mode, what’s on the picture and the replay speed), or a wall-screen link that shows the picture alone. A wall-screen link on Replay 24 h plays the day again each time it ends. This browser keeps your view too.</dd>
+		</dl>
 
 		<h2 id="everywhere">Everywhere</h2>
 		<dl>

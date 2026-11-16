@@ -2,6 +2,7 @@
 
   python3 analysis/guide_shots.py                          from the live site
   python3 analysis/guide_shots.py http://localhost:4173    from `npm run preview` (its /data comes from the live site)
+  python3 analysis/guide_shots.py [base] --dashboards      only the two dashboards' shots (the rest stay as they are)
 
 Needs Python's playwright and Pillow. Redo them when a layout they show changes. Each image's width and height goes into
 site/src/lib/methods/shots.json, which Shot.svelte reads, so a page doesn't jump as they load. Every shot is a crop of a
@@ -16,7 +17,9 @@ import urllib.request
 from PIL import Image
 from playwright.sync_api import sync_playwright
 
-BASE = (sys.argv[1] if len(sys.argv) > 1 else 'https://elenz.co.nz').rstrip('/')
+ARGS = [a for a in sys.argv[1:] if not a.startswith('--')]
+ONLY_DASHBOARDS = '--dashboards' in sys.argv
+BASE = (ARGS[0] if ARGS else 'https://elenz.co.nz').rstrip('/')
 OUT = os.path.join(os.path.dirname(__file__), '..', 'site', 'static', 'guide')
 SIZES = os.path.join(os.path.dirname(__file__), '..', 'site', 'src', 'lib', 'methods', 'shots.json')
 LIVE = 'https://elenz.co.nz'
@@ -148,6 +151,22 @@ def desktop(browser, theme):
     page.context.close()
 
 
+def dashboards(browser, theme):
+    """The dashboard with its settings open, and the power landscape on Right now (no pop-up cards or birds)."""
+    ctx = context(browser, theme, viewport={'width': 1180, 'height': 900}, device_scale_factor=1.5)
+    ctx.route('**/data/beat', lambda r: r.fulfill(status=204))   # no heartbeat from a screenshot
+    page = ctx.new_page()
+    page.goto(BASE + '/dashboard')
+    page.wait_for_function("/Live|Delayed/.test(document.querySelector('.stage .live')?.textContent ?? '')", timeout=30000)
+    page.wait_for_timeout(2500)
+    save(page.screenshot(clip=clip_of(page, ['.stagewrap', '.panels']), full_page=True), 'dashboard', theme)
+    page.goto(BASE + '/landscape?cards=0&birds=0')
+    page.wait_for_function("!/Loading/.test(document.querySelector('#when')?.textContent ?? 'Loading')", timeout=30000)
+    page.wait_for_timeout(4000)
+    save(page.screenshot(clip=clip_of(page, ['.controls', '.scene']), full_page=True), 'landscape', theme)
+    ctx.close()
+
+
 def phone(browser, theme):
     ctx = context(browser, theme, viewport={'width': 390, 'height': 780}, device_scale_factor=2, has_touch=True, is_mobile=True)
     # the clock a minute after the newest data, so the status button reads Live even if the feed has stalled
@@ -166,11 +185,16 @@ def phone(browser, theme):
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
+    if ONLY_DASHBOARDS:   # keep every other shot's size
+        with open(SIZES) as f:
+            sizes.update(json.load(f))
     with sync_playwright() as p:
         browser = p.chromium.launch()
         for theme in ('light', 'dark'):
-            desktop(browser, theme)
-            phone(browser, theme)
+            if not ONLY_DASHBOARDS:
+                desktop(browser, theme)
+                phone(browser, theme)
+            dashboards(browser, theme)
         browser.close()
     with open(SIZES, 'w') as f:
         json.dump(sizes, f, indent=0, sort_keys=True)

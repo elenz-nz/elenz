@@ -2,20 +2,25 @@
 	// /landscape: the power landscape, a kids' dashboard. An animated storybook New Zealand driven by the live feed: the
 	// river runs faster with hydro, the turbines turn with the wind, the sun hides behind cloud as embedded solar drops.
 	// The scene and its controls are in #lib/landscape/scene.js, the dials in dials.js, the feed in feed.js; this page
-	// fetches tracker.json as /now does and hands each new interval over. Not linked from the site yet and kept out
-	// of search engines (noindex) while it is tested. The view (mode, what shows, replay speed) is in the address and kept
-	// in this browser (prefs.js); `kiosk=1` shows the picture alone for a wall screen, replaying again if it's a replay.
+	// fetches tracker.json as /now does and hands each new interval over. Linked from /now and /guide since 16 Nov 2026,
+	// with its own link-preview image (static/og/landscape.png, analysis/dashboard_og_png.py); sends a heartbeat while
+	// open (#lib/site/heartbeat.js). The view (mode, what shows, replay speed) is in the address and kept in this browser
+	// (prefs.js); `kiosk=1` shows the picture alone for a wall screen, replaying again if it's a replay.
 	import { onMount } from 'svelte';
 	import '@fontsource/fredoka/500.css';
 	import '@fontsource/fredoka/600.css';
 	import '#lib/landscape/landscape.css';
 	import Masthead from '#lib/site/Masthead.svelte';
+	import Preview from '#lib/site/Preview.svelte';
+	import { startHeartbeat } from '#lib/site/heartbeat.js';
+	import { track, trackOnLoad } from '#lib/site/track.js';
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
 	import { generatorRows } from '#lib/now/generators.js';
 	import { feedFrom } from '#lib/landscape/feed.js';
 	import { clean, fromQuery, toQuery, load as loadPrefs, save as savePrefs, SPEEDS } from '#lib/landscape/prefs.js';
 
 	const DATA_URL = '/data/tracker.json';
+	const DESC = "New Zealand's electricity for kids: a living landscape where the wind, rivers, sun and steam follow the live data.";
 	let root = $state<HTMLElement>();
 	let error = $state('');
 	let ready = $state(false);
@@ -26,12 +31,14 @@
 
 	// a changed view is kept in this browser and in the address (not in history: Back still leaves the page)
 	function keep(p: ReturnType<typeof clean>) {
+		if (p.mode !== prefs.mode) track('landscape-mode', { mode: p.mode });
 		prefs = p;
 		savePrefs(p);
 		try { history.replaceState(history.state, '', location.pathname + toQuery(p, { kiosk: kiosk ? '1' : '' })); } catch { /* the view still works */ }
 	}
 	async function copy(which: 'view' | 'kiosk') {
 		const url = location.origin + location.pathname + toQuery(prefs, { kiosk: which === 'kiosk' ? '1' : '' });
+		if (which === 'kiosk') track('wall-screen-copy', { page: 'landscape' });
 		try { await navigator.clipboard.writeText(url); copied = which; } catch { prompt('Copy this link:', url); }
 		setTimeout(() => (copied = ''), 2200);
 	}
@@ -40,6 +47,8 @@
 		const q = new URLSearchParams(location.search);
 		kiosk = q.get('kiosk') === '1';
 		prefs = fromQuery(q) ?? loadPrefs();
+		const stopBeat = startHeartbeat('landscape', { kiosk });
+		if (kiosk) trackOnLoad('wall-screen-open', { page: 'landscape' });
 		let scene: { setFeed(f: any): void; destroy(): void } | null = null;
 		let due = 0, stamp = 0, gone = false;
 		async function load() {
@@ -66,14 +75,14 @@
 		const check = () => { if (document.visibilityState === 'visible' && Date.now() >= due) load().catch(() => {}); };
 		const poll = setInterval(check, CHECK_EVERY);
 		document.addEventListener('visibilitychange', check);
-		return () => { gone = true; clearInterval(poll); document.removeEventListener('visibilitychange', check); scene?.destroy(); };
+		return () => { gone = true; stopBeat(); clearInterval(poll); document.removeEventListener('visibilitychange', check); scene?.destroy(); };
 	});
 </script>
 
 <svelte:head>
 	<title>ELENZ · Power landscape</title>
-	<meta name="description" content="New Zealand's electricity for kids: a living landscape where the wind, rivers, sun and steam follow the live data." />
-	<meta name="robots" content="noindex" />
+	<meta name="description" content={DESC} />
+	<Preview title="Power landscape · ELENZ" description={DESC} path="/landscape" image="/og/landscape.png?v=1" alt="The Elenz power landscape: a storybook New Zealand whose wind turbines, rivers and sun follow the live grid" />
 </svelte:head>
 
 <div class="wrap" class:kiosk>

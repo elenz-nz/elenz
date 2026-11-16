@@ -422,8 +422,20 @@ test.describe('with JavaScript off', () => {
   }
 });
 
-// the dashboards (not linked yet, noindex): the big-number dashboard and the power landscape
+// the dashboards: the big-number dashboard and the power landscape, linked from Now since 16 Nov 2026
 test.describe('dashboards', () => {
+  test("Now's line under its heading opens each dashboard, and neither sends a heartbeat off elenz.co.nz", async ({ page }) => {
+    const beats = [];
+    page.on('request', (r) => { if (r.url().includes('/data/beat')) beats.push(r.url()); });
+    for (const [name, path, shows] of [['big-number dashboard', '/dashboard', '.stage'], ['power landscape', '/landscape', '#cv']]) {
+      await page.goto('/now');
+      await page.locator('.hero .lede').getByRole('link', { name }).click();
+      await expect(page).toHaveURL(new RegExp(path + '$'));
+      await expect(page.locator(shows).first()).toBeVisible();
+    }
+    expect(beats, 'heartbeats from a local build').toEqual([]);
+  });
+
   test('the big-number dashboard opens the layout in its address and keeps a change in it', async ({ page }) => {
     await page.goto('/dashboard?bg=aurora&big=gen:NZ&small=hydro:NZ:pct,hvdc');
     await expect(page.locator('.stage .tile.big')).toHaveCount(1);

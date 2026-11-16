@@ -9,11 +9,12 @@
 	// pages a small thumbnail of it.
 	import { SITE_URL } from '#lib/site/viewurl.js';
 
-	let { title, description, path, image, alt = "ELENZ: New Zealand's electricity, live", type = 'website' }:
-		{ title: string; description: string; path: string; image?: string; alt?: string; type?: string } = $props();
+	// size: an own image's width and height, when it isn't an article cover's 1200 x 630 (the dashboard's is 2400 x 1260)
+	let { title, description, path, image, size, alt = "ELENZ: New Zealand's electricity, live", type = 'website' }:
+		{ title: string; description: string; path: string; image?: string; size?: [number, number]; alt?: string; type?: string } = $props();
 	const page = $derived(path.replace(/^\/|\/$/g, '').replace(/[^a-z0-9]+/gi, '-') || 'home');
 	const src = $derived(image ?? `/og/elenz.png?p=${page}`);
-	const [w, h] = $derived(image ? [1200, 630] : [2400, 1260]);
+	const [w, h] = $derived(image ? (size ?? [1200, 630]) : [2400, 1260]);
 </script>
 
 <meta property="og:type" content={type} />
