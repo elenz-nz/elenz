@@ -15,6 +15,7 @@
 		"check:previews": "node scripts/check-previews.js && node scripts/check-css.js && node scripts/check-methods.js && node scripts/check-reviewed.js"
 	},
 	"devDependencies": {
+		"@fontsource/fredoka": "^5.3.0",
 		"@fontsource/ibm-plex-mono": "^5.3.0",
 		"@fontsource/schibsted-grotesk": "^5.3.0",
 		"@playwright/test": "1.63.0",

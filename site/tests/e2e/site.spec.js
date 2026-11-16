@@ -421,3 +421,110 @@ test.describe('with JavaScript off', () => {
     });
   }
 });
+
+// the dashboards (not linked yet, noindex): the big-number dashboard and the power landscape
+test.describe('dashboards', () => {
+  test('the big-number dashboard opens the layout in its address and keeps a change in it', async ({ page }) => {
+    await page.goto('/dashboard?bg=aurora&big=gen:NZ&small=hydro:NZ:pct,hvdc');
+    await expect(page.locator('.stage .tile.big')).toHaveCount(1);
+    await expect(page.locator('.stage .tile.small')).toHaveCount(2);
+    await expect(page.locator('.stage .tile.big .num')).not.toHaveText('–');
+    const customise = page.getByRole('button', { name: 'Customise' });   // open on wide screens, closed on phones
+    if (await customise.getAttribute('aria-pressed') !== 'true') await customise.click();
+    await page.getByRole('button', { name: 'Cook Strait' }).click();
+    await expect(page).toHaveURL(/bg=strait/);
+    // a value picked from the list replaces the tile's
+    await page.getByRole('button', { name: /^Small 2: HVDC transfer/ }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Prices' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: /^Price at Ōtāhuhu/ }).click();
+    await expect(page.getByRole('dialog')).toBeHidden();
+    await expect(page).toHaveURL(/small=hydro:NZ:pct,price_ota/);
+    await expect(page.locator('.stage .tile.small').nth(1)).toContainText('Price at Ōtāhuhu');
+    // kept in this browser: the bare address opens it again
+    await page.goto('/dashboard');
+    await expect(page.locator('.stage .tile.small').nth(1)).toContainText('Price at Ōtāhuhu');
+  });
+
+  test('a long value shrinks to fit its card, and Simple hides the line under it', async ({ page }) => {
+    await page.goto('/dashboard?bg=plain&col=0b1a33&view=simple&big=gen:NZ,price:NI&small=price:SI,co2rate:NZ,bigbatt,biggest&kiosk=1');
+    await expect(page.locator('.stage .tile.big .num').first()).not.toHaveText('–');
+    await expect(page.locator('.stage .sub')).toHaveCount(0);
+    await expect(page.locator('.stage .live')).toHaveText(/^(Live|Delayed)$/);
+    // every value and its unit fit inside their card
+    await expect.poll(() => page.evaluate(() => [...document.querySelectorAll('.stage .row')]
+      .filter((r) => { const n = r.querySelector('.num'); return n.scrollWidth > n.clientWidth + 1; }).length)).toBe(0);
+  });
+
+  test('the cards sit in the middle of the screen', async ({ page }) => {
+    await page.goto('/dashboard?bg=aurora&big=gen:NZ&small=hvdc&kiosk=1');
+    await expect(page.locator('.stage .tile.big')).toHaveCount(1);   // the address's layout, not the page's first paint
+    await expect(page.locator('.stage .tile.big .num')).not.toHaveText('–');
+    // how far the cards' middle is from the screen's, as a share of its height (measured again until the layout settles)
+    await expect.poll(() => page.evaluate(() => {
+      const st = document.querySelector('.stage').getBoundingClientRect(), c = document.querySelector('.stage .cards').getBoundingClientRect();
+      return Math.abs((c.top + c.height / 2) - (st.top + st.height / 2)) / st.height;
+    })).toBeLessThan(0.06);
+  });
+
+  test("Plain colour's own picker changes the screen, and the address once it's let go", async ({ page }, testInfo) => {
+    test.skip(isPhone(testInfo), 'desktop only: the panel starts closed on phones');
+    await page.goto('/dashboard?bg=plain&col=1f5f8b&big=gen:NZ&small=');
+    await page.getByRole('button', { name: 'Pick any colour' }).click();
+    const code = page.getByRole('textbox', { name: /Colour code/ });
+    await expect(code).toHaveValue('#1f5f8b');
+    await code.fill('#e0a526');
+    await code.blur();
+    await expect(page.locator('.stage .plain')).toHaveAttribute('style', /rgb\(224, 165, 38\)/);
+    await expect(page).toHaveURL(/col=e0a526/);
+    // light colours get dark ink
+    await expect(page.locator('.stage')).toHaveAttribute('style', /--ink: ?#132020/);
+  });
+
+  test('the wall-screen link shows the screen alone', async ({ page }) => {
+    await page.goto('/dashboard?bg=mix&big=gen:NZ,ren:NZ&small=&kiosk=1');
+    await expect(page.locator('.stage .tile.big')).toHaveCount(2);
+    await expect(page.locator('.mast-wrap')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Customise' })).toHaveCount(0);
+  });
+
+  test('the power landscape draws from the live data', async ({ page }) => {
+    await page.goto('/landscape');
+    await expect(page.locator('#k-gen')).toHaveText(/MW$/);
+    await expect(page.locator('#dtable .drow')).toHaveCount(9);
+    await page.getByRole('button', { name: 'Replay 24 h' }).click();
+    await expect(page.locator('#scrub')).toBeVisible();
+  });
+
+  test("the landscape's dials fold their notes, and the replay has its own speed and cards setting", async ({ page }) => {
+    await page.goto('/landscape');
+    await expect(page.locator('#k-gen')).toHaveText(/MW$/);
+    await expect(page.locator('#how-wind')).toBeHidden();
+    await page.locator('.dmore').first().click();
+    await expect(page.locator('#how-wind')).toBeVisible();
+    await expect(page.locator('#cards-btn')).toHaveText('Cards on');
+    await page.getByRole('button', { name: 'Replay 24 h' }).click();
+    await expect(page.locator('#cards-btn')).toHaveText('Cards off');
+    await page.locator('#speed button', { hasText: '3 min' }).click();
+    await expect(page).toHaveURL(/mode=replay/);
+    await expect(page).toHaveURL(/speed=3/);
+    await page.getByRole('button', { name: 'Right now' }).click();
+    await expect(page.locator('#cards-btn')).toHaveText('Cards on');
+  });
+
+  test("the landscape's wall-screen link shows the picture alone, in the linked view", async ({ page }) => {
+    await page.goto('/landscape?mode=replay&names=0&kiosk=1');
+    await expect(page.locator('#stage')).toBeVisible();
+    await expect(page.locator('.controls')).toBeHidden();
+    await expect(page.locator('.dials')).toBeHidden();
+    await expect(page.locator('#labels')).toBeHidden();
+    await expect(page.locator('#m-replay')).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  for (const path of ['/dashboard', '/landscape']) {
+    test(`${path} fits a phone's screen`, async ({ page }, testInfo) => {
+      test.skip(!isPhone(testInfo), 'phones only');
+      await page.goto(path);
+      await expect.poll(() => page.evaluate(sticksOut), { message: 'what sticks out past the side of the screen' }).toBe('');
+    });
+  }
+});

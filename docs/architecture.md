@@ -7,6 +7,7 @@ How each part of the site, the data jobs and the Worker works, and the design de
 - [Site build and hosting](#site-build-and-hosting)
 - [Landing page](#landing-page)
 - [Now](#now)
+- [Dashboards](#dashboards)
 - [Articles](#articles)
 - [Records](#records)
 - [Tracker](#tracker)
@@ -29,6 +30,67 @@ How each part of the site, the data jobs and the Worker works, and the design de
 ## Now
 
 `/now` the live page (`src/routes/now/+page.svelte`: live figures, the island map with each island's mix ring, the generation mix now, from tracker.json's newest interval via `src/lib/home/now.js`; island outlines in `src/lib/home/nzmap.js`, made by `analysis/make_nz_map.py`; under the price tiles the price explainer, "Why is the price high?": rules and wording in `src/lib/now/explain.js`, drawn by `src/lib/now/PriceExplainer.svelte`, from tracker.json's `explain` block (see `ingest/explain.py`); quiet, highlighted or open by itself, rules tested in `analysis/price_triggers.py`; opened from a button in the wholesale price tile (`PriceButton.svelte`, lit when highlighted), the card drops down under the tiles; its explanation is always two paragraphs, the general one (how prices get like this) then what's going on now ("Currently, ..."); each reason is a pair of bars, now over its recent level; reasons include plants running well below the past week (`BELOW`, an outage stand-in from the live week's per-plant series), a held state after a short jump says so, and when nothing pushes the price up it says what it can't see; a record the live data beat today is a small link above Generation now (`RecordLine.svelte`), only on the day it was set; Keep screen on glows slowly while on; on a preview link, `/now?sim=up|high|split|apart|jump|low` shows the explainer at a price that may not come along during testing (`src/lib/now/simulate.js`, loaded only away from elenz.co.nz, with a banner on the page; NOW-08)).
+
+## Dashboards
+
+Two live dashboards, on test since 16 Nov 2026: unlinked, `noindex` and out of the sitemap until the Elenz team decides to
+publish them (then: a `<Preview>`, a sitemap entry, a link from the site, and drop `noindex`). Both read tracker.json and
+poll it as `/now` does (`#lib/site/poll.js`).
+
+`/dashboard`, the big-number dashboard (`src/routes/dashboard/+page.svelte`, `src/lib/dashboard/`): one or two large live
+values and up to four small ones over a background, for a wall screen, a spare tablet or a phone. Every value is in
+`values.js` (keys, groups for the picker's tabs, the regions and measures each can show, and how it is worked out, from
+`summarise()` in `#lib/home/now.js`, the generator rows of `#lib/now/generators.js` and tracker.json's `explain` block);
+plants are added from the generator rows, largest first, and the fun facts name the top plant of each kind by MW. A value
+needing embedded solar says "No estimate" when there is none. Layouts (`layout.js`) are written `key:region:measure`
+(`hydro:SI:cf`, `hvdc`, `p_benmore::cf`) in the address (`?bg=…&big=…&small=…`, plus `col=` for a plain colour and
+`view=simple`, so a link opens that layout) and kept in localStorage `elenz-dashboard` (on `/privacy`); an address with a
+layout wins. `kiosk=1` shows the screen alone (the "wall-screen link"). Simple shows the numbers and Live or Delayed;
+Detailed (the default) adds the time and the line under each value.
+`Stage.svelte` draws the screen. Its sizes are hundredths of its own measured width (`--u`), not container query units,
+which need Safari 16. On wide screens the cards sit in the middle with a margin round them (test report, 16 Nov 2026:
+at the foot they sat too low), in two large columns and four small ones whether or not each is filled, so fewer cards
+keep their size (test report, 16 Nov 2026: on a PC and a TV they had stretched across the screen). Cards, buttons and
+panels follow the site's own (4 px corners; the header buttons as Keep screen on, the copy buttons as the site's Copy). A value and unit too wide for their card shrink to fit (`fit`, down to 35%).
+Screens 640 px wide or less stack the cards, with the credit at the foot of the screen. Full screen uses the browser's
+full screen where it can, the page's own otherwise, with an X that fades after 3 seconds without the mouse or a touch.
+Backgrounds: Horizon and Horizon light draw the last 24 hours of generation, Live mix the mix now, Plain colour a flat
+colour (twelve ready-made, dark to light, or any picked; the ink is light or dark, whichever stands out more,
+`plainPalette()`). Any colour is picked with the page's own picker (`ColourPick.svelte`: colour, strength and shade
+sliders and a hex box), not the browser's, whose dialog differs on every system (design decision, 16 Nov 2026); the
+screen follows a slider as it moves and the address and storage are written when it is let go. The drawn scenes are
+SVG in `backgrounds.js`, loaded only when picked, and keep their main feature clear of the centred cards. Contours
+(Ruapehu), Cook Strait's coastline, Lines at sunset (a 220 kV double-circuit lattice line) and the Alps' snow are made
+by `analysis/dashboard_backgrounds.py` from LINZ's 8 m contour-interpolated DEM (CC BY 4.0; credited on the screen and
+on /methods/sources): rerun it rather than editing the SVG (`--look <name>` draws one to /tmp without touching
+`backgrounds.js`). Cook Strait's overland lines are routed over land only (the cheapest path on the DEM's grid, dearer
+near the coast), from Benmore's direction to Fighting Bay and from Oteranga Bay to Haywards, where the line stops. Lines at sunset follows a photo of a New Zealand 220 kV double-circuit line (test report, 16 Nov 2026): each tower is
+the same tower scaled towards one vanishing point at the sun, so every wire joins the same insulator on the next tower,
+and the near ground is drawn over the towers' feet so none floats. The far end of the line runs on behind a hill rather than
+stopping in the open (test report, 16 Nov 2026). Cook Strait's cable runs the way the HVDC is flowing and Aurora's turbines turn with the wind; all
+still under reduced motion. Design from the big-number mockup (15 Nov 2026). Tests: `tests/dashboard.test.js`, and the
+dashboards block in `tests/e2e/site.spec.js`.
+
+`/landscape`, the power landscape, a kids' dashboard (`src/routes/landscape/+page.svelte`, `src/lib/landscape/`): an
+animated storybook New Zealand on a canvas, ported from the prototype (13 Nov 2026) with its drawing unchanged. `feed.js`
+turns tracker.json into New Zealand's last 24 hours (islands added; other embedded generation with its renewable part;
+embedded solar with no estimate keeps the last estimate for the picture and is marked `roofNA`, so the numbers under it say
+"No estimate"); `dials.js` turns the feed into 0–1 dials (bands in `BAND`, provisional, see its header), the sun and the
+season; `scene.js` draws and runs the page's controls (Right now, Replay 24 h, Play with dials, full screen), finding its
+elements by id inside the page. The installed capacities for the wind and battery dials come from the generator rows.
+Fredoka (the kids' face) is bundled with `@fontsource/fredoka` and loaded on this page only; cards, buttons and panels
+take the site's shapes (4 px corners, the site's buttons and segmented control), and sizes on the picture follow `--u`
+(1% of its width, set by scene.js) rather than container query units, which need Safari 16. The view (mode, names,
+numbers, birds, low motion, cards, replay speed) is in the address and kept in this browser (`prefs.js`, localStorage
+`elenz-landscape`, on /privacy); Share copies a link to it or a wall-screen link (`kiosk=1`: the picture alone, a replay
+starting again 6 s after it ends). The pop-up cards are off in the replay and on otherwise unless the viewer chooses;
+the replay takes 1, 3 or 10 minutes for the day; each dial's notes fold under More info; the play-mode season slider
+stops at spring (December's look comes only with the date). Smoothness (test report, 16 Nov 2026): the canvas is capped
+at about 2.4 million pixels (a 4K TV would otherwise draw up to 9 million a frame and drop frames), frame times are
+smoothed, the clock and labels are only written when they change, and the clouds drift slowly. Still to do from the
+production plan (post-launch ideas doc): pop-ups beside their subject, the phone layout, drawing the still parts once, the
+kids' wording and a fact check of each dial against the method pages. Tests: `tests/landscape.test.js` and the dashboards
+block in `tests/e2e/site.spec.js`.
 
 ## Articles
 

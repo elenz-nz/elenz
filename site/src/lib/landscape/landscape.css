@@ -1,0 +1,118 @@
+/* The power landscape (/landscape): one wide living scene, kid-sized numbers under it, then the dials that drive it.
+   Every rule sits under .ls: parts of the page are written by scene.js (names, pop-ups, the fuel stack, the dials), so
+   Svelte's scoped styles can't reach them. Ported from the prototype (13 Nov 2026). Fredoka stays for the picture's
+   words and the big numbers; cards, buttons and panels have the site's shapes (4 px corners, the site's button sizes and
+   segmented control, test report 16 Nov 2026). Sizes on the picture follow --u, 1% of its width, set by scene.js:
+   container query units would need Safari 16, and Safari 15 is the floor. */
+.ls { --font-kid: "Fredoka", var(--font-ui); --bubble: #ffffff; --bubble-ink: #132020; display: grid; gap: 22px; font-size: 15px; line-height: 1.5; }
+.ls [hidden] { display: none !important; }
+.ls .ls-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 20px; }
+.ls .ls-head h1 { margin: 0; font: 600 1.7rem/1.2 var(--font-kid); color: var(--accent); }
+.ls .ls-head p { margin: 6px 0 0; color: var(--ink-2); max-width: 70ch; }
+.ls .when { font-family: var(--font-data); font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* the site's buttons: as Keep screen on and the tracker's controls */
+.ls .controls { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; }
+.ls .btn { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 0.74rem; font-weight: 500; min-height: 30px; padding: 3px 10px;
+  border-radius: 4px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); cursor: pointer; white-space: nowrap; }
+.ls .btn:hover { color: var(--ink); border-color: var(--ink-2); }
+.ls .btn[aria-pressed="true"], .ls .btn[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.ls .btn.go { font-size: 0.8rem; font-weight: 600; color: var(--accent); padding: 3px 12px; }
+.ls .btn.go:hover { background: var(--accent-soft); border-color: var(--accent); }
+.ls button:focus-visible, .ls input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ls .scrub { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; flex: 1 1 100%; min-width: 0; }
+.ls .scrub input { flex: 1 1 200px; min-width: 0; accent-color: var(--accent); }
+.ls .scrub output { font-family: var(--font-data); font-size: 13px; min-width: 7ch; font-variant-numeric: tabular-nums; }
+.ls .speed-l { font-size: 0.78rem; color: var(--ink-2); margin-left: 8px; }
+.ls .ls-share { display: grid; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; }
+.ls .ls-share p { margin: 0; color: var(--ink-2); font-size: 0.86rem; max-width: 80ch; }
+.ls .share-b { display: flex; flex-wrap: wrap; gap: 8px 10px; }
+
+.ls .stage { --u: 10px; position: relative; width: 100%; max-width: 100%; aspect-ratio: 1000 / 640; border-radius: 4px; overflow: hidden; background: #6fa8dc;
+  border: 1px solid var(--line); }
+.ls .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.ls .labels span { position: absolute; transform: translate(-50%, -100%); font: 600 12px var(--font-kid); color: #13202a; background: rgba(255, 255, 255, .86);
+  border-radius: 3px; padding: 1px 8px 1px 6px; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; pointer-events: none; }
+.ls .labels span i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+.ls .labels span.under { transform: translate(-50%, 0); }
+.ls .scene { position: relative; display: grid; gap: 10px; }
+.ls .hud { position: absolute; left: 1.4%; top: 2.6%; height: 47%; display: flex; flex-direction: column; align-items: flex-start; gap: calc(.7 * var(--u)); pointer-events: none; font-family: var(--font-kid); color: #13202a; }
+.ls .hud-card { background: rgba(255, 255, 255, .88); border-radius: max(3px, calc(.4 * var(--u))); padding: calc(.35 * var(--u)) var(--u) calc(.45 * var(--u)); display: flex; align-items: baseline; gap: calc(.6 * var(--u)); white-space: nowrap; }
+.ls .hud-card b { font-weight: 600; font-size: clamp(13px, calc(2.5 * var(--u)), 27px); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.ls .hud-card span { font-weight: 500; font-size: clamp(8px, calc(1.25 * var(--u)), 13px); }
+.ls .vstack { position: relative; flex: 1; min-height: 0; width: clamp(12px, calc(2.4 * var(--u)), 24px); display: flex; flex-direction: column-reverse; border-radius: 3px;
+  border: 2px solid rgba(255, 255, 255, .92); background: rgba(255, 255, 255, .5); box-shadow: 0 2px 8px -3px rgba(0, 0, 0, .4); margin-left: calc(.3 * var(--u)); }
+.ls .vbar { position: absolute; inset: 0; border-radius: 2px; overflow: hidden; display: flex; flex-direction: column-reverse; }
+.ls .vbar div { flex: none; min-height: 0; transition: height .6s ease; }
+.ls #vlabs span { position: absolute; left: calc(100% + .9 * var(--u)); transform: translateY(50%); font-weight: 600; font-size: clamp(8px, calc(1.2 * var(--u)), 12.5px); background: rgba(255, 255, 255, .86);
+  border-radius: 3px; padding: calc(.1 * var(--u)) calc(.8 * var(--u)); white-space: nowrap; transition: bottom .6s ease; }
+
+/* full screen, and the wall-screen link (kiosk=1): the picture alone, as large as fits */
+.ls .scene:fullscreen, .ls.kiosk .scene { background: #0b1420; place-content: center; width: 100vw; height: 100vh; }
+.ls .scene:fullscreen .stage, .ls.kiosk .stage { width: min(100vw, calc(100vh * 1000 / 640)); border-radius: 0; border: 0; justify-self: center; }
+.ls .scene:fullscreen .toasts, .ls.kiosk .toasts { left: calc((100vw - min(100vw, 100vh * 1000 / 640)) / 2 + min(27vw, 43.2vh)); top: calc((100vh - min(100vh, 100vw * 640 / 1000)) / 2 + 12px); }
+.ls.kiosk { position: fixed; inset: 0; z-index: 10; display: block; }
+.ls.kiosk > :not(.scene) { display: none !important; }
+.wrap.kiosk { max-width: none; padding: 0; margin: 0; }
+.ls .kcredit { display: none; }
+.ls.kiosk .kcredit { display: block; position: absolute; left: 10px; bottom: 8px; margin: 0; font-size: 12px; color: rgba(255, 255, 255, .8);
+  background: rgba(11, 20, 32, .55); padding: 2px 8px; border-radius: 3px; }
+.ls .fsbar { display: none; }
+.ls .scene:fullscreen .fsbar { display: flex; gap: 8px; position: absolute; top: 12px; right: 12px; z-index: 5; }
+.ls .fsb { width: 40px; height: 40px; border-radius: 4px; border: 0; background: rgba(255, 255, 255, .88); color: #13202a; display: grid; place-items: center; cursor: pointer; box-shadow: 0 4px 14px -6px rgba(0, 0, 0, .6); }
+.ls .fsb[aria-expanded="true"] { background: #fff; }
+.ls .fsmenu { position: absolute; top: 48px; right: 0; display: grid; gap: 6px; padding: 8px; border-radius: 4px; background: rgba(255, 255, 255, .96); box-shadow: 0 18px 50px rgb(0 0 0 / 0.28); min-width: 150px; }
+.ls .fsmenu .btn { text-align: left; color: #13202a; background: #fff; border-color: #d6dfde; }
+.ls .fsmenu .btn[aria-pressed="true"] { color: #0d6275; background: #d6e8eb; border-color: #0d6275; }
+.ls .scene.hud-on .toasts { left: 27%; }
+.ls .toasts { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; pointer-events: none; }
+.ls .toast { max-width: min(380px, 92%); background: var(--bubble); color: var(--bubble-ink); font: 500 15px/1.3 var(--font-kid); border-radius: 4px;
+  padding: 9px 14px 9px 12px; box-shadow: 0 6px 18px -8px rgba(0, 0, 0, .45); display: flex; gap: 9px; align-items: flex-start; animation: ls-pop .35s cubic-bezier(.3, 1.5, .6, 1) both; }
+.ls .toast i { flex: none; width: 12px; height: 12px; border-radius: 3px; margin-top: 4px; }
+.ls .toast.out { animation: ls-fade .5s ease forwards; }
+@keyframes ls-pop { from { transform: scale(.6) translateY(-6px); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes ls-fade { to { opacity: 0; transform: translateY(-6px) } }
+
+/* the site's cards: 4 px corners, a hairline border */
+.ls .kid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.ls .kid .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px; display: grid; gap: 2px; min-width: 0; }
+.ls .kid small { font-size: 0.8rem; font-weight: 600; color: var(--ink-2); }
+.ls .kid strong { font: 600 clamp(26px, 4.4vw, 38px)/1.1 var(--font-kid); font-variant-numeric: tabular-nums; }
+.ls .kid em { font-style: normal; color: var(--ink-2); font-size: 13.5px; }
+.ls .ls-mix { display: flex; height: 12px; border-radius: 2px; overflow: hidden; margin-top: 8px; background: var(--line); }
+.ls .ls-mix div { height: 100%; transition: width .6s ease; }
+
+.ls .dials { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px 14px 8px; display: grid; gap: 10px; }
+.ls .dials h2 { margin: 0; font-size: 1rem; font-weight: 600; text-wrap: balance; }
+.ls .dials p.lede { margin: 0; color: var(--ink-2); font-size: 14px; max-width: 70ch; }
+.ls .dtable { display: grid; grid-template-columns: minmax(8.5rem, 11rem) minmax(0, 1fr); }
+.ls .drow { display: contents; }
+.ls .drow > * { padding: 9px 0; border-top: 1px solid var(--line); min-width: 0; }
+.ls .dname { font-weight: 600; display: flex; align-items: center; gap: 8px; padding-right: 12px; }
+.ls .dname i { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+.ls .dbody { display: grid; gap: 6px; }
+.ls .dline { display: flex; align-items: center; gap: 10px; }
+.ls .dbar { flex: 1; height: 8px; border-radius: 2px; background: var(--line); overflow: hidden; position: relative; }
+.ls .dbar b { position: absolute; top: 0; bottom: 0; left: 0; }
+.ls .dbar.mid b { left: 50%; }
+.ls .dval { font-family: var(--font-data); font-size: 12.5px; min-width: 15ch; text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.ls .dmore { flex: none; font: inherit; font-size: 0.74rem; font-weight: 500; min-height: 26px; padding: 1px 8px; border-radius: 4px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--accent); cursor: pointer; white-space: nowrap; }
+.ls .dmore:hover, .ls .dmore[aria-expanded="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.ls .dhow { font-size: 13px; color: var(--muted); }
+.ls .dbody input[type="range"] { width: 100%; accent-color: var(--accent); }
+.ls .ls-foot { font-size: 12.5px; color: var(--muted); max-width: 80ch; margin: 0; }
+.ls .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+@media (max-width: 640px) {
+  .ls .kid { grid-template-columns: minmax(0, 1fr); }
+  .ls .dtable { grid-template-columns: minmax(0, 1fr); }
+  .ls .dname { border-top: 1px solid var(--line); padding-bottom: 0 !important; }
+  .ls .dbody { border-top: 0 !important; padding-top: 4px !important; }
+  .ls .dval { min-width: 0; }
+  .ls .speed-l { margin-left: 0; }
+  .ls .labels span { font-size: 9px; padding: 0 5px 0 4px; gap: 3px; }
+  .ls .labels span i { width: 6px; height: 6px; }
+  .ls .toasts { position: static !important; min-height: 44px; }
+  .ls .toast { font-size: 14px; padding: 8px 12px; max-width: 100%; box-shadow: none; border: 1px solid var(--line); }
+}
