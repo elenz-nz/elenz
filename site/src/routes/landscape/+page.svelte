@@ -163,7 +163,7 @@
 
 		<section class="dials js-only" aria-labelledby="dials-h">
 			<h2 id="dials-h">The dials behind the scene</h2>
-			<p class="lede" id="dials-lede">Each part of the picture listens to one number between 0 and 1, worked out from the live feed. The scene eases towards each new value, so a 5-minute update never makes anything jump.</p>
+			<p class="lede" id="dials-lede">Each part of the picture follows one dial, somewhere between its minimum and maximum, worked out from the live feed. The scene eases towards each new value, so a 5-minute update never makes anything jump.</p>
 			<div class="dtable" id="dtable"></div>
 		</section>
 

@@ -996,16 +996,18 @@ const MIXF = [['geo','Geothermal'],['hydro','Hydro'],['wind','Wind'],['solar','S
 $('vstack').innerHTML = MIXF.map(([k]) => `<div data-k="${k}" style="background:var(--f-${k === 'roof' ? 'solar' : k});${k === 'roof' ? 'filter:brightness(1.25)' : ''}"></div>`).join('');
 $('vlabs').innerHTML = MIXF.map(([k]) => `<span data-k="${k}"></span>`).join('');
 $('mix').innerHTML = MIXF.map(([k]) => `<div data-k="${k}" style="background:var(--f-${k === 'roof' ? 'solar' : k});${k === 'roof' ? 'opacity:.6' : ''}"></div>`).join('');
+// what each dial does, and what sets its minimum and maximum (the dials themselves run 0 to 1 in dials.js; the page
+// shows minimum and maximum instead: test report, 16 Nov 2026)
 const DIALS = [
-  ['wind', 'Wind', '--f-wind', 'Turbine speed, cloud drift, grass sway; over 0.55 the birds start to struggle, and over 0.96 the kererū is blown away. The tūī’s ride back downwind gets faster.', '0 at no wind, 1 at 1,270 MW (about the most the fleet reaches)'],
-  ['hydro', 'Hydro', '--f-hydro', 'River flow speed, width and dam spray.', '0 at 1,400 MW, 1 at 4,600 MW (the range hydro really works in)'],
-  ['geo', 'Geothermal', '--f-geo', 'How much steam rises from the station. Steady day and night.', '0.5 at 900 MW, 1 at 1,180 MW; 0 only if it stops'],
-  ['cloud', 'Cloud cover', '--f-solar', 'Number and greyness of clouds, how bright the sun is.', '1 − rooftop solar ÷ clear-sky estimate (held overnight)'],
-  ['time', 'Time of day', '--f-solar', 'Sun or moon position, sky colour and lit windows; house lights go out one by one from 9:30 pm, leaving a single window lit by 1 am.', 'NZ clock time; the sun’s height is worked out for the centre of NZ'],
-  ['solar', 'Solar', '--f-solar', 'Shine on the solar farm’s panels and on the house roofs.', '(Grid solar + rooftop MW) ÷ 1,360 MW; the farm and the roofs each follow their own share'],
-  ['thermal', 'Gas and coal', '--f-gas', 'Smoke from the chimneys; none when it’s zero.', '0 below 30 MW (the small plants that never stop), 1 at 600 MW'],
-  ['batt', 'Battery', '--f-batt', 'Arrow and sparks run in when charging and out when discharging.', 'Battery MW ÷ installed (− = charging)'],
-  ['season', 'Season', '--f-hydro', 'Snow, the braided river and the lake level; spring flowers, brown summer paddocks, autumn leaves, Matariki in winter and Christmas lights in December.', 'Summer, autumn, winter, spring or December, from the date'],
+  ['wind', 'Wind', '--f-wind', 'Turbine speed, cloud drift, grass sway; in a strong wind the birds start to struggle, and near the maximum the kererū is blown away. The tūī’s ride back downwind gets faster.', 'Min: no wind. Max: 1,270 MW (about the most the fleet reaches).'],
+  ['hydro', 'Hydro', '--f-hydro', 'River flow speed, width and dam spray.', 'Min: 1,400 MW. Max: 4,600 MW (the range hydro really works in).'],
+  ['geo', 'Geothermal', '--f-geo', 'How much steam rises from the station. Steady day and night.', 'Halfway at 900 MW, max at 1,180 MW: always a healthy plume, none only if the stations stop.'],
+  ['cloud', 'Cloud cover', '--f-solar', 'Number and greyness of clouds, how bright the sun is.', 'Min: clear sky. Max: overcast. Rooftop solar against what a clear sky would give (held overnight).'],
+  ['time', 'Time of day', '--f-solar', 'Sun or moon position, sky colour and lit windows; house lights go out one by one from 9:30 pm, leaving a single window lit by 1 am.', 'NZ clock time; the sun’s height is worked out for the centre of NZ.'],
+  ['solar', 'Solar', '--f-solar', 'Shine on the solar farm’s panels and on the house roofs.', 'Min: none. Max: 1,360 MW of grid and rooftop solar together; the farm and the roofs each follow their own share.'],
+  ['thermal', 'Gas and coal', '--f-gas', 'Smoke from the chimneys; none at the minimum.', 'Min: 30 MW or less (the small plants that never stop). Max: 600 MW.'],
+  ['batt', 'Battery', '--f-batt', 'Arrow and sparks run in when charging and out when discharging.', 'Left: charging at full power. Middle: resting. Right: discharging at full power.'],
+  ['season', 'Season', '--f-hydro', 'Snow, the braided river and the lake level; spring flowers, brown summer paddocks, autumn leaves, Matariki in winter and Christmas lights in December.', 'Summer, autumn, winter, spring or December, from the date.'],
 ];
 // what each dial does and how it's worked out stays folded under More info until asked for (test report, 16 Nov 2026).
 // The season slider stops at spring: December's Christmas look comes with the date, not the slider.
@@ -1044,10 +1046,11 @@ function updateText(d) {
     const bar = $('bar-' + k), val = $('val-' + k);
     if (k === 'season') { const si = seasonIdx(v), dec = isXmas(v); bar.style.width = (dec ? 100 : (si + 1) * 20) + '%'; val.textContent = dec ? 'December · Christmas' : SEASONS[si] + ' · ' + ['dry paddocks, little snow', 'autumn leaves', 'deep snow, Matariki', 'flowers, snow melting'][si]; continue; }
     if (k === 'time') { bar.style.width = clamp(v / 24) * 100 + '%'; val.textContent = fmtTime(DAY0 + v * 36e5) + ` · sun ${d.sun.toFixed(0)}°`; continue; }
-    if (k === 'batt') { const w = Math.abs(v) * 50; bar.style.width = w + '%'; bar.style.left = v < 0 ? (50 - w) + '%' : '50%'; val.textContent = v.toFixed(2) + (mode !== 'play' ? ` · ${Math.round(s.batt)} MW` : ''); continue; }
+    if (k === 'batt') { const w = Math.abs(v) * 50; bar.style.width = w + '%'; bar.style.left = v < 0 ? (50 - w) + '%' : '50%'; val.textContent = (Math.abs(v) <= .05 ? 'Resting' : v < 0 ? 'Charging' : 'Discharging') + (mode !== 'play' ? ` · ${Math.abs(Math.round(s.batt))} MW` : ''); continue; }
     bar.style.width = clamp(v) * 100 + '%';
     const mw = { wind: s.wind, hydro: s.hydro, geo: s.geo, solar: s.solar + s.roof, thermal: s.coal + s.gas + s.diesel }[k];
-    val.textContent = v.toFixed(2) + (mode !== 'play' && mw !== undefined ? ` · ${Math.round(mw).toLocaleString('en-NZ')} MW` : '');
+    // MW where the dial has them; otherwise how far between its minimum and maximum
+    val.textContent = mode !== 'play' && mw !== undefined ? `${Math.round(mw).toLocaleString('en-NZ')} MW` : `${Math.round(clamp(v) * 100)}% ${k === 'cloud' ? 'cloudy' : 'of max'}`;
   }
 }
 
@@ -1069,7 +1072,7 @@ function setMode(m, keepCards = false) {
   }
   $('dials-lede').textContent = m === 'play'
     ? 'Each slider sets one dial directly. On the real page these come from the live feed.'
-    : 'Each part of the picture listens to one number between 0 and 1, worked out from the live feed. The scene eases towards each new value, so a 5-minute update never makes anything jump.';
+    : 'Each part of the picture follows one dial, somewhere between its minimum and maximum, worked out from the live feed. The scene eases towards each new value, so a 5-minute update never makes anything jump.';
 }
 // the on/off buttons and the replay speed, set from prefs; every change goes back to the page (opts.onPrefs) to keep
 const toggle = (id, on, word) => { const b = $(id); b.setAttribute('aria-pressed', String(on)); b.textContent = `${word} ${on ? 'on' : 'off'}`; };
