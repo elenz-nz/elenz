@@ -66,7 +66,8 @@ on /methods/sources): rerun it rather than editing the SVG (`--look <name>` draw
 `backgrounds.js`). Cook Strait's overland lines are routed over land only (the cheapest path on the DEM's grid, dearer
 near the coast), from Benmore's direction to Fighting Bay and from Oteranga Bay to Haywards, where the line stops. Lines at sunset follows a photo of a New Zealand 220 kV double-circuit line (test report, 16 Nov 2026): each tower is
 the same tower scaled towards one vanishing point at the sun, so every wire joins the same insulator on the next tower,
-and the near ground is drawn over the towers' feet so none floats. Cook Strait's cable runs the way the HVDC is flowing and Aurora's turbines turn with the wind; all
+and the near ground is drawn over the towers' feet so none floats. The far end of the line runs on behind a hill rather than
+stopping in the open (test report, 16 Nov 2026). Cook Strait's cable runs the way the HVDC is flowing and Aurora's turbines turn with the wind; all
 still under reduced motion. Design from the big-number mockup (15 Nov 2026). Tests: `tests/dashboard.test.js`, and the
 dashboards block in `tests/e2e/site.spec.js`.
 

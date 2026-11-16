@@ -190,7 +190,7 @@ def pylons():
     """A 220 kV double-circuit steel lattice line receding into a sunset, after a photo of a New Zealand line: a narrow
     lattice column with legs splaying out below the lowest crossarm, three crossarms each side (a little longer lower
     down), vertical insulator strings, and a short earth-wire arm on top. Every tower is the same tower scaled towards
-    one vanishing point on the horizon, so each conductor and earth wire runs from the same point on one tower to the
+    one vanishing point on the horizon (behind a hill the line goes over), so each conductor and earth wire runs from the same point on one tower to the
     same point on the next, and the line runs on towards the viewer (off the frame) the same way. The near ground is
     drawn over the towers' feet, so none stands in the air."""
     C = '#140c1e'
@@ -255,10 +255,17 @@ def pylons():
     def sag(p, q, k):
         (x1, y1), (x2, y2) = p, q
         return f'M{f(x1)} {f(y1)} Q{f((x1 + x2) / 2)} {f((y1 + y2) / 2 + k * math.hypot(x2 - x1, y2 - y1))} {f(x2)} {f(y2)}'
-    wires = []
-    for k in range(-1, N - 1):     # k = -1: the next tower, behind the viewer, off the frame
+    def span(k):                   # the wires from tower k to the next one out; k = -1 starts off the frame, behind the viewer
         a, b = attach(k), attach(k + 1)
-        wires += [sag(p, q, 0.05 if i < 6 else 0.04) for i, (p, q) in enumerate(zip(a, b))]
+        return ''.join(sag(p, q, 0.05 if i < 6 else 0.04) for i, (p, q) in enumerate(zip(a, b)))
+    W = lambda d: f'<path d="{d}" fill="none" stroke="{C}" stroke-width="1.4" stroke-opacity=".9"></path>'
+    # the line runs on over a hill: the far towers and their wires are drawn behind it, so the line goes out of sight
+    # rather than stopping (test report, 16 Nov 2026); only the nearest tower and its wires are in front of it
+    behind = W(''.join(span(k) for k in range(1, N - 1))) + ''.join(tower(k) for k in reversed(range(1, N)))
+    front = W(span(-1) + span(0)) + tower(0)
+    hill = ('<path d="M-10 786 C 110 776, 250 712, 400 670 C 470 652, 525 690, 590 738 C 650 780, 720 806, 800 832 '
+            'L870 862 L870 900 L-10 900 Z" fill="#2c1830"></path>')    # its foot runs under the near ground
+    SUN = (190, 772)               # the sun sets beside the hill
     # the near ground: its edge runs just above each tower's base, so the feet are in the grass
     edge = []
     for x in range(0, 1601, 20):
@@ -272,10 +279,8 @@ def pylons():
             '<defs><linearGradient id="pysky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a1238"></stop><stop offset=".45" stop-color="#5a2a5c"></stop>'
             '<stop offset=".72" stop-color="#d4664c"></stop><stop offset=".86" stop-color="#f2a85a"></stop><stop offset="1" stop-color="#f7cf7a"></stop></linearGradient>'
             '<radialGradient id="pysun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffe2a0" stop-opacity=".8"></stop><stop offset="1" stop-color="#ffe2a0" stop-opacity="0"></stop></radialGradient></defs>'
-            f'<rect width="1600" height="900" fill="url(#pysky)"></rect><circle cx="{V[0]}" cy="{V[1] - 4}" r="210" fill="url(#pysun)"></circle><circle cx="{V[0]}" cy="{V[1] + 6}" r="58" fill="#ffd98a" fill-opacity=".9"></circle>'
-            + far +
-            f'<path d="{"".join(wires)}" fill="none" stroke="{C}" stroke-width="1.4" stroke-opacity=".9"></path>' +
-            ''.join(tower(k) for k in reversed(range(N))) +
+            f'<rect width="1600" height="900" fill="url(#pysky)"></rect><circle cx="{SUN[0]}" cy="{SUN[1] - 4}" r="210" fill="url(#pysun)"></circle><circle cx="{SUN[0]}" cy="{SUN[1] + 6}" r="58" fill="#ffd98a" fill-opacity=".9"></circle>'
+            + far + behind + hill + front +
             f'<path d="{ground}" fill="#241426"></path>'
             '<path d="M0 892 C 400 884, 900 896, 1600 886 L1600 900 L0 900 Z" fill="#140c1e"></path></svg>')
 
