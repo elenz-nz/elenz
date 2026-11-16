@@ -423,9 +423,12 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   `/privacy#screens`. Worker tests: the heartbeat block; site: `tests/heartbeat.test.js`.
   **Reading them:** Cloudflare's dashboard has no view of an Analytics Engine dataset (it is read through the SQL API),
   so the Worker draws a private page, `/data/screens?key=<SCREENS_KEY>` (`worker/screens.js`, design decision 16 Nov
-  2026): for the last 24 hours, 7, 30 or 90 days, each page's screens (one opening of a page), how many came from a
-  wall-screen link, median and longest time open and countries; the average screens open in each NZ hour of the day;
-  and hour by hour, the screens open, on screen and from a wall-screen link. It needs three Worker settings, added in the
+  2026): for the last 24 hours, 7, 30 or 90 days, a card per page (screens, one opening of a page; how many came from
+  a wall-screen link; median and longest time open; countries), then two stacked bar charts side by side, drawn as SVG on
+  the server: the average screens open in each NZ hour of the day, and screens open over time (by hour up to 7 days,
+  by day beyond). Each bar has a hover note; a short glossary and the tables (by time of day; hour by hour, open, on
+  screen and from a wall-screen link) fold away below. Colours are the first three slots of the data-viz reference
+  palette, light and dark (redesign 17 Nov 2026). It needs three Worker settings, added in the
   Cloudflare dashboard (Workers & Pages → elenz → Settings → Variables and Secrets; `keep_vars` keeps them through
   deploys): `SCREENS_KEY` (secret, a long random string of letters and digits; without it, or with the wrong one, the
   address answers 404), `CF_ANALYTICS_TOKEN` (secret: a Cloudflare API token with Account → Account Analytics → Read
