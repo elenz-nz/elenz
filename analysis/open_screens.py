@@ -6,7 +6,8 @@ heartbeats in Workers Analytics Engine (dataset elenz_beats; worker/index.js, si
 CF_ANALYTICS_TOKEN is a Cloudflare API token with the one permission Account > Account Analytics > Read (step by step
 in docs/architecture.md, Worker). Analytics Engine keeps three months of rows.
 
-Prints, for each hour with any beat: the screens open on each page (a screen is one page load), how many of them were on
+The same tables are on the private page https://elenz.co.nz/data/screens?key=<SCREENS_KEY> (worker/screens.js),
+which needs nothing installed. Prints, for each hour with any beat: the screens open on each page (a screen is one page load), how many of them were on
 screen rather than hidden at some point in the hour, and how many came from a wall-screen link; then how long screens
 stayed open. Standard library only.
 """
@@ -22,14 +23,16 @@ from zoneinfo import ZoneInfo
 NZ = ZoneInfo('Pacific/Auckland')
 PAGES = ('now', 'dashboard', 'landscape')
 
-# one row per page load per hour: whether it was on screen at all, and the most minutes it reported
+# one row per page load per hour and state: the most minutes it reported (the same query as worker/screens.js, which
+# draws this on the private page elenz.co.nz/data/screens)
 SQL = """
-SELECT toStartOfInterval(timestamp, INTERVAL '1' HOUR) AS hour, blob1 AS page, index1 AS id, blob3 AS opened,
-       max(double1) AS minutes, sum(if(blob2 = 'visible', 1, 0)) AS shown, sum(_sample_interval) AS beats
+SELECT toStartOfInterval(timestamp, INTERVAL '1' HOUR) AS hour, blob1 AS page, index1 AS id,
+  blob2 AS shown, blob3 AS opened, blob4 AS country, max(double1) AS minutes, count() AS beats
 FROM elenz_beats
 WHERE timestamp > NOW() - INTERVAL '{days}' DAY
-GROUP BY hour, page, id, opened
+GROUP BY hour, page, id, shown, opened, country
 ORDER BY hour
+LIMIT 100000
 FORMAT JSON
 """
 
@@ -51,18 +54,21 @@ def nz_hour(text):
 def summarise(rows):
     """Per NZ hour and page: screens open, of them on screen, of them from a wall-screen link; and each screen's
     longest time open, in minutes."""
-    hours = defaultdict(lambda: {p: [0, 0, 0] for p in PAGES})
+    sets = defaultdict(lambda: {p: (set(), set(), set()) for p in PAGES})
     longest = {}
     for r in rows:
         if r['page'] not in PAGES:
             continue
-        h = hours[nz_hour(r['hour'])][r['page']]
-        h[0] += 1
-        h[1] += int(float(r['shown'])) > 0
-        h[2] += r['opened'] == 'kiosk'
+        opened, shown, wall = sets[nz_hour(r['hour'])][r['page']]
+        opened.add(r['id'])
+        if r['shown'] == 'visible':
+            shown.add(r['id'])
+        if r['opened'] == 'kiosk':
+            wall.add(r['id'])
         key = (r['page'], r['id'])
         longest[key] = max(longest.get(key, 0), float(r['minutes']))
-    return dict(sorted(hours.items())), longest
+    hours = {h: {p: [len(x) for x in by[p]] for p in PAGES} for h, by in sorted(sets.items())}
+    return hours, longest
 
 
 def main(days=7):
