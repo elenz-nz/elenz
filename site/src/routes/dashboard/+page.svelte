@@ -12,7 +12,7 @@
 	import { recent } from '#lib/home/now.js';
 	import { generatorRows } from '#lib/now/generators.js';
 	import { context, catalogue, resolve, GROUPS, REGION_NAMES, MEASURE_NAMES } from '#lib/dashboard/values.js';
-	import { BACKGROUNDS, DEFAULT, MAX_BIG, MAX_SMALL, clean, fromQuery, toQuery, load, save, resize } from '#lib/dashboard/layout.js';
+	import { BACKGROUNDS, PLAIN, DEFAULT, clean, fromQuery, toQuery, load, save, resize } from '#lib/dashboard/layout.js';
 
 	const DATA_URL = '/data/tracker.json';
 	const LIVE_MINUTES = 15;
@@ -37,7 +37,9 @@
 	const clockOf = (t: number) => { const p = parts(t); return `${p.hour}:${p.minute} ${String(p.dayPeriod).toLowerCase()}`; };
 	const dayOf = (t: number) => { const p = parts(t); return `${p.weekday} ${p.day} ${p.month}`; };
 	const fresh = $derived(!!x && (clock - x.end) / 60000 < LIVE_MINUTES);
+	// Detailed: the time of the newest data; Simple: just whether it's live
 	const live = $derived(!x ? (error ? 'Data unavailable' : 'Loading…')
+		: layout.view === 'simple' ? (fresh ? 'Live' : 'Delayed')
 		: fresh ? `Live ${clockOf(x.end)} · ${dayOf(x.end)}` : `Delayed · data to ${clockOf(x.end)} ${dayOf(x.end)}`);
 
 	const windLoad = $derived.by(() => {
@@ -48,7 +50,7 @@
 	});
 
 	// ---------- changing the layout ----------
-	function set(next: { bg: string; big: string[]; small: string[] }) {
+	function set(next: { bg: string; col: string; view: string; big: string[]; small: string[] }) {
 		layout = clean(next);
 		save(layout);
 		const url = location.pathname + toQuery(layout, { kiosk: kiosk ? '1' : '' });
@@ -105,7 +107,16 @@
 	// ---------- full screen ----------
 	async function goFull() {
 		full = true;
+		wake();
 		try { if (stageWrap?.requestFullscreen) await stageWrap.requestFullscreen(); } catch { /* the page's own full screen stays */ }
+	}
+	// the X to leave full screen fades after 3 seconds without the mouse or a touch, and comes back with either
+	let idle = $state(false);
+	let idleTimer: ReturnType<typeof setTimeout> | undefined;
+	function wake() {
+		idle = false;
+		clearTimeout(idleTimer);
+		idleTimer = setTimeout(() => (idle = true), 3000);
 	}
 	function exitFull() {
 		full = false;
@@ -127,6 +138,9 @@
 		layout = fromQuery(location.search) ?? load() ?? clean(DEFAULT);
 		if (matchMedia('(max-width: 640px)').matches) panel = false;
 		const fsChange = () => { if (!document.fullscreenElement) full = false; };
+		const moved = () => { if (full) wake(); };
+		addEventListener('pointermove', moved);
+		addEventListener('pointerdown', moved);
 		document.addEventListener('fullscreenchange', fsChange);
 		const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') { if (picking) closePicker(); else if (full) exitFull(); } };
 		addEventListener('keydown', esc);
@@ -156,6 +170,9 @@
 			document.removeEventListener('visibilitychange', check);
 			document.removeEventListener('fullscreenchange', fsChange);
 			removeEventListener('keydown', esc);
+			removeEventListener('pointermove', moved);
+			removeEventListener('pointerdown', moved);
+			clearTimeout(idleTimer);
 		};
 	});
 </script>
@@ -168,7 +185,7 @@
 
 {#if kiosk}
 	<div class="kiosk" bind:this={stageWrap}>
-		<Stage bg={layout.bg} {big} {small} {live} {fresh} {line} mix={x?.now.mix ?? []} hvdc={x?.now.hvdc.mid ?? 0} {windLoad} />
+		<Stage bg={layout.bg} col={layout.col} simple={layout.view === 'simple'} {big} {small} {live} {fresh} {line} mix={x?.now.mix ?? []} hvdc={x?.now.hvdc.mid ?? 0} {windLoad} />
 	</div>
 {:else}
 <div class="wrap wide dash">
@@ -195,8 +212,12 @@
 		<noscript><p class="lede">The dashboard needs JavaScript turned on.</p></noscript>
 
 		<div class="stagewrap js-only" class:full bind:this={stageWrap}>
-			{#if full}<button type="button" class="btn exit" onclick={exitFull}>Exit full screen</button>{/if}
-			<Stage bg={layout.bg} {big} {small} {live} {fresh} {line} mix={x?.now.mix ?? []} hvdc={x?.now.hvdc.mid ?? 0} {windLoad} />
+			{#if full}
+				<button type="button" class="exit" class:idle aria-label="Exit full screen" title="Exit full screen" onclick={exitFull}>
+					<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none" /></svg>
+				</button>
+			{/if}
+			<Stage bg={layout.bg} col={layout.col} simple={layout.view === 'simple'} {big} {small} {live} {fresh} {line} mix={x?.now.mix ?? []} hvdc={x?.now.hvdc.mid ?? 0} {windLoad} />
 		</div>
 
 		{#if panel}
@@ -215,6 +236,12 @@
 									{#each [0, 1, 2, 3, 4] as n}<button type="button" aria-pressed={layout.small.length === n} onclick={() => set({ ...layout, small: resize(layout.small, n, layout.big) })}>{n}</button>{/each}
 								</div>
 							</div>
+							<div class="opt-g"><span class="hint">Show</span>
+								<div class="seg" role="group" aria-label="How much to show">
+									<button type="button" aria-pressed={layout.view === 'simple'} title="The numbers alone" onclick={() => set({ ...layout, view: 'simple' })}>Simple</button>
+									<button type="button" aria-pressed={layout.view !== 'simple'} title="The time, and a line under each value" onclick={() => set({ ...layout, view: 'detailed' })}>Detailed</button>
+								</div>
+							</div>
 						</div>
 					</section>
 					<section class="panel" aria-labelledby="h-bg">
@@ -223,6 +250,19 @@
 							{#each BACKGROUNDS as b}
 								<button type="button" class="bgsw" aria-pressed={layout.bg === b.k} onclick={() => set({ ...layout, bg: b.k })}><span style="background:{b.sw}"></span>{b.name}</button>
 							{/each}
+						</div>
+						<div class="plainrow">
+							<span class="hint">Plain colour</span>
+							<div class="dots" role="group" aria-label="Plain colour">
+								{#each PLAIN as p}
+									<button type="button" class="dot" style="background:#{p.c}" aria-label={p.name} title={p.name}
+										aria-pressed={layout.bg === 'plain' && layout.col === p.c} onclick={() => set({ ...layout, bg: 'plain', col: p.c })}></button>
+								{/each}
+								<label class="dot pickc" title="Pick any colour" class:on={layout.bg === 'plain' && !PLAIN.some((p) => p.c === layout.col)}>
+									<span class="sr">Pick any colour</span>
+									<input type="color" value={'#' + layout.col} oninput={(e) => set({ ...layout, bg: 'plain', col: (e.currentTarget as HTMLInputElement).value.slice(1) })} />
+								</label>
+							</div>
 						</div>
 					</section>
 				</div>
@@ -310,8 +350,11 @@
 	.stagewrap { position: relative; }
 	.stagewrap.full { position: fixed; inset: 0; z-index: 100; background: #0b1212; display: grid; }
 	.stagewrap.full :global(.stage), .kiosk :global(.stage) { aspect-ratio: auto; height: 100%; min-height: 0; border-radius: 0; }
-	.exit { position: absolute; top: 12px; right: 12px; z-index: 2; opacity: 0.3; transition: opacity 0.2s; }
+	.exit { position: absolute; top: 10px; right: 10px; z-index: 2; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%;
+		border: 1px solid rgba(255, 255, 255, 0.18); background: rgba(5, 12, 12, 0.55); color: #f4f7f6; cursor: pointer; transition: opacity 0.4s; }
+	.exit.idle { opacity: 0; }
 	.exit:hover, .exit:focus-visible { opacity: 1; }
+	.exit:focus-visible { outline: 2px solid #5cc2d2; outline-offset: 2px; }
 	.kiosk { position: fixed; inset: 0; display: grid; background: #0b1212; }
 
 	.panels { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
@@ -321,7 +364,15 @@
 	.panel h2 { margin: 0; font-size: 1rem; font-weight: 700; }
 	.hint { margin: 0; font-size: 0.82rem; color: var(--muted); }
 	.opts { display: flex; flex-wrap: wrap; gap: 12px 28px; }
-	.opt-g { display: grid; gap: 6px; }
+	.opt-g { display: grid; gap: 6px; justify-items: start; }
+	.plainrow { display: grid; gap: 6px; padding-top: 4px; }
+	.dots { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+	.dot { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line); cursor: pointer; padding: 0; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06); }
+	.dot[aria-pressed='true'], .dot.on { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent); }
+	.dot:focus-visible, .pickc:focus-within { outline: 2px solid var(--accent); outline-offset: 3px; }
+	.pickc { position: relative; overflow: hidden; background: conic-gradient(#e0524a, #e6c35c, #2fa883, #4f8bd6, #8a72d8, #e0524a); }
+	.pickc input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; padding: 0; }
+	.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 	.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
 	.bgsw { display: grid; gap: 6px; text-align: left; font: inherit; font-size: 0.82rem; font-weight: 600; color: var(--ink-2); padding: 6px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; }
 	.bgsw span { display: block; height: 46px; border-radius: 5px; }

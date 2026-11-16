@@ -2,7 +2,7 @@
 // browser's storage, and its values follow /now, including "No estimate" where embedded solar has none.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { clean, fromQuery, toQuery, resize, DEFAULT } from '#lib/dashboard/layout.js';
+import { clean, fromQuery, toQuery, resize, plainPalette, DEFAULT } from '#lib/dashboard/layout.js';
 import { context, catalogue, resolve } from '#lib/dashboard/values.js';
 
 // an hour of 5-minute data; the North Island's embedded solar has no estimate in the newest interval when `gap`
@@ -26,12 +26,23 @@ const rows = [
 test('a layout from the address: counts capped, unknown backgrounds and bad specs dropped, an empty small list kept', () => {
   assert.equal(fromQuery(''), null);
   const l = fromQuery('?bg=nope&big=gen:NZ,ren:NZ,hydro:SI:cf&small=hvdc,<script>,wind:NI:pct');
-  assert.deepEqual(l, { bg: DEFAULT.bg, big: ['gen:NZ', 'ren:NZ'], small: ['hvdc', 'wind:NI:pct'] });
+  assert.deepEqual(l, { bg: DEFAULT.bg, col: DEFAULT.col, view: 'detailed', big: ['gen:NZ', 'ren:NZ'], small: ['hvdc', 'wind:NI:pct'] });
   assert.deepEqual(fromQuery('?bg=aurora&big=gen:NZ&small=').small, []);
   assert.deepEqual(clean({ big: [] }).big, ['gen:NZ']);
-  const back = fromQuery(toQuery({ bg: 'alps', big: ['p_benmore::cf'], small: [] }, { kiosk: '1' }));
-  assert.deepEqual(back, { bg: 'alps', big: ['p_benmore::cf'], small: [] });
+  const back = fromQuery(toQuery(clean({ bg: 'alps', big: ['p_benmore::cf'], small: [] }), { kiosk: '1' }));
+  assert.deepEqual(back, { bg: 'alps', col: DEFAULT.col, view: 'detailed', big: ['p_benmore::cf'], small: [] });
   assert.match(toQuery(DEFAULT), /big=gen:NZ,ren:NZ/);
+});
+
+test('a plain colour and the simple view survive the address; a bad colour falls back', () => {
+  const q = toQuery(clean({ bg: 'plain', col: '0B1A33', view: 'simple', big: ['gen:NZ'], small: [] }));
+  assert.match(q, /bg=plain&col=0b1a33&view=simple/);
+  assert.deepEqual(fromQuery(q), { bg: 'plain', col: '0b1a33', view: 'simple', big: ['gen:NZ'], small: [] });
+  assert.doesNotMatch(toQuery(clean({ bg: 'aurora', big: ['gen:NZ'] })), /col=|view=/);
+  assert.equal(fromQuery('?bg=plain&col=red&big=gen:NZ').col, DEFAULT.col);
+  // light ink on dark colours, dark ink on light ones
+  assert.equal(plainPalette('000000').ink, '#f4f7f6');
+  assert.equal(plainPalette('f2efe8').ink, '#132020');
 });
 
 test('growing a row adds values not already shown', () => {
@@ -54,6 +65,8 @@ test('values follow /now: generation, shares, HVDC, prices, plants and the possi
   assert.ok(v('setter:NI').est);
   assert.equal(v('p_benmore::cf').v, '66');
   assert.equal(v('bigwind').v, 'Turitea');
+  assert.equal(v('bigwind').label, 'Top wind farm');
+  assert.equal(v('bighydro').v, 'Benmore');
   assert.equal(v('tiwai').s, '38% of South Island demand');
   // a region a value doesn't have falls back to its first
   assert.equal(v('price:NZ').region, 'NI');

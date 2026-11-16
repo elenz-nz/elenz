@@ -261,6 +261,13 @@ export const SOURCES: Source[] = [
 		period: 'A single 2018 dataset.', fresh: 'Static dataset, not updated.', licence: CCBY,
 	},
 	{
+		id: 'linz-dem', name: 'Contour-interpolated elevation', publisher: 'Toitū Te Whenua Land Information New Zealand (LINZ)', dataset: 'New Zealand Contour-Interpolated 8m DEM', role: 'Mapping',
+		url: 'https://registry.opendata.aws/nz-elevation/',
+		what: 'Ground height across New Zealand on an 8 m grid, interpolated from the Topo50 map contours.',
+		use: 'Draws the contour lines around Ruapehu and the Cook Strait coastline in two of the dashboard’s backgrounds.',
+		period: 'A single national dataset.', fresh: 'Static dataset, not updated.', licence: CCBY,
+	},
+	{
 		id: 'guehmt', name: 'Installed distributed generation', publisher: EA, dataset: 'Report GUEHMT', role: 'Main data',
 		url: 'https://www.emi.ea.govt.nz/Retail/Reports/GUEHMT',
 		what: 'Installed distributed generation each month, from the registry, by grid exit point and fuel. Solar is also split into systems up to 10 kW and over 10 kW.',

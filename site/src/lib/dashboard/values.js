@@ -220,12 +220,22 @@ const BASE = [
   { k: 'fossil', g: 'By fuel', label: 'Fossil fuels', c: C.fossil, regions: ALL, ms: ['mw', 'pct'], get: sum(['gas', 'coal', 'diesel'], 'Gas, coal and diesel') },
   { k: 'allsolar', g: 'By fuel', label: 'All solar', c: C.solar, regions: ALL, ms: ['mw', 'pct'], est: true, get: sum(['solar', 'roof'], 'Grid solar and embedded solar', { needsRoof: true }) },
   // Fun facts
-  { k: 'biggest', g: 'Fun facts', label: 'Biggest plant right now', c: C.fun, txt: true, get: (x) => {
+  { k: 'biggest', g: 'Fun facts', label: 'Top plant right now', c: C.fun, txt: true, get: (x) => {
     const top = x.rows.filter((r) => !r.est).sort((a, b) => b.mw - a.mw)[0];
     return top ? { v: top.name, u: '', s: `${mw(top.mw)} MW of ${top.fuelName.toLowerCase()}` } : null;
   } },
-  { k: 'bigwind', g: 'Fun facts', label: 'Busiest wind farm', c: C.wind, txt: true, get: (x) => busiest(x, 'wind') },
-  { k: 'bigsolar', g: 'Fun facts', label: 'Busiest solar farm', c: C.solar, txt: true, get: (x) => busiest(x, 'solar') },
+  // the plant making the most of each kind right now (keys kept from the first version, so saved layouts still work)
+  { k: 'bighydro', g: 'Fun facts', label: 'Top hydro station', c: C.hydro, txt: true, get: (x) => top(x, ['hydro'], 'No hydro right now') },
+  { k: 'bigwind', g: 'Fun facts', label: 'Top wind farm', c: C.wind, txt: true, get: (x) => top(x, ['wind'], 'No wind right now') },
+  { k: 'biggeo', g: 'Fun facts', label: 'Top geothermal station', c: C.geo, txt: true, get: (x) => top(x, ['geo'], 'No geothermal right now') },
+  { k: 'bigsolar', g: 'Fun facts', label: 'Top solar farm', c: C.solar, txt: true, get: (x) => top(x, ['solar'], 'No grid solar right now') },
+  { k: 'bigthermal', g: 'Fun facts', label: 'Top gas or coal plant', c: C.gas, txt: true, get: (x) => top(x, ['gas', 'coal'], 'No gas or coal plant running') },
+  { k: 'bigbatt', g: 'Fun facts', label: 'Top battery', c: C.batt, txt: true, get: (x) => {
+    // the battery moving the most power, either way
+    const b = x.rows.filter((r) => r.fuel === 'batt' && !r.est).sort((p, q) => Math.abs(q.mw) - Math.abs(p.mw))[0];
+    if (!b || Math.abs(b.mw) < 0.5) return { v: 'None', u: '', s: 'No battery running right now' };
+    return { v: b.name, u: '', s: `${b.mw > 0 ? 'Discharging' : 'Charging'} ${mw(Math.abs(b.mw))} MW` };
+  } },
   { k: 'running', g: 'Fun facts', label: 'Grid plants running', c: C.fun, get: (x) => {
     const all = x.rows.filter((r) => !r.est);
     return { v: String(all.filter((r) => r.mw > 0.5).length), u: `of ${all.length}`, s: 'Making more than half a megawatt' };
@@ -235,10 +245,12 @@ const BASE = [
   { k: 'hydrovs', g: 'Fun facts', label: 'Hydro against usual', c: C.hydro, regions: ALL, get: vsUsual('hydro', 'Hydro') },
 ];
 
-function busiest(x, f) {
-  const top = x.rows.filter((r) => r.fuel === f && !r.est).sort((a, b) => b.mw - a.mw)[0];
-  if (!top || top.mw < 0.5) return { v: 'None', u: '', s: f === 'solar' ? 'No grid solar right now' : 'No wind right now' };
-  return { v: top.name.replace(/ (Wind|Solar) Farm$/, ''), u: '', s: `${mw(top.mw)} MW` + (top.pct != null ? `, ${pct0(top.pct)}% of capacity` : '') };
+/** The plant of these fuels making the most right now, by MW. */
+function top(x, fuels, none) {
+  const t = x.rows.filter((r) => fuels.includes(r.fuel) && !r.est).sort((a, b) => b.mw - a.mw)[0];
+  if (!t || t.mw < 0.5) return { v: 'None', u: '', s: none };
+  const of = fuels.length > 1 ? ` of ${t.fuelName.toLowerCase()}` : '';
+  return { v: t.name.replace(/ (Wind|Solar) Farm$/, ''), u: '', s: `${mw(t.mw)} MW${of}` + (t.pct != null ? `, ${pct0(t.pct)}% of capacity` : '') };
 }
 
 /** The whole catalogue for this data: the fixed values, then one per plant (largest installed first). */

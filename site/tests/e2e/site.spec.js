@@ -445,6 +445,16 @@ test.describe('dashboards', () => {
     await expect(page.locator('.stage .tile.small').nth(1)).toContainText('Price at Ōtāhuhu');
   });
 
+  test('a long value shrinks to fit its card, and Simple hides the line under it', async ({ page }) => {
+    await page.goto('/dashboard?bg=plain&col=0b1a33&view=simple&big=gen:NZ,price:NI&small=price:SI,co2rate:NZ,bigbatt,biggest&kiosk=1');
+    await expect(page.locator('.stage .tile.big .num').first()).not.toHaveText('–');
+    await expect(page.locator('.stage .sub')).toHaveCount(0);
+    await expect(page.locator('.stage .live')).toHaveText(/^(Live|Delayed)$/);
+    // every value and its unit fit inside their card
+    await expect.poll(() => page.evaluate(() => [...document.querySelectorAll('.stage .row')]
+      .filter((r) => { const n = r.querySelector('.num'); return n.scrollWidth > n.clientWidth + 1; }).length)).toBe(0);
+  });
+
   test('the wall-screen link shows the screen alone', async ({ page }) => {
     await page.goto('/dashboard?bg=mix&big=gen:NZ,ren:NZ&small=&kiosk=1');
     await expect(page.locator('.stage .tile.big')).toHaveCount(2);

@@ -1,27 +1,32 @@
 <script lang="ts">
 	// The big-number dashboard's screen (/dashboard): a background with one or two large values and up to four small
-	// ones over it. Sized by its own width (container query units), so the same layout fills a phone, a laptop or a
-	// wall screen. Horizon draws the last 24 hours of New Zealand's generation; Live mix is the generation mix right now;
-	// the other backgrounds are drawn scenes (backgrounds.js, loaded only when picked).
-	import { BACKGROUNDS } from './layout.js';
+	// ones over it. Sized by its own width (--u, a hundredth of it), so the same layout fills a phone, a laptop or a
+	// wall screen. Cards keep their size when fewer are chosen (two large columns, four small), and a value too long
+	// for its card shrinks until it fits (fit, below). Horizon draws the last 24 hours of New Zealand's generation,
+	// Live mix the mix right now, Plain colour a flat colour; the other backgrounds are drawn scenes (backgrounds.js,
+	// loaded only when picked). Simple hides the line under each value.
+	import { BACKGROUNDS, plainPalette } from './layout.js';
 	import { FUEL_COLOUR } from './values.js';
 
 	type Tile = { label: string; region: string | null; v: string; u: string; s: string; c: string; est: boolean; none: boolean; txt: boolean };
-	let { bg, big, small, live, fresh = true, line, mix, hvdc = 0, windLoad = 0.3 }: {
-		bg: string; big: Tile[]; small: Tile[]; live: string; fresh?: boolean;
+	let { bg, col = '0e2a2c', simple = false, big, small, live, fresh = true, line, mix, hvdc = 0, windLoad = 0.3 }: {
+		bg: string; col?: string; simple?: boolean; big: Tile[]; small: Tile[]; live: string; fresh?: boolean;
 		line: number[];                       // the last 24 hours of generation, oldest first
 		mix: { k: string; mw: number }[];     // the mix right now, largest first
 		hvdc?: number;                        // HVDC transfer, MW, northward positive (Cook Strait's cable)
 		windLoad?: number;                    // wind output ÷ installed, 0 to 1 (Aurora's turbines)
 	} = $props();
 
-	const pal = $derived(BACKGROUNDS.find((b) => b.k === bg) ?? BACKGROUNDS[0]);
+	const info = $derived(BACKGROUNDS.find((b) => b.k === bg) ?? BACKGROUNDS[0]);
+	const pal = $derived(bg === 'plain' ? plainPalette(col) : info);
+	// sizes are in hundredths of the screen's width (--u), measured here: container query units need Safari 16
+	let w = $state(0);
 	const RN: Record<string, string> = { NZ: 'New Zealand', NI: 'North Island', SI: 'South Island' };
 
 	// drawn scenes: loaded on first use
 	let svg = $state<Record<string, string> | null>(null);
 	$effect(() => {
-		if (!svg && !['horizon', 'light', 'mix'].includes(bg)) import('./backgrounds.js').then((m) => (svg = m.SVG));
+		if (!svg && !['horizon', 'light', 'mix', 'plain'].includes(bg)) import('./backgrounds.js').then((m) => (svg = m.SVG));
 	});
 
 	// Horizon: the line of the last 24 hours, its newest point pulsing at the right edge
@@ -40,10 +45,33 @@
 	});
 	const flow = $derived(Math.abs(hvdc) < 5 ? 'none' : hvdc > 0 ? 'north' : 'south');
 	const spin = $derived(windLoad < 0.03 ? 0 : 9 - 7 * Math.min(1, windLoad));   // seconds a turn
+
+	// A value and its unit too wide for their card: --fit scales both down until they fit (not below 35%).
+	// Measured again when the value changes and when the card is resized.
+	function fit(node: HTMLElement, _key: string) {
+		let raf = 0;
+		const run = () => {
+			node.style.setProperty('--fit', '1');
+			const num = node.querySelector<HTMLElement>('.num');
+			if (!num) return;
+			const unit = node.querySelector<HTMLElement>('.unit');
+			const gap = parseFloat(getComputedStyle(node).columnGap) || 0;
+			const need = num.scrollWidth + (unit ? unit.scrollWidth + gap : 0);
+			const have = node.clientWidth;
+			if (have > 0 && need > have) node.style.setProperty('--fit', String(Math.max(0.35, (have / need) * 0.97)));
+		};
+		const later = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(run); };
+		const ro = new ResizeObserver(later);
+		ro.observe(node);
+		document.fonts?.ready.then(later);
+		run();
+		return { update: later, destroy() { ro.disconnect(); cancelAnimationFrame(raf); } };
+	}
 </script>
 
-<div class="stage" style="--ink:{pal.ink};--sub:{pal.sub};--tile:{pal.tile};--edge:{pal.edge};--spin:{spin || 1}s"
-	data-hvdc={flow} class:still={!spin}>
+<div class="stage" bind:clientWidth={w} class:narrow={w > 0 && w <= 640}
+	style="--u:{(w || 1280) / 100}px;--ink:{pal.ink};--sub:{pal.sub};--tile:{pal.tile};--edge:{pal.edge};--spin:{spin || 1}s"
+	data-hvdc={flow} class:still={!spin} class:simple>
 	<div class="bg" aria-hidden="true">
 		{#if bg === 'horizon' || bg === 'light'}
 			{@const dark = bg === 'horizon'}
@@ -69,6 +97,8 @@
 				<rect width="1600" height="900" fill="#071012" fill-opacity=".62" />
 				{#each { length: 14 } as _, i}<path d="M0 {(i + 1) * 60} H1600" stroke="#ffffff" stroke-opacity=".05" stroke-width="1" />{/each}
 			</svg>
+		{:else if bg === 'plain'}
+			<div class="plain" style="background:#{col}"></div>
 		{:else if svg?.[bg]}
 			{@html svg[bg]}
 		{/if}
@@ -82,8 +112,8 @@
 			{#each big as t}
 				<div class="tile big" class:txt={t.txt}>
 					<div class="lab"><i style="background:{t.c}"></i><span>{t.label}{#if t.region}<em>{' · '}{RN[t.region]}</em>{/if}{#if t.est && !t.none}<span class="etag">est.</span>{/if}</span></div>
-					<div class="row" class:none={t.none}><span class="num">{t.v}</span>{#if t.u}<span class="unit">{t.u}</span>{/if}</div>
-					<div class="sub">{t.s}</div>
+					<div class="row" class:none={t.none} use:fit={t.v + t.u}><span class="num">{t.v}</span>{#if t.u}<span class="unit">{t.u}</span>{/if}</div>
+					{#if !simple}<div class="sub">{t.s}</div>{/if}
 				</div>
 			{/each}
 		</div>
@@ -92,76 +122,70 @@
 				{#each small as t}
 					<div class="tile small" class:txt={t.txt}>
 						<div class="lab"><i style="background:{t.c}"></i><span>{t.label}{#if t.region}<em>{' · '}{t.region}</em>{/if}{#if t.est && !t.none}<span class="etag">est.</span>{/if}</span></div>
-						<div class="row" class:none={t.none}><span class="num">{t.v}</span>{#if t.u}<span class="unit">{t.u}</span>{/if}</div>
-						<div class="sub">{t.s}</div>
+						<div class="row" class:none={t.none} use:fit={t.v + t.u}><span class="num">{t.v}</span>{#if t.u}<span class="unit">{t.u}</span>{/if}</div>
+						{#if !simple}<div class="sub">{t.s}</div>{/if}
 					</div>
 				{/each}
 			</div>
 		{/if}
-		<div class="foot">Elenz (elenz.co.nz), from Electricity Authority data</div>
+		<div class="foot">Elenz (elenz.co.nz), from Electricity Authority data{#if 'credit' in info && bg !== 'plain'}{' · '}{info.credit}{/if}</div>
 	</div>
 </div>
 
 <style>
 	.stage { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 14px; background: #131c1c; color: var(--ink);
-		font-family: var(--font-ui); container-type: inline-size; }
-	.bg, .bg :global(svg) { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-	.fg { position: absolute; inset: 0; display: grid; grid-template-rows: auto 1fr auto auto; gap: 2.2cqw; padding: 2.8cqw 3.4cqw 2cqw; }
-	.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 1cqw 2cqw; }
-	.top b { font-weight: 800; font-size: 2.3cqw; letter-spacing: -0.02em; }
-	.live { display: inline-flex; align-items: center; gap: 0.7cqw; font: 500 1.35cqw var(--font-data); color: var(--sub); font-variant-numeric: tabular-nums; }
-	.live i { width: 0.8cqw; height: 0.8cqw; border-radius: 50%; background: #3fd18b; box-shadow: 0 0 0 0.35cqw rgba(63, 209, 139, 0.18); }
-	.live.late i { background: #e0b44c; box-shadow: 0 0 0 0.35cqw rgba(224, 180, 76, 0.18); }
-	.bigrow { align-self: end; display: grid; gap: 2cqw; grid-template-columns: repeat(var(--n, 1), minmax(0, 1fr)); }
-	.nb2 .bigrow { --n: 2; }
-	.smallrow { display: grid; gap: 1.4cqw; grid-template-columns: repeat(var(--m, 1), minmax(0, 1fr)); }
-	.ns2 .smallrow { --m: 2; } .ns3 .smallrow { --m: 3; } .ns4 .smallrow { --m: 4; }
-	.tile { min-width: 0; background: var(--tile); border: 1px solid var(--edge); border-radius: 1.4cqw; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
-	.tile.big { padding: 1.8cqw 2.2cqw 2cqw; }
-	.tile.small { padding: 1.2cqw 1.5cqw 1.3cqw; }
-	.lab { display: flex; align-items: center; gap: 0.8cqw; color: var(--sub); font-weight: 600; min-width: 0; }
+		font-family: var(--font-ui); }
+	.bg, .bg :global(svg), .plain { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+	/* wide screens: the cards sit at the foot of the screen, with room around them; two large columns and four small
+	   ones whether or not each is filled, so fewer cards stay the same size */
+	.fg { position: absolute; inset: 0; display: flex; flex-direction: column; gap: calc(1.5 * var(--u)); padding: calc(4.2 * var(--u)) calc(5.6 * var(--u)) calc(2.4 * var(--u)); }
+	.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: calc(1 * var(--u)) calc(2 * var(--u)); }
+	.top b { font-weight: 800; font-size: calc(2 * var(--u)); letter-spacing: -0.02em; }
+	.live { display: inline-flex; align-items: center; gap: calc(0.7 * var(--u)); font: 500 calc(1.15 * var(--u)) var(--font-data); color: var(--sub); font-variant-numeric: tabular-nums; }
+	.live i { width: calc(0.7 * var(--u)); height: calc(0.7 * var(--u)); border-radius: 50%; background: #3fd18b; box-shadow: 0 0 0 calc(0.3 * var(--u)) rgba(63, 209, 139, 0.18); }
+	.live.late i { background: #e0b44c; box-shadow: 0 0 0 calc(0.3 * var(--u)) rgba(224, 180, 76, 0.18); }
+	.bigrow { margin-top: auto; display: grid; gap: calc(1.6 * var(--u)); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.smallrow { display: grid; gap: calc(1.2 * var(--u)); grid-template-columns: repeat(4, minmax(0, 1fr)); }
+	.foot { margin-top: calc(0.6 * var(--u)); font-size: calc(0.9 * var(--u)); color: var(--sub); opacity: 0.85; }
+
+	.tile { min-width: 0; background: var(--tile); border: 1px solid var(--edge); border-radius: calc(1.2 * var(--u)); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+	.tile.big { padding: calc(1.5 * var(--u)) calc(1.9 * var(--u)) calc(1.6 * var(--u)); --nf: calc(7.2 * var(--u)); --uf: calc(1.9 * var(--u)); }
+	.tile.small { padding: calc(1 * var(--u)) calc(1.3 * var(--u)) calc(1.1 * var(--u)); --nf: calc(2.9 * var(--u)); --uf: calc(1 * var(--u)); }
+	.tile.big.txt { --nf: calc(4.6 * var(--u)); } .tile.small.txt { --nf: calc(2 * var(--u)); }
+	.tile.big .row.none { --nf: calc(3.2 * var(--u)); } .tile.small .row.none { --nf: calc(1.7 * var(--u)); }
+	.lab { display: flex; align-items: center; gap: calc(0.7 * var(--u)); color: var(--sub); font-weight: 600; min-width: 0; }
 	.lab > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 	.lab i { flex: none; border-radius: 50%; }
 	.lab em { font-style: normal; font-weight: 500; }
 	.etag { margin-left: 0.6em; font: 500 0.8em var(--font-data); padding: 0 0.4em; border: 1px solid var(--edge); border-radius: 0.3em; }
-	.big .lab { font-size: 1.55cqw; } .big .lab i { width: 1.1cqw; height: 1.1cqw; }
-	.small .lab { font-size: 1.1cqw; } .small .lab i { width: 0.8cqw; height: 0.8cqw; }
-	.row { display: flex; align-items: baseline; gap: 0.8cqw; min-width: 0; }
-	.num { font-weight: 600; letter-spacing: -0.03em; line-height: 1.02; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-	.unit { color: var(--sub); font-weight: 500; white-space: nowrap; }
-	.big .num { font-size: 9.5cqw; } .big .unit { font-size: 2.4cqw; }
-	.nb1 .big .num { font-size: 12.5cqw; } .nb1 .big .unit { font-size: 3cqw; }
-	.small .num { font-size: 3.9cqw; } .small .unit { font-size: 1.3cqw; }
-	.ns4 .small .num { font-size: 3.4cqw; }
-	/* names rather than numbers (a plant, the possible price setter) are long: a smaller size, in the text face */
+	.big .lab { font-size: calc(1.3 * var(--u)); } .big .lab i { width: calc(0.95 * var(--u)); height: calc(0.95 * var(--u)); }
+	.small .lab { font-size: calc(0.95 * var(--u)); } .small .lab i { width: calc(0.7 * var(--u)); height: calc(0.7 * var(--u)); }
+	.row { display: flex; align-items: baseline; gap: calc(0.7 * var(--u)); min-width: 0; --fit: 1; }
+	.num { font-size: calc(var(--nf) * var(--fit)); font-weight: 600; letter-spacing: -0.03em; line-height: 1.04; font-variant-numeric: tabular-nums;
+		white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+	.unit { font-size: calc(var(--uf) * max(var(--fit), 0.7)); color: var(--sub); font-weight: 500; white-space: nowrap; }
+	/* names rather than numbers (a plant, the possible price setter): the text face */
 	.txt .num, .row.none .num { font-family: var(--font-ui); letter-spacing: -0.02em; }
-	.big.txt .num { font-size: 6.4cqw; } .nb2 .big.txt .num { font-size: 5cqw; }
-	.small.txt .num { font-size: 2.5cqw; }
-	.row.none .num { font-size: 4cqw; color: var(--sub); }
-	.small .row.none .num { font-size: 2.2cqw; }
+	.row.none .num { color: var(--sub); }
 	.sub { color: var(--sub); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-	.big .sub { font-size: 1.5cqw; margin-top: 0.4cqw; } .small .sub { font-size: 1.05cqw; margin-top: 0.2cqw; }
-	.foot { font-size: 1cqw; color: var(--sub); opacity: 0.85; }
+	.big .sub { font-size: calc(1.2 * var(--u)); margin-top: calc(0.3 * var(--u)); } .small .sub { font-size: calc(0.9 * var(--u)); margin-top: calc(0.15 * var(--u)); }
 
-	/* phones, upright: the tiles stack and everything is sized up; the screen is as tall as its tiles need */
-	@media (max-width: 640px) { .stage { aspect-ratio: auto; min-height: 70vh; } }
-	@container (max-width: 640px) {
-		.fg { position: relative; grid-template-rows: auto auto auto auto; gap: 4cqw; padding: 5cqw 5cqw 4cqw; min-height: 100%; }
-		.top b { font-size: 6cqw; } .live { font-size: 3cqw; gap: 2cqw; } .live i { width: 2cqw; height: 2cqw; }
-		.bigrow, .nb2 .bigrow { grid-template-columns: minmax(0, 1fr); gap: 3cqw; margin-top: 10cqw; }
-		.smallrow, .ns3 .smallrow, .ns4 .smallrow { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3cqw; }
-		.ns1 .smallrow { grid-template-columns: minmax(0, 1fr); }
-		.tile { border-radius: 4cqw; } .tile.big { padding: 4.5cqw 5cqw; } .tile.small { padding: 3.5cqw 4cqw; }
-		.big .lab { font-size: 3.8cqw; gap: 2cqw; } .big .lab i { width: 2.6cqw; height: 2.6cqw; }
-		.small .lab { font-size: 3cqw; gap: 1.6cqw; } .small .lab i { width: 2cqw; height: 2cqw; }
-		.big .num, .nb1 .big .num { font-size: 19cqw; } .big .unit, .nb1 .big .unit { font-size: 5cqw; }
-		.nb2 .big .num { font-size: 15cqw; }
-		.small .num, .ns4 .small .num { font-size: 9cqw; } .small .unit { font-size: 3.2cqw; }
-		.big.txt .num, .nb2 .big.txt .num { font-size: 10cqw; } .small.txt .num { font-size: 5.5cqw; }
-		.row.none .num { font-size: 8cqw; } .small .row.none .num { font-size: 5cqw; }
-		.big .sub { font-size: 3.4cqw; } .small .sub { font-size: 2.8cqw; white-space: normal; }
-		.foot { font-size: 2.6cqw; }
-	}
+	/* phones, upright (a screen 640 px wide or less): the cards stack under the top line and the credit keeps to the
+	   foot of the screen */
+	.stage.narrow { aspect-ratio: auto; min-height: 70vh; display: flex; }
+	.narrow .fg { position: relative; flex: 1; gap: calc(3 * var(--u)); padding: calc(5 * var(--u)) calc(5 * var(--u)) calc(4 * var(--u)); }
+	.narrow .top b { font-size: calc(6 * var(--u)); }.narrow .live { font-size: calc(3 * var(--u)); gap: calc(2 * var(--u)); }.narrow .live i { width: calc(2 * var(--u)); height: calc(2 * var(--u)); }
+	.narrow .bigrow { margin-top: calc(8 * var(--u)); grid-template-columns: minmax(0, 1fr); gap: calc(3 * var(--u)); }
+	.narrow .smallrow { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: calc(3 * var(--u)); }
+	.narrow .foot { margin-top: auto; padding-top: calc(3 * var(--u)); font-size: calc(2.6 * var(--u)); }
+	.narrow .tile { border-radius: calc(4 * var(--u)); }
+	.narrow .tile.big { padding: calc(4.5 * var(--u)) calc(5 * var(--u)); --nf: calc(16 * var(--u)); --uf: calc(4.6 * var(--u)); }.narrow .tile.big.txt { --nf: calc(9 * var(--u)); }.narrow .tile.big .row.none { --nf: calc(7 * var(--u)); }
+	.narrow .tile.small { padding: calc(3.5 * var(--u)) calc(4 * var(--u)); --nf: calc(8 * var(--u)); --uf: calc(3 * var(--u)); }.narrow .tile.small.txt { --nf: calc(5 * var(--u)); }.narrow .tile.small .row.none { --nf: calc(4.5 * var(--u)); }
+	.narrow .big .lab { font-size: calc(3.8 * var(--u)); gap: calc(2 * var(--u)); }.narrow .big .lab i { width: calc(2.6 * var(--u)); height: calc(2.6 * var(--u)); }
+	.narrow .small .lab { font-size: calc(3 * var(--u)); gap: calc(1.6 * var(--u)); }.narrow .small .lab i { width: calc(2 * var(--u)); height: calc(2 * var(--u)); }
+	.narrow .row { gap: calc(1.6 * var(--u)); }
+	.narrow .big .sub { font-size: calc(3.4 * var(--u)); }.narrow .small .sub { font-size: calc(2.8 * var(--u)); white-space: normal; }
 
 	/* the drawn scenes' motion; still for viewers who ask for less */
 	.stage :global(.tw) { animation: dash-tw 3.2s ease-in-out infinite alternate; }

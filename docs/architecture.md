@@ -41,15 +41,26 @@ poll it as `/now` does (`#lib/site/poll.js`).
 values and up to four small ones over a background, for a wall screen, a spare tablet or a phone. Every value is in
 `values.js` (keys, groups for the picker's tabs, the regions and measures each can show, and how it is worked out, from
 `summarise()` in `#lib/home/now.js`, the generator rows of `#lib/now/generators.js` and tracker.json's `explain` block);
-plants are added from the generator rows, largest first. A value needing embedded solar says "No estimate" when there is
-none. Layouts (`layout.js`) are written `key:region:measure` (`hydro:SI:cf`, `hvdc`, `p_benmore::cf`) in the address
-(`?bg=…&big=…&small=…`, so a link opens that layout) and kept in localStorage `elenz-dashboard` (on `/privacy`); an address
-with a layout wins. `kiosk=1` shows the screen alone (the "wall-screen link"). `Stage.svelte` draws the screen, sized by
-container query units; on phones (≤ 640 px) the tiles stack. Backgrounds: Horizon and Horizon light draw the last 24 hours
-of generation, Live mix the mix now; the drawn scenes are SVG in `backgrounds.js`, loaded only when picked; Cook Strait's
-cable runs the way the HVDC is flowing and Aurora's turbines turn with the wind; all still under reduced motion. Full
-screen uses the browser's full screen where it can, the page's own otherwise. Design from the big-number mockup (15 Nov
-2026). Tests: `tests/dashboard.test.js`, and the dashboards block in `tests/e2e/site.spec.js`.
+plants are added from the generator rows, largest first, and the fun facts name the top plant of each kind by MW. A value
+needing embedded solar says "No estimate" when there is none. Layouts (`layout.js`) are written `key:region:measure`
+(`hydro:SI:cf`, `hvdc`, `p_benmore::cf`) in the address (`?bg=…&big=…&small=…`, plus `col=` for a plain colour and
+`view=simple`, so a link opens that layout) and kept in localStorage `elenz-dashboard` (on `/privacy`); an address with a
+layout wins. `kiosk=1` shows the screen alone (the "wall-screen link"). Simple shows the numbers and Live or Delayed;
+Detailed (the default) adds the time and the line under each value.
+`Stage.svelte` draws the screen. Its sizes are hundredths of its own measured width (`--u`), not container query units,
+which need Safari 16. On wide screens the cards sit at the foot with a margin round them, in two large columns and four
+small ones whether or not each is filled, so fewer cards keep their size (test report, 16 Nov 2026: on a PC and a TV
+they had stretched across the screen). A value and unit too wide for their card shrink to fit (`fit`, down to 35%).
+Screens 640 px wide or less stack the cards, with the credit at the foot of the screen. Full screen uses the browser's
+full screen where it can, the page's own otherwise, with an X that fades after 3 seconds without the mouse or a touch.
+Backgrounds: Horizon and Horizon light draw the last 24 hours of generation, Live mix the mix now, Plain colour a flat
+colour (eight ready-made or any picked; the ink turns dark on light colours, `plainPalette()`); the drawn scenes are SVG
+in `backgrounds.js`, loaded only when picked. Contours (Ruapehu, Tongariro and Ngauruhoe), Cook Strait's coastline,
+Lines at sunset (a 220 kV double-circuit lattice line) and the Alps' snow are made by `analysis/dashboard_backgrounds.py`
+from LINZ's 8 m contour-interpolated DEM (CC BY 4.0; credited on the screen and on /methods/sources): rerun it rather
+than editing the SVG. Cook Strait's cable runs the way the HVDC is flowing and Aurora's turbines turn with the wind; all
+still under reduced motion. Design from the big-number mockup (15 Nov 2026). Tests: `tests/dashboard.test.js`, and the
+dashboards block in `tests/e2e/site.spec.js`.
 
 `/landscape`, the power landscape, a kids' dashboard (`src/routes/landscape/+page.svelte`, `src/lib/landscape/`): an
 animated storybook New Zealand on a canvas, ported from the prototype (13 Nov 2026) with its drawing unchanged. `feed.js`
