@@ -6,7 +6,7 @@
 	// with its own link-preview image (static/og/landscape.png, analysis/dashboard_og_png.py); sends a heartbeat while
 	// open (#lib/site/heartbeat.js). The view (mode, what shows, replay speed) is in the address and kept in this browser
 	// (prefs.js); `kiosk=1` shows the picture alone for a wall screen, replaying again if it's a replay.
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import '@fontsource/fredoka/500.css';
 	import '@fontsource/fredoka/600.css';
 	import '#lib/landscape/landscape.css';
@@ -43,9 +43,21 @@
 	// a changed view is kept in this browser and in the address (not in history: Back still leaves the page)
 	function keep(p: ReturnType<typeof clean>) {
 		if (p.mode !== prefs.mode) track('landscape-mode', { mode: p.mode });
+		const toPlay = p.mode === 'play' && prefs.mode !== 'play';
 		prefs = p;
+		if (toPlay) tick().then(showDials);
 		savePrefs(p);
 		try { history.replaceState(history.state, '', location.pathname + toQuery(p, { kiosk: kiosk ? '1' : '' })); } catch { /* the view still works */ }
+	}
+	// Play with dials: the sliders sit just under the picture, which shrinks so both fit on the screen (landscape.css,
+	// .ls.play). Choosing it scrolls the page there, unless they're already in view (test report, 17 Nov 2026).
+	function showDials() {
+		const scene = root?.querySelector('.scene'), dials = root?.querySelector('.dials');
+		if (!scene || !dials) return;
+		const top = scene.getBoundingClientRect().top, bottom = dials.getBoundingClientRect().bottom;
+		if (top >= 0 && bottom <= innerHeight) return;
+		const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+		scrollTo({ top: scrollY + top - 12, behavior: calm ? 'auto' : 'smooth' });
 	}
 	async function copy(which: 'view' | 'kiosk') {
 		const url = location.origin + location.pathname + toQuery(prefs, { kiosk: which === 'kiosk' ? '1' : '' });
@@ -100,7 +112,7 @@
 
 <div class="wrap" class:kiosk>
 	{#if !kiosk}<Masthead />{/if}
-	<main class="ls" class:kiosk bind:this={root}>
+	<main class="ls" class:kiosk class:play={prefs.mode === 'play'} bind:this={root}>
 		<div class="ls-head">
 			<div>
 				<h1>Power landscape</h1>
@@ -198,11 +210,11 @@
 		</section>
 
 		<section class="dials js-only" aria-labelledby="dials-h">
-			<h2 id="dials-h">The dials behind the scene</h2>
+			<h2 id="dials-h">{prefs.mode === 'play' ? 'Your dials' : 'The dials behind the scene'}</h2>
 			<p class="lede" id="dials-lede">Each part of the picture follows one dial, somewhere between its minimum and maximum, worked out from the live feed.</p>
 			<div class="dtable" id="dtable"></div>
 		</section>
 
-		<p class="ls-foot">Elenz (elenz.co.nz), from Electricity Authority data. Embedded solar and cloud cover are calculated estimates; the lake level and snow follow the season, not measurements.{#if !ready && !error} Loading the latest data…{/if}</p>
+		<p class="ls-foot">Elenz (elenz.co.nz), from Electricity Authority data. Embedded solar and cloud cover are calculated estimates; the lake level and snow follow the season, not measurements. What each dial changes in the picture is in <a href="/guide#landscape-dials">Using Elenz</a>.{#if !ready && !error} Loading the latest data…{/if}</p>
 	</main>
 </div>
