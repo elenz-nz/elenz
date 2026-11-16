@@ -3,7 +3,9 @@
 	let { label = 'Support Elenz' }: { label?: string } = $props();
 </script>
 
-<a class="coffee" href="https://buymeacoffee.com/elenz" target="_blank" rel="noopener">
+<!-- data-umami-event: Umami counts the click (#lib/site/track.js lists the events); it opens in a new tab, so Umami
+     doesn't hold up the link -->
+<a class="coffee" href="https://buymeacoffee.com/elenz" target="_blank" rel="noopener" data-umami-event="support-click">
 	{label}<span class="sr">(opens in a new tab)</span>
 </a>
 

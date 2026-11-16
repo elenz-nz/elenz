@@ -422,6 +422,23 @@ test.describe('with JavaScript off', () => {
   }
 });
 
+// opting out of the counts (src/app.html, /privacy#opt-out), 16 Nov 2026
+test('?exclude-me saves the opt-out, leaves the address and says so; ?include-me undoes it', async ({ page }) => {
+  await page.goto('/now?exclude-me');
+  await expect(page.locator('#optout-note')).toContainText('left out');
+  await expect(page).toHaveURL(/\/now$/);
+  expect(await page.evaluate(() => localStorage.getItem('umami.disabled'))).toBe('1');
+  await page.goto('/about?include-me');
+  await expect(page.locator('#optout-note')).toContainText('counted');
+  await expect(page).toHaveURL(/\/about$/);
+  expect(await page.evaluate(() => localStorage.getItem('umami.disabled'))).toBeNull();
+  // the links on /privacy load the page afresh, so the opt-out runs (a link inside the site wouldn't otherwise)
+  await page.goto('/privacy');
+  await page.locator('#opt-out').getByRole('link', { name: 'elenz.co.nz/?exclude-me' }).click();
+  await expect(page.locator('#optout-note')).toContainText('left out');
+  expect(await page.evaluate(() => localStorage.getItem('umami.disabled'))).toBe('1');
+});
+
 // the dashboards: the big-number dashboard and the power landscape, linked from Now since 16 Nov 2026
 test.describe('dashboards', () => {
   test("Now's line under its heading opens each dashboard, and neither sends a heartbeat off elenz.co.nz", async ({ page }) => {

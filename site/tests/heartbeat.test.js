@@ -39,6 +39,15 @@ test('only visits to elenz.co.nz without Do Not Track are counted', () => {
   assert.equal(counting({ hostname: 'localhost' }, {}, {}), false);
 });
 
+test('a browser that has opted out (umami.disabled, as Umami reads it) sends no beats', () => {
+  const site = { hostname: 'elenz.co.nz' };
+  const stored = (v) => ({ localStorage: { getItem: (k) => (k === 'umami.disabled' ? v : null) } });
+  assert.equal(counting(site, {}, stored('1')), false);
+  assert.equal(counting(site, {}, stored('true')), false);
+  assert.equal(counting(site, {}, stored(null)), true);
+  assert.equal(counting(site, {}, { localStorage: { getItem: () => { throw new Error('blocked'); } } }), true);
+});
+
 test('a throttled event goes at once, then the last of a burst at the end of the wait', async () => {
   const sent = [];
   const ev = throttled(40, (n, d) => sent.push(d.i));
