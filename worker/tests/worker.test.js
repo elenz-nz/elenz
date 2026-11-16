@@ -414,11 +414,13 @@ test('/data/screens with its key asks the SQL API and draws the screens open', a
   assert.ok(!page.includes('tok-abc'), 'the token never reaches the page');
   assert.match(page, /Mon 16 Nov, 20:00/);
   // that hour: the dashboard open 1, on screen 1, from a wall-screen link 1; Now open 1, on screen 0, wall 0
-  assert.match(page, /<td>1 · 1 · 1<\/td>/);
-  assert.match(page, /<td>1 · <span class="zero">0<\/span> · <span class="zero">0<\/span><\/td>/);
+  assert.match(page, /<td class="gstart">1<\/td><td>1<\/td><td>1<\/td>/);
+  assert.match(page, /<td class="gstart">1<\/td><td><span class="zero">0<\/span><\/td><td><span class="zero">0<\/span><\/td>/);
+  assert.equal((page.match(/<svg /g) ?? []).length, 2, 'two charts: by time of day and over time');
+  assert.match(page, /<title>20:00–21:00 NZ time\nNow: /);   // each bar carries its own hover note
   assert.match(page, /58 min/);              // the dashboard screen's time open
   assert.match(page, /NZ 1/);
-  assert.match(page, /aria-current="page">Last 30 days/);
+  assert.match(page, /aria-current="page" title="Last 30 days">30 days</);
 });
 
 test('/data/screens says what is missing or wrong, in words', async () => {
