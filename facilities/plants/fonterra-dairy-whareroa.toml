@@ -1,0 +1,65 @@
+# Plant page facts for Fonterra Dairy - Whareroa. How to check a plant: facilities/PLANTS.md.
+
+slug = "fonterra-dairy-whareroa"
+plant = "Fonterra Dairy - Whareroa"
+name = "Fonterra Dairy - Whareroa"
+register = ["T009"]
+reviewed = ""
+to_check = [
+  "Location is the grid connection, not the station.",
+  "Capacity: Verify units, fuel and export capability.",
+  "Location: only the grid connection so far; find the station itself.",
+]
+notes = ["68 MW; Generation_MD is net of ~50% local load."]
+
+[grid_connection]
+value = [-39.5665, 174.31012]
+code = "HWA1101 HAWERA; HWA1102 HAWERA"
+source = "ea-nsp"
+grade = "A"
+checked = ""
+
+[facts.commissioned]
+value = "1996"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[[facts.commissioned.alt]]
+value = "1966"
+source = "ea-register"
+grade = "A"
+checked = ""
+note = "the register's start date, 1966-01-01: often a year, not the day"
+
+[facts.scheme]
+value = "Whareroa dairy factory"
+source = "elenz-register"
+grade = "C"
+checked = ""
+
+[facts.region]
+value = "Taranaki"
+source = "elenz-register"
+grade = "C"
+checked = ""
+
+[facts.territorial_authority]
+value = "South Taranaki"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[facts.owner]
+value = "Nova"
+source = "ea-register"
+grade = "B"
+checked = ""
+note = "the register's operator, as Elenz groups owners; check the owner"
+
+[facts.about]
+value = ""
+source = "elenz-register"
+grade = "C"
+checked = ""
+note = "To write: 2-4 plain sentences in our own words, from cited sources."

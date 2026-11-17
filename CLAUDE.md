@@ -89,7 +89,8 @@ docs, not here: keep this file short.
   `records.py`, `offered.py`, `embedded.py`, `rooftop.py`, `hvdc.py`, `explain.py`, `tod.py`, `capacity.py`,
   `plant_meta.py`. Tests in `ingest/tests/`.
 - `facilities/`: curated tables (`overrides.toml`, `metered_plants.csv`, `embedded_points.csv`, `plant_capacity.csv`,
-  `dispatch_adjust.json`, the plant register).
+  `dispatch_adjust.json`, the plant register) and the plant pages' facts (`plants/<slug>.toml`; `PLANTS.md` says how to
+  check a plant).
 - `analysis/`: development scripts. `.github/workflows/`: checks, update-data, history, offers, watchdog. `data/`: raw
   downloads, git-ignored.
 
@@ -115,7 +116,8 @@ Each is explained in `docs/architecture.md`.
   `npx playwright test --project=chromium --project=phone-chrome` after a build (only Chromium is installed there).
 - `ingest/requirements.txt` is locked to exact versions and hashes; refresh it from `ingest/requirements.in` (the
   command is at its top). Nothing else may be installed on the same `pip install -r` line.
-- After editing `facilities/plant_capacity.csv`, run `python3 ingest/capacity.py` and commit both. After refreshing the
+- After editing `facilities/plant_capacity.csv`, run `python3 ingest/capacity.py` and commit both. After editing a plant file or its
+  sources, run `python3 ingest/plant_files.py --check`; a new tracker plant needs a plant file too. After refreshing the
   register or editing the site-only tables, rerun `ingest/plant_meta.py` and commit the JSON.
 - History rebuilds: bump `BUILD` in `ingest/history.py` after changing how months are built. A change to any
   fingerprinted file (listed in `facilities/NEXT_REBUILD.md`) rebuilds every month, so collect them on the

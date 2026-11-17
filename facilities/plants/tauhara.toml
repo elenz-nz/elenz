@@ -1,0 +1,70 @@
+# Plant page facts for Tauhara. How to check a plant: facilities/PLANTS.md.
+
+slug = "tauhara"
+plant = "Tauhara"
+name = "Tauhara"
+register = ["G007"]
+wikidata = "Q7688687"
+osm = ["way/965573000"]
+reviewed = ""
+to_check = ["Capacity: Verify capacity stages and net/gross basis."]
+notes = ["174 MW from Oct 2023."]
+
+[location]
+value = [-38.6681, 176.151]
+basis = "station"
+source = "wd-q7688687"
+grade = "B"
+checked = ""
+
+[facts.other_names]
+value = ["Tauhara 2", "Tauhara Stage 2"]
+source = "elenz-register"
+grade = "C"
+checked = ""
+note = "Names the EA register, Wikipedia and Elenz use for this plant; check each."
+
+[facts.commissioned]
+value = "2024"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[[facts.commissioned.alt]]
+value = "2023"
+source = "ea-register"
+grade = "A"
+checked = ""
+note = "the register's start date, 2023-10-05: often a year, not the day"
+
+[facts.field]
+value = "Wairākei–Tauhara field"
+source = "elenz-register"
+grade = "C"
+checked = ""
+
+[facts.region]
+value = "Waikato"
+source = "elenz-register"
+grade = "C"
+checked = ""
+
+[facts.territorial_authority]
+value = "Taupō"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[facts.owner]
+value = "Contact"
+source = "ea-register"
+grade = "B"
+checked = ""
+note = "the register's operator, as Elenz groups owners; check the owner"
+
+[facts.about]
+value = ""
+source = "elenz-register"
+grade = "C"
+checked = ""
+note = "To write: 2-4 plain sentences in our own words, from cited sources."

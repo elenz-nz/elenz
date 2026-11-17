@@ -1,0 +1,40 @@
+# Plant page facts for Kaiwera Downs (Stage 2). How to check a plant: facilities/PLANTS.md.
+
+slug = "kaiwera-downs-stage-2"
+plant = "Kaiwera Downs (Stage 2)"
+name = "Kaiwera Downs (Stage 2)"
+register = ["W026"]
+osm = ["relation/17250859"]
+reviewed = ""
+to_check = [
+  "No Wikipedia row: use the operator's pages.",
+  "No location yet.",
+  "Location: no station point yet (OpenStreetMap is research only); check one against the LINZ aerial or Wikidata.",
+]
+notes = ["Two plants: stage 1 (43 MW, GOR0331, Aug 2023) and stage 2 (155 MW, KIW2201, Mar 2026). Split from W022."]
+
+[facts.scheme]
+value = "Southland"
+source = "elenz-register"
+grade = "C"
+checked = ""
+
+[facts.region]
+value = "Southland"
+source = "elenz-register"
+grade = "C"
+checked = ""
+
+[facts.owner]
+value = "Mercury"
+source = "ea-register"
+grade = "B"
+checked = ""
+note = "the register's operator, as Elenz groups owners; check the owner"
+
+[facts.about]
+value = ""
+source = "elenz-register"
+grade = "C"
+checked = ""
+note = "To write: 2-4 plain sentences in our own words, from cited sources."

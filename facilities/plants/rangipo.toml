@@ -1,0 +1,55 @@
+# Plant page facts for Rangipo. How to check a plant: facilities/PLANTS.md.
+
+slug = "rangipo"
+plant = "Rangipo"
+name = "Rangipo"
+register = ["H057"]
+osm = ["way/989021414"]
+reviewed = ""
+to_check = ["Location: no station point yet (OpenStreetMap is research only); check one against the LINZ aerial or Wikidata."]
+notes = ["Added from Elenz's plant list (8 Nov 2026)."]
+
+[grid_connection]
+value = [-39.15319, 175.83744]
+code = "RPO2201 RANGIPO"
+source = "ea-nsp"
+grade = "A"
+checked = ""
+
+[facts.commissioned]
+value = "1983"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[facts.scheme]
+value = "Tongariro"
+source = "elenz-register"
+grade = "C"
+checked = ""
+
+[facts.region]
+value = "Waikato"
+source = "elenz-register"
+grade = "C"
+checked = ""
+
+[facts.territorial_authority]
+value = "Taupō"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[facts.owner]
+value = "Genesis"
+source = "ea-register"
+grade = "B"
+checked = ""
+note = "the register's operator, as Elenz groups owners; check the owner"
+
+[facts.about]
+value = ""
+source = "elenz-register"
+grade = "C"
+checked = ""
+note = "To write: 2-4 plain sentences in our own words, from cited sources."

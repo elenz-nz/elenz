@@ -1,0 +1,70 @@
+# Plant page facts for Te Huka 3. How to check a plant: facilities/PLANTS.md.
+
+slug = "te-huka-3"
+plant = "Te Huka 3"
+name = "Te Huka 3"
+register = ["G005"]
+wikidata = "Q7690821"
+osm = ["way/169516349"]
+reviewed = ""
+to_check = ["Capacity: Verify commissioning and rating."]
+notes = ["54 MW from 24 Sep 2024."]
+
+[location]
+value = [-38.6669, 176.118]
+basis = "whole site"
+source = "wd-q7690821"
+grade = "B"
+checked = ""
+
+[facts.commissioned]
+value = "2010 (Unit 3) 2024"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[[facts.commissioned.alt]]
+value = "2024"
+source = "ea-register"
+grade = "A"
+checked = ""
+note = "the register's start date, 2024-09-24: often a year, not the day"
+
+[facts.field]
+value = "Wairākei–Tauhara field"
+source = "elenz-register"
+grade = "C"
+checked = ""
+
+[facts.region]
+value = "Waikato"
+source = "elenz-register"
+grade = "C"
+checked = ""
+
+[facts.territorial_authority]
+value = "Taupō"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[facts.owner]
+value = "Contact"
+source = "ea-register"
+grade = "B"
+checked = ""
+note = "the register's operator, as Elenz groups owners; check the owner"
+
+[facts.about]
+value = ""
+source = "elenz-register"
+grade = "C"
+checked = ""
+note = "To write: 2-4 plain sentences in our own words, from cited sources."
+
+[[ratings]]
+value = "79"
+basis = "Wikipedia (basis not stated)"
+source = "wp-list"
+grade = "B"
+checked = ""

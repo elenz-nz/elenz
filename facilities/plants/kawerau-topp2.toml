@@ -1,0 +1,64 @@
+# Plant page facts for Kawerau (TOPP2). How to check a plant: facilities/PLANTS.md.
+
+slug = "kawerau-topp2"
+plant = "Kawerau (TOPP2)"
+name = "Kawerau (TOPP2)"
+register = ["G018"]
+reviewed = ""
+to_check = [
+  "Capacity: Verify full name, owner and station identity.",
+  "Owner: not one of the main owners; find the current owner.",
+]
+notes = ["49 MW from Dec 2025; shares a metered code with Te Ahi O Maui."]
+
+[location]
+value = [-38.07472, 176.69972]
+basis = "station"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[grid_connection]
+value = [-38.07673, 176.72238]
+code = "KAW2201 TOPP2"
+source = "ea-nsp"
+grade = "A"
+checked = ""
+
+[facts.commissioned]
+value = "2025"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[facts.field]
+value = "Kawerau field"
+source = "elenz-register"
+grade = "C"
+checked = ""
+
+[facts.region]
+value = "Bay of Plenty"
+source = "elenz-register"
+grade = "C"
+checked = ""
+
+[facts.territorial_authority]
+value = "|Kawerau"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[facts.owner]
+value = ""
+source = "ea-register"
+grade = "C"
+checked = ""
+note = "the register's operator(s): Eastland Generation Limited"
+
+[facts.about]
+value = ""
+source = "elenz-register"
+grade = "C"
+checked = ""
+note = "To write: 2-4 plain sentences in our own words, from cited sources."
