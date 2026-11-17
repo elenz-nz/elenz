@@ -166,6 +166,7 @@ These follow the data.govt.nz style guide, except for clock times, where a space
 | Currency | New Zealand dollars, said once in Conventions | NZ$ throughout |
 | Minus sign | − (U+2212) | A hyphen |
 | Regions | North Island, South Island, New Zealand | NI, SI and NZ in prose. They are fine in formulas with a definition. |
+| Records against the history | the highest since our records began in 1997; the lowest in our records | the highest since 1997 (it reads as if 1997 was higher) |
 
 Use the same rounded figure everywhere, and don't write a ratio in two forms. Glenbrook's metered output is "about 1.47
 times" its dispatch figure on every page.
