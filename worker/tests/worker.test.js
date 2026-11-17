@@ -47,7 +47,7 @@ export default {
 
 let dir, mf, kv;
 let github = [], githubAnswer = () => new Response(null, { status: 204 });
-let sql = [], sqlAnswer = () => Response.json({ data: [] });   // stands in for Cloudflare's Analytics Engine SQL API
+let sql = [], sqlAnswer = (body) => Response.json({ data: [] });   // stands in for Cloudflare's Analytics Engine SQL API
 const start = (bindings = {}) => new Miniflare({
   modules: [
     { type: 'ESModule', path: join(dir, 'worker.mjs'), contents: readFileSync(join(dir, 'worker.mjs'), 'utf8') },
@@ -70,8 +70,9 @@ const start = (bindings = {}) => new Miniflare({
   },
   outboundService: async (request) => {
     if (new URL(request.url).hostname === 'api.cloudflare.com') {
-      sql.push({ url: request.url, auth: request.headers.get('authorization'), body: await request.text() });
-      return sqlAnswer();
+      const body = await request.text();
+      sql.push({ url: request.url, auth: request.headers.get('authorization'), body });
+      return sqlAnswer(body);
     }
     github.push(request.url); return githubAnswer();
   },
@@ -388,6 +389,12 @@ const ROWS = [
   { hour: '2026-11-16 07:00:00', page: 'dashboard', id: 'aaaa', shown: 'hidden', opened: 'kiosk', country: 'NZ', minutes: '58', beats: '1' },
   { hour: '2026-11-16 07:00:00', page: 'now', id: 'bbbb', shown: 'hidden', opened: 'page', country: 'AU', minutes: '5', beats: '2' },
 ];
+// open now: a dashboard screen on a wall link (seen, then hidden: its latest beat counts) and a /now screen on screen
+const LIVE = [
+  { page: 'dashboard', id: 'aaaa', shown: 'visible', opened: 'kiosk', last: '2026-11-17 07:01:00' },
+  { page: 'dashboard', id: 'aaaa', shown: 'hidden', opened: 'kiosk', last: '2026-11-17 07:06:00' },
+  { page: 'now', id: 'cccc', shown: 'visible', opened: 'page', last: '2026-11-17 07:05:00' },
+];
 const KEY = 'test-key-0123456789';
 let mfKey;
 const screensGet = (q, m = mfKey) => m.dispatchFetch('https://elenz.co.nz/data/screens' + q);
@@ -400,13 +407,14 @@ test('/data/screens is a 404 without its key, or when no key is set at all', asy
 });
 
 test('/data/screens with its key asks the SQL API and draws the screens open', async () => {
-  sql = []; sqlAnswer = () => Response.json({ data: ROWS });
+  sql = []; sqlAnswer = (body) => Response.json({ data: /MINUTE/.test(body) ? LIVE : ROWS });
   const r = await screensGet(`?key=${KEY}&days=30`);
   assert.equal(r.status, 200);
   assert.equal(r.headers.get('cache-control'), 'no-store');
   assert.match(r.headers.get('x-robots-tag'), /noindex/);
   const page = await r.text();
-  assert.equal(sql.length, 1);
+  assert.equal(sql.length, 2, 'the range and open now');
+  sql.sort((a, b) => (/MINUTE/.test(a.body) ? 1 : 0) - (/MINUTE/.test(b.body) ? 1 : 0));
   assert.equal(sql[0].url, 'https://api.cloudflare.com/client/v4/accounts/acct123/analytics_engine/sql');
   assert.equal(sql[0].auth, 'Bearer tok-abc');
   assert.match(sql[0].body, /FROM elenz_beats/);
@@ -417,7 +425,11 @@ test('/data/screens with its key asks the SQL API and draws the screens open', a
   assert.match(page, /<td class="gstart">1<\/td><td>1<\/td><td>1<\/td>/);
   assert.match(page, /<td class="gstart">1<\/td><td><span class="zero">0<\/span><\/td><td><span class="zero">0<\/span><\/td>/);
   assert.equal((page.match(/<svg /g) ?? []).length, 2, 'two charts: by time of day and over time');
-  assert.match(page, /<title>20:00–21:00 NZ time\nNow: /);   // each bar carries its own hover note
+  assert.match(page, /<title>20:00–21:00 NZ time\n\/now: /);   // each bar carries its own hover note
+  assert.match(sql[1].body, /INTERVAL '11' MINUTE/);
+  // open now: 2 screens, 1 on screen (the dashboard's latest beat was hidden), 1 from a wall link
+  assert.match(page, /<p class="big">2 <small>screens · 1 on screen · 1 from a wall link<\/small>/);
+  assert.match(page, /\/dashboard <b>1<\/b>/);
   assert.match(page, /58 min/);              // the dashboard screen's time open
   assert.match(page, /NZ 1/);
   assert.match(page, /aria-current="page" title="Last 30 days">30 days</);

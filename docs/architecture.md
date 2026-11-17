@@ -434,7 +434,11 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   the server: the average screens open in each NZ hour of the day, and screens open over time (by hour up to 7 days,
   by day beyond). Each bar has a hover note; a short glossary and the tables (by time of day; hour by hour, open, on
   screen and from a wall-screen link) fold away below. Colours are the first three slots of the data-viz reference
-  palette, light and dark (redesign 17 Nov 2026). It needs three Worker settings, added in the
+  palette, light and dark (redesign 17 Nov 2026). Pages are named by address (/now, /dashboard, /landscape), since
+  "Now" read as "at the moment". At the top, Open now: a second query (`liveSql`, asked alongside the range's) counts
+  the screens with a beat in the last 11 minutes (one late beat allowed), with how many are on screen by their latest
+  beat and how many came from a wall link. An estimate: a screen just closed counts for a few minutes more, and one on
+  a sleeping device stops counting. If that query fails, the card says so and the rest of the page still shows. It needs three Worker settings, added in the
   Cloudflare dashboard (Workers & Pages → elenz → Settings → Variables and Secrets; `keep_vars` keeps them through
   deploys): `SCREENS_KEY` (secret, a long random string of letters and digits; without it, or with the wrong one, the
   address answers 404), `CF_ANALYTICS_TOKEN` (secret: a Cloudflare API token with Account → Account Analytics → Read
