@@ -10,7 +10,7 @@
 
 export const SCREENS_URL = '/data/screens';
 export const PAGES = ['now', 'dashboard', 'landscape'];
-const NAMES = { now: 'Now', dashboard: 'Dashboard', landscape: 'Power landscape' };
+const NAMES = { now: '/now', dashboard: '/dashboard', landscape: '/landscape' };   // by address: "Now" read as "at the moment"
 const RANGES = [1, 7, 30, 90];   // days; Analytics Engine keeps three months
 
 /** One row per page load per hour and state: the most minutes it reported, and how many beats. */
@@ -23,6 +23,37 @@ GROUP BY hour, page, id, shown, opened, country
 ORDER BY hour
 LIMIT 100000
 FORMAT JSON`;
+}
+
+// Open now: a page beats once when it opens and every 5 minutes after (BEAT_EVERY in beat.js), so a screen with a beat
+// in the last 11 minutes is taken as still open (one late beat allowed). It's an estimate: a screen closed a minute ago
+// still counts for up to 11 minutes, and one whose device has gone to sleep stops beating.
+export const LIVE_MINUTES = 11;
+export function liveSql(minutes = LIVE_MINUTES) {
+  return `SELECT blob1 AS page, index1 AS id, blob2 AS shown, blob3 AS opened, max(timestamp) AS last
+FROM elenz_beats
+WHERE timestamp > NOW() - INTERVAL '${minutes}' MINUTE
+GROUP BY page, id, shown, opened
+FORMAT JSON`;
+}
+
+/** From liveSql's rows: per page, the screens open now, how many are on screen (their latest beat) and from a wall link. */
+export function openNow(rows) {
+  const latest = new Map();
+  for (const r of rows) {
+    if (!PAGES.includes(r.page)) continue;
+    const key = `${r.page} ${r.id}`, t = utc(r.last), was = latest.get(key);
+    if (!was || t > was.t) latest.set(key, { page: r.page, t, shown: r.shown === 'visible', wall: (was?.wall ?? false) || r.opened === 'kiosk' });
+    else if (r.opened === 'kiosk') was.wall = true;
+  }
+  const pages = Object.fromEntries(PAGES.map((p) => [p, { open: 0, shown: 0, wall: 0 }]));
+  for (const s of latest.values()) {
+    pages[s.page].open += 1;
+    if (s.shown) pages[s.page].shown += 1;
+    if (s.wall) pages[s.page].wall += 1;
+  }
+  const total = (k) => PAGES.reduce((a, p) => a + pages[p][k], 0);
+  return { open: total('open'), shown: total('shown'), wall: total('wall'), pages };
 }
 
 /** Whole days asked for, from the address: 1, 7, 30 or 90 (7 if anything else). */
@@ -115,6 +146,9 @@ nav a[aria-current]{background:var(--ink);color:var(--card);font-weight:600}
 .charts{grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr))}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
 .page{display:flex;align-items:center;gap:8px;font-weight:600}.sw{width:12px;height:12px;border-radius:3px;flex:none}
+.live{display:flex;flex-wrap:wrap;align-items:center;gap:10px 28px;margin-bottom:14px}.live .big{margin:0}.live h2{margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.9rem;font-variant-numeric:tabular-nums}
+.chip b{font-weight:700}.dot{width:9px;height:9px;border-radius:50%;background:var(--s3);box-shadow:0 0 0 3px color-mix(in srgb,var(--s3) 25%,transparent)}
 .big{font-size:2.3rem;font-weight:700;line-height:1.1;margin:8px 0 0;font-variant-numeric:tabular-nums}.big small{font-size:.9rem;font-weight:400;color:var(--muted)}
 dl.stats{display:grid;grid-template-columns:1fr auto;gap:4px 12px;margin:12px 0 0;font-size:.92rem}dl.stats dt{color:var(--ink2)}
 dl.stats dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
@@ -220,7 +254,7 @@ function overTime(sum, now) {
 }
 
 /** The page for a summary. `key` goes back into its own links so the range buttons work. */
-export function screensPage(sum, key, now = Date.now()) {
+export function screensPage(sum, key, now = Date.now(), live = null) {
   const q = (d) => `?key=${encodeURIComponent(key)}&days=${d}`;
   const rangeName = (d) => (d === 1 ? 'Last 24 hours' : `Last ${d} days`);
   const nav = RANGES.map((d) => `<a href="${q(d)}"${d === sum.days ? ' aria-current="page"' : ''} title="${rangeName(d)}">${d === 1 ? '24 hours' : `${d} days`}</a>`).join('');
@@ -249,10 +283,17 @@ export function screensPage(sum, key, now = Date.now()) {
       }).join('')}</tr>`).join('')}</tbody></table>`
     : '<p class="note">No heartbeats in this range yet.</p>';
   const asOf = new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', dateStyle: 'medium', timeStyle: 'short' }).format(new Date(now));
+  const liveCard = live
+    ? `<section class="card live" aria-label="Open now"><div><h2><i class="dot" style="display:inline-block;margin-right:8px"></i>Open now</h2>
+<p class="note" style="margin:2px 0 0">Estimate: a heartbeat in the last ${LIVE_MINUTES} minutes.</p></div>
+<p class="big">${live.open} <small>screen${live.open === 1 ? '' : 's'} · ${live.shown} on screen · ${live.wall} from a wall link</small></p>
+<div class="chips">${PAGES.map((p) => `<span class="chip"><i class="sw" style="background:${SWATCH[p]}"></i>${NAMES[p]} <b>${live.pages[p].open}</b></span>`).join('')}</div></section>`
+    : `<section class="card live" aria-label="Open now"><h2>Open now</h2><p class="note" style="margin:0">Couldn't be read just now; reload to try again.</p></section>`;
   const span = sum.days === 1 ? 'the last 24 hours' : `the last ${sum.days} days`;
   return page('Open screens', `<div class="top"><div><h1>Open screens</h1>
-<p class="lede">Now, the dashboard and the power landscape, left open. ${esc(rangeName(sum.days))}, as of ${esc(asOf)} NZ time.</p></div>
+<p class="lede">/now, /dashboard and /landscape, left open. ${esc(rangeName(sum.days))}, as of ${esc(asOf)} NZ time.</p></div>
 <nav aria-label="Range">${nav}</nav></div>
+${liveCard}
 <section class="grid cards">${cards}</section>
 <section class="grid charts">
 <div class="card"><h2>By time of day</h2><p class="note">Average screens open in each hour of the day, over ${esc(span)}.</p>${legend}${clockSvg}</div>
@@ -260,7 +301,8 @@ export function screensPage(sum, key, now = Date.now()) {
 </section>
 <details><summary>What the numbers mean</summary><ul class="help">
 <li><b>Screen:</b> one opening of a page. Reloading or opening it again in another tab counts as a new screen.</li>
-<li><b>Open:</b> the page sent a heartbeat that hour. It sends one every 5 minutes while open, even in a hidden tab.</li>
+<li><b>Open:</b> the page sent a heartbeat that hour. It sends one when it opens and every 5 minutes after, even in a hidden tab.</li>
+<li><b>Open now:</b> an estimate, the screens with a heartbeat in the last ${LIVE_MINUTES} minutes. A screen just closed can still count for a few minutes; one whose device has gone to sleep stops counting.</li>
 <li><b>On screen:</b> it was actually visible at some point that hour, not behind another tab or on a sleeping display.</li>
 <li><b>Wall link:</b> opened from a wall-screen link (the picture alone, no menus).</li>
 <li><b>Typical time open:</b> the median: half the screens were open longer, half shorter.</li>
@@ -295,11 +337,14 @@ export async function screens(request, env, url) {
   const missing = ['CF_ACCOUNT_ID', 'CF_ANALYTICS_TOKEN'].filter((k) => !env[k]);
   if (missing.length) return html(problemPage(`Add ${missing.join(' and ')} to the Worker's settings (Workers & Pages → elenz → Settings → Variables and Secrets), then reload.`), 503);
   const days = daysOf(url);
+  const ask = (sql) => fetch(`https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(env.CF_ACCOUNT_ID)}/analytics_engine/sql`, {
+    method: 'POST', body: sql, headers: { Authorization: `Bearer ${env.CF_ANALYTICS_TOKEN}` },
+  });
+  // Open now, asked at the same time; if it fails, the rest of the page still shows (its card says so)
+  const livePromise = ask(liveSql()).then(async (r) => (r.ok ? openNow(JSON.parse(await r.text()).data ?? []) : null)).catch(() => null);
   let res;
   try {
-    res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(env.CF_ACCOUNT_ID)}/analytics_engine/sql`, {
-      method: 'POST', body: screensSql(days), headers: { Authorization: `Bearer ${env.CF_ANALYTICS_TOKEN}` },
-    });
+    res = await ask(screensSql(days));
   } catch (e) {
     return html(problemPage(`Cloudflare's analytics couldn't be reached: ${e && e.message}. Try again in a minute.`), 502);
   }
@@ -314,5 +359,5 @@ export async function screens(request, env, url) {
   }
   let data;
   try { data = JSON.parse(text).data ?? []; } catch { return html(problemPage('Cloudflare sent something that is not a table.'), 502); }
-  return html(screensPage(summarise(data, days), url.searchParams.get('key')));
+  return html(screensPage(summarise(data, days), url.searchParams.get('key'), Date.now(), await livePromise));
 }
