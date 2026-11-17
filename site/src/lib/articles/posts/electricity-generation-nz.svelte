@@ -1,7 +1,7 @@
 <script module lang="ts">
 	export const meta = {
 		title: 'Electricity generation in New Zealand: where the power comes from',
-		dek: 'Hydro, geothermal and wind made almost 90% of New Zealand’s electricity in the 12 months to October 2026, and 95.3% of it was renewable, the highest of any 12 months since 1997.',
+		dek: 'Hydro, geothermal and wind made almost 90% of New Zealand’s electricity in the 12 months to October 2026, and 95.3% of it was renewable, the highest since our records began in 1997.',
 		description: 'How New Zealand generates its electricity: hydro, geothermal, wind, solar, gas and coal, by island and by month, from the latest 12 months of data.',
 		date: '2026-11-16',
 		kind: 'Guide',
@@ -106,7 +106,7 @@
 
 <Stats items={[
 	{ label: 'Generated', value: '44.1', unit: 'TWh', note: '12 months to October 2026', tok: '--accent' },
-	{ label: 'Renewable', value: pct(D.renewable), note: 'the highest of any 12 months since 1997', tok: '--g-ren' },
+	{ label: 'Renewable', value: pct(D.renewable), note: 'the highest since our records began in 1997', tok: '--g-ren' },
 	{ label: 'Hydro', value: pct(share(mix.hydro)), note: '92% of South Island generation', tok: '--f-hydro' },
 	{ label: 'Geothermal', value: pct(share(mix.geo)), note: 'the North Island’s largest source', tok: '--f-geo' },
 ]} />
@@ -139,7 +139,7 @@
 
 <h3>Gas, coal and diesel</h3>
 <p>Gas stations generated <strong>1,020 GWh</strong>, 2.3% of the total. Huntly’s Rankine units, which burn coal or gas, generated 502 GWh, 1.1%. These stations mostly run when renewable output falls short of demand, in dry spells and at peak times. Over the 12 months, gas stations ran at 11% of their capacity and the Rankine units at 8%. Whirinaki, a 156 MW diesel station, generated less than 1 GWh.</p>
-<p>Gas generated 2,112 GWh less than in calendar 2025, and the Rankine units 667 GWh less. Over the 12 months to September 2026, gas, coal/gas and diesel generated 1,505 GWh between them, 3.4% of the total. That is the least of any 12 months since 1997, in energy and as a share. Their peak was 14,511 GWh, in the 12 months to April 2006.</p>
+<p>Gas generated 2,112 GWh less than in calendar 2025, and the Rankine units 667 GWh less. Over the 12 months to September 2026, gas, coal/gas and diesel generated 1,505 GWh between them, 3.4% of the total. That is the least of any 12 months in our records, in energy and as a share. Their peak was 14,511 GWh, in the 12 months to April 2006.</p>
 
 <h3>Other sources</h3>
 <p>Other embedded generation supplied about 912 GWh, 2.1% of the total. NZ Steel’s Glenbrook mill generated 440 GWh from the waste heat and gases of ironmaking, which we don’t count as renewable. Kinleith pulp and paper mill generated 123 GWh from wood waste.</p>
@@ -168,7 +168,7 @@
 <p>The HVDC link joins the two islands’ grids under Cook Strait. It sent a net 3.7 TWh north over the 12 months, about 18% of the South Island’s generation, and its net flow was northward on 346 of the 365 days. Compare the <a href="/tracker?{YEAR}&region=NI">North Island</a> and the <a href="/tracker?{YEAR}&region=SI">South Island</a> over the 12 months.</p>
 
 <h2>Through the year</h2>
-<p>The mix shifts with the seasons. The renewable share was lowest from March to June 2026, when gas generation rose to 235 GWh in April and the renewable share fell to 91.4%. In September 2026 it reached <strong>98.0%</strong>, the <a href="/records/ren_max?period=month">highest of any month</a> since 1997.</p>
+<p>The mix shifts with the seasons. The renewable share was lowest from March to June 2026, when gas generation rose to 235 GWh in April and the renewable share fell to 91.4%. In September 2026 it reached <strong>98.0%</strong>, the <a href="/records/ren_max?period=month">highest of any month</a> in our records.</p>
 
 <Figure caption="Generation by source each month, November 2025 to October 2026, with the renewable share above each month, to the nearest percent" source="EA metered generation. Solar includes embedded solar, and Other includes other embedded generation, both calculated estimates. Other is also waste heat, bioenergy and diesel." wide>
 	<Columns cats={D.months} xlabels={monthX} series={monthSeries} stacked tops={D.ren_monthly.map((v) => `${Math.round(v)}%`)}
