@@ -12,7 +12,7 @@ to_check = [
   "Location: only the grid connection so far; find the station itself.",
   "Owner: not one of the main owners; find the current owner.",
 ]
-notes = ["The EA register's names for KAW0112 ONU0 include \"Kawerau Mill CoGen\" and \"Norske Skog CoGen\". Elenz shows the meter as Kawerau (Onepu), geothermal, from Jan 2013. Keep to the site's public wording for this one."]
+notes = ["The EA register's names for KAW0112 ONU0 include \"Kawerau Mill CoGen\" and \"Norske Skog CoGen\". Elenz shows the meter as Kawerau (Onepu), geothermal, from Jan 2013."]
 
 [grid_connection]
 value = [-38.07673, 176.72238]

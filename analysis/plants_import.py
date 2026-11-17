@@ -230,8 +230,9 @@ def plant(rows, S):
     notes = []
     for x in rows:
         for k in ('Research notes', 'Matching notes'):
-            if x[k] and x[k] not in notes:
-                notes.append(x[k] if len(rows) == 1 else f'{x["Station ID"]}: {x[k]}')
+            text = x[k].replace(" Keep to the site's public wording for this one.", '') if x[k] else ''   # public repo
+            if text and text not in notes:
+                notes.append(text if len(rows) == 1 else f'{x["Station ID"]}: {text}')
     if r['Images']:
         notes.append(f'Images: {r["Images"]}')
     leads = [u for x in rows for u in urls(x['Sources']) if urlparse(u).hostname != 'en.wikipedia.org']
