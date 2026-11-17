@@ -19,8 +19,8 @@ function live(gap = false) {
   return D;
 }
 const rows = [
-  { name: 'Benmore', key: 'benmore', fuel: 'hydro', fuelName: 'Hydro', isl: 'SI', mw: 356, cap: 540, pct: 65.9, est: false, charging: false },
-  { name: 'Turitea Wind Farm', key: 'turitea-wind-farm', fuel: 'wind', fuelName: 'Wind', isl: 'NI', mw: 182, cap: 222, pct: 82, est: false, charging: false },
+  { name: 'Benmore', key: 'benmore', fuel: 'hydro', fuelName: 'Hydro', isl: 'SI', owner: 'Meridian', scheme: 'Waitaki', mw: 356, cap: 540, pct: 65.9, est: false, charging: false },
+  { name: 'Turitea Wind Farm', key: 'turitea-wind-farm', fuel: 'wind', fuelName: 'Wind', isl: 'NI', owner: 'Mercury', scheme: null, mw: 182, cap: 222, pct: 82, est: false, charging: false },
 ];
 
 test('a layout from the address: counts capped, unknown backgrounds and bad specs dropped, an empty small list kept', () => {
@@ -84,13 +84,40 @@ test('values follow /now: generation, shares, HVDC, prices, plants and the possi
   assert.equal(v('price:NZ').region, 'NI');
 });
 
+test("the tracker's groupings: renewable vs fossil, inverter vs synchronous, flexibility, owners and hydro schemes", () => {
+  const x = context(live(), rows), cat = catalogue(x), v = (s) => resolve(s, cat, x);
+  // 2,900 MW: 2,000 hydro, 400 wind, 200 gas and 300 embedded solar
+  assert.equal(v('inverter:NZ').v, '24.1');                 // shown as a share unless MW is asked for
+  assert.equal(v('inverter:NZ:mw').v, '700');
+  assert.equal(v('inverter:NZ:mw').s, 'Wind, solar and batteries · 24.1% of generation');
+  assert.equal(v('sync:NZ').v, '75.9');
+  assert.equal(v('sync:SI:mw').v, '1,600');
+  assert.equal(v('fossil:NZ:pct').v, '6.9');
+  assert.equal(v('fastflex:NZ:mw').v, '2,200');
+  assert.equal(v('variable:NI:mw').v, '500');
+  assert.equal(v('slowflex:SI').region, 'NZ');               // Huntly is in the North Island only
+  assert.equal(v('own_meridian:NZ:mw').v, '356');
+  assert.equal(v('own_meridian:NZ:mw').s, '1 of 1 running · 12.3% of generation');
+  assert.equal(v('own_meridian:NI:mw').v, '0');
+  assert.equal(v('own_meridian:SI:cf').v, '66');
+  assert.equal(v('own_mercury:NZ:mw').v, '182');
+  assert.equal(v('sch_waitaki').v, '356');
+  assert.equal(v('sch_waitaki').label, 'Waitaki scheme');
+  assert.equal(v('sch_waitaki').s, '1 of 1 running · 12.3% of generation');   // of New Zealand's, not the South Island's
+  assert.equal(v('sch_waitaki::cf').s, '356 of 540 MW installed');
+  assert.equal(v('sch_waikato').v, '0');
+  // each grouping has its heading in the picker; old keys kept, now under Groupings
+  for (const k of ['renmw', 'fossil', 'inverter', 'sync', 'own_genesis', 'sch_manapouri', 'sch_other-hydro']) assert.equal(cat.find((c) => c.k === k)?.g, 'Groupings', k);
+});
+
 test('with no embedded solar estimate, the values that need one say "No estimate"', () => {
   const x = context(live(true), rows), cat = catalogue(x), v = (s) => resolve(s, cat, x);
-  for (const s of ['ren:NZ', 'ren:NI', 'co2:NZ', 'underlying:NI', 'roof:NI:mw', 'allsolar:NZ:mw', 'ibr:NZ']) {
+  for (const s of ['ren:NZ', 'ren:NI', 'co2:NZ', 'underlying:NI', 'roof:NI:mw', 'allsolar:NZ:mw', 'ibr:NZ', 'inverter:NZ', 'variable:NI:mw', 'sync:NI:pct']) {
     assert.equal(v(s).v, 'No estimate', s);
     assert.ok(v(s).none, s);
   }
   assert.notEqual(v('ren:SI').v, 'No estimate');
+  assert.equal(v('sync:NI:mw').v, '600');                     // synchronous MW doesn't need embedded solar
   assert.equal(v('gen:NZ').s, 'No renewable estimate right now');
 });
 

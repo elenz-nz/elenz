@@ -48,7 +48,7 @@ a minute), `landscape-mode` on the landscape.
 values and up to four small ones over a background, for a wall screen, a spare tablet or a phone. Every value is in
 `values.js` (keys, groups for the picker's tabs, the regions and measures each can show, and how it is worked out, from
 `summarise()` in `#lib/home/now.js`, the generator rows of `#lib/now/generators.js` and tracker.json's `explain` block);
-plants are added from the generator rows, largest first, and the fun facts name the top plant of each kind by MW. A value
+plants are added from the generator rows, largest first, and the fun facts name the top plant of each kind by MW. The Groupings tab has the tracker's groupings (/methods/groupings), each under its own heading in the picker (`sec`): renewable vs fossil (waste heat with the fossil fuels, as on the tracker), inverter vs synchronous (shown as a share unless MW is picked), flexibility, thermal, the tracker's owners and its hydro schemes; battery discharge counts in its group, and owners and schemes add up the generator rows (each row carries its scheme from plants.json). `renmw` and `fossil` were under By fuel at first; their keys are kept, so saved layouts still work. A value
 needing embedded solar says "No estimate" when there is none. Layouts (`layout.js`) are written `key:region:measure`
 (`hydro:SI:cf`, `hvdc`, `p_benmore::cf`) in the address (`?bg=…&big=…&small=…`, plus `col=` for a plain colour and
 `view=simple`, so a link opens that layout) and kept in localStorage `elenz-dashboard` (on `/privacy`); an address with a

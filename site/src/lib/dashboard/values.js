@@ -12,14 +12,20 @@ import { summarise } from '#lib/home/now.js';
 
 export const REGION_NAMES = { NZ: 'New Zealand', NI: 'North Island', SI: 'South Island' };
 export const MEASURE_NAMES = { mw: 'MW', pct: '% of generation', cf: '% of capacity' };
-export const GROUPS = ['System', 'Prices', 'By fuel', 'Plants', 'Fun facts'];
+export const GROUPS = ['System', 'Prices', 'By fuel', 'Groupings', 'Plants', 'Fun facts'];
 
-// dot colours: the site's dark-theme fuel colours, which read on every background (the stage has its own palette)
+// dot colours: the site's dark-theme fuel colours, which read on every background (the stage has its own palette);
+// the groupings take the tracker's dark-theme group and owner colours (tracker.css: --g-*, --o1 to --o6)
 const C = {
   hydro: '#4f8bd6', wind: '#2fa883', geo: '#c4508f', solar: '#bb8c18', roof: '#d9a62a', gas: '#cc7a2e', coal: '#8a8480',
   diesel: '#bf3a52', batt: '#8a72d8', bio: '#8fb03c', waste: '#a88a74', oemb: '#6fa8c2', hvdc: '#9fb0bb',
   sys: '#7fc4d1', ren: '#2ea88a', co2: '#a8927f', price: '#e6c35c', fossil: '#c0834f', fun: '#e58fb0',
+  vre: '#9a9020', resid: '#5784d0', fast: '#3c97c2', thermal: '#a8693a',
 };
+// the tracker's owners (tracker.js OWNERS), in its order and colours; any other owner counts as "Other generators"
+const OWNERS = [['Genesis', '#f08a3c'], ['Meridian', '#4fb3cb'], ['Contact', '#e5484d'], ['Mercury', '#e0c51c'], ['Nova', '#c78a1a'], ['Other generators', '#a9b4b3']];
+// the tracker's hydro schemes (tracker.js SCHEMES) and the island each is in ("Other hydro" is in both)
+const SCHEMES = [['Tekapo', 'SI'], ['Waitaki', 'SI'], ['Waikato', 'NI'], ['Manapōuri', 'SI'], ['Clutha', 'SI'], ['Tongariro', 'NI'], ['Waikaremoana', 'NI'], ['Rangitaiki', 'NI'], ['Waipori', 'SI'], ['Other hydro', null]];
 export const FUEL_COLOUR = C;
 
 const ALL = ['NZ', 'NI', 'SI'];
@@ -86,17 +92,38 @@ function fuel(k, { est = false, noCf = false } = {}) {
   };
 }
 
-/** A group of fuels added up (all renewables, fossil fuels, all solar). */
-function sum(keys, words, { needsRoof = false } = {}) {
+/** A group of fuels added up (fossil fuels, all solar, the tracker's groupings). Battery counts only while discharging,
+ * as in the tracker's groupings; a group with embedded solar in it says "No estimate" when there is none. */
+function sum(keys, words, { needsRoof = keys.includes('roof'), est = false, share = false } = {}) {
   return (x, r, m) => {
     const vals = keys.map((k) => fuelMW(x, r, k));
     if (needsRoof && vals.some((v) => v == null)) return NONE('No embedded solar estimate at the moment');
     const v = vals.reduce((a, b) => a + Math.max(0, b ?? 0), 0);
-    const g = reg(x, r).gen;
-    if (m === 'pct') return { v: pct1(g > 0 ? (v / g) * 100 : 0), u: '%', s: `${mw(v)} MW` };
-    return { v: mw(v), u: 'MW', s: words };
+    const g = reg(x, r).gen, p = pct1(g > 0 ? (v / g) * 100 : 0);
+    if (m === 'pct') return { v: p, u: '%', s: `${mw(v)} MW`, est };
+    return { v: mw(v), u: 'MW', s: share ? `${words} · ${p}% of generation` : words, est };
   };
 }
+
+/** A set of grid plants added up (an owner, a hydro scheme), from the generator rows: battery discharge only. */
+function plantSum(pick, words) {
+  return (x, r, m) => {
+    const ps = x.rows.filter((p) => !p.est && pick(p) && (r === 'NZ' || p.isl === r));
+    const v = ps.reduce((a, p) => a + Math.max(0, p.mw), 0);
+    const g = reg(x, r).gen, p = pct1(g > 0 ? (v / g) * 100 : 0);
+    if (m === 'pct') return { v: p, u: '%', s: `${mw(v)} MW` };
+    if (m === 'cf') {
+      const c = ps.reduce((a, q) => a + (q.cap ?? 0), 0);
+      return c ? { v: pct0((v / c) * 100), u: '%', s: `${mw(v)} of ${mw(c)} MW installed` } : null;
+    }
+    return { v: mw(v), u: 'MW', s: `${words(ps)} · ${p}% of generation` };
+  };
+}
+// how many of a set's plants are running: "3 of 8 running"
+const running = (ps) => `${ps.filter((p) => p.mw > 0.5).length} of ${ps.length} running`;
+// a name as a key: lower case, no macrons, words joined by hyphens ("Manapōuri" → "manapouri")
+const slugOf = (n) => n.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const ownerOf = (p) => (OWNERS.some(([o]) => o === p.owner) ? p.owner : 'Other generators');
 
 /** Now against the usual for this time of day, as a percentage (fun facts). */
 function vsUsual(k, words) {
@@ -210,15 +237,34 @@ const BASE = [
   { k: 'bio', g: 'By fuel', label: 'Bioenergy', c: C.bio, regions: NI_ONLY, ms: ['mw', 'pct', 'cf'], get: fuel('bio') },
   { k: 'waste', g: 'By fuel', label: 'Waste heat', c: C.waste, regions: NI_ONLY, ms: ['mw', 'pct', 'cf'], get: fuel('waste') },
   { k: 'oemb', g: 'By fuel', label: 'Other embedded', c: C.oemb, regions: ALL, ms: ['mw', 'pct'], est: true, get: fuel('oemb', { est: true, noCf: true }) },
-  { k: 'renmw', g: 'By fuel', label: 'All renewables', c: C.ren, regions: ALL, ms: ['mw', 'pct'], get: (x, r, m) => {
+  { k: 'allsolar', g: 'By fuel', label: 'All solar', c: C.solar, regions: ALL, ms: ['mw', 'pct'], est: true, get: sum(['solar', 'roof'], 'Grid solar and embedded solar') },
+  // Groupings: the tracker's ways of grouping generation (its menu above the generation chart; /methods/groupings).
+  // Each has a section heading in the picker (sec). The keys renmw and fossil were under By fuel in the first version.
+  { k: 'renmw', g: 'Groupings', sec: 'Renewable vs fossil', label: 'All renewables', c: C.ren, regions: ALL, ms: ['mw', 'pct'], get: (x, r, m) => {
     const R = reg(x, r);
     if (R.ren == null) return NONE('No embedded solar estimate at the moment');
     const v = (R.ren / 100) * baseGen(x, r);
     if (m === 'pct') return { v: pct1(R.ren), u: '%', s: `${mw(v)} MW` };
     return { v: mw(v), u: 'MW', s: 'Hydro, wind, geothermal, solar and bioenergy' };
   } },
-  { k: 'fossil', g: 'By fuel', label: 'Fossil fuels', c: C.fossil, regions: ALL, ms: ['mw', 'pct'], get: sum(['gas', 'coal', 'diesel'], 'Gas, coal and diesel') },
-  { k: 'allsolar', g: 'By fuel', label: 'All solar', c: C.solar, regions: ALL, ms: ['mw', 'pct'], est: true, get: sum(['solar', 'roof'], 'Grid solar and embedded solar', { needsRoof: true }) },
+  // waste heat sits with the fossil fuels, as in the tracker's Renewable vs fossil
+  { k: 'fossil', g: 'Groupings', sec: 'Renewable vs fossil', label: 'Fossil fuels', c: C.fossil, regions: ALL, ms: ['mw', 'pct'], get: sum(['gas', 'coal', 'diesel', 'waste'], 'Gas, coal, diesel and waste heat') },
+  { k: 'inverter', g: 'Groupings', sec: 'Inverter vs synchronous', label: 'Inverter-based', c: C.vre, regions: ALL, ms: ['pct', 'mw'], est: true,
+    get: sum(['wind', 'solar', 'roof', 'batt'], 'Wind, solar and batteries', { est: true, share: true }) },
+  { k: 'sync', g: 'Groupings', sec: 'Inverter vs synchronous', label: 'Synchronous', c: C.resid, regions: ALL, ms: ['pct', 'mw'],
+    // its share needs the whole of generation, embedded solar included
+    get: (x, r, m) => (m === 'pct' && reg(x, r).roof == null ? NONE('No embedded solar estimate at the moment')
+      : sum(['hydro', 'geo', 'bio', 'waste', 'coal', 'gas', 'diesel', 'oemb'], 'Hydro, geothermal and thermal', { share: true })(x, r, m)) },
+  { k: 'inflex', g: 'Groupings', sec: 'Flexibility', label: 'Inflexible', c: C.geo, regions: ALL, ms: ['mw', 'pct'], get: sum(['geo', 'bio', 'waste', 'oemb'], 'Geothermal, cogeneration and other embedded', { share: true }) },
+  { k: 'slowflex', g: 'Groupings', sec: 'Flexibility', label: 'Slow flexible', c: C.coal, regions: NI_ONLY, ms: ['mw', 'pct'], get: sum(['coal'], 'Huntly’s Rankine units', { share: true }) },
+  { k: 'fastflex', g: 'Groupings', sec: 'Flexibility', label: 'Fast flexible', c: C.fast, regions: ALL, ms: ['mw', 'pct'], get: sum(['hydro', 'gas', 'diesel', 'batt'], 'Hydro, gas, diesel and batteries', { share: true }) },
+  { k: 'variable', g: 'Groupings', sec: 'Flexibility', label: 'Variable', c: C.vre, regions: ALL, ms: ['mw', 'pct'], est: true, get: sum(['wind', 'solar', 'roof'], 'Wind and solar', { est: true, share: true }) },
+  { k: 'thermal', g: 'Groupings', sec: 'Simplified', label: 'Thermal', c: C.thermal, regions: NI_ONLY, ms: ['mw', 'pct'], get: sum(['coal', 'gas', 'diesel', 'bio', 'waste'], 'Gas, coal, diesel, bioenergy and waste heat', { share: true }) },
+  ...OWNERS.map(([o, c]) => ({ k: 'own_' + slugOf(o), g: 'Groupings', sec: 'By owner', label: o, c, regions: ALL, ms: ['mw', 'pct', 'cf'],
+    get: plantSum((p) => ownerOf(p) === o, running) })),
+  ...SCHEMES.map(([sc, isl]) => ({ k: 'sch_' + slugOf(sc), g: 'Groupings', sec: 'By hydro scheme', label: sc === 'Other hydro' ? sc : `${sc} scheme`, c: C.hydro,
+    regions: isl ? null : ALL, ms: ['mw', 'pct', 'cf'],
+    get: (x, r, m) => plantSum((p) => p.fuel === 'hydro' && (p.scheme || 'Other hydro') === sc, running)(x, isl ? 'NZ' : r, m) })),   // a scheme in one island: its share of New Zealand's generation
   // Fun facts
   { k: 'biggest', g: 'Fun facts', label: 'Top plant right now', c: C.fun, txt: true, get: (x) => {
     const top = x.rows.filter((r) => !r.est).sort((a, b) => b.mw - a.mw)[0];

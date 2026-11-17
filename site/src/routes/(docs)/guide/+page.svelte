@@ -108,7 +108,7 @@
 			<dt>Customise it</dt>
 			<dd>Customise shows or hides the settings under the screen. In Layout, choose how many large and small values to show, and Simple (the numbers alone) or Detailed (the time, and a line under each value). In Background, pick a scene or a plain colour; the last dot mixes any colour.</dd>
 			<dt>Pick the values</dt>
-			<dd>In Values, select one to choose another, from System, Prices, By fuel, Plants or Fun facts. Some then offer a region (NZ, NI, SI) or how to show them: MW, % of generation or % of capacity.</dd>
+			<dd>In Values, select one to choose another, from System, Prices, By fuel, Groupings, Plants or Fun facts. Groupings has the tracker’s ways of grouping generation: renewable vs fossil, inverter vs synchronous, flexibility, thermal, each owner and each hydro scheme. Some then offer a region (NZ, NI, SI) or how to show them: MW, % of generation or % of capacity.</dd>
 			<dt>Keep it and share it</dt>
 			<dd>This browser keeps your layout. Copy link to this layout gives an address that opens it anywhere, or bookmark the page.</dd>
 			<dt>Put it on a wall screen</dt>

@@ -474,6 +474,24 @@ test.describe('dashboards', () => {
     await expect(page.locator('.stage .tile.small').nth(1)).toContainText('Price at Ōtāhuhu');
   });
 
+  test("the big-number dashboard's Groupings tab lists the tracker's groupings under their headings", async ({ page }) => {
+    await page.goto('/dashboard?bg=aurora&big=gen:NZ&small=hvdc');
+    await expect(page.locator('.stage .tile.big')).toHaveCount(1);   // the address's layout, once the page has started
+    await expect(page.locator('.stage .tile.big .num')).not.toHaveText('–');
+    const customise = page.getByRole('button', { name: 'Customise' });
+    if (await customise.getAttribute('aria-pressed') !== 'true') await customise.click();
+    await page.getByRole('button', { name: /^Small 1: HVDC transfer/ }).click();
+    const sheet = page.getByRole('dialog');
+    await sheet.getByRole('button', { name: 'Groupings' }).click();
+    for (const h of ['Renewable vs fossil', 'Inverter vs synchronous', 'Flexibility', 'Simplified', 'By owner', 'By hydro scheme']) {
+      await expect(sheet.getByRole('heading', { name: h })).toBeVisible();
+    }
+    await sheet.getByRole('button', { name: /^Inverter-based/ }).click();
+    await expect(page).toHaveURL(/small=inverter:NZ:pct/);
+    await expect(page.locator('.stage .tile.small').first()).toContainText('Inverter-based');
+    await expect(page.locator('.stage .tile.small .num').first()).not.toHaveText('–');
+  });
+
   test('a long value shrinks to fit its card, and Simple hides the line under it', async ({ page }) => {
     await page.goto('/dashboard?bg=plain&col=0b1a33&view=simple&big=gen:NZ,price:NI&small=price:SI,co2rate:NZ,bigbatt,biggest&kiosk=1');
     await expect(page.locator('.stage .tile.big .num').first()).not.toHaveText('–');
