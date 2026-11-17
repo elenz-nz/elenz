@@ -264,7 +264,7 @@ const BASE = [
     get: plantSum((p) => ownerOf(p) === o, running) })),
   ...SCHEMES.map(([sc, isl]) => ({ k: 'sch_' + slugOf(sc), g: 'Groupings', sec: 'By hydro scheme', label: sc === 'Other hydro' ? sc : `${sc} scheme`, c: C.hydro,
     regions: isl ? null : ALL, ms: ['mw', 'pct', 'cf'],
-    get: (x, r, m) => plantSum((p) => p.fuel === 'hydro' && (p.scheme || 'Other hydro') === sc, running)(x, isl ?? r, m) })),
+    get: (x, r, m) => plantSum((p) => p.fuel === 'hydro' && (p.scheme || 'Other hydro') === sc, running)(x, isl ? 'NZ' : r, m) })),   // a scheme in one island: its share of New Zealand's generation
   // Fun facts
   { k: 'biggest', g: 'Fun facts', label: 'Top plant right now', c: C.fun, txt: true, get: (x) => {
     const top = x.rows.filter((r) => !r.est).sort((a, b) => b.mw - a.mw)[0];

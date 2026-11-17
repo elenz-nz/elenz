@@ -103,6 +103,7 @@ test("the tracker's groupings: renewable vs fossil, inverter vs synchronous, fle
   assert.equal(v('own_mercury:NZ:mw').v, '182');
   assert.equal(v('sch_waitaki').v, '356');
   assert.equal(v('sch_waitaki').label, 'Waitaki scheme');
+  assert.equal(v('sch_waitaki').s, '1 of 1 running · 12.3% of generation');   // of New Zealand's, not the South Island's
   assert.equal(v('sch_waitaki::cf').s, '356 of 540 MW installed');
   assert.equal(v('sch_waikato').v, '0');
   // each grouping has its heading in the picker; old keys kept, now under Groupings
