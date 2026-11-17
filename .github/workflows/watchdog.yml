@@ -12,6 +12,12 @@
 #             least a day ahead, so this comes well before the estimate runs out of data), or the satellite more
 #             than SATELLITE_HOURS behind (the estimate is then running on the forecast)
 #
+#
+# The `records` job is the record alert (design decision, 17 Nov 2026): when the site shows a provisional record the
+# Elenz team hasn't been told about (the live week beating a record, as /now and the record pages check it, or the
+# history's dispatch months), it opens one issue labelled `record` listing them, which GitHub emails the same way.
+# Each record is told once (site/src/lib/records/alert.js keeps its key in the issue); close the issue once dealt with.
+#
 # The Worker runs this every 15 minutes (workflow_dispatch); the schedule below is a backup in case the Worker
 # itself has stopped.
 name: Watchdog
@@ -115,3 +121,45 @@ jobs:
             } else {
               core.info(`OK: live data to ${nz(live.meta.end)}, history to ${nz(hist.end)}.`);
             }
+
+  records:
+    if: github.repository == 'elenz-nz/elenz'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: site/src/lib
+          persist-credentials: false
+      - uses: actions/github-script@v9
+        with:
+          script: |
+            const { pathToFileURL } = require('node:url');
+            const lib = (f) => import(pathToFileURL(`${process.env.GITHUB_WORKSPACE}/site/src/lib/records/${f}`).href);
+            const { dropTies } = await lib('records.js');
+            const { provisionalNow, toldKeys, issueFor } = await lib('alert.js');
+            const site = process.env.SITE;
+            async function get(path) {
+              for (let i = 0; i < 3; i++) {
+                try {
+                  const r = await fetch(site + path, { headers: { 'cache-control': 'no-cache' } });
+                  if (r.ok) return await r.json();
+                } catch { /* try again */ }
+                await new Promise((res) => setTimeout(res, 5000));
+              }
+              return null;
+            }
+            const R = await get('/data/history/records.json');
+            if (!R) { core.info('No records file: nothing to check (the stale-data check covers an outage).'); return; }
+            const D = await get('/data/tracker.json');
+            const list = provisionalNow(dropTies(R), D);
+            const label = 'record';
+            const { owner, repo } = context.repo;
+            const issues = await github.paginate(github.rest.issues.listForRepo, { owner, repo, state: 'all', labels: label, per_page: 100 });
+            // the first run (no record issues yet) lists what is provisional already, in one issue, instead of announcing it
+            const first = issues.length === 0;
+            const issue = issueFor(list, toldKeys(issues.map((i) => i.body)), Date.now(), first);
+            if (!issue) { core.info(`${list.length} provisional record(s), none new.`); return; }
+            try { await github.rest.issues.createLabel({ owner, repo, name: label, color: '1f9d55', description: 'Raised by the record alert' }); } catch { /* exists */ }
+            await github.rest.issues.create({ owner, repo, labels: [label], title: issue.title, body: issue.body });
+            core.notice(issue.title);

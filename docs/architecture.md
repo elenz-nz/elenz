@@ -403,6 +403,15 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   (GitHub emails it to the Elenz team) when live data is over 60 minutes old, history over 5 days behind, the Worker
   can't start a job, or embedded solar's irradiance is failing (the reserve forecast not refreshed for 6 hours, the
   satellite 6 hours behind, or daylight with no irradiance at all: `docs/data-notes.md`), and closes it when the data recovers.
+  Its `records` job is the record alert (design decision, 17 Nov 2026, for the public push: the team hears of a record
+  first). It reads records.json and tracker.json from the live site and lists every provisional record the site shows
+  (`provisionalNow` in `site/src/lib/records/alert.js`: the live week through `liveBeats`, as /now and the record pages
+  check it, and the history's `prov` for half-hours, periods and runs). Any not told before go into one issue labelled
+  `record` (GitHub emails it), with each record's line, its page, a UTM-tagged link for a post and its key as
+  `<!-- record: id|region|period|NZ date -->`; keys already in any `record` issue, open or closed, aren't told again,
+  so a figure that keeps climbing through the afternoon, or the history's version of a live-week record days later, is
+  one email. Its first run, with no `record` issues yet, lists what was already provisional in one issue rather than
+  announcing it. Close each issue once dealt with. Tests: `site/tests/alert.test.js`.
 
 ## Worker
 
