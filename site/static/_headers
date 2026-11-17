@@ -13,6 +13,17 @@ https://:preview.elenz.workers.dev/*
   Strict-Transport-Security: max-age=2592000
   X-Content-Type-Options: nosniff
 
+# The two dashboards may be shown inside other pages, such as a Home Assistant Webpage card or a wall-screen app
+# (design decision, 17 Nov 2026): they hold no account or form, so framing them risks nothing. The /* rule above still
+# applies here, so its frame-ancestors is taken off and a looser one put on. Every other page keeps frame-ancestors
+# 'self'. Both pages are static files, so the Worker's own list (SECURITY_HEADERS) doesn't need the exception.
+/dashboard
+  ! Content-Security-Policy
+  Content-Security-Policy: frame-ancestors *
+/landscape
+  ! Content-Security-Policy
+  Content-Security-Policy: frame-ancestors *
+
 # SvelteKit's built scripts and styles carry a hash of their contents in their names, so a file at one address never
 # changes: browsers may keep them for a year without asking again. Everything else keeps Cloudflare's default (check
 # with the server on every use), so a new build shows at once.
