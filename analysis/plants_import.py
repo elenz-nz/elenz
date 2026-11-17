@@ -30,6 +30,7 @@ import re
 import sys
 import unicodedata
 from collections import defaultdict
+from urllib.parse import urlparse
 
 import openpyxl
 
@@ -233,7 +234,7 @@ def plant(rows, S):
                 notes.append(x[k] if len(rows) == 1 else f'{x["Station ID"]}: {x[k]}')
     if r['Images']:
         notes.append(f'Images: {r["Images"]}')
-    leads = [u for x in rows for u in urls(x['Sources']) if not u.startswith('https://en.wikipedia.org')]
+    leads = [u for x in rows for u in urls(x['Sources']) if urlparse(u).hostname != 'en.wikipedia.org']
     if leads:
         notes.append('Source leads: ' + ' '.join(dict.fromkeys(leads)))
 
