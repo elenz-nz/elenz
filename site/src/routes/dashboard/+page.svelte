@@ -104,6 +104,11 @@
 	const sections = $derived.by(() => {
 		if (!picking) return [];
 		const items = cat.filter((c) => c.g === tab);
+		// Groupings: a heading for each of the tracker's groupings, in catalogue order
+		if (items.some((c: any) => c.sec)) {
+			const secs = [...new Set(items.map((c: any) => c.sec as string))];
+			return secs.map((name) => ({ name, items: items.filter((c: any) => c.sec === name) }));
+		}
 		if (tab !== 'Plants') return [{ name: '', items }];
 		const FUELS = ['hydro', 'geo', 'wind', 'solar', 'gas', 'coal', 'batt', 'bio', 'waste'];
 		const NAMES: Record<string, string> = { hydro: 'Hydro', geo: 'Geothermal', wind: 'Wind', solar: 'Grid solar', gas: 'Gas', coal: 'Coal/gas, Rankine', batt: 'Battery', bio: 'Bioenergy', waste: 'Waste heat' };

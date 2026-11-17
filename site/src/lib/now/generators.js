@@ -10,7 +10,7 @@ import { slug } from '#lib/site/viewurl.js';
 import { withOemb } from '#lib/tracker/oemb.js';
 
 const FUEL = Object.fromEntries(FUELS.map((f) => [f.k, f]));
-const META = /** @type {Record<string, { owner?: string, aka?: string[] }>} */ (PLANT_META);
+const META = /** @type {Record<string, { owner?: string, scheme?: string, aka?: string[] }>} */ (PLANT_META);
 const CAP_ROWS = new Map(CAPACITY.plants.map((p) => [p.name, p.rows]));
 const TODAY = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Pacific/Auckland' }).format(new Date());
 
@@ -22,7 +22,7 @@ function capacityNow(name, fallback, today) {
 }
 
 /** @typedef {{ name: string, mw: number, cap: number | null }} Unit */
-/** @typedef {{ name: string, key: string, fuel: string, fuelName: string, tok: string, isl: string, owner: string,
+/** @typedef {{ name: string, key: string, fuel: string, fuelName: string, tok: string, isl: string, owner: string, scheme: string | null,
  *   mw: number, cap: number | null, pct: number | null, charging: boolean, href: string, units: Unit[], part: string,
  *   aka: string[], est?: boolean }} Row */
 /** @typedef {{ by: string, asc: boolean }} SortKey */
@@ -52,6 +52,7 @@ export function generatorRows(D) {
     return {
       name: p.name, key: slug(p.name), fuel: p.fuel, fuelName: f.name, tok: f.tok, isl: p.isl,
       owner: META[p.group || p.name]?.owner || 'Other generators',
+      scheme: META[p.group || p.name]?.scheme || null,   // hydro: its river scheme (the dashboard's By hydro scheme)
       mw, cap, pct: cap ? (mw / cap) * 100 : null,
       charging: p.fuel === 'batt' && mw < -0.05,
       href: p.est ? `/tracker?fuel=oemb&region=${p.isl}` : `/tracker?fuel=${p.fuel}&plant=${slug(p.group || p.name)}`,
