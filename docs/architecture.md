@@ -295,6 +295,11 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   drawn at `/og/card` (noindex, disallowed in robots.txt) and saved by `analysis/site_card_png.py` (redo it now and
   then; it isn't dated). `npm run check:previews` (`scripts/check-previews.js`, after the build, in checks.yml) fails
   if a public page (not noindex) lacks any tag or its image. A new page needs a `<Preview>`.
+- Press kit (design decision, 17 Nov 2026, for the public push): `static/press/elenz-press-kit.zip`, served at
+  `/press/elenz-press-kit.zip` with no page of its own (journalist emails link it): `README.txt` (descriptions, credit
+  line, key facts), the mark as SVG and 1024 px PNG for light and dark backgrounds, the site card and eight screenshots
+  from the guide's pictures. Built by `analysis/press_kit/build.sh` from `analysis/press_kit/README.txt`; rerun it when
+  the guide's screenshots, the card or the README change (the README's figures are typed in by hand).
 - Descriptions and caching (site audit, 11 Nov 2026): each public page's `<meta name="description">` is 110 to 160
   characters, the length search results show whole, and its og:description is the same text (`check-previews.js` fails
   otherwise). A method page's is its summary plus a closing sentence where the summary is short (`describe` in
