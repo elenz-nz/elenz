@@ -51,6 +51,7 @@
 	const LAP = 1700, FADE = 700;   // ms: once round the Articles card, then its outline fading
 	const ART = LAP + FADE;
 	const ART_PAD = 5;  // px: the outline sits this far outside the card
+	const END_SLACK = 120;   // px: the last stops are reached this far above the foot of the page (HOME-07)
 
 	onMount(() => {
 		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -109,6 +110,10 @@
 			// 220 px after the map), and the line grows out from there on its own clock (GROW) while the dot flies on.
 			// On a tall screen the page may end before then, so every stop is pulled in to the last scroll position.
 			const maxS = Math.max(0, document.documentElement.scrollHeight - vh);
+			// the last stops are pulled in a little short of the foot of the page: a tablet or phone browser often comes to
+			// rest a few px to ~100 px above it (its toolbars resize the screen; momentum stops short), which left the dot
+			// waiting just above the Articles card on a portrait tablet (test report HOME-07, 17 Nov 2026)
+			const end = Math.max(0, maxS - END_SLACK);
 			const last = stops[stops.length - 1].at;
 			const sC = Math.min(Math.max(travel, last + 220), Math.max(last + 40, maxS - 260));
 			stops.push({ p: page(qEnd), at: sC });
@@ -120,9 +125,10 @@
 			const hasRec = !!(recPath && ctmR && L > 0);
 			const onRec = (u: number) => { const p = recPath!.getPointAtLength(Math.max(0, Math.min(1, u)) * L); const q = new DOMPoint(p.x, p.y).matrixTransform(ctmR!); return { x: q.x, y: q.y + s }; };
 			let c0 = Infinity;
+			const hasArtEl = !!document.querySelector('[data-handoff="art"]');
 			if (hasRec) {
 				const start = onRec(0);
-				c0 = Math.min(Math.max(sC + 220, start.y - vh * 0.6), Math.max(sC + 60, maxS - 2));
+				c0 = Math.min(Math.max(sC + 220, start.y - vh * 0.6), Math.max(sC + 60, end - (hasArtEl ? 60 : 0)));
 				stops.push({ p: start, at: c0 });
 			}
 			// the Articles card, on screen: its outline, a little outside it, as a point a share w (0-1) of the way round
@@ -148,7 +154,7 @@
 			let cA = Infinity;
 			if (hasArt) {
 				const corner = { x: corners[0].x, y: corners[0].y + s };
-				cA = Math.min(Math.max(c0 + 220, corner.y - vh * 0.45), Math.max(c0 + 60, maxS - 1));
+				cA = Math.min(Math.max(c0 + 220, corner.y - vh * 0.45), Math.max(c0 + 60, end));
 				stops.push({ p: corner, at: cA });
 			}
 			// where the dot is (page coordinates) at scroll position v
@@ -179,7 +185,7 @@
 			const kC = smooth(grown);
 			const u = smooth(climb);
 			// the lap round the Articles card runs once the dot has reached its corner; scrolling back above winds it back
-			const artGo = hasArt && s >= cA - 1;
+			const artGo = hasArt && s >= Math.min(cA, end) - 1;   // on a page too short to fit every stop, at the foot anyway
 			art = hasArt ? Math.max(0, Math.min(ART, art + (artGo ? dt : -dt * 2.5))) : 0;
 			// the dot on the lap at time a (ms)
 			const artAt = (a: number): Pt => tip(round(smooth(a / LAP)));
@@ -212,7 +218,7 @@
 
 			// the dot is out while it flies or climbs; once it rests on the record (or, with no Records preview, on the
 			// end of the Tracker's line) the page's own marks take over
-			const dotOut = s > 0 && (hasArt ? s < cA - 1 || art < LAP : hasRec ? climb < 1 : s < sC);
+			const dotOut = s > 0 && (hasArt ? !artGo || art < LAP : hasRec ? climb < 1 : s < sC);
 			// the outline the dot has drawn round the Articles card, fading once it's round
 			lap = onArt ? 'M' + round(smooth(art / LAP)).map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join('L') : '';
 			lapO = art <= LAP ? 0.9 : 0.9 * (1 - (art - LAP) / FADE);

@@ -9,7 +9,7 @@
 	const YEAR = new Date().getFullYear();
 	type Link = { k: string; name: string; href: string };
 	const LINKS: Link[] = [
-		{ k: 'linkedin', name: 'LinkedIn', href: '' },
+		{ k: 'linkedin', name: 'Elenz on LinkedIn', href: 'https://www.linkedin.com/company/elenz/' },
 		{ k: 'bluesky', name: 'Bluesky', href: '' },
 		{ k: 'x', name: 'X', href: '' },
 		{ k: 'instagram', name: 'Instagram', href: '' },
