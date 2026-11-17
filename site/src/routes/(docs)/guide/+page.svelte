@@ -113,6 +113,8 @@
 			<dd>This browser keeps your layout. Copy link to this layout gives an address that opens it anywhere, or bookmark the page.</dd>
 			<dt>Put it on a wall screen</dt>
 			<dd>Copy wall-screen link gives the screen alone, with no buttons: open it in the wall screen’s browser and turn on that browser’s full screen (F11 on most computers). On the page itself, Full screen does the same; the X in the corner leaves it, and fades after 3 seconds. Keep screen on stops the display sleeping while the page is open; with a wall-screen link, set the device’s own screen timeout instead.</dd>
+			<dt id="dashboard-embed">Show it inside another page</dt>
+			<dd>The dashboard and the power landscape can be shown inside another page or app, such as a Home Assistant dashboard. Copy the wall-screen link and paste it as the page’s address: in Home Assistant, add a Webpage card and paste it as the URL. The link carries the layout, so it shows the same values wherever it opens.</dd>
 		</dl>
 
 		<h2 id="landscape">Power landscape</h2>
