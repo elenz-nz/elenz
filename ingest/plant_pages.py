@@ -76,7 +76,7 @@ def source_links(s):
     for part in [p.strip() for p in str(s or '').split(';') if p.strip()]:
         if part.startswith('http'):
             u = urlparse(part)
-            if 'wikipedia.org' in u.netloc and '/wiki/' in u.path:
+            if u.netloc.endswith('.wikipedia.org') and '/wiki/' in u.path:
                 label = 'Wikipedia, ' + unquote(u.path.split('/wiki/', 1)[1]).replace('_', ' ')
             else:
                 label = u.netloc.removeprefix('www.')
