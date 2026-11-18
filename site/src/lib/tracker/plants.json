@@ -261,7 +261,7 @@
 "Rangipo":{
 "owner":"Genesis",
 "scheme":"Tongariro",
-"river":1
+"river":0
 },
 "Rangitaiki Solar Farm":{
 "owner":"Other generators",
@@ -402,7 +402,7 @@
 "Tokaanu":{
 "owner":"Genesis",
 "scheme":"Tongariro",
-"river":0
+"river":1
 },
 "Turitea Wind Farm":{
 "owner":"Mercury"

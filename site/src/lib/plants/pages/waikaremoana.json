@@ -23,12 +23,162 @@
  "scheme": "Waikaremoana",
  "metered": "The metered history has one meter for Tuai, Piripaua and Kaitawa together, so it shows the scheme whole. The dispatch data (the live week and the weeks since the newest metered month) shows each station.",
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-18",
+ "about": {
+  "text": "The Waikaremoana Power Scheme in northern Hawke's Bay runs water from Lake Waikaremoana through three stations in turn: Kaitawa, Tuai and Piripaua. Tuai opened first, in 1929, making this the North Island's second government hydro scheme after Mangahao; Piripaua followed in 1943 and Kaitawa last. Kaitawa was the first to draw straight from the lake, through tunnels in the ancient landslide dam that formed it; before then the stations used only the water that leaked or spilled out. Tuai has the highest head and makes the largest share of the scheme's power.",
+  "refs": [
+   1
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "Tuai 1929; Piripaua 1943; Kaitawa 1948",
+   "refs": [
+    1
+   ],
+   "note": "Genesis's lake history gives 1949 for Kaitawa (see notes)"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "7 units: Tuai 3 of 20 MW, Piripaua 2 of 21 MW, Kaitawa 2 of 18 MW",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "scheme",
+   "label": "Scheme",
+   "value": "Waikaremoana Power Scheme",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "river",
+   "label": "River or lake",
+   "value": "Lake Waikaremoana and the Waikaretaheke River",
+   "refs": [
+    1
+   ],
+   "note": "Kaitawa draws from Lake Waikaremoana and discharges into Lake Kaitawa, Tuai's head pond; Tuai discharges into Lake Whakamarino, Piripaua's intake"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Hawke's Bay",
+   "refs": [
+    2
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Wairoa",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Genesis Energy",
+   "refs": [
+    4,
+    1
+   ],
+   "note": "Genesis Energy Limited, named Genesis Power Limited when it took the scheme over in 1999"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–99",
+   "refs": [
+    5,
+    6
+   ],
+   "note": "ECNZ took over the Crown's generation on 1 April 1987; the split directions of March 1999 moved Kaitawa, Tuai and Piripaua to Genesis Power Limited (now Genesis Energy), from 1 April 1999"
+  },
+  {
+   "k": "stations",
+   "label": "Stations",
+   "refs": [
+    1
+   ],
+   "value": "Kaitawa (36 MW), Tuai (60 MW), Piripaua (42 MW)"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1
+   ],
+   "value": "138 MW (Genesis's total capacity)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Tuai (TUI1101)",
+   "refs": [
+    7
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Waikaremoana Power Scheme",
+   "publisher": "Genesis Energy",
+   "url": "https://www.genesisenergy.co.nz/about/generation/waikaremoana-power-scheme",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 2,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 3,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 4,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 5,
+   "title": "New Zealand Gazette, 27 November 1995, issue 140: ECNZ information for disclosure",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1995/1995%20ISSUE%20140.pdf",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 6,
+   "title": "New Zealand Gazette, 25 March 1999, issue 37: Directions relating to split of Electricity Corporation of New Zealand Limited",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1999/1999%20ISSUE%20037.pdf",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 7,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-18"
+  }
+ ],
  "related": {
   "owner": [
    {
@@ -53,7 +203,7 @@
    },
    {
     "slug": "rangipo",
-    "name": "Rangipo"
+    "name": "Rangipō"
    },
    {
     "slug": "tekapo-a",
@@ -93,7 +243,7 @@
    },
    {
     "slug": "rangipo",
-    "name": "Rangipo"
+    "name": "Rangipō"
    },
    {
     "slug": "karapiro",

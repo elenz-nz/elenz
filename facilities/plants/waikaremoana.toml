@@ -7,12 +7,23 @@ register = ["H060"]
 wikidata = ["Q61448290", "Q140121649", "Q140119415"]
 osm = ["way/216744819", "way/216943486", "way/986072121"]
 reviewed = ""
-notes = ["Added from Elenz's plant list (8 Nov 2026)."]
+photo_leads = ["P032"]
+to_check = ["Location: confirm the point sits on Tuai's powerhouse against the LINZ aerial (separate task)."]
+notes = [
+  "Added from Elenz's plant list (8 Nov 2026).",
+  "Elenz shows the scheme's three stations (Tuai, Piripaua and Kaitawa) as one plant, 140 MW in the EA register.",
+  "Hydro batch 2 (18 Nov 2026): facts checked against Genesis's Waikaremoana Power Scheme page, the EA register, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "Location: Tuai's point from Wikidata (Q61448290), not yet checked against the aerial; Tuai is the largest station and where the scheme connects to the grid (about 150 m away). Kaitawa (Q140121649) is about 1.8 km and Piripaua (Q140119415) about 4 km from the grid connection point.",
+  "District and region from all three stations' Wikidata points in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026: all in Wairoa District, Hawke's Bay; no other district or region is within 5 km of any of them.",
+  "Resolved: Capacity: Genesis gives 138 MW (Tuai 60, Piripaua 42, Kaitawa 36); the EA register gives Piripaua 44 MW, so Elenz's installed figure is 140 MW. The register spells Piripaua 'Pirirpaua'.",
+  "Kaitawa's year: Genesis's scheme page gives 1948 in its summary and the register agrees; the same page's lake history says it was commissioned in 1949, as does Wikidata. The page shows 1948.",
+  "Other names (Tuai, Piripaua, Kaitawa) dropped 18 Nov 2026: they are the scheme's stations, shown in the Stations row.",
+]
 
 [location]
-value = [-38.806819, 177.150844]
-basis = "station"
-source = "wp-list"
+value = [-38.806639, 177.150889]
+basis = "Tuai station"
+source = "wd-q61448290"
 grade = "B"
 checked = ""
 
@@ -21,36 +32,62 @@ value = [-38.80535, 177.1514]
 code = "TUI1101 TUAI"
 source = "ea-nsp"
 grade = "A"
-checked = ""
-
-[facts.other_names]
-value = ["Tuai", "Piripaua", "Kaitawa"]
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "Names the EA register, Wikipedia and Elenz use for this plant; check each."
+checked = "2026-11-18"
+note = "code and point match the EA's network supply points table of 17 Nov 2026; all three stations connect here"
 
 [facts.commissioned]
+value = "Tuai 1929; Piripaua 1943; Kaitawa 1948"
+source = "genesis-waikaremoana"
+grade = "A"
+checked = "2026-11-18"
+note = "Genesis's lake history gives 1949 for Kaitawa (see notes)"
+
+[[facts.commissioned.alt]]
 value = "Tuai 1929; Piripaua 1943; Kaitawa 1948"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [[facts.commissioned.alt]]
-value = "1929"
-source = "wd-q61448290"
+value = "Tuai 1929; Piripaua 1943; Kaitawa 1949"
+source = ["wd-q61448290", "wd-q140119415", "wd-q140121649"]
 grade = "B"
 checked = ""
-note = "inception 1929; inception 1949; inception 1943"
+note = "inception"
 
 [[facts.commissioned.alt]]
-value = "1929"
+value = "Tuai 1929; Piripaua 1943; Kaitawa 1948"
 source = "ea-register"
 grade = "A"
 checked = ""
-note = "the register's start date, 1929-01-01; 1943-01-01; 1948-01-01: often a year, not the day"
+note = "the register's start dates, 1 January of each year: often a year, not the day"
+
+[facts.units]
+value = "7 units: Tuai 3 of 20 MW, Piripaua 2 of 21 MW, Kaitawa 2 of 18 MW"
+source = "genesis-waikaremoana"
+grade = "A"
+checked = "2026-11-18"
+
+[facts.scheme]
+value = "Waikaremoana Power Scheme"
+source = "genesis-waikaremoana"
+grade = "A"
+checked = "2026-11-18"
+
+[facts.river]
+value = "Lake Waikaremoana and the Waikaretaheke River"
+source = "genesis-waikaremoana"
+grade = "A"
+checked = "2026-11-18"
+note = "Kaitawa draws from Lake Waikaremoana and discharges into Lake Kaitawa, Tuai's head pond; Tuai discharges into Lake Whakamarino, Piripaua's intake"
 
 [facts.region]
+value = "Hawke's Bay"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.region.alt]]
 value = "Hawke's Bay"
 source = "elenz-register"
 grade = "C"
@@ -58,45 +95,60 @@ checked = ""
 
 [facts.territorial_authority]
 value = "Wairoa"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.territorial_authority.alt]]
+value = "Wairoa"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Genesis"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Genesis Energy"
+source = ["ea-register", "genesis-waikaremoana"]
+grade = "A"
+checked = "2026-11-18"
+note = "Genesis Energy Limited, named Genesis Power Limited when it took the scheme over in 1999"
+
+[facts.previous_owners]
+value = "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–99"
+source = ["gazette-1995-140", "gazette-1999-37"]
+grade = "A"
+checked = "2026-11-18"
+note = "ECNZ took over the Crown's generation on 1 April 1987; the split directions of March 1999 moved Kaitawa, Tuai and Piripaua to Genesis Power Limited (now Genesis Energy), from 1 April 1999"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "The Waikaremoana Power Scheme in northern Hawke's Bay runs water from Lake Waikaremoana through three stations in turn: Kaitawa, Tuai and Piripaua. Tuai opened first, in 1929, making this the North Island's second government hydro scheme after Mangahao; Piripaua followed in 1943 and Kaitawa last. Kaitawa was the first to draw straight from the lake, through tunnels in the ancient landslide dam that formed it; before then the stations used only the water that leaked or spilled out. Tuai has the highest head and makes the largest share of the scheme's power."
+source = "genesis-waikaremoana"
+grade = "A"
+checked = "2026-11-18"
 
 [[ratings]]
-value = "Tuai 60; Piripaua 42; Kaitawa 36"
-basis = "Wikipedia (basis not stated)"
-source = "wp-list"
-grade = "B"
-checked = ""
-
-[[stations]]
-value = "Tuai"
-source = "wp-list"
-grade = "B"
-checked = ""
-
-[[stations]]
-value = "Piripaua"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = 138
+basis = "Genesis's total capacity"
+source = "genesis-waikaremoana"
+grade = "A"
+checked = "2026-11-18"
 
 [[stations]]
 value = "Kaitawa"
-source = "wp-list"
-grade = "B"
-checked = ""
+mw = 36
+source = "genesis-waikaremoana"
+grade = "A"
+checked = "2026-11-18"
+
+[[stations]]
+value = "Tuai"
+mw = 60
+source = "genesis-waikaremoana"
+grade = "A"
+checked = "2026-11-18"
+
+[[stations]]
+value = "Piripaua"
+mw = 42
+source = "genesis-waikaremoana"
+grade = "A"
+checked = "2026-11-18"
