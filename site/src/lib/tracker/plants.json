@@ -172,7 +172,7 @@
 "owner":"Genesis"
 },
 "Mahinerangi (Waipori B)":{
-"owner":"Contact",
+"owner":"Mercury",
 "metered":"Since June 2011 one meter (WPG0331) carries Mahinerangi and Deep Stream hydro together. The metered history splits it 70% Mahinerangi, 30% Deep Stream, their average shares in the dispatch data 2020–26. The dispatch data (the live week and the weeks since the newest metered month) has each plant's own output."
 },
 "Manapōuri":{
@@ -313,17 +313,17 @@
 "owner":"Other generators"
 },
 "Tararua Wind Farm 3":{
-"owner":"Contact",
+"owner":"Mercury",
 "aka":[
 "Tararua Wind Central",
 "Tararua stage III"
 ]
 },
 "Tararua stage I":{
-"owner":"Contact"
+"owner":"Mercury"
 },
 "Tararua stage II":{
-"owner":"Contact"
+"owner":"Mercury"
 },
 "Tauhara":{
 "owner":"Contact",
@@ -369,7 +369,7 @@
 "owner":"Contact"
 },
 "Te Rere Hau":{
-"owner":"Other generators"
+"owner":"Meridian"
 },
 "Te Uku":{
 "owner":"Meridian"
@@ -422,7 +422,7 @@
 "metered":"The metered history has one meter for Tuai, Piripaua and Kaitawa together, so it shows the scheme whole. The dispatch data (the live week and the weeks since the newest metered month) shows each station."
 },
 "Waipipi":{
-"owner":"Genesis",
+"owner":"Mercury",
 "aka":[
 "Waverley Wind Farm"
 ]

@@ -19,65 +19,195 @@
    ]
   }
  ],
- "owner": "Contact",
+ "owner": "Mercury",
  "scheme": null,
  "metered": "Since June 2011 one meter (WPG0331) carries Mahinerangi and Deep Stream hydro together. The metered history splits it 70% Mahinerangi, 30% Deep Stream, their average shares in the dispatch data 2020–26. The dispatch data (the live week and the weeks since the newest metered month) has each plant's own output.",
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Mahinerangi Wind Farm stands on farmland above Lake Mahinerangi, about 50 km west of Dunedin, at 600 to 730 m above sea level. Trustpower won consent in 2007 for up to 100 turbines and 200 MW, and built a first stage of 12 Vestas turbines (36 MW) in 2011, which feeds its power into the nearby Waipori hydro scheme's lines. Mercury, which bought it in 2021, began building a 192 MW second stage, Puke Kapo Hau, in November 2026.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2011",
+   "refs": [
+    2
+   ],
+   "note": "first power on 21 February 2011; all 12 turbines by the end of March"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "12 turbines of 3 MW",
+   "refs": [
+    2,
+    1
+   ],
+   "note": "Vestas V90-3MW turbines; 36 MW in all"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Otago",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Clutha",
+   "refs": [
+    4,
+    5
+   ],
+   "note": "Dunedin City is within 2 km"
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Mercury",
+   "refs": [
+    2,
+    6
+   ],
+   "note": "since 3 August 2021"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "Trustpower, 2011–16; Tilt Renewables, 2016–21",
+   "refs": [
+    7,
+    6,
+    1
+   ],
+   "note": "Trustpower moved its wind farms to Tilt Renewables in its demerger of October 2016; Mercury bought Tilt's New Zealand operations on 3 August 2021"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Halfway Bush (HWB0331)",
+   "refs": [
+    8
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Mahinerangi Wind Farm",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Mahinerangi_Wind_Farm",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Mahinerangi Wind Farm",
+   "publisher": "Mercury",
+   "url": "https://www.mercury.co.nz/about-us/renewable-energy/wind-generation/mahinerangi-wind-farm",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "TrustPower Modifies Mahinerangi Windfarm Application (29 September 2006)",
+   "publisher": "TrustPower (via Scoop)",
+   "url": "https://www.scoop.co.nz/stories/BU0609/S00508.htm",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Mercury acquires Tilt Renewables' New Zealand operations (NZX, 3 August 2021)",
+   "publisher": "Mercury NZ",
+   "url": "https://www.nzx.com/announcements/376610",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "Tilt Renewables introduction booklet (2016)",
+   "publisher": "Tilt Renewables",
+   "url": "https://tiltrenewables.com/wp-content/uploads/2024/08/TILT12848_IntroductionBooklet_11F_Web.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 8,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {
-    "slug": "clyde",
-    "name": "Clyde"
+    "slug": "arapuni",
+    "name": "Arapuni"
    },
    {
-    "slug": "glenbrook-ohurua-battery",
-    "name": "Glenbrook-Ohurua Battery"
+    "slug": "kaiwera-downs-stage-2",
+    "name": "Kaiwera Downs (Stage 2)"
    },
    {
-    "slug": "kowhai-park-solar-farm",
-    "name": "Kōwhai Park Solar Farm"
+    "slug": "karapiro",
+    "name": "Karāpiro"
    },
    {
-    "slug": "matahina",
-    "name": "Matahina"
+    "slug": "kawerau",
+    "name": "Kawerau"
    },
    {
-    "slug": "roxburgh",
-    "name": "Roxburgh"
+    "slug": "maraetai",
+    "name": "Maraetai"
    },
    {
-    "slug": "stratford",
-    "name": "Stratford"
+    "slug": "nga-awa-purua",
+    "name": "Ngā Awa Pūrua"
+   },
+   {
+    "slug": "nga-tamariki",
+    "name": "Ngā Tamariki"
+   },
+   {
+    "slug": "ohakuri",
+    "name": "Ōhakuri"
    },
    {
     "slug": "tararua-wind-farm-3",
     "name": "Tararua Wind Farm 3"
    },
    {
-    "slug": "tauhara",
-    "name": "Tauhara"
+    "slug": "turitea-wind-farm",
+    "name": "Turitea Wind Farm"
    },
    {
-    "slug": "te-mihi",
-    "name": "Te Mihi"
+    "slug": "waipipi",
+    "name": "Waipipi"
    },
    {
-    "slug": "waipori-2a-3-4",
-    "name": "Waipori (2A/3/4)"
-   },
-   {
-    "slug": "wairakei",
-    "name": "Wairākei"
-   },
-   {
-    "slug": "whirinaki",
-    "name": "Whirinaki"
+    "slug": "whakamaru",
+    "name": "Whakamaru"
    }
   ],
   "owner_all": false,

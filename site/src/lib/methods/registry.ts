@@ -109,7 +109,7 @@ export const TOPICS: Topic[] = [
 		title: 'Renewable share and groupings',
 		summary: 'How generation is counted as renewable, and how plants are grouped by fuel, flexibility, site, hydro scheme and owner.',
 		shownOn: [['Tracker', '/tracker'], ['Now', '/now']],
-		reviewed: '2026-11-06',
+		reviewed: '2026-11-19',
 		code: ['site/src/lib/tracker/fuels.js', 'site/src/lib/tracker/tracker.js', 'facilities/overrides.toml', 'ingest/plant_meta.py'],
 	},
 	{

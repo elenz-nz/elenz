@@ -19,60 +19,207 @@
    ]
   }
  ],
- "owner": "Genesis",
+ "owner": "Mercury",
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Waipipi stands on coastal farmland between Pātea and Waverley in South Taranaki. Trustpower took over the project in 2010, and Tilt Renewables, its wind spin-off, built it from late 2019 with 31 Siemens Gamesa turbines of 4.3 MW, then the largest in New Zealand. The first turbines fed the grid in November 2020 and all were running by March 2021; Genesis Energy buys its output under a 20-year agreement. Mercury bought it, with Tilt's other New Zealand wind farms, in August 2021.",
+  "refs": [
+   1,
+   2,
+   3,
+   4
+  ]
+ },
+ "facts": [
+  {
+   "k": "other_names",
+   "label": "Other names",
+   "value": "Waverley Wind Farm",
+   "refs": [
+    2
+   ],
+   "note": "its name until 2019, when Ngaa Rauru Kiitahi gave it the name Waipipi"
+  },
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2021",
+   "refs": [
+    3,
+    5
+   ],
+   "note": "the first turbines fed the grid in November 2020; complete in March 2021"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "31 turbines of 4.3 MW",
+   "refs": [
+    2,
+    5
+   ],
+   "note": "Siemens Gamesa turbines with 130 m rotors"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Taranaki",
+   "refs": [
+    6
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "South Taranaki",
+   "refs": [
+    7
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Mercury",
+   "refs": [
+    5,
+    4
+   ],
+   "note": "since 3 August 2021; Genesis Energy buys its output"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "Tilt Renewables, to 2021",
+   "refs": [
+    2,
+    4
+   ],
+   "note": "Tilt built it; Mercury bought Tilt Renewables' New Zealand operations on 3 August 2021"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Waverley (WVY1101)",
+   "refs": [
+    8
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Waipipi Wind Farm",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Waipipi_Wind_Farm",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Investment Decision for Waipipi Wind Farm (NZX, 28 August 2019)",
+   "publisher": "Tilt Renewables",
+   "url": "https://www.nzx.com/announcements/340043",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Waipipi Wind Farm Update (NZX, 5 March 2021)",
+   "publisher": "Genesis Energy",
+   "url": "https://www.nzx.com/announcements/368705",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Mercury acquires Tilt Renewables' New Zealand operations (NZX, 3 August 2021)",
+   "publisher": "Mercury NZ",
+   "url": "https://www.nzx.com/announcements/376610",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Waipipi Wind Farm",
+   "publisher": "Mercury",
+   "url": "https://www.mercury.co.nz/about-us/renewable-energy/wind-generation/waipipi-wind-farm",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 8,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {
-    "slug": "huntly-5",
-    "name": "Huntly 5"
+    "slug": "arapuni",
+    "name": "Arapuni"
    },
    {
-    "slug": "huntly-6",
-    "name": "Huntly 6"
+    "slug": "aratiatia",
+    "name": "Aratiatia"
    },
    {
-    "slug": "huntly-battery",
-    "name": "Huntly Battery"
+    "slug": "kaiwera-downs-stage-2",
+    "name": "Kaiwera Downs (Stage 2)"
    },
    {
-    "slug": "huntly-rankines",
-    "name": "Huntly Rankines"
+    "slug": "karapiro",
+    "name": "Karāpiro"
    },
    {
-    "slug": "lauriston-solar-farm",
-    "name": "Lauriston Solar Farm"
+    "slug": "kawerau",
+    "name": "Kawerau"
    },
    {
-    "slug": "rangipo",
-    "name": "Rangipō"
+    "slug": "maraetai",
+    "name": "Maraetai"
    },
    {
-    "slug": "tekapo-a",
-    "name": "Tekapo A"
+    "slug": "nga-awa-purua",
+    "name": "Ngā Awa Pūrua"
    },
    {
-    "slug": "tekapo-b",
-    "name": "Tekapo B"
+    "slug": "nga-tamariki",
+    "name": "Ngā Tamariki"
    },
    {
-    "slug": "tokaanu",
-    "name": "Tokaanu"
+    "slug": "ohakuri",
+    "name": "Ōhakuri"
    },
    {
-    "slug": "waikaremoana",
-    "name": "Waikaremoana"
+    "slug": "tararua-wind-farm-3",
+    "name": "Tararua Wind Farm 3"
+   },
+   {
+    "slug": "turitea-wind-farm",
+    "name": "Turitea Wind Farm"
+   },
+   {
+    "slug": "whakamaru",
+    "name": "Whakamaru"
    }
   ],
-  "owner_all": true,
+  "owner_all": false,
   "scheme": [],
   "fuel": [
    {

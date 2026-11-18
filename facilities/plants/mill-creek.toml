@@ -7,8 +7,16 @@ register = ["W012"]
 wikidata = "Q6858304"
 osm = ["relation/8550044"]
 reviewed = ""
-to_check = ["Capacity: Verify rating."]
-notes = ["60 MW from Sep 2014 (staged from May 2014)."]
+to_check = [
+  "Location: confirm the point sits on the wind farm against the LINZ aerial (separate task).",
+]
+notes = [
+  "60 MW from Sep 2014 (staged from May 2014).",
+  "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the [location] point (not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. The only other area within 5 km is the sea (outside any district).",
+  "Resolved: Capacity: Meridian gives 26 turbines and 59.8 MW; Elenz and the register use 60 MW. Peak metered half-hour, Aug-Sep 2026: 58.3 MW.",
+  "Removed the scheme fact (Wellington, from our own register): a single wind farm has no scheme.",
+]
 
 [location]
 value = [-41.212222, 174.738889]
@@ -22,48 +30,68 @@ value = [-41.2584, 174.75956]
 code = "WIL0331 Wilton"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
 value = "2014"
-source = "wp-list"
+source = "meridian-mill-creek"
+grade = "A"
+checked = "2026-11-19"
+note = "first power in May 2014; fully running from October 2014"
+
+[[facts.commissioned.alt]]
+value = "2014"
+source = "ea-register"
+grade = "A"
+checked = ""
+note = "the register's start date, 2014-01-01: a year, not the day"
+
+[[facts.commissioned.alt]]
+value = "2014"
+source = "wp-mill-creek"
 grade = "B"
 checked = ""
 
 [facts.units]
-value = "26 turbines"
-source = "wp-list"
+value = "26 turbines of 2.3 MW"
+source = ["meridian-mill-creek", "wp-mill-creek"]
 grade = "B"
-checked = ""
-
-[facts.scheme]
-value = "Wellington"
-source = "elenz-register"
-grade = "C"
-checked = ""
+checked = "2026-11-19"
+note = "Siemens SWT-2.3-82 VS turbines; 59.8 MW in all"
 
 [facts.region]
+value = "Wellington"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
 value = "Wellington"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
+value = "Wellington City"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
 value = "Wellington"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Meridian"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Meridian Energy"
+source = ["ea-register", "meridian-mill-creek"]
+grade = "A"
+checked = "2026-11-19"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Mill Creek is in the hills above the Ōhāriu Valley, north-west of Wellington, on private farms whose owners chose wind farming over a housing subdivision or forestry and picked Meridian to build it. Plans for 31 turbines were cut to 26 by the Environment Court in 2011. Building began in 2012, with about 800,000 cubic metres of earthworks and 19 km of tracks, and the 26 turbines (59.8 MW) were fully running in 2014, feeding the grid at Transpower's Wilton substation."
+source = ["meridian-mill-creek", "wp-mill-creek"]
+grade = "B"
+checked = "2026-11-19"

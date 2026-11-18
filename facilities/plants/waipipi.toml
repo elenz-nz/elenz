@@ -8,12 +8,17 @@ wikidata = "Q28180573"
 osm = ["relation/13458398"]
 reviewed = ""
 to_check = [
-  "Owner: Elenz shows the register operator, not Mercury.",
-  "Mercury since 3 Aug 2021 (bought Tilt Renewables' NZ wind farms).",
-  "Elenz shows the register's operator (Genesis), which looks like the party that offers its output, not the owner.",
-  "Capacity: Verify capacity and stage boundaries.",
+  "Location: confirm the point sits on the wind farm against the LINZ aerial (separate task).",
 ]
-notes = ["133 MW from Jan 2020. Owner: Mercury since 2021 (Elenz shows Genesis, the register's operator)."]
+notes = [
+  "133 MW from Jan 2020.",
+  "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the [location] point (not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. The only other area within 5 km is the sea (outside any district). Wikidata's point is coarse (to the minute); the LINZ check should move it onto the farm.",
+  "Owner: Mercury since 3 August 2021. The EA register lists Genesis Energy, which buys all its output under a 20-year agreement; that is how Elenz's By owner view showed it under Genesis. [plant_owners] now sets Mercury.",
+  "Resolved: Capacity: Mercury's page says \"Maximum capacity: 113 MW\", but Tilt (2019), Genesis (2021), the register and Wikipedia give 133 MW (31 x 4.3 MW), and the metered peak reached 125.7 MW (13 Sep 2026, TP4): 113 looks like a typo. Elenz keeps 133.",
+  "Mercury's page also says Siemens Gamesa \"SWT130\" and $277 million; Tilt said $276 million (2019).",
+  "Removed the scheme fact (South Taranaki, from our own register): a single wind farm has no scheme.",
+]
 
 [location]
 value = [-39.783333, 174.55]
@@ -27,41 +32,56 @@ value = [-39.7541, 174.6355]
 code = "WVY1101 WAVERLEY"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.other_names]
+value = ["Waverley Wind Farm"]
+source = "tilt-waipipi-2019"
+grade = "A"
+checked = "2026-11-19"
+note = "its name until 2019, when Ngaa Rauru Kiitahi gave it the name Waipipi"
+
+[[facts.other_names.alt]]
 value = ["Waverley Wind Farm"]
 source = "elenz-register"
 grade = "C"
 checked = ""
-note = "Names the EA register, Wikipedia and Elenz use for this plant; check each."
 
 [facts.commissioned]
 value = "2021"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = ["genesis-waipipi-2021", "mercury-waipipi"]
+grade = "A"
+checked = "2026-11-19"
+note = "the first turbines fed the grid in November 2020; complete in March 2021"
 
 [[facts.commissioned.alt]]
 value = "2020"
 source = "ea-register"
 grade = "A"
 checked = ""
-note = "the register's start date, 2020-01-01: often a year, not the day"
+note = "the register's start date, 2020-01-01"
 
-[facts.units]
-value = "31 turbines"
-source = "wp-list"
+[[facts.commissioned.alt]]
+value = "2021"
+source = "wp-waipipi"
 grade = "B"
 checked = ""
 
-[facts.scheme]
-value = "South Taranaki"
-source = "elenz-register"
-grade = "C"
-checked = ""
+[facts.units]
+value = "31 turbines of 4.3 MW"
+source = ["tilt-waipipi-2019", "mercury-waipipi"]
+grade = "A"
+checked = "2026-11-19"
+note = "Siemens Gamesa turbines with 130 m rotors"
 
 [facts.region]
+value = "Taranaki"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
 value = "Taranaki"
 source = "elenz-register"
 grade = "C"
@@ -69,20 +89,39 @@ checked = ""
 
 [facts.territorial_authority]
 value = "South Taranaki"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "South Taranaki"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Genesis"
+value = "Mercury"
+source = ["mercury-waipipi", "nzx-announcements-376610"]
+grade = "A"
+checked = "2026-11-19"
+note = "since 3 August 2021; Genesis Energy buys its output"
+
+[[facts.owner.alt]]
+value = "Genesis Energy Limited"
 source = "ea-register"
-grade = "B"
+grade = "A"
 checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+note = "the register's operator: Genesis buys all its output"
+
+[facts.previous_owners]
+value = "Tilt Renewables, to 2021"
+source = ["tilt-waipipi-2019", "nzx-announcements-376610"]
+grade = "A"
+checked = "2026-11-19"
+note = "Tilt built it; Mercury bought Tilt Renewables' New Zealand operations on 3 August 2021"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Waipipi stands on coastal farmland between Pātea and Waverley in South Taranaki. Trustpower took over the project in 2010, and Tilt Renewables, its wind spin-off, built it from late 2019 with 31 Siemens Gamesa turbines of 4.3 MW, then the largest in New Zealand. The first turbines fed the grid in November 2020 and all were running by March 2021; Genesis Energy buys its output under a 20-year agreement. Mercury bought it, with Tilt's other New Zealand wind farms, in August 2021."
+source = ["wp-waipipi", "tilt-waipipi-2019", "genesis-waipipi-2021", "nzx-announcements-376610"]
+grade = "B"
+checked = "2026-11-19"

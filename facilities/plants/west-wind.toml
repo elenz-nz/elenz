@@ -8,8 +8,16 @@ wikidata = "Q7249372"
 osm = ["relation/8550043"]
 reviewed = ""
 photo_leads = ["P024", "P025", "P026"]
-to_check = ["Capacity: Capacity to verify; Commons image leads."]
-notes = ["142.6 MW on two buses."]
+to_check = [
+  "Location: confirm the point sits on the wind farm against the LINZ aerial (separate task).",
+]
+notes = [
+  "142.6 MW on two connections (WWD1102, WWD1103); the register lists 80 + 80 MW.",
+  "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the [location] point (not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. No other district within 2 km.",
+  "Resolved: Capacity: Meridian gives 62 turbines and 142.6 MW, the figure Elenz uses; the register's 160 MW (two rows of 80 MW) is kept as a rating. Peak metered half-hours, Aug-Sep 2026: 65.1 and 63.3 MW on the two connections.",
+  "Removed the scheme fact (Mākara, from our own register): a single wind farm has no scheme; Mākara is in the about text.",
+]
 
 [location]
 value = [-41.2764, 174.66]
@@ -23,55 +31,75 @@ value = [-41.29562, 174.6605]
 code = "WWD1102 Westwind; WWD1103 Westwind"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
 value = "2009"
-source = "wp-list"
+source = "meridian-west-wind"
+grade = "A"
+checked = "2026-11-19"
+note = "construction began in 2007; the first 15 turbines were switched on in April 2009"
+
+[[facts.commissioned.alt]]
+value = "2009"
+source = "ea-register"
+grade = "A"
+checked = ""
+note = "the register's start date, 2009-01-01: a year, not the day"
+
+[[facts.commissioned.alt]]
+value = "2009"
+source = "wp-west-wind"
 grade = "B"
 checked = ""
 
 [facts.units]
-value = "62 turbines"
-source = "wp-list"
+value = "62 turbines of 2.3 MW"
+source = ["meridian-west-wind", "wp-west-wind"]
 grade = "B"
-checked = ""
-
-[facts.scheme]
-value = "Mākara"
-source = "elenz-register"
-grade = "C"
-checked = ""
+checked = "2026-11-19"
+note = "Siemens SWT-2.3-82 VS turbines; 142.6 MW in all"
 
 [facts.region]
+value = "Wellington"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
 value = "Wellington"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
+value = "Wellington City"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
 value = "Wellington"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Meridian"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Meridian Energy"
+source = ["ea-register", "meridian-west-wind"]
+grade = "A"
+checked = "2026-11-19"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "West Wind stands on the coastal hills at Mākara, west of Wellington, where Cook Strait funnels strong, steady winds. Meridian began building it in 2007, bringing the turbine parts in through a temporary wharf at Oteranga Bay and 33 km of new roads to keep them off the city's streets. Its 62 turbines, up to 142.6 MW, were fully running in 2009, and a public recreation area lets visitors walk and bike among them."
+source = ["meridian-west-wind", "wp-west-wind"]
+grade = "B"
+checked = "2026-11-19"
 
 [[ratings]]
-value = "143"
-basis = "Wikipedia (basis not stated)"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = 160
+basis = "The EA register's nameplate: two rows of 80 MW, one for each grid connection"
+source = "ea-register"
+grade = "A"
+checked = "2026-11-19"

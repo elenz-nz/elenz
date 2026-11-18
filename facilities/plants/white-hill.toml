@@ -7,8 +7,16 @@ register = ["W005"]
 wikidata = "Q7994795"
 osm = ["relation/8776651"]
 reviewed = ""
-to_check = ["Capacity: Verify capacity and status."]
-notes = ["58 MW from Jun 2007."]
+to_check = [
+  "Location: confirm the point sits on the wind farm against the LINZ aerial (separate task).",
+]
+notes = [
+  "58 MW from Jun 2007.",
+  "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the [location] point (not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. No other district within 5 km.",
+  "Resolved: Capacity and status: Meridian gives 29 turbines and 58 MW, operating; matches Elenz and the register.",
+  "Removed the scheme fact (Southland, from our own register): a single wind farm has no scheme.",
+]
 
 [location]
 value = [-45.7525, 168.272]
@@ -22,27 +30,43 @@ value = [-46.30539, 168.35953]
 code = "NMA0331 NTH MAKAREWA"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
 value = "2007"
-source = "wp-list"
+source = "meridian-white-hill"
+grade = "A"
+checked = "2026-11-19"
+note = "construction began in 2006"
+
+[[facts.commissioned.alt]]
+value = "2007"
+source = "ea-register"
+grade = "A"
+checked = ""
+note = "the register's start date, 2007-01-01: a year, not the day"
+
+[[facts.commissioned.alt]]
+value = "October 2007"
+source = "wp-white-hill"
 grade = "B"
 checked = ""
 
 [facts.units]
-value = "29 turbines"
-source = "wp-list"
+value = "29 turbines of 2 MW"
+source = ["meridian-white-hill", "wp-white-hill"]
 grade = "B"
-checked = ""
-
-[facts.scheme]
-value = "Southland"
-source = "elenz-register"
-grade = "C"
-checked = ""
+checked = "2026-11-19"
+note = "Vestas V80-2.0MW turbines; 58 MW in all"
 
 [facts.region]
+value = "Southland"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
 value = "Southland"
 source = "elenz-register"
 grade = "C"
@@ -50,20 +74,24 @@ checked = ""
 
 [facts.territorial_authority]
 value = "Southland"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Southland"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Meridian"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Meridian Energy"
+source = ["ea-register", "meridian-white-hill"]
+grade = "A"
+checked = "2026-11-19"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "White Hill stands on forestry land south-east of Mossburn in Southland. It was Meridian's second wind farm and the first in the South Island: building began in 2006, and its 29 turbines, up to 58 MW, were fully running in 2007. While building it, Meridian fenced off ecologically important areas and saved the topsoil and red tussock to put back afterwards."
+source = "meridian-white-hill"
+grade = "B"
+checked = "2026-11-19"

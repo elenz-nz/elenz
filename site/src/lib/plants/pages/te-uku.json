@@ -23,12 +23,116 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Te Uku sits on the Wharauroa Plateau near Raglan, on a working sheep and cattle farm that rises above 400 m. It was built as an alliance with the community-owned lines company WEL Networks: Meridian built and runs the 28 turbines, and WEL built the 25 km, 33 kV line that carries their power to its network and the grid. The first turbine went live in November 2010, and the Prime Minister formally switched the wind farm on in February 2011.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2011",
+   "refs": [
+    2,
+    3
+   ],
+   "note": "the first turbine went live on 13 November 2010; switched on formally in February 2011"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "28 turbines of 2.3 MW",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "Siemens turbines; 64.4 MW in all"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Waikato",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Waikato",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Meridian Energy",
+   "refs": [
+    3,
+    1
+   ],
+   "note": "built in an alliance with WEL Networks, which owns the line to the grid"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Te Kowhai (TWH0331)",
+   "refs": [
+    6
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Te Uku Wind Farm",
+   "publisher": "Meridian Energy",
+   "url": "https://www.meridianenergy.co.nz/power-stations/wind/te-uku",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Te Uku makes the most of Waikato's wind (press release, 10 February 2011)",
+   "publisher": "Meridian Energy (via Scoop)",
+   "url": "https://www.scoop.co.nz/stories/AK1102/S00402/te-uku-makes-the-most-of-waikatos-wind.htm",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

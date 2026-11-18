@@ -53,19 +53,168 @@
    ]
   }
  ],
- "owner": null,
+ "owner": "Meridian",
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Te Rere Hau is on the Tararua Range about 11 km east of Palmerston North. NZ Windfarms built it in four stages from 2006 to 2011 with 97 two-bladed Windflow 500 turbines of 500 kW, designed and made in New Zealand, which set it apart from its neighbours. Meridian, already its partner in a plan to replace them with far larger turbines, bought NZ Windfarms in July 2025.",
+  "refs": [
+   1,
+   2,
+   3
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2006",
+   "refs": [
+    2
+   ],
+   "note": "built in four stages, 2006 to 2011"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "91 turbines of 500 kW",
+   "refs": [
+    2,
+    1
+   ],
+   "note": "two-bladed Windflow 500 turbines, made in New Zealand; 97 were built"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Manawatū-Whanganui",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Meridian Energy",
+   "refs": [
+    2,
+    3
+   ],
+   "note": "through NZ Windfarms Limited, which Meridian bought in July 2025"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "NZ Windfarms, 2006–25",
+   "refs": [
+    2,
+    3,
+    1
+   ],
+   "note": "NZ Windfarms, an NZX-listed company, built the wind farm; Meridian bought it on 30 July 2025"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Nz Windfarms (TWC2201)",
+   "refs": [
+    5
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Te Rere Hau Wind Farm",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Te_Rere_Hau_Wind_Farm",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Te Rere Hau Wind (repowering project)",
+   "publisher": "Meridian Energy",
+   "url": "https://www.meridianenergy.co.nz/new-projects/te-rere-hau",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "High Court approves acquisition of NZ Windfarms (16 July 2025)",
+   "publisher": "Meridian Energy",
+   "url": "https://announcements.asx.com.au/asxpdf/20250716/pdf/06lvjdk2fmm0qj.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
-  "owner": [],
-  "owner_all": true,
+  "owner": [
+   {
+    "slug": "aviemore",
+    "name": "Aviemore"
+   },
+   {
+    "slug": "benmore",
+    "name": "Benmore"
+   },
+   {
+    "slug": "harapaki",
+    "name": "Harapaki"
+   },
+   {
+    "slug": "manapouri",
+    "name": "Manapōuri"
+   },
+   {
+    "slug": "ohau-a",
+    "name": "Ōhau A"
+   },
+   {
+    "slug": "ohau-b",
+    "name": "Ōhau B"
+   },
+   {
+    "slug": "ohau-c",
+    "name": "Ōhau C"
+   },
+   {
+    "slug": "ruakaka-energy-park",
+    "name": "Ruakākā Energy Park"
+   },
+   {
+    "slug": "te-apiti",
+    "name": "Te Āpiti"
+   },
+   {
+    "slug": "te-uku",
+    "name": "Te Uku"
+   },
+   {
+    "slug": "waitaki",
+    "name": "Waitaki"
+   },
+   {
+    "slug": "west-wind",
+    "name": "West Wind"
+   }
+  ],
+  "owner_all": false,
   "scheme": [],
   "fuel": [
    {

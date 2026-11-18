@@ -7,8 +7,19 @@ register = ["W007"]
 wikidata = "Q5684897"
 osm = ["relation/13730358"]
 reviewed = ""
-to_check = ["Capacity: Verify final installed capacity."]
-notes = ["88 MW from Nov 2023, 176 MW from May 2024."]
+to_check = [
+  "Location: confirm the point sits on the wind farm against the LINZ aerial (separate task).",
+]
+notes = [
+  "88 MW from Nov 2023, 176 MW from May 2024.",
+  "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the [location] point (not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. No other district within 5 km.",
+  "Resolved: Capacity: Meridian gives 41 turbines and 176 MW, matching Elenz and the register; complete in July 2024. Peak metered half-hour, Aug-Sep 2026: 174.1 MW.",
+  "Grid connection: HRP2201 has no coordinates in the EA's network supply points table, so no [grid_connection] yet. Wikipedia: a new substation on Transpower's Redclyffe-Whirinaki-Wairakei 220 kV line.",
+  "District: the old value \"Hawkes Bay\" (Wikipedia's list) is the region; the point is in Hastings District.",
+  "Removed the scheme fact (Maungaharuru Range, from our own register): a range, not a scheme; it is in the about text.",
+  "Previous owners: none for the station. Meridian bought Hawke's Bay Wind Farm Ltd (2010) and Unison's consent (2011) before building it (Wikipedia).",
+]
 
 [location]
 value = [-39.183889, 176.693056]
@@ -19,51 +30,63 @@ checked = ""
 
 [facts.commissioned]
 value = "2024"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = "meridian-harapaki"
+grade = "A"
+checked = "2026-11-19"
+note = "first power in November 2023; complete in July 2024"
 
 [[facts.commissioned.alt]]
 value = "2023"
 source = "ea-register"
 grade = "A"
 checked = ""
-note = "the register's start date, 2023-11-17: often a year, not the day"
+note = "the register's commissioning date, 2023-11-17 (first power)"
 
-[facts.units]
-value = "41 turbines"
-source = "wp-list"
+[[facts.commissioned.alt]]
+value = "2024"
+source = "wp-harapaki"
 grade = "B"
 checked = ""
 
-[facts.scheme]
-value = "Maungaharuru Range"
-source = "elenz-register"
-grade = "C"
-checked = ""
+[facts.units]
+value = "41 turbines of 4.3 MW"
+source = ["meridian-harapaki", "wp-harapaki"]
+grade = "B"
+checked = "2026-11-19"
+note = "Siemens Gamesa turbines; 176 MW in all"
 
 [facts.region]
+value = "Hawke's Bay"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
 value = "Hawke's Bay"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
+value = "Hastings"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
 value = "Hawkes Bay"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Meridian"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Meridian Energy"
+source = ["ea-register", "meridian-harapaki"]
+grade = "A"
+checked = "2026-11-19"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Harapaki runs along the Maungaharuru Range in Hawke's Bay, about 35 km north-west of Napier. Meridian built it over three years through three cyclones, Covid-19 and supply-chain delays, finishing in July 2024 within a month of the original date and within its $448 million budget. Its 41 turbines can produce up to 176 MW; a foundation design that needed less concrete and an on-site concrete plant cut truck trips from Napier."
+source = ["meridian-harapaki", "wp-harapaki"]
+grade = "B"
+checked = "2026-11-19"

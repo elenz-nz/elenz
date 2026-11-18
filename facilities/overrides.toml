@@ -122,6 +122,13 @@ tiwai = "TWI2201"
 "Kōwhai Park Solar Farm" = "Contact"
 "Mangahao" = "Contact"                    # King Country Energy, part of Manawa
 "Kinleith" = "Oji Fibre Solutions"        # the register says Manawa; Oji owns it (MBIE 2020 stack report). Counts under Other generators in By owner
+# Wind farms whose register operator buys the output rather than owning the plant (plant files, wind batch 1, 19 Nov 2026)
+"Tararua stage I" = "Mercury"             # Mercury since 3 Aug 2021 (bought Tilt's NZ wind farms); the register says Manawa
+"Tararua stage II" = "Mercury"
+"Tararua Wind Farm 3" = "Mercury"
+"Mahinerangi (Waipori B)" = "Mercury"
+"Waipipi" = "Mercury"                     # the register says Genesis, which buys its output under a 20-year agreement
+"Te Rere Hau" = "Meridian"                # Meridian bought NZ Windfarms on 30 Jul 2025; the register says NZ Windfarms
 # plants only in the metered history (retired, or never dispatched)
 "Ōtāhuhu A" = "Contact"
 "Ōtāhuhu B" = "Contact"
