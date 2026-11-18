@@ -42,12 +42,180 @@
  "scheme": "Clutha",
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-18",
+ "about": {
+  "text": "Clyde holds back Lake Dunstan on the Clutha River and is New Zealand's largest concrete gravity dam, with about a million cubic metres of concrete in the dam and another 200,000 in the powerhouse. The government chose a high dam at Clyde in 1976 and passed special legislation in 1982 to get it built. The dam was finished in 1990, but extensive work to stabilise the Cromwell Gorge, which the lake would fill, held up commissioning until 1992. Built to produce 432 MW from its four units, the station is now rated at 464 MW.",
+  "refs": [
+   1,
+   2,
+   3
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1992",
+   "refs": [
+    1
+   ],
+   "note": "the dam was finished in 1990; landslide stabilisation in the Cromwell Gorge delayed commissioning to 1992"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "4 units",
+   "refs": [
+    1
+   ],
+   "note": "Contact: four turbine generator units, 464 MW in all"
+  },
+  {
+   "k": "scheme",
+   "label": "Scheme",
+   "value": "Clutha Mata Au Hydro Scheme",
+   "refs": [
+    4
+   ],
+   "note": "with Roxburgh downstream"
+  },
+  {
+   "k": "river",
+   "label": "River or lake",
+   "value": "Clutha River (Lake Dunstan)",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Otago",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Central Otago",
+   "refs": [
+    6
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Contact Energy",
+   "refs": [
+    7,
+    1
+   ],
+   "note": "Contact Energy Limited"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "New Zealand Government (while being built), to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–96",
+   "refs": [
+    8,
+    3,
+    9
+   ],
+   "note": "ECNZ took over the Crown's generation on 1 April 1987, and the station was finished for it; ECNZ sold Clyde to Contact Energy, then a new state-owned enterprise, on 1 February 1996 (agreement of 13 November 1995). Contact was privatised in 1999."
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    3,
+    7
+   ],
+   "value": "432 MW (The EA register's nameplate: the station's original output, from four units)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Clyde (CYD2201)",
+   "refs": [
+    10
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Clyde hydro power station",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/about-us/our-story/our-generation-and-power-sites/hydro/clyde",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 2,
+   "title": "Hydroelectricity: Hydro and the environment (John E. Martin)",
+   "publisher": "Te Ara, the Encyclopedia of New Zealand (Manatū Taonga)",
+   "url": "https://teara.govt.nz/en/hydroelectricity/page-4",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 3,
+   "title": "Clyde power project nears completion (The Press, 8 December 1988, page 36)",
+   "publisher": "Papers Past (National Library of New Zealand)",
+   "url": "https://paperspast.natlib.govt.nz/newspapers/CHP19881208.2.156.5",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 4,
+   "title": "Clutha Mata Au Hydro Scheme",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/about-us/sustainability/our-projects/hydro/clutha-hydro-scheme",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 5,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 6,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 7,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 8,
+   "title": "New Zealand Gazette, 27 November 1995, issue 140: ECNZ information for disclosure",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1995/1995%20ISSUE%20140.pdf",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 9,
+   "title": "New Zealand Gazette, 2 December 1996, issue 174: ECNZ financial statements",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1996/1996%20ISSUE%20174.pdf",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 10,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-18"
+  }
+ ],
  "related": {
   "owner": [
    {

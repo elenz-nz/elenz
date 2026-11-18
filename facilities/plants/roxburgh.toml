@@ -7,8 +7,16 @@ register = ["H039"]
 wikidata = "Q1246704"
 osm = ["relation/11819261"]
 reviewed = ""
-to_check = ["Capacity: Verify rating and unit breakdown."]
-notes = ["Elenz has 328 MW on two buses."]
+to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+notes = [
+  "Elenz has 328 MW on two buses (the EA register: 205 MW at ROX2201, 123 MW at ROX1101).",
+  "Hydro batch 4 (18 Nov 2026): facts checked against Contact's station and scheme pages and releases, Voith's release, the EA register and network supply points table, the Gazette (ECNZ's 1996 financial statements), Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same. No other district within 5 km.",
+  "Capacity (open): Contact's station page gives 320 MW from eight units (eight original 40 MW units, per Voith); the EA register, which Elenz uses, gives 328 MW. Contact says the four new turbines (2024–26) give more energy from the same water, not more megawatts. Kept 328 for now: a question for the brief.",
+  "Turbine upgrade progress: Voith says the first new unit was finished in December 2024 (Contact: operational January 2025) and the second handed over in mid-August 2025; the third arrived at Port Chalmers on 31 August 2025. Not yet found: the third and fourth units' completion.",
+  "Commissioning: first power July 1956 (Water Power magazine) or an official opening on 3 November 1956 (Wikipedia infobox); neither is published. Wikidata gives inception 1948, in service 1962.",
+  "Wikidata: Q1246704 (Roxburgh Dam) is also typed as a hydroelectric power station, so it stands for the station. The [location] point is Wikidata's.",
+]
 
 [location]
 value = [-45.47581, 169.32255]
@@ -22,13 +30,15 @@ value = [-45.47721, 169.31914]
 code = "ROX1101 ROXBURGH; ROX2201 ROXBURGH"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-18"
+note = "codes and point match the EA's network supply points table of 17 Nov 2026; both are current, at 110 kV and 220 kV, at the same point"
 
 [facts.commissioned]
 value = "1956"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = ["contact-roxburgh", "contact-roxburgh-turbines-2024"]
+grade = "A"
+checked = "2026-11-18"
+note = "the first of eight generators in 1956; the station was commissioned between 1956 and 1962"
 
 [[facts.commissioned.alt]]
 value = "1962"
@@ -37,13 +47,53 @@ grade = "B"
 checked = ""
 note = "in service 1962; inception 1948"
 
+[[facts.commissioned.alt]]
+value = "1956"
+source = "ea-register"
+grade = "A"
+checked = ""
+note = "the register's start date, 1956-01-01: a year, not the day"
+
+[[facts.commissioned.alt]]
+value = "1956"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[facts.units]
+value = "8 units of 40 MW"
+source = ["contact-roxburgh", "voith-roxburgh-2025"]
+grade = "A"
+checked = "2026-11-18"
+note = "Contact: eight generators, 320 MW; Voith: eight original 40 MW units. Four turbines are being replaced (2024–26)."
+
 [facts.scheme]
+value = "Clutha Mata Au Hydro Scheme"
+source = "contact-clutha-scheme"
+grade = "A"
+checked = "2026-11-18"
+note = "with Clyde upstream"
+
+[[facts.scheme.alt]]
 value = "Clutha scheme"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
+[facts.river]
+value = "Clutha River (Lake Roxburgh)"
+source = ["contact-roxburgh", "wp-roxburgh-dam"]
+grade = "B"
+checked = "2026-11-18"
+note = "Contact gives the river and the lake's size (nearly 6 km²); Wikipedia names the lake"
+
 [facts.region]
+value = "Otago"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.region.alt]]
 value = "Otago"
 source = "elenz-register"
 grade = "C"
@@ -51,27 +101,39 @@ checked = ""
 
 [facts.territorial_authority]
 value = "Central Otago"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.territorial_authority.alt]]
+value = "Central Otago"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Contact"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Contact Energy"
+source = ["ea-register", "contact-roxburgh-turbines-2024"]
+grade = "A"
+checked = "2026-11-18"
+note = "Contact Energy Limited"
+
+[facts.previous_owners]
+value = "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–96"
+source = ["gazette-1995-140", "gazette-1996-174"]
+grade = "A"
+checked = "2026-11-18"
+note = "ECNZ took over the Crown's generation on 1 April 1987; ECNZ sold Roxburgh to Contact Energy, then a new state-owned enterprise, on 1 February 1996 (agreement of 13 November 1995). Contact was privatised in 1999."
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Roxburgh holds back Lake Roxburgh on the Clutha River, about 9 km north of the town of Roxburgh. The government approved it in December 1947, and its first generator ran in 1956: four Canadian-built turbines went in during 1956–57 and four more in 1960–61, giving eight units and 320 MW. Contact is replacing four of the original turbines with more efficient ones made by Voith between 2024 and 2026, which it expects to add about 44 GWh a year from the same water."
+source = ["contact-roxburgh", "contact-roxburgh-turbines-2024", "contact-clutha-scheme", "wp-roxburgh-dam"]
+grade = "B"
+checked = "2026-11-18"
 
 [[ratings]]
-value = "320"
-basis = "Wikipedia (basis not stated)"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = 320
+basis = "Contact's maximum capacity (Elenz uses the EA register's 328 MW)"
+source = "contact-roxburgh"
+grade = "A"
+checked = "2026-11-18"

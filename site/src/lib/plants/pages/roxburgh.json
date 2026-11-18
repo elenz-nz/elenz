@@ -23,12 +23,190 @@
  "scheme": "Clutha",
  "metered": "It generates onto two buses (ROX2201 and ROX1101), so it can be split by grid connection.",
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-18",
+ "about": {
+  "text": "Roxburgh holds back Lake Roxburgh on the Clutha River, about 9 km north of the town of Roxburgh. The government approved it in December 1947, and its first generator ran in 1956: four Canadian-built turbines went in during 1956–57 and four more in 1960–61, giving eight units and 320 MW. Contact is replacing four of the original turbines with more efficient ones made by Voith between 2024 and 2026, which it expects to add about 44 GWh a year from the same water.",
+  "refs": [
+   1,
+   2,
+   3,
+   4
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1956",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "the first of eight generators in 1956; the station was commissioned between 1956 and 1962"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "8 units of 40 MW",
+   "refs": [
+    1,
+    5
+   ],
+   "note": "Contact: eight generators, 320 MW; Voith: eight original 40 MW units. Four turbines are being replaced (2024–26)."
+  },
+  {
+   "k": "scheme",
+   "label": "Scheme",
+   "value": "Clutha Mata Au Hydro Scheme",
+   "refs": [
+    3
+   ],
+   "note": "with Clyde upstream"
+  },
+  {
+   "k": "river",
+   "label": "River or lake",
+   "value": "Clutha River (Lake Roxburgh)",
+   "refs": [
+    1,
+    4
+   ],
+   "note": "Contact gives the river and the lake's size (nearly 6 km²); Wikipedia names the lake"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Otago",
+   "refs": [
+    6
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Central Otago",
+   "refs": [
+    7
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Contact Energy",
+   "refs": [
+    8,
+    2
+   ],
+   "note": "Contact Energy Limited"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–96",
+   "refs": [
+    9,
+    10
+   ],
+   "note": "ECNZ took over the Crown's generation on 1 April 1987; ECNZ sold Roxburgh to Contact Energy, then a new state-owned enterprise, on 1 February 1996 (agreement of 13 November 1995). Contact was privatised in 1999."
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1
+   ],
+   "value": "320 MW (Contact's maximum capacity (Elenz uses the EA register's 328 MW))"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Roxburgh; Rox2201 Roxburgh (ROX1101)",
+   "refs": [
+    11
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Roxburgh hydro power station",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/about-us/our-story/our-generation-and-power-sites/hydro/roxburgh",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 2,
+   "title": "New turbines at Contact's Roxburgh dam to create more renewable energy (10 June 2024)",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/investor-centre/news/2024/new-turbines-at-contacts-roxburgh-dam",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 3,
+   "title": "Clutha Mata Au Hydro Scheme",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/about-us/sustainability/our-projects/hydro/clutha-hydro-scheme",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 4,
+   "title": "Roxburgh Dam",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Roxburgh_Dam",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 5,
+   "title": "Voith completes second turbine upgrade at New Zealand's Roxburgh hydropower station (30 September 2025)",
+   "publisher": "Voith",
+   "url": "https://www.voith.com/corp-en/news-room/press-releases/2025-09-30_vp-voith-completes-second-turbine-upgrade.html",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 6,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 7,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 8,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 9,
+   "title": "New Zealand Gazette, 27 November 1995, issue 140: ECNZ information for disclosure",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1995/1995%20ISSUE%20140.pdf",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 10,
+   "title": "New Zealand Gazette, 2 December 1996, issue 174: ECNZ financial statements",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1996/1996%20ISSUE%20174.pdf",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 11,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-18"
+  }
+ ],
  "related": {
   "owner": [
    {
