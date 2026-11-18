@@ -158,6 +158,26 @@ plant's MWh by month since 1997, about 140 KB, 65 KB gzipped) and works out year
 clock changes; the running month to the history's end). A month inside a plant's span with no figure is zero: a month
 file leaves out a plant with no output. A part year (hatched) has fewer than 12 whole months of the plant's data.
 
+The research page, `/plants/research` (`src/routes/plants/research/`, `src/lib/plants/research.js`, `xlsx.js`; design
+decision, 17 Nov 2026: it replaces the retired research workbook): private, for the Elenz team, and built from the same
+plant files, so what the team reviews is what the pages will publish. Its data is `src/lib/plants/research.json`, written
+by `ingest/plant_research.py` (every plant file's facts, checked or not, with sources, grades, dates, notes, the to-check
+list and the other sources' values, plus the photo and station leads) and committed (`--check` in checks.yml). A server
+load puts it only in this page's HTML and `__data.json`; no public page bundles it. Progress cards (pages reviewed, facts
+checked, locations checked, photos); filters for fuel, island, owner, status and what still needs work (something to
+check, not reviewed, facts not all checked, sources that disagree, no photo, location not checked, location only at the
+grid connection), kept in the address with its key; a sortable table, each plant opening to its links (page, plant file,
+Wikidata, OpenStreetMap, tracker), to-check list, notes, every fact with its source, grade and date checked (a green edge
+once published) and each other source's value beneath it (amber where it differs), and its photos and photo leads; the
+two leads files folded below. "Download workbook" builds an .xlsx in the browser (`xlsx.js`, no library: sheets Plants,
+Facts, Sources, Photo leads, Station leads; the first row bold, frozen and filtered). The Worker guards it (`research` in
+`worker/index.js`, routed through it by `run_worker_first`): on elenz.co.nz it opens only with `?key=` set to the Worker
+secret `SCREENS_KEY` (the screens page's key), else the not-found page, `__data.json` included; on a branch preview it opens
+without one, so a research batch is reviewed on its pull request's preview (previews may not carry the Worker's secrets,
+and they are noindex). It is never cached or indexed, sends no referrer, and the Worker takes out Cloudflare Web Analytics
+and Umami, so the team's visits aren't counted and the key never reaches either. Tests: `tests/research.test.js`,
+`tests/e2e/research.spec.js` and the `/plants/research` block in the Worker tests.
+
 The page: name, a line from Elenz's data (`subtitle()`), tags (fuel, island, owner, status, installed MW); "We're still
 checking this page's facts" until the plant file's `reviewed` is set; the photo (once `plant_images.csv` has a row; the
 file goes in `static/plants/`, and `plant_pages.py --check` fails if it's missing) beside the Now panel, which takes the
@@ -503,6 +523,8 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   refused token or no beats yet each get a sentence saying so. `analysis/open_screens.py` runs the same query from a
   computer (`CF_ACCOUNT_ID=... CF_ANALYTICS_TOKEN=... python3 analysis/open_screens.py 7`). Rows are kept three months.
   Worker tests: the `/data/screens` block, with a stand-in for the SQL API.
+- The plant research page, `/plants/research`: on elenz.co.nz only with `?key=<SCREENS_KEY>` (`research` in
+  `worker/index.js`; Plant pages, the research page).
 
 ## Facilities
 

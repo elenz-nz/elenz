@@ -20,6 +20,10 @@ const RECORD_PAGE = '<!doctype html><html><head><title>Peak demand</title><meta 
   + '<meta property="og:image" content="https://elenz.co.nz/og/elenz.png?p=records-demand_max">'
   + '<meta property="og:image:width" content="2400"><meta property="og:image:height" content="1260">'
   + '<meta property="og:image:alt" content="ELENZ"></head><body>Record</body></html>';
+// stands in for the prerendered plant research page, with the site's two visit counters
+const RESEARCH_PAGE = '<!doctype html><html><head><title>Plant research</title></head><body><main>facts</main>'
+  + '<script defer src="https://static.cloudflareinsights.com/beacon.min.js"></script>'
+  + '<script defer src="https://cloud.umami.is/script.js" data-website-id="x"></script><script src="/_app/app.js"></script></body></html>';
 const CARD = new Uint8Array([137, 80, 78, 71, 1, 2, 3]);   // stands in for static/og/elenz.png
 // a records file with one record: New Zealand's peak demand, which grew in three steps
 const RECORDS = {
@@ -64,6 +68,8 @@ const start = (bindings = {}) => new Miniflare({
       if (pathname === '/tracker') return new Response(PAGE, { headers: { 'content-type': 'text/html' } });
       if (pathname === '/data/tracker.json') return Response.json({ snapshot: true });
       if (pathname.startsWith('/records/')) return new Response(RECORD_PAGE, { headers: { 'content-type': 'text/html' } });
+      if (pathname === '/plants/research') return new Response(RESEARCH_PAGE, { headers: { 'content-type': 'text/html' } });
+      if (pathname === '/plants/research/__data.json') return Response.json({ facts: 1 });
       if (pathname === '/og/elenz.png') return new Response(CARD, { headers: { 'content-type': 'image/png' } });
       return new Response('not found', { status: 404 });
     },
@@ -451,4 +457,41 @@ test('/data/screens says what is missing or wrong, in words', async () => {
   sqlAnswer = () => Response.json({ data: [] });
   assert.match(await (await screensGet(`?key=${KEY}&days=1`)).text(), /No heartbeats in this range yet/);
   await mfKey.dispose(); mfKey = undefined;
+});
+
+// ---------- /plants/research: the private plant research page ----------
+test('/plants/research on elenz.co.nz needs the key; without it, the not-found page', async () => {
+  const keyed = start({ SCREENS_KEY: KEY });
+  try {
+    const get = (path, m = keyed, init) => m.dispatchFetch('https://elenz.co.nz' + path, init);
+    for (const q of ['', '?key=', '?key=wrong', `?key=${KEY}x`]) {
+      for (const path of ['/plants/research', '/plants/research/__data.json']) {
+        const r = await get(path + q);
+        assert.equal(r.status, 404, path + q);
+        assert.equal(r.headers.get('cache-control'), 'no-store');
+        assert.ok(!(await r.text()).includes('facts'), 'nothing of the page without the key');
+      }
+    }
+    assert.equal((await get(`/plants/research?key=${KEY}`, mf)).status, 404, 'no key set at all: closed on the real site');
+    assert.equal((await get(`/plants/research?key=${KEY}`, keyed, { method: 'POST', body: 'x' })).status, 404);
+    const r = await get(`/plants/research?key=${KEY}&fuel=hydro`);
+    assert.equal(r.status, 200);
+    assert.equal(r.headers.get('cache-control'), 'no-store');
+    assert.match(r.headers.get('x-robots-tag'), /noindex/);
+    assert.equal(r.headers.get('referrer-policy'), 'no-referrer');
+    const page = await r.text();
+    assert.match(page, /<main>facts<\/main>/);
+    assert.ok(!/cloudflareinsights|umami/.test(page), 'the visit counters are taken out, so the key never reaches them');
+    assert.match(page, /\/_app\/app\.js/, 'the page keeps its own script');
+    assert.equal((await get(`/plants/research/__data.json?key=${KEY}`)).status, 200);
+  } finally { await keyed.dispose(); }
+});
+
+test('/plants/research opens without a key on a branch preview, still noindex', async () => {
+  const r = await mf.dispatchFetch('https://plant-research-elenz.elenz.workers.dev/plants/research');
+  assert.equal(r.status, 200);
+  assert.match(r.headers.get('x-robots-tag'), /noindex/);
+  assert.ok(!/umami/.test(await r.text()));
+  // a plant page is not the research page
+  assert.notEqual((await mf.dispatchFetch('https://elenz.co.nz/plants/researcher')).headers.get('referrer-policy'), 'no-referrer');
 });

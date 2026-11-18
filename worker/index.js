@@ -20,11 +20,13 @@
 //             site/src/lib/site/beat.js), written to Workers Analytics Engine (binding BEATS, dataset elenz_beats) so the
 //             Elenz team can see how many screens are left open, and when. Only on elenz.co.nz; anything else posted is dropped.
 //  screens:   GET /data/screens?key=..., a private page of those heartbeats for the Elenz team (worker/screens.js).
+//  research:  /plants/research, the private plant research page (prerendered by the site): on elenz.co.nz only with
+//             ?key=<SCREENS_KEY>, else the not-found page; on previews without a key, so a batch's preview shows it.
 //  tests:     worker/tests/worker.test.js runs this file in Cloudflare's own runtime (cd worker && npm ci && npm test).
 import { readQuery, writeQuery, describe, SITE_URL } from '../site/src/lib/site/viewurl.js';
 import { RECORD_PAGE, RECORD_IMAGE, recordPage, recordImage } from './og.js';
 import { BEAT_URL, readBeat } from '../site/src/lib/site/beat.js';
-import { SCREENS_URL, screens } from './screens.js';
+import { SCREENS_URL, screens, keyMatches } from './screens.js';
 
 const WORKFLOWS = 'https://api.github.com/repos/elenz-nz/elenz/actions/workflows';
 const HISTORY_CRON = '40 */6 * * *'; // must match wrangler.jsonc
@@ -92,6 +94,32 @@ export const SECURITY_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
 };
 
+// ---------- the plant research page ----------
+// /plants/research (site/src/routes/plants/research/, design decision 17 Nov 2026) shows every plant file's facts, checked
+// or not, for the Elenz team. Its data is already public in the repository, but unchecked facts on elenz.co.nz could be
+// read as Elenz's, so there it needs the same key as /data/screens (?key=<SCREENS_KEY>, a Worker secret) and anything
+// else gets the site's not-found page. On a branch preview it opens without one: a research batch's pull request is
+// reviewed there, previews may not carry the Worker's secrets, and they are noindex anyway. The page is never cached
+// or indexed, sends no referrer, and loses its two visit counters (Cloudflare Web Analytics and Umami), so the team's
+// visits aren't counted and the key never reaches them. Its __data.json is behind the same check.
+export const RESEARCH = /^\/plants\/research(?:\.html|\/.*)?$/;
+const COUNTERS = ['script[src*="cloudflareinsights.com"]', 'script[src*="umami.is"]'];
+async function research(request, env, url) {
+  const open = url.hostname !== SITE_HOST || (await keyMatches(url.searchParams.get('key'), env.SCREENS_KEY));
+  if (!open || !['GET', 'HEAD'].includes(request.method)) {
+    const nf = await env.ASSETS.fetch(new Request(new URL('/404-not-a-page', url)));
+    return new Response(nf.body, { status: 404, headers: { 'content-type': nf.headers.get('content-type') || 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
+  }
+  const res = await env.ASSETS.fetch(request);
+  const out = new Response(res.body, res);
+  out.headers.set('cache-control', 'no-store');
+  out.headers.set('X-Robots-Tag', 'noindex, nofollow');
+  if (!(out.headers.get('content-type') || '').includes('text/html')) return out;
+  let rw = new HTMLRewriter();
+  for (const sel of COUNTERS) rw = rw.on(sel, { element(el) { el.remove(); } });
+  return rw.transform(out);
+}
+
 // ---------- noindex off the real site ----------
 // Branch previews (https://<branch>-elenz.elenz.workers.dev) serve the whole site with live data; Google must not index
 // them as copies. Static files get the header from site/static/_headers, which Cloudflare doesn't apply to responses
@@ -100,7 +128,8 @@ const SITE_HOST = new URL(SITE_URL).hostname;
 function finish(res, url) {
   const out = new Response(res.body, res);
   for (const [k, v] of Object.entries(SECURITY_HEADERS)) out.headers.set(k, v);
-  if (url.hostname !== SITE_HOST) out.headers.set('X-Robots-Tag', 'noindex');
+  if (url.hostname !== SITE_HOST && !out.headers.has('X-Robots-Tag')) out.headers.set('X-Robots-Tag', 'noindex');
+  if (RESEARCH.test(url.pathname)) out.headers.set('Referrer-Policy', 'no-referrer');
   return out;
 }
 
@@ -134,6 +163,7 @@ export default {
 async function serve(request, env, url, ctx) {
   if (url.pathname === BEAT_URL) return beat(request, env, url);
   if (url.pathname === SCREENS_URL) return screens(request, env, url);
+  if (RESEARCH.test(url.pathname)) return research(request, env, url);
   if (url.pathname === '/data/health' && env.DATA) {
     // for an outside uptime monitor: 200 while the data is fresh, 503 (with the reasons) when it isn't. Unlike the
     // GitHub watchdog, it doesn't depend on the Worker's cron, so it also catches the cron itself stopping.

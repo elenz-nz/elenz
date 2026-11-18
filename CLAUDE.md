@@ -80,14 +80,14 @@ docs, not here: keep this file short.
 - `site/`: the SvelteKit site. Routes in `src/routes/`; shared pieces in `src/lib/site/`; the Generation tab's charts in
   `src/lib/tracker/` (`tracker.js`, `fuels.js`, `emissions.js`, `series.js`, `oemb.js`, `tracker.css`) and its lower
   cards in `src/lib/generation/`; the Prices tab in `src/lib/prices/`; Now in `src/lib/now/` and `src/lib/home/`;
-  Records in `src/lib/records/`; plant pages in `src/lib/plants/` (hidden until `PLANTS_PUBLIC`); Articles in `src/lib/articles/`; Data and methods in `src/lib/methods/`
+  Records in `src/lib/records/`; plant pages in `src/lib/plants/` (hidden until `PLANTS_PUBLIC`; the private research page at `/plants/research`); Articles in `src/lib/articles/`; Data and methods in `src/lib/methods/`
   (`registry.ts`, `roles.ts`, `pages/`); the landing page's previews in `src/lib/landing/`. Tests in `site/tests/`
   (`npm test`) and `site/tests/e2e/` (browsers).
 - `worker/index.js`: serves the site and `/data/*` from Workers KV, and its crons start the GitHub jobs. Tests in
   `worker/tests/`.
 - `ingest/`: the Python data jobs. `update.py` (live, every 5 minutes), `history.py` (history since 1997, `BUILD`),
   `records.py`, `offered.py`, `embedded.py`, `rooftop.py`, `hvdc.py`, `explain.py`, `tod.py`, `capacity.py`,
-  `plant_meta.py`, `plant_history.py`, `plant_pages.py`. Tests in `ingest/tests/`.
+  `plant_meta.py`, `plant_history.py`, `plant_pages.py`, `plant_research.py`. Tests in `ingest/tests/`.
 - `facilities/`: curated tables (`overrides.toml`, `metered_plants.csv`, `embedded_points.csv`, `plant_capacity.csv`,
   `dispatch_adjust.json`, the plant register) and the plant pages' facts (`plants/<slug>.toml`; `PLANTS.md` says how to
   check a plant).
@@ -117,8 +117,9 @@ Each is explained in `docs/architecture.md`.
 - `ingest/requirements.txt` is locked to exact versions and hashes; refresh it from `ingest/requirements.in` (the
   command is at its top). Nothing else may be installed on the same `pip install -r` line.
 - After editing `facilities/plant_capacity.csv`, run `python3 ingest/capacity.py` and commit both. After editing a plant file, its
-  sources or images, run `python3 ingest/plant_files.py --check` and `python3 ingest/plant_pages.py`, and commit the pages'
-  JSON; a new tracker plant needs a plant file too. After refreshing the
+  sources or images, run `python3 ingest/plant_files.py --check`, `python3 ingest/plant_pages.py` and
+  `python3 ingest/plant_research.py` (also after editing the leads files), and commit the JSON; a new tracker plant needs
+  a plant file too. After refreshing the
   register or editing the site-only tables, rerun `ingest/plant_meta.py` and commit the JSON.
 - History rebuilds: bump `BUILD` in `ingest/history.py` after changing how months are built. A change to any
   fingerprinted file (listed in `facilities/NEXT_REBUILD.md`) rebuilds every month, so collect them on the
