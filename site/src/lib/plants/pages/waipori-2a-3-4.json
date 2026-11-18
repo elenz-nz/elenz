@@ -23,12 +23,172 @@
  "scheme": "Waipori",
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "The Waipori scheme, in the hills west of Dunedin, began as a private company's plan to power gold dredges. Dunedin City Council bought it while it was being built, in 1904, and power reached the city on 27 April 1907. Lake Mahinerangi, formed by a dam finished in 1931 and raised by 1946, now stores the water, which drops through a steep gorge to four stations. The council sold the scheme to TrustPower in 1998 under the electricity reforms. Elenz's figures for this plant cover Waipori 2A, 3 and 4, as the EA register groups them.",
+  "refs": [
+   1,
+   2,
+   3,
+   4
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1907–1963",
+   "refs": [
+    2
+   ],
+   "note": "Contact's dates for the whole four-station scheme; first power 27 April 1907"
+  },
+  {
+   "k": "scheme",
+   "label": "Scheme",
+   "value": "Waipori Power Scheme",
+   "refs": [
+    2
+   ]
+  },
+  {
+   "k": "river",
+   "label": "River or lake",
+   "value": "Waipori River (Lake Mahinerangi)",
+   "refs": [
+    2
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Otago",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Clutha",
+   "refs": [
+    6
+   ],
+   "note": "from Waipori 2A's point; Dunedin City is within 5 km"
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Contact Energy",
+   "refs": [
+    2,
+    7
+   ],
+   "note": "The EA register's operator is still Manawa Energy Limited (Trustpower until 2022), which Contact bought on 11 July 2025."
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "Waipori Falls Hydro-Electric Power Company, to 1904; Dunedin City Council and its companies, 1904–98; Trustpower (Manawa Energy from 2022), 1998–2025",
+   "refs": [
+    1,
+    8,
+    7
+   ],
+   "note": "the council bought the scheme during its construction in 1904 and sold it to TrustPower under the electricity reforms (see notes)"
+  },
+  {
+   "k": "stations",
+   "label": "Stations",
+   "refs": [
+    2
+   ],
+   "value": "Waipori 2A, Waipori 3, Waipori 4"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    2
+   ],
+   "value": "93 MW (Contact's maximum capacity for the whole four-station scheme (Elenz uses the EA register's 74 MW for 2A, 3 and 4))"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Berwick (BWK1101)",
+   "refs": [
+    9
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Waipori Centenary Talks Start This Week (31 October 2007)",
+   "publisher": "TrustPower (via Scoop)",
+   "url": "https://www.scoop.co.nz/stories/AK0710/S00299.htm",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Waipori hydro power scheme",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/about-us/our-story/our-generation-and-power-sites/hydro/waipori",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Lake Mahinerangi",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Lake_Mahinerangi",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "Contact buys Manawa Energy",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/support/notice/manawa",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 8,
+   "title": "Update on retail sale and Manawa Energy launch (NZX, 2 May 2022)",
+   "publisher": "Trustpower (Manawa Energy)",
+   "url": "https://www.nzx.com/announcements/391276",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 9,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

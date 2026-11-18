@@ -38,12 +38,168 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Coleridge, in inland Canterbury, was the New Zealand Government's first major hydro scheme, built from 1911, largely by hand, to supply Christchurch, and running from 1914. It needs no dam: Lake Coleridge is a natural lake about 165 m above the powerhouse, and its water reaches the turbines through tunnels and steel penstocks, then flows into the Rakaia River. Diversions of the Harper, Acheron and Wilberforce rivers later added water to the lake. Five units run today, after a refurbishment finished in 2008.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1914",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "construction began in 1911; three units ran from 1914"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "5 units",
+   "refs": [
+    2
+   ],
+   "note": "three in 1914 and nine by 1930; five remain in use after a refurbishment finished in 2008"
+  },
+  {
+   "k": "river",
+   "label": "River or lake",
+   "value": "Lake Coleridge and the Rakaia River",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "the natural lake sits about 165 m above the powerhouse, which discharges to the Rakaia"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Canterbury",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Selwyn",
+   "refs": [
+    4
+   ],
+   "note": "Ashburton District is within 1 km, across the Rakaia"
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Contact Energy",
+   "refs": [
+    1,
+    5
+   ],
+   "note": "The EA register's operator is still Manawa Energy Limited (Trustpower until 2022), which Contact bought on 11 July 2025."
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "New Zealand Government, 1914–87; Electricity Corporation of New Zealand (ECNZ), 1987–98; Trustpower (Manawa Energy from 2022), 1998–2025",
+   "refs": [
+    2,
+    6,
+    7,
+    8,
+    5
+   ],
+   "note": "built by the Public Works Department; ECNZ offered it for sale under its 1995 agreement with the Crown (see notes)"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1
+   ],
+   "value": "43 MW (Contact's maximum capacity (Elenz uses 42 MW, what it has dispatched at since May 2026))"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Coleridge (COL0661)",
+   "refs": [
+    9
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Coleridge hydro power station",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/about-us/our-story/our-generation-and-power-sites/hydro/coleridge",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Coleridge Power Station",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Coleridge_Power_Station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Contact buys Manawa Energy",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/support/notice/manawa",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "New Zealand Gazette, 27 November 1995, issue 140: ECNZ information for disclosure",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1995/1995%20ISSUE%20140.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "New Zealand Gazette, 1999, issue 170: ECNZ financial statements",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1999/1999%20ISSUE%20170.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 8,
+   "title": "Update on retail sale and Manawa Energy launch (NZX, 2 May 2022)",
+   "publisher": "Trustpower (Manawa Energy)",
+   "url": "https://www.nzx.com/announcements/391276",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 9,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

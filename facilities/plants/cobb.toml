@@ -4,43 +4,78 @@ slug = "cobb"
 plant = "Cobb"
 name = "Cobb"
 register = ["H023"]
+wikidata = "Q5138774"
 osm = ["relation/12200238"]
 reviewed = ""
 photo_leads = ["P032"]
 to_check = [
-  "MW: this row has 36, Elenz 32.",
-  "Capacity: Confirm current rating and gross/net basis.",
-  "Location: no station point yet (OpenStreetMap is research only); check one against the LINZ aerial or Wikidata.",
+  "Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task).",
 ]
-notes = ["Elenz has 32 MW (register); Wikipedia 34.3. Generation_MD is net of ~35% local load at STK0661."]
+notes = [
+  "Elenz has 32 MW (register). Generation_MD is net of ~35% local load at STK0661.",
+  "Hydro batch 5 (19 Nov 2026): facts checked against Contact's station page, the EA register and network supply points table, the Gazette (ECNZ's 1995 disclosure and the 1999 split directions), the Commerce Commission, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "Location: Wikidata's point (Q5138774), not yet checked against the aerial; it is about 25 m from the COB0661 connection point.",
+  "District and region from the station's Wikidata point in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. The grid connection point gives the same. No other district within 5 km.",
+  "Resolved: Capacity: Contact gives a maximum of 33 MW (its text also says the head lets 36 MW be generated); the EA register, which Elenz uses, has 32 MW; Wikipedia's list 34.3. Kept 32; Contact's 33 is a rating.",
+  "Ownership: the March 1999 split directions moved Cobb to the South Island SOE (now Meridian) from 1 April 1999; Wikipedia, citing the Press of 28 May 1999, says TransAlta bought it in 1999, and NGC bought TransAlta New Zealand about a year later. NGC sold it by tender: TrustPower, for $92.5 million, in 2003 (Commerce Commission; Wikipedia: March 2003).",
+  "Wikidata: Q5138774 (Cobb Power Station) is the station.",
+]
+
+[location]
+value = [-41.086194, 172.7325]
+basis = "station"
+source = "wd-q5138774"
+grade = "B"
+checked = ""
 
 [grid_connection]
 value = [-41.08637, 172.73264]
 code = "COB0661 COBB; STK0661 STOKE"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "COB0661 and its point match the EA's network supply points table of 18 Nov 2026; COB0661, beside the station, ended in February 2015, and since then the register has the station at STK0661 (Stoke), about 50 km away. The point shown is COB0661's."
 
 [facts.commissioned]
-value = "1956"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = "1944"
+source = ["contact-cobb", "wp-cobb"]
+grade = "A"
+checked = "2026-11-19"
+note = "first power in June 1944, as a run-of-river station; the storage dam followed in 1954"
 
 [[facts.commissioned.alt]]
 value = "1944"
 source = "ea-register"
 grade = "A"
 checked = ""
-note = "the register's start date, 1944-01-01; 1994-01-01: often a year, not the day"
+note = "the register's start date, 1944-01-01: a year, not the day"
 
-[facts.scheme]
-value = "Cobb scheme"
-source = "elenz-register"
-grade = "C"
+[[facts.commissioned.alt]]
+value = "1956"
+source = "wp-list"
+grade = "B"
 checked = ""
 
+[facts.units]
+value = "6 Pelton turbines"
+source = "wp-cobb"
+grade = "B"
+checked = "2026-11-19"
+
+[facts.river]
+value = "Cobb River (Cobb Reservoir)"
+source = ["contact-cobb", "wp-cobb"]
+grade = "B"
+checked = "2026-11-19"
+note = "the powerhouse is where the Cobb meets the Tākaka; the water comes from Cobb Reservoir, almost 600 m higher"
+
 [facts.region]
+value = "Tasman"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
 value = "Tasman"
 source = "elenz-register"
 grade = "C"
@@ -48,23 +83,48 @@ checked = ""
 
 [facts.territorial_authority]
 value = "Tasman"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Tasman"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Contact"
+value = "Contact Energy"
+source = ["contact-cobb", "contact-manawa-2025"]
+grade = "A"
+checked = "2026-11-19"
+note = "The EA register's operator is still Manawa Energy Limited (Trustpower until 2022), which Contact bought on 11 July 2025."
+
+[[facts.owner.alt]]
+value = "Manawa Energy Limited"
 source = "ea-register"
-grade = "B"
+grade = "A"
 checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+
+[facts.previous_owners]
+value = "New Zealand Government, 1940–87; Electricity Corporation of New Zealand (ECNZ), 1987–99; Meridian Energy, 1999; TransAlta New Zealand, 1999–2000; NGC (Natural Gas Corporation), 2000–03; Trustpower (Manawa Energy from 2022), 2003–25"
+source = [
+  "wp-cobb",
+  "gazette-1995-140",
+  "gazette-1999-37",
+  "comcom-cobb-2009",
+  "nzx-announcements-391276",
+  "contact-manawa-2025",
+]
+grade = "B"
+checked = "2026-11-19"
+note = "The government took the scheme over from the Hume Pipe Company in 1940; ECNZ took over the Crown's generation on 1 April 1987; see notes for 1999–2003."
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Cobb stands where the Cobb River meets the Tākaka, on the edge of Kahurangi National Park in Golden Bay. Its water falls almost 600 m from the storage lake to the powerhouse, the greatest head of any power station in New Zealand, so a small flow makes a lot of power. A private company planned the scheme in the 1930s but could not raise the money; the government took it over, first power came in 1944, and a storage dam was finished in 1954. Until 1955, when a line from Stoke joined the region to the South Island grid, Cobb supplied Nelson and Tasman on its own."
+source = ["contact-cobb", "wp-cobb"]
+grade = "B"
+checked = "2026-11-19"
 
 [[ratings]]
 value = "34.3"
@@ -72,3 +132,10 @@ basis = "Wikipedia (basis not stated)"
 source = "wp-list"
 grade = "B"
 checked = ""
+
+[[ratings]]
+value = 33
+basis = "Contact's maximum capacity (Elenz uses the EA register's 32 MW)"
+source = "contact-cobb"
+grade = "A"
+checked = "2026-11-19"

@@ -23,12 +23,174 @@
  "scheme": null,
  "metered": "At this point metered generation is net of local load, about 35% of Cobb's gross output. Where the embedded generation meter reads more, we add the difference.",
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Cobb stands where the Cobb River meets the Tākaka, on the edge of Kahurangi National Park in Golden Bay. Its water falls almost 600 m from the storage lake to the powerhouse, the greatest head of any power station in New Zealand, so a small flow makes a lot of power. A private company planned the scheme in the 1930s but could not raise the money; the government took it over, first power came in 1944, and a storage dam was finished in 1954. Until 1955, when a line from Stoke joined the region to the South Island grid, Cobb supplied Nelson and Tasman on its own.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1944",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "first power in June 1944, as a run-of-river station; the storage dam followed in 1954"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "6 Pelton turbines",
+   "refs": [
+    2
+   ]
+  },
+  {
+   "k": "river",
+   "label": "River or lake",
+   "value": "Cobb River (Cobb Reservoir)",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "the powerhouse is where the Cobb meets the Tākaka; the water comes from Cobb Reservoir, almost 600 m higher"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Tasman",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Tasman",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Contact Energy",
+   "refs": [
+    1,
+    5
+   ],
+   "note": "The EA register's operator is still Manawa Energy Limited (Trustpower until 2022), which Contact bought on 11 July 2025."
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "New Zealand Government, 1940–87; Electricity Corporation of New Zealand (ECNZ), 1987–99; Meridian Energy, 1999; TransAlta New Zealand, 1999–2000; NGC (Natural Gas Corporation), 2000–03; Trustpower (Manawa Energy from 2022), 2003–25",
+   "refs": [
+    2,
+    6,
+    7,
+    8,
+    9,
+    5
+   ],
+   "note": "The government took the scheme over from the Hume Pipe Company in 1940; ECNZ took over the Crown's generation on 1 April 1987; see notes for 1999–2003."
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1
+   ],
+   "value": "33 MW (Contact's maximum capacity (Elenz uses the EA register's 32 MW))"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Cobb; Stk0661 Stoke (COB0661)",
+   "refs": [
+    10
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Cobb River hydro power station",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/about-us/our-story/our-generation-and-power-sites/hydro/cobb-river",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Cobb Power Station",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Cobb_Power_Station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Contact buys Manawa Energy",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/support/notice/manawa",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "New Zealand Gazette, 27 November 1995, issue 140: ECNZ information for disclosure",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1995/1995%20ISSUE%20140.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "New Zealand Gazette, 25 March 1999, issue 37: Directions relating to split of Electricity Corporation of New Zealand Limited",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1999/1999%20ISSUE%20037.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 8,
+   "title": "Energy companies warned over alleged anti-competitive behaviour (24 November 2009)",
+   "publisher": "Commerce Commission",
+   "url": "https://comcom.govt.nz/news-and-media/media-releases/archive/energy-companies-warned-over-alleged-anti-competitive-behaviour",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 9,
+   "title": "Update on retail sale and Manawa Energy launch (NZX, 2 May 2022)",
+   "publisher": "Trustpower (Manawa Energy)",
+   "url": "https://www.nzx.com/announcements/391276",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 10,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

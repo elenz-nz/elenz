@@ -4,14 +4,24 @@ slug = "matahina"
 plant = "Matahina"
 name = "Matahina"
 register = ["H011"]
+wikidata = "Q61448288"
 reviewed = ""
-to_check = ["Capacity: Confirm rating and unit history."]
-notes = ["Elenz has 80 MW from Sep 1998. No metered rows from Oct 2021 (dispatch fills)."]
+to_check = [
+  "Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task).",
+]
+notes = [
+  "Elenz has 80 MW from Sep 1998. No metered rows from Oct 2021 (dispatch fills).",
+  "Hydro batch 5 (19 Nov 2026): facts checked against Contact's station page, the EA register and network supply points table, the Gazette (ECNZ's 1995 disclosure and its accounts for the year to 31 March 1999), Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "Location: now Wikidata's point (Q61448288), about 115 m from the Wikipedia list's; not yet checked against the aerial.",
+  "District and region from the station's Wikidata point in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. The grid connection point gives the same. No other district within 5 km.",
+  "Resolved: Capacity: Contact gives a maximum of 77 MW from two generators; Elenz uses 80 MW (the register); Wikipedia's list 72. Contact's 77 is a rating.",
+  "Sale: ECNZ's accounts record the sale in the year to 31 March 1999 (gain $41 million); Wikipedia's Manawa Energy article gives 1998 and $115 million, its station article 1999. The page shows 1998.",
+]
 
 [location]
-value = [-38.114908, 176.814473]
+value = [-38.113917, 176.814083]
 basis = "station"
-source = "wp-list"
+source = "wd-q61448288"
 grade = "B"
 checked = ""
 
@@ -20,21 +30,43 @@ value = [-38.11343, 176.81462]
 code = "MAT1101 MATAHINA; MAT1102 MATAHINA"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "codes and point match the EA's network supply points table of 18 Nov 2026; MAT1102 was used only in 2012–14"
 
 [facts.commissioned]
+value = "1967"
+source = ["contact-matahina", "wp-matahina"]
+grade = "A"
+checked = "2026-11-19"
+note = "generator 1 on 25 January 1967, generator 2 in April 1967"
+
+[[facts.commissioned.alt]]
 value = "1967"
 source = "wp-list"
 grade = "B"
 checked = ""
 
-[facts.scheme]
-value = "Rangitāiki scheme"
-source = "elenz-register"
-grade = "C"
-checked = ""
+[facts.units]
+value = "2 units"
+source = "contact-matahina"
+grade = "A"
+checked = "2026-11-19"
+note = "one set for low flows, one for high flows"
+
+[facts.river]
+value = "Rangitāiki River (Lake Matahina)"
+source = ["contact-matahina", "wp-matahina"]
+grade = "B"
+checked = "2026-11-19"
+note = "the lowest of three schemes on the river, below Wheao and Flaxy and Aniwhenua"
 
 [facts.region]
+value = "Bay of Plenty"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
 value = "Bay of Plenty"
 source = "elenz-register"
 grade = "C"
@@ -42,20 +74,59 @@ checked = ""
 
 [facts.territorial_authority]
 value = "Whakatane"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Whakatane"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Contact"
+value = "Contact Energy"
+source = ["contact-matahina", "contact-manawa-2025"]
+grade = "A"
+checked = "2026-11-19"
+note = "The EA register's operator is still Manawa Energy Limited (Trustpower until 2022), which Contact bought on 11 July 2025."
+
+[[facts.owner.alt]]
+value = "Manawa Energy Limited"
 source = "ea-register"
-grade = "B"
+grade = "A"
 checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+
+[facts.previous_owners]
+value = "New Zealand Government, 1967–87; Electricity Corporation of New Zealand (ECNZ), 1987–98; Trustpower (Manawa Energy from 2022), 1998–2025"
+source = [
+  "wp-matahina",
+  "wp-manawa-energy",
+  "gazette-1995-140",
+  "gazette-1999-170",
+  "nzx-announcements-391276",
+  "contact-manawa-2025",
+]
+grade = "B"
+checked = "2026-11-19"
+note = "built by the Ministry of Works; see notes for the year of sale"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
+value = "Matahina's 86 m earth dam across the Rangitāiki River, inland from Whakatāne, is the largest dam of its kind in the North Island and holds back Lake Matahina. The Ministry of Works began the scheme in 1960 on difficult, faulted ground, and its two generators came into service in 1967. It is the lowest of the river's three hydro schemes, below Wheao and Flaxy and Aniwhenua. The Waiohau fault runs beneath the dam, which has since been strengthened against a large earthquake."
+source = ["contact-matahina", "wp-matahina"]
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 77
+basis = "Contact's maximum capacity (Elenz uses 80 MW, the EA register's figure)"
+source = "contact-matahina"
+grade = "A"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 72
+basis = "Wikipedia (basis not stated)"
+source = "wp-list"
+grade = "B"
 checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."

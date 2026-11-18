@@ -23,12 +23,99 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Paerau and Patearoa are two small power stations on the upper Taieri River in Otago, both opened in 1984. In winter they run on the river's natural flow. In summer Paerau uses water stored for irrigation in the Loganburn Reservoir and released down the Taieri, while Patearoa runs only when there is water to spare.",
+  "refs": [
+   1
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1984",
+   "refs": [
+    1
+   ],
+   "note": "both stations"
+  },
+  {
+   "k": "river",
+   "label": "River or lake",
+   "value": "Taieri River",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Otago",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Contact Energy",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "The EA register's operator is still Manawa Energy Limited (Trustpower until 2022), which Contact bought on 11 July 2025."
+  },
+  {
+   "k": "stations",
+   "label": "Stations",
+   "refs": [
+    1
+   ],
+   "value": "Paerau, Patearoa"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1
+   ],
+   "value": "12 MW (Contact's maximum capacity for both stations (Elenz uses the EA register's 12.5 MW))"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Naseby (NSY0331)",
+   "refs": [
+    3
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Paerau and Patearoa hydro power stations",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/about-us/our-story/our-generation-and-power-sites/hydro/paerau-and-patearoa",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Contact buys Manawa Energy",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/support/notice/manawa",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

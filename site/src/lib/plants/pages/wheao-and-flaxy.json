@@ -23,12 +23,107 @@
  "scheme": "Rangitaiki",
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Wheao and Flaxy are two linked power stations in the Kaingaroa Forest, on the upper Rangitāiki River, the furthest upstream of the river's three hydro schemes. Three dams and two canals gather water from the Rangitāiki and Wheao rivers and Flaxy Stream for the two stations. The scheme was commissioned in 1982, and its Rangitāiki canal is now a good trout fishery.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1982",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "river",
+   "label": "River or lake",
+   "value": "Rangitāiki and Wheao rivers and Flaxy Stream",
+   "refs": [
+    1
+   ],
+   "note": "the furthest upstream of the Rangitāiki's three schemes (Contact's Matahina page)"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Bay of Plenty",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Contact Energy",
+   "refs": [
+    1,
+    3
+   ],
+   "note": "The EA register's operator is still Manawa Energy Limited (Trustpower until 2022), which Contact bought on 11 July 2025."
+  },
+  {
+   "k": "stations",
+   "label": "Stations",
+   "refs": [
+    1
+   ],
+   "value": "Wheao, Flaxy"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1
+   ],
+   "value": "26 MW (Contact's maximum capacity for both stations (Elenz uses the EA register's 24 MW))"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Rotorua (ROT1101)",
+   "refs": [
+    4
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Wheao and Flaxy hydro power stations",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/about-us/our-story/our-generation-and-power-sites/hydro/wheao-and-flaxy",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Matahina hydro power station",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/about-us/our-story/our-generation-and-power-sites/hydro/matahina",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Contact buys Manawa Energy",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/support/notice/manawa",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

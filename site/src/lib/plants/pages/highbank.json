@@ -23,12 +23,166 @@
  "scheme": null,
  "metered": "It has no metered rows before October 2001, and its rows read next to nothing until April 2002.",
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Highbank, on the south bank of the Rakaia River in mid Canterbury, runs on water from the Rangitata Diversion Race, a canal built for irrigation: in summer farms have first call on the water, so the station generates mostly in winter. The Public Works Department built it alongside the race, and it opened in June 1945 with a single generator, then the largest in New Zealand. Since 2010 pumps at the site can lift water from the Rakaia back up the penstock into the race for irrigators. The 1945 unit is now being replaced, and the pumps have been run as small turbines in the meantime.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1945",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "opened 16 June 1945; Contact gives 1939–1945 for the build"
+  },
+  {
+   "k": "river",
+   "label": "River or lake",
+   "value": "Rangitata Diversion Race, discharging to the Rakaia River",
+   "refs": [
+    2,
+    1
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Canterbury",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Ashburton",
+   "refs": [
+    4
+   ],
+   "note": "Selwyn District is within 1 km, across the Rakaia"
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Contact Energy",
+   "refs": [
+    1,
+    5
+   ],
+   "note": "The EA register's operator is still Manawa Energy Limited (Trustpower until 2022), which Contact bought on 11 July 2025."
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "New Zealand Government, 1945–87; Electricity Corporation of New Zealand (ECNZ), 1987–98; Trustpower (Manawa Energy from 2022), 1998–2025",
+   "refs": [
+    2,
+    6,
+    7,
+    8,
+    9,
+    5
+   ],
+   "note": "built by the Public Works Department; ECNZ's accounts record the sale in the year to 31 March 1999, and Wikipedia gives 1998 ($37 million, with Montalto)"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1
+   ],
+   "value": "27 MW (Contact's maximum capacity, the 1945 unit now being replaced (Elenz uses the EA register's 28 MW))"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Ashburton (ASB0661)",
+   "refs": [
+    10
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Highbank hydro power station",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/about-us/our-story/our-generation-and-power-sites/hydro/highbank",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Highbank Power Station",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Highbank_Power_Station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Contact buys Manawa Energy",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/support/notice/manawa",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Manawa Energy",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Manawa_Energy",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "New Zealand Gazette, 27 November 1995, issue 140: ECNZ information for disclosure",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1995/1995%20ISSUE%20140.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 8,
+   "title": "New Zealand Gazette, 1999, issue 170: ECNZ financial statements",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1999/1999%20ISSUE%20170.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 9,
+   "title": "Update on retail sale and Manawa Energy launch (NZX, 2 May 2022)",
+   "publisher": "Trustpower (Manawa Energy)",
+   "url": "https://www.nzx.com/announcements/391276",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 10,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

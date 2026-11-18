@@ -23,12 +23,126 @@
  "scheme": null,
  "metered": "The metered history has Teviot's own meter. It is never dispatched, so in the live week and the weeks since the newest metered month, its output is a calculated estimate from its typical day.",
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "The Teviot scheme in Central Otago carries water from Lake Onslow, high in the Lammerlaw Range, down the Teviot River through a chain of small dams and six power stations to the Clutha near Roxburgh. The first, George, opened in 1924; Bridge followed in 1972, then Ellis and Michelle in the early 1980s, when a new arch dam raised Lake Onslow, Horseshoe Bend in 1999 and Kowhai in 2010. Irrigation shares the water, and in summer it takes priority at some stations. Ellis runs on refurbished 1940s machinery bought from Dunedin's Waipori Falls station.",
+  "refs": [
+   1
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "George 1924; Bridge 1972; Ellis 1981; Michelle 1982; Horseshoe Bend 1999; Kowhai 2010",
+   "refs": [
+    1
+   ],
+   "note": "George was refurbished in 2002"
+  },
+  {
+   "k": "scheme",
+   "label": "Scheme",
+   "value": "Teviot Scheme",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "river",
+   "label": "River or lake",
+   "value": "Teviot River (Lake Onslow)",
+   "refs": [
+    1
+   ],
+   "note": "joins the Clutha near Roxburgh"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Otago",
+   "refs": [
+    1
+   ],
+   "note": "see notes"
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Central Otago",
+   "refs": [
+    1
+   ],
+   "note": "Pioneer's location for the scheme; not yet tested against Stats NZ's boundaries"
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Pioneer Energy",
+   "refs": [
+    2,
+    3
+   ],
+   "note": "the register's operator is Pioneer Generation, Pioneer Energy's name until 2016"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "Teviot and Otago Central electric power boards (merged in 1960), to 1993; Central Electric, 1993–99",
+   "refs": [
+    3
+   ],
+   "note": "the Otago Central board amalgamated with the Teviot Power Board in 1960 and became Central Electric in 1993; Central Electric kept its generation as Pioneer Generation in 1999"
+  },
+  {
+   "k": "stations",
+   "label": "Stations",
+   "refs": [
+    1
+   ],
+   "value": "George (1 MW), Bridge, Ellis, Michelle (1.6 MW), Horseshoe Bend (4.3 MW), Kowhai"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Clyde (CYD0331)",
+   "refs": [
+    4
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Teviot Scheme",
+   "publisher": "Pioneer Energy Renewables",
+   "url": "https://www.pioneerenergyrenewables.co.nz/our-locations/teviot-hydro-scheme",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Our history",
+   "publisher": "Pioneer Energy",
+   "url": "https://www.pioneerenergy.co.nz/our-history",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [],
   "owner_all": true,

@@ -23,12 +23,129 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "The Roaring Meg scheme has two small stations in the Kawarau Gorge between Cromwell and Queenstown, fed from a dam on the Roaring Meg stream, which is said to be named after a gold-rush barmaid. The Otago Central Electric Power Board built the lower station with money advanced by two gold-dredging companies, and it opened in March 1936; workers drilled the rock by hand and hauled the pipes up the hill on a tramline. The upper station, below a concrete arch dam at the head of the valley, followed in 1947 despite wartime shortages, floods and snow.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "Lower Roaring Meg 1936; Upper Roaring Meg 1947",
+   "refs": [
+    1
+   ],
+   "note": "the lower station was opened on 19 March 1936; the upper began producing in July 1947"
+  },
+  {
+   "k": "river",
+   "label": "River or lake",
+   "value": "Roaring Meg stream, Kawarau Gorge",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "the lower station discharges into the Kawarau River"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Otago",
+   "refs": [
+    1
+   ],
+   "note": "see notes"
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Pioneer Energy",
+   "refs": [
+    3,
+    4,
+    2
+   ],
+   "note": "the register's operator is Pioneer Generation, Pioneer Energy's name until 2016"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "Otago Central Electric Power Board, 1936–93; Central Electric, 1993–99",
+   "refs": [
+    4,
+    1
+   ],
+   "note": "the board became Central Electric in 1993; Central Electric kept its generation as Pioneer Generation in 1999"
+  },
+  {
+   "k": "stations",
+   "label": "Stations",
+   "refs": [
+    1,
+    2
+   ],
+   "value": "Lower Roaring Meg (3 MW), Upper Roaring Meg (1.26 MW)"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    2
+   ],
+   "value": "4.3 MW (Wikipedia: lower station 3.0 MW and upper 1.26 MW, two turbines each (Elenz uses the EA register's 12 MW))"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Cromwell (CML0331)",
+   "refs": [
+    5
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Roaring Meg Scheme",
+   "publisher": "Pioneer Energy Renewables",
+   "url": "https://www.pioneerenergyrenewables.co.nz/our-locations/roaring-meg-hydro",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Roaring Meg hydro scheme",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Roaring_Meg_hydro_scheme",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Our history",
+   "publisher": "Pioneer Energy",
+   "url": "https://www.pioneerenergy.co.nz/our-history",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [],
   "owner_all": true,
