@@ -8,8 +8,15 @@ wikidata = "Q1103620"
 osm = ["relation/11211038"]
 reviewed = ""
 photo_leads = ["P006", "P007", "P008"]
-to_check = ["Capacity: Verify current rating and unit configuration."]
-notes = ["Elenz has 464 MW from Nov 2015 (432 before)."]
+to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+notes = [
+  "Elenz has 464 MW from Nov 2015 (432 before).",
+  "Hydro batch 4 (18 Nov 2026): facts checked against Contact's station and scheme pages, the EA register and network supply points table, the Gazette (ECNZ's 1996 financial statements), Te Ara, Papers Past and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same. No other district within 5 km.",
+  "Resolved: Capacity: Contact's station page gives four units and 464 MW, the figure Elenz uses from Nov 2015. The EA register still has the original 432 MW (kept as a rating). Wikipedia says a 2005 consent change allowed the full 464 MW and gives four 120 MVA (116 MW) units in the text but 4 x 108 MW in its infobox; Elenz dates the step from Nov 2015, when metered output first passed 432 MW.",
+  "Construction start differs by source: Te Ara says construction began in 1979; the Press (1 July 1988) says the Ministry of Works and Development began excavating in 1977 (Wikidata's inception, 1977). Neither year is published.",
+  "Wikidata: Q1103620 (Clyde Dam) is typed only as a dam, not as a power station. The [location] point is Wikidata's (the same as Wikipedia's).",
+]
 
 [location]
 value = [-45.17944, 169.30694]
@@ -23,28 +30,69 @@ value = [-45.18039, 169.30622]
 code = "CYD2201 CLYDE"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-18"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
 value = "1992"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = "contact-clyde"
+grade = "A"
+checked = "2026-11-18"
+note = "the dam was finished in 1990; landslide stabilisation in the Cromwell Gorge delayed commissioning to 1992"
 
 [[facts.commissioned.alt]]
 value = "1977"
 source = "wd-q1103620"
 grade = "B"
 checked = ""
-note = "inception 1977"
+note = "inception 1977 (start of site works)"
+
+[[facts.commissioned.alt]]
+value = "1992"
+source = "ea-register"
+grade = "A"
+checked = ""
+note = "the register's start date, 1992-01-01: a year, not the day"
+
+[[facts.commissioned.alt]]
+value = "1992"
+source = "teara-hydro-4"
+grade = "B"
+checked = ""
+
+[facts.units]
+value = "4 units"
+source = "contact-clyde"
+grade = "A"
+checked = "2026-11-18"
+note = "Contact: four turbine generator units, 464 MW in all"
 
 [facts.scheme]
+value = "Clutha Mata Au Hydro Scheme"
+source = "contact-clutha-scheme"
+grade = "A"
+checked = "2026-11-18"
+note = "with Roxburgh downstream"
+
+[[facts.scheme.alt]]
 value = "Clutha scheme"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
+[facts.river]
+value = "Clutha River (Lake Dunstan)"
+source = "contact-clyde"
+grade = "A"
+checked = "2026-11-18"
+
 [facts.region]
+value = "Otago"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.region.alt]]
 value = "Otago"
 source = "elenz-register"
 grade = "C"
@@ -52,27 +100,39 @@ checked = ""
 
 [facts.territorial_authority]
 value = "Central Otago"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.territorial_authority.alt]]
+value = "Central Otago"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Contact"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Contact Energy"
+source = ["ea-register", "contact-clyde"]
+grade = "A"
+checked = "2026-11-18"
+note = "Contact Energy Limited"
+
+[facts.previous_owners]
+value = "New Zealand Government (while being built), to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–96"
+source = ["gazette-1995-140", "paperspast-press-1988-12-08", "gazette-1996-174"]
+grade = "A"
+checked = "2026-11-18"
+note = "ECNZ took over the Crown's generation on 1 April 1987, and the station was finished for it; ECNZ sold Clyde to Contact Energy, then a new state-owned enterprise, on 1 February 1996 (agreement of 13 November 1995). Contact was privatised in 1999."
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Clyde holds back Lake Dunstan on the Clutha River and is New Zealand's largest concrete gravity dam, with about a million cubic metres of concrete in the dam and another 200,000 in the powerhouse. The government chose a high dam at Clyde in 1976 and passed special legislation in 1982 to get it built. The dam was finished in 1990, but extensive work to stabilise the Cromwell Gorge, which the lake would fill, held up commissioning until 1992. Built to produce 432 MW from its four units, the station is now rated at 464 MW."
+source = ["contact-clyde", "teara-hydro-4", "paperspast-press-1988-12-08"]
+grade = "B"
+checked = "2026-11-18"
 
 [[ratings]]
-value = "432"
-basis = "Wikipedia (basis not stated)"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = 432
+basis = "The EA register's nameplate: the station's original output, from four units"
+source = ["ea-register", "paperspast-press-1988-12-08"]
+grade = "A"
+checked = "2026-11-18"
