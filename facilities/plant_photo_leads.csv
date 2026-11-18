@@ -1,0 +1,39 @@
+id,slugs,subject,collection,url,rights_lead,description
+P001,maraetai,Maraetai,Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Maraetai_Power_Station.jpg,Check file-specific licence,Station view
+P002,arapuni,Arapuni,Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Arapuni_power_station.JPG,Check file-specific licence,Station view
+P003,arapuni,Arapuni,Wikimedia Commons category,https://commons.wikimedia.org/wiki/Category:Arapuni_Power_Station,Mixed licences; check each file,More images
+P004,benmore,Benmore,Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Benmore_Power_Station.jpg,Check file-specific licence,Station view
+P005,benmore,Benmore,Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Benmore_Power_Stn_NZ.jpg,Check file-specific licence,Alternative view
+P006,clyde,Clyde,Wikimedia Commons category,https://commons.wikimedia.org/wiki/Category:Clyde_Dam,Mixed licences; check each file,Dam and station images
+P007,clyde,Clyde,Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Clyde_Dam_with_Power_Station_%28scenery%29.jpg,Check file-specific licence,Landscape view
+P008,clyde,Clyde,Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Clyde_Dam_with_Power_Station_%28frontview%29.jpg,Check file-specific licence,Front view
+P009,manapouri,Manapōuri,Wikimedia Commons category,https://commons.wikimedia.org/wiki/Category:Manapouri_Power_Station,Mixed licences; check each file,Station image leads
+P010,manapouri,Manapōuri,Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Manapouri_power_station_at_Lake_Manapouri_in_the_afternoon.jpg,Check file-specific licence,Station and lake
+P011,manapouri,Manapōuri,Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Manapouri_Power_Station.jpg,Check file-specific licence,Station view
+P012,ohau-c,Ōhau C,Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Ohau_C_hydroelectric_Power_station_New_Zealand.jpg,Check file-specific licence,Station view
+P013,tokaanu,Tokaanu,Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Tokaanu_Power_Station.jpg,Check file-specific licence,Station view
+P014,waipapa,Waipapa,DigitalNZ / Alexander Turnbull Library,https://digitalnz.org/records/23135737,Record indicates CC BY 4.0; reconfirm,"Whites Aviation aerial, 14 Oct 1966"
+P015,waipapa,Waipapa,DigitalNZ / Alexander Turnbull Library,https://digitalnz.org/records/23206198,Rights to recheck,"Whites Aviation aerial, 6 Jan 1976"
+P016,mangahao,Mangahao,Wikimedia Commons / Godber,"https://commons.wikimedia.org/wiki/File:Mangahao_Power_Station,_1924_ATLIB_301155.png",Reported NZ public domain; verify,"Historic station, 1924"
+P017,mangahao,Mangahao,Wikimedia Commons / Godber,"https://commons.wikimedia.org/wiki/File:Mangahao_Power_Station,_1924_ATLIB_301146.png",Reported NZ public domain; verify,"Historic station, 1924"
+P018,wairakei,Wairākei,Wikimedia Commons category,https://commons.wikimedia.org/wiki/Category:Wairakei_Geothermal_Power_Plant,Mixed licences; check each file,Geothermal images
+P019,wairakei,Wairākei,Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Wairakei_Geothermal_Power_Plant.jpg,Check file-specific licence,Plant view
+P020,,Kawerau geothermal,Wikimedia Commons,https://commons.wikimedia.org/wiki/File:100_MW_Geothermal_Power_Plant_at_Kawerau_NZ.jpg,Check identity and licence,Geothermal plant
+P021,ohaaki,Ōhaaki,Te Ara,https://teara.govt.nz/en/photograph/5428/ohaki-power-station,Image rights separate from text,Station image; permission may be needed
+P022,ohaaki,Ōhaaki,Te Ara,https://teara.govt.nz/en/photograph/15060/ohaaki-power-station,Image rights separate from text,Station image; permission may be needed
+P023,te-apiti,Te Apiti,Wikimedia Commons category,https://commons.wikimedia.org/wiki/Category:Te_Apiti_Wind_Farm,Mixed licences; check each file,Wind farm photos
+P024,west-wind,West Wind,Wikimedia Commons category,https://commons.wikimedia.org/wiki/Category:West_Wind_Farm_Makara,Mixed licences; check each file,Wind farm photos
+P025,west-wind,West Wind,Wikimedia Commons,https://commons.wikimedia.org/wiki/File:MakaraWindFarm.jpg,Check file-specific licence,Wind farm view
+P026,west-wind,West Wind,Wikimedia Commons,https://commons.wikimedia.org/wiki/File:West_Wind_Farm_Makara_01.jpg,Check file-specific licence,Turbines
+P027,,Tararua,Wikimedia Commons category,https://commons.wikimedia.org/wiki/Category:Tararua_Wind_Farm,Mixed licences; check each file,Wind farm photos
+P028,,Huntly,Wikimedia Commons category,https://commons.wikimedia.org/wiki/Category:Huntly_Power_Station,Mixed licences; check each file,Station photos
+P029,,Huntly,DigitalNZ,https://digitalnz.org/records/29975193,Check record rights,"Historic station photo, 1983"
+P030,otahuhu-b,Ōtāhuhu B,Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Otahuhu_B_combined_cycle_turbine.jpg,Check file-specific licence,Turbine image
+P031,southdown,Southdown,Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Southdown_Power_Station.jpg,Check file-specific licence,Station view
+P032,cobb coleridge ohaaki wairakei,Wairākei; Ōhaaki; Cobb; Tuai; Coleridge,National Library / ECNZ collection,https://natlib.govt.nz/records/22674471,Check individual item rights,ECNZ 1989 station photo collection
+P033,,Contact hydro portfolio,Contact Energy,https://contact.co.nz/About-Us/Our-Story/our-generation-and-power-sites/hydro,Likely copyright reserved; seek permission,Operator portfolio imagery
+P034,lauriston-solar-farm,Lauriston,Genesis Energy,https://www.genesisenergy.co.nz/about/generation/lauriston-solar-farm,Likely copyright reserved; seek permission,Solar farm imagery
+P035,,NZ solar farms,Lodestone Energy,https://lodestoneenergy.co.nz/,Likely copyright reserved; seek permission,Portfolio imagery; verify exact site
+P036,,All stations,Openverse,https://openverse.org/en-nz/about,Search index; verify original licence,Openly licensed image discovery
+P037,,All stations,DigitalNZ,https://digitalnz.org/,Rights vary by item,NZ archive search
+P038,,All stations,National Library Photographic Archive,https://natlib.govt.nz/collections/a-z/photographic-archive,Rights vary by item,Historic photo archive

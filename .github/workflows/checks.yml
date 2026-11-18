@@ -33,6 +33,8 @@ jobs:
         run: python ingest/tests/method_constants.py
       - name: Installed capacity (every plant has a row; the site's copy is up to date)
         run: python ingest/capacity.py --check
+      - name: Plant files (every tracker plant has one; published facts are sourced; images are licensed)
+        run: python ingest/plant_files.py --check
 
   site:
     runs-on: ubuntu-latest

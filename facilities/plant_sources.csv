@@ -1,0 +1,110 @@
+id,title,publisher,url,kind,opened,note
+commons-plants-in-new-zealand,Wikimedia Commons – NZ power plants,,https://commons.wikimedia.org/wiki/Category:Power_plants_in_New_Zealand,public,,Image leads; each file has its own licence.
+contact-2025-pdf-language-en,Contact Energy – 2025 operating assets presentation,,https://contact.co.nz/getContentAsset/08cfbffc-e43e-449b-aebd-aed0547d3ce9/a677e4b4-b3c2-492c-ae74-9399720288b8/Contact-introduction-appendix-Capital-Markets-Day-2025.pdf?language=en,public,,Asset capacity and portfolio; check gross/net and date.
+contact-and-power-sites-hydro,Contact Energy – Hydro sites,,https://contact.co.nz/About-Us/Our-Story/our-generation-and-power-sites/hydro,public,,Operator asset portfolio; confirm rating definitions.
+contact-of-manawa-investor-presentation,Contact / Manawa acquisition presentation,,https://contact.co.nz/-/media/contact/pdfs/about-us/contact-acquisition-of-manawa---investor-presentation.ashx,public,,Small hydro leads; some figures may be aggregated.
+creativecommons-reusing-cc-licensed-content,Creative Commons – Reuse guide,,https://creativecommons.org/reusing-cc-licensed-content/,public,,Attribution and licence compliance.
+digitalnz,DigitalNZ,,https://digitalnz.org/,public,,NZ archive aggregator; rights vary by item.
+digitalnz-domain-in-new-zealand,DigitalNZ – Copyright and public domain,,https://digitalnz.org/make-it-digital/enabling-use-and-reuse/copyright-terms-and-the-public-domain-in-new-zealand,public,,NZ reuse guidance; not legal advice.
+doc-heritage-topics-power-generation,Department of Conservation – Power generation heritage,,https://www.doc.govt.nz/our-work/heritage/heritage-topics/power-generation/,public,,"Historic generation sites; useful leads, not exhaustive.; Identifies historic sites including Kerikeri, Dawson Falls, Mangaweka, Ōkere Falls, Six Mile, Sawyer Stream, Bullendale and Upper Hollyford. Some already in workbook; useful to validate status and heritage context.; All existing stations: Historic sites list, including several already in workbook and sites not in it. Good for retired/historic station discovery; not a complete list."
+ea-generation-generation-fleet-existing,Electricity Authority – Existing generation fleet,,https://www.ea.govt.nz/data-and-insights/datasets/wholesale/generation/generation-fleet/existing/,public,,"All existing stations: Dispatched plants, dated records; EA explicitly says it is best endeavours and older embedded register is incomplete. Use as dispatch/unit cross-check, not as a complete national station inventory."
+ea-new-zealands-electricity-mix,Electricity Authority – Geothermal role,,https://www.ea.govt.nz/news/eye-on-electricity/the-growing-role-of-geothermal-in-new-zealands-electricity-mix/,public,,Sector context; not a full register.
+ea-nsp,Network supply points table,Electricity Authority,https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable,public,,Coordinates of grid connection points.
+ea-register,Dispatched generation plant (DispatchedGenerationPlant.csv),Electricity Authority,https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing,public,,"Operator, nameplate MW and the date each unit's row starts. Its 1 January dates count as years."
+ea-wholesale-market-operation-generation,Electricity Authority – Generation,,https://www.ea.govt.nz/industry/wholesale/market-operation/generation/,public,,Official generation fleet context; not a complete historic register.
+eastlandgeneration-renewable-generation-geotherm,Eastland Generation,,https://eastlandgeneration.nz/renewable-generation/geothermal,public,,Ngāwhā generation and project information.
+elenz-methods-capacity,ELENZ – Capacity methodology,,https://elenz.co.nz/methods/capacity,public,,Project reference for capacity and station/unit distinctions; not independent evidence.
+elenz-register,Elenz research register (working draft of 8 Nov 2026),Elenz,,research,,"Our own discovery workbook, retired 18 Nov 2026. A lead only: never the source of a published fact."
+emidatasets-20generation-20investment-20pipeline,Electricity Authority – Generation investment pipeline (EMI),,https://emidatasets.blob.core.windows.net/publicdata/Datasets/Wholesale/Generation/GenerationFleet/Proposed/20240912%20Generation%20investment%20pipeline.csv,public,,"Proposed projects (Sep 2024 edition); a lead for the plant pages' ""coming soon"" list."
+emidatasets-existing-20260702-dispatchedgenerati,Electricity Authority – Dispatched generation plant (EMI),,https://emidatasets.blob.core.windows.net/publicdata/Datasets/Wholesale/Generation/GenerationFleet/Existing/20260702_DispatchedGenerationPlant.csv,public,,"Register names, connections, units, operators, commissioning dates (often 1 January placeholders). CC BY 4.0."
+emidatasets-networksupplypointstable-20261106-ne,Electricity Authority – Network supply points table (EMI),,https://emidatasets.blob.core.windows.net/publicdata/Datasets/Wholesale/MappingsAndGeospatial/NetworkSupplyPointsTable/20261106_NetworkSupplyPointsTable.csv,public,,"Grid connection names, network reporting regions and NZTM coordinates (converted to latitude/longitude). CC BY 4.0."
+engineeringnz-creek-hydro-electric-station,Engineering New Zealand – One Mile Creek hydro-electric station,,https://www.engineeringnz.org/programmes/heritage/engineering-heritage-records/power-stations/one-mile-creek-hydro-electric-station/,public,,"Station history and technical detail: 60 kW generator; operated 1924–1966.; One Mile Creek: 60 kW generator; municipal scheme; operated 1924–1966; technical details. Historic station, not current operating capacity."
+engineeringnz-heritage-records-power-stations,Engineering New Zealand – Power stations heritage records,,https://www.engineeringnz.org/programmes/heritage/engineering-heritage-records/power-stations/,public,,"Station-specific engineering histories, dates, plant details, historic photos and references; includes Kourarau, One Mile Creek, Horahora and others.; All existing stations: Engineering histories and station-specific pages for major and local hydro plants. Useful technical details, commissioning, equipment and archival photo references."
+engineeringnz-stations-kourarau-power-stations,Engineering New Zealand – Kourarau Power Stations,,https://www.engineeringnz.org/programmes/heritage/engineering-heritage-records/power-stations/kourarau-power-stations/,public,,"Detailed history and equipment: Station A 700 kW and Station B 250 kW; archive image reference.; Kourarau A and B: History, 700 kW and 250 kW generators, equipment, archive photo reference. Excellent technical/history source; distinguish two stations from one scheme."
+genesisenergy-generation-lauriston-solar-farm,Genesis Energy – Lauriston,,https://www.genesisenergy.co.nz/about/generation/lauriston-solar-farm,public,,Project detail and imagery; operator copyright likely applies.
+github-elenz-tree-main-facilities,Elenz repository – facilities tables,,https://github.com/elenz-nz/elenz/tree/main/facilities,public,,"plant_capacity.csv, overrides.toml, metered_plants.csv, embedded_points.csv and plants.json as of 8 Nov 2026: the source for the Plants and Capacity history sheets."
+heritage-list-details-31-listing,Heritage New Zealand – Mokopeka Station Hydro-electric Power Scheme,,https://www.heritage.org.nz/list-details/31/Listing,public,,"Historic Place Category 1 listing; 1892 private station, one of the oldest continuously operating hydro plants claim requires careful qualification.; Mokopeka: 1892 powerhouse; Category 1 historic place. Heritage evidence; not a 1 MW+ plant."
+heritage-the-list,Heritage New Zealand Pouhere Taonga – The List,,https://www.heritage.org.nz/the-list,public,,"Historic-place records for individual generating sites; useful for construction history, descriptions, listing records and sometimes photographs."
+iponz-get-ip-copyright-duration,IPONZ – Copyright duration,,https://www.iponz.govt.nz/get-ip/copyright/duration/,public,,NZ copyright duration guidance; old images can have transitional rules.
+iponz-ip-copyright-crown-copyright,IPONZ – Crown copyright,,https://www.iponz.govt.nz/get-ip/copyright/crown-copyright/,public,,Crown copyright duration and exceptions.
+legislation-1994-143-en-latest,Copyright Act 1994,,https://www.legislation.govt.nz/act/public/1994/143/en/latest/,public,,Primary NZ copyright legislation.
+library-1983-1983-20issue-20071,New Zealand Gazette – Argyle and Wairau hydro generation consents (1983),,https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1983/1983%20ISSUE%20071.pdf,public,,"Primary legal notice describes Argyle powerhouse at 3.8 MW and Wairau powerhouse at 7.2 MW, with associated waterworks.; Argyle: Legal notice gives 3.8 MW maximum capacity and describes turbine/generator and waterworks. Primary source for consented/authorised capacity; pair with current operator confirmation.; Wairau: Legal notice gives 7.2 MW maximum capacity and describes powerhouse downstream of Argyle. Likely related cascade; model scheme relationship to Argyle."
+mainpower-corporate-information-renewable-energy,MainPower – Renewable energy / Cleardale mini-hydro,,https://www.mainpower.co.nz/about-us/corporate-information/renewable-energy/,public,,"Owner source for Cleardale mini-hydro; facility description and annual generation. Capacity needs confirmation.; Cleardale: Owner confirms mini-hydro facility, location near Mount Hutt and annual output about 4 GWh. MBIE lists 0.9 MW; below current 1 MW cutoff but a good embedded-generation example."
+mbie-energy-statistics-renewables-statistics,MBIE – Renewables statistics,,https://www.mbie.govt.nz/building-and-energy/energy-and-natural-resources/energy-statistics-and-modelling/energy-statistics/renewables-statistics,public,,"All existing stations: Annual renewable energy workbook with hydro, wind, geothermal, solar, woody biomass and biogas tables. Useful for sector-level and some facility-level cross-checks; inspect workbook tabs and reporting basis."
+mbie-new-zealand-2026-electricity,MBIE – Energy in NZ 2026: Electricity,,https://www.mbie.govt.nz/building-and-energy/energy-and-natural-resources/energy-statistics-and-modelling/energy-publications-and-technical-papers/energy-in-new-zealand/energy-in-new-zealand-2026/electricity,public,,Generation and thermal/cogeneration context; may aggregate industrial generation.
+mbie-new-zealand-2026-renewables,MBIE – Energy in NZ 2026: Renewables,,https://www.mbie.govt.nz/building-and-energy/energy-and-natural-resources/energy-statistics-and-modelling/energy-publications-and-technical-papers/energy-in-new-zealand/energy-in-new-zealand-2026/renewables,public,,Renewable facility reporting; distinguish MWp/DC and MWac.
+mbie-opportunities-in-new-zealand,MBIE – Embedded Hydro Generation Opportunities in New Zealand (2020),,https://www.mbie.govt.nz/assets/embedded-hydro-generation-opportunities-in-new-zealand.pdf,public,,"Appendix D lists 78 existing small hydro schemes, including 55 at >=1 MW; valuable independent cross-check for small/embedded hydro. Historical snapshot; verify current status and aliases."
+natlib-a-z-photographic-archive,National Library Photographic Archive,,https://natlib.govt.nz/collections/a-z/photographic-archive,public,,Historic images; access does not imply reuse permission.
+natlib-records-22657539,National Library of New Zealand – Hydroelectric power plants catalogue,,https://natlib.govt.nz/records/22657539,public,,Subject catalogue of historic hydroelectric power plant material; leads to archival photographs and records for named stations.
+nzgeothermal-nz-what-is-geothermal,NZ Geothermal Association,,https://www.nzgeothermal.org.nz/geothermal-in-nz/what-is-geothermal/,public,,Capacity and sector history; check gross/net basis.
+nzx-announcements-376610,"Mercury – acquisition of Tilt Renewables' NZ operations (NZX, 3 Aug 2021)",,https://www.nzx.com/announcements/376610,public,,"Tararua I, II and III, Mahinerangi and Waipipi owned by Mercury from 3 Aug 2021."
+openinframap-20zealand-plants-source-hydro,Open Infrastructure Map – NZ hydro plants,,https://openinframap.org/stats/area/New%20Zealand/plants?source=hydro,research,,"Hydro-only inventory includes small stations and scheme components such as Argyle, Wairau, Ellis, Talla Burn, Kowhai and others. Check against operator evidence."
+openinframap-area-new-20zealand-plants,Open Infrastructure Map – New Zealand power plants,,https://openinframap.org/stats/area/New%20Zealand/plants,research,,OSM-based independent mapped inventory; useful cross-check and discovery lead. Not authoritative; capacities and naming can be wrong or stale.
+openstreetmap-copyright,"OpenStreetMap – power=plant features in New Zealand (Overpass export, 8 Nov 2026)",,https://www.openstreetmap.org/copyright,research,,"158 features: station locations, Wikidata IDs, start dates; capacities and operators are often stale. © OpenStreetMap contributors, ODbL 1.0: attribution needed, and a database built from it that is shared publicly must also be ODbL."
+openverse-en-nz-about,Openverse,,https://openverse.org/en-nz/about,public,,Openly licensed image search; verify original source licence.
+osm,OpenStreetMap,OpenStreetMap contributors,https://www.openstreetmap.org,research,,ODbL: research only. Its coordinates and other values are not copied into these files.
+trusthouse-korarau-hydroelectric-power-scheme,Trust House – Kourarau Hydroelectric Power Scheme,,https://trusthouse.co.nz/project/korarau-hydroelectric-power-scheme/,public,,"Operator/owner source: two stations A and B, 700 kW + 250 kW, 910 kW combined, operating since 1923.; Kourarau A and B: Two stations; combined installed capacity 910 kW; 3 GWh/year; continuous operation since 1923. Strong owner source; use 0.91 MW combined rather than rounded 1 MW."
+waikatoregion-geothermal-energy-and-extraction,Waikato Regional Council – Geothermal energy,,https://www.waikatoregion.govt.nz/environment/geothermal/energy-and-extraction/,public,,"Facilities, fields and regional history."
+wd-q107547911,Wikidata item Q107547911,Wikidata,https://www.wikidata.org/wiki/Q107547911,public,,
+wd-q108122994,Wikidata item Q108122994,Wikidata,https://www.wikidata.org/wiki/Q108122994,public,,
+wd-q1103620,Wikidata item Q1103620,Wikidata,https://www.wikidata.org/wiki/Q1103620,public,,
+wd-q115803980,Wikidata item Q115803980,Wikidata,https://www.wikidata.org/wiki/Q115803980,public,,
+wd-q11980453,Wikidata item Q11980453,Wikidata,https://www.wikidata.org/wiki/Q11980453,public,,
+wd-q11988091,Wikidata item Q11988091,Wikidata,https://www.wikidata.org/wiki/Q11988091,public,,
+wd-q12010561,Wikidata item Q12010561,Wikidata,https://www.wikidata.org/wiki/Q12010561,public,,
+wd-q122495380,Wikidata item Q122495380,Wikidata,https://www.wikidata.org/wiki/Q122495380,public,,
+wd-q1246704,Wikidata item Q1246704,Wikidata,https://www.wikidata.org/wiki/Q1246704,public,,
+wd-q125563903,Wikidata item Q125563903,Wikidata,https://www.wikidata.org/wiki/Q125563903,public,,
+wd-q125856182,Wikidata item Q125856182,Wikidata,https://www.wikidata.org/wiki/Q125856182,public,,
+wd-q130271374,Wikidata item Q130271374,Wikidata,https://www.wikidata.org/wiki/Q130271374,public,,
+wd-q130302252,Wikidata item Q130302252,Wikidata,https://www.wikidata.org/wiki/Q130302252,public,,
+wd-q133480513,Wikidata item Q133480513,Wikidata,https://www.wikidata.org/wiki/Q133480513,public,,
+wd-q133855880,Wikidata item Q133855880,Wikidata,https://www.wikidata.org/wiki/Q133855880,public,,
+wd-q133860797,Wikidata item Q133860797,Wikidata,https://www.wikidata.org/wiki/Q133860797,public,,
+wd-q140119415,Wikidata item Q140119415,Wikidata,https://www.wikidata.org/wiki/Q140119415,public,,
+wd-q140121649,Wikidata item Q140121649,Wikidata,https://www.wikidata.org/wiki/Q140121649,public,,
+wd-q1411290,Wikidata item Q1411290,Wikidata,https://www.wikidata.org/wiki/Q1411290,public,,
+wd-q15243749,Wikidata item Q15243749,Wikidata,https://www.wikidata.org/wiki/Q15243749,public,,
+wd-q15379053,Wikidata item Q15379053,Wikidata,https://www.wikidata.org/wiki/Q15379053,public,,
+wd-q21037313,Wikidata item Q21037313,Wikidata,https://www.wikidata.org/wiki/Q21037313,public,,
+wd-q21037318,Wikidata item Q21037318,Wikidata,https://www.wikidata.org/wiki/Q21037318,public,,
+wd-q24998516,Wikidata item Q24998516,Wikidata,https://www.wikidata.org/wiki/Q24998516,public,,
+wd-q28180573,Wikidata item Q28180573,Wikidata,https://www.wikidata.org/wiki/Q28180573,public,,
+wd-q288300,Wikidata item Q288300,Wikidata,https://www.wikidata.org/wiki/Q288300,public,,
+wd-q3434500,Wikidata item Q3434500,Wikidata,https://www.wikidata.org/wiki/Q3434500,public,,
+wd-q4784238,Wikidata item Q4784238,Wikidata,https://www.wikidata.org/wiki/Q4784238,public,,
+wd-q4784425,Wikidata item Q4784425,Wikidata,https://www.wikidata.org/wiki/Q4784425,public,,
+wd-q4815757,Wikidata item Q4815757,Wikidata,https://www.wikidata.org/wiki/Q4815757,public,,
+wd-q5144632,Wikidata item Q5144632,Wikidata,https://www.wikidata.org/wiki/Q5144632,public,,
+wd-q5684897,Wikidata item Q5684897,Wikidata,https://www.wikidata.org/wiki/Q5684897,public,,
+wd-q5945709,Wikidata item Q5945709,Wikidata,https://www.wikidata.org/wiki/Q5945709,public,,
+wd-q61448287,Wikidata item Q61448287,Wikidata,https://www.wikidata.org/wiki/Q61448287,public,,
+wd-q61448290,Wikidata item Q61448290,Wikidata,https://www.wikidata.org/wiki/Q61448290,public,,
+wd-q6368582,Wikidata item Q6368582,Wikidata,https://www.wikidata.org/wiki/Q6368582,public,,
+wd-q6858304,Wikidata item Q6858304,Wikidata,https://www.wikidata.org/wiki/Q6858304,public,,
+wd-q7021804,Wikidata item Q7021804,Wikidata,https://www.wikidata.org/wiki/Q7021804,public,,
+wd-q7022117,Wikidata item Q7022117,Wikidata,https://www.wikidata.org/wiki/Q7022117,public,,
+wd-q7080591,Wikidata item Q7080591,Wikidata,https://www.wikidata.org/wiki/Q7080591,public,,
+wd-q7080628,Wikidata item Q7080628,Wikidata,https://www.wikidata.org/wiki/Q7080628,public,,
+wd-q7080629,Wikidata item Q7080629,Wikidata,https://www.wikidata.org/wiki/Q7080629,public,,
+wd-q7080630,Wikidata item Q7080630,Wikidata,https://www.wikidata.org/wiki/Q7080630,public,,
+wd-q7207841,Wikidata item Q7207841,Wikidata,https://www.wikidata.org/wiki/Q7207841,public,,
+wd-q7249372,Wikidata item Q7249372,Wikidata,https://www.wikidata.org/wiki/Q7249372,public,,
+wd-q7370574,Wikidata item Q7370574,Wikidata,https://www.wikidata.org/wiki/Q7370574,public,,
+wd-q7621980,Wikidata item Q7621980,Wikidata,https://www.wikidata.org/wiki/Q7621980,public,,
+wd-q7685516,Wikidata item Q7685516,Wikidata,https://www.wikidata.org/wiki/Q7685516,public,,
+wd-q7688687,Wikidata item Q7688687,Wikidata,https://www.wikidata.org/wiki/Q7688687,public,,
+wd-q7690758,Wikidata item Q7690758,Wikidata,https://www.wikidata.org/wiki/Q7690758,public,,
+wd-q7690821,Wikidata item Q7690821,Wikidata,https://www.wikidata.org/wiki/Q7690821,public,,
+wd-q7690882,Wikidata item Q7690882,Wikidata,https://www.wikidata.org/wiki/Q7690882,public,,
+wd-q7691000,Wikidata item Q7691000,Wikidata,https://www.wikidata.org/wiki/Q7691000,public,,
+wd-q7854981,Wikidata item Q7854981,Wikidata,https://www.wikidata.org/wiki/Q7854981,public,,
+wd-q7994795,Wikidata item Q7994795,Wikidata,https://www.wikidata.org/wiki/Q7994795,public,,
+wd-q81432024,Wikidata item Q81432024,Wikidata,https://www.wikidata.org/wiki/Q81432024,public,,
+wd-q81826971,Wikidata item Q81826971,Wikidata,https://www.wikidata.org/wiki/Q81826971,public,,
+wd-query,"Wikidata – items linked from OSM (SPARQL query, 8 Nov 2026)",,https://query.wikidata.org/,public,,"Coordinates (P625) and service entry / inception dates (P729, P571) for 59 stations. CC0: no conditions on reuse."
+webstatic-library-tonlocal,NIWA – Hawke's Bay hydroelectric potential / Mokopeka report,,https://webstatic.niwa.co.nz/library/TonLocal.pdf,public,,"Historic regional technical report; records Mokopeka as about 20 kVA and includes 1978 photographs.; Mokopeka: About 20 kVA; photos of weir, powerhouse, turbine and pump taken in 1978. Useful technical/history and image lead; check image reuse rights."
+windenergy-operating-onshore-windfarm-projects,NZ Wind Energy Association – Operating wind farms,,https://www.windenergy.org.nz/onshore-wind/operating-onshore-windfarm-projects/,public,,Operating wind farms and indicative capacities; verify basis.
+windenergy-wind-onshore-windfarm-pipeline,NZWEA – Wind pipeline,,https://www.windenergy.org.nz/onshore-wind/onshore-windfarm-pipeline/,public,,Proposed and staged projects; not commissioned capacity.
+wp-aniwhenua-power-station,Aniwhenua Power Station,Wikipedia,https://en.wikipedia.org/wiki/Aniwhenua_Power_Station,public,,
+wp-list,List of power stations in New Zealand,Wikipedia,https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand,public,,"Read for the register (Nov 2026). Grade B: check each value against the station's own page or its references.; Station names, territorial authorities, coordinates, commissioning years, operators (read 8 Nov 2026). A lead, not evidence: check against operator pages."

@@ -395,7 +395,7 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   which downloaded every month's reconciliation file into the states once, 55 minutes and 925 writes);
   it starts with the next history run (or by hand, Actions → History); never start one while another is running. The Worker starts the Offers workflow (`offers.yml`) with it.
 - `.github/workflows/checks.yml`: on every push, ruff (syntax errors and undefined names only), `ingest/tests/smoke.py`
-  (the live and history paths on a committed one-hour sample of real dispatch data and matching final prices, no network), `ingest/tests/method_constants.py`
+  (the live and history paths on a committed one-hour sample of real dispatch data and matching final prices, no network), `ingest/tests/method_constants.py`, `ingest/capacity.py --check`, `ingest/plant_files.py --check` (the plant files: `facilities/PLANTS.md`)
   and the site's `npm run check`, `npm test` (`site/tests/`: the tracker's address), `npm run build`, `npm run check:previews` (which also runs `scripts/check-css.js`, `scripts/check-methods.js` and `scripts/check-reviewed.js`), the Worker tests and `npm run test:browsers`. Its `ingest` and `site` jobs are required checks: a pull request can't
   merge into `main` (so nothing deploys) until both pass.
   Browser tests (design decision, 2 Nov 2026; `site/playwright.config.js`, `site/tests/e2e/site.spec.js`): Playwright opens the built site in Chromium, Firefox and WebKit (Safari's engine) and at two phone sizes, through the site's own links as well as direct visits and refreshes, and with JavaScript off. They use the snapshot bundled at `static/data/tracker.json` (no history files), not the live site, so a fix can still merge while the live site is down; check only what the snapshot can show. WebKit here is new, so old Safari is covered by `check-css.js` alone. A new page or card with its own fault worth guarding gets a test; put the bug back once to see the test fail. To run them in a Claude session: `npx playwright test --project=chromium --project=phone-chrome` after a build (only Chromium is installed there; `@playwright/test` is pinned to that browser's version, so bump them together).
@@ -489,6 +489,16 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   `rooftop_capacity.json`, rows per plant) and, with `--check` (run in checks.yml), fails if a plant has no row, rows
   overlap, or the JSON is stale: after editing the CSV, run `python3 ingest/capacity.py` and commit both. A new plant
   that isn't generating yet gets a `pending` row with no dates.
+- Plant pages (design decision, 18 Nov 2026): `facilities/plants/<slug>.toml`,
+  one file per page with the researched facts, each with a source ID, a grade (A, B, C) and the date a person checked
+  it; `facilities/plant_sources.csv`, `plant_images.csv`, `plant_photo_leads.csv` and `station_leads.csv` beside them.
+  The folder stays `facilities/` (it already holds the plant tables, and the word covers substations or load centres
+  later). The site will be built only from these files, and a fact is published only once checked, grade A or B, with
+  public sources. OpenStreetMap's values stay out (ODbL): only its feature IDs, as pointers. First drafts came from the
+  research register workbook (`analysis/plants_import.py`, run once); the files are the record from then on.
+  `ingest/plant_files.py` reads them (`load()`), prints progress, and with `--check` (in checks.yml) fails if a tracker
+  plant has no file or a file breaks the rules in `facilities/PLANTS.md`, which also says how to check a plant. Not in
+  the rebuild fingerprint.
 - `facilities/NEXT_REBUILD.md`: changes waiting for the next full history rebuild (they touch fingerprinted files).
   Bundle them into one rebuild; never start one while another is running. While a build is being collected, its items
   go on the branch `next-rebuild` (a draft PR), not on `main`.

@@ -1,0 +1,102 @@
+# Plant page facts for Kūmara. How to check a plant: facilities/PLANTS.md.
+
+slug = "kumara"
+plant = "Kūmara"
+name = "Kūmara"
+register = ["H028", "H029", "H030"]
+osm = ["relation/12568803"]
+reviewed = ""
+to_check = [
+  "Location is the grid connection, not the station.",
+  "Capacity: Distinguish from Dillmans and Duffers.",
+  "Location: no station point yet (OpenStreetMap is research only); check one against the LINZ aerial or Wikidata.",
+]
+notes = [
+  "H028: 10 MW at KUM0661; the scheme beyond its dispatched unit is also in other embedded generation.",
+  "H029: In the Kūmara scheme (metered code kumara_dillmans).",
+  "H030: In the Kūmara scheme.",
+]
+
+[grid_connection]
+value = [-42.63552, 171.19555]
+code = "KUM0661 KUMARA"
+source = "ea-nsp"
+grade = "A"
+checked = ""
+
+[facts.commissioned]
+value = "Kumara 1928; Dillmans 1928; Duffers 1928"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[[facts.commissioned.alt]]
+value = "1928"
+source = "ea-register"
+grade = "A"
+checked = ""
+note = "the register's start date, 1928-01-01: often a year, not the day"
+
+[facts.scheme]
+value = "West Coast small hydro"
+source = "elenz-register"
+grade = "C"
+checked = ""
+
+[facts.region]
+value = "West Coast"
+source = "elenz-register"
+grade = "C"
+checked = ""
+
+[facts.territorial_authority]
+value = "Westland"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[facts.owner]
+value = "Contact"
+source = "ea-register"
+grade = "B"
+checked = ""
+note = "the register's operator, as Elenz groups owners; check the owner"
+
+[facts.about]
+value = ""
+source = "elenz-register"
+grade = "C"
+checked = ""
+note = "To write: 2-4 plain sentences in our own words, from cited sources."
+
+[[ratings]]
+value = "Kumara 6.5; Dillmans 3.5; Duffers 0.5"
+basis = "Wikipedia (basis not stated)"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[[stations]]
+value = "Kumara"
+id = "H028"
+source = "elenz-register"
+grade = "C"
+checked = ""
+commissioned = "Kumara 1928; Dillmans 1928; Duffers 1928"
+
+[[stations]]
+value = "Dillmans"
+id = "H029"
+source = "elenz-register"
+grade = "C"
+checked = ""
+commissioned = "Kumara 1928; Dillmans 1928; Duffers 1928"
+
+[[stations]]
+value = "Duffers"
+id = "H030"
+source = "elenz-register"
+grade = "C"
+checked = ""
+mw = 0.6
+commissioned = "Kumara 1928; Dillmans 1928; Duffers 1928"

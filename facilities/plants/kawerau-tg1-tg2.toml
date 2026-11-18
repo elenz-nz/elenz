@@ -1,0 +1,54 @@
+# Plant page facts for Kawerau TG1/TG2. How to check a plant: facilities/PLANTS.md.
+
+slug = "kawerau-tg1-tg2"
+plant = "Kawerau TG1/TG2"
+name = "Kawerau TG1/TG2"
+register = ["G021"]
+reviewed = ""
+to_check = [
+  "Owner differs from Wikipedia.",
+  "Location is the grid connection, not the station.",
+  "Wikipedia gives Nova Energy; check.",
+  "Location: only the grid connection so far; find the station itself.",
+  "Closed: Elenz's data ends 2008-03-31; find the closing date.",
+]
+notes = ["Added from Elenz's plant list (8 Nov 2026)."]
+
+[grid_connection]
+value = [-38.07673, 176.72238]
+code = "KAW0111 KAWERAU"
+source = "ea-nsp"
+grade = "A"
+checked = ""
+
+[facts.commissioned]
+value = "1989, 1993"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[facts.region]
+value = "Bay of Plenty"
+source = "elenz-register"
+grade = "C"
+checked = ""
+
+[facts.territorial_authority]
+value = "Kawerau"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[facts.about]
+value = ""
+source = "elenz-register"
+grade = "C"
+checked = ""
+note = "To write: 2-4 plain sentences in our own words, from cited sources."
+
+[[ratings]]
+value = "6"
+basis = "Wikipedia (basis not stated)"
+source = "wp-list"
+grade = "B"
+checked = ""

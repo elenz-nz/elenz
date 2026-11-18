@@ -1,0 +1,46 @@
+# Plant page facts for Junction Road. How to check a plant: facilities/PLANTS.md.
+
+slug = "junction-road"
+plant = "Junction Road"
+name = "Junction Road"
+register = ["T012"]
+osm = ["way/781973296"]
+reviewed = ""
+to_check = [
+  "No location yet.",
+  "Capacity: Establish rating and ownership.",
+  "Location: no station point yet (OpenStreetMap is research only); check one against the LINZ aerial or Wikidata.",
+]
+notes = ["100 MW from Feb 2020."]
+
+[facts.commissioned]
+value = "2020"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[facts.region]
+value = "Taranaki"
+source = "elenz-register"
+grade = "C"
+checked = ""
+
+[facts.territorial_authority]
+value = "Taranaki"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[facts.owner]
+value = "Nova"
+source = "ea-register"
+grade = "B"
+checked = ""
+note = "the register's operator, as Elenz groups owners; check the owner"
+
+[facts.about]
+value = ""
+source = "elenz-register"
+grade = "C"
+checked = ""
+note = "To write: 2-4 plain sentences in our own words, from cited sources."

@@ -1,0 +1,85 @@
+# Plant page facts for McKee. How to check a plant: facilities/PLANTS.md.
+
+slug = "mckee"
+plant = "McKee"
+name = "McKee"
+register = ["T011"]
+osm = ["relation/13108944"]
+reviewed = ""
+to_check = [
+  "Location is the grid connection, not the station.",
+  "Capacity: Establish rating and current status.",
+  "Location: no station point yet (OpenStreetMap is research only); check one against the LINZ aerial or Wikidata.",
+]
+notes = ["100 MW from Sep 2012. Wikipedia lists a turbine and a reciprocating plant."]
+
+[grid_connection]
+value = [-39.08934, 174.33297]
+code = "MKE1101 McKee"
+source = "ea-nsp"
+grade = "A"
+checked = ""
+
+[facts.commissioned]
+value = "McKee (turbine) 2013; McKee (recip) 2008"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[[facts.commissioned.alt]]
+value = "2013"
+source = "ea-register"
+grade = "A"
+checked = ""
+note = "the register's start date, 2013-01-01: often a year, not the day"
+
+[facts.scheme]
+value = "McKee gas field"
+source = "elenz-register"
+grade = "C"
+checked = ""
+
+[facts.region]
+value = "Taranaki"
+source = "elenz-register"
+grade = "C"
+checked = ""
+
+[facts.territorial_authority]
+value = "New Plymouth"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[facts.owner]
+value = "Nova"
+source = "ea-register"
+grade = "B"
+checked = ""
+note = "the register's operator, as Elenz groups owners; check the owner"
+
+[facts.about]
+value = ""
+source = "elenz-register"
+grade = "C"
+checked = ""
+note = "To write: 2-4 plain sentences in our own words, from cited sources."
+
+[[ratings]]
+value = "McKee (turbine) 100; McKee (recip) 2.0"
+basis = "Wikipedia (basis not stated)"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[[stations]]
+value = "McKee (turbine)"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[[stations]]
+value = "McKee (recip)"
+source = "wp-list"
+grade = "B"
+checked = ""
