@@ -23,6 +23,9 @@ engineeringnz-heritage-records-power-stations,Engineering New Zealand – Power 
 engineeringnz-stations-kourarau-power-stations,Engineering New Zealand – Kourarau Power Stations,,https://www.engineeringnz.org/programmes/heritage/engineering-heritage-records/power-stations/kourarau-power-stations/,public,,"Detailed history and equipment: Station A 700 kW and Station B 250 kW; archive image reference.; Kourarau A and B: History, 700 kW and 250 kW generators, equipment, archive photo reference. Excellent technical/history source; distinguish two stations from one scheme."
 gazette-1995-140,"New Zealand Gazette, 27 November 1995, issue 140: ECNZ information for disclosure",New Zealand Gazette (Victoria University of Wellington Library archive),https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1995/1995%20ISSUE%20140.pdf,public,2026-11-18,"ECNZ commenced business on 1 April 1987, acquiring the Crown's electricity generation business (Electricity Division of the Ministry of Energy)."
 gazette-1999-170,"New Zealand Gazette, 1999, issue 170: ECNZ financial statements",New Zealand Gazette (Victoria University of Wellington Library archive),https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1999/1999%20ISSUE%20170.pdf,public,2026-11-18,"On 1 April 1999 ECNZ moved its generation to three new SOEs: Mighty River Power (Waikato catchment hydro), Genesis Energy (Huntly, Te Awamutu, Tongariro catchment hydro), Meridian Energy (Waitaki catchment and Manapōuri hydro)."
+gazette-1999-37,"New Zealand Gazette, 25 March 1999, issue 37: Directions relating to split of Electricity Corporation of New Zealand Limited",New Zealand Gazette (Victoria University of Wellington Library archive),https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1999/1999%20ISSUE%20037.pdf,public,2026-11-18,"Pages 897-907. Huntly SOE means Genesis Power Limited; Schedule 1 transfers to it the power stations at Huntly, Rangipo, Tokaanu, Te Awamutu, Kinleith, Kaitawa, Tuai and Piripaua."
+genesis-tongariro,Tongariro Power Scheme,Genesis Energy,https://www.genesisenergy.co.nz/about/generation/tongariro-power-scheme,public,2026-11-18,"361.8 MW: Tokaanu 240 MW (four 60 MW units, 1973), Rangipō 120 MW (two 60 MW units, underground, 1983), Mangaio 1.8 MW (2008). Diversions, tunnels, lakes and tailraces; Rangipō 63 m below ground, New Zealand's second underground station."
+genesis-waikaremoana,Waikaremoana Power Scheme,Genesis Energy,https://www.genesisenergy.co.nz/about/generation/waikaremoana-power-scheme,public,2026-11-18,"138 MW: Tuai 60 MW (three 20 MW units, 1929), Piripaua 42 MW (two 21 MW, 1943), Kaitawa 36 MW (two 18 MW, 1948; the lake history on the same page says 1949). Second North Island government scheme after Mangahao."
 genesisenergy-generation-lauriston-solar-farm,Genesis Energy – Lauriston,,https://www.genesisenergy.co.nz/about/generation/lauriston-solar-farm,public,,Project detail and imagery; operator copyright likely applies.
 github-elenz-tree-main-facilities,Elenz repository – facilities tables,,https://github.com/elenz-nz/elenz/tree/main/facilities,public,,"plant_capacity.csv, overrides.toml, metered_plants.csv, embedded_points.csv and plants.json as of 8 Nov 2026: the source for the Plants and Capacity history sheets."
 heritage-list-details-31-listing,Heritage New Zealand – Mokopeka Station Hydro-electric Power Scheme,,https://www.heritage.org.nz/list-details/31/Listing,public,,"Historic Place Category 1 listing; 1892 private station, one of the oldest continuously operating hydro plants claim requires careful qualification.; Mokopeka: 1892 powerhouse; Category 1 historic place. Heritage evidence; not a 1 MW+ plant."
@@ -67,6 +70,7 @@ wd-q11980453,Wikidata item Q11980453,Wikidata,https://www.wikidata.org/wiki/Q119
 wd-q11988091,Wikidata item Q11988091,Wikidata,https://www.wikidata.org/wiki/Q11988091,public,,
 wd-q12010561,Wikidata item Q12010561,Wikidata,https://www.wikidata.org/wiki/Q12010561,public,,
 wd-q122495380,Wikidata item Q122495380,Wikidata,https://www.wikidata.org/wiki/Q122495380,public,,
+wd-q123943230,Wikidata item Q123943230,Wikidata,https://www.wikidata.org/wiki/Q123943230,public,2026-11-18,"Tokaanu Power Station: coordinates; 240 MW; part of the Tongariro Power Scheme (Q12006578). Replaces Q61448287, which now redirects to the scheme item."
 wd-q1246704,Wikidata item Q1246704,Wikidata,https://www.wikidata.org/wiki/Q1246704,public,,
 wd-q125563903,Wikidata item Q125563903,Wikidata,https://www.wikidata.org/wiki/Q125563903,public,,
 wd-q125856182,Wikidata item Q125856182,Wikidata,https://www.wikidata.org/wiki/Q125856182,public,,
@@ -75,8 +79,8 @@ wd-q130302252,Wikidata item Q130302252,Wikidata,https://www.wikidata.org/wiki/Q1
 wd-q133480513,Wikidata item Q133480513,Wikidata,https://www.wikidata.org/wiki/Q133480513,public,,
 wd-q133855880,Wikidata item Q133855880,Wikidata,https://www.wikidata.org/wiki/Q133855880,public,,
 wd-q133860797,Wikidata item Q133860797,Wikidata,https://www.wikidata.org/wiki/Q133860797,public,,
-wd-q140119415,Wikidata item Q140119415,Wikidata,https://www.wikidata.org/wiki/Q140119415,public,,
-wd-q140121649,Wikidata item Q140121649,Wikidata,https://www.wikidata.org/wiki/Q140121649,public,,
+wd-q140119415,Wikidata item Q140119415,Wikidata,https://www.wikidata.org/wiki/Q140119415,public,2026-11-18,Piripaua Power Station: coordinates; inception 1943; 42 MW.
+wd-q140121649,Wikidata item Q140121649,Wikidata,https://www.wikidata.org/wiki/Q140121649,public,2026-11-18,Kaitawa Power Station: coordinates; inception 1949; 36 MW.
 wd-q1411290,Wikidata item Q1411290,Wikidata,https://www.wikidata.org/wiki/Q1411290,public,,
 wd-q15243749,Wikidata item Q15243749,Wikidata,https://www.wikidata.org/wiki/Q15243749,public,,
 wd-q15379053,Wikidata item Q15379053,Wikidata,https://www.wikidata.org/wiki/Q15379053,public,,
@@ -92,8 +96,8 @@ wd-q4815757,Wikidata item Q4815757,Wikidata,https://www.wikidata.org/wiki/Q48157
 wd-q5144632,Wikidata item Q5144632,Wikidata,https://www.wikidata.org/wiki/Q5144632,public,,
 wd-q5684897,Wikidata item Q5684897,Wikidata,https://www.wikidata.org/wiki/Q5684897,public,,
 wd-q5945709,Wikidata item Q5945709,Wikidata,https://www.wikidata.org/wiki/Q5945709,public,,
-wd-q61448287,Wikidata item Q61448287,Wikidata,https://www.wikidata.org/wiki/Q61448287,public,,
-wd-q61448290,Wikidata item Q61448290,Wikidata,https://www.wikidata.org/wiki/Q61448290,public,,
+wd-q61448285,Wikidata item Q61448285,Wikidata,https://www.wikidata.org/wiki/Q61448285,public,2026-11-18,Rangipo power station: coordinates; service entry 1983; 120 MW; part of the Tongariro Power Scheme (Q12006578).
+wd-q61448290,Wikidata item Q61448290,Wikidata,https://www.wikidata.org/wiki/Q61448290,public,2026-11-18,Tuai Power Station: coordinates; inception 1929; 60 MW.
 wd-q6368582,Wikidata item Q6368582,Wikidata,https://www.wikidata.org/wiki/Q6368582,public,,
 wd-q6858304,Wikidata item Q6858304,Wikidata,https://www.wikidata.org/wiki/Q6858304,public,,
 wd-q7021804,Wikidata item Q7021804,Wikidata,https://www.wikidata.org/wiki/Q7021804,public,,

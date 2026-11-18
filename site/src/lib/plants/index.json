@@ -1246,20 +1246,20 @@
   },
   {
    "slug": "rangipo",
-   "name": "Rangipo",
+   "name": "Rangipō",
    "plant": "Rangipo",
    "fuel": "hydro",
    "island": "NI",
    "status": "operating",
    "mw": 120.0,
    "owner": "Genesis",
-   "commissioned": null,
+   "commissioned": "1983",
    "closed": null,
    "reviewed": false,
    "pt": {
-    "lat": -39.15319,
-    "lon": 175.83744,
-    "basis": "grid connection",
+    "lat": -39.153194,
+    "lon": 175.836417,
+    "basis": "station",
     "checked": false
    }
   },
@@ -1823,13 +1823,13 @@
    "status": "operating",
    "mw": 242.0,
    "owner": "Genesis",
-   "commissioned": null,
+   "commissioned": "1973",
    "closed": null,
    "reviewed": false,
    "pt": {
-    "lat": -38.98172,
-    "lon": 175.77022,
-    "basis": "grid connection",
+    "lat": -38.981667,
+    "lon": 175.768889,
+    "basis": "station",
     "checked": false
    }
   },
@@ -1880,13 +1880,13 @@
    "status": "operating",
    "mw": 140.0,
    "owner": "Genesis",
-   "commissioned": null,
+   "commissioned": "Tuai",
    "closed": null,
    "reviewed": false,
    "pt": {
-    "lat": -38.806819,
-    "lon": 177.150844,
-    "basis": "station",
+    "lat": -38.806639,
+    "lon": 177.150889,
+    "basis": "Tuai station",
     "checked": false
    }
   },

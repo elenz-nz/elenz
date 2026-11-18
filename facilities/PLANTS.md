@@ -38,7 +38,8 @@ notes = ["..."]           # research notes, never shown on the site
 
 [location]                # the station's own point
 value = [-38.0714, 175.6433]
-basis = "station"         # or "whole site" for one point covering several stations
+basis = "station"         # or "whole site" for one point covering several stations, or the station the point
+                          # marks where a plant's stations are far apart ("Tuai station"); the page shows it after the point
 source = "wd-q4784238"
 grade = "B"
 checked = ""
