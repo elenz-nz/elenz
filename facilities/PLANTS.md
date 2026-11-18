@@ -15,6 +15,10 @@ like the rest of the repository, so they hold only what public sources say.
 The first drafts came from the research register workbook of 8 Nov 2026 (`analysis/plants_import.py`, run once on
 18 Nov 2026). The workbook is retired: these files are now the record, edited directly.
 
+**The research page**, `/plants/research` (private: on elenz.co.nz it needs `?key=` with the screens page's key; on a
+pull request's preview it opens without one), shows every plant's state and facts from these files, with filters for
+what still needs work and a workbook download. It is how the Elenz team reviews a batch.
+
 `python3 ingest/plant_files.py` prints progress; `python3 ingest/plant_files.py --check` runs the checks below (also
 run on every push, in `checks.yml`).
 
@@ -102,8 +106,9 @@ as years.
 4. Location: confirm the point sits on the station (not the switchyard or grid connection) against the LINZ aerial
    imagery or Wikidata, then mark it checked.
 5. Empty `to_check`, set `reviewed` to today, and run `python3 ingest/plant_files.py --check`.
-6. Run `python3 ingest/plant_pages.py` and commit the page files it changes (`site/src/lib/plants/pages/`): the page
-   shows the checked facts on the batch's preview. Its `--check` (in checks.yml) fails while one is out of date.
+6. Run `python3 ingest/plant_pages.py` and `python3 ingest/plant_research.py`, and commit the files they change
+   (`site/src/lib/plants/pages/`, `site/src/lib/plants/research.json`): the page shows the checked facts on the batch's
+   preview, and the research page its progress. Their `--check` (in checks.yml) fails while one is out of date.
 
 Research goes in batches by fuel, one pull request per batch, for the Elenz team to review on the preview.
 
