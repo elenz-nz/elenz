@@ -7,8 +7,18 @@ register = ["G005"]
 wikidata = "Q7690821"
 osm = ["way/169516349"]
 reviewed = ""
-to_check = ["Capacity: Verify commissioning and rating."]
-notes = ["54 MW from 24 Sep 2024."]
+to_check = [
+  "Location: give Te Huka 3 its own point on its plant, beside Te Huka, from the LINZ aerial (separate task); it shares Te Huka's Wikidata point for now.",
+  "Grid connection: the register connects it at TAB0331 (Tauhara), which has no coordinates in the EA's network supply points table (17 Nov 2026); add the point if the EA adds one.",
+]
+notes = [
+  "54 MW from 24 Sep 2024.",
+  "Geothermal batch 1 (19 Nov 2026): facts checked against Contact's announcements (Microsoft agreement, May 2023; Tauhara opening, Nov 2024), ThinkGeoEnergy's report of Contact's first-power announcement (Oct 2024), the EA register, the NZ Geothermal Association's Tauhara page and Stats NZ boundaries. The location and grid connection are left open (to_check).",
+  "District and region from Te Huka's point (shared, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. No other district within 5 km.",
+  "Resolved: Capacity: the register and Contact give 51.4 MW; Elenz uses 54 MW, what it runs at (design decision, 30 Oct 2026). Wikipedia's list figure, 79, is Te Huka and Te Huka 3 together.",
+  "Dates: the register's start date is 2024-09-24; Contact announced its first supply to the grid on 14 October 2024, at 15 MW during three weeks of tests, with full operation expected by the end of 2024. It was in final commissioning on 22 Nov 2024.",
+  "Units: NZGA calls it a 50 MWe Ormat binary plant but doesn't say how many units; not published.",
+]
 
 [location]
 value = [-38.6669, 176.118]
@@ -17,20 +27,33 @@ source = "wd-q7690821"
 grade = "B"
 checked = ""
 
+[facts.other_names]
+value = ["Te Huka Unit 3"]
+source = "contact-microsoft-2023"
+grade = "A"
+checked = "2026-11-19"
+
 [facts.commissioned]
+value = "2024"
+source = ["ea-register", "thinkgeo-te-huka-3-2024"]
+grade = "A"
+checked = "2026-11-19"
+note = "first supplied the grid on 14 October 2024, then ran up to full output after testing"
+
+[[facts.commissioned.alt]]
 value = "2010 (Unit 3) 2024"
 source = "wp-list"
 grade = "B"
 checked = ""
 
-[[facts.commissioned.alt]]
-value = "2024"
-source = "ea-register"
-grade = "A"
-checked = ""
-note = "the register's start date, 2024-09-24: often a year, not the day"
-
 [facts.field]
+value = "Tauhara geothermal field"
+source = "nzga-tauhara"
+grade = "B"
+checked = "2026-11-19"
+note = "in the field's central sector (NZGA)"
+
+[[facts.field.alt]]
 value = "Wairākei–Tauhara field"
 source = "elenz-register"
 grade = "C"
@@ -38,29 +61,47 @@ checked = ""
 
 [facts.region]
 value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
+value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
 value = "Taupō"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Taupō"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Contact"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Contact Energy"
+source = ["ea-register", "contact-microsoft-2023"]
+grade = "A"
+checked = "2026-11-19"
+note = "Contact Energy Limited, which built it"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Te Huka 3 is a binary plant built at Te Huka, on the Tauhara geothermal field near Taupō, beside the station's two original units. Geothermal fluid heats pentane, which drives the turbine, and the plant was designed to put all its potential emissions back into the reservoir, making it one of the first geothermal stations built to be carbon neutral. Microsoft agreed to buy its renewable energy attributes for ten years, which helped Contact decide to build it, and it first supplied the grid in October 2024."
+source = ["thinkgeo-te-huka-3-2024", "contact-microsoft-2023", "nzga-tauhara"]
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 51.4
+basis = "The EA register's nameplate and Contact's full capacity"
+source = ["ea-register", "contact-microsoft-2023"]
+grade = "A"
+checked = "2026-11-19"
 
 [[ratings]]
 value = "79"

@@ -23,12 +23,135 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Tauhara draws on the Tauhara geothermal field along the eastern edge of Taupō, and its single steam turbine is, Contact says, the largest single-shaft geothermal turbine in the world, spinning at 3,000 revolutions a minute. Building took about three and a half years from 2021, and the cost came to $924 million. It first supplied the grid in May 2024 and was officially opened on 22 November 2024; at up to 174 MW it can meet around 3.5% of New Zealand's electricity needs.",
+  "refs": [
+   1,
+   2,
+   3,
+   4
+  ]
+ },
+ "facts": [
+  {
+   "k": "other_names",
+   "label": "Other names",
+   "value": "Tauhara 2",
+   "refs": [
+    4
+   ],
+   "note": "Wikipedia: previously known as Tauhara 2 (the project's Stage 2)"
+  },
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2024",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "first supplied the grid on 6 May 2024; officially opened on 22 November 2024"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "1 unit",
+   "refs": [
+    1,
+    3
+   ],
+   "note": "one single-shaft Fuji triple-flash condensing steam turbine"
+  },
+  {
+   "k": "field",
+   "label": "Geothermal field",
+   "value": "Tauhara geothermal field",
+   "refs": [
+    3
+   ],
+   "note": "in the field's eastern sector (NZGA)"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Waikato",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Taupō",
+   "refs": [
+    6
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Contact Energy",
+   "refs": [
+    7,
+    1
+   ],
+   "note": "Contact Energy Limited, which built it"
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Tauhara geothermal power station",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/about-us/our-story/our-generation-and-power-sites/geothermal/tauhara",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "New Zealand's energy security boosted as Contact opens new geothermal power station (22 November 2024)",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/investor-centre/news/2024/new-zealands-energy-security-boosted-as-contact-opens-new-geothermal-power-station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Tauhara Geothermal System",
+   "publisher": "New Zealand Geothermal Association",
+   "url": "https://www.nzgeothermal.org.nz/geothermal-in-nz/nz-geothermal-fields/tauhara/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Tauhara Power Station",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Tauhara_Power_Station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

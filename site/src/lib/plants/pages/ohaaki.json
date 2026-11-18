@@ -42,12 +42,192 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Ōhaaki stands beside the Waikato River and the Ngāti Tahu marae of the same name, partly on land leased from its Māori owners, and was approved by the government in 1982. Opened on 31 October 1989, it was New Zealand's second geothermal power station and the first to put used geothermal fluid back into the ground. Its 105-metre concrete cooling tower, the first of its kind in the country, cools the condenser water so the river isn't used for cooling. Built for about 108 MW, it now produces much less: the steamfield has declined and one of its high-pressure turbines has been retired.",
+  "refs": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1989",
+   "refs": [
+    4,
+    2
+   ],
+   "note": "officially opened on 31 October 1989 (Te Ara); the government approved its construction in 1982"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "3 units",
+   "refs": [
+    5,
+    1,
+    6
+   ],
+   "note": "built with two intermediate-pressure and two high-pressure turbo-generators (Tu Tangata, 1986); one high-pressure turbine has since been decommissioned (NZGA), leaving three in operation (Wikipedia)"
+  },
+  {
+   "k": "field",
+   "label": "Geothermal field",
+   "value": "Ōhaaki–Broadlands geothermal field",
+   "refs": [
+    5,
+    3
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Waikato",
+   "refs": [
+    7
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Taupō",
+   "refs": [
+    8
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Contact Energy",
+   "refs": [
+    9,
+    4
+   ],
+   "note": "Contact Energy Limited"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "New Zealand Government (while being built), to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–96",
+   "refs": [
+    1,
+    10,
+    11
+   ],
+   "note": "the government approved construction in 1982; ECNZ took over the Crown's generation on 1 April 1987 and finished the station; ECNZ sold Ohaaki to Contact Energy, then a new state-owned enterprise, on 1 February 1996 (agreement of 13 November 1995)"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    3,
+    9
+   ],
+   "value": "44 MW (The EA register's nameplate); 108 MW (Engineering New Zealand: the capacity it added when it opened in 1989)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Ōhaaki (OKI2201)",
+   "refs": [
+    12
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Ohaaki will be a spectacular sight (Tu Tangata, issue 29, 1 April 1986, page 40)",
+   "publisher": "National Library of New Zealand",
+   "url": "https://dynamic-rsnz.natlib.govt.nz/periodicals/TUTANG19860401.2.23",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Ōhākī power station (photograph caption)",
+   "publisher": "Te Ara, the Encyclopedia of New Zealand (Manatū Taonga)",
+   "url": "https://teara.govt.nz/mi/node/11158",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Ōhaaki Power Station (heritage record)",
+   "publisher": "Engineering New Zealand",
+   "url": "https://engineeringnz.org/programmes/heritage/heritage-records/ohaaki-power-station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Ohaaki geothermal power station",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/about-us/our-story/our-generation-and-power-sites/geothermal/ohaaki",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Ohaaki Geothermal System",
+   "publisher": "New Zealand Geothermal Association",
+   "url": "https://www.nzgeothermal.org.nz/geothermal-in-nz/nz-geothermal-fields/ohaaki/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Ohaaki Power Station",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Ohaaki_Power_Station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 8,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 9,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 10,
+   "title": "New Zealand Gazette, 27 November 1995, issue 140: ECNZ information for disclosure",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1995/1995%20ISSUE%20140.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 11,
+   "title": "New Zealand Gazette, 2 December 1996, issue 174: ECNZ financial statements",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1996/1996%20ISSUE%20174.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 12,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

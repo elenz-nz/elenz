@@ -7,8 +7,14 @@ register = ["G006"]
 wikidata = "Q7690882"
 osm = ["way/275188675"]
 reviewed = ""
-to_check = ["Capacity: Verify current rating and units."]
-notes = ["166 MW; Te Mihi 1 and 2 shown as one."]
+to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+notes = [
+  "166 MW; Te Mihi 1 and 2 shown as one.",
+  "Geothermal batch 1 (19 Nov 2026): facts checked against Contact's station page and its 13 Nov 2024 Wairakei announcement, the EA register and network supply points table, the NZ Geothermal Association's Wairakei page, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; the grid connection point gives the same. No other district within 5 km.",
+  "Resolved: Capacity: Contact gives 166 MW, the figure Elenz uses. The register has two units, Te Mihi 1 (90 MW) and Te Mihi 2 (91 MW), 181 MW in all (kept as a rating). Wikipedia gives two 83 MW Toshiba turbines; NZGA two 84 MW Toshiba dual-flash condensing turbines, 160 MW net.",
+  "Te Mihi Stage 2 (101 MW, two Ormat binary units) is due online by Q3 2027 (Contact, Nov 2024); it will need its own page or a station row here once it appears in the register.",
+]
 
 [location]
 value = [-38.619167, 176.048056]
@@ -22,15 +28,44 @@ value = [-38.61695, 176.04333]
 code = "THI2201 TE MIHI"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026 and the register's connection for Te Mihi 1 and 2"
 
 [facts.commissioned]
+value = "2014"
+source = "contact-te-mihi"
+grade = "A"
+checked = "2026-11-19"
+note = "construction began in March 2011; generating from May 2014 and officially opened in August 2014 (Wikipedia)"
+
+[[facts.commissioned.alt]]
+value = "2014"
+source = "ea-register"
+grade = "A"
+checked = ""
+note = "the register's start date, 2014-01-01: a year, not the day"
+
+[[facts.commissioned.alt]]
 value = "2014"
 source = "wp-list"
 grade = "B"
 checked = ""
 
+[facts.units]
+value = "2 units"
+source = ["ea-register", "wp-te-mihi"]
+grade = "A"
+checked = "2026-11-19"
+note = "Te Mihi 1 and Te Mihi 2 in the register; two Toshiba steam turbines (Wikipedia, NZGA)"
+
 [facts.field]
+value = "Wairākei geothermal field"
+source = ["contact-te-mihi", "nzga-wairakei"]
+grade = "A"
+checked = "2026-11-19"
+note = "on the field's western side, where its main upflow lies (NZGA)"
+
+[[facts.field.alt]]
 value = "Wairākei–Tauhara field"
 source = "elenz-register"
 grade = "C"
@@ -38,26 +73,44 @@ checked = ""
 
 [facts.region]
 value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
+value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
 value = "Taupō"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Taupō"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Contact"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Contact Energy"
+source = ["ea-register", "contact-te-mihi"]
+grade = "A"
+checked = "2026-11-19"
+note = "Contact Energy Limited, which built it"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Te Mihi draws steam from the western side of the Wairākei geothermal field, where the field's main upflow of hot fluid lies, and was built to take over gradually from the ageing Wairākei station nearby. Its two Toshiba steam turbines began generating in 2014; some of Wairākei's steam was moved to the new plant, so the field's total output rose. Contact is now building Te Mihi Stage 2, a 101 MW binary plant on the same field, due online in 2027 as the next step in replacing Wairākei."
+source = ["nzga-wairakei", "wp-te-mihi", "contact-te-mihi", "contact-wairakei-2024"]
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 181
+basis = "The EA register's nameplate: Te Mihi 1 (90 MW) and Te Mihi 2 (91 MW)"
+source = "ea-register"
+grade = "A"
+checked = "2026-11-19"

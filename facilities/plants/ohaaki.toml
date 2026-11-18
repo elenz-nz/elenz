@@ -8,8 +8,15 @@ wikidata = "Q7080591"
 osm = ["way/143397051"]
 reviewed = ""
 photo_leads = ["P021", "P022", "P032"]
-to_check = ["Capacity: Reconstruct historic additions and retirements."]
-notes = ["65 MW to Dec 2012, 43.7 MW from Jan 2013."]
+to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+notes = [
+  "65 MW to Dec 2012, 43.7 MW from Jan 2013.",
+  "Geothermal batch 1 (19 Nov 2026): facts checked against Contact's station page, the EA register and network supply points table, the NZ Geothermal Association's Ōhaaki page, Engineering New Zealand's heritage record, Te Ara, Tu Tangata (April 1986), the Gazette (ECNZ's 1996 financial statements), Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; the grid connection point gives the same. Rotorua District lies 1–2 km away: recheck the district if the point moves.",
+  "Resolved: Capacity history. Built for about 104–114 MW (Wikipedia 104, Engineering New Zealand and Te Ara 108, NZGA 114, Te Ara's photo caption about 115); steamfield decline brought deratings, including retiring one high-pressure turbine (NZGA). Elenz's steps (65 MW to 2012, 43.7 MW from 2013, Contact's current maximum) come from metered output; no public source dates the earlier deratings.",
+  "Commissioned: Contact, NZGA, Engineering New Zealand and Te Ara say 1989 (officially opened 31 October 1989); the EA register's start date is 1992-01-01 (kept as an alternative).",
+  "Name: Te Ara spells it Ōhākī; Contact Ohaaki; the field is the Ohaaki–Broadlands system.",
+]
 
 [location]
 value = [-38.526944, 176.291944]
@@ -23,13 +30,15 @@ value = [-38.52805, 176.29223]
 code = "OKI2201 OHAAKI"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026 and the register's connection for Ōhaaki"
 
 [facts.commissioned]
 value = "1989"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = ["contact-ohaaki", "teara-ohaki-photo"]
+grade = "A"
+checked = "2026-11-19"
+note = "officially opened on 31 October 1989 (Te Ara); the government approved its construction in 1982"
 
 [[facts.commissioned.alt]]
 value = "1992"
@@ -38,7 +47,26 @@ grade = "A"
 checked = ""
 note = "the register's start date, 1992-01-01: often a year, not the day"
 
+[[facts.commissioned.alt]]
+value = "1989"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[facts.units]
+value = "3 units"
+source = ["nzga-ohaaki", "tutangata-1986-04", "wp-ohaaki"]
+grade = "B"
+checked = "2026-11-19"
+note = "built with two intermediate-pressure and two high-pressure turbo-generators (Tu Tangata, 1986); one high-pressure turbine has since been decommissioned (NZGA), leaving three in operation (Wikipedia)"
+
 [facts.field]
+value = "Ōhaaki–Broadlands geothermal field"
+source = ["nzga-ohaaki", "enz-ohaaki"]
+grade = "B"
+checked = "2026-11-19"
+
+[[facts.field.alt]]
 value = "Ōhaaki field"
 source = "elenz-register"
 grade = "C"
@@ -46,29 +74,61 @@ checked = ""
 
 [facts.region]
 value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
+value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
 value = "Taupō"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Taupō"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Contact"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Contact Energy"
+source = ["ea-register", "contact-ohaaki"]
+grade = "A"
+checked = "2026-11-19"
+note = "Contact Energy Limited"
+
+[facts.previous_owners]
+value = "New Zealand Government (while being built), to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–96"
+source = ["tutangata-1986-04", "gazette-1995-140", "gazette-1996-174"]
+grade = "A"
+checked = "2026-11-19"
+note = "the government approved construction in 1982; ECNZ took over the Crown's generation on 1 April 1987 and finished the station; ECNZ sold Ohaaki to Contact Energy, then a new state-owned enterprise, on 1 February 1996 (agreement of 13 November 1995)"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Ōhaaki stands beside the Waikato River and the Ngāti Tahu marae of the same name, partly on land leased from its Māori owners, and was approved by the government in 1982. Opened on 31 October 1989, it was New Zealand's second geothermal power station and the first to put used geothermal fluid back into the ground. Its 105-metre concrete cooling tower, the first of its kind in the country, cools the condenser water so the river isn't used for cooling. Built for about 108 MW, it now produces much less: the steamfield has declined and one of its high-pressure turbines has been retired."
+source = ["tutangata-1986-04", "teara-ohaki-photo", "enz-ohaaki", "contact-ohaaki", "nzga-ohaaki", "wp-ohaaki"]
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 44
+basis = "The EA register's nameplate"
+source = "ea-register"
+grade = "A"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 108
+basis = "Engineering New Zealand: the capacity it added when it opened in 1989"
+source = "enz-ohaaki"
+grade = "B"
+checked = "2026-11-19"
 
 [[ratings]]
 value = "44"

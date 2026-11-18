@@ -8,10 +8,14 @@ wikidata = "Q3434500"
 osm = ["way/170298057"]
 reviewed = ""
 photo_leads = ["P018", "P019", "P032"]
-to_check = ["Capacity: Legacy complex; distinguish historic units and binary plant."]
+to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
 notes = [
   "G001: 167 → 181 (Jun 2005) → 136 MW (May 2014).",
-  "G002: The register has one Wairakei plant (WRK2201 WRK0); the binary plant is probably inside it. Check.",
+  "Geothermal batch 1 (19 Nov 2026): facts checked against Contact's station page and its 13 Nov 2024 Wairakei announcement, the EA register and network supply points table, the NZ Geothermal Association's field page, Engineering New Zealand's heritage record, Te Ara, the Gazette (ECNZ's 1996 financial statements) and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; the grid connection point gives the same. No other district within 5 km.",
+  "Resolved (G002): the register has one Wairakei plant (WRK2201 WRK0) and Contact's Nov 2024 presentation counts the binary plant as part of the Wairakei station, so it stays inside this page as a station.",
+  "Units: Contact's Nov 2024 presentation lists eight: Wairakei A 3 x 11 MW, Wairakei B 3 x 30 MW, binary 2 x 7 MW (137 MW installed; Elenz uses 136). Contact's station page still says ten turbines and 133 MW, and Wikipedia lists six A units and a 4 MW unit 14 (NZGA: a 4.5 MW back-pressure set from 1996); the presentation is the newest.",
+  "Closure: Contact planned to close the station in June 2026, then extended all units to mid-2027 (when Te Mihi Stage 2 is due) and 67 MW (two B units and one binary unit) to June 2031, when the resource consent ends. Add a closed date and update the stations when units retire.",
 ]
 
 [location]
@@ -26,22 +30,44 @@ value = [-38.62571, 176.10546]
 code = "WRK2201 WAIRAKEI"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026 and the register's connection for Wairakei"
 
 [facts.commissioned]
-value = "1958 (Binary added 2005)"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = "1958"
+source = ["contact-wairakei", "nzga-wairakei"]
+grade = "A"
+checked = "2026-11-19"
+note = "the first turbine generated on 15 November 1958; the B station was finished in October 1963 and the binary plant added in June 2005"
 
 [[facts.commissioned.alt]]
 value = "1958"
 source = "ea-register"
 grade = "A"
 checked = ""
-note = "the register's start date, 1958-01-01: often a year, not the day"
+note = "the register's start date, 1958-01-01: a year, not the day"
+
+[[facts.commissioned.alt]]
+value = "1958 (Binary added 2005)"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[facts.units]
+value = "8 units"
+source = "contact-wairakei-2024"
+grade = "A"
+checked = "2026-11-19"
+note = "Wairakei A 3 x 11 MW, Wairakei B 3 x 30 MW and the binary plant 2 x 7 MW (Contact, Nov 2024)"
 
 [facts.field]
+value = "Wairākei geothermal field"
+source = ["contact-wairakei", "nzga-wairakei"]
+grade = "A"
+checked = "2026-11-19"
+note = "partly connected to the Tauhara field; the Waikato River is the boundary between them by convention"
+
+[[facts.field.alt]]
 value = "Wairākei–Tauhara field"
 source = "elenz-register"
 grade = "C"
@@ -49,29 +75,61 @@ checked = ""
 
 [facts.region]
 value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
+value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
 value = "Taupō"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Taupō"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Contact"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Contact Energy"
+source = ["ea-register", "contact-wairakei"]
+grade = "A"
+checked = "2026-11-19"
+note = "Contact Energy Limited"
+
+[facts.previous_owners]
+value = "New Zealand Government (New Zealand Electricity Department), 1958–87; Electricity Corporation of New Zealand (ECNZ), 1987–96"
+source = ["nzga-wairakei", "gazette-1995-140", "gazette-1996-174"]
+grade = "A"
+checked = "2026-11-19"
+note = "the government built the station (the Ministry of Works and the DSIR drilled the field) and the NZ Electricity Department ran it; ECNZ took over the Crown's generation on 1 April 1987 and sold Wairakei to Contact Energy, then a new state-owned enterprise, on 1 February 1996 (agreement of 13 November 1995)"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Wairākei was the world's second geothermal power station and the first to make electricity from wet steam, a mix of steam and hot water drawn from wells north of Taupō; the station stands beside the Waikato River. It began as a joint project with Britain's atomic energy authority to make heavy water as well as power, but the British withdrew in 1956 and the station was built for electricity alone: its first turbine ran in November 1958 and the B station was finished in 1963. A binary plant added in 2005 makes more power from heat left in the separated water. Contact plans to retire most of the station once Te Mihi Stage 2 is running, expected in 2027, and to close the rest by June 2031, when its resource consent ends."
+source = ["teara-geothermal-2", "nzga-wairakei", "enz-wairakei", "contact-wairakei-2024"]
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 152
+basis = "The EA register's nameplate"
+source = "ea-register"
+grade = "A"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 133
+basis = "Contact's station page: maximum capacity"
+source = "contact-wairakei"
+grade = "A"
+checked = "2026-11-19"
 
 [[ratings]]
 value = "132"
@@ -81,18 +139,31 @@ grade = "B"
 checked = ""
 
 [[stations]]
-value = "Wairākei"
+value = "Wairākei A"
 id = "G001"
-source = "elenz-register"
-grade = "C"
-checked = ""
-commissioned = "1958 (Binary added 2005)"
+mw = 33
+source = ["contact-wairakei-2024", "nzga-wairakei"]
+grade = "A"
+checked = "2026-11-19"
+commissioned = "1958"
+note = "3 x 11 MW (Contact, Nov 2024); built 1956–60 as stages 1 and 1A (NZGA)"
 
 [[stations]]
-value = "Wairākei Binary"
+value = "Wairākei B"
+id = "G001"
+mw = 90
+source = ["contact-wairakei-2024", "nzga-wairakei"]
+grade = "A"
+checked = "2026-11-19"
+commissioned = "1963"
+note = "3 x 30 MW; stage 2 finished commissioning in October 1963 (NZGA)"
+
+[[stations]]
+value = "Wairākei binary"
 id = "G002"
-source = "elenz-register"
-grade = "C"
-checked = ""
 mw = 14
-commissioned = "1958 (Binary added 2005)"
+source = ["contact-wairakei-2024", "nzga-wairakei"]
+grade = "A"
+checked = "2026-11-19"
+commissioned = "2005"
+note = "2 x 7 MW Ormat units (Contact, Nov 2024); commissioned June 2005 at 14.3 MW (NZGA)"

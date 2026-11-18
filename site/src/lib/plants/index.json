@@ -987,7 +987,7 @@
    "status": "operating",
    "mw": 43.7,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "1989",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1215,7 +1215,7 @@
    "status": "operating",
    "mw": 55.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "1997",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1538,7 +1538,7 @@
    "status": "operating",
    "mw": 174.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "2024",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1633,7 +1633,7 @@
    "status": "operating",
    "mw": 30.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "2010",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1652,7 +1652,7 @@
    "status": "operating",
    "mw": 54.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "2024",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1671,7 +1671,7 @@
    "status": "operating",
    "mw": 166.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "2014",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1956,7 +1956,7 @@
    "status": "operating",
    "mw": 136.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "1958",
    "closed": null,
    "reviewed": false,
    "pt": {
