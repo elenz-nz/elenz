@@ -39,6 +39,7 @@ and across all months:
   hist/rec/months.json.gz, hist/records.json   the Records pages: a summary of every month and the records drawn from
                              them (records.py; published while the history is complete, only when something changed)
   hist/tod.json              each month's average for every half-hour of the day (tod.py): the heat maps' rows on All
+  hist/plants.json           each plant's output by month (plant_history.py): the plant pages' history
   hist/oemb/profiles.json    other embedded generation's average day by grid exit point for the newest reconciliation
                              months (embedded.py), for the months not yet covered
   hist/oemb/live.json        the typical days the live job lays over its week (embedded.live_days): last month to next
@@ -79,6 +80,7 @@ import embedded as emb
 import explain
 import hvdc
 import metered as mt
+import plant_history
 import records
 import tod
 import rooftop
@@ -772,6 +774,11 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
         tod.update(store, tod_fresh, sorted(stored), room=lambda n: store.room(n + 3), log=log)
     except Exception as e:  # noqa: BLE001  never fatal: the heat maps fall back to daily rows
         log(f'time of day: skipped ({type(e).__name__}: {e})')
+    # each plant's output by month, for the plant pages (plant_history.py): the same months, read back the same way
+    try:
+        plant_history.update(store, tod_fresh, sorted(stored), room=lambda n: store.room(n + 3), log=log)
+    except Exception as e:  # noqa: BLE001  never fatal: the plant pages say their history is being worked out
+        log(f'plant history: skipped ({type(e).__name__}: {e})')
 
     months = sorted(stored)
     # 'at': when this run saved it; the Worker's health check and the watchdog treat a stale index as expected while a

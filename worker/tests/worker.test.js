@@ -138,6 +138,8 @@ test('history files come from KV under an allowed name only', async () => {
   assert.equal(r.status, 200);
   assert.deepEqual(await r.json(), { month: true });
   assert.equal(r.headers.get('cache-control'), 'public, max-age=900');
+  await kv.put('hist/plants.json', '{"plants":{}}');
+  assert.deepEqual(await (await get('/data/history/plants.json')).json(), { plants: {} });
   await kv.put('hist/state/2026-10.csv.gz', 'private');
   assert.equal((await get('/data/history/state/2026-10.csv.gz')).status, 404);
 });

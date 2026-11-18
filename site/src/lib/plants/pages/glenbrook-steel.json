@@ -1,0 +1,38 @@
+{
+ "slug": "glenbrook-steel",
+ "name": "Glenbrook Steel",
+ "plant": "Glenbrook Steel",
+ "fuel": "waste",
+ "island": "NI",
+ "status": "operating",
+ "mw": 112.0,
+ "steps": [
+  {
+   "from": "1998-01-01",
+   "to": null,
+   "mw": 112.0,
+   "sources": [
+    {
+     "label": "Wikipedia, Glenbrook Power Station",
+     "url": "https://en.wikipedia.org/wiki/Glenbrook_Power_Station"
+    }
+   ]
+  }
+ ],
+ "owner": null,
+ "scheme": null,
+ "metered": "The register lists it as gas. We show it as waste heat: it runs on waste gas and heat from NZ Steel's ironmaking, not pipeline gas.\nIts metered output (meter points GLN0111 and GLN0332) runs about 1.47 times the dispatch data's figure, so expect a step where the metered history meets the dispatch weeks.",
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [],
+  "owner_all": true,
+  "scheme": [],
+  "fuel": []
+ }
+}

@@ -1,0 +1,76 @@
+{
+ "slug": "mckee",
+ "name": "McKee",
+ "plant": "McKee",
+ "fuel": "gas",
+ "island": "NI",
+ "status": "operating",
+ "mw": 100.0,
+ "steps": [
+  {
+   "from": "2012-09-01",
+   "to": null,
+   "mw": 100.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Nova",
+ "scheme": null,
+ "metered": null,
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "fonterra-dairy-whareroa",
+    "name": "Fonterra Dairy - Whareroa"
+   },
+   {
+    "slug": "junction-road",
+    "name": "Junction Road"
+   },
+   {
+    "slug": "kapuni",
+    "name": "Kapuni"
+   }
+  ],
+  "owner_all": true,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "huntly-5",
+    "name": "Huntly 5"
+   },
+   {
+    "slug": "stratford",
+    "name": "Stratford"
+   },
+   {
+    "slug": "junction-road",
+    "name": "Junction Road"
+   },
+   {
+    "slug": "fonterra-dairy-whareroa",
+    "name": "Fonterra Dairy - Whareroa"
+   },
+   {
+    "slug": "huntly-6",
+    "name": "Huntly 6"
+   },
+   {
+    "slug": "kapuni",
+    "name": "Kapuni"
+   }
+  ]
+ }
+}

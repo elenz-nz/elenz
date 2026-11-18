@@ -1,0 +1,133 @@
+{
+ "slug": "aviemore",
+ "name": "Aviemore",
+ "plant": "Aviemore",
+ "fuel": "hydro",
+ "island": "SI",
+ "status": "operating",
+ "mw": 220.0,
+ "steps": [
+  {
+   "from": null,
+   "to": null,
+   "mw": 220.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Meridian",
+ "scheme": "Waitaki",
+ "metered": null,
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "benmore",
+    "name": "Benmore"
+   },
+   {
+    "slug": "harapaki",
+    "name": "Harapaki"
+   },
+   {
+    "slug": "manapouri",
+    "name": "Manapōuri"
+   },
+   {
+    "slug": "mill-creek",
+    "name": "Mill Creek"
+   },
+   {
+    "slug": "ohau-a",
+    "name": "Ōhau A"
+   },
+   {
+    "slug": "ohau-b",
+    "name": "Ōhau B"
+   },
+   {
+    "slug": "ohau-c",
+    "name": "Ōhau C"
+   },
+   {
+    "slug": "ruakaka-energy-park",
+    "name": "Ruakākā Energy Park"
+   },
+   {
+    "slug": "te-apiti",
+    "name": "Te Āpiti"
+   },
+   {
+    "slug": "te-uku",
+    "name": "Te Uku"
+   },
+   {
+    "slug": "waitaki",
+    "name": "Waitaki"
+   },
+   {
+    "slug": "west-wind",
+    "name": "West Wind"
+   }
+  ],
+  "owner_all": false,
+  "scheme": [
+   {
+    "slug": "ohau-a",
+    "name": "Ōhau A"
+   },
+   {
+    "slug": "ohau-b",
+    "name": "Ōhau B"
+   },
+   {
+    "slug": "ohau-c",
+    "name": "Ōhau C"
+   },
+   {
+    "slug": "benmore",
+    "name": "Benmore"
+   },
+   {
+    "slug": "waitaki",
+    "name": "Waitaki"
+   }
+  ],
+  "fuel": [
+   {
+    "slug": "manapouri",
+    "name": "Manapōuri"
+   },
+   {
+    "slug": "benmore",
+    "name": "Benmore"
+   },
+   {
+    "slug": "clyde",
+    "name": "Clyde"
+   },
+   {
+    "slug": "roxburgh",
+    "name": "Roxburgh"
+   },
+   {
+    "slug": "ohau-a",
+    "name": "Ōhau A"
+   },
+   {
+    "slug": "ohau-b",
+    "name": "Ōhau B"
+   }
+  ]
+ }
+}

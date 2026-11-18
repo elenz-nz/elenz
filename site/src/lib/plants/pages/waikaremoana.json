@@ -1,0 +1,104 @@
+{
+ "slug": "waikaremoana",
+ "name": "Waikaremoana",
+ "plant": "Waikaremoana",
+ "fuel": "hydro",
+ "island": "NI",
+ "status": "operating",
+ "mw": 140.0,
+ "steps": [
+  {
+   "from": null,
+   "to": null,
+   "mw": 140.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Genesis",
+ "scheme": "Waikaremoana",
+ "metered": "The metered history has one meter for Tuai, Piripaua and Kaitawa together, so it shows the scheme whole. The dispatch data (the live week and the weeks since the newest metered month) shows each station.",
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "huntly-5",
+    "name": "Huntly 5"
+   },
+   {
+    "slug": "huntly-6",
+    "name": "Huntly 6"
+   },
+   {
+    "slug": "huntly-battery",
+    "name": "Huntly Battery"
+   },
+   {
+    "slug": "huntly-rankines",
+    "name": "Huntly Rankines"
+   },
+   {
+    "slug": "lauriston-solar-farm",
+    "name": "Lauriston Solar Farm"
+   },
+   {
+    "slug": "rangipo",
+    "name": "Rangipo"
+   },
+   {
+    "slug": "tekapo-a",
+    "name": "Tekapo A"
+   },
+   {
+    "slug": "tekapo-b",
+    "name": "Tekapo B"
+   },
+   {
+    "slug": "tokaanu",
+    "name": "Tokaanu"
+   },
+   {
+    "slug": "waipipi",
+    "name": "Waipipi"
+   }
+  ],
+  "owner_all": true,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "maraetai",
+    "name": "Maraetai"
+   },
+   {
+    "slug": "tokaanu",
+    "name": "Tokaanu"
+   },
+   {
+    "slug": "arapuni",
+    "name": "Arapuni"
+   },
+   {
+    "slug": "whakamaru",
+    "name": "Whakamaru"
+   },
+   {
+    "slug": "rangipo",
+    "name": "Rangipo"
+   },
+   {
+    "slug": "karapiro",
+    "name": "Karāpiro"
+   }
+  ]
+ }
+}

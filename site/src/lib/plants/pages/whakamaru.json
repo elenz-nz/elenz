@@ -1,0 +1,201 @@
+{
+ "slug": "whakamaru",
+ "name": "Whakamaru",
+ "plant": "Whakamaru",
+ "fuel": "hydro",
+ "island": "NI",
+ "status": "operating",
+ "mw": 124.0,
+ "steps": [
+  {
+   "from": null,
+   "to": "2017-04-30",
+   "mw": 100.0,
+   "sources": [
+    {
+     "label": "Wikipedia, Whakamaru Power Station",
+     "url": "https://en.wikipedia.org/wiki/Whakamaru_Power_Station"
+    }
+   ]
+  },
+  {
+   "from": "2017-05-01",
+   "to": "2018-02-28",
+   "mw": 106.0,
+   "sources": [
+    {
+     "label": "Wikipedia, Whakamaru Power Station",
+     "url": "https://en.wikipedia.org/wiki/Whakamaru_Power_Station"
+    },
+    {
+     "label": "Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+     "url": ""
+    }
+   ]
+  },
+  {
+   "from": "2018-03-01",
+   "to": "2019-05-31",
+   "mw": 112.0,
+   "sources": [
+    {
+     "label": "Wikipedia, Whakamaru Power Station",
+     "url": "https://en.wikipedia.org/wiki/Whakamaru_Power_Station"
+    },
+    {
+     "label": "Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+     "url": ""
+    }
+   ]
+  },
+  {
+   "from": "2019-06-01",
+   "to": "2020-02-29",
+   "mw": 118.0,
+   "sources": [
+    {
+     "label": "Wikipedia, Whakamaru Power Station",
+     "url": "https://en.wikipedia.org/wiki/Whakamaru_Power_Station"
+    },
+    {
+     "label": "Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+     "url": ""
+    }
+   ]
+  },
+  {
+   "from": "2020-03-01",
+   "to": null,
+   "mw": 124.0,
+   "sources": [
+    {
+     "label": "Wikipedia, Whakamaru Power Station",
+     "url": "https://en.wikipedia.org/wiki/Whakamaru_Power_Station"
+    },
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Mercury",
+ "scheme": "Waikato",
+ "metered": null,
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "arapuni",
+    "name": "Arapuni"
+   },
+   {
+    "slug": "aratiatia",
+    "name": "Aratiatia"
+   },
+   {
+    "slug": "atiamuri",
+    "name": "Ātiamuri"
+   },
+   {
+    "slug": "kaiwaikawe-wind-farm",
+    "name": "Kaiwaikawe Wind Farm"
+   },
+   {
+    "slug": "kaiwera-downs-stage-2",
+    "name": "Kaiwera Downs (Stage 2)"
+   },
+   {
+    "slug": "karapiro",
+    "name": "Karāpiro"
+   },
+   {
+    "slug": "kawerau",
+    "name": "Kawerau"
+   },
+   {
+    "slug": "maraetai",
+    "name": "Maraetai"
+   },
+   {
+    "slug": "nga-awa-purua",
+    "name": "Ngā Awa Pūrua"
+   },
+   {
+    "slug": "nga-tamariki",
+    "name": "Ngā Tamariki"
+   },
+   {
+    "slug": "ohakuri",
+    "name": "Ōhakuri"
+   },
+   {
+    "slug": "turitea-wind-farm",
+    "name": "Turitea Wind Farm"
+   }
+  ],
+  "owner_all": false,
+  "scheme": [
+   {
+    "slug": "aratiatia",
+    "name": "Aratiatia"
+   },
+   {
+    "slug": "ohakuri",
+    "name": "Ōhakuri"
+   },
+   {
+    "slug": "atiamuri",
+    "name": "Ātiamuri"
+   },
+   {
+    "slug": "maraetai",
+    "name": "Maraetai"
+   },
+   {
+    "slug": "waipapa",
+    "name": "Waipāpa"
+   },
+   {
+    "slug": "arapuni",
+    "name": "Arapuni"
+   },
+   {
+    "slug": "karapiro",
+    "name": "Karāpiro"
+   }
+  ],
+  "fuel": [
+   {
+    "slug": "maraetai",
+    "name": "Maraetai"
+   },
+   {
+    "slug": "tokaanu",
+    "name": "Tokaanu"
+   },
+   {
+    "slug": "arapuni",
+    "name": "Arapuni"
+   },
+   {
+    "slug": "waikaremoana",
+    "name": "Waikaremoana"
+   },
+   {
+    "slug": "rangipo",
+    "name": "Rangipo"
+   },
+   {
+    "slug": "karapiro",
+    "name": "Karāpiro"
+   }
+  ]
+ }
+}

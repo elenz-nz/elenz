@@ -1,0 +1,63 @@
+{
+ "slug": "teviot",
+ "name": "Teviot",
+ "plant": "Teviot",
+ "fuel": "hydro",
+ "island": "SI",
+ "status": "operating",
+ "mw": 22.0,
+ "steps": [
+  {
+   "from": "1999-06-01",
+   "to": null,
+   "mw": 22.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": null,
+ "scheme": null,
+ "metered": "The metered history has Teviot's own meter. It is never dispatched, so in the live week and the weeks since the newest metered month, its output is a calculated estimate from its typical day.",
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [],
+  "owner_all": true,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "manapouri",
+    "name": "Manapōuri"
+   },
+   {
+    "slug": "benmore",
+    "name": "Benmore"
+   },
+   {
+    "slug": "clyde",
+    "name": "Clyde"
+   },
+   {
+    "slug": "roxburgh",
+    "name": "Roxburgh"
+   },
+   {
+    "slug": "ohau-a",
+    "name": "Ōhau A"
+   },
+   {
+    "slug": "aviemore",
+    "name": "Aviemore"
+   }
+  ]
+ }
+}

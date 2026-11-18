@@ -1,0 +1,112 @@
+{
+ "slug": "west-wind",
+ "name": "West Wind",
+ "plant": "West Wind",
+ "fuel": "wind",
+ "island": "NI",
+ "status": "operating",
+ "mw": 142.6,
+ "steps": [
+  {
+   "from": "2009-03-01",
+   "to": null,
+   "mw": 142.6,
+   "sources": [
+    {
+     "label": "Wikipedia, List of power stations in New Zealand",
+     "url": "https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand"
+    }
+   ]
+  }
+ ],
+ "owner": "Meridian",
+ "scheme": null,
+ "metered": "It generates onto two buses (WWD1102 and WWD1103), so it can be split by grid connection. The dispatch data's West Wind 1 and 2 are one wind farm.",
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "aviemore",
+    "name": "Aviemore"
+   },
+   {
+    "slug": "benmore",
+    "name": "Benmore"
+   },
+   {
+    "slug": "harapaki",
+    "name": "Harapaki"
+   },
+   {
+    "slug": "manapouri",
+    "name": "Manapōuri"
+   },
+   {
+    "slug": "mill-creek",
+    "name": "Mill Creek"
+   },
+   {
+    "slug": "ohau-a",
+    "name": "Ōhau A"
+   },
+   {
+    "slug": "ohau-b",
+    "name": "Ōhau B"
+   },
+   {
+    "slug": "ohau-c",
+    "name": "Ōhau C"
+   },
+   {
+    "slug": "ruakaka-energy-park",
+    "name": "Ruakākā Energy Park"
+   },
+   {
+    "slug": "te-apiti",
+    "name": "Te Āpiti"
+   },
+   {
+    "slug": "te-uku",
+    "name": "Te Uku"
+   },
+   {
+    "slug": "waitaki",
+    "name": "Waitaki"
+   }
+  ],
+  "owner_all": false,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "turitea-wind-farm",
+    "name": "Turitea Wind Farm"
+   },
+   {
+    "slug": "harapaki",
+    "name": "Harapaki"
+   },
+   {
+    "slug": "waipipi",
+    "name": "Waipipi"
+   },
+   {
+    "slug": "tararua-wind-farm-3",
+    "name": "Tararua Wind Farm 3"
+   },
+   {
+    "slug": "te-apiti",
+    "name": "Te Āpiti"
+   },
+   {
+    "slug": "kaiwaikawe-wind-farm",
+    "name": "Kaiwaikawe Wind Farm"
+   }
+  ]
+ }
+}

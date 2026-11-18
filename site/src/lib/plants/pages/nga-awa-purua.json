@@ -1,0 +1,123 @@
+{
+ "slug": "nga-awa-purua",
+ "name": "Ngā Awa Pūrua",
+ "plant": "Ngā Awa Pūrua",
+ "fuel": "geo",
+ "island": "NI",
+ "status": "operating",
+ "mw": 148.0,
+ "steps": [
+  {
+   "from": "2010-01-01",
+   "to": "2023-03-31",
+   "mw": 144.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  },
+  {
+   "from": "2023-04-01",
+   "to": null,
+   "mw": 148.0,
+   "sources": [
+    {
+     "label": "Elenz: daily history (metered output)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Mercury",
+ "scheme": null,
+ "metered": null,
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "arapuni",
+    "name": "Arapuni"
+   },
+   {
+    "slug": "aratiatia",
+    "name": "Aratiatia"
+   },
+   {
+    "slug": "atiamuri",
+    "name": "Ātiamuri"
+   },
+   {
+    "slug": "kaiwaikawe-wind-farm",
+    "name": "Kaiwaikawe Wind Farm"
+   },
+   {
+    "slug": "kaiwera-downs-stage-2",
+    "name": "Kaiwera Downs (Stage 2)"
+   },
+   {
+    "slug": "karapiro",
+    "name": "Karāpiro"
+   },
+   {
+    "slug": "kawerau",
+    "name": "Kawerau"
+   },
+   {
+    "slug": "maraetai",
+    "name": "Maraetai"
+   },
+   {
+    "slug": "nga-tamariki",
+    "name": "Ngā Tamariki"
+   },
+   {
+    "slug": "ohakuri",
+    "name": "Ōhakuri"
+   },
+   {
+    "slug": "turitea-wind-farm",
+    "name": "Turitea Wind Farm"
+   },
+   {
+    "slug": "whakamaru",
+    "name": "Whakamaru"
+   }
+  ],
+  "owner_all": false,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "tauhara",
+    "name": "Tauhara"
+   },
+   {
+    "slug": "te-mihi",
+    "name": "Te Mihi"
+   },
+   {
+    "slug": "wairakei",
+    "name": "Wairākei"
+   },
+   {
+    "slug": "nga-tamariki",
+    "name": "Ngā Tamariki"
+   },
+   {
+    "slug": "mokai",
+    "name": "Mōkai"
+   },
+   {
+    "slug": "kawerau",
+    "name": "Kawerau"
+   }
+  ]
+ }
+}

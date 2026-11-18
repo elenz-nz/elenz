@@ -1,0 +1,63 @@
+{
+ "slug": "kawerau-topp2",
+ "name": "Kawerau (TOPP2)",
+ "plant": "Kawerau (TOPP2)",
+ "fuel": "geo",
+ "island": "NI",
+ "status": "operating",
+ "mw": 49.0,
+ "steps": [
+  {
+   "from": "2025-12-01",
+   "to": null,
+   "mw": 49.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": null,
+ "scheme": null,
+ "metered": "Since December 2025 one metered code at KAW2201 carries TOPP2 and Te Ahi O Maui together. The metered history splits it 65% TOPP2, 35% Te Ahi O Maui, by their shares in the dispatch data. The dispatch data (the live week and the weeks since the newest metered month) has each plant's own output.",
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [],
+  "owner_all": true,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "tauhara",
+    "name": "Tauhara"
+   },
+   {
+    "slug": "te-mihi",
+    "name": "Te Mihi"
+   },
+   {
+    "slug": "nga-awa-purua",
+    "name": "Ngā Awa Pūrua"
+   },
+   {
+    "slug": "wairakei",
+    "name": "Wairākei"
+   },
+   {
+    "slug": "nga-tamariki",
+    "name": "Ngā Tamariki"
+   },
+   {
+    "slug": "mokai",
+    "name": "Mōkai"
+   }
+  ]
+ }
+}

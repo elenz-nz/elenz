@@ -1,0 +1,97 @@
+{
+ "slug": "mokai",
+ "name": "Mōkai",
+ "plant": "Mokai",
+ "fuel": "geo",
+ "island": "NI",
+ "status": "operating",
+ "mw": 112.0,
+ "steps": [
+  {
+   "from": "1999-10-01",
+   "to": "2005-04-30",
+   "mw": 55.0,
+   "sources": [
+    {
+     "label": "Wikipedia, Mokai Power Station",
+     "url": "https://en.wikipedia.org/wiki/Mokai_Power_Station"
+    },
+    {
+     "label": "Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+     "url": ""
+    }
+   ]
+  },
+  {
+   "from": "2005-05-01",
+   "to": "2007-05-31",
+   "mw": 95.0,
+   "sources": [
+    {
+     "label": "Wikipedia, Mokai Power Station",
+     "url": "https://en.wikipedia.org/wiki/Mokai_Power_Station"
+    },
+    {
+     "label": "Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+     "url": ""
+    }
+   ]
+  },
+  {
+   "from": "2007-06-01",
+   "to": null,
+   "mw": 112.0,
+   "sources": [
+    {
+     "label": "Wikipedia, Mokai Power Station",
+     "url": "https://en.wikipedia.org/wiki/Mokai_Power_Station"
+    },
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": null,
+ "scheme": null,
+ "metered": null,
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [],
+  "owner_all": true,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "tauhara",
+    "name": "Tauhara"
+   },
+   {
+    "slug": "te-mihi",
+    "name": "Te Mihi"
+   },
+   {
+    "slug": "nga-awa-purua",
+    "name": "Ngā Awa Pūrua"
+   },
+   {
+    "slug": "wairakei",
+    "name": "Wairākei"
+   },
+   {
+    "slug": "nga-tamariki",
+    "name": "Ngā Tamariki"
+   },
+   {
+    "slug": "kawerau",
+    "name": "Kawerau"
+   }
+  ]
+ }
+}

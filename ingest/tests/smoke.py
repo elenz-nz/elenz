@@ -95,6 +95,16 @@ import tod  # noqa: E402
 tp = tod.profile(hhj)
 check(len(tp['NI']['hydro']) == 48 and len(tp['SI']['price']) == 48 and sum(x is not None for x in tp['NI']['hydro']) >= 1,
       'tod: a month by half-hour of the day (48 slots)')
+import plant_history  # noqa: E402
+ps = plant_history.summarise(hhj)
+man = ps['p'].get('Manapōuri', [0, 0])
+check(man[0] > 0 and man[1] == 0, f'plant history: a station\'s energy for the month ({man[0]:.0f} MWh)')
+pf = plant_history.build({'2026-09': ps, '2026-10': ps}, ['2026-09', '2026-10', '2026-11'])
+check(pf['left'] == 1 and pf['src'] == 'dd' and pf['plants']['Manapōuri']['g'] == [round(man[0])] * 2,
+      'plant history: plant-major months, months still to read counted')
+check(plant_history.build(plant_history.unpack(pf), ['2026-09', '2026-10', '2026-11'])['plants'] == pf['plants'],
+      'plant history: the published file reads back unchanged')
+json.dumps(pf, allow_nan=False)
 for k in ('p10', 'p90', 'pmin', 'pmax', 'n500', 'n1000', 'rv_hydro', 'rv_geo', 'batt_d', 'batt_c', 'rv_battc'):
     check(k in dd['NI'] and len(dd['NI'][k]) == len(dd['t']), f'daily: {k}')
 check(dd['NI']['pmin'][0] <= dd['NI']['p10'][0] <= dd['NI']['p90'][0] <= dd['NI']['pmax'][0], 'daily: pmin <= p10 <= p90 <= pmax')

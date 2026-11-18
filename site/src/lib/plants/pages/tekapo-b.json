@@ -1,0 +1,109 @@
+{
+ "slug": "tekapo-b",
+ "name": "Tekapo B",
+ "plant": "Tekapo B",
+ "fuel": "hydro",
+ "island": "SI",
+ "status": "operating",
+ "mw": 160.0,
+ "steps": [
+  {
+   "from": null,
+   "to": null,
+   "mw": 160.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Genesis",
+ "scheme": "Tekapo",
+ "metered": null,
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "huntly-5",
+    "name": "Huntly 5"
+   },
+   {
+    "slug": "huntly-6",
+    "name": "Huntly 6"
+   },
+   {
+    "slug": "huntly-battery",
+    "name": "Huntly Battery"
+   },
+   {
+    "slug": "huntly-rankines",
+    "name": "Huntly Rankines"
+   },
+   {
+    "slug": "lauriston-solar-farm",
+    "name": "Lauriston Solar Farm"
+   },
+   {
+    "slug": "rangipo",
+    "name": "Rangipo"
+   },
+   {
+    "slug": "tekapo-a",
+    "name": "Tekapo A"
+   },
+   {
+    "slug": "tokaanu",
+    "name": "Tokaanu"
+   },
+   {
+    "slug": "waikaremoana",
+    "name": "Waikaremoana"
+   },
+   {
+    "slug": "waipipi",
+    "name": "Waipipi"
+   }
+  ],
+  "owner_all": true,
+  "scheme": [
+   {
+    "slug": "tekapo-a",
+    "name": "Tekapo A"
+   }
+  ],
+  "fuel": [
+   {
+    "slug": "manapouri",
+    "name": "Manapōuri"
+   },
+   {
+    "slug": "benmore",
+    "name": "Benmore"
+   },
+   {
+    "slug": "clyde",
+    "name": "Clyde"
+   },
+   {
+    "slug": "roxburgh",
+    "name": "Roxburgh"
+   },
+   {
+    "slug": "ohau-a",
+    "name": "Ōhau A"
+   },
+   {
+    "slug": "aviemore",
+    "name": "Aviemore"
+   }
+  ]
+ }
+}

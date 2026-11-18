@@ -1,0 +1,38 @@
+{
+ "slug": "kinleith",
+ "name": "Kinleith",
+ "plant": "Kinleith",
+ "fuel": "bio",
+ "island": "NI",
+ "status": "operating",
+ "mw": 40.0,
+ "steps": [
+  {
+   "from": "1997-08-01",
+   "to": null,
+   "mw": 40.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Oji Fibre Solutions",
+ "scheme": null,
+ "metered": "The register lists it as gas. We show it as bioenergy: Oji Fibre Solutions' cogeneration runs on wood waste and black liquor, with natural gas as a secondary fuel.",
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [],
+  "owner_all": true,
+  "scheme": [],
+  "fuel": []
+ }
+}

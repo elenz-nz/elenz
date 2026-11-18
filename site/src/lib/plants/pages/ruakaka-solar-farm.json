@@ -1,0 +1,100 @@
+{
+ "slug": "ruakaka-solar-farm",
+ "name": "Ruakākā Solar Farm",
+ "plant": "Ruakākā Solar Farm",
+ "fuel": "solar",
+ "island": "NI",
+ "status": "pending",
+ "mw": 120.0,
+ "steps": [],
+ "owner": "Meridian",
+ "scheme": null,
+ "metered": "It isn't in the EA's plant register yet, so we add it from its dispatched unit (BRB0331 RUS0).",
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "aviemore",
+    "name": "Aviemore"
+   },
+   {
+    "slug": "benmore",
+    "name": "Benmore"
+   },
+   {
+    "slug": "harapaki",
+    "name": "Harapaki"
+   },
+   {
+    "slug": "manapouri",
+    "name": "Manapōuri"
+   },
+   {
+    "slug": "ohau-a",
+    "name": "Ōhau A"
+   },
+   {
+    "slug": "ohau-b",
+    "name": "Ōhau B"
+   },
+   {
+    "slug": "ohau-c",
+    "name": "Ōhau C"
+   },
+   {
+    "slug": "ruakaka-energy-park",
+    "name": "Ruakākā Energy Park"
+   },
+   {
+    "slug": "te-apiti",
+    "name": "Te Āpiti"
+   },
+   {
+    "slug": "te-uku",
+    "name": "Te Uku"
+   },
+   {
+    "slug": "waitaki",
+    "name": "Waitaki"
+   },
+   {
+    "slug": "west-wind",
+    "name": "West Wind"
+   }
+  ],
+  "owner_all": false,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "tauhei-solar-farm",
+    "name": "Tauhei Solar Farm"
+   },
+   {
+    "slug": "te-herenga-o-te-ra-solar-farm",
+    "name": "Te Herenga o Te Rā Solar Farm"
+   },
+   {
+    "slug": "omeheu-solar-farm",
+    "name": "Omeheu Solar Farm"
+   },
+   {
+    "slug": "kohira-solar-farm",
+    "name": "Kohirā Solar Farm"
+   },
+   {
+    "slug": "rangitaiki-solar-farm",
+    "name": "Rangitaiki Solar Farm"
+   },
+   {
+    "slug": "twin-rivers-solar-farm",
+    "name": "Twin Rivers Solar Farm"
+   }
+  ]
+ }
+}

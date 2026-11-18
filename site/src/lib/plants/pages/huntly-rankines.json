@@ -1,0 +1,98 @@
+{
+ "slug": "huntly-rankines",
+ "name": "Huntly Rankines",
+ "plant": "Huntly Rankines",
+ "fuel": "coal",
+ "island": "NI",
+ "status": "operating",
+ "mw": 750.0,
+ "steps": [
+  {
+   "from": null,
+   "to": "2014-01-23",
+   "mw": 1000.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    },
+    {
+     "label": "Wikipedia, Huntly Power Station",
+     "url": "https://en.wikipedia.org/wiki/Huntly_Power_Station"
+    }
+   ]
+  },
+  {
+   "from": "2014-01-24",
+   "to": null,
+   "mw": 750.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    },
+    {
+     "label": "Wikipedia, Huntly Power Station",
+     "url": "https://en.wikipedia.org/wiki/Huntly_Power_Station"
+    }
+   ]
+  }
+ ],
+ "owner": "Genesis",
+ "scheme": null,
+ "metered": "Shown as Coal/gas: units 1, 2 and 4 can burn coal or gas, and the market data doesn't say which.\nThe metered history has one meter for units 1–4 together, so it shows them as one. The dispatch data (the live week and the weeks since the newest metered month) shows each unit.\nSeptember 2020: Generation_MD has no Huntly that month, so the history uses the grid meter for the whole station, split between units by their offers.",
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "huntly-5",
+    "name": "Huntly 5"
+   },
+   {
+    "slug": "huntly-6",
+    "name": "Huntly 6"
+   },
+   {
+    "slug": "huntly-battery",
+    "name": "Huntly Battery"
+   },
+   {
+    "slug": "lauriston-solar-farm",
+    "name": "Lauriston Solar Farm"
+   },
+   {
+    "slug": "rangipo",
+    "name": "Rangipo"
+   },
+   {
+    "slug": "tekapo-a",
+    "name": "Tekapo A"
+   },
+   {
+    "slug": "tekapo-b",
+    "name": "Tekapo B"
+   },
+   {
+    "slug": "tokaanu",
+    "name": "Tokaanu"
+   },
+   {
+    "slug": "waikaremoana",
+    "name": "Waikaremoana"
+   },
+   {
+    "slug": "waipipi",
+    "name": "Waipipi"
+   }
+  ],
+  "owner_all": true,
+  "scheme": [],
+  "fuel": []
+ }
+}
