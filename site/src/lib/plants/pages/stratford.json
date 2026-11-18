@@ -133,7 +133,7 @@
    "refs": [
     1
    ],
-   "note": "the site's first station, four gas turbines, completed in June 1976 (Wikipedia, from an NZ Electricity brochure); the combined cycle unit followed in 1998 and the peakers in 2011"
+   "note": "the site's first station, four gas turbines, was completed in June 1976; the combined cycle unit followed in 1998 and the peakers in 2011"
   },
   {
    "k": "units",
@@ -190,7 +190,7 @@
     3,
     5
    ],
-   "value": "200 MW (Contact's maximum capacity for the two peakers; the EA register has two units of 106 MW); 377 MW (The EA register's nameplate for the combined cycle unit, later 360 MW (2022) and 330 MW (2023))"
+   "value": "200 MW (Contact's maximum capacity for the two peakers; the EA register has two units of 106 MW); 377 MW (The EA register's nameplate for the combined cycle unit; later 360 MW from 2022 and 330 MW from 2023)"
   },
   {
    "k": "grid_connection",

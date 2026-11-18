@@ -49,7 +49,7 @@ value = "1976"
 source = "wp-stratford"
 grade = "B"
 checked = "2026-11-19"
-note = "the site's first station, four gas turbines, completed in June 1976 (Wikipedia, from an NZ Electricity brochure); the combined cycle unit followed in 1998 and the peakers in 2011"
+note = "the site's first station, four gas turbines, was completed in June 1976; the combined cycle unit followed in 1998 and the peakers in 2011"
 
 [[facts.commissioned.alt]]
 value = "1998"
@@ -136,7 +136,7 @@ checked = "2026-11-19"
 
 [[ratings]]
 value = 377
-basis = "The EA register's nameplate for the combined cycle unit, later 360 MW (2022) and 330 MW (2023)"
+basis = "The EA register's nameplate for the combined cycle unit; later 360 MW from 2022 and 330 MW from 2023"
 source = "ea-register"
 grade = "A"
 checked = "2026-11-19"
