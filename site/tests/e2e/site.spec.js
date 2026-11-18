@@ -411,6 +411,37 @@ test.describe('plant pages', () => {
   });
 });
 
+// the plant index (/plants): without a LINZ key (as in checks.yml) the map is the drawn outline
+test.describe('plant index', () => {
+  test('filters keep to the address, and a dot opens its plant in the panel', async ({ page }) => {
+    await page.goto('/plants');
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+    await expect(page.locator('.tbl tbody tr')).toHaveCount(20);
+    await page.getByRole('button', { name: /^Show all \d+$/ }).click();
+    await expect(page.locator('.tbl tbody tr')).toHaveCount(101);   // closed plants wait for "Show closed"
+    await page.locator('.fuels').getByRole('button', { name: /^Geothermal/ }).click();
+    await page.getByRole('group', { name: 'Island' }).getByRole('button', { name: 'North Island' }).click();
+    await expect(page).toHaveURL(/fuel=geo/);
+    await expect(page).toHaveURL(/island=NI/);
+    await expect(page.locator('.tbl tbody tr').first()).toContainText('Geothermal');
+    // the Taupō dots overlap on the outline map, so pick Wairākei's from the keyboard
+    await page.locator('.outline .dot[aria-label^="Wairākei,"]').focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#sel-h')).toHaveText('Wairākei');
+    await expect(page.getByRole('link', { name: 'Open Wairākei’s page' })).toHaveAttribute('href', '/plants/wairakei');
+    await expect(page).toHaveURL(/plant=wairakei/);
+    await page.reload();
+    await expect(page.locator('#sel-h')).toHaveText('Wairākei');
+    await expect(page.locator('.fuels button[aria-pressed="true"]')).toContainText('Geothermal');
+  });
+
+  test('closed plants show when asked for', async ({ page }) => {
+    await page.goto('/plants?closed=1&q=otahuhu');
+    await expect(page.locator('.tbl tbody tr')).toHaveCount(2);
+    await expect(page.locator('.tbl tbody')).toContainText('Closed 2015');
+  });
+});
+
 test.describe('on a phone', () => {
   test.beforeEach(({}, testInfo) => test.skip(!isPhone(testInfo), 'phones only'));
 

@@ -1,9 +1,11 @@
-// Tests for the plant pages' history, live panel and map (src/lib/plants/): run with `npm test`.
+// Tests for the plant pages' history, live panel, map and index (src/lib/plants/): run with `npm test`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { plantMonths, years, lastMonths, latestYear, bestYear, capAt, hoursIn, capChanges, fmtGwh, fmtMw } from '#lib/plants/history.js';
 import { livePlant } from '#lib/plants/live.js';
 import { toView } from '#lib/plants/map.js';
+import { readSettings, writeSettings, pick, filtered, fuelsOf, ownersOf, dotSize, statusText, DEFAULTS } from '#lib/plants/list.js';
+import INDEX from '#lib/plants/index.json' with { type: 'json' };
 import { PTS } from '#lib/home/nzmap.js';
 import MANAPOURI from '#lib/plants/pages/manapouri.json' with { type: 'json' };
 
@@ -74,5 +76,48 @@ test('a checked point lands where the island outlines put it', () => {
   for (const [k, [la, lo]] of Object.entries({ ben: [-44.57, 170.20], akl: [-36.85, 174.76], chc: [-43.53, 172.63] })) {
     const [x, y] = toView(la, lo);
     assert.ok(Math.hypot(x - PTS[k][0], y - PTS[k][1]) < 0.5, `${k}: ${x.toFixed(1)}, ${y.toFixed(1)} against ${PTS[k]}`);
+  }
+});
+
+// the index (/plants): its rows, filters and the settings in the address
+const ROWS = [
+  { slug: 'big', name: 'Big', plant: 'Big', fuel: 'hydro', island: 'SI', status: 'operating', mw: 800, owner: 'Meridian', commissioned: '1971', closed: null, reviewed: true, pt: null },
+  { slug: 'oho', name: 'Ōhau', plant: 'Ohau', fuel: 'hydro', island: 'SI', status: 'operating', mw: 264, owner: 'Meridian', commissioned: null, closed: null, reviewed: false, pt: null },
+  { slug: 'gas', name: 'Gas Town', plant: 'Gas Town', fuel: 'gas', island: 'NI', status: 'closed', mw: 400, owner: 'Contact', commissioned: '2000', closed: '2015', reviewed: false, pt: null },
+  { slug: 'sun', name: 'Sunny', plant: 'Sunny', fuel: 'solar', island: 'NI', status: 'operating', mw: 20, owner: 'Other generators', commissioned: null, closed: null, reviewed: false, pt: null }
+];
+
+test('the index: closed plants hidden until asked for, largest first', () => {
+  assert.deepEqual(pick(ROWS, DEFAULTS).map((p) => p.slug), ['big', 'oho', 'sun']);
+  assert.deepEqual(pick(ROWS, { ...DEFAULTS, closed: true }).map((p) => p.slug), ['big', 'gas', 'oho', 'sun']);
+  assert.deepEqual(pick(ROWS, { ...DEFAULTS, text: 'ohau' }).map((p) => p.slug), ['oho']);   // macrons don't matter
+  assert.deepEqual(pick(ROWS, { ...DEFAULTS, owner: 'meridian', island: 'SI' }).map((p) => p.slug), ['big', 'oho']);
+  assert.deepEqual(pick(ROWS, { ...DEFAULTS, by: 'name', asc: true }).map((p) => p.slug), ['big', 'oho', 'sun']);
+  // Now sorts by live MW; a plant with no figure goes last
+  assert.deepEqual(pick(ROWS, { ...DEFAULTS, by: 'now' }, new Map([['Sunny', 15], ['Big', 600]])).map((p) => p.slug), ['big', 'sun', 'oho']);
+  assert.deepEqual(pick(ROWS, { ...DEFAULTS, by: 'commissioned', asc: true }).map((p) => p.slug), ['big', 'oho', 'sun']);
+  // the fuel buttons count everything the other filters let through
+  assert.equal(filtered(ROWS, { ...DEFAULTS, fuel: 'solar' }).length, 3);
+  assert.deepEqual(fuelsOf(ROWS).map((f) => f.k), ['hydro', 'solar', 'gas']);
+  assert.deepEqual(ownersOf(ROWS), ['Contact', 'Meridian', 'Other generators']);
+  assert.equal(statusText(ROWS[2]), 'Closed 2015');
+  assert.ok(dotSize(500) > dotSize(100) && dotSize(100) > dotSize(10));
+});
+
+test('the index keeps its settings in the address, and ignores what it does not know', () => {
+  const s = { ...DEFAULTS, fuel: 'hydro', island: 'SI', owner: 'meridian', closed: true, text: 'Ō', by: 'name', asc: true, sel: 'big' };
+  const q = writeSettings(s);
+  assert.equal(q, '?fuel=hydro&island=SI&owner=meridian&closed=1&q=%C5%8C&sort=name&plant=big');
+  assert.deepEqual(readSettings(q, ROWS), s);
+  assert.equal(writeSettings(DEFAULTS), '');
+  assert.deepEqual(readSettings('?fuel=coal&owner=nobody&plant=gone&sort=bogus', ROWS), DEFAULTS);
+  assert.deepEqual(readSettings('?sort=mw-asc', ROWS), { ...DEFAULTS, asc: true });
+});
+
+test('the index file: every plant, each point in New Zealand', () => {
+  assert.equal(INDEX.plants.length, 110);
+  for (const p of INDEX.plants) {
+    assert.ok(p.slug && p.name && p.fuel && p.island && p.status, p.slug);
+    if (p.pt) assert.ok(p.pt.lat < -34 && p.pt.lat > -48 && p.pt.lon > 166 && p.pt.lon < 179, `${p.slug}: ${p.pt.lat}, ${p.pt.lon}`);
   }
 });
