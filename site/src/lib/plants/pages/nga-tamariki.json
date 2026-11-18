@@ -34,12 +34,139 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Ngā Tamariki, 17 km northeast of Taupō on the Wairakei Pastoral Estate, opened in 2013 with four Ormat binary units, at the time the largest of their kind in the world. In a binary plant the geothermal fluid heats a separate working fluid that drives the turbines, and the cooled fluid goes back into the reservoir. Ngā Tamariki also pumps its non-condensable gases, mostly carbon dioxide, back underground, which Mercury was the first New Zealand generator to do. A fifth unit, built from May 2024, began supplying the grid in January 2026 and lifted capacity from 86 MW to 132 MW.",
+  "refs": [
+   1,
+   2,
+   3
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2013",
+   "refs": [
+    1,
+    3
+   ],
+   "note": "operating from September 2013 (Wikipedia); the fifth unit first supplied the grid in January 2026 and was opened in March 2026"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "5 units",
+   "refs": [
+    1
+   ],
+   "note": "binary units: four Ormat units of 2013 (NZGA: 20.5 MW each) and a fifth added in 2026"
+  },
+  {
+   "k": "field",
+   "label": "Geothermal field",
+   "value": "Ngā Tamariki geothermal field",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Waikato",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Taupō",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Mercury",
+   "refs": [
+    6,
+    1
+   ],
+   "note": "Mercury NZ Limited; the resource consents are held jointly with Tauhara North No. 2 Trust, which has options to take an equity interest"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    6
+   ],
+   "value": "87 MW (The EA register's nameplate (not yet updated for the fifth unit))"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Ngatamariki (NAP2202)",
+   "refs": [
+    7
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Ngā Tamariki Geothermal Station",
+   "publisher": "Mercury",
+   "url": "https://www.mercury.co.nz/about-us/renewable-energy/geothermal/nga-tamariki-geothermal-station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Geothermal generation",
+   "publisher": "Mercury",
+   "url": "https://www.mercury.co.nz/about-us/renewable-energy/geothermal",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Ngā Tamariki Geothermal System",
+   "publisher": "New Zealand Geothermal Association",
+   "url": "https://www.nzgeothermal.org.nz/geothermal-in-nz/nz-geothermal-fields/ngatamariki/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

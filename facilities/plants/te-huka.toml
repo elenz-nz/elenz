@@ -7,11 +7,15 @@ register = ["G004"]
 wikidata = "Q7690821"
 osm = ["way/169516349"]
 reviewed = ""
-to_check = [
-  "MW: this row has 26, Elenz 30.",
-  "Capacity: Combined lead; split if sources support it.",
+to_check = ["Location: confirm the point sits on the Te Huka 1 plant (not Te Huka 3 beside it) against the LINZ aerial (separate task)."]
+notes = [
+  "30 MW from Jan 2009.",
+  "Geothermal batch 1 (19 Nov 2026): facts checked against Contact's station page, the EA register and network supply points table, the NZ Geothermal Association's Tauhara page, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, shared with Te Huka 3 and not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. No other district within 5 km.",
+  "Resolved: Capacity: Elenz uses the register's 30 MW. NZGA gives 24 MW when built (2010), 26 MW after a 2012 upgrade of its two units; Wikipedia 23 MW. Contact's station page gives about 82 MW, which appears to include Te Huka 3 (51.4 MW). Wikipedia's list figure, 79, is the two together.",
+  "Grid connection: WRK0331 is the Wairakei substation's 33 kV bus (the register's connection for Te Huka); Wikipedia says a 33 kV line runs from the station to Transpower's Wairakei substation, so the point is the substation's, about 5 km north of the station.",
+  "Elenz's history starts in Jan 2009 (metered output) though the station opened in May 2010; check whether the early months are commissioning output.",
 ]
-notes = ["30 MW from Jan 2009."]
 
 [location]
 value = [-38.6669, 176.118]
@@ -25,29 +29,51 @@ value = [-38.62571, 176.10546]
 code = "WRK0331 WAIRAKEI"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "the register's connection for Te Huka; the point is Transpower's Wairakei substation, reached by a 33 kV line"
 
 [facts.other_names]
 value = ["Tauhara One", "Centennial Drive binary"]
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "Names the EA register, Wikipedia and Elenz use for this plant; check each."
+source = "wp-te-huka"
+grade = "B"
+checked = "2026-11-19"
+note = "Wikipedia: also known as Tauhara One; formerly Centennial Drive binary"
 
 [facts.commissioned]
-value = "2010 (Unit 3) 2024"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = "2010"
+source = ["contact-te-huka", "nzga-tauhara"]
+grade = "A"
+checked = "2026-11-19"
+note = "opened in May 2010 (Wikipedia)"
 
 [[facts.commissioned.alt]]
 value = "2010"
 source = "ea-register"
 grade = "A"
 checked = ""
-note = "the register's start date, 2010-01-01: often a year, not the day"
+note = "the register's start date, 2010-01-01: a year, not the day"
+
+[[facts.commissioned.alt]]
+value = "2010 (Unit 3) 2024"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[facts.units]
+value = "2 units"
+source = "nzga-tauhara"
+grade = "B"
+checked = "2026-11-19"
+note = "two Ormat binary units, upgraded in 2012 (NZGA); Te Huka 3 has its own page"
 
 [facts.field]
+value = "Tauhara geothermal field"
+source = ["contact-te-huka", "nzga-tauhara"]
+grade = "A"
+checked = "2026-11-19"
+note = "the first power station on the Tauhara field (Contact)"
+
+[[facts.field.alt]]
 value = "Wairākei–Tauhara field"
 source = "elenz-register"
 grade = "C"
@@ -55,29 +81,47 @@ checked = ""
 
 [facts.region]
 value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
+value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
 value = "Taupō"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Taupō"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Contact"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Contact Energy"
+source = ["ea-register", "contact-te-huka"]
+grade = "A"
+checked = "2026-11-19"
+note = "Contact Energy Limited, which built it"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Te Huka was the first power station on the Tauhara geothermal field, which lies east of the Waikato River from Wairākei, along the edge of Taupō. It is a binary plant: heat from the geothermal fluid boils a separate working fluid that drives the turbines, and the used geothermal fluid all goes back into the field. Its two units opened in 2010 and were upgraded in 2012, and a third, larger unit, Te Huka 3, was added at Te Huka in 2024."
+source = ["contact-te-huka", "nzga-tauhara", "wp-te-huka", "contact-microsoft-2023"]
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 26
+basis = "NZ Geothermal Association: its two units after a 2012 upgrade (24 MW when built)"
+source = "nzga-tauhara"
+grade = "B"
+checked = "2026-11-19"
 
 [[ratings]]
 value = "79"

@@ -7,8 +7,18 @@ register = ["G007"]
 wikidata = "Q7688687"
 osm = ["way/965573000"]
 reviewed = ""
-to_check = ["Capacity: Verify capacity stages and net/gross basis."]
-notes = ["174 MW from Oct 2023."]
+to_check = [
+  "Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task).",
+  "Grid connection: the register connects it at TAB2201 (Tauhara), which has no coordinates in the EA's network supply points table (17 Nov 2026); add the point if the EA adds one.",
+]
+notes = [
+  "174 MW from Oct 2023.",
+  "Geothermal batch 1 (19 Nov 2026): facts checked against Contact's station page and its opening announcement (22 Nov 2024), the EA register, the NZ Geothermal Association's Tauhara page, Wikipedia and Stats NZ boundaries. The location and grid connection are left open (to_check).",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. No other district within 5 km.",
+  "Resolved: Capacity: 174 MW in the register and from Contact, at peak; the register's figure is what Elenz uses. Contact ran it at about 152 MW at first, with modifications in a later outage to reach 174 MW long term (Wikipedia, citing Contact). Contact's opening announcement says it had run at 160 MW.",
+  "Dates: the register's start date is 2023-10-05 and Elenz counts it from then; Contact says it first supplied the grid on 6 May 2024 and was officially opened on 22 Nov 2024. Construction began on 31 March 2021 (Wikipedia). The page shows 2024.",
+  "Names: Wikipedia says it was previously known as Tauhara 2 (Tauhara Stage 2); NZGA's page, written during construction, calls it Tauhara I. Wikipedia says Contact developed it with the Tauhara Moana Trust; Contact's pages don't say so, so it isn't published.",
+]
 
 [location]
 value = [-38.6681, 176.151]
@@ -18,26 +28,53 @@ grade = "B"
 checked = ""
 
 [facts.other_names]
+value = ["Tauhara 2"]
+source = "wp-tauhara"
+grade = "B"
+checked = "2026-11-19"
+note = "Wikipedia: previously known as Tauhara 2 (the project's Stage 2)"
+
+[[facts.other_names.alt]]
 value = ["Tauhara 2", "Tauhara Stage 2"]
 source = "elenz-register"
 grade = "C"
 checked = ""
-note = "Names the EA register, Wikipedia and Elenz use for this plant; check each."
 
 [facts.commissioned]
 value = "2024"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = ["contact-tauhara", "contact-tauhara-opening-2024"]
+grade = "A"
+checked = "2026-11-19"
+note = "first supplied the grid on 6 May 2024; officially opened on 22 November 2024"
 
 [[facts.commissioned.alt]]
 value = "2023"
 source = "ea-register"
 grade = "A"
 checked = ""
-note = "the register's start date, 2023-10-05: often a year, not the day"
+note = "the register's start date, 2023-10-05"
+
+[[facts.commissioned.alt]]
+value = "2024"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[facts.units]
+value = "1 unit"
+source = ["contact-tauhara", "nzga-tauhara"]
+grade = "A"
+checked = "2026-11-19"
+note = "one single-shaft Fuji triple-flash condensing steam turbine"
 
 [facts.field]
+value = "Tauhara geothermal field"
+source = "nzga-tauhara"
+grade = "B"
+checked = "2026-11-19"
+note = "in the field's eastern sector (NZGA)"
+
+[[facts.field.alt]]
 value = "Wairākei–Tauhara field"
 source = "elenz-register"
 grade = "C"
@@ -45,26 +82,37 @@ checked = ""
 
 [facts.region]
 value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
+value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
 value = "Taupō"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Taupō"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Contact"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Contact Energy"
+source = ["ea-register", "contact-tauhara"]
+grade = "A"
+checked = "2026-11-19"
+note = "Contact Energy Limited, which built it"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Tauhara draws on the Tauhara geothermal field along the eastern edge of Taupō, and its single steam turbine is, Contact says, the largest single-shaft geothermal turbine in the world, spinning at 3,000 revolutions a minute. Building took about three and a half years from 2021, and the cost came to $924 million. It first supplied the grid in May 2024 and was officially opened on 22 November 2024; at up to 174 MW it can meet around 3.5% of New Zealand's electricity needs."
+source = ["contact-tauhara", "contact-tauhara-opening-2024", "nzga-tauhara", "wp-tauhara"]
+grade = "B"
+checked = "2026-11-19"

@@ -7,8 +7,14 @@ register = ["G013"]
 wikidata = "Q7022117"
 osm = ["way/270555062"]
 reviewed = ""
-to_check = ["Capacity: 82 MW plus 46 MW expansion lead; verify final rating."]
-notes = ["86 MW from Mar 2013, 132 MW from 21 Jan 2026."]
+to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+notes = [
+  "86 MW from Mar 2013, 132 MW from 21 Jan 2026.",
+  "Geothermal batch 1 (19 Nov 2026): facts checked against Mercury's station page, the EA register and network supply points table, the NZ Geothermal Association's Ngā Tamariki page, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. Rotorua District lies 2–3 km away.",
+  "Resolved: Capacity: Mercury gives 132 MW installed since the fifth unit (86 MW before), which Elenz uses. The EA register still lists 87 MW (17 Nov 2026), kept as a rating; the fifth unit's net capacity is 50 MW, the station's net gain 46 MW (Mercury, Sep 2023).",
+  "Grid connection: NAP2202 is at the Ngā Awa Pūrua substation, reached by a 220 kV line from the station (Wikipedia).",
+]
 
 [location]
 value = [-38.547222, 176.195833]
@@ -22,13 +28,15 @@ value = [-38.61411, 176.1793]
 code = "NAP2202 NGATAMARIKI"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "the register's connection for Ngā Tamariki; the point is the Ngā Awa Pūrua substation, reached by a 220 kV line"
 
 [facts.commissioned]
-value = "2013 | 2013 (Unit 5 added 2026)"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = "2013"
+source = ["mercury-nga-tamariki", "nzga-ngatamariki"]
+grade = "A"
+checked = "2026-11-19"
+note = "operating from September 2013 (Wikipedia); the fifth unit first supplied the grid in January 2026 and was opened in March 2026"
 
 [[facts.commissioned.alt]]
 value = "2013"
@@ -37,7 +45,26 @@ grade = "A"
 checked = ""
 note = "the register's start date, 2013-01-01: often a year, not the day"
 
+[[facts.commissioned.alt]]
+value = "2013 | 2013 (Unit 5 added 2026)"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[facts.units]
+value = "5 units"
+source = "mercury-nga-tamariki"
+grade = "A"
+checked = "2026-11-19"
+note = "binary units: four Ormat units of 2013 (NZGA: 20.5 MW each) and a fifth added in 2026"
+
 [facts.field]
+value = "Ngā Tamariki geothermal field"
+source = "nzga-ngatamariki"
+grade = "B"
+checked = "2026-11-19"
+
+[[facts.field.alt]]
 value = "Ngā Tamariki field"
 source = "elenz-register"
 grade = "C"
@@ -45,11 +72,23 @@ checked = ""
 
 [facts.region]
 value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
+value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
+value = "Taupō"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
 value = "Taupō"
 source = "wp-list"
 grade = "B"
@@ -57,14 +96,20 @@ checked = ""
 
 [facts.owner]
 value = "Mercury"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+source = ["ea-register", "mercury-nga-tamariki"]
+grade = "A"
+checked = "2026-11-19"
+note = "Mercury NZ Limited; the resource consents are held jointly with Tauhara North No. 2 Trust, which has options to take an equity interest"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Ngā Tamariki, 17 km northeast of Taupō on the Wairakei Pastoral Estate, opened in 2013 with four Ormat binary units, at the time the largest of their kind in the world. In a binary plant the geothermal fluid heats a separate working fluid that drives the turbines, and the cooled fluid goes back into the reservoir. Ngā Tamariki also pumps its non-condensable gases, mostly carbon dioxide, back underground, which Mercury was the first New Zealand generator to do. A fifth unit, built from May 2024, began supplying the grid in January 2026 and lifted capacity from 86 MW to 132 MW."
+source = ["mercury-nga-tamariki", "mercury-geothermal", "nzga-ngatamariki"]
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 87
+basis = "The EA register's nameplate (not yet updated for the fifth unit)"
+source = "ea-register"
+grade = "A"
+checked = "2026-11-19"

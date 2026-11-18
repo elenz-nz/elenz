@@ -7,8 +7,15 @@ register = ["G016"]
 wikidata = "Q11980453"
 osm = ["way/170175198"]
 reviewed = ""
-to_check = ["Capacity: Confirm exact plant identity and rating."]
-notes = ["Mercury's Kawerau station (KAW1101 KAG0), 109 MW from Jun 2008."]
+to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task); Whakatāne District lies 200–250 m away, so recheck the district if the point moves."]
+notes = [
+  "Mercury's Kawerau station (KAW1101 KAG0), 109 MW from Jun 2008.",
+  "Geothermal batch 1 (19 Nov 2026): facts checked against Mercury's station and geothermal pages, POWER magazine (Jan 2009), the EA register and network supply points table, the NZ Geothermal Association's Kawerau page and 2023 generation report, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. Kawerau District is small and Whakatāne District surrounds it: the line is 200–250 m from this point.",
+  "Resolved: Capacity: Elenz uses the register's 109 MW. Mercury gives 107 MW installed; NZGA lists 100 MW in 2008 plus a 7 MW rerate in 2017; Wikipedia 100 MW (built for 90 MW, ran at 100). Both owner figures kept as ratings.",
+  "Dates: construction began January 2007; operating from August 2008 (POWER) or July 2008 (Wikipedia); officially opened in late November 2008. The page shows 2008.",
+  "Built by Mighty River Power, Mercury's former name, so there are no previous owners.",
+]
 
 [location]
 value = [-38.0634, 176.7257]
@@ -22,15 +29,44 @@ value = [-38.07673, 176.72238]
 code = "KAW1101 KAWERAU GEOTHERMAL"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026 and the register's connection for Kawerau; the substation is near the mill (POWER)"
 
 [facts.commissioned]
+value = "2008"
+source = ["mercury-kawerau", "powermag-kawerau-2009"]
+grade = "A"
+checked = "2026-11-19"
+note = "operating from August 2008 and officially opened in late November 2008; construction began in January 2007"
+
+[[facts.commissioned.alt]]
+value = "2008"
+source = "ea-register"
+grade = "A"
+checked = ""
+note = "the register's start date, 2008-01-01: a year, not the day"
+
+[[facts.commissioned.alt]]
 value = "2008"
 source = "wp-list"
 grade = "B"
 checked = ""
 
+[facts.units]
+value = "1 unit"
+source = ["mercury-kawerau", "powermag-kawerau-2009"]
+grade = "A"
+checked = "2026-11-19"
+note = "one Fuji Electric single-shaft, dual-flash steam turbine"
+
 [facts.field]
+value = "Kawerau geothermal field"
+source = ["mercury-geothermal", "nzga-kawerau"]
+grade = "A"
+checked = "2026-11-19"
+note = "shared with other operators; Ngāti Tūwharetoa Geothermal Assets owns and runs part of the steamfield and supplies steam to the station (NZGA, 2023)"
+
+[[facts.field.alt]]
 value = "Kawerau field"
 source = "elenz-register"
 grade = "C"
@@ -38,11 +74,24 @@ checked = ""
 
 [facts.region]
 value = "Bay of Plenty"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
+value = "Bay of Plenty"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
+value = "Kawerau"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+note = "Whakatāne District is 200–250 m away"
+
+[[facts.territorial_authority.alt]]
 value = "Kawerau"
 source = "wp-list"
 grade = "B"
@@ -50,17 +99,30 @@ checked = ""
 
 [facts.owner]
 value = "Mercury"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+source = ["ea-register", "mercury-kawerau"]
+grade = "A"
+checked = "2026-11-19"
+note = "Mercury NZ Limited, which built it as Mighty River Power"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Kawerau was New Zealand's biggest geothermal project in 20 years when Mighty River Power, now Mercury, opened it in 2008, on a field that has supplied steam to the town's mills since 1957. Fluid from wells about 2 km away is separated twice, giving high- and low-pressure steam for a single turbine, and the used fluid is injected back into the ground north of the field. Built for 90 MW, it soon proved able to run at about 100 MW, and Mercury now gives its installed capacity as 107 MW."
+source = ["powermag-kawerau-2009", "nzga-kawerau", "mercury-kawerau", "wp-kawerau"]
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 109
+basis = "The EA register's nameplate"
+source = "ea-register"
+grade = "A"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 107
+basis = "Mercury: total installed capacity"
+source = "mercury-kawerau"
+grade = "A"
+checked = "2026-11-19"
 
 [[ratings]]
 value = "105"

@@ -23,12 +23,60 @@
  "scheme": null,
  "metered": "This meter is a whole site's grid connection, not one generator's. It counts power going into the grid there, so it leaves out what the site uses itself and the power it takes from the grid at the same time. Generation_MD has no row for it before 2020, so 2013–2019 use the same figure from the grid meter (Grid_import). The dispatch data (the live week and the weeks since the newest metered month) reads higher.",
  "checking": true,
- "checked": null,
+ "checked": "2026-11-19",
  "about": null,
- "facts": [],
+ "facts": [
+  {
+   "k": "other_names",
+   "label": "Other names",
+   "value": "Carter Holt Harvey Energy Ltd CoGen, Norske Skog CoGen",
+   "refs": [
+    1
+   ],
+   "note": "the EA register's names for KAW0112 ONU0: Norske Skog CoGen to 5 May 2023, Carter Holt Harvey Energy Ltd CoGen since"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Bay of Plenty",
+   "refs": [
+    2
+   ]
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Kawerau (KAW0112)",
+   "refs": [
+    3
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [],
   "owner_all": true,

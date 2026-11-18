@@ -7,16 +7,16 @@ register = ["G010", "G011", "G012"]
 wikidata = "Q15379053"
 osm = ["way/170176583"]
 reviewed = ""
-to_check = [
-  "Owner differs from Wikipedia.",
-  "Wikipedia gives Mercury Energy; check.",
-  "Capacity: Confirm station vs unit grouping.",
-  "Owner: not one of the main owners; find the current owner.",
-]
+to_check = ["Location: confirm the point against the LINZ aerial (separate task); it is the whole site for now."]
 notes = [
   "G010: Elenz shows Mōkai as one plant: 55 → 95 (May 2005) → 112 MW (Jun 2007).",
   "G011: See G010.",
   "G012: See G010.",
+  "Geothermal batch 1 (19 Nov 2026): facts checked against Mercury's station page, the EA register and network supply points table, the NZ Geothermal Association's Mokai page, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the site's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. No other district within 5 km of the point (the Whakamaru grid connection is near South Waikato District).",
+  "Resolved: Owner: the register's operator is Tuaropaki Power Company; Mercury says the station is owned by the Tūaropaki Trust (75%) and Mercury (25%), and Wikipedia that Tuaropaki Power Company is owned in those shares and Mercury operates the station.",
+  "Resolved: Stations and capacity: NZGA lists Mokai 1 (1999, six units, 55 MW), Mokai 2 (2005, five units, 39 MW) and Mokai 1A (2007, one binary unit, 17 MW); Mercury gives 55 MW in 2000, +38 MW in 2005 and +20 MW in 2008, 113 MW in all, with 10 binary and 2 steam turbines. Elenz's 112 MW matches the register.",
+  "Commissioned: Mercury and the register say 2000; NZGA and Wikipedia 1999; Elenz's metered history starts Oct 1999. The page shows 2000.",
 ]
 
 [location]
@@ -31,15 +31,42 @@ value = [-38.41908, 175.80036]
 code = "WKM2201 WHAKAMARU"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "the register's connection for Mokai; the point is the Whakamaru substation, about 15 km northwest of the station"
 
 [facts.commissioned]
+value = "2000"
+source = ["mercury-mokai", "ea-register"]
+grade = "A"
+checked = "2026-11-19"
+note = "NZGA dates the first stage to 1999; enlarged in 2005 and 2007–08"
+
+[[facts.commissioned.alt]]
+value = "1999"
+source = "nzga-mokai"
+grade = "B"
+checked = ""
+
+[[facts.commissioned.alt]]
 value = "2000"
 source = "wp-list"
 grade = "B"
 checked = ""
 
+[facts.units]
+value = "12 units"
+source = ["mercury-mokai", "nzga-mokai"]
+grade = "A"
+checked = "2026-11-19"
+note = "10 binary turbines and two steam turbines (Mercury)"
+
 [facts.field]
+value = "Mōkai geothermal field"
+source = ["mercury-mokai", "nzga-mokai"]
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.field.alt]]
 value = "Mōkai field"
 source = "elenz-register"
 grade = "C"
@@ -47,53 +74,74 @@ checked = ""
 
 [facts.region]
 value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
+value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
 value = "Taupō"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Taupō"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = ""
-source = "ea-register"
-grade = "C"
-checked = ""
-note = "the register's operator(s): Tuaropaki Power Company Limited"
+value = "Tuaropaki Power Company: the Tūaropaki Trust 75%, Mercury 25%"
+source = ["ea-register", "mercury-mokai"]
+grade = "A"
+checked = "2026-11-19"
+note = "Mercury operates the station (Wikipedia)"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Mōkai, about 30 km northwest of Taupō, is majority-owned by the Tūaropaki Trust, with Mercury holding a quarter. It opened in 2000 as a 55 MW station and was enlarged in 2005 and again in 2007–08 to about 113 MW. It combines steam turbines with binary units, which make more electricity from the heat left in the fluid, and all the geothermal fluid goes back into the field. The field's heat also warms a large glasshouse and the Miraka milk-powder factory."
+source = ["mercury-mokai", "nzga-mokai", "wp-mokai"]
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 113
+basis = "Mercury: total installed capacity"
+source = "mercury-mokai"
+grade = "A"
+checked = "2026-11-19"
 
 [[stations]]
-value = "Mōkai A"
+value = "Mōkai 1"
 id = "G010"
-source = "elenz-register"
-grade = "C"
-checked = ""
 mw = 55
-commissioned = "2000"
+source = "nzga-mokai"
+grade = "B"
+checked = "2026-11-19"
+commissioned = "1999"
+note = "six units (one flash, the rest binary)"
 
 [[stations]]
-value = "Mōkai B"
+value = "Mōkai 2"
 id = "G011"
-source = "elenz-register"
-grade = "C"
-checked = ""
 mw = 39
-commissioned = "2000"
+source = "nzga-mokai"
+grade = "B"
+checked = "2026-11-19"
+commissioned = "2005"
+note = "five units (one flash, the rest binary)"
 
 [[stations]]
-value = "Mōkai C"
+value = "Mōkai 1A"
 id = "G012"
-source = "elenz-register"
-grade = "C"
-checked = ""
-mw = 18
-commissioned = "2000"
+mw = 17
+source = "nzga-mokai"
+grade = "B"
+checked = "2026-11-19"
+commissioned = "2007"
+note = "one binary unit; Mercury dates this addition to 2008 at 20 MW"

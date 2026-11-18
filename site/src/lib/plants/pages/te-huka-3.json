@@ -27,12 +27,125 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Te Huka 3 is a binary plant built at Te Huka, on the Tauhara geothermal field near Taupō, beside the station's two original units. Geothermal fluid heats pentane, which drives the turbine, and the plant was designed to put all its potential emissions back into the reservoir, making it one of the first geothermal stations built to be carbon neutral. Microsoft agreed to buy its renewable energy attributes for ten years, which helped Contact decide to build it, and it first supplied the grid in October 2024.",
+  "refs": [
+   1,
+   2,
+   3
+  ]
+ },
+ "facts": [
+  {
+   "k": "other_names",
+   "label": "Other names",
+   "value": "Te Huka Unit 3",
+   "refs": [
+    2
+   ]
+  },
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2024",
+   "refs": [
+    4,
+    1
+   ],
+   "note": "first supplied the grid on 14 October 2024, then ran up to full output after testing"
+  },
+  {
+   "k": "field",
+   "label": "Geothermal field",
+   "value": "Tauhara geothermal field",
+   "refs": [
+    3
+   ],
+   "note": "in the field's central sector (NZGA)"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Waikato",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Taupō",
+   "refs": [
+    6
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Contact Energy",
+   "refs": [
+    4,
+    2
+   ],
+   "note": "Contact Energy Limited, which built it"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    2,
+    4
+   ],
+   "value": "51.4 MW (The EA register's nameplate and Contact's full capacity)"
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Te Huka 3 geothermal power station in New Zealand starts grid supply (15 October 2024)",
+   "publisher": "ThinkGeoEnergy",
+   "url": "https://www.thinkgeoenergy.com/te-huka-3-geothermal-power-station-in-new-zealand-starts-grid-supply/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Contact signs 10-year renewable energy agreement with Microsoft on new geothermal power station at Te Huka (25 May 2023)",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/investor-centre/news/2023/contact-signs-ten-year-renewable-energy-agreement-with-microsoft",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Tauhara Geothermal System",
+   "publisher": "New Zealand Geothermal Association",
+   "url": "https://www.nzgeothermal.org.nz/geothermal-in-nz/nz-geothermal-fields/tauhara/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

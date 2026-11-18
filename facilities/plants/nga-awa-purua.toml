@@ -7,8 +7,14 @@ register = ["G009"]
 wikidata = "Q7021804"
 osm = ["way/167285262"]
 reviewed = ""
-to_check = ["Capacity: Verify rating and unit status."]
-notes = ["144 MW from Jan 2010, 148 MW from Apr 2023."]
+to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+notes = [
+  "144 MW from Jan 2010, 148 MW from Apr 2023.",
+  "Geothermal batch 1 (19 Nov 2026): facts checked against Mercury's station page, the EA register and network supply points table, the NZ Geothermal Association's Rotokawa page and 2023 generation report, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; the grid connection point gives the same. No other district within 5 km.",
+  "Resolved: Capacity: Elenz uses 148 MW from Apr 2023 (the register's 144 MW before; NZGA lists a 3 MW upgrade in 2021). Mercury gives 139 MW installed, NZGA 138–140, Wikipedia 140. The register's and Mercury's figures are shown as ratings.",
+  "Owner: Mercury gives Mercury 65%, Tauhara North No. 2 Trust 35%; Wikipedia's 75/25 is older. The register's operator is the Nga Awa Purua Joint Venture.",
+]
 
 [location]
 value = [-38.614167, 176.184167]
@@ -22,22 +28,42 @@ value = [-38.61411, 176.1793]
 code = "NAP2201 Nga Awa Purua"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026 and the register's connection for Ngā Awa Pūrua"
 
 [facts.other_names]
 value = ["Rotokawa II"]
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "Names the EA register, Wikipedia and Elenz use for this plant; check each."
+source = "wp-nga-awa-purua"
+grade = "B"
+checked = "2026-11-19"
 
 [facts.commissioned]
+value = "2010"
+source = ["mercury-nga-awa-purua", "ea-register"]
+grade = "A"
+checked = "2026-11-19"
+note = "first generated on 18 January 2010 and officially opened on 15 May 2010 (Wikipedia); construction began in May 2008"
+
+[[facts.commissioned.alt]]
 value = "2010"
 source = "wp-list"
 grade = "B"
 checked = ""
 
+[facts.units]
+value = "1 unit"
+source = ["nzga-rotokawa", "wp-nga-awa-purua"]
+grade = "B"
+checked = "2026-11-19"
+note = "one triple-flash steam turbine (Fuji Electric–Sumitomo, Mercury), at one time the largest single-shaft geothermal turbine in the world (NZGA)"
+
 [facts.field]
+value = "Rotokawa geothermal field"
+source = ["mercury-nga-awa-purua", "nzga-rotokawa"]
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.field.alt]]
 value = "Rotokawa field"
 source = "elenz-register"
 grade = "C"
@@ -45,29 +71,54 @@ checked = ""
 
 [facts.region]
 value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
+value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
 value = "Taupō"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Taupō"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Mercury"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Mercury (65%) and Tauhara North No. 2 Trust (35%)"
+source = ["mercury-nga-awa-purua", "ea-register"]
+grade = "A"
+checked = "2026-11-19"
+note = "the register's operator is the Nga Awa Purua Joint Venture; Mercury runs the station"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Ngā Awa Pūrua was built by Mighty River Power, now Mercury, in partnership with the Tauhara North No. 2 Trust, whose members are affiliated to Ngāti Tahu; the trust owns 35% of the station. It stands beside the older Rotokawa station on the Rotokawa field, 14 km northeast of Taupō, and its wells average 2,500 metres deep. Its single triple-flash steam turbine was at one time the largest geothermal turbine in the world, and it first generated in January 2010."
+source = ["mercury-nga-awa-purua", "wp-nga-awa-purua", "nzga-rotokawa", "nzga-generation-2023"]
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 144
+basis = "The EA register's nameplate"
+source = "ea-register"
+grade = "A"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 139
+basis = "Mercury: installed capacity"
+source = "mercury-nga-awa-purua"
+grade = "A"
+checked = "2026-11-19"
 
 [[ratings]]
 value = "149"

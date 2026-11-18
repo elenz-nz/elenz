@@ -7,11 +7,15 @@ register = ["G003"]
 wikidata = "Q7207841"
 osm = ["way/171571719"]
 reviewed = ""
-to_check = [
-  "MW: Elenz 55, Wikipedia 40.",
-  "Capacity: Verify current rating and ownership.",
+to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+notes = [
+  "55 MW.",
+  "Geothermal batch 1 (19 Nov 2026): facts checked against Contact's station page, the EA register and network supply points table, the NZ Geothermal Association's Wairakei page, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikipedia's list, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; the grid connection point gives the same. No other district within 5 km.",
+  "Capacity (open): Elenz uses the register's 55 MW. Contact gives 51 MW, NZGA 50 MW installed, Wikipedia's article 55 MW (its list had 40). Wikipedia says maximum output plateaued just under 52 MW in 2012–15 and has fallen since (unsourced). Worth checking metered half-hour peaks before deciding whether plant_capacity.csv should move to 51.",
+  "Commissioned: Contact and the register say 1997; NZGA and Wikipedia 1996. The page shows 1997.",
+  "Wikipedia's development section (unsourced) names the venture Mercury Geotherm Ltd, a joint venture of Mercury Energy's network company and the landowners' Waituruturu trust, and says the turbine was a Fuji set built for The Geysers in California but never run. Not published: no public source checked yet. NZGA calls the builder the Geotherm Joint Venture.",
 ]
-notes = ["55 MW."]
 
 [location]
 value = [-38.63028, 176.04167]
@@ -25,15 +29,50 @@ value = [-38.62977, 176.04125]
 code = "PPI2201 POIHIPI"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026 and the register's connection for Poihipi"
+
+[facts.other_names]
+value = ["Poihipi Road"]
+source = "contact-poihipi"
+grade = "A"
+checked = "2026-11-19"
+note = "Contact's name for the station"
 
 [facts.commissioned]
+value = "1997"
+source = ["contact-poihipi", "ea-register"]
+grade = "A"
+checked = "2026-11-19"
+note = "the register's start date is 1997-01-01, a year"
+
+[[facts.commissioned.alt]]
+value = "1996"
+source = "nzga-wairakei"
+grade = "B"
+checked = ""
+
+[[facts.commissioned.alt]]
 value = "1997"
 source = "wp-list"
 grade = "B"
 checked = ""
 
+[facts.units]
+value = "1 unit"
+source = "nzga-wairakei"
+grade = "B"
+checked = "2026-11-19"
+note = "one 50 MW Fuji condensing steam turbine (NZGA)"
+
 [facts.field]
+value = "Wairākei geothermal field"
+source = ["contact-poihipi", "nzga-wairakei"]
+grade = "A"
+checked = "2026-11-19"
+note = "on the field's south-western edge; run as part of the Wairakei steamfield since 2006"
+
+[[facts.field.alt]]
 value = "Wairākei–Tauhara field"
 source = "elenz-register"
 grade = "C"
@@ -41,29 +80,61 @@ checked = ""
 
 [facts.region]
 value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
+value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
 value = "Taupō"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Taupō"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Contact"
-source = "ea-register"
+value = "Contact Energy"
+source = ["ea-register", "contact-poihipi"]
+grade = "A"
+checked = "2026-11-19"
+note = "Contact Energy Limited, owner since 2000"
+
+[facts.previous_owners]
+value = "Geotherm Joint Venture, to 2000"
+source = ["nzga-wairakei", "contact-poihipi"]
 grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+checked = "2026-11-19"
+note = "NZGA: built by the Geotherm Joint Venture, which became insolvent for lack of steam; its assets were sold to Contact in 2000 (Contact: bought by Contact in 2000)"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Poihipi was built in the 1990s on the south-western edge of the Wairākei geothermal field, one of several independent geothermal developments that followed the opening of the electricity market. It drew on a thin steam zone through just four wells, and the venture failed for lack of steam; Contact bought the station in 2000. Contact linked it to the main Wairākei steamfield in 2006, and it now runs as part of that system with Te Mihi and Wairākei."
+source = ["nzga-wairakei", "contact-poihipi"]
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 51
+basis = "Contact's station page: capacity"
+source = "contact-poihipi"
+grade = "A"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 50
+basis = "NZ Geothermal Association: installed capacity, one 50 MW unit"
+source = "nzga-wairakei"
+grade = "B"
+checked = "2026-11-19"
 
 [[ratings]]
 value = "40"
