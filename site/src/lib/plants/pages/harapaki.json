@@ -38,12 +38,99 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Harapaki runs along the Maungaharuru Range in Hawke's Bay, about 35 km north-west of Napier. Meridian built it over three years through three cyclones, Covid-19 and supply-chain delays, finishing in July 2024 within a month of the original date and within its $448 million budget. Its 41 turbines can produce up to 176 MW; a foundation design that needed less concrete and an on-site concrete plant cut truck trips from Napier.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2024",
+   "refs": [
+    1
+   ],
+   "note": "first power in November 2023; complete in July 2024"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "41 turbines of 4.3 MW",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "Siemens Gamesa turbines; 176 MW in all"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Hawke's Bay",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Hastings",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Meridian Energy",
+   "refs": [
+    5,
+    1
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Harapaki Wind Farm",
+   "publisher": "Meridian Energy",
+   "url": "https://www.meridianenergy.co.nz/power-stations/wind/harapaki",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Harapaki Wind Farm",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Harapaki_Wind_Farm",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

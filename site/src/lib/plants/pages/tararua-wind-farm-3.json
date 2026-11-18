@@ -19,65 +19,190 @@
    ]
   }
  ],
- "owner": "Contact",
+ "owner": "Mercury",
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Tararua Wind Farm stands on about 700 hectares of farmland on the Tararua Range east of Palmerston North, built in three stages. Stage III, 31 Vestas V90 turbines of 3 MW, opened in September 2007 and made Tararua New Zealand's largest wind farm until Turitea was finished in 2023. Unlike the first two stages it connects straight to Transpower's grid, teed off one circuit of the Bunnythorpe to Linton 220 kV line. Trustpower built it; the farm passed to Tilt Renewables in 2016 and to Mercury in 2021.",
+  "refs": [
+   1,
+   2,
+   3,
+   4
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2007",
+   "refs": [
+    1
+   ],
+   "note": "opened in September 2007"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "31 turbines of 3 MW",
+   "refs": [
+    1,
+    4
+   ],
+   "note": "Vestas V90-3MW turbines; 93 MW in all"
+  },
+  {
+   "k": "scheme",
+   "label": "Scheme",
+   "value": "Tararua Wind Farm",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "stage III of three"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Manawatū-Whanganui",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Mercury",
+   "refs": [
+    1,
+    6
+   ],
+   "note": "since 3 August 2021"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "Trustpower, 2007–2016; Tilt Renewables, 2016–21",
+   "refs": [
+    2,
+    4,
+    6
+   ],
+   "note": "Trustpower moved its wind farms to Tilt Renewables in its demerger of October 2016; Mercury bought Tilt's New Zealand operations on 3 August 2021"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Nz Windfarms (TWC2201)",
+   "refs": [
+    7
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Tararua Wind Farm",
+   "publisher": "Mercury",
+   "url": "https://www.mercury.co.nz/about-us/renewable-energy/wind-generation/tararua-wind-farm",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "New Zealand's largest wind farm turns 20! (media release, 13 February 2020)",
+   "publisher": "Tilt Renewables",
+   "url": "https://tiltrenewables.com/wp-content/uploads/2024/08/New_Zealands_largest_wind_farm_turns_20.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Tararua Wind Farm",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Tararua_Wind_Farm",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Tilt Renewables introduction booklet (2016)",
+   "publisher": "Tilt Renewables",
+   "url": "https://tiltrenewables.com/wp-content/uploads/2024/08/TILT12848_IntroductionBooklet_11F_Web.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Mercury acquires Tilt Renewables' New Zealand operations (NZX, 3 August 2021)",
+   "publisher": "Mercury NZ",
+   "url": "https://www.nzx.com/announcements/376610",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {
-    "slug": "clyde",
-    "name": "Clyde"
+    "slug": "arapuni",
+    "name": "Arapuni"
    },
    {
-    "slug": "glenbrook-ohurua-battery",
-    "name": "Glenbrook-Ohurua Battery"
+    "slug": "aratiatia",
+    "name": "Aratiatia"
    },
    {
-    "slug": "kowhai-park-solar-farm",
-    "name": "Kōwhai Park Solar Farm"
+    "slug": "kaiwera-downs-stage-2",
+    "name": "Kaiwera Downs (Stage 2)"
    },
    {
-    "slug": "matahina",
-    "name": "Matahina"
+    "slug": "karapiro",
+    "name": "Karāpiro"
    },
    {
-    "slug": "poihipi",
-    "name": "Poihipi"
+    "slug": "kawerau",
+    "name": "Kawerau"
    },
    {
-    "slug": "roxburgh",
-    "name": "Roxburgh"
+    "slug": "maraetai",
+    "name": "Maraetai"
    },
    {
-    "slug": "stratford",
-    "name": "Stratford"
+    "slug": "nga-awa-purua",
+    "name": "Ngā Awa Pūrua"
    },
    {
-    "slug": "tauhara",
-    "name": "Tauhara"
+    "slug": "nga-tamariki",
+    "name": "Ngā Tamariki"
    },
    {
-    "slug": "te-mihi",
-    "name": "Te Mihi"
+    "slug": "ohakuri",
+    "name": "Ōhakuri"
    },
    {
-    "slug": "waipori-2a-3-4",
-    "name": "Waipori (2A/3/4)"
+    "slug": "turitea-wind-farm",
+    "name": "Turitea Wind Farm"
    },
    {
-    "slug": "wairakei",
-    "name": "Wairākei"
+    "slug": "waipipi",
+    "name": "Waipipi"
    },
    {
-    "slug": "whirinaki",
-    "name": "Whirinaki"
+    "slug": "whakamaru",
+    "name": "Whakamaru"
    }
   ],
   "owner_all": false,

@@ -7,13 +7,48 @@ register = ["W026"]
 osm = ["relation/17250859"]
 reviewed = ""
 to_check = [
-  "No Wikipedia row: use the operator's pages.",
-  "No location yet.",
   "Location: no station point yet (OpenStreetMap is research only); check one against the LINZ aerial or Wikidata.",
+  "District: stage 2 is south-east of stage 1, towards Clutha District; test its own point once located (Gore District for stage 1).",
 ]
-notes = ["Two plants: stage 1 (43 MW, GOR0331, Aug 2023) and stage 2 (155 MW, KIW2201, Mar 2026). Split from W022."]
+notes = [
+  "Kaiwera Downs is two Elenz plants: stage 1 (43 MW, GOR0331, from Aug 2023) and stage 2 (155 MW, KIW2201, from Apr 2026).",
+  "Mercury's wind farm page has slips: stage 1 \"Commissioned in 2013\" (its text says November 2023), \"12km north-west of Gore\" (its fact sheet: 15 km south-east), and stage 2 \"35 wind turbines with an installed capacity of 43MW\" (elsewhere 36 and 155 MW). Facts here use the fact sheet, the September 2026 release and the page's consistent figures.",
+  "Previous owners: none for the station. Trustpower proposed the project and won consent in 2008; it passed to Tilt Renewables, and Mercury bought it with Tilt's New Zealand development options in 2021 before building it (Wikipedia; NZX, 3 Aug 2021).",
+  "Removed the scheme fact (Southland, from our own register) and published \"Kaiwera Downs Wind Farm\" as the scheme, joining the two stages.",
+  "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. It has no location yet.",
+  "Region: Mercury's fact sheet thanks Environment Southland for stage 2, and Wikipedia's point for the farm has only Southland Region within 5 km; published Southland. District left open.",
+  "Grid connection: KIW2201 has no coordinates in the EA's network supply points table, so no [grid_connection] yet; about 4 km of 220 kV line to Transpower's North Makarewa to Three Mile Hill line (fact sheet; Wikipedia).",
+  "Resolved: Capacity: Mercury gives 36 turbines and 155 MW, matching Elenz and the register. Elenz starts it on 31 Mar 2026, the register row on 1 Apr 2026; Mercury says it first generated in April 2026.",
+]
+
+[facts.commissioned]
+value = "2026"
+source = ["mercury-kaiwera-downs-2026", "mercury-kaiwera-downs"]
+grade = "A"
+checked = "2026-11-19"
+note = "first power in April 2026; opened on 9 September 2026"
+
+[[facts.commissioned.alt]]
+value = "2026"
+source = "wp-kaiwera-downs"
+grade = "B"
+checked = ""
+
+[facts.units]
+value = "36 turbines of 4.3 MW"
+source = ["mercury-kaiwera-downs-factsheet", "mercury-kaiwera-downs-2026"]
+grade = "A"
+checked = "2026-11-19"
+note = "Vestas V136 turbines; 155 MW in all"
 
 [facts.scheme]
+value = "Kaiwera Downs Wind Farm"
+source = ["mercury-kaiwera-downs", "mercury-kaiwera-downs-2026"]
+grade = "A"
+checked = "2026-11-19"
+note = "stage 2 of two"
+
+[[facts.scheme.alt]]
 value = "Southland"
 source = "elenz-register"
 grade = "C"
@@ -21,20 +56,24 @@ checked = ""
 
 [facts.region]
 value = "Southland"
+source = ["mercury-kaiwera-downs-factsheet", "statsnz-regc-2025"]
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
+value = "Southland"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.owner]
 value = "Mercury"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+source = ["ea-register", "mercury-kaiwera-downs-2026"]
+grade = "A"
+checked = "2026-11-19"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "The second stage of Kaiwera Downs, on land south-east of the first, added 36 Vestas turbines of 4.3 MW (155 MW), taller than stage 1's at 156 m to the blade tip. Mercury went ahead after agreeing in 2024 to supply the Tiwai Point aluminium smelter, began building in June 2024, first generated in April 2026 and opened it in September 2026. With both stages Kaiwera Downs is, at 198 MW, the South Island's largest wind farm."
+source = ["mercury-kaiwera-downs-2026", "mercury-kaiwera-downs-factsheet", "mercury-kaiwera-downs"]
+grade = "B"
+checked = "2026-11-19"

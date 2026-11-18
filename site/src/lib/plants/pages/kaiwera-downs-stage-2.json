@@ -23,12 +23,104 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "The second stage of Kaiwera Downs, on land south-east of the first, added 36 Vestas turbines of 4.3 MW (155 MW), taller than stage 1's at 156 m to the blade tip. Mercury went ahead after agreeing in 2024 to supply the Tiwai Point aluminium smelter, began building in June 2024, first generated in April 2026 and opened it in September 2026. With both stages Kaiwera Downs is, at 198 MW, the South Island's largest wind farm.",
+  "refs": [
+   1,
+   2,
+   3
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2026",
+   "refs": [
+    1,
+    3
+   ],
+   "note": "first power in April 2026; opened on 9 September 2026"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "36 turbines of 4.3 MW",
+   "refs": [
+    2,
+    1
+   ],
+   "note": "Vestas V136 turbines; 155 MW in all"
+  },
+  {
+   "k": "scheme",
+   "label": "Scheme",
+   "value": "Kaiwera Downs Wind Farm",
+   "refs": [
+    3,
+    1
+   ],
+   "note": "stage 2 of two"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Southland",
+   "refs": [
+    2,
+    4
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Mercury",
+   "refs": [
+    5,
+    1
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Mercury opens $486 million Kaiwera Downs Wind Farm expansion (9 September 2026)",
+   "publisher": "Mercury",
+   "url": "https://www.mercury.co.nz/media/News%20Release%20Kaiwera%20Downs%20Wind%20Farm%20Celebration%20Event%20FINAL.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Kaiwera Downs Wind Farm stage 2 fact sheet",
+   "publisher": "Mercury",
+   "url": "https://www.mercury.co.nz/kaiwera-downs-wind-farm-fact-sheet",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Kaiwera Downs Wind Farm",
+   "publisher": "Mercury",
+   "url": "https://www.mercury.co.nz/about-us/renewable-energy/wind-generation/kaiwera-downs-wind-farm",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {
@@ -38,14 +130,6 @@
    {
     "slug": "aratiatia",
     "name": "Aratiatia"
-   },
-   {
-    "slug": "atiamuri",
-    "name": "Ātiamuri"
-   },
-   {
-    "slug": "kaiwaikawe-wind-farm",
-    "name": "Kaiwaikawe Wind Farm"
    },
    {
     "slug": "karapiro",
@@ -72,8 +156,16 @@
     "name": "Ōhakuri"
    },
    {
+    "slug": "tararua-wind-farm-3",
+    "name": "Tararua Wind Farm 3"
+   },
+   {
     "slug": "turitea-wind-farm",
     "name": "Turitea Wind Farm"
+   },
+   {
+    "slug": "waipipi",
+    "name": "Waipipi"
    },
    {
     "slug": "whakamaru",

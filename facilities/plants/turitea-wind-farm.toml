@@ -8,12 +8,17 @@ wikidata = "Q7854981"
 osm = ["relation/13560722"]
 reviewed = ""
 to_check = [
-  "Previous Wikipedia location was 26 km away",
-  "Capacity: Verify stage capacity.",
+  "Location: confirm the point sits on the wind farm against the LINZ aerial (separate task).",
 ]
 notes = [
   "W009: Elenz shows Turitea as one plant: 118.8 MW from Aug 2021, 221.4 MW from Apr 2023.",
   "W010: See W009.",
+  "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the [location] point (not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. Tararua District is within 5 km, not within 2 km; the grid connection (Linton) is also in Palmerston North City.",
+  "Resolved: \"Previous Wikipedia location was 26 km away\": Wikipedia's point now matches Wikidata's (used here).",
+  "Resolved: Capacity: Mercury gives 60 Vestas V112 turbines and 222 MW; the register 222 MW; Elenz 221.4 MW (33 x 3.6 + 27 x 3.8, Wikipedia). Stations: northern 118.8 MW, southern 102.6 MW. Peak metered half-hour, Aug-Sep 2026: 212.2 MW.",
+  "Removed the scheme fact (Tararua Range, from our own register): a single wind farm has no scheme.",
+  "Previous owners: none. Mercury was called Mighty River Power until 2016 (nzx-mcy); the same company.",
 ]
 
 [location]
@@ -28,40 +33,56 @@ value = [-40.41045, 175.63139]
 code = "LTN2201 TURITEA"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code matches the EA's network supply points table of 17 Nov 2026; its point is Transpower's Linton substation, where the 220 kV line from the farm ends"
 
 [facts.commissioned]
-value = "2021 (stage 1) 2023 (stage 2)"
-source = "wp-list"
+value = "2021 (northern stage), 2023 (southern stage)"
+source = ["wp-turitea", "mercury-turitea"]
 grade = "B"
+checked = "2026-11-19"
+note = "first power on 30 July 2021; formally opened in May 2023"
+
+[[facts.commissioned.alt]]
+value = "2023"
+source = "mercury-turitea"
+grade = "A"
 checked = ""
+note = "Mercury: commissioned 2023"
 
 [[facts.commissioned.alt]]
 value = "2021"
 source = "ea-register"
 grade = "A"
 checked = ""
-note = "the register's start date, 2021-01-01: often a year, not the day"
+note = "the register's start date, 2021-01-01"
 
 [facts.units]
-value = "60 turbines"
-source = "wp-list"
+value = "60 turbines: 33 of 3.6 MW, 27 of 3.8 MW"
+source = ["mercury-turitea", "wp-turitea"]
 grade = "B"
-checked = ""
-
-[facts.scheme]
-value = "Tararua Range"
-source = "elenz-register"
-grade = "C"
-checked = ""
+checked = "2026-11-19"
+note = "Vestas V112 turbines"
 
 [facts.region]
+value = "Manawatū-Whanganui"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
 value = "Manawatū-Whanganui"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
+value = "Palmerston North"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
 value = "Palmerston North / Turitea"
 source = "wp-list"
 grade = "B"
@@ -69,39 +90,39 @@ checked = ""
 
 [facts.owner]
 value = "Mercury"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+source = ["ea-register", "mercury-turitea"]
+grade = "A"
+checked = "2026-11-19"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Turitea stands on the Tararua Range above Palmerston North, much of it in the city council's Turitea Reserve. The council chose Mercury, then Mighty River Power, to develop it in 2005, and after a long consent process a board of inquiry approved 60 turbines in 2011. The 33-turbine northern stage first generated in July 2021 and the 27-turbine southern stage followed; at 222 MW it was New Zealand's largest wind farm when it opened in May 2023. A 12 km, 220 kV line carries its power to Transpower's Linton substation."
+source = ["wp-turitea", "mercury-turitea"]
+grade = "B"
+checked = "2026-11-19"
 
 [[ratings]]
-value = "222"
-basis = "Wikipedia (basis not stated)"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = 222
+basis = "Mercury and the EA register: maximum capacity"
+source = ["mercury-turitea", "ea-register"]
+grade = "A"
+checked = "2026-11-19"
 
 [[stations]]
 value = "Turitea North"
 id = "W009"
-source = "elenz-register"
-grade = "C"
-checked = ""
-mw = 119
-commissioned = "2021 (stage 1) 2023 (stage 2)"
+mw = 118.8
+commissioned = "2021"
+source = "wp-turitea"
+grade = "B"
+checked = "2026-11-19"
+note = "33 Vestas V112 turbines of 3.6 MW"
 
 [[stations]]
 value = "Turitea South"
 id = "W010"
-source = "elenz-register"
-grade = "C"
-checked = ""
-mw = 102
-commissioned = "2021 (stage 1) 2023 (stage 2)"
+mw = 102.6
+commissioned = "2023"
+source = "wp-turitea"
+grade = "B"
+checked = "2026-11-19"
+note = "27 Vestas V112 turbines of 3.8 MW"

@@ -57,12 +57,114 @@
  "scheme": null,
  "metered": "Its first 16 months, May 2014 to August 2015, aren't in metered generation or embedded generation. They come from Meridian's injection at Wilton in the reconciliation data.",
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Mill Creek is in the hills above the Ōhāriu Valley, north-west of Wellington, on private farms whose owners chose wind farming over a housing subdivision or forestry and picked Meridian to build it. Plans for 31 turbines were cut to 26 by the Environment Court in 2011. Building began in 2012, with about 800,000 cubic metres of earthworks and 19 km of tracks, and the 26 turbines (59.8 MW) were fully running in 2014, feeding the grid at Transpower's Wilton substation.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2014",
+   "refs": [
+    1
+   ],
+   "note": "first power in May 2014; fully running from October 2014"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "26 turbines of 2.3 MW",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "Siemens SWT-2.3-82 VS turbines; 59.8 MW in all"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Wellington",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Wellington City",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Meridian Energy",
+   "refs": [
+    5,
+    1
+   ]
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Wilton (WIL0331)",
+   "refs": [
+    6
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Mill Creek wind farm",
+   "publisher": "Meridian Energy",
+   "url": "https://www.meridianenergy.co.nz/power-stations/wind/mill-creek",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Mill Creek Wind Farm",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Mill_Creek_Wind_Farm",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

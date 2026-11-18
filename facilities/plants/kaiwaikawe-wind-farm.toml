@@ -8,10 +8,17 @@ wikidata = "Q108122994"
 osm = ["relation/19754078"]
 reviewed = ""
 to_check = [
-  "No Wikipedia row: use the operator's pages.",
-  "Location is the grid connection, not the station.",
+  "Location: confirm the point sits on the wind farm against the LINZ aerial (separate task).",
+  "Capacity: Elenz uses 74 MW; the register gives 77 MW and Mercury 12 x 6.4 MW (76.8 MW). A design decision for the Elenz team.",
 ]
-notes = ["Added from Elenz's plant list (8 Nov 2026)."]
+notes = [
+  "Added from Elenz's plant list (8 Nov 2026).",
+  "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the [location] point (not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. No other district within 2 km. The old to-check item said this was the grid connection: it isn't. The point is near Dargaville; the grid connection, Maungatapere, is about 45 km east in Whangārei District.",
+  "Capacity: Elenz's 74 MW came from Wikipedia's list; the EA register (from 13 Jul 2026) gives 77 MW, as do Wikipedia's article and 12 x 6.4 MW = 76.8 MW (Mercury). Tilt's 2021 offtake release said 75 MW. Left at 74 pending a decision; final commissioning continues to early 2027.",
+  "Offtake: Tilt signed a 20-year agreement for Genesis to buy its output in 2021 (NZX, 3 Aug 2021); the register lists Mercury as operator. Not published until checked against a current source.",
+  "Not in Generation_MD for Aug-Sep 2026 (no metered peak to compare).",
+]
 
 [location]
 value = [-35.869056, 173.730792]
@@ -25,24 +32,70 @@ value = [-35.76637, 174.20718]
 code = "MPE1101 MAUNGATAPERE"
 source = "ea-nsp"
 grade = "A"
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026; the farm connects to Northpower's substation near Dargaville, then to the grid here"
+
+[facts.other_names]
+value = ["Omamari"]
+source = "wp-kaiwaikawe"
+grade = "B"
+checked = "2026-11-19"
+note = "the project's name when consent was sought in 2021"
+
+[facts.commissioned]
+value = "2026"
+source = "mercury-kaiwaikawe"
+grade = "A"
+checked = "2026-11-19"
+note = "first power in July 2026; final commissioning continues to early 2027"
+
+[[facts.commissioned.alt]]
+value = "2026"
+source = "ea-register"
+grade = "A"
 checked = ""
+note = "the register row starts 2026-07-13"
+
+[facts.units]
+value = "12 turbines of 6.4 MW"
+source = "mercury-kaiwaikawe"
+grade = "A"
+checked = "2026-11-19"
+note = "Vestas V162-6.4 MW turbines, 206 m to the blade tip"
 
 [facts.region]
+value = "Northland"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
 value = "Northland"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
+[facts.territorial_authority]
+value = "Kaipara"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
 [facts.owner]
 value = "Mercury"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+source = ["ea-register", "mercury-kaiwaikawe"]
+grade = "A"
+checked = "2026-11-19"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Kaiwaikawe Wind Farm is 12 km north-west of Dargaville in Northland and 3 km inland from the Tasman Sea, with its 12 turbines in two clusters. They are Vestas V162 machines of 6.4 MW, 206 m to the blade tip, the first of their kind built in New Zealand and its largest and tallest wind turbines. Tilt Renewables first proposed it, as Omamari, and Mercury took it over in 2021; it first generated in July 2026, sending its power through Northpower's substation near Dargaville to the grid at Maungatapere."
+source = ["mercury-kaiwaikawe", "wp-kaiwaikawe"]
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 77
+basis = "The EA register's nameplate (12 turbines of 6.4 MW, 76.8 MW, Mercury)"
+source = ["ea-register", "mercury-kaiwaikawe"]
+grade = "A"
+checked = "2026-11-19"

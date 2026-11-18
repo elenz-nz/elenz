@@ -7,8 +7,18 @@ register = ["W006"]
 wikidata = "Q7691000"
 osm = ["relation/12165811"]
 reviewed = ""
-to_check = ["Capacity: NZWEA indicative figure; confirm installed/export capacity."]
-notes = ["64.4 MW."]
+to_check = [
+  "Location: confirm the point sits on the wind farm against the LINZ aerial (separate task).",
+]
+notes = [
+  "64.4 MW.",
+  "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the [location] point (not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. No other district within 5 km.",
+  "Resolved: Capacity: Meridian gives 28 turbines and 64.4 MW, matching Elenz and the register.",
+  "Commissioning: Meridian's page says fully operational in 2010; its release of 10 February 2011 says the first turbine went live on 13 November 2010 (Elenz has output from Nov 2010), 17 of 28 were generating when the Prime Minister switched it on that day, and all 28 were expected by early March 2011. Wikipedia: fully operational 10 March 2011. Published 2011.",
+  "Ownership: Wikipedia says WEL Networks and Meridian own it jointly. Meridian's page and its 2011 release describe an alliance: Meridian built and runs the turbines, WEL built and runs the 33 kV line. The EA register names Meridian. Published Meridian, with the alliance in the about text.",
+  "Removed the scheme fact (Waikato, from our own register): a single wind farm has no scheme.",
+]
 
 [location]
 value = [-37.8783, 174.963]
@@ -22,27 +32,44 @@ value = [-37.73833, 175.15414]
 code = "TWH0331 TE KOWHAI"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
 value = "2011"
-source = "wp-list"
+source = ["meridian-te-uku-2011", "ea-register"]
+grade = "A"
+checked = "2026-11-19"
+note = "the first turbine went live on 13 November 2010; switched on formally in February 2011"
+
+[[facts.commissioned.alt]]
+value = "2010"
+source = "meridian-te-uku"
+grade = "A"
+checked = ""
+note = "Meridian's page: fully operational in 2010"
+
+[[facts.commissioned.alt]]
+value = "2011"
+source = "wp-te-uku"
 grade = "B"
 checked = ""
+note = "fully operational 10 March 2011"
 
 [facts.units]
-value = "28 turbines"
-source = "wp-list"
-grade = "B"
-checked = ""
-
-[facts.scheme]
-value = "Waikato"
-source = "elenz-register"
-grade = "C"
-checked = ""
+value = "28 turbines of 2.3 MW"
+source = ["meridian-te-uku", "meridian-te-uku-2011"]
+grade = "A"
+checked = "2026-11-19"
+note = "Siemens turbines; 64.4 MW in all"
 
 [facts.region]
+value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
 value = "Waikato"
 source = "elenz-register"
 grade = "C"
@@ -50,20 +77,25 @@ checked = ""
 
 [facts.territorial_authority]
 value = "Waikato"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Waikato"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Meridian"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Meridian Energy"
+source = ["ea-register", "meridian-te-uku"]
+grade = "A"
+checked = "2026-11-19"
+note = "built in an alliance with WEL Networks, which owns the line to the grid"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Te Uku sits on the Wharauroa Plateau near Raglan, on a working sheep and cattle farm that rises above 400 m. It was built as an alliance with the community-owned lines company WEL Networks: Meridian built and runs the 28 turbines, and WEL built the 25 km, 33 kV line that carries their power to its network and the grid. The first turbine went live in November 2010, and the Prime Minister formally switched the wind farm on in February 2011."
+source = ["meridian-te-uku", "meridian-te-uku-2011"]
+grade = "B"
+checked = "2026-11-19"

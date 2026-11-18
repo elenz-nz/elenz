@@ -169,21 +169,21 @@
    "title": "Regional Council 2025 (boundaries)",
    "publisher": "Stats NZ",
    "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
-   "opened": "2026-11-18"
+   "opened": "2026-11-19"
   },
   {
    "n": 7,
    "title": "Territorial Authority 2026 (boundaries)",
    "publisher": "Stats NZ",
    "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
-   "opened": "2026-11-18"
+   "opened": "2026-11-19"
   },
   {
    "n": 8,
    "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
-   "opened": "2026-11-18"
+   "opened": "2026-11-19"
   },
   {
    "n": 9,
@@ -204,7 +204,7 @@
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
-   "opened": "2026-11-18"
+   "opened": "2026-11-19"
   }
  ],
  "related": {
@@ -234,12 +234,12 @@
     "name": "Stratford"
    },
    {
-    "slug": "tararua-wind-farm-3",
-    "name": "Tararua Wind Farm 3"
-   },
-   {
     "slug": "tauhara",
     "name": "Tauhara"
+   },
+   {
+    "slug": "te-huka-3",
+    "name": "Te Huka 3"
    },
    {
     "slug": "te-mihi",

@@ -8,8 +8,16 @@ wikidata = "Q7690758"
 osm = ["relation/3666831"]
 reviewed = ""
 photo_leads = ["P023"]
-to_check = ["Capacity: Capacity to verify; early NZ wind farm."]
-notes = ["90 MW from Jul 2004."]
+to_check = [
+  "Location: confirm the point sits on the wind farm against the LINZ aerial (separate task).",
+]
+notes = [
+  "90 MW from Jul 2004.",
+  "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the [location] point (not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. Palmerston North City and Manawatū District are within 5 km, not within 2 km; the grid connection (Woodville) is also in Tararua District.",
+  "Resolved: Capacity: Meridian gives 90.75 MW (55 x 1.65 MW); Elenz and the register use 90 MW. Kept 90 with 90.75 as a rating. Peak metered half-hour, Aug-Sep 2026: 57 MW, and output has fallen since 2024 (258 GWh a year expected; 187 GWh in 2025): worth a look later, not a page fact.",
+  "Removed the scheme fact (Tararua Range, from our own register): a single wind farm has no scheme.",
+]
 
 [location]
 value = [-40.2961, 175.808]
@@ -23,55 +31,75 @@ value = [-40.31546, 175.85607]
 code = "WDV1101 WOODVILLE"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
 value = "2004"
-source = "wp-list"
+source = "meridian-te-apiti"
+grade = "A"
+checked = "2026-11-19"
+note = "construction began in 2003"
+
+[[facts.commissioned.alt]]
+value = "2004"
+source = "ea-register"
+grade = "A"
+checked = ""
+note = "the register's start date, 2004-01-01: a year, not the day"
+
+[[facts.commissioned.alt]]
+value = "December 2004"
+source = "wp-te-apiti"
 grade = "B"
 checked = ""
 
 [facts.units]
-value = "55 turbines"
-source = "wp-list"
+value = "55 turbines of 1.65 MW"
+source = ["meridian-te-apiti", "wp-te-apiti"]
 grade = "B"
-checked = ""
-
-[facts.scheme]
-value = "Tararua Range"
-source = "elenz-register"
-grade = "C"
-checked = ""
+checked = "2026-11-19"
+note = "Vestas NM72 turbines; 90.75 MW in all"
 
 [facts.region]
+value = "Manawatū-Whanganui"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
 value = "Manawatū-Whanganui"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
+value = "Tararua"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
 value = "Palmerston North / Tararua"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Meridian"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Meridian Energy"
+source = ["ea-register", "meridian-te-apiti"]
+grade = "A"
+checked = "2026-11-19"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Te Āpiti stands on farmland just north of the Manawatū Gorge, where the gap between the Ruahine and Tararua ranges funnels the westerly winds. Built from 2003 and fully running in 2004, it was Meridian's first wind farm and the first in New Zealand to connect straight to the national grid, through a 4.5 km line to Transpower's Woodville substation. Its 55 turbines can produce up to 90.75 MW; when they reached the end of their original design life in 2024, Meridian chose to extend their life rather than replace them."
+source = ["meridian-te-apiti", "wp-te-apiti"]
+grade = "B"
+checked = "2026-11-19"
 
 [[ratings]]
-value = "91"
-basis = "Wikipedia (basis not stated)"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = 90.75
+basis = "Meridian: 55 turbines of 1.65 MW"
+source = ["meridian-te-apiti", "wp-te-apiti"]
+grade = "A"
+checked = "2026-11-19"

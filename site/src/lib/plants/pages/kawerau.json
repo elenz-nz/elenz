@@ -40,14 +40,6 @@
     "name": "Aratiatia"
    },
    {
-    "slug": "atiamuri",
-    "name": "Ātiamuri"
-   },
-   {
-    "slug": "kaiwaikawe-wind-farm",
-    "name": "Kaiwaikawe Wind Farm"
-   },
-   {
     "slug": "kaiwera-downs-stage-2",
     "name": "Kaiwera Downs (Stage 2)"
    },
@@ -72,8 +64,16 @@
     "name": "Ōhakuri"
    },
    {
+    "slug": "tararua-wind-farm-3",
+    "name": "Tararua Wind Farm 3"
+   },
+   {
     "slug": "turitea-wind-farm",
     "name": "Turitea Wind Farm"
+   },
+   {
+    "slug": "waipipi",
+    "name": "Waipipi"
    },
    {
     "slug": "whakamaru",

@@ -332,7 +332,7 @@
    "status": "operating",
    "mw": 176.0,
    "owner": "Meridian",
-   "commissioned": null,
+   "commissioned": "2024",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -479,7 +479,7 @@
    "status": "operating",
    "mw": 74.0,
    "owner": "Mercury",
-   "commissioned": null,
+   "commissioned": "2026",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -498,7 +498,7 @@
    "status": "operating",
    "mw": 155.0,
    "owner": "Mercury",
-   "commissioned": null,
+   "commissioned": "2026",
    "closed": null,
    "reviewed": false,
    "pt": null
@@ -512,7 +512,7 @@
    "status": "operating",
    "mw": 43.0,
    "owner": "Mercury",
-   "commissioned": null,
+   "commissioned": "2023",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -758,8 +758,8 @@
    "island": "SI",
    "status": "operating",
    "mw": 36.0,
-   "owner": "Contact",
-   "commissioned": null,
+   "owner": "Mercury",
+   "commissioned": "2011",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -873,7 +873,7 @@
    "status": "operating",
    "mw": 60.0,
    "owner": "Meridian",
-   "commissioned": null,
+   "commissioned": "2014",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1480,8 +1480,8 @@
    "island": "NI",
    "status": "operating",
    "mw": 36.0,
-   "owner": "Contact",
-   "commissioned": null,
+   "owner": "Mercury",
+   "commissioned": "1999",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1499,8 +1499,8 @@
    "island": "NI",
    "status": "operating",
    "mw": 37.0,
-   "owner": "Contact",
-   "commissioned": null,
+   "owner": "Mercury",
+   "commissioned": "2004",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1518,8 +1518,8 @@
    "island": "NI",
    "status": "operating",
    "mw": 93.0,
-   "owner": "Contact",
-   "commissioned": null,
+   "owner": "Mercury",
+   "commissioned": "2007",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1576,7 +1576,7 @@
    "status": "operating",
    "mw": 90.0,
    "owner": "Meridian",
-   "commissioned": null,
+   "commissioned": "2004",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1727,8 +1727,8 @@
    "island": "NI",
    "status": "operating",
    "mw": 48.5,
-   "owner": "Other generators",
-   "commissioned": null,
+   "owner": "Meridian",
+   "commissioned": "2006",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1747,7 +1747,7 @@
    "status": "operating",
    "mw": 64.4,
    "owner": "Meridian",
-   "commissioned": null,
+   "commissioned": "2011",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1842,7 +1842,7 @@
    "status": "operating",
    "mw": 221.4,
    "owner": "Mercury",
-   "commissioned": null,
+   "commissioned": "2021",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1917,8 +1917,8 @@
    "island": "NI",
    "status": "operating",
    "mw": 133.0,
-   "owner": "Genesis",
-   "commissioned": null,
+   "owner": "Mercury",
+   "commissioned": "2021",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1994,7 +1994,7 @@
    "status": "operating",
    "mw": 142.6,
    "owner": "Meridian",
-   "commissioned": null,
+   "commissioned": "2009",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -2070,7 +2070,7 @@
    "status": "operating",
    "mw": 58.0,
    "owner": "Meridian",
-   "commissioned": null,
+   "commissioned": "2007",
    "closed": null,
    "reviewed": false,
    "pt": {

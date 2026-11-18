@@ -100,7 +100,7 @@
 	<dt>By owner</dt>
 	<dd>
 		<p>Each plant’s operator in the Electricity Authority’s register, grouped as Meridian, Contact, Mercury, Genesis, Nova and other generators. Batteries count with their owner. Other embedded generation has one row per island.</p>
-		<p>Contact includes Manawa Energy, formerly Trustpower, which it <a href={ref('manawa')}>took over in July 2025</a>. Mercury includes Ngā Awa Pūrua, which it operates. We set the owner by hand for plants the register doesn’t list, and for plants seen only in the metered history. We also set it for Kinleith: the register’s operator is Manawa, but Oji Fibre Solutions owns it, so it counts under other generators.</p>
+		<p>Contact includes Manawa Energy, formerly Trustpower, which it <a href={ref('manawa')}>took over in July 2025</a>. Mercury includes Ngā Awa Pūrua, which it operates. We set the owner by hand for plants the register doesn’t list, and for plants seen only in the metered history. We also set it for Kinleith: the register’s operator is Manawa, but Oji Fibre Solutions owns it, so it counts under other generators. And we set it for six wind farms the register lists under another company: Tararua’s three stages and Mahinerangi (listed under Manawa) and Waipipi (listed under Genesis, which buys its output) count under Mercury, which bought them from Tilt Renewables in 2021, and Te Rere Hau (listed under NZ Windfarms) counts under Meridian, which bought NZ Windfarms in 2025.</p>
 	</dd>
 </dl>
 <p>When a fuel or group is opened, other embedded generation shows one row per island, like embedded solar. The lists of owners and hydro schemes are in <a href={REPO + 'facilities/overrides.toml'}><code>facilities/overrides.toml</code></a>.</p>

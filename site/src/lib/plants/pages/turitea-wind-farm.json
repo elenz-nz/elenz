@@ -42,12 +42,132 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Turitea stands on the Tararua Range above Palmerston North, much of it in the city council's Turitea Reserve. The council chose Mercury, then Mighty River Power, to develop it in 2005, and after a long consent process a board of inquiry approved 60 turbines in 2011. The 33-turbine northern stage first generated in July 2021 and the 27-turbine southern stage followed; at 222 MW it was New Zealand's largest wind farm when it opened in May 2023. A 12 km, 220 kV line carries its power to Transpower's Linton substation.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2021 (northern stage), 2023 (southern stage)",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "first power on 30 July 2021; formally opened in May 2023"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "60 turbines: 33 of 3.6 MW, 27 of 3.8 MW",
+   "refs": [
+    2,
+    1
+   ],
+   "note": "Vestas V112 turbines"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Manawatū-Whanganui",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Palmerston North",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Mercury",
+   "refs": [
+    5,
+    2
+   ]
+  },
+  {
+   "k": "stations",
+   "label": "Stations",
+   "refs": [
+    1
+   ],
+   "value": "Turitea North (118.8 MW), Turitea South (102.6 MW)"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    2,
+    5
+   ],
+   "value": "222 MW (Mercury and the EA register: maximum capacity)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Turitea (LTN2201)",
+   "refs": [
+    6
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Turitea Wind Farm",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Turitea_Wind_Farm",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Turitea Wind Farm",
+   "publisher": "Mercury",
+   "url": "https://www.mercury.co.nz/about-us/renewable-energy/wind-generation/turitea-wind-farm",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {
@@ -57,14 +177,6 @@
    {
     "slug": "aratiatia",
     "name": "Aratiatia"
-   },
-   {
-    "slug": "atiamuri",
-    "name": "Ātiamuri"
-   },
-   {
-    "slug": "kaiwaikawe-wind-farm",
-    "name": "Kaiwaikawe Wind Farm"
    },
    {
     "slug": "kaiwera-downs-stage-2",
@@ -93,6 +205,14 @@
    {
     "slug": "ohakuri",
     "name": "Ōhakuri"
+   },
+   {
+    "slug": "tararua-wind-farm-3",
+    "name": "Tararua Wind Farm 3"
+   },
+   {
+    "slug": "waipipi",
+    "name": "Waipipi"
    },
    {
     "slug": "whakamaru",

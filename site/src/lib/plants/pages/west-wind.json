@@ -23,12 +23,122 @@
  "scheme": null,
  "metered": "It generates onto two buses (WWD1102 and WWD1103), so it can be split by grid connection. The dispatch data's West Wind 1 and 2 are one wind farm.",
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "West Wind stands on the coastal hills at Mākara, west of Wellington, where Cook Strait funnels strong, steady winds. Meridian began building it in 2007, bringing the turbine parts in through a temporary wharf at Oteranga Bay and 33 km of new roads to keep them off the city's streets. Its 62 turbines, up to 142.6 MW, were fully running in 2009, and a public recreation area lets visitors walk and bike among them.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2009",
+   "refs": [
+    1
+   ],
+   "note": "construction began in 2007; the first 15 turbines were switched on in April 2009"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "62 turbines of 2.3 MW",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "Siemens SWT-2.3-82 VS turbines; 142.6 MW in all"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Wellington",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Wellington City",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Meridian Energy",
+   "refs": [
+    5,
+    1
+   ]
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    5
+   ],
+   "value": "160 MW (The EA register's nameplate: two rows of 80 MW, one for each grid connection)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Westwind; Wwd1103 Westwind (WWD1102)",
+   "refs": [
+    6
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "West Wind farm",
+   "publisher": "Meridian Energy",
+   "url": "https://www.meridianenergy.co.nz/power-stations/wind/west-wind",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "West Wind Wind Farm",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Project_West_Wind",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {
