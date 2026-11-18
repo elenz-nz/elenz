@@ -23,12 +23,98 @@
  "scheme": null,
  "metered": "The register lists it as gas. We show it as bioenergy: Oji Fibre Solutions' cogeneration runs on wood waste and black liquor, with natural gas as a secondary fuel.",
  "checking": true,
- "checked": null,
+ "checked": "2026-11-19",
  "about": null,
- "facts": [],
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1997",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "Carter Holt Harvey's court papers: installed in 1997 (NZ Herald); the EA's metered data has its output from August 1997"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Waikato",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "South Waikato",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    5
+   ],
+   "value": "40 MW (Genesis's portfolio as the Commerce Commission listed it in 2003)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Kinleith (KIN0112)",
+   "refs": [
+    6
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Carter Holt Harvey weighs in for court bout",
+   "publisher": "NZ Herald",
+   "url": "https://www.nzherald.co.nz/business/companies/energy/carter-holt-harvey-weighs-in-for-court-bout/PLNTBP6E2VWNXCJMV4IRH4FQH4/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "List of power stations in New Zealand",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Decision 490: Genesis Power Limited and Natural Gas Corporation Holdings Limited (4 February 2003)",
+   "publisher": "Commerce Commission",
+   "url": "https://www.comcom.govt.nz/__data/assets/pdf_file/0025/73456/Public-Decision-490-Genesis-Power-Natural-Gas-4-Feb-2003.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [],
   "owner_all": true,

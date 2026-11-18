@@ -27,12 +27,105 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Junction Road is a 100 MW gas-fired peaking plant about 7 km south of New Plymouth, near State Highway 3. Its two 50 MW gas turbines can reach full output in 15 minutes and are used when demand is high or other generation isn't available. Built by Todd Generation, it went into commercial operation in May 2020, and Nova Energy took over its operation in 2022.",
+  "refs": [
+   1,
+   2,
+   3
+  ]
+ },
+ "facts": [
+  {
+   "k": "other_names",
+   "label": "Other names",
+   "value": "Junction Road Power Plant",
+   "refs": [
+    1,
+    2
+   ]
+  },
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2020",
+   "refs": [
+    1,
+    2,
+    4
+   ],
+   "note": "commissioned in March 2020; in commercial operation from 15 May 2020 (council report)"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "2 open cycle gas turbines of 50 MW",
+   "refs": [
+    2
+   ],
+   "note": "aero-derivative gas turbines, side by side"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Taranaki",
+   "refs": [
+    2
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "New Plymouth",
+   "refs": [
+    2
+   ],
+   "note": "from the address, 688 Junction Road, New Plymouth"
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Nova Energy",
+   "refs": [
+    4,
+    2
+   ],
+   "note": "the council: Nova Energy Ltd operates the plant; the register's operator: Nova Energy Limited"
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Power plants",
+   "publisher": "Todd Energy",
+   "url": "https://toddenergy.co.nz/peakers/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Nova Energy Ltd Junction Road Power Plant monitoring programme annual report 2023/24 (Technical Report 2024-59)",
+   "publisher": "Taranaki Regional Council",
+   "url": "https://trc.govt.nz/assets/Documents/Environment/Monitoring-Industry/2024/24-59-Nova-Junction-Road-Power-Plant-JRPP-Monitoring-Programme-Annual-Report-2023-2024.PDF",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Junction Road power plant (news release, 9 July 2018)",
+   "publisher": "Todd Corporation",
+   "url": "https://toddcorporation.com/assets/Uploads/9-July-2018-Junction-Road.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

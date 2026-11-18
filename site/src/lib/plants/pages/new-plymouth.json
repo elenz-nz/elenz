@@ -38,12 +38,156 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "New Plymouth was a 600 MW station at Port Taranaki, New Zealand's first large thermal station planned to run continuously as baseload. It was designed for coal at first, then changed to burn natural gas or fuel oil after the Maui gas field was found. Its five units came into service between 1974 and 1976, and in later years it ran mostly in dry years. It was mothballed at the end of 2007, ran one unit through 2008's dry winter, and was demolished in 2014–15.",
+  "refs": [
+   1
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1974",
+   "refs": [
+    2,
+    1
+   ],
+   "note": "Wikipedia: the first unit was commissioned in February 1974 and the fifth in 1976"
+  },
+  {
+   "k": "closed",
+   "label": "Closed",
+   "value": "2008",
+   "refs": [
+    1
+   ],
+   "note": "mothballed in December 2007; one unit ran again from May to December 2008"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "5 steam units of 120 MW, able to burn natural gas or fuel oil",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Taranaki",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "New Plymouth",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Contact Energy (when it closed)",
+   "refs": [
+    5,
+    1
+   ],
+   "note": "the site was sold to Port Taranaki and Methanex in 2013"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–96",
+   "refs": [
+    6,
+    5
+   ],
+   "note": "ECNZ sold New Plymouth to Contact Energy, then a new state-owned enterprise, on 1 February 1996"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1,
+    2,
+    7
+   ],
+   "value": "600 MW (The EA register's nameplate: five units of 120 MW); 400 MW (Contact's generation portfolio as the Commerce Commission listed it in 2003)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "New Plymouth (NPL2201)",
+   "refs": [
+    8
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "New Plymouth Power Station",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/New_Plymouth_Power_Station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "New Zealand Gazette, 2 December 1996, issue 174: ECNZ financial statements",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1996/1996%20ISSUE%20174.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "New Zealand Gazette, 27 November 1995, issue 140: ECNZ information for disclosure",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1995/1995%20ISSUE%20140.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "Decision 491: Contact Energy Limited and Natural Gas Corporation Holdings Limited (4 February 2003)",
+   "publisher": "Commerce Commission",
+   "url": "https://comcom.govt.nz/__data/assets/pdf_file/0026/73466/491.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 8,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

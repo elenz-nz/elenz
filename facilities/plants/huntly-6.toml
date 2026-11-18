@@ -7,7 +7,15 @@ register = ["T024"]
 wikidata = "Q5945709"
 osm = ["way/167293886"]
 reviewed = ""
-notes = ["Elenz has four plants here: the Rankines (units 1–4 as one, Coal/gas, 1,000 MW → 750 MW from Jan 2014), Huntly 5 (403 MW), Huntly 6 (50 MW) and the battery (100 MW, Jul 2026). Split from T001."]
+to_check = [
+  "Location: the point is Wikidata's for the whole Huntly site; check it against the LINZ aerial (separate task).",
+  "Other name P40: only Wikipedia's Genesis article calls Unit 6 \"Huntly P40\"; find a Genesis or official source before publishing it.",
+]
+notes = [
+  "Elenz has four plants here: the Rankines (units 1–4 as one, Coal/gas, 1,000 MW → 750 MW from Jan 2014), Huntly 5 (403 MW), Huntly 6 (50 MW) and the battery (100 MW, Jul 2026). Split from T001.",
+  "Thermal batch 1 (19 Nov 2026): facts checked against Genesis's Huntly page, the EA register and Stats NZ boundaries. Built by Genesis, so no previous owners. District and region as for the Rankines (same site).",
+  "Capacity: Genesis gives 50.8 MW, the EA register 50 MW (Elenz uses 50); Wikipedia's list 48.",
+]
 
 [location]
 value = [-37.543889, 175.152778]
@@ -21,20 +29,33 @@ value = [-37.54159, 175.15181]
 code = "HLY2201 HUNTLY"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.other_names]
+value = ["Huntly Unit 6"]
+source = "genesis-huntly"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.other_names.alt]]
 value = ["P40"]
 source = "elenz-register"
 grade = "C"
 checked = ""
-note = "Names the EA register, Wikipedia and Elenz use for this plant; check each."
+note = "Wikipedia's Genesis Energy article: Huntly P40 (Unit 6)"
 
 [facts.commissioned]
 value = "2004"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = ["genesis-huntly", "ea-register"]
+grade = "A"
+checked = "2026-11-19"
+
+[facts.units]
+value = "1 open cycle gas turbine of 50.8 MW, able to burn gas or diesel"
+source = "genesis-huntly"
+grade = "A"
+checked = "2026-11-19"
 
 [facts.scheme]
 value = "Huntly complex"
@@ -44,29 +65,41 @@ checked = ""
 
 [facts.region]
 value = "Waikato"
-source = "elenz-register"
-grade = "C"
-checked = ""
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
 
 [facts.territorial_authority]
+value = "Waikato"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
 value = "Waikato"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Genesis"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Genesis Energy"
+source = ["ea-register", "genesis-huntly"]
+grade = "A"
+checked = "2026-11-19"
+note = "Genesis Energy Limited"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Unit 6 is a single open cycle gas turbine added to the Huntly station in 2004. It can run on gas or diesel and is used as a peaking unit, started when wholesale prices are high or for short spells when it pays to run it."
+source = "genesis-huntly"
+grade = "A"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 50.8
+basis = "Genesis's rating for Unit 6"
+source = "genesis-huntly"
+grade = "A"
+checked = "2026-11-19"
 
 [[ratings]]
 value = "48"

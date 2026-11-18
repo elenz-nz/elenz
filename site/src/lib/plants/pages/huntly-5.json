@@ -23,12 +23,121 @@
  "scheme": null,
  "metered": "September 2020: Generation_MD has no Huntly that month, so the history uses the grid meter for the whole station, split between units by their offers.",
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Unit 5 is the Huntly station's combined cycle gas unit, added to the site in 2007. Known while it was built as e3p, the Energy Efficiency Enhancement Project, it runs a 250 MW gas turbine and uses the heat in its exhaust to raise steam for a second turbine, a high-efficiency design. It burns natural gas from Taranaki and can produce up to 403 MW.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "other_names",
+   "label": "Other names",
+   "value": "Huntly Unit 5, e3p (Energy Efficiency Enhancement Project)",
+   "refs": [
+    1
+   ],
+   "note": "Genesis: Huntly Unit 5, previously known as e3p"
+  },
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "June 2007",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "1 combined cycle unit: a 250 MW gas turbine, a heat recovery steam generator and a steam turbine",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Waikato",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Waikato",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Genesis Energy",
+   "refs": [
+    5,
+    1
+   ],
+   "note": "Genesis Energy Limited"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Huntly (HLY2201)",
+   "refs": [
+    6
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Huntly Power Station",
+   "publisher": "Genesis Energy",
+   "url": "https://www.genesisenergy.co.nz/about/generation/huntly-power-station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Huntly Power Station",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Huntly_Power_Station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

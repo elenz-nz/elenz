@@ -4,9 +4,19 @@ slug = "te-rapa"
 plant = "Te Rapa"
 name = "Te Rapa"
 register = ["T008"]
+wikidata = "Q7690951"
 reviewed = ""
-to_check = ["Capacity: Indicative rating; verify operating configuration."]
-notes = ["Elenz data ends 30 Jun 2023 (48 MW): mark as closed, check the date."]
+to_check = [
+  "Location: the point is Wikipedia's list's (Wikidata Q7690951 gives -37.7164, 175.217); check it sits on the plant at Fonterra's Te Rapa site against the LINZ aerial (separate task). Waikato District is within 1 km.",
+  "Closed: find Contact's 21 June 2022 release (or a later one) for the last day; Elenz's data ends 30 Jun 2023.",
+]
+notes = [
+  "Elenz data ends 30 Jun 2023 (48 MW): mark as closed, check the date.",
+  "Thermal batch 1 (19 Nov 2026): facts checked against the EA register, Wikipedia's Te Rapa cogeneration article, the Commerce Commission's 2003 decision and Stats NZ boundaries.",
+  "District and region: the station point (Wikipedia's list, not yet checked) is in Hamilton City, with Waikato District within 1 km; its grid connection, TWH0331 Te Kōwhai, is in Waikato District (an embedded plant, joined to the grid through the local network). Both in Waikato Region. Hamilton used, from the station point: recheck if the point moves.",
+  "Capacity: the EA register 48 MW (Elenz); Wikipedia and the Commerce Commission (2003) 44 MW.",
+  "No previous owners found: Contact applied for consents from 1997 and the plant is in Contact's portfolio from its start (Wikipedia).",
+]
 
 [location]
 value = [-37.71639, 175.21667]
@@ -20,19 +30,34 @@ value = [-37.73833, 175.15414]
 code = "TWH0331 TE KOWHAI"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
+
+[facts.other_names]
+value = ["Te Rapa cogeneration plant"]
+source = "wp-te-rapa"
+grade = "B"
+checked = "2026-11-19"
 
 [facts.commissioned]
 value = "1999"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = ["ea-register", "wp-te-rapa"]
+grade = "A"
+checked = "2026-11-19"
 
 [facts.closed]
 value = "2023"
-source = "wp-list"
+source = "wp-te-rapa"
 grade = "B"
-checked = ""
+checked = "2026-11-19"
+note = "Contact announced on 21 June 2022 that it would close the plant by June 2023, when its contract to supply Fonterra ended; our data (from the EA's meters) ends on 30 June 2023"
+
+[facts.units]
+value = "1 gas turbine with a heat recovery steam generator"
+source = "wp-te-rapa"
+grade = "B"
+checked = "2026-11-19"
+note = "a GE Frame 6B; the steam generator's duct burners could raise up to 180 tonnes of steam an hour"
 
 [facts.scheme]
 value = "Te Rapa industrial site"
@@ -42,29 +67,46 @@ checked = ""
 
 [facts.region]
 value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
+value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
 value = "Hamilton"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Hamilton"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Contact"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Contact Energy (when it closed)"
+source = ["ea-register", "wp-te-rapa"]
+grade = "A"
+checked = "2026-11-19"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Te Rapa was a gas-fired cogeneration plant at Fonterra's dairy factory at Te Rapa, near Hamilton, commissioned in 1999. Its gas turbine made electricity, and its exhaust heat raised steam for the factory. Plans for a 150 MW plant were cut to about 45 MW in 1997 after opposition over its emissions and the Waikato River. Contact closed it in 2023, when its contract to supply Fonterra ended."
+source = "wp-te-rapa"
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 44
+basis = "Wikipedia's figure, and Contact's portfolio as the Commerce Commission listed it in 2003"
+source = ["wp-te-rapa", "comcom-491"]
+grade = "A"
+checked = "2026-11-19"
 
 [[ratings]]
 value = "44"

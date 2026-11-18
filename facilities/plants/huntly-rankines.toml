@@ -7,7 +7,18 @@ register = ["T001"]
 wikidata = "Q5945709"
 osm = ["way/167293886"]
 reviewed = ""
-notes = ["Elenz has four plants here: the Rankines (units 1–4 as one, Coal/gas, 1,000 MW → 750 MW from Jan 2014), Huntly 5 (403 MW), Huntly 6 (50 MW) and the battery (100 MW, Jul 2026)."]
+to_check = [
+  "Location: the point is Wikidata's for the whole Huntly site; check it against the LINZ aerial (separate task).",
+  "Unit history: Genesis's August 2025 release says one Rankine unit was due to be decommissioned in February 2026; Elenz still counts 750 MW (three units). Check whether it closed and, if so, add a capacity row.",
+]
+notes = [
+  "Elenz has four plants here: the Rankines (units 1–4 as one, Coal/gas, 1,000 MW → 750 MW from Jan 2014), Huntly 5 (403 MW), Huntly 6 (50 MW) and the battery (100 MW, Jul 2026).",
+  "Thermal batch 1 (19 Nov 2026): facts checked against Genesis's Huntly page and its August 2025 market release, the EA register, the Gazette (ECNZ notices) and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the site point (Wikidata, not yet checked against the aerial) and the grid connection point in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026: both Waikato District, no other district within 5 km.",
+  "Commissioning: Genesis says the Rankine units were commissioned between 1982 and 1985; Wikipedia's infobox gives 1982 and the EA register 1983 for every unit. Wikipedia also says the units were installed in stages between 1973 and 1985 (construction), not used here.",
+  "Unit 3: the EA register's decommission date is 23 Jan 2014 (Elenz's 1,000 → 750 MW step). Wikipedia says one unit went into long-term storage in Dec 2012 and the second was retired in Jun 2015 after storage from 2013; Wikipedia's list gives Huntly 3 closed 2012. Elenz counts the stored unit until 2021 (plant_capacity.csv note).",
+  "The closed fact (2012, Wikipedia's list) was unit 3's, not the plant's: removed, as the plant is operating.",
+]
 
 [location]
 value = [-37.543889, 175.152778]
@@ -21,26 +32,36 @@ value = [-37.54159, 175.15181]
 code = "HLY2201 HUNTLY"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
-value = "Huntly 1,2, & 4 1983; Huntly 3 1983"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = "1982 to 1985"
+source = "genesis-huntly"
+grade = "A"
+checked = "2026-11-19"
+note = "Genesis: the Rankine units were commissioned between 1982 and 1985"
 
 [[facts.commissioned.alt]]
 value = "1983"
 source = "ea-register"
 grade = "A"
 checked = ""
-note = "the register's start date, 1983-01-01: often a year, not the day"
+note = "the register's start date for each unit, 1983-01-01: a year, not the day"
 
-[facts.closed]
-value = "2012"
-source = "wp-list"
+[[facts.commissioned.alt]]
+value = "1982"
+source = "wp-huntly"
 grade = "B"
 checked = ""
+note = "infobox"
+
+[facts.units]
+value = "3 Rankine (steam) units of 250 MW, able to burn coal or gas; a fourth was decommissioned in 2014"
+source = ["genesis-huntly", "ea-register"]
+grade = "A"
+checked = "2026-11-19"
+note = "Genesis: three 250 MW Rankine units (gas/coal). The register lists four 250 MW units, unit 3 decommissioned 23 Jan 2014."
 
 [facts.scheme]
 value = "Huntly complex"
@@ -50,36 +71,61 @@ checked = ""
 
 [facts.region]
 value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
+value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
 value = "Waikato"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Waikato"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Genesis"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Genesis Energy"
+source = ["ea-register", "genesis-huntly"]
+grade = "A"
+checked = "2026-11-19"
+note = "Genesis Energy Limited"
+
+[facts.previous_owners]
+value = "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–99"
+source = ["gazette-1995-140", "gazette-1999-37", "gazette-1999-170"]
+grade = "A"
+checked = "2026-11-19"
+note = "ECNZ took over the Crown's generation on 1 April 1987; on 1 April 1999 the Huntly station passed to the new Huntly SOE, Genesis Power (now Genesis Energy)."
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Huntly, on the Waikato River, is New Zealand's largest power station by capacity, and its Rankine units are its original part. Built as four 250 MW steam units able to burn either gas or coal, they were commissioned between 1982 and 1985. One unit was decommissioned in 2014 and three remain, run for baseload, to back up the hydro lakes in dry years, and for peaks."
+source = ["genesis-huntly", "ea-register"]
+grade = "A"
+checked = "2026-11-19"
 
 [[ratings]]
-value = "Huntly 1,2, & 4 750; Huntly 3 250"
-basis = "Wikipedia (basis not stated)"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = 720
+basis = "Genesis, August 2025: three Rankine units of 240 MW each"
+source = "genesis-nzx-2025-08"
+grade = "A"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 1000
+basis = "The original four units of 250 MW (the EA register's nameplates), to 2014"
+source = "ea-register"
+grade = "A"
+checked = "2026-11-19"
 
 [[stations]]
 value = "Huntly 1,2, & 4"

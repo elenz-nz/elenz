@@ -27,12 +27,138 @@
  "scheme": null,
  "metered": "At this point metered generation is net of local load, about 50% of Whareroa's gross output. Where the embedded generation meter reads more, we add the difference.",
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "This cogeneration plant supplies process steam and electricity to Fonterra's Whareroa dairy site near Hāwera, one of the largest dairy processing sites in the Southern Hemisphere. Its main job is steam: four gas turbines each feed a heat recovery boiler, and the steam drives a steam turbine or goes to the factory, so electricity is a co-product. Running since 1996, it was a Fonterra and Todd joint venture until Fonterra took full ownership in August 2026. Fonterra is adding two 34 MW electric boilers, but the site still needs the plant for the rest of its heat.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "other_names",
+   "label": "Other names",
+   "value": "Whareroa Cogeneration Plant",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1996",
+   "refs": [
+    2,
+    3
+   ],
+   "note": "Todd Energy: gas supply contracts to the Fonterra/Todd Energy co-generation plant at Whareroa (1996)"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "4 gas turbines of 10 MW, each with a heat recovery boiler, and a 28 MW steam turbine",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Taranaki",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "South Taranaki",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Fonterra",
+   "refs": [
+    1
+   ],
+   "note": "Whareroa Cogeneration Limited, a wholly owned Fonterra subsidiary, from 1 August 2026"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "Whareroa Cogeneration Joint Venture of Fonterra and Nova Energy (earlier Todd Energy and Whareroa Power), to 2026",
+   "refs": [
+    1,
+    6
+   ],
+   "note": "Fonterra bought Nova's remaining 50% from 1 August 2026. The 2022 co-generator register names the joint venture as Todd Energy Ltd and Whareroa Power Ltd."
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Hawera; Hwa1102 Hawera (HWA1101)",
+   "refs": [
+    7
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Whareroa Cogeneration Plant: notice of transfer of ownership and application for type B industrial co-generator classification (3 July 2026)",
+   "publisher": "Electricity Authority (letter from Fonterra)",
+   "url": "https://www.ea.govt.nz/documents/10490/Whareroa_Type_B_Application.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Kapuni",
+   "publisher": "Todd Energy",
+   "url": "https://toddenergy.co.nz/kapuni",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "List of power stations in New Zealand",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Register of generators approved as industrial co-generators (updated 17 August 2022)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.ea.govt.nz/documents/1932/Register_of_approved_industrial_co-generating_stations_mWHik6p.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

@@ -23,12 +23,59 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
+ "checked": "2026-11-19",
  "about": null,
- "facts": [],
+ "facts": [
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Bay of Plenty",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Whakatāne",
+   "refs": [
+    2
+   ]
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Edgecumbe (EDG0331)",
+   "refs": [
+    3
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [],
   "owner_all": true,

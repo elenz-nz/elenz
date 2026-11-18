@@ -105,12 +105,183 @@
  "scheme": null,
  "metered": "The metered history has one meter (SFD2201) for Taranaki Combined Cycle (1998–2025) and the two peakers (from 2011), and until 2001 the old Stratford gas turbines too, so it shows the station whole. The dispatch data (the live week and the weeks since the newest metered month) shows each unit.",
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "The Stratford site east of Stratford has held three gas-fired stations. Four gas turbines ran here from 1976 until 2001; the Taranaki Combined Cycle unit, cooled with water from the Pātea River, ran from 1998 until it reached the end of its life in 2026; and two fast-start peakers, opened in 2011, remain. The peakers can go from a cold start to full output in about ten minutes, to cover peaks in demand and complement hydro and wind generation.",
+  "refs": [
+   1,
+   2,
+   3,
+   4
+  ]
+ },
+ "facts": [
+  {
+   "k": "other_names",
+   "label": "Other names",
+   "value": "Stratford Peakers, Taranaki Combined Cycle (TCC)",
+   "refs": [
+    3,
+    5
+   ],
+   "note": "the register's units: Stratford Peaker 1, Stratford Peaker 2 and Taranaki Combined Cycle"
+  },
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1976",
+   "refs": [
+    1
+   ],
+   "note": "the site's first station, four gas turbines, was completed in June 1976; the combined cycle unit followed in 1998 and the peakers in 2011"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "2 gas turbine peakers, 200 MW in all (from 2011). Closed: a 377 MW combined cycle unit (1998 to 2026) and four 50 MW gas turbines (1976 to 2001)",
+   "refs": [
+    3,
+    2,
+    5,
+    1
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Taranaki",
+   "refs": [
+    6
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Stratford",
+   "refs": [
+    7
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Contact Energy",
+   "refs": [
+    5,
+    3
+   ],
+   "note": "Contact Energy Limited"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "The first gas turbines: New Zealand Government, to 1987, and the Electricity Corporation of New Zealand (ECNZ), 1987–96. The combined cycle unit: Natural Gas Corporation (NGC), to 2003",
+   "refs": [
+    8,
+    9,
+    10
+   ],
+   "note": "ECNZ sold Stratford to Contact Energy, then a new state-owned enterprise, on 1 February 1996. The Commerce Commission cleared Contact to buy Stratford Power Limited, NGC's subsidiary that owned TCC, on 4 February 2003."
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    3,
+    5
+   ],
+   "value": "200 MW (Contact's maximum capacity for the two peakers; the EA register has two units of 106 MW); 377 MW (The EA register's nameplate for the combined cycle unit; later 360 MW from 2022 and 330 MW from 2023)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Stratford (SFD2201)",
+   "refs": [
+    11
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Stratford Power Station",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Stratford_Power_Station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Contact partners with CDC to explore data centre development (market release, 10 August 2026)",
+   "publisher": "Contact Energy",
+   "url": "https://announcements.nzx.com/announcement/477523",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Stratford Peakers",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/about-us/our-story/our-generation-and-power-sites/thermal/stratford-peakers",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "TCC power station returns to limited service (4 April 2022)",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/aboutus/media-centre/2022/04/04/tcc-power-station-returns-to-limited-service",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 8,
+   "title": "New Zealand Gazette, 27 November 1995, issue 140: ECNZ information for disclosure",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1995/1995%20ISSUE%20140.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 9,
+   "title": "New Zealand Gazette, 2 December 1996, issue 174: ECNZ financial statements",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1996/1996%20ISSUE%20174.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 10,
+   "title": "Decision 491: Contact Energy Limited and Natural Gas Corporation Holdings Limited (4 February 2003)",
+   "publisher": "Commerce Commission",
+   "url": "https://comcom.govt.nz/__data/assets/pdf_file/0026/73466/491.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 11,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

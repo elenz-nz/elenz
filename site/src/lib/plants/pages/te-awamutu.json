@@ -23,12 +23,139 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Te Awamutu was a gas-fired cogeneration plant at the Te Awamutu dairy factory, built around a gas turbine unit that ECNZ moved from its old Whirinaki station in 1993. It passed to Genesis Power when ECNZ was split in 1999, and Genesis still had it, at 54 MW, in 2003.",
+  "refs": [
+   1,
+   2,
+   3
+  ]
+ },
+ "facts": [
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "1 twin-pack unit of two gas turbines, moved from the old Whirinaki station",
+   "refs": [
+    1
+   ],
+   "note": "Pratt & Whitney FT4 gas turbines"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Waikato",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Waipā",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Genesis Energy (when it closed)",
+   "refs": [
+    2,
+    3,
+    6
+   ]
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "Electricity Corporation of New Zealand (ECNZ), to 1999",
+   "refs": [
+    2,
+    7
+   ],
+   "note": "the Te Awamutu co-generation plant passed to the Huntly SOE, Genesis Power, on 1 April 1999"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    3,
+    6
+   ],
+   "value": "54 MW (Genesis's portfolio as the Commerce Commission listed it in 2003)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Te Awamutu (TMU1101)",
+   "refs": [
+    8
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Whirinaki Power Station",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Whirinaki_Power_Station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "New Zealand Gazette, 25 March 1999, issue 37: Directions relating to split of Electricity Corporation of New Zealand Limited",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1999/1999%20ISSUE%20037.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Decision 490: Genesis Power Limited and Natural Gas Corporation Holdings Limited (4 February 2003)",
+   "publisher": "Commerce Commission",
+   "url": "https://www.comcom.govt.nz/__data/assets/pdf_file/0025/73456/Public-Decision-490-Genesis-Power-Natural-Gas-4-Feb-2003.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "List of power stations in New Zealand",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "New Zealand Gazette, 1999, issue 170: ECNZ financial statements",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1999/1999%20ISSUE%20170.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 8,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [],
   "owner_all": true,
