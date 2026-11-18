@@ -116,6 +116,9 @@ check(plant_pages.point({'location': loc('wd'), 'grid_connection': grid}, srcs) 
 check(plant_pages.point({'location': loc('osm'), 'grid_connection': grid}, srcs)['basis'] == 'grid connection',
       'plant index: an OpenStreetMap point is never used; the grid connection is')
 check(plant_pages.point({'location': loc('osm')}, srcs) is None, 'plant index: no public point, no dot')
+# aerial views (plant_pages.aerial_on): only while centred on the plant file's location
+check(plant_pages.aerial_on({'lat': '-45.5', 'lon': '167.3'}, loc('wd', '2026-11-18')), 'plant aerials: centred on the location')
+check(not plant_pages.aerial_on({'lat': '-45.5', 'lon': '167.31'}, loc('wd', '2026-11-18')), 'plant aerials: an old point is stale')
 json.dumps(pf, allow_nan=False)
 for k in ('p10', 'p90', 'pmin', 'pmax', 'n500', 'n1000', 'rv_hydro', 'rv_geo', 'batt_d', 'batt_c', 'rv_battc'):
     check(k in dd['NI'] and len(dd['NI'][k]) == len(dd['t']), f'daily: {k}')

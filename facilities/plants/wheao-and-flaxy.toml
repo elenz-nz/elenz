@@ -7,8 +7,6 @@ register = ["H012", "H013"]
 osm = ["way/409969758"]
 reviewed = ""
 to_check = [
-  "Location: no station point yet (OpenStreetMap is research only); find one on the LINZ aerial or in Wikidata (separate task). Two stations in the Kaingaroa Forest; the grid connection (Rotorua) is far from them.",
-  "District: Whakatane (Wikipedia's list); test once the stations' points are found.",
   "Previous owners: not yet found in a source we could open (built in the early 1980s for the Rotorua area's electricity authority; with Trustpower by 1999).",
 ]
 notes = [
@@ -16,7 +14,17 @@ notes = [
   "H013: Elenz shows Wheao and Flaxy as one plant (24 MW, ROT1101).",
   "Hydro batch 5 (19 Nov 2026): facts checked against Contact's station page, the EA register and network supply points table. The locations, district and previous owners are left open.",
   "Resolved: Capacity: Contact gives a maximum of 26 MW for both stations (Manawa's old page 26.1); the register 24 MW (Elenz); Wikipedia's list gives Wheao 24 and Flaxy 2.1. Contact's 26 is a rating.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "The [location] point is Wheao's, the larger station; Flaxy's is in its entry. Both points are in Taupō District (Stats NZ, 19 Nov 2026), not Whakatāne as Wikipedia's list has it.",
 ]
+
+[location]
+value = [-38.633149, 176.578097]
+basis = "Wheao station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-38.14825, 176.22704]
@@ -65,10 +73,10 @@ grade = "C"
 checked = ""
 
 [facts.territorial_authority]
-value = "Whakatane"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = "Taupō"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
 
 [facts.owner]
 value = "Contact Energy"
@@ -105,6 +113,7 @@ checked = "2026-11-19"
 
 [[stations]]
 value = "Wheao"
+location = [-38.633149, 176.578097]
 id = "H012"
 source = "contact-wheao-flaxy"
 grade = "A"
@@ -112,6 +121,7 @@ checked = "2026-11-19"
 
 [[stations]]
 value = "Flaxy"
+location = [-38.634231, 176.557952]
 id = "H013"
 source = "contact-wheao-flaxy"
 grade = "A"

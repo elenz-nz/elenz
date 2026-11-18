@@ -8,7 +8,6 @@ wikidata = "Q5945709"
 osm = ["way/167293886"]
 reviewed = ""
 to_check = [
-  "Location: the point is Wikidata's for the whole Huntly site (the power station); find the battery's own point on the LINZ aerial (separate task), then retest it against the Stats NZ boundaries.",
   "Stage 2 (another 100 MW / 200 MWh, FID April 2026, commercial operation expected Q3 FY28): add a capacity row and update the About text when it dispatches.",
 ]
 notes = [
@@ -17,22 +16,24 @@ notes = [
   "Dates: the register's row starts 1 Jul 2026; Genesis said in August 2026 that commissioning was under way and it would be fully operational by September 2026; officially opened 15 Oct 2026 (ESS News and other reports).",
   "District and region from Wikidata's site point (Waikato District; no other district within 3 km). The grid connection point (HLY2201) gives the same.",
   "Dropped the Wikipedia-list rating lead: battery ratings are MW / MWh, and the page shows ratings as MW. Storage (200 MWh) is in units and About. Genesis gives the cost as about NZ$130 million (not published).",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
 ]
 
 [location]
-value = [-37.543889, 175.152778]
+value = [-37.543134, 175.146859]
 basis = "whole site"
-source = "wd-q5945709"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-37.543889, 175.152778] came from wd-q5945709"
 
 [grid_connection]
-value = [-37.54159, 175.15181]
+value = [-37.542068, 175.151857]
 code = "HLY2201 HUNTLY"
-source = "ea-nsp"
+source = ["ea-nsp", "linz-aerial"]
 grade = "A"
-checked = "2026-11-19"
-note = "code and point match the EA's network supply points table of 17 Nov 2026; the battery connects through Transpower's Huntly substation (ESS News)"
+checked = "2026-11-18"
+note = "code from the EA's network supply points table; the point is the substation, read from the LINZ aerial, 18 Nov 2026 (the table's point was [-37.541590, 175.151810])"
 
 [facts.other_names]
 value = ["Huntly BESS"]

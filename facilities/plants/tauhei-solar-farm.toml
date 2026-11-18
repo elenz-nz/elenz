@@ -6,22 +6,24 @@ name = "Tauhei Solar Farm"
 register = ["S019"]
 wikidata = "Q115803980"
 osm = ["relation/19726847"]
-reviewed = ""
-to_check = ["Location: confirm the point sits on the solar farm against the LINZ aerial (separate task)."]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "Solar batch (19 Nov 2026): facts checked against Harmony Energy's financial close release, PV Tech, the EA register and network supply points table, and Stats NZ boundaries.",
   "District and region from the station's point (the [location] value, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; no other district within 3 km.",
   "Owner: Harmony's January 2025 release names the joint venture partner as First Renewables (part of Clarus); PV Tech's July 2026 report names Igneo Infrastructure Partners. The page follows the newer report.",
   "Capacity: Elenz uses the register's 147 MW; sources give 150 MW AC (not published, no owner source read) and 202 MWp.",
   "Full commercial operation was targeted for September to October 2026 (PV Tech).",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 
 [location]
 value = [-37.588333, 175.721667]
 basis = "station"
-source = "wd-q115803980"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wd-q115803980, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-37.56924, 175.68307]

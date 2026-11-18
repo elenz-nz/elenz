@@ -6,31 +6,33 @@ name = "Benmore"
 register = ["H003"]
 wikidata = "Q4889583"
 osm = ["relation/12455469"]
-reviewed = ""
+reviewed = "2026-11-19"
 photo_leads = ["P004", "P005"]
-to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+to_check = []
 notes = [
   "Elenz has 570 MW from 30 Jul 2026 (540 → 552 → 570 after upgrades).",
   "Hydro batch 3 (18 Nov 2026): facts checked against Meridian's station pages, the EA register and network supply points table, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district. Waimate District is about 250–300 m from the point, across the river (150–200 m from the grid connection point); recheck if the point moves.",
   "Resolved: Capacity: Meridian's station page still gives six 93 MW units and up to 552 MW; Meridian's 30 July 2026 announcement raised the station to 570 MW, the figure Elenz uses. The Wikipedia rating of 540 MW (the consent-limited output before 2024) is dropped.",
   "Wikidata: Q4889583 (Benmore Dam) is also typed as a hydroelectric power station, so it stands for the station. The [location] point is still Wikipedia's.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
 ]
 
 [location]
-value = [-44.56417, 170.19722]
+value = [-44.563459, 170.193808]
 basis = "station"
-source = "wp-list"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-44.564170, 170.197220] came from wp-list"
 
 [grid_connection]
-value = [-44.5656, 170.19357]
+value = [-44.566422, 170.194518]
 code = "BEN0162 BENMORE; BEN0163 BENMORE; BEN2202 BENMORE"
-source = "ea-nsp"
+source = ["ea-nsp", "linz-aerial"]
 grade = "A"
 checked = "2026-11-18"
-note = "code and point match the EA's network supply points table of 17 Nov 2026; BEN0162 and BEN0163 ended in 2011–12, and BEN2202 is the current connection"
+note = "code from the EA's network supply points table; the point is the substation, read from the LINZ aerial, 18 Nov 2026 (the table's point was [-44.565600, 170.193570])"
 
 [facts.commissioned]
 value = "1965"

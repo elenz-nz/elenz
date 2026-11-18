@@ -9,7 +9,6 @@ osm = ["way/1383072076"]
 reviewed = ""
 photo_leads = ["P034"]
 to_check = [
-  "Location: confirm the point sits on the solar farm against the LINZ aerial (separate task).",
   "Mounting (plan question): fixed or tracking? Not stated in the sources read (Genesis's page is drawn by script and could not be read).",
 ]
 notes = [
@@ -17,14 +16,16 @@ notes = [
   "District and region from the station's point (the [location] value, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; no other district within 3 km.",
   "Resolved: capacity. Elenz uses the register's 47 MW (AC); BraveTrace and PV Tech give 63 MWp.",
   "Dropped the \"Canterbury\" scheme lead.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
 
 [location]
-value = [-43.730989, 171.789431]
+value = [-43.730393, 171.786134]
 basis = "station"
-source = "wd-q125563903"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-43.730989, 171.789431] came from wd-q125563903"
 
 [grid_connection]
 value = [-43.94164, 171.80215]

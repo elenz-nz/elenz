@@ -9,6 +9,7 @@
 	import Masthead from '#lib/site/Masthead.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import InfoTip from '#lib/site/InfoTip.svelte';
+	import Aerial from '#lib/plants/Aerial.svelte';
 	import ReportLink from '#lib/site/ReportLink.svelte';
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
 	import { slug as toSlug } from '#lib/site/viewurl.js';
@@ -129,16 +130,18 @@
 			<p class="checking" role="note">We’re still checking this page’s facts against their sources. The live and history figures are Elenz’s own. <a href={PLANTS_MD}>How we check plants</a></p>
 		{/if}
 
-		{#if p.image || operating}
+		{#if p.image || p.aerial || operating}
 			<div class="top">
 				{#if p.image}
 					<figure class="photo">
 						<img src="/plants/{p.image.file}" alt={p.image.title} />
 						<figcaption>Photo: {p.image.author}, <a href={p.image.source_url}>{p.image.title}</a>, {#if p.image.licence_url}<a href={p.image.licence_url}>{p.image.licence}</a>{:else}{p.image.licence}{/if}</figcaption>
 					</figure>
+				{:else if p.aerial}
+					<div class="photo"><Aerial views={p.aerial} name={p.name} eager /></div>
 				{/if}
 				{#if operating}
-					<section class="panel now" class:wide={!p.image} aria-labelledby="now-h">
+					<section class="panel now" class:wide={!p.image && !p.aerial} aria-labelledby="now-h">
 						<div class="p-head">
 							<h2 id="now-h">Now</h2>
 							{#if L}<span class="pill" class:live={fresh}>{fresh ? 'Live' : 'Delayed'}</span><span class="when">{clockOf(L.end)}</span>{/if}
@@ -305,6 +308,7 @@
 							<circle cx={pin[0]} cy={pin[1]} r="14" class="halo" /><circle cx={pin[0]} cy={pin[1]} r="7" class="dot" />
 						</svg>
 						<p class="quiet"><span class="num">{Math.abs(p.location.lat).toFixed(3)}° S, {p.location.lon.toFixed(3)}° E</span>{p.location.basis !== 'station' ? ` · ${p.location.basis}` : ''}{@render refs(p.location.refs)}</p>
+						{#if p.image && p.aerial}<Aerial views={p.aerial} name={p.name} />{/if}
 					</section>
 				{/if}
 

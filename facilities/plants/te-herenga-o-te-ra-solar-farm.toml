@@ -8,7 +8,6 @@ wikidata = "Q133480513"
 osm = ["way/1410036411"]
 reviewed = ""
 to_check = [
-  "Location: confirm the point sits on the solar farm against the LINZ aerial (separate task).",
   "Capacity (decision): Elenz uses the register's 33 MW; BraveTrace's sheet (May 2026) gives 30 MW AC. Keep 33 unless metered half-hour peaks say otherwise.",
 ]
 notes = [
@@ -17,14 +16,16 @@ notes = [
   "Commissioning: the register's row starts 22 Nov 2024; BraveTrace says it started generating in December 2024 and was commissioned on 20 January 2025. The page shows 2025.",
   "Connects at Transpower's Waiotahi point (WAI0331), as grid-connected generation (reconciliation type GG).",
   "Dropped the \"Manawatū\" scheme lead.",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 
 [location]
 value = [-38.025861, 177.183]
 basis = "station"
-source = "wd-q133480513"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wd-q133480513, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-38.02525, 177.19231]

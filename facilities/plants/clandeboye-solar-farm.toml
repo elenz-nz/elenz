@@ -5,14 +5,23 @@ plant = "Clandeboye Solar Farm"
 name = "Clandeboye Solar Farm"
 register = ["S013"]
 osm = ["way/1442514369"]
-reviewed = ""
-to_check = ["Location: no station point yet (OpenStreetMap is research only); find one on the LINZ aerial (separate task), then test it against the Stats NZ boundaries."]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "Solar batch (19 Nov 2026): facts checked against the EA register and network supply points table, Lodestone's farm page and groundbreaking news (through search results), EVs & Beyond's first-power report and Stats NZ boundaries.",
   "Region from the grid connection point (no station point yet); the sources place the farm near it, in the same region (Temuka; the farm is north of Temuka). District left unchecked until there is a station point: Temuka's point is in Timaru District.",
   "First power: EVs & Beyond reported it on 7 Aug 2026; the register's row starts 11 Jun 2026, and Elenz's data from 10 Jun 2026.",
   "Capacity: Elenz uses the register's 24 MW (AC); Lodestone gives 27.7 MWp. Mounting: single-portrait (1P) bifacial panels; tracking not stated.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
+
+[location]
+value = [-44.190668, 171.408782]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-44.22364, 171.29224]
@@ -39,8 +48,8 @@ note = "from the grid connection point (no station point yet); the sources place
 [facts.territorial_authority]
 value = "Timaru"
 source = "statsnz-ta-2026"
-grade = "C"
-checked = ""
+grade = "A"
+checked = "2026-11-19"
 note = "the grid connection point (Temuka) only"
 
 [facts.owner]

@@ -6,7 +6,6 @@ name = "Fonterra Dairy - Whareroa"
 register = ["T009"]
 reviewed = ""
 to_check = [
-  "Location: only the grid connection (Hāwera substation) so far. The plant is at Fonterra's Whareroa site near Hāwera: find it on the LINZ aerial (separate task), then test the point against Stats NZ's boundaries.",
   "Page name: the EA register's \"Fonterra Dairy - Whareroa\"; the owner calls it the Whareroa Cogeneration Plant. Rename the page? (Decision needed; the tracker's name stays.)",
   "Capacity: Elenz uses 68 MW (the register's figure); the plant is four 10 MW gas turbines and a 28 MW steam turbine. Generation_MD is net of the site's load (see notes).",
 ]
@@ -16,7 +15,16 @@ notes = [
   "District and region from the grid connection point (Hāwera) in Stats NZ's boundaries, 19 Nov 2026: South Taranaki District, no other district within 5 km; the owner places the plant near Hāwera.",
   "Commissioned: Todd's Kapuni page (gas supply contracts, 1996) and Wikipedia's list give 1996; the EA register's 1966 looks like the dairy site's date or a typo (its effective dates start in 1996).",
   "The register's operator is still Nova Energy (Nov 2026).",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
+
+[location]
+value = [-39.609560, 174.298311]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-39.5665, 174.31012]

@@ -6,18 +6,31 @@ name = "Junction Road"
 register = ["T012"]
 osm = ["way/781973296"]
 reviewed = ""
-to_check = [
-  "Location: no station point yet (OpenStreetMap is research only, and there is no Wikidata item). The Taranaki Regional Council gives the address, 688 Junction Road, New Plymouth: find the plant there on the LINZ aerial (separate task), then test the point against Stats NZ's boundaries.",
-  "Grid connection: the EA's network supply points table has JRD1101 (Junction Road) without coordinates.",
-  "Capacity: Elenz uses 100 MW; the EA register says 130 MW. (Unchanged: plant_capacity.csv note.)",
-]
+to_check = ["Capacity: Elenz uses 100 MW; the EA register says 130 MW. (Unchanged: plant_capacity.csv note.)"]
 notes = [
   "100 MW from Feb 2020.",
   "Thermal batch 1 (19 Nov 2026): facts checked against Todd Energy's power plants page, the Taranaki Regional Council's 2023/24 monitoring report and the EA register.",
   "District from the council's address (688 Junction Road, New Plymouth), not yet from a point in Stats NZ's boundaries; region: the Taranaki Regional Council monitors the plant.",
   "Commissioned: commissioning in March 2020 and commercial operation from 15 May 2020 (council report); Todd and the EA register: 2020. Elenz's history has its output from Feb 2020.",
   "Previous operator: the council says the site was formerly operated by Todd Generation Ltd, whose consents moved to Nova Energy on 1 June 2022. Ownership before and after isn't stated, so no previous owners fact yet.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point added (the substation).",
 ]
+
+[location]
+value = [-39.116698, 174.103689]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026"
+
+[grid_connection]
+value = [-39.117336, 174.103789]
+code = "JRD1101 Junction Road"
+source = ["ea-nsp", "linz-aerial"]
+grade = "A"
+checked = "2026-11-18"
+note = "code from the EA's network supply points table (18 Nov 2026), which gives it no coordinates; the point is the substation, read from the LINZ aerial, 18 Nov 2026"
 
 [facts.other_names]
 value = ["Junction Road Power Plant"]

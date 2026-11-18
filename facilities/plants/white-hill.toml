@@ -6,24 +6,24 @@ name = "White Hill"
 register = ["W005"]
 wikidata = "Q7994795"
 osm = ["relation/8776651"]
-reviewed = ""
-to_check = [
-  "Location: confirm the point sits on the wind farm against the LINZ aerial (separate task).",
-]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "58 MW from Jun 2007.",
   "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "District and region from the [location] point (not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. No other district within 5 km.",
   "Resolved: Capacity and status: Meridian gives 29 turbines and 58 MW, operating; matches Elenz and the register.",
   "Removed the scheme fact (Southland, from our own register): a single wind farm has no scheme.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
 
 [location]
-value = [-45.7525, 168.272]
+value = [-45.739189, 168.269315]
 basis = "station"
-source = "wd-q7994795"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-45.752500, 168.272000] came from wd-q7994795"
 
 [grid_connection]
 value = [-46.30539, 168.35953]

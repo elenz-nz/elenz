@@ -6,9 +6,9 @@ name = "Wairākei"
 register = ["G001", "G002"]
 wikidata = "Q3434500"
 osm = ["way/170298057"]
-reviewed = ""
+reviewed = "2026-11-19"
 photo_leads = ["P018", "P019", "P032"]
-to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+to_check = []
 notes = [
   "G001: 167 → 181 (Jun 2005) → 136 MW (May 2014).",
   "Geothermal batch 1 (19 Nov 2026): facts checked against Contact's station page and its 13 Nov 2024 Wairakei announcement, the EA register and network supply points table, the NZ Geothermal Association's field page, Engineering New Zealand's heritage record, Te Ara, the Gazette (ECNZ's 1996 financial statements) and Stats NZ boundaries. The location is left for the LINZ aerial check.",
@@ -16,14 +16,16 @@ notes = [
   "Resolved (G002): the register has one Wairakei plant (WRK2201 WRK0) and Contact's Nov 2024 presentation counts the binary plant as part of the Wairakei station, so it stays inside this page as a station.",
   "Units: Contact's Nov 2024 presentation lists eight: Wairakei A 3 x 11 MW, Wairakei B 3 x 30 MW, binary 2 x 7 MW (137 MW installed; Elenz uses 136). Contact's station page still says ten turbines and 133 MW, and Wikipedia lists six A units and a 4 MW unit 14 (NZGA: a 4.5 MW back-pressure set from 1996); the presentation is the newest.",
   "Closure: Contact planned to close the station in June 2026, then extended all units to mid-2027 (when Te Mihi Stage 2 is due) and 67 MW (two B units and one binary unit) to June 2031, when the resource consent ends. Add a closed date and update the stations when units retire.",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 
 [location]
 value = [-38.6269, 176.105]
 basis = "station"
-source = "wd-q3434500"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wd-q3434500, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-38.62571, 176.10546]

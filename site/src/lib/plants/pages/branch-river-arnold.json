@@ -22,7 +22,7 @@
  "owner": "Contact",
  "scheme": null,
  "metered": null,
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "The Branch River scheme, in the Wairau Valley in inland Marlborough, is a run-of-river scheme with two power stations. Water taken from the Branch River runs along a race to the Argyle powerhouse, then through a storage pond, Lake Argyle, and a second race to the Wairau powerhouse, which discharges into the Wairau River. The Marlborough Electric Power Board built it, gaining the government's consent to generate in March 1983. Lake Argyle and the Branch and Leatham rivers are popular with anglers.",
@@ -124,8 +124,35 @@
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -41.67076,
+  "lon": 173.203316,
+  "basis": "Argyle station",
+  "refs": [
+   9
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/branch-river-arnold-site.webp",
+   "across": 450,
+   "imagery": "Marlborough 0.25m Rural Aerial Photos (2023-2024)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/branch-river-arnold-close.webp",
+   "across": 890,
+   "imagery": "Marlborough 0.25m Rural Aerial Photos (2023-2024)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/branch-river-arnold-wide.webp",
+   "across": 7140,
+   "imagery": "Marlborough 0.25m Rural Aerial Photos (2023-2024)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -182,6 +209,13 @@
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 9,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

@@ -8,7 +8,6 @@ wikidata = "Q131745148"
 osm = ["relation/12618188"]
 reviewed = ""
 to_check = [
-  "Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task).",
   "Capacity (open): Contact says the 27 MW 1945 unit is being replaced by a new 19 MW GE unit; Wikipedia says a new 29 MW turbine and generator (Nov 2024 to May 2026). Check which, and whether the new unit is running, before changing Elenz's 28 MW.",
 ]
 notes = [
@@ -17,14 +16,16 @@ notes = [
   "Location: Wikidata's point (Q131745148), not yet checked against the aerial.",
   "District and region from the station's Wikidata point in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. The grid connection point (Ashburton) also gives Ashburton District. Selwyn District is within 1 km, across the Rakaia River.",
   "Capacity: Contact gives a maximum of 27 MW, the 1945 unit; the register 28 MW (Elenz); Wikipedia's list 25.2. While the unit is replaced, the site's six irrigation pumps run as turbines (Contact: 1 MW each; Wikipedia: 5.8 MW in all).",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
 
 [location]
-value = [-43.5731, 171.7355]
+value = [-43.573176, 171.735537]
 basis = "station"
-source = "wd-q131745148"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-43.573100, 171.735500] came from wd-q131745148"
 
 [grid_connection]
 value = [-43.94164, 171.80215]

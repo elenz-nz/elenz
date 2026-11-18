@@ -7,7 +7,6 @@ register = ["S014"]
 osm = ["way/1516694558"]
 reviewed = ""
 to_check = [
-  "Location: no station point yet (OpenStreetMap is research only); find one on the LINZ aerial (separate task), then test it against the Stats NZ boundaries.",
   "Capacity (decision): Elenz uses 23 MW from the earlier register copy; the EA register (17 Nov 2026) now lists 19 MW. 23 MWp is the DC rating (SolarQuarter). Move plant_capacity.csv to 19 MW at the next register refresh?",
 ]
 notes = [
@@ -15,7 +14,16 @@ notes = [
   "Region and district from the grid connection point (no station point yet); the sources place the farm near it, in the same region (Dannevirke); the consent is for 440 Tamaki River Road, Dannevirke, granted by Tararua District Council.",
   "Mounting: single-axis trackers (GameChange Genius Tracker 1P; tracker commissioning finished 25 Aug 2026).",
   "Owner: the register's operator is Dannevirke Solar Farm Ltd (the consent applicant); SolarQuarter calls it Bright Fern Energy's farm.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
+
+[location]
+value = [-40.183795, 176.009067]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-40.1901, 176.03077]

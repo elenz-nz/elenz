@@ -89,12 +89,40 @@
    "label": "Connection point",
    "value": "Kaikohe (KOE1101)",
    "refs": [
-    6
+    6,
+    7
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -34.818333,
+  "lon": 173.110556,
+  "basis": "station",
+  "refs": [
+   7
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/pukenui-solar-farm-site.webp",
+   "across": 490,
+   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/pukenui-solar-farm-close.webp",
+   "across": 980,
+   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/pukenui-solar-farm-wide.webp",
+   "across": 7840,
+   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -137,6 +165,13 @@
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

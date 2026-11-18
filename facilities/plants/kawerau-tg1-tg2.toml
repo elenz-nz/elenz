@@ -6,7 +6,6 @@ name = "Kawerau TG1/TG2"
 register = ["G021"]
 reviewed = ""
 to_check = [
-  "Location: only the grid connection so far. Wikipedia gives a point for each plant (TG1 38°3'53\"S 176°43'20\"E, TG2 38°3'47\"S 176°43'12\"E); check them against the LINZ aerial (separate task). Both were removed (Wikipedia: by 2020).",
   "District: Wikipedia's TG1 point is in Kawerau District and its TG2 point in Whakatāne District (Stats NZ, 19 Nov 2026), so no district is published until the points are checked.",
   "Previous owners: who built and owned them before Nova Energy is not yet sourced.",
 ]
@@ -16,7 +15,17 @@ notes = [
   "Resolved (owner): NZGA lists the owners as Nova Energy and Ngāti Tūwharetoa Geothermal Assets, and Nova Energy as retiring them; Wikipedia's list gives Nova Energy.",
   "Resolved (closed): TG1 retired in 2014 and TG2 in 2017 (NZGA). Elenz's metered data ends 2008-03-31 because the EA's files stop then (Wikipedia notes the same gap), not because they closed.",
   "Capacity: TG1 2.4 MW, TG2 3.5 MW (NZGA), 5.9 MW in all; Elenz uses 6 MW.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "Stats NZ (19 Nov 2026): TG1's checked point is in Kawerau District and TG2's in Whakatāne District, so no district is published. The [location] point is TG2's (the larger).",
 ]
+
+[location]
+value = [-38.063066, 176.720000]
+basis = "TG2 station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-38.07673, 176.72238]
@@ -93,6 +102,7 @@ checked = ""
 
 [[stations]]
 value = "TG1"
+location = [-38.064752, 176.722224]
 mw = 2.4
 source = "nzga-generation-2023"
 grade = "B"
@@ -102,6 +112,7 @@ note = "retired 2014"
 
 [[stations]]
 value = "TG2"
+location = [-38.063066, 176.720000]
 mw = 3.5
 source = "nzga-generation-2023"
 grade = "B"

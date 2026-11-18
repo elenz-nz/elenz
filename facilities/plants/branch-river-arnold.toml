@@ -6,24 +6,24 @@ name = "Branch River"
 register = ["H024"]
 wikidata = "Q140959164"
 osm = ["relation/12568807"]
-reviewed = ""
-to_check = [
-  "Location: the point is Argyle station's (Wikidata Q140959164); confirm it against the LINZ aerial and find Wairau station (separate task).",
-]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "The EA register names it \"Branch River (Arnold)\" at ARG1101 (12 MW); the metered code is argyle_wairau, so the scheme is Argyle plus Wairau. Arnold is a separate West Coast station (E020; Contact: Arnold River, 3 MW). The page's name drops \"(Arnold)\" (19 Nov 2026); the tracker's plant name is unchanged.",
   "Hydro batch 5 (19 Nov 2026): facts checked against Contact's scheme page, the Gazette (the 1983 consent to generate), the Ministry for the Environment's 2009 review, the EA register and network supply points table, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "District and region from Argyle station's Wikidata point in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. The grid connection point gives the same. No other district within 5 km.",
   "Resolved: Capacity: the 1983 consent gives Argyle 3.8 MW and Wairau 7.2 MW (11 MW, as Contact says); the register has 12 MW (Elenz); Wikipedia's list's 3.8 is Argyle alone. Contact's 11 is a rating.",
   "Wikipedia's river article says commissioned in 1983 and completed in 1984. The Ministry for the Environment's review says a scheme has existed in the valley since about 1973; not used.",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 
 [location]
 value = [-41.67076, 173.203316]
 basis = "Argyle station"
-source = "wd-q140959164"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wd-q140959164, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-41.67085, 173.20225]

@@ -8,7 +8,6 @@ reviewed = ""
 to_check = [
   "Still running? Elenz's data ends 2008-03-31, but Fonterra said in January 2025 that its Edgecumbe site still uses steam and electricity from a co-generation plant, to be replaced by an electrode boiler. So the plant probably didn't close in 2008: find why it leaves Elenz's data (the EA's network supply points table shows EDG0331's embedded generation record changing on 1 May 2008), and whether it has closed since. (Data question for the Elenz team.)",
   "Owner: Wikipedia's list gives Nova Energy; Fonterra's site hosts it. Find the owner (the Commerce Commission, the EA or the owners).",
-  "Location: only the grid connection so far. The plant is at Fonterra's Edgecumbe dairy factory: find it on the LINZ aerial (separate task), then test the point against Stats NZ's boundaries.",
   "Capacity: Elenz uses 10 MW (Wikipedia's list); check against an owner or official source.",
 ]
 notes = [
@@ -16,15 +15,24 @@ notes = [
   "Thermal batch 1 (19 Nov 2026): facts checked against Fonterra's January 2025 release, the EA's network supply points table, Wikipedia's list and Stats NZ boundaries. The plant isn't in the EA's dispatched plant register.",
   "District and region from the grid connection point (Edgecumbe) in Stats NZ's boundaries, 19 Nov 2026: Whakatāne District, no other district within 5 km.",
   "Fonterra's release (29 Jan 2025): the Edgecumbe site will move from steam and electricity from its co-generation plant to a new electrode boiler ($57 million).",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
 ]
 
+[location]
+value = [-37.977689, 176.832250]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026"
+
 [grid_connection]
-value = [-37.98726, 176.82888]
+value = [-37.986756, 176.829644]
 code = "EDG0331 EDGECUMBE"
-source = "ea-nsp"
+source = ["ea-nsp", "linz-aerial"]
 grade = "A"
-checked = "2026-11-19"
-note = "code and point match the EA's network supply points table of 17 Nov 2026"
+checked = "2026-11-18"
+note = "code from the EA's network supply points table; the point is the substation, read from the LINZ aerial, 18 Nov 2026 (the table's point was [-37.987260, 176.828880])"
 
 [facts.commissioned]
 value = "1996"

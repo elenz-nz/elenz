@@ -8,7 +8,6 @@ reviewed = ""
 to_check = [
   "Owner: who owns the cogeneration plant now? ECNZ built it (Kinleith Cogeneration Limited) and it passed to Genesis Power in 1999; the EA register's operator was TrustPower to Oct 2021 and Manawa Energy since (Contact bought Manawa in 2025); the EA's co-generator register (2015) approves Carter Holt Harvey Pulp and Paper's Kinleith Mill turbine generator; Elenz's design decision (2 Nov 2026) groups it under Oji Fibre Solutions. Find a public source for the change from Genesis and today's owner.",
   "Capacity: Indicative gross rating; net output reported around 38 MW.",
-  "Location: confirm Wikipedia's point sits on the cogeneration plant at the mill against the LINZ aerial (separate task).",
   "Since June 2025 the mill makes pulp only (Wikipedia): check whether the plant still runs as before.",
 ]
 notes = [
@@ -18,14 +17,16 @@ notes = [
   "Commissioned: Wikipedia's list gives 1997, the EA register 1998 (a year). Elenz's data has its metered output from Aug 1997. The ECNZ agreement with Carter Holt Harvey to build and run it is dated 31 May 1995, and Rolls-Royce's contract for its construction and commissioning 4 July 1995 (Gazette 1999-37).",
   "Fuel: the EA register says cogeneration on gas; Wikipedia and the bioenergy association say it burns wood waste. Elenz shows bioenergy (design decision, 2 Nov 2026).",
   "Previous owners (not published until the owner is settled): ECNZ, through Kinleith Cogeneration Limited, to 1999; Genesis Power, from 1999 (Gazette 1999-37; Genesis still had it in 2003, Commerce Commission decision 490).",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 
 [location]
 value = [-38.2734157065402, 175.880681282426]
 basis = "station"
-source = "wp-list"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wp-list, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-38.27244, 175.88309]

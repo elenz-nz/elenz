@@ -8,7 +8,6 @@ wikidata = "Q133860797"
 osm = ["way/1395935526"]
 reviewed = ""
 to_check = [
-  "Location: Wikidata's point, not yet checked against the LINZ aerial (separate task: two hectares at Marsden Point, beside State Highway 15 and opposite Transpower's Bream Bay substation).",
   "Name (decision): this page is the battery, which the register calls Ruakākā Energy Park; Meridian uses that name for the battery and the solar farm together. Rename the page to Ruakākā Battery (a site-only name)?",
 ]
 notes = [
@@ -17,14 +16,16 @@ notes = [
   "Dates: the register's row starts 15 Oct 2024; RNZ: grid-connected since early 2025; Meridian: construction and commissioning complete and officially opened 23 May 2025, final test results still to be approved then. Commissioned given as 2025.",
   "District and region from Wikidata's point (Whangārei District; only the sea, outside any district, within 3 km). The grid connection point gives the same.",
   "Dropped the Wikipedia-list rating lead (100/200): battery ratings are MW / MWh, and the page shows ratings as MW. Storage (200 MWh) is in units and About. Cost $186 million (not published).",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 
 [location]
 value = [-35.84867, 174.47729]
 basis = "station"
-source = "wd-q133860797"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wd-q133860797, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-35.84903, 174.47989]

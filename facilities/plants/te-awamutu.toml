@@ -6,7 +6,6 @@ name = "Te Awamutu"
 register = ["T022"]
 reviewed = ""
 to_check = [
-  "Location: only the grid connection so far. The plant stood at the Te Awamutu dairy factory (now Fonterra's): find its site on historical imagery or the LINZ aerial (separate task), then test the point against Stats NZ's boundaries.",
   "Commissioned and closed: only Wikipedia's list gives 1995 and 2007 (Elenz's data ends May 2007). Find a Genesis or official source for both.",
 ]
 notes = [
@@ -15,7 +14,16 @@ notes = [
   "District and region from the grid connection point (Te Awamutu) in Stats NZ's boundaries, 19 Nov 2026: Waipā District, no other district within 5 km.",
   "Units: Wikipedia's Whirinaki article says one of the old Whirinaki station's FT4 twin-pack units was moved in 1993 to build a gas-fired cogeneration plant at the Te Awamutu dairy factory.",
   "Owner differed from Wikipedia (resolved): ECNZ's Te Awamutu co-generation plant passed to Genesis Power on 1 April 1999 (Gazette), and the Commerce Commission lists Te Awamutu cogeneration (54 MW) in Genesis's portfolio in 2003, as Wikipedia's list says.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
+
+[location]
+value = [-38.004227, 175.310579]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-38.00214, 175.32017]

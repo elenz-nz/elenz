@@ -6,32 +6,32 @@ name = "Mill Creek"
 register = ["W012"]
 wikidata = "Q6858304"
 osm = ["relation/8550044"]
-reviewed = ""
-to_check = [
-  "Location: confirm the point sits on the wind farm against the LINZ aerial (separate task).",
-]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "60 MW from Sep 2014 (staged from May 2014).",
   "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "District and region from the [location] point (not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. The only other area within 5 km is the sea (outside any district).",
   "Resolved: Capacity: Meridian gives 26 turbines and 59.8 MW; Elenz and the register use 60 MW. Peak metered half-hour, Aug-Sep 2026: 58.3 MW.",
   "Removed the scheme fact (Wellington, from our own register): a single wind farm has no scheme.",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point moved to the substation.",
 ]
 
 [location]
 value = [-41.212222, 174.738889]
 basis = "station"
-source = "wd-q6858304"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wd-q6858304, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
-value = [-41.2584, 174.75956]
+value = [-41.258716, 174.759766]
 code = "WIL0331 Wilton"
-source = "ea-nsp"
+source = ["ea-nsp", "linz-aerial"]
 grade = "A"
-checked = "2026-11-19"
-note = "code and point match the EA's network supply points table of 17 Nov 2026"
+checked = "2026-11-18"
+note = "code from the EA's network supply points table; the point is the substation, read from the LINZ aerial, 18 Nov 2026 (the table's point was [-41.258400, 174.759560])"
 
 [facts.commissioned]
 value = "2014"

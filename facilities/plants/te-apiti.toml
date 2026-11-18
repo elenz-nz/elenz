@@ -6,25 +6,25 @@ name = "Te Āpiti"
 register = ["W001"]
 wikidata = "Q7690758"
 osm = ["relation/3666831"]
-reviewed = ""
+reviewed = "2026-11-19"
 photo_leads = ["P023"]
-to_check = [
-  "Location: confirm the point sits on the wind farm against the LINZ aerial (separate task).",
-]
+to_check = []
 notes = [
   "90 MW from Jul 2004.",
   "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "District and region from the [location] point (not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. Palmerston North City and Manawatū District are within 5 km, not within 2 km; the grid connection (Woodville) is also in Tararua District.",
   "Resolved: Capacity: Meridian gives 90.75 MW (55 x 1.65 MW); Elenz and the register use 90 MW. Kept 90 with 90.75 as a rating. Peak metered half-hour, Aug-Sep 2026: 57 MW, and output has fallen since 2024 (258 GWh a year expected; 187 GWh in 2025): worth a look later, not a page fact.",
   "Removed the scheme fact (Tararua Range, from our own register): a single wind farm has no scheme.",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 
 [location]
 value = [-40.2961, 175.808]
 basis = "station"
-source = "wd-q7690758"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wd-q7690758, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-40.31546, 175.85607]

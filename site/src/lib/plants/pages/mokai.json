@@ -56,7 +56,7 @@
  "owner": null,
  "scheme": null,
  "metered": null,
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "Mōkai, about 30 km northwest of Taupō, is majority-owned by the Tūaropaki Trust, with Mercury holding a quarter. It opened in 2000 as a 55 MW station and was enlarged in 2005 and again in 2007–08 to about 113 MW. It combines steam turbines with binary units, which make more electricity from the heat left in the fluid, and all the geothermal fluid goes back into the field. The field's heat also warms a large glasshouse and the Miraka milk-powder factory.",
@@ -143,12 +143,40 @@
    "label": "Connection point",
    "value": "Whakamaru (WKM2201)",
    "refs": [
-    7
+    7,
+    8
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -38.5306,
+  "lon": 175.926,
+  "basis": "whole site",
+  "refs": [
+   8
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/mokai-site.webp",
+   "across": 470,
+   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/mokai-close.webp",
+   "across": 930,
+   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/mokai-wide.webp",
+   "across": 7470,
+   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -198,6 +226,13 @@
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 8,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

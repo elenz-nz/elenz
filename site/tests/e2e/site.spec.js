@@ -410,6 +410,17 @@ test.describe('plant pages', () => {
     await expect(page.locator('section[aria-labelledby="hist-h"]')).toBeVisible();
     await expect(page.locator('.now')).toHaveCount(0);
   });
+
+  test('the aerial views switch scale and credit their imagery', async ({ page }) => {
+    await page.goto('/plants/manapouri');
+    const img = page.locator('.aerial img');
+    await expect(img).toHaveAttribute('src', '/plants/aerial/manapouri-site.webp');
+    await expect(img).toHaveJSProperty('complete', true);
+    expect(await img.evaluate((el) => el.naturalWidth)).toBe(1000);   // the file is there
+    await page.getByRole('button', { name: 'Wide' }).click();
+    await expect(img).toHaveAttribute('src', '/plants/aerial/manapouri-wide.webp');
+    await expect(page.locator('.aerial figcaption')).toContainText('Toitū Te Whenua LINZ');
+  });
 });
 
 // the plant index (/plants): without a LINZ key (as in checks.yml) the map is the drawn outline

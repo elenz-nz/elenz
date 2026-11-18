@@ -15,6 +15,7 @@ notes = [
   "The EA register's names for KAW0112 ONU0 include \"Kawerau Mill CoGen\" and \"Norske Skog CoGen\". Elenz shows the meter as Kawerau (Onepu), geothermal, from Jan 2013.",
   "Geothermal batch 1 (19 Nov 2026): checked against the EA register and network supply points table and Stats NZ boundaries only. Public wording for this meter follows the generation method page's note.",
   "Region from the grid connection point in Stats NZ's 2025 region boundaries, 19 Nov 2026. No district published: the point is a substation, and Whakatāne District is 150–200 m from it.",
+  "LINZ aerial check (18 Nov 2026): station point not set, grid connection point confirmed.",
 ]
 
 [grid_connection]

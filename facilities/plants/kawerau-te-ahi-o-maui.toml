@@ -7,8 +7,6 @@ register = ["G019"]
 osm = ["way/956295751"]
 reviewed = ""
 to_check = [
-  "Location: no station point yet (OpenStreetMap is research only); check one against the LINZ aerial or Wikidata (separate task).",
-  "District: not published until there's a station point; the field spans Kawerau and Whakatāne districts and the line is close.",
   "Capacity (open): Elenz uses 27 MW (the register's first entry, Jan 2018 to Sep 2025). Since 19 Sep 2025 the register lists 26 MW, and Eastland gives 26 MW; NZGA 25 MW, Wikipedia 24. Move plant_capacity.csv to 26 MW from Sep 2025? (Design decision.)",
 ]
 notes = [
@@ -16,7 +14,16 @@ notes = [
   "Geothermal batch 1 (19 Nov 2026): facts checked against Eastland Generation's geothermal page, the EA register and network supply points table, the NZ Geothermal Association's Kawerau page and 2023 generation report, and Stats NZ boundaries.",
   "Resolved (owner): Eastland Generation, the register's operator; a partnership with the Kawerau A8D Ahu Whenua Trust (Eastland; NZGA names the Te Ahi O Māui Partnership as a consent holder). Obayashi Corporation bought 50% of Eastland Generation in April 2024.",
   "Grid connection: the register moved it from KAW0111 (to 3 Sep 2025) to KAW2201, the connection it now shares with TOPP2; both are at the Kawerau substation's point.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
+
+[location]
+value = [-38.063200, 176.702952]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-38.07673, 176.72238]
@@ -64,10 +71,10 @@ grade = "C"
 checked = ""
 
 [facts.territorial_authority]
-value = "Kawerau"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = "Whakatāne"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
 
 [facts.owner]
 value = "Eastland Generation"

@@ -6,24 +6,24 @@ name = "Pātea"
 register = ["H021"]
 wikidata = "Q7144392"
 osm = ["relation/12550529"]
-reviewed = ""
-to_check = [
-  "Location: the point is Wikidata's for Pātea Dam (Q7144392); find the powerhouse on the LINZ aerial (separate task).",
-]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "34.5 MW (register: three units of 11.5, 11 and 12 MW); moved from HWA1101 to OHG1101 in June 2026.",
   "Hydro batch 5 (19 Nov 2026): facts checked against Contact's station page, the EA register and network supply points table, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "District and region from the dam's Wikidata point in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. No other district within 5 km, so the powerhouse below the dam is in the same district.",
   "Resolved: Capacity: Contact gives a maximum of 32 MW; the register 34.5 MW (Elenz); Wikipedia 33 (three 10.5 MW sets and a 700 kW auxiliary). Contact's 32 is a rating.",
   "Ownership: Wikipedia's Powerco article says Powerco bought Egmont Electricity in September 1997 and, after the 1998 reforms, sold its five hydro stations to TrustPower; the Pātea Dam article says owned and operated by Trustpower/Manawa since 1999.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
 
 [location]
-value = [-39.545, 174.569]
+value = [-39.546423, 174.567346]
 basis = "Pātea Dam"
-source = "wd-q7144392"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-19"
+note = "read from the LINZ aerial, 19 Nov 2026; the earlier point [-39.545000, 174.569000] came from wd-q7144392"
 
 [grid_connection]
 value = [-39.5665, 174.31012]

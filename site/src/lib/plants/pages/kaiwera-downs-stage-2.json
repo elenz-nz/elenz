@@ -22,7 +22,7 @@
  "owner": "Mercury",
  "scheme": null,
  "metered": null,
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "The second stage of Kaiwera Downs, on land south-east of the first, added 36 Vestas turbines of 4.3 MW (155 MW), taller than stage 1's at 156 m to the blade tip. Mercury went ahead after agreeing in 2024 to supply the Tiwai Point aluminium smelter, began building in June 2024, first generated in April 2026 and opened it in September 2026. With both stages Kaiwera Downs is, at 198 MW, the South Island's largest wind farm.",
@@ -73,17 +73,61 @@
    ]
   },
   {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Gore",
+   "refs": [
+    5
+   ]
+  },
+  {
    "k": "owner",
    "label": "Owner",
    "value": "Mercury",
    "refs": [
-    5,
+    6,
     1
+   ]
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Kaiwera Downs (KIW2201)",
+   "refs": [
+    7,
+    8
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -46.220875,
+  "lon": 169.060654,
+  "basis": "station",
+  "refs": [
+   8
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/kaiwera-downs-stage-2-site.webp",
+   "across": 410,
+   "imagery": "Southland 0.25m Rural Aerial Photos (2023-2024)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/kaiwera-downs-stage-2-close.webp",
+   "across": 830,
+   "imagery": "Southland 0.25m Rural Aerial Photos (2023-2024)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/kaiwera-downs-stage-2-wide.webp",
+   "across": 6610,
+   "imagery": "Southland 0.25m Rural Aerial Photos (2023-2024)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -115,10 +159,31 @@
   },
   {
    "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
    "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 8,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {
@@ -185,7 +250,7 @@
    },
    {
     "slug": "mahinerangi-waipori-b",
-    "name": "Mahinerangi (Waipori B)"
+    "name": "Mahinerangi"
    }
   ]
  }

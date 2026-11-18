@@ -6,21 +6,23 @@ name = "Ōhau B"
 register = ["H056"]
 wikidata = "Q7080630"
 osm = ["relation/11111269"]
-reviewed = ""
-to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "Added from Elenz's plant list (8 Nov 2026).",
   "Hydro batch 3 (18 Nov 2026): facts checked against Meridian's station pages, the EA register and network supply points table, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district. Mackenzie District is about 400–500 m from the point (700–800 m from the grid connection point); recheck if the point moves.",
   "Resolved: Capacity: Meridian's station page gives four 53 MW units, up to 212 MW; Meridian reassessed the station from 216 MW to 220 MW from 30 July 2026, the figure Elenz uses. The Wikipedia rating of 212 MW is replaced by Meridian's.",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 
 [location]
 value = [-44.2994, 170.112]
 basis = "station"
-source = "wd-q7080630"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wd-q7080630, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-44.3018, 170.11055]

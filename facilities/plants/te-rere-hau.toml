@@ -7,8 +7,6 @@ register = ["W008"]
 osm = ["relation/6122225"]
 reviewed = ""
 to_check = [
-  "Location: no station point yet (OpenStreetMap is research only); check one against the LINZ aerial or Wikidata.",
-  "District: Wikipedia's point is in Palmerston North City, but Tararua District is within 2 km; check against a station point.",
   "Capacity: Meridian now gives 91 turbines and 45.5 MW; Elenz uses 48.5 MW. A design decision for the Elenz team (when did it change?).",
 ]
 notes = [
@@ -19,7 +17,16 @@ notes = [
   "Repowering: Meridian plans up to 40 new turbines and 172 MW, with a final investment decision expected in early 2027 and completion about 2030. Not a page fact until built.",
   "Region from Wikipedia's point (-40.38833, 175.72417), Stats NZ 2025 boundaries; only Manawatū-Whanganui within 5 km.",
   "Removed the scheme fact (Tararua Range, from our own register): a single wind farm has no scheme.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
+
+[location]
+value = [-40.387808, 175.734445]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-40.35427, 175.77371]
@@ -70,9 +77,9 @@ checked = ""
 
 [facts.territorial_authority]
 value = "Palmerston North"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
 
 [[facts.territorial_authority.alt]]
 value = "Palmerston North City"

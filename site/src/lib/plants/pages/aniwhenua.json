@@ -22,7 +22,7 @@
  "owner": null,
  "scheme": "Rangitaiki",
  "metered": null,
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "Aniwhenua is the middle of three hydro schemes on the Rangitāiki River in the eastern Bay of Plenty, between Murupara and Whakatāne. A 10 m barrage above the Aniwhenua Falls turns the river into a 2.2 km concrete-lined canal and a head pond, from which two buried penstocks feed the power station beside the falls. The Bay of Plenty Electric Power Board built it under a government scheme of the late 1970s that helped local bodies develop small hydro, and it began generating in October 1980. Nova Energy owned it from 1998 until 2016, when it passed to a partnership that Pioneer Energy has wholly owned since 2024.",
@@ -98,8 +98,35 @@
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -38.29369,
+  "lon": 176.79236,
+  "basis": "station",
+  "refs": [
+   8
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/aniwhenua-site.webp",
+   "across": 470,
+   "imagery": "Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/aniwhenua-close.webp",
+   "across": 940,
+   "imagery": "Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/aniwhenua-wide.webp",
+   "across": 7500,
+   "imagery": "Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -149,6 +176,13 @@
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 8,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

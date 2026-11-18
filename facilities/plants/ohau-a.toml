@@ -6,21 +6,23 @@ name = "Ōhau A"
 register = ["H055"]
 wikidata = "Q7080628"
 osm = ["relation/12200234"]
-reviewed = ""
-to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "Added from Elenz's plant list (8 Nov 2026).",
   "Hydro batch 3 (18 Nov 2026): facts checked against Meridian's station pages, the EA register and network supply points table, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district. Waitaki District is about 400–500 m from the point (250–300 m from the grid connection point); recheck if the point moves.",
   "Year: Meridian gives 1979 (fully operational), as does Wikidata; the EA register and Wikipedia's list give 1980. The page shows 1979.",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 
 [location]
 value = [-44.2644, 170.032]
 basis = "station"
-source = "wd-q7080628"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wd-q7080628, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-44.26587, 170.02921]

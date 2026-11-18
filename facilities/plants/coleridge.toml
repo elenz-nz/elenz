@@ -6,25 +6,25 @@ name = "Coleridge"
 register = ["H032"]
 wikidata = "Q5144632"
 osm = ["way/403005270"]
-reviewed = ""
+reviewed = "2026-11-19"
 photo_leads = ["P032"]
-to_check = [
-  "Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task).",
-]
+to_check = []
 notes = [
   "Elenz has 42 MW from 27 May 2026 (40 before); Wikipedia 45.",
   "Hydro batch 5 (19 Nov 2026): facts checked against Contact's station page, the EA register and network supply points table, the Gazette (ECNZ's 1995 disclosure and its accounts for the year to 31 March 1999), Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. The grid connection point gives the same. Ashburton District is within 1 km, across the Rakaia River.",
   "Resolved: Capacity: Contact gives a maximum of 43 MW; the register 40 MW; Elenz uses 42 MW, what it has dispatched at since May 2026 (design decision, 30 Oct 2026); Wikipedia's list 45 and its article 39 (as of 2020). Contact's 43 is a rating.",
   "Sale: ECNZ's accounts record the sale in the year to 31 March 1999 (gain $70 million); Wikipedia says Trustpower bought it in 1998 for $90.6 million, with Alpine Energy, which withdrew.",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 
 [location]
 value = [-43.364167, 171.526944]
 basis = "station"
-source = "wd-q5144632"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wd-q5144632, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-43.36377, 171.52712]

@@ -6,10 +6,8 @@ name = "Turitea Wind Farm"
 register = ["W009", "W010"]
 wikidata = "Q7854981"
 osm = ["relation/13560722"]
-reviewed = ""
-to_check = [
-  "Location: confirm the point sits on the wind farm against the LINZ aerial (separate task).",
-]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "W009: Elenz shows Turitea as one plant: 118.8 MW from Aug 2021, 221.4 MW from Apr 2023.",
   "W010: See W009.",
@@ -19,14 +17,16 @@ notes = [
   "Resolved: Capacity: Mercury gives 60 Vestas V112 turbines and 222 MW; the register 222 MW; Elenz 221.4 MW (33 x 3.6 + 27 x 3.8, Wikipedia). Stations: northern 118.8 MW, southern 102.6 MW. Peak metered half-hour, Aug-Sep 2026: 212.2 MW.",
   "Removed the scheme fact (Tararua Range, from our own register): a single wind farm has no scheme.",
   "Previous owners: none. Mercury was called Mighty River Power until 2016 (nzx-mcy); the same company.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
 
 [location]
-value = [-40.4411, 175.671]
+value = [-40.436369, 175.700324]
 basis = "whole site"
-source = "wd-q7854981"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-40.441100, 175.671000] came from wd-q7854981"
 
 [grid_connection]
 value = [-40.41045, 175.63139]

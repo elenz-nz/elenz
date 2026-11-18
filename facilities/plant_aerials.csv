@@ -1,0 +1,325 @@
+slug,view,file,lat,lon,zoom,across_m,imagery,fetched
+aniwhenua,site,aerial/aniwhenua-site.webp,-38.29369,176.79236,18,470,Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+aniwhenua,close,aerial/aniwhenua-close.webp,-38.29369,176.79236,17,940,Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+aniwhenua,wide,aerial/aniwhenua-wide.webp,-38.29369,176.79236,14,7500,Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+arapuni,site,aerial/arapuni-site.webp,-38.071287,175.643923,18,470,Waipa 0.1m Urban Aerial Photos (2026),2026-11-19
+arapuni,close,aerial/arapuni-close.webp,-38.071287,175.643923,17,940,Waipa 0.1m Urban Aerial Photos (2026),2026-11-19
+arapuni,wide,aerial/arapuni-wide.webp,-38.071287,175.643923,14,7520,Waipa 0.1m Urban Aerial Photos (2026),2026-11-19
+aratiatia,site,aerial/aratiatia-site.webp,-38.615833,176.1425,18,470,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+aratiatia,close,aerial/aratiatia-close.webp,-38.615833,176.1425,17,930,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+aratiatia,wide,aerial/aratiatia-wide.webp,-38.615833,176.1425,14,7470,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+atiamuri,site,aerial/atiamuri-site.webp,-38.39188,176.022032,18,470,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+atiamuri,close,aerial/atiamuri-close.webp,-38.39188,176.022032,17,940,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+atiamuri,wide,aerial/atiamuri-wide.webp,-38.39188,176.022032,14,7490,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+aviemore,site,aerial/aviemore-site.webp,-44.656411,170.354764,18,420,Canterbury - Waitaki 0.3m Rural Aerial Photos (2021),2026-11-19
+aviemore,close,aerial/aviemore-close.webp,-44.656411,170.354764,17,850,Canterbury - Waitaki 0.3m Rural Aerial Photos (2021),2026-11-19
+aviemore,wide,aerial/aviemore-wide.webp,-44.656411,170.354764,14,6800,Canterbury - Waitaki 0.3m Rural Aerial Photos (2021),2026-11-19
+benmore,site,aerial/benmore-site.webp,-44.563459,170.193808,18,430,Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021),2026-11-19
+benmore,close,aerial/benmore-close.webp,-44.563459,170.193808,17,850,Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021),2026-11-19
+benmore,wide,aerial/benmore-wide.webp,-44.563459,170.193808,14,6810,Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021),2026-11-19
+branch-river-arnold,site,aerial/branch-river-arnold-site.webp,-41.67076,173.203316,18,450,Marlborough 0.25m Rural Aerial Photos (2023-2024),2026-11-19
+branch-river-arnold,close,aerial/branch-river-arnold-close.webp,-41.67076,173.203316,17,890,Marlborough 0.25m Rural Aerial Photos (2023-2024),2026-11-19
+branch-river-arnold,wide,aerial/branch-river-arnold-wide.webp,-41.67076,173.203316,14,7140,Marlborough 0.25m Rural Aerial Photos (2023-2024),2026-11-19
+clandeboye-solar-farm,site,aerial/clandeboye-solar-farm-site.webp,-44.190668,171.408782,18,430,Canterbury 0.2m Rural Aerial Photos (2024),2026-11-19
+clandeboye-solar-farm,close,aerial/clandeboye-solar-farm-close.webp,-44.190668,171.408782,17,860,Canterbury 0.2m Rural Aerial Photos (2024),2026-11-19
+clandeboye-solar-farm,wide,aerial/clandeboye-solar-farm-wide.webp,-44.190668,171.408782,14,6850,Canterbury 0.2m Rural Aerial Photos (2024),2026-11-19
+clyde,site,aerial/clyde-site.webp,-45.179886,169.306344,18,420,Otago 0.1m Urban Aerial Photos (2023-2024),2026-11-19
+clyde,close,aerial/clyde-close.webp,-45.179886,169.306344,17,840,Otago 0.1m Urban Aerial Photos (2023-2024),2026-11-19
+clyde,wide,aerial/clyde-wide.webp,-45.179886,169.306344,14,6730,Otago 0.1m Urban Aerial Photos (2023-2024),2026-11-19
+cobb,site,aerial/cobb-site.webp,-41.086303,172.732233,18,450,Tasman 0.25m Rural Aerial Photos (2024-2025),2026-11-19
+cobb,close,aerial/cobb-close.webp,-41.086303,172.732233,17,900,Tasman 0.25m Rural Aerial Photos (2024-2025),2026-11-19
+cobb,wide,aerial/cobb-wide.webp,-41.086303,172.732233,14,7200,Tasman 0.25m Rural Aerial Photos (2024-2025),2026-11-19
+coleridge,site,aerial/coleridge-site.webp,-43.364167,171.526944,18,430,Selwyn 0.2m Rural Aerial Photos (2025),2026-11-19
+coleridge,close,aerial/coleridge-close.webp,-43.364167,171.526944,17,870,Selwyn 0.2m Rural Aerial Photos (2025),2026-11-19
+coleridge,wide,aerial/coleridge-wide.webp,-43.364167,171.526944,14,6950,Selwyn 0.2m Rural Aerial Photos (2025),2026-11-19
+dannevirke-solar-farm,site,aerial/dannevirke-solar-farm-site.webp,-40.183795,176.009067,18,460,Manawatū-Whanganui 0.2m Rural Aerial Photos (2023-2024),2026-11-19
+dannevirke-solar-farm,close,aerial/dannevirke-solar-farm-close.webp,-40.183795,176.009067,17,910,Manawatū-Whanganui 0.2m Rural Aerial Photos (2023-2024),2026-11-19
+dannevirke-solar-farm,wide,aerial/dannevirke-solar-farm-wide.webp,-40.183795,176.009067,14,7300,Manawatū-Whanganui 0.2m Rural Aerial Photos (2023-2024),2026-11-19
+deep-stream-waipori-a,site,aerial/deep-stream-waipori-a-site.webp,-45.809597,169.905336,18,420,Otago 0.2m Rural Aerial Photos (2025),2026-11-19
+deep-stream-waipori-a,close,aerial/deep-stream-waipori-a-close.webp,-45.809597,169.905336,17,830,Otago 0.2m Rural Aerial Photos (2025),2026-11-19
+deep-stream-waipori-a,wide,aerial/deep-stream-waipori-a-wide.webp,-45.809597,169.905336,14,6660,Otago 0.2m Rural Aerial Photos (2025),2026-11-19
+edgecumbe,site,aerial/edgecumbe-site.webp,-37.977689,176.83225,18,470,Bay of Plenty 0.1m Urban Aerial Photos (2025),2026-11-19
+edgecumbe,close,aerial/edgecumbe-close.webp,-37.977689,176.83225,17,940,Bay of Plenty 0.1m Urban Aerial Photos (2025),2026-11-19
+edgecumbe,wide,aerial/edgecumbe-wide.webp,-37.977689,176.83225,14,7530,Bay of Plenty 0.1m Urban Aerial Photos (2025),2026-11-19
+fonterra-dairy-whareroa,site,aerial/fonterra-dairy-whareroa-site.webp,-39.60956,174.298311,18,460,Taranaki 0.1m Urban Aerial Photos (2022-2023),2026-11-19
+fonterra-dairy-whareroa,close,aerial/fonterra-dairy-whareroa-close.webp,-39.60956,174.298311,17,920,Taranaki 0.1m Urban Aerial Photos (2022-2023),2026-11-19
+fonterra-dairy-whareroa,wide,aerial/fonterra-dairy-whareroa-wide.webp,-39.60956,174.298311,14,7360,Taranaki 0.1m Urban Aerial Photos (2022-2023),2026-11-19
+glenbrook-ohurua-battery,site,aerial/glenbrook-ohurua-battery-site.webp,-37.200769,174.735005,18,480,Auckland 0.075m Urban Aerial Photos (2024-2025),2026-11-19
+glenbrook-ohurua-battery,close,aerial/glenbrook-ohurua-battery-close.webp,-37.200769,174.735005,17,950,Auckland 0.075m Urban Aerial Photos (2024-2025),2026-11-19
+glenbrook-ohurua-battery,wide,aerial/glenbrook-ohurua-battery-wide.webp,-37.200769,174.735005,14,7610,Auckland 0.075m Urban Aerial Photos (2024-2025),2026-11-19
+glenbrook-steel,site,aerial/glenbrook-steel-site.webp,-37.206075,174.725074,18,480,Auckland 0.075m Urban Aerial Photos (2024-2025),2026-11-19
+glenbrook-steel,close,aerial/glenbrook-steel-close.webp,-37.206075,174.725074,17,950,Auckland 0.075m Urban Aerial Photos (2024-2025),2026-11-19
+glenbrook-steel,wide,aerial/glenbrook-steel-wide.webp,-37.206075,174.725074,14,7610,Auckland 0.075m Urban Aerial Photos (2024-2025),2026-11-19
+harapaki,site,aerial/harapaki-site.webp,-39.1867,176.708469,18,460,Hawke's Bay 0.2m Rural Aerial Photos (2025-2026),2026-11-19
+harapaki,close,aerial/harapaki-close.webp,-39.1867,176.708469,17,930,Hawke's Bay 0.2m Rural Aerial Photos (2025-2026),2026-11-19
+harapaki,wide,aerial/harapaki-wide.webp,-39.1867,176.708469,14,7410,Hawke's Bay 0.2m Rural Aerial Photos (2025-2026),2026-11-19
+highbank,site,aerial/highbank-site.webp,-43.573176,171.735537,18,430,Selwyn 0.2m Rural Aerial Photos (2025),2026-11-19
+highbank,close,aerial/highbank-close.webp,-43.573176,171.735537,17,870,Selwyn 0.2m Rural Aerial Photos (2025),2026-11-19
+highbank,wide,aerial/highbank-wide.webp,-43.573176,171.735537,14,6920,Selwyn 0.2m Rural Aerial Photos (2025),2026-11-19
+huntly-5,site,aerial/huntly-5-site.webp,-37.544493,175.149956,18,470,Waikato 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+huntly-5,close,aerial/huntly-5-close.webp,-37.544493,175.149956,17,950,Waikato 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+huntly-5,wide,aerial/huntly-5-wide.webp,-37.544493,175.149956,14,7580,Waikato 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+huntly-6,site,aerial/huntly-6-site.webp,-37.544493,175.149956,18,470,Waikato 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+huntly-6,close,aerial/huntly-6-close.webp,-37.544493,175.149956,17,950,Waikato 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+huntly-6,wide,aerial/huntly-6-wide.webp,-37.544493,175.149956,14,7580,Waikato 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+huntly-battery,site,aerial/huntly-battery-site.webp,-37.543134,175.146859,18,470,Waikato 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+huntly-battery,close,aerial/huntly-battery-close.webp,-37.543134,175.146859,17,950,Waikato 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+huntly-battery,wide,aerial/huntly-battery-wide.webp,-37.543134,175.146859,14,7580,Waikato 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+huntly-rankines,site,aerial/huntly-rankines-site.webp,-37.544493,175.149956,18,470,Waikato 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+huntly-rankines,close,aerial/huntly-rankines-close.webp,-37.544493,175.149956,17,950,Waikato 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+huntly-rankines,wide,aerial/huntly-rankines-wide.webp,-37.544493,175.149956,14,7580,Waikato 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+junction-road,site,aerial/junction-road-site.webp,-39.116698,174.103689,18,460,Taranaki 0.1m Urban Aerial Photos (2022),2026-11-19
+junction-road,close,aerial/junction-road-close.webp,-39.116698,174.103689,17,930,Taranaki 0.1m Urban Aerial Photos (2022),2026-11-19
+junction-road,wide,aerial/junction-road-wide.webp,-39.116698,174.103689,14,7410,Taranaki 0.1m Urban Aerial Photos (2022),2026-11-19
+kaimai,site,aerial/kaimai-site.webp,-37.777318,176.055234,18,470,Bay of Plenty 0.1m Urban Aerial Photos (2025),2026-11-19
+kaimai,close,aerial/kaimai-close.webp,-37.777318,176.055234,17,940,Bay of Plenty 0.1m Urban Aerial Photos (2025),2026-11-19
+kaimai,wide,aerial/kaimai-wide.webp,-37.777318,176.055234,14,7550,Bay of Plenty 0.1m Urban Aerial Photos (2025),2026-11-19
+kaiwaikawe-wind-farm,site,aerial/kaiwaikawe-wind-farm-site.webp,-35.862847,173.707693,18,480,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+kaiwaikawe-wind-farm,close,aerial/kaiwaikawe-wind-farm-close.webp,-35.862847,173.707693,17,970,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+kaiwaikawe-wind-farm,wide,aerial/kaiwaikawe-wind-farm-wide.webp,-35.862847,173.707693,14,7740,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+kaiwera-downs-stage-2,site,aerial/kaiwera-downs-stage-2-site.webp,-46.220875,169.060654,18,410,Southland 0.25m Rural Aerial Photos (2023-2024),2026-11-19
+kaiwera-downs-stage-2,close,aerial/kaiwera-downs-stage-2-close.webp,-46.220875,169.060654,17,830,Southland 0.25m Rural Aerial Photos (2023-2024),2026-11-19
+kaiwera-downs-stage-2,wide,aerial/kaiwera-downs-stage-2-wide.webp,-46.220875,169.060654,14,6610,Southland 0.25m Rural Aerial Photos (2023-2024),2026-11-19
+kaiwera-downs-wind-farm,site,aerial/kaiwera-downs-wind-farm-site.webp,-46.217765,169.016115,18,410,Southland 0.25m Rural Aerial Photos (2023-2024),2026-11-19
+kaiwera-downs-wind-farm,close,aerial/kaiwera-downs-wind-farm-close.webp,-46.217765,169.016115,17,830,Southland 0.25m Rural Aerial Photos (2023-2024),2026-11-19
+kaiwera-downs-wind-farm,wide,aerial/kaiwera-downs-wind-farm-wide.webp,-46.217765,169.016115,14,6610,Southland 0.25m Rural Aerial Photos (2023-2024),2026-11-19
+kapuni,site,aerial/kapuni-site.webp,-39.477568,174.172625,18,460,Taranaki 0.1m Urban Aerial Photos (2022-2023),2026-11-19
+kapuni,close,aerial/kapuni-close.webp,-39.477568,174.172625,17,920,Taranaki 0.1m Urban Aerial Photos (2022-2023),2026-11-19
+kapuni,wide,aerial/kapuni-wide.webp,-39.477568,174.172625,14,7370,Taranaki 0.1m Urban Aerial Photos (2022-2023),2026-11-19
+karapiro,site,aerial/karapiro-site.webp,-37.924315,175.539397,18,470,Waipa 0.1m Urban Aerial Photos (2026),2026-11-19
+karapiro,close,aerial/karapiro-close.webp,-37.924315,175.539397,17,940,Waipa 0.1m Urban Aerial Photos (2026),2026-11-19
+karapiro,wide,aerial/karapiro-wide.webp,-37.924315,175.539397,14,7540,Waipa 0.1m Urban Aerial Photos (2026),2026-11-19
+kawerau,site,aerial/kawerau-site.webp,-38.0634,176.7257,18,470,Bay of Plenty 0.1m Urban Aerial Photos (2025),2026-11-19
+kawerau,close,aerial/kawerau-close.webp,-38.0634,176.7257,17,940,Bay of Plenty 0.1m Urban Aerial Photos (2025),2026-11-19
+kawerau,wide,aerial/kawerau-wide.webp,-38.0634,176.7257,14,7520,Bay of Plenty 0.1m Urban Aerial Photos (2025),2026-11-19
+kawerau-te-ahi-o-maui,site,aerial/kawerau-te-ahi-o-maui-site.webp,-38.0632,176.702952,18,470,Bay of Plenty 0.1m Urban Aerial Photos (2023),2026-11-19
+kawerau-te-ahi-o-maui,close,aerial/kawerau-te-ahi-o-maui-close.webp,-38.0632,176.702952,17,940,Bay of Plenty 0.1m Urban Aerial Photos (2023),2026-11-19
+kawerau-te-ahi-o-maui,wide,aerial/kawerau-te-ahi-o-maui-wide.webp,-38.0632,176.702952,14,7520,Bay of Plenty 0.1m Urban Aerial Photos (2023),2026-11-19
+kawerau-tg1-tg2,site,aerial/kawerau-tg1-tg2-site.webp,-38.063066,176.72,18,470,Bay of Plenty 0.1m Urban Aerial Photos (2025),2026-11-19
+kawerau-tg1-tg2,close,aerial/kawerau-tg1-tg2-close.webp,-38.063066,176.72,17,940,Bay of Plenty 0.1m Urban Aerial Photos (2025),2026-11-19
+kawerau-tg1-tg2,wide,aerial/kawerau-tg1-tg2-wide.webp,-38.063066,176.72,14,7520,Bay of Plenty 0.1m Urban Aerial Photos (2025),2026-11-19
+kawerau-topp2,site,aerial/kawerau-topp2-site.webp,-38.07472,176.69972,18,470,Bay of Plenty 0.1m Urban Aerial Photos (2025),2026-11-19
+kawerau-topp2,close,aerial/kawerau-topp2-close.webp,-38.07472,176.69972,17,940,Bay of Plenty 0.1m Urban Aerial Photos (2025),2026-11-19
+kawerau-topp2,wide,aerial/kawerau-topp2-wide.webp,-38.07472,176.69972,14,7520,Bay of Plenty 0.1m Urban Aerial Photos (2025),2026-11-19
+kinleith,site,aerial/kinleith-site.webp,-38.2734157065402,175.880681282426,18,470,South Waikato 0.1m Urban Aerial Photos (2025),2026-11-19
+kinleith,close,aerial/kinleith-close.webp,-38.2734157065402,175.880681282426,17,940,South Waikato 0.1m Urban Aerial Photos (2025),2026-11-19
+kinleith,wide,aerial/kinleith-wide.webp,-38.2734157065402,175.880681282426,14,7500,South Waikato 0.1m Urban Aerial Photos (2025),2026-11-19
+kohira-solar-farm,site,aerial/kohira-solar-farm-site.webp,-35.081667,173.219444,18,490,Northland 0.1m Urban Aerial Photos (2016),2026-11-19
+kohira-solar-farm,close,aerial/kohira-solar-farm-close.webp,-35.081667,173.219444,17,980,Northland 0.1m Urban Aerial Photos (2016),2026-11-19
+kohira-solar-farm,wide,aerial/kohira-solar-farm-wide.webp,-35.081667,173.219444,14,7820,Northland 0.1m Urban Aerial Photos (2016),2026-11-19
+kowhai-park-solar-farm,site,aerial/kowhai-park-solar-farm-site.webp,-43.495833,172.510556,18,430,Christchurch 0.075m Urban Aerial Photos (2025),2026-11-19
+kowhai-park-solar-farm,close,aerial/kowhai-park-solar-farm-close.webp,-43.495833,172.510556,17,870,Christchurch 0.075m Urban Aerial Photos (2025),2026-11-19
+kowhai-park-solar-farm,wide,aerial/kowhai-park-solar-farm-wide.webp,-43.495833,172.510556,14,6930,Christchurch 0.075m Urban Aerial Photos (2025),2026-11-19
+kumara,site,aerial/kumara-site.webp,-42.635999,171.19527,18,440,West Coast 0.2m Rural Aerial Photos (2024-2026),2026-11-19
+kumara,close,aerial/kumara-close.webp,-42.635999,171.19527,17,880,West Coast 0.2m Rural Aerial Photos (2024-2026),2026-11-19
+kumara,wide,aerial/kumara-wide.webp,-42.635999,171.19527,14,7030,West Coast 0.2m Rural Aerial Photos (2024-2026),2026-11-19
+lauriston-solar-farm,site,aerial/lauriston-solar-farm-site.webp,-43.730393,171.786134,18,430,Ashburton 0.075m Urban Aerial Photos (2025),2026-11-19
+lauriston-solar-farm,close,aerial/lauriston-solar-farm-close.webp,-43.730393,171.786134,17,860,Ashburton 0.075m Urban Aerial Photos (2025),2026-11-19
+lauriston-solar-farm,wide,aerial/lauriston-solar-farm-wide.webp,-43.730393,171.786134,14,6900,Ashburton 0.075m Urban Aerial Photos (2025),2026-11-19
+mahinerangi-waipori-b,site,aerial/mahinerangi-waipori-b-site.webp,-45.7717,169.879417,18,420,Otago 0.2m Rural Aerial Photos (2025),2026-11-19
+mahinerangi-waipori-b,close,aerial/mahinerangi-waipori-b-close.webp,-45.7717,169.879417,17,830,Otago 0.2m Rural Aerial Photos (2025),2026-11-19
+mahinerangi-waipori-b,wide,aerial/mahinerangi-waipori-b-wide.webp,-45.7717,169.879417,14,6660,Otago 0.2m Rural Aerial Photos (2025),2026-11-19
+manapouri,site,aerial/manapouri-site.webp,-45.5214,167.278,18,420,Southland 0.75m Rural Aerial Photos (2005-2011),2026-11-19
+manapouri,close,aerial/manapouri-close.webp,-45.5214,167.278,17,840,Southland 0.75m Rural Aerial Photos (2005-2011),2026-11-19
+manapouri,wide,aerial/manapouri-wide.webp,-45.5214,167.278,14,6690,Southland 0.75m Rural Aerial Photos (2005-2011),2026-11-19
+mangahao,site,aerial/mangahao-site.webp,-40.576719,175.450132,18,450,Manawatū-Whanganui 0.3m Rural Aerial Photos (2021-2022),2026-11-19
+mangahao,close,aerial/mangahao-close.webp,-40.576719,175.450132,17,910,Manawatū-Whanganui 0.3m Rural Aerial Photos (2021-2022),2026-11-19
+mangahao,wide,aerial/mangahao-wide.webp,-40.576719,175.450132,14,7260,Manawatū-Whanganui 0.3m Rural Aerial Photos (2021-2022),2026-11-19
+maraetai,site,aerial/maraetai-site.webp,-38.351965,175.743502,18,470,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+maraetai,close,aerial/maraetai-close.webp,-38.351965,175.743502,17,940,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+maraetai,wide,aerial/maraetai-wide.webp,-38.351965,175.743502,14,7490,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+matahina,site,aerial/matahina-site.webp,-38.113984,176.814089,18,470,Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+matahina,close,aerial/matahina-close.webp,-38.113984,176.814089,17,940,Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+matahina,wide,aerial/matahina-wide.webp,-38.113984,176.814089,14,7520,Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+mckee,site,aerial/mckee-site.webp,-39.097476,174.335658,18,460,Taranaki 0.25m Rural Aerial Photos (2021-2022),2026-11-19
+mckee,close,aerial/mckee-close.webp,-39.097476,174.335658,17,930,Taranaki 0.25m Rural Aerial Photos (2021-2022),2026-11-19
+mckee,wide,aerial/mckee-wide.webp,-39.097476,174.335658,14,7420,Taranaki 0.25m Rural Aerial Photos (2021-2022),2026-11-19
+mill-creek,site,aerial/mill-creek-site.webp,-41.212222,174.738889,18,450,Wellington 0.2m Rural Aerial Photos (2025-2026),2026-11-19
+mill-creek,close,aerial/mill-creek-close.webp,-41.212222,174.738889,17,900,Wellington 0.2m Rural Aerial Photos (2025-2026),2026-11-19
+mill-creek,wide,aerial/mill-creek-wide.webp,-41.212222,174.738889,14,7190,Wellington 0.2m Rural Aerial Photos (2025-2026),2026-11-19
+mokai,site,aerial/mokai-site.webp,-38.5306,175.926,18,470,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+mokai,close,aerial/mokai-close.webp,-38.5306,175.926,17,930,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+mokai,wide,aerial/mokai-wide.webp,-38.5306,175.926,14,7470,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+new-plymouth,site,aerial/new-plymouth-site.webp,-39.058191,174.027447,18,460,Taranaki 0.1m Urban Aerial Photos (2022),2026-11-19
+new-plymouth,close,aerial/new-plymouth-close.webp,-39.058191,174.027447,17,930,Taranaki 0.1m Urban Aerial Photos (2022),2026-11-19
+new-plymouth,wide,aerial/new-plymouth-wide.webp,-39.058191,174.027447,14,7420,Taranaki 0.1m Urban Aerial Photos (2022),2026-11-19
+nga-awa-purua,site,aerial/nga-awa-purua-site.webp,-38.614167,176.184167,18,470,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+nga-awa-purua,close,aerial/nga-awa-purua-close.webp,-38.614167,176.184167,17,930,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+nga-awa-purua,wide,aerial/nga-awa-purua-wide.webp,-38.614167,176.184167,14,7470,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+nga-tamariki,site,aerial/nga-tamariki-site.webp,-38.547222,176.195833,18,470,Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+nga-tamariki,close,aerial/nga-tamariki-close.webp,-38.547222,176.195833,17,930,Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+nga-tamariki,wide,aerial/nga-tamariki-wide.webp,-38.547222,176.195833,14,7470,Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+ngawha,site,aerial/ngawha-site.webp,-35.417424,173.852112,18,490,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+ngawha,close,aerial/ngawha-close.webp,-35.417424,173.852112,17,970,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+ngawha,wide,aerial/ngawha-wide.webp,-35.417424,173.852112,14,7790,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+ohaaki,site,aerial/ohaaki-site.webp,-38.52796,176.29391,18,470,Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+ohaaki,close,aerial/ohaaki-close.webp,-38.52796,176.29391,17,930,Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+ohaaki,wide,aerial/ohaaki-wide.webp,-38.52796,176.29391,14,7470,Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+ohakuri,site,aerial/ohakuri-site.webp,-38.407878,176.088644,18,470,Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+ohakuri,close,aerial/ohakuri-close.webp,-38.407878,176.088644,17,940,Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+ohakuri,wide,aerial/ohakuri-wide.webp,-38.407878,176.088644,14,7490,Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+ohau-a,site,aerial/ohau-a-site.webp,-44.2644,170.032,18,430,Mackenzie 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+ohau-a,close,aerial/ohau-a-close.webp,-44.2644,170.032,17,860,Mackenzie 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+ohau-a,wide,aerial/ohau-a-wide.webp,-44.2644,170.032,14,6840,Mackenzie 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+ohau-b,site,aerial/ohau-b-site.webp,-44.2994,170.112,18,430,Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021),2026-11-19
+ohau-b,close,aerial/ohau-b-close.webp,-44.2994,170.112,17,850,Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021),2026-11-19
+ohau-b,wide,aerial/ohau-b-wide.webp,-44.2994,170.112,14,6840,Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021),2026-11-19
+ohau-c,site,aerial/ohau-c-site.webp,-44.3419,170.182,18,430,Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021),2026-11-19
+ohau-c,close,aerial/ohau-c-close.webp,-44.3419,170.182,17,850,Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021),2026-11-19
+ohau-c,wide,aerial/ohau-c-wide.webp,-44.3419,170.182,14,6830,Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021),2026-11-19
+omeheu-solar-farm,site,aerial/omeheu-solar-farm-site.webp,-37.980254,176.854003,18,470,Bay of Plenty 0.1m Urban Aerial Photos (2025),2026-11-19
+omeheu-solar-farm,close,aerial/omeheu-solar-farm-close.webp,-37.980254,176.854003,17,940,Bay of Plenty 0.1m Urban Aerial Photos (2025),2026-11-19
+omeheu-solar-farm,wide,aerial/omeheu-solar-farm-wide.webp,-37.980254,176.854003,14,7530,Bay of Plenty 0.1m Urban Aerial Photos (2025),2026-11-19
+otahuhu-a,site,aerial/otahuhu-a-site.webp,-36.950273,174.862683,18,480,Auckland 0.075m Urban Aerial Photos (2024-2025),2026-11-19
+otahuhu-a,close,aerial/otahuhu-a-close.webp,-36.950273,174.862683,17,950,Auckland 0.075m Urban Aerial Photos (2024-2025),2026-11-19
+otahuhu-a,wide,aerial/otahuhu-a-wide.webp,-36.950273,174.862683,14,7640,Auckland 0.075m Urban Aerial Photos (2024-2025),2026-11-19
+otahuhu-b,site,aerial/otahuhu-b-site.webp,-36.950273,174.862683,18,480,Auckland 0.075m Urban Aerial Photos (2024-2025),2026-11-19
+otahuhu-b,close,aerial/otahuhu-b-close.webp,-36.950273,174.862683,17,950,Auckland 0.075m Urban Aerial Photos (2024-2025),2026-11-19
+otahuhu-b,wide,aerial/otahuhu-b-wide.webp,-36.950273,174.862683,14,7640,Auckland 0.075m Urban Aerial Photos (2024-2025),2026-11-19
+paerau-gorge,site,aerial/paerau-gorge-site.webp,-45.348745,169.94459,18,420,Otago 0.2m Rural Aerial Photos (2025),2026-11-19
+paerau-gorge,close,aerial/paerau-gorge-close.webp,-45.348745,169.94459,17,840,Otago 0.2m Rural Aerial Photos (2025),2026-11-19
+paerau-gorge,wide,aerial/paerau-gorge-wide.webp,-45.348745,169.94459,14,6710,Otago 0.2m Rural Aerial Photos (2025),2026-11-19
+pamu-ra-ki-whitianga-solar-farm,site,aerial/pamu-ra-ki-whitianga-solar-farm-site.webp,-36.851743,175.664193,18,480,Waikato 0.3m Rural Aerial Photos (2023-2024),2026-11-19
+pamu-ra-ki-whitianga-solar-farm,close,aerial/pamu-ra-ki-whitianga-solar-farm-close.webp,-36.851743,175.664193,17,960,Waikato 0.3m Rural Aerial Photos (2023-2024),2026-11-19
+pamu-ra-ki-whitianga-solar-farm,wide,aerial/pamu-ra-ki-whitianga-solar-farm-wide.webp,-36.851743,175.664193,14,7650,Waikato 0.3m Rural Aerial Photos (2023-2024),2026-11-19
+papareireia,site,aerial/papareireia-site.webp,-36.087942,174.357662,18,480,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+papareireia,close,aerial/papareireia-close.webp,-36.087942,174.357662,17,970,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+papareireia,wide,aerial/papareireia-wide.webp,-36.087942,174.357662,14,7720,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+patea,site,aerial/patea-site.webp,-39.546423,174.567346,18,460,Taranaki 0.25m Rural Aerial Photos (2021-2022),2026-11-19
+patea,close,aerial/patea-close.webp,-39.546423,174.567346,17,920,Taranaki 0.25m Rural Aerial Photos (2021-2022),2026-11-19
+patea,wide,aerial/patea-wide.webp,-39.546423,174.567346,14,7370,Taranaki 0.25m Rural Aerial Photos (2021-2022),2026-11-19
+poihipi,site,aerial/poihipi-site.webp,-38.63028,176.04167,18,470,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+poihipi,close,aerial/poihipi-close.webp,-38.63028,176.04167,17,930,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+poihipi,wide,aerial/poihipi-wide.webp,-38.63028,176.04167,14,7460,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+pukenui-solar-farm,site,aerial/pukenui-solar-farm-site.webp,-34.818333,173.110556,18,490,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+pukenui-solar-farm,close,aerial/pukenui-solar-farm-close.webp,-34.818333,173.110556,17,980,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+pukenui-solar-farm,wide,aerial/pukenui-solar-farm-wide.webp,-34.818333,173.110556,14,7840,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+rangipo,site,aerial/rangipo-site.webp,-39.153677,175.834367,18,460,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+rangipo,close,aerial/rangipo-close.webp,-39.153677,175.834367,17,930,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+rangipo,wide,aerial/rangipo-wide.webp,-39.153677,175.834367,14,7410,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+rangitaiki-solar-farm,site,aerial/rangitaiki-solar-farm-site.webp,-37.996342,176.809961,18,470,Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+rangitaiki-solar-farm,close,aerial/rangitaiki-solar-farm-close.webp,-37.996342,176.809961,17,940,Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+rangitaiki-solar-farm,wide,aerial/rangitaiki-solar-farm-wide.webp,-37.996342,176.809961,14,7530,Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+roaring-meg,site,aerial/roaring-meg-site.webp,-45.001541,169.069988,18,420,Otago 0.2m Rural Aerial Photos (2025),2026-11-19
+roaring-meg,close,aerial/roaring-meg-close.webp,-45.001541,169.069988,17,840,Otago 0.2m Rural Aerial Photos (2025),2026-11-19
+roaring-meg,wide,aerial/roaring-meg-wide.webp,-45.001541,169.069988,14,6760,Otago 0.2m Rural Aerial Photos (2025),2026-11-19
+rotohiko,site,aerial/rotohiko-site.webp,-37.576758,175.144881,18,470,Waikato 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+rotohiko,close,aerial/rotohiko-close.webp,-37.576758,175.144881,17,950,Waikato 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+rotohiko,wide,aerial/rotohiko-wide.webp,-37.576758,175.144881,14,7570,Waikato 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+rotokawa,site,aerial/rotokawa-site.webp,-38.612222,176.193611,18,470,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+rotokawa,close,aerial/rotokawa-close.webp,-38.612222,176.193611,17,930,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+rotokawa,wide,aerial/rotokawa-wide.webp,-38.612222,176.193611,14,7470,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+roxburgh,site,aerial/roxburgh-site.webp,-45.47581,169.32255,18,420,Otago 0.1m Urban Aerial Photos (2023-2024),2026-11-19
+roxburgh,close,aerial/roxburgh-close.webp,-45.47581,169.32255,17,840,Otago 0.1m Urban Aerial Photos (2023-2024),2026-11-19
+roxburgh,wide,aerial/roxburgh-wide.webp,-45.47581,169.32255,14,6700,Otago 0.1m Urban Aerial Photos (2023-2024),2026-11-19
+ruakaka-energy-park,site,aerial/ruakaka-energy-park-site.webp,-35.84867,174.47729,18,480,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+ruakaka-energy-park,close,aerial/ruakaka-energy-park-close.webp,-35.84867,174.47729,17,970,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+ruakaka-energy-park,wide,aerial/ruakaka-energy-park-wide.webp,-35.84867,174.47729,14,7740,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+ruakaka-solar-farm,site,aerial/ruakaka-solar-farm-site.webp,-35.85486,174.469867,18,480,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+ruakaka-solar-farm,close,aerial/ruakaka-solar-farm-close.webp,-35.85486,174.469867,17,970,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+ruakaka-solar-farm,wide,aerial/ruakaka-solar-farm-wide.webp,-35.85486,174.469867,14,7740,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+southdown,site,aerial/southdown-site.webp,-36.92756,174.82733,18,480,Auckland 0.075m Urban Aerial Photos (2024-2025),2026-11-19
+southdown,close,aerial/southdown-close.webp,-36.92756,174.82733,17,950,Auckland 0.075m Urban Aerial Photos (2024-2025),2026-11-19
+southdown,wide,aerial/southdown-wide.webp,-36.92756,174.82733,14,7640,Auckland 0.075m Urban Aerial Photos (2024-2025),2026-11-19
+southdown-battery,site,aerial/southdown-battery-site.webp,-36.92756,174.82733,18,480,Auckland 0.075m Urban Aerial Photos (2024-2025),2026-11-19
+southdown-battery,close,aerial/southdown-battery-close.webp,-36.92756,174.82733,17,950,Auckland 0.075m Urban Aerial Photos (2024-2025),2026-11-19
+southdown-battery,wide,aerial/southdown-battery-wide.webp,-36.92756,174.82733,14,7640,Auckland 0.075m Urban Aerial Photos (2024-2025),2026-11-19
+stratford,site,aerial/stratford-site.webp,-39.3322,174.319,18,460,Taranaki 0.05m Urban Aerial Photos (2022-2023),2026-11-19
+stratford,close,aerial/stratford-close.webp,-39.3322,174.319,17,920,Taranaki 0.05m Urban Aerial Photos (2022-2023),2026-11-19
+stratford,wide,aerial/stratford-wide.webp,-39.3322,174.319,14,7390,Taranaki 0.05m Urban Aerial Photos (2022-2023),2026-11-19
+taiohi-solar-farm,site,aerial/taiohi-solar-farm-site.webp,-37.440563,175.131703,18,470,Waikato District 0.1m Urban Aerial Photos (2021),2026-11-19
+taiohi-solar-farm,close,aerial/taiohi-solar-farm-close.webp,-37.440563,175.131703,17,950,Waikato District 0.1m Urban Aerial Photos (2021),2026-11-19
+taiohi-solar-farm,wide,aerial/taiohi-solar-farm-wide.webp,-37.440563,175.131703,14,7590,Waikato District 0.1m Urban Aerial Photos (2021),2026-11-19
+tararua-stage-i,site,aerial/tararua-stage-i-site.webp,-40.338074,175.787747,18,460,Manawatū-Whanganui 0.2m Rural Aerial Photos (2023-2024),2026-11-19
+tararua-stage-i,close,aerial/tararua-stage-i-close.webp,-40.338074,175.787747,17,910,Manawatū-Whanganui 0.2m Rural Aerial Photos (2023-2024),2026-11-19
+tararua-stage-i,wide,aerial/tararua-stage-i-wide.webp,-40.338074,175.787747,14,7280,Manawatū-Whanganui 0.2m Rural Aerial Photos (2023-2024),2026-11-19
+tararua-stage-ii,site,aerial/tararua-stage-ii-site.webp,-40.357345,175.770738,18,460,Manawatū-Whanganui 0.3m Rural Aerial Photos (2021-2022),2026-11-19
+tararua-stage-ii,close,aerial/tararua-stage-ii-close.webp,-40.357345,175.770738,17,910,Manawatū-Whanganui 0.3m Rural Aerial Photos (2021-2022),2026-11-19
+tararua-stage-ii,wide,aerial/tararua-stage-ii-wide.webp,-40.357345,175.770738,14,7280,Manawatū-Whanganui 0.3m Rural Aerial Photos (2021-2022),2026-11-19
+tararua-wind-farm-3,site,aerial/tararua-wind-farm-3-site.webp,-40.357225,175.752989,18,460,Palmerston North 0.1m Urban Aerial Photos (2024),2026-11-19
+tararua-wind-farm-3,close,aerial/tararua-wind-farm-3-close.webp,-40.357225,175.752989,17,910,Palmerston North 0.1m Urban Aerial Photos (2024),2026-11-19
+tararua-wind-farm-3,wide,aerial/tararua-wind-farm-3-wide.webp,-40.357225,175.752989,14,7280,Palmerston North 0.1m Urban Aerial Photos (2024),2026-11-19
+tauhara,site,aerial/tauhara-site.webp,-38.667907,176.156748,18,470,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+tauhara,close,aerial/tauhara-close.webp,-38.667907,176.156748,17,930,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+tauhara,wide,aerial/tauhara-wide.webp,-38.667907,176.156748,14,7460,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+tauhei-solar-farm,site,aerial/tauhei-solar-farm-site.webp,-37.588333,175.721667,18,470,Waikato 0.3m Rural Aerial Photos (2023-2024),2026-11-19
+tauhei-solar-farm,close,aerial/tauhei-solar-farm-close.webp,-37.588333,175.721667,17,950,Waikato 0.3m Rural Aerial Photos (2023-2024),2026-11-19
+tauhei-solar-farm,wide,aerial/tauhei-solar-farm-wide.webp,-37.588333,175.721667,14,7570,Waikato 0.3m Rural Aerial Photos (2023-2024),2026-11-19
+te-apiti,site,aerial/te-apiti-site.webp,-40.2961,175.808,18,460,Manawatū-Whanganui 0.2m Rural Aerial Photos (2023-2024),2026-11-19
+te-apiti,close,aerial/te-apiti-close.webp,-40.2961,175.808,17,910,Manawatū-Whanganui 0.2m Rural Aerial Photos (2023-2024),2026-11-19
+te-apiti,wide,aerial/te-apiti-wide.webp,-40.2961,175.808,14,7290,Manawatū-Whanganui 0.2m Rural Aerial Photos (2023-2024),2026-11-19
+te-awamutu,site,aerial/te-awamutu-site.webp,-38.004227,175.310579,18,470,Waipa 0.1m Urban Aerial Photos (2026),2026-11-19
+te-awamutu,close,aerial/te-awamutu-close.webp,-38.004227,175.310579,17,940,Waipa 0.1m Urban Aerial Photos (2026),2026-11-19
+te-awamutu,wide,aerial/te-awamutu-wide.webp,-38.004227,175.310579,14,7530,Waipa 0.1m Urban Aerial Photos (2026),2026-11-19
+te-herenga-o-te-ra-solar-farm,site,aerial/te-herenga-o-te-ra-solar-farm-site.webp,-38.025861,177.183,18,470,Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+te-herenga-o-te-ra-solar-farm,close,aerial/te-herenga-o-te-ra-solar-farm-close.webp,-38.025861,177.183,17,940,Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+te-herenga-o-te-ra-solar-farm,wide,aerial/te-herenga-o-te-ra-solar-farm-wide.webp,-38.025861,177.183,14,7530,Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+te-huka,site,aerial/te-huka-site.webp,-38.667612,176.116198,18,470,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+te-huka,close,aerial/te-huka-close.webp,-38.667612,176.116198,17,930,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+te-huka,wide,aerial/te-huka-wide.webp,-38.667612,176.116198,14,7460,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+te-huka-3,site,aerial/te-huka-3-site.webp,-38.668768,176.118708,18,470,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+te-huka-3,close,aerial/te-huka-3-close.webp,-38.668768,176.118708,17,930,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+te-huka-3,wide,aerial/te-huka-3-wide.webp,-38.668768,176.118708,14,7460,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+te-mihi,site,aerial/te-mihi-site.webp,-38.619167,176.048056,18,470,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+te-mihi,close,aerial/te-mihi-close.webp,-38.619167,176.048056,17,930,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+te-mihi,wide,aerial/te-mihi-wide.webp,-38.619167,176.048056,14,7470,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+te-puna-mauri-o-omaru-at-ruawai,site,aerial/te-puna-mauri-o-omaru-at-ruawai-site.webp,-36.115614,174.02707,18,480,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+te-puna-mauri-o-omaru-at-ruawai,close,aerial/te-puna-mauri-o-omaru-at-ruawai-close.webp,-36.115614,174.02707,17,960,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+te-puna-mauri-o-omaru-at-ruawai,wide,aerial/te-puna-mauri-o-omaru-at-ruawai-wide.webp,-36.115614,174.02707,14,7720,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+te-rapa,site,aerial/te-rapa-site.webp,-37.71639,175.21667,18,470,Hamilton 0.05m Urban Aerial Photos (2025),2026-11-19
+te-rapa,close,aerial/te-rapa-close.webp,-37.71639,175.21667,17,940,Hamilton 0.05m Urban Aerial Photos (2025),2026-11-19
+te-rapa,wide,aerial/te-rapa-wide.webp,-37.71639,175.21667,14,7560,Hamilton 0.05m Urban Aerial Photos (2025),2026-11-19
+te-rere-hau,site,aerial/te-rere-hau-site.webp,-40.387808,175.734445,18,450,Palmerston North 0.1m Urban Aerial Photos (2024),2026-11-19
+te-rere-hau,close,aerial/te-rere-hau-close.webp,-40.387808,175.734445,17,910,Palmerston North 0.1m Urban Aerial Photos (2024),2026-11-19
+te-rere-hau,wide,aerial/te-rere-hau-wide.webp,-40.387808,175.734445,14,7280,Palmerston North 0.1m Urban Aerial Photos (2024),2026-11-19
+te-uku,site,aerial/te-uku-site.webp,-37.872513,174.961995,18,470,Waikato 0.3m Rural Aerial Photos (2023-2024),2026-11-19
+te-uku,close,aerial/te-uku-close.webp,-37.872513,174.961995,17,940,Waikato 0.3m Rural Aerial Photos (2023-2024),2026-11-19
+te-uku,wide,aerial/te-uku-wide.webp,-37.872513,174.961995,14,7540,Waikato 0.3m Rural Aerial Photos (2023-2024),2026-11-19
+tekapo-a,site,aerial/tekapo-a-site.webp,-44.013775,170.460563,18,430,Mackenzie 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+tekapo-a,close,aerial/tekapo-a-close.webp,-44.013775,170.460563,17,860,Mackenzie 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+tekapo-a,wide,aerial/tekapo-a-wide.webp,-44.013775,170.460563,14,6870,Mackenzie 0.075m Urban Aerial Photos (2025-2026),2026-11-19
+tekapo-b,site,aerial/tekapo-b-site.webp,-44.122806,170.211972,18,430,Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021),2026-11-19
+tekapo-b,close,aerial/tekapo-b-close.webp,-44.122806,170.211972,17,860,Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021),2026-11-19
+tekapo-b,wide,aerial/tekapo-b-wide.webp,-44.122806,170.211972,14,6860,Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021),2026-11-19
+tokaanu,site,aerial/tokaanu-site.webp,-38.981147,175.768366,18,460,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+tokaanu,close,aerial/tokaanu-close.webp,-38.981147,175.768366,17,930,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+tokaanu,wide,aerial/tokaanu-wide.webp,-38.981147,175.768366,14,7430,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+turitea-wind-farm,site,aerial/turitea-wind-farm-site.webp,-40.436369,175.700324,18,450,Palmerston North 0.1m Urban Aerial Photos (2024),2026-11-19
+turitea-wind-farm,close,aerial/turitea-wind-farm-close.webp,-40.436369,175.700324,17,910,Palmerston North 0.1m Urban Aerial Photos (2024),2026-11-19
+turitea-wind-farm,wide,aerial/turitea-wind-farm-wide.webp,-40.436369,175.700324,14,7270,Palmerston North 0.1m Urban Aerial Photos (2024),2026-11-19
+twin-rivers-solar-farm,site,aerial/twin-rivers-solar-farm-site.webp,-35.136452,173.350885,18,490,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+twin-rivers-solar-farm,close,aerial/twin-rivers-solar-farm-close.webp,-35.136452,173.350885,17,980,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+twin-rivers-solar-farm,wide,aerial/twin-rivers-solar-farm-wide.webp,-35.136452,173.350885,14,7810,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+waikaremoana,site,aerial/waikaremoana-site.webp,-38.806639,177.150889,18,470,Hawke's Bay 0.2m Rural Aerial Photos (2025-2026),2026-11-19
+waikaremoana,close,aerial/waikaremoana-close.webp,-38.806639,177.150889,17,930,Hawke's Bay 0.2m Rural Aerial Photos (2025-2026),2026-11-19
+waikaremoana,wide,aerial/waikaremoana-wide.webp,-38.806639,177.150889,14,7450,Hawke's Bay 0.2m Rural Aerial Photos (2025-2026),2026-11-19
+waipapa,site,aerial/waipapa-site.webp,-38.291944,175.683611,18,470,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+waipapa,close,aerial/waipapa-close.webp,-38.291944,175.683611,17,940,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+waipapa,wide,aerial/waipapa-wide.webp,-38.291944,175.683611,14,7500,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
+waipipi,site,aerial/waipipi-site.webp,-39.790947,174.539476,18,460,Taranaki 0.25m Rural Aerial Photos (2021-2022),2026-11-19
+waipipi,close,aerial/waipipi-close.webp,-39.790947,174.539476,17,920,Taranaki 0.25m Rural Aerial Photos (2021-2022),2026-11-19
+waipipi,wide,aerial/waipipi-wide.webp,-39.790947,174.539476,14,7340,Taranaki 0.25m Rural Aerial Photos (2021-2022),2026-11-19
+waipori-2a-3-4,site,aerial/waipori-2a-3-4-site.webp,-45.905521,169.985545,18,420,Otago 0.2m Rural Aerial Photos (2025),2026-11-19
+waipori-2a-3-4,close,aerial/waipori-2a-3-4-close.webp,-45.905521,169.985545,17,830,Otago 0.2m Rural Aerial Photos (2025),2026-11-19
+waipori-2a-3-4,wide,aerial/waipori-2a-3-4-wide.webp,-45.905521,169.985545,14,6650,Otago 0.2m Rural Aerial Photos (2025),2026-11-19
+wairakei,site,aerial/wairakei-site.webp,-38.6269,176.105,18,470,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+wairakei,close,aerial/wairakei-close.webp,-38.6269,176.105,17,930,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+wairakei,wide,aerial/wairakei-wide.webp,-38.6269,176.105,14,7460,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+waitaki,site,aerial/waitaki-site.webp,-44.690642,170.426202,18,420,Canterbury - Waitaki 0.3m Rural Aerial Photos (2021),2026-11-19
+waitaki,close,aerial/waitaki-close.webp,-44.690642,170.426202,17,850,Canterbury - Waitaki 0.3m Rural Aerial Photos (2021),2026-11-19
+waitaki,wide,aerial/waitaki-wide.webp,-44.690642,170.426202,14,6790,Canterbury - Waitaki 0.3m Rural Aerial Photos (2021),2026-11-19
+west-wind,site,aerial/west-wind-site.webp,-41.278129,174.676272,18,450,Wellington 0.2m Rural Aerial Photos (2025-2026),2026-11-19
+west-wind,close,aerial/west-wind-close.webp,-41.278129,174.676272,17,900,Wellington 0.2m Rural Aerial Photos (2025-2026),2026-11-19
+west-wind,wide,aerial/west-wind-wide.webp,-41.278129,174.676272,14,7180,Wellington 0.2m Rural Aerial Photos (2025-2026),2026-11-19
+whakamaru,site,aerial/whakamaru-site.webp,-38.419633,175.808217,18,470,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+whakamaru,close,aerial/whakamaru-close.webp,-38.419633,175.808217,17,940,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+whakamaru,wide,aerial/whakamaru-wide.webp,-38.419633,175.808217,14,7490,Taupō 0.1m Urban Aerial Photos (2025),2026-11-19
+wheao-and-flaxy,site,aerial/wheao-and-flaxy-site.webp,-38.633149,176.578097,18,470,Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+wheao-and-flaxy,close,aerial/wheao-and-flaxy-close.webp,-38.633149,176.578097,17,930,Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+wheao-and-flaxy,wide,aerial/wheao-and-flaxy-wide.webp,-38.633149,176.578097,14,7460,Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025),2026-11-19
+whirinaki,site,aerial/whirinaki-site.webp,-39.382873,176.887595,18,460,Hawke's Bay 0.1m Urban Aerial Photos (2024-2025),2026-11-19
+whirinaki,close,aerial/whirinaki-close.webp,-39.382873,176.887595,17,920,Hawke's Bay 0.1m Urban Aerial Photos (2024-2025),2026-11-19
+whirinaki,wide,aerial/whirinaki-wide.webp,-39.382873,176.887595,14,7380,Hawke's Bay 0.1m Urban Aerial Photos (2024-2025),2026-11-19
+white-hill,site,aerial/white-hill-site.webp,-45.739189,168.269315,18,420,Southland 0.25m Rural Aerial Photos (2023-2024),2026-11-19
+white-hill,close,aerial/white-hill-close.webp,-45.739189,168.269315,17,830,Southland 0.25m Rural Aerial Photos (2023-2024),2026-11-19
+white-hill,wide,aerial/white-hill-wide.webp,-45.739189,168.269315,14,6670,Southland 0.25m Rural Aerial Photos (2023-2024),2026-11-19

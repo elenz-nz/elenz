@@ -8,7 +8,6 @@ wikidata = "Q7621980"
 osm = ["relation/17609409"]
 reviewed = ""
 to_check = [
-  "Location: the point is Wikidata's for the whole site; check it against the LINZ aerial (separate task).",
   "Previous owners of the combined cycle unit between 1998 and 2002: the Commerce Commission (2003) has it owned by NGC's Stratford Power Ltd; NGC entered generation by buying TransAlta NZ in 2000. Who built and owned it before that?",
   "TCC's last day: Contact says it retired in 2026 (FY26); Elenz's last output is Dec 2025 and its capacity step 1 Apr 2026. Find the date.",
 ]
@@ -20,14 +19,16 @@ notes = [
   "Capacity: the EA register has the peakers at 2 × 106 MW (Elenz's 212); Contact gives 200 MW; Wikipedia's list 200. TCC: register 377 MW, then 360 (Jun 2022) and 330 (Nov 2023); the Commerce Commission gave 354 MW (+10 MW supplementary firing) in 2003.",
   "Contact's 2022 releases say TCC was commissioned in 1996; the Commerce Commission (2003), Wikipedia and the EA register say 1998 (construction began 1996). 1998 used.",
   "Stations kept unpublished: the units fact carries the peakers and the closed units.",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 
 [location]
 value = [-39.3322, 174.319]
 basis = "whole site"
-source = "wd-q7621980"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wd-q7621980, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-39.33415, 174.32046]

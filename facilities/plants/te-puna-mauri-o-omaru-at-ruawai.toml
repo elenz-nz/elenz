@@ -8,7 +8,6 @@ wikidata = "Q132019984"
 osm = ["way/1411665342"]
 reviewed = ""
 to_check = [
-  "Location: confirm the point sits on the solar farm against the LINZ aerial (separate task).",
   "Capacity (decision): Elenz uses the register's 16.8 MW, which was stage 1's DC rating (Northpower). A stage 2 extension in July 2025 took it to about 20 MWdc. BraveTrace (Dec 2025) gives \"AC 19.3 MW, DC 16.8 MWp\", which looks swapped or out of date. Check metered half-hour peaks since August 2025 before changing plant_capacity.csv.",
   "Name: the EA register (17 Nov 2026) now calls it \"Te Puna Mauri ō Omaru\" (no \"at Ruawai\"); the plant name is fingerprinted, so any rename waits for next-rebuild.",
 ]
@@ -17,14 +16,16 @@ notes = [
   "Location: Wikidata Q132019984 has a point at Ruawai (CC0), added as the draft location. District and region from the station's point (the [location] value, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; no other district within 3 km (only the Kaipara Harbour, outside any district).",
   "Mounting: single-axis trackers (Northpower lists Nextracker among its suppliers; BraveTrace says bifacial tracking panels).",
   "Merged with S007 (Te Puna Mauri ō Omaru, 17 MW) in the workbook.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
 
 [location]
-value = [-36.115433, 174.026719]
+value = [-36.115614, 174.027070]
 basis = "station"
-source = "wd-q132019984"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-36.115433, 174.026719] came from wd-q132019984"
 
 [grid_connection]
 value = [-36.08667, 174.35919]

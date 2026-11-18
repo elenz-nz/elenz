@@ -58,12 +58,20 @@
    ]
   },
   {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Westland",
+   "refs": [
+    2
+   ]
+  },
+  {
    "k": "owner",
    "label": "Owner",
    "value": "Contact Energy",
    "refs": [
     1,
-    2
+    3
    ],
    "note": "The EA register's operator is still Manawa Energy Limited (Trustpower until 2022), which Contact bought on 11 July 2025."
   },
@@ -88,12 +96,39 @@
    "label": "Connection point",
    "value": "Kūmara (KUM0661)",
    "refs": [
-    3
+    4
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -42.635999,
+  "lon": 171.19527,
+  "basis": "station",
+  "refs": [
+   5
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/kumara-site.webp",
+   "across": 440,
+   "imagery": "West Coast 0.2m Rural Aerial Photos (2024-2026)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/kumara-close.webp",
+   "across": 880,
+   "imagery": "West Coast 0.2m Rural Aerial Photos (2024-2026)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/kumara-wide.webp",
+   "across": 7030,
+   "imagery": "West Coast 0.2m Rural Aerial Photos (2024-2026)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -104,17 +139,31 @@
   },
   {
    "n": 2,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
    "title": "Contact buys Manawa Energy",
    "publisher": "Contact Energy",
    "url": "https://contact.co.nz/support/notice/manawa",
    "opened": "2026-11-19"
   },
   {
-   "n": 3,
+   "n": 4,
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

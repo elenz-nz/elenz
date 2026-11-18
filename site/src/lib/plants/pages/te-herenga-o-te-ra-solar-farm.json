@@ -83,8 +83,35 @@
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -38.025861,
+  "lon": 177.183,
+  "basis": "station",
+  "refs": [
+   6
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/te-herenga-o-te-ra-solar-farm-site.webp",
+   "across": 470,
+   "imagery": "Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/te-herenga-o-te-ra-solar-farm-close.webp",
+   "across": 940,
+   "imagery": "Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/te-herenga-o-te-ra-solar-farm-wide.webp",
+   "across": 7530,
+   "imagery": "Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -120,6 +147,13 @@
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

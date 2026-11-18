@@ -9,6 +9,7 @@ like the rest of the repository, so they hold only what public sources say.
 | `plants/<slug>.toml` | One plant page: its facts, each with a source, a grade and the date it was checked |
 | `plant_sources.csv` | One row per source: `id`, `title`, `publisher`, `url`, `kind` (`public` or `research`), `opened` (the date we last read it), `note` |
 | `plant_images.csv` | One row per image we may use: `slug`, `file`, `title`, `author`, `source_url`, `licence`, `licence_url`, `checked`, `crop` |
+| `plant_aerials.csv` | The LINZ aerial views each page shows (`analysis/plant_aerials.py`): `slug`, `view` (site, close, wide), `file`, the point it is centred on, `zoom`, `across_m`, the `imagery` collection, `fetched` |
 | `plant_photo_leads.csv` | Photos worth checking, not yet cleared for use |
 | `station_leads.csv` | Stations without a page yet: embedded stations, stations not in Elenz's data, new-station leads |
 
@@ -73,6 +74,7 @@ checked = ""
 [[stations]]              # for plants made of several stations
 value = "Mōkai A"
 id = "G010"
+location = [-38.53, 175.92]   # optional: the station's own point, read from the LINZ aerial
 mw = 55
 source = "elenz-register"
 grade = "C"
@@ -110,7 +112,13 @@ as years.
    the New Zealand Gazette's ECNZ notices (`gazette-1995-140` for 1 April 1987, `gazette-1999-170` for the 1 April 1999
    split to Mighty River Power, Genesis Energy and Meridian Energy).
 4. Location: confirm the point sits on the station (not the switchyard or grid connection) against the LINZ aerial
-   imagery or Wikidata, then mark it checked.
+   imagery or Wikidata, then mark it checked. A point read from the aerial cites `linz-aerial` (grade B), and a point
+   confirmed on it cites `linz-aerial` too, naming where it came from in `note`. For a plant of several stations, give
+   each `[[stations]]` entry its own `location` and put `[location]` on the largest station (its `basis` names it), or
+   midway with basis "whole site" where they sit together. The grid connection point is the substation on the aerial;
+   its code stays the EA's. If the point moved, test the district and region again (step 3).
+   Then refresh the aerial views: `LINZ_BASEMAPS_KEY=... python3 analysis/plant_aerials.py` (only plants whose point
+   moved are fetched), before step 6.
 5. Empty `to_check`, set `reviewed` to today, and run `python3 ingest/plant_files.py --check`.
 6. Run `python3 ingest/plant_pages.py` and `python3 ingest/plant_research.py`, and commit the files they change
    (`site/src/lib/plants/pages/`, `site/src/lib/plants/research.json`): the page shows the checked facts on the batch's

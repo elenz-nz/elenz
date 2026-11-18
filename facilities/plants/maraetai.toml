@@ -6,22 +6,26 @@ name = "Maraetai"
 register = ["H001"]
 wikidata = "Q11988091"
 osm = ["relation/8056852"]
-reviewed = ""
+reviewed = "2026-11-19"
 photo_leads = ["P001"]
-to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+to_check = []
 notes = [
   "Elenz shows Maraetai I and II as one plant, 360 MW.",
   "Hydro batch 1 (18 Nov 2026): facts checked against Mercury's station pages, the EA register, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district. South Waikato District is about 150–300 m away across the river.",
   "Resolved: Capacity: Mercury gives 180 MW for each powerhouse (360 MW, as the register); 5 Francis turbines each.",
+  "District from the checked point (Stats NZ, 19 Nov 2026): Taupō; South Waikato is within 300 m.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "The [location] point is midway between Maraetai I and II, about 470 m apart; each station's own point is in its entry.",
 ]
 
 [location]
-value = [-38.3525, 175.743889]
-basis = "station"
-source = "wd-q11988091"
+value = [-38.351965, 175.743502]
+basis = "whole site"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-38.352500, 175.743889] came from wd-q11988091"
 
 [grid_connection]
 value = [-38.35274, 175.74427]
@@ -127,6 +131,7 @@ checked = "2026-11-18"
 
 [[stations]]
 value = "Maraetai I"
+location = [-38.352043, 175.746163]
 mw = 180
 source = "mercury-maraetai"
 grade = "A"
@@ -134,6 +139,7 @@ checked = "2026-11-18"
 
 [[stations]]
 value = "Maraetai II"
+location = [-38.351886, 175.740842]
 mw = 180
 source = "mercury-maraetai"
 grade = "A"

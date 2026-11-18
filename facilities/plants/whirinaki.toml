@@ -8,7 +8,6 @@ wikidata = "Q288300"
 osm = ["way/95512220"]
 reviewed = ""
 to_check = [
-  "Location: confirm the Wikidata point sits on the station against the LINZ aerial (separate task).",
   "Previous owners: Wikipedia's dates (Crown-owned 2004–11, bought by Contact on 22 Dec 2011) rest on government and Contact releases it cites; find one of them to raise the grade.",
 ]
 notes = [
@@ -17,22 +16,24 @@ notes = [
   "District and region from the station's point (Wikidata, not yet checked) and the grid connection point in Stats NZ's boundaries, 19 Nov 2026: both Hastings District. \"Area Outside Territorial Authority\" (the sea) is within 1 km and Napier City within 5 km.",
   "Capacity: Contact's page says 155 MW in its text and 156 MW in its figures; the EA register 156 MW to Nov 2023, then three units of 52 MW (156 MW).",
   "The earlier station on the site (NZED, 1978): four twin-pack units with Pratt & Whitney FT4 gas turbines, 220 MW, burning diesel and seldom run; one unit moved to the Te Awamutu dairy factory cogeneration plant in 1993 and the other three were sold to Australia in 2001 (Wikipedia). It was among the stations ECNZ sold to Contact on 1 Feb 1996 (Gazette 1996-174). Before Elenz's data begins (a few hours at WHI2201 in 1997–2000 have no known plant: plant_capacity.csv note).",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
 ]
 
 [location]
-value = [-39.38283, 176.88825]
+value = [-39.382873, 176.887595]
 basis = "station"
-source = "wd-q288300"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-39.382830, 176.888250] came from wd-q288300"
 
 [grid_connection]
-value = [-39.38206, 176.88677]
+value = [-39.382423, 176.887023]
 code = "WHI2201 WHIRINAKI"
-source = "ea-nsp"
+source = ["ea-nsp", "linz-aerial"]
 grade = "A"
-checked = "2026-11-19"
-note = "code and point match the EA's network supply points table of 17 Nov 2026"
+checked = "2026-11-18"
+note = "code from the EA's network supply points table; the point is the substation, read from the LINZ aerial, 18 Nov 2026 (the table's point was [-39.382060, 176.886770])"
 
 [facts.other_names]
 value = ["Whirinaki Peaker Plant"]

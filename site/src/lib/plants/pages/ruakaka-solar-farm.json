@@ -48,6 +48,15 @@
    "note": "from the grid connection point (no station point yet); the sources place the farm near it, in the same region"
   },
   {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Whangārei",
+   "refs": [
+    5
+   ],
+   "note": "the grid connection point (Bream Bay) only"
+  },
+  {
    "k": "owner",
    "label": "Owner",
    "value": "Meridian Energy",
@@ -71,12 +80,39 @@
    "label": "Connection point",
    "value": "Bream Bay (BRB0331)",
    "refs": [
-    5
+    6
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -35.85486,
+  "lon": 174.469867,
+  "basis": "station",
+  "refs": [
+   7
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/ruakaka-solar-farm-site.webp",
+   "across": 480,
+   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/ruakaka-solar-farm-close.webp",
+   "across": 970,
+   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/ruakaka-solar-farm-wide.webp",
+   "across": 7740,
+   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -108,10 +144,24 @@
   },
   {
    "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

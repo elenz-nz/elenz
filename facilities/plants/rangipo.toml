@@ -6,8 +6,8 @@ name = "Rangipō"
 register = ["H057"]
 wikidata = "Q61448285"
 osm = ["way/989021414"]
-reviewed = ""
-to_check = ["Location: confirm the point against the LINZ aerial (separate task). The powerhouse is underground, so the point should mark the surface above it or its entrance, not the switchyard."]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "Added from Elenz's plant list (8 Nov 2026).",
   "Hydro batch 2 (18 Nov 2026): facts checked against Genesis's Tongariro Power Scheme page, the EA register, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
@@ -15,14 +15,16 @@ notes = [
   "District and region from the station's point (the [location] value) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district, and no other district or region is within 5 km.",
   "Genesis spells the station Rangipō; the EA register and Elenz's data use Rangipo.",
   "Scheme order: Rangipō's tailrace returns water to the Tongariro River above the Poutū intake, which feeds Lake Rotoaira and Tokaanu, so Rangipō is the upstream station (overrides.toml [hydro_schemes] corrected 18 Nov 2026).",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
 
 [location]
-value = [-39.153194, 175.836417]
+value = [-39.153677, 175.834367]
 basis = "station"
-source = "wd-q61448285"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-39.153194, 175.836417] came from wd-q61448285"
 
 [grid_connection]
 value = [-39.15319, 175.83744]

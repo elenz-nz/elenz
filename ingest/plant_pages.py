@@ -16,6 +16,8 @@ Each plant page (/plants/<slug>) is prerendered from its file here; its live pan
   facts                  [{k, label, value, refs, note?}]: the checked facts, in page order
   location               {lat, lon, basis, refs} once the station's point is checked
   image                  the first row of plant_images.csv for the plant, or null
+  aerial                 [{k, file, across, imagery}]: the plant's LINZ aerial views (site, close, wide;
+                         analysis/plant_aerials.py), once its location is checked and while the views are centred on it
   sources                [{n, title, publisher, url, opened}]: the sources the published facts cite, numbered
   related                {owner: [...], scheme: [...], fuel: [...]}: other plant pages, each {slug, name}
 
@@ -49,6 +51,7 @@ OUT = os.path.join(ROOT, 'site', 'src', 'lib', 'plants', 'pages')
 INDEX = os.path.join(ROOT, 'site', 'src', 'lib', 'plants', 'index.json')
 META = os.path.join(ROOT, 'site', 'src', 'lib', 'tracker', 'plants.json')
 IMAGES_DIR = os.path.join(ROOT, 'site', 'static', 'plants')
+AERIALS = os.path.join(ROOT, 'facilities', 'plant_aerials.csv')
 
 # the facts a page shows, in its order, with their labels (FACT_KEYS in plant_files.py; `about` has its own block)
 LABELS = [('other_names', 'Other names'), ('commissioned', 'Commissioned'), ('closed', 'Closed'), ('units', 'Units'),
@@ -113,7 +116,7 @@ def status_of(rs):
     return 'closed' if rs and all(r['end'] for r in rs) else 'operating'
 
 
-def page(s, p, cap, meta, srcs, images):
+def page(s, p, cap, meta, srcs, images, aerials):
     rs = cap.get(p.get('plant'), [])
     m = meta.get(p.get('plant'), {})
     last = rs[-1] if rs else {}
@@ -154,6 +157,9 @@ def page(s, p, cap, meta, srcs, images):
                 if loc and pf.published(loc) else None)
     dates = [e.get('checked') for _, e, alt in pf.entries(p) if not alt and pf.published(e)]
     img = next((r for r in images if r['slug'] == s), None)
+    views = [r for r in aerials if r['slug'] == s]
+    aerial = ([{'k': r['view'], 'file': r['file'], 'across': int(r['across_m']), 'imagery': r['imagery']} for r in views]
+              if location and views and all(aerial_on(r, loc) for r in views) else None)
     return {
         'slug': s, 'name': p['name'], 'plant': p.get('plant', ''),
         'fuel': last.get('fuel', ''), 'island': last.get('island', ''), 'status': status_of(rs),
@@ -169,8 +175,14 @@ def page(s, p, cap, meta, srcs, images):
         'facts': facts,
         'location': location,
         'image': ({k: img[k] for k in ('file', 'title', 'author', 'source_url', 'licence', 'licence_url')} if img else None),
+        'aerial': aerial,
         'sources': [{'n': n, **{k: srcs[x][k] for k in ('title', 'publisher', 'url', 'opened')}} for x, n in numbers.items()],
     }
+
+
+def aerial_on(row, loc):
+    """True while an aerial view is centred on the plant file's location."""
+    return float(row['lat']) == loc['value'][0] and float(row['lon']) == loc['value'][1]
 
 
 def related(pages, meta):
@@ -225,12 +237,28 @@ def build():
     plants = pf.load()
     srcs = pf.sources()
     images = pf.read_csv(pf.IMAGES)
+    aerials = pf.read_csv(AERIALS) if os.path.exists(AERIALS) else []
     cap = capacity_rows()
     with open(META, encoding='utf-8') as f:
         meta = json.load(f)
-    pages = {s: page(s, p, cap, meta, srcs, images) for s, p in plants.items() if p.get('plant')}
+    pages = {s: page(s, p, cap, meta, srcs, images, aerials) for s, p in plants.items() if p.get('plant')}
     related(pages, meta)
-    return pages, index(plants, pages, meta, srcs)
+    return pages, index(plants, pages, meta, srcs), aerial_problems(plants, aerials)
+
+
+def aerial_problems(plants, aerials):
+    """Aerial views that no longer match their plant's checked location, or whose file is missing."""
+    out = []
+    for r in aerials:
+        p = plants.get(r['slug'], {})
+        loc = p.get('location')
+        if not (loc and pf.published(loc)):
+            out.append(f"{r['slug']}: aerial view {r['view']} but no checked location (run analysis/plant_aerials.py)")
+        elif not aerial_on(r, loc):
+            out.append(f"{r['slug']}: aerial view {r['view']} is centred on an old point (run analysis/plant_aerials.py)")
+        if not os.path.exists(os.path.join(IMAGES_DIR, r['file'])):
+            out.append(f"{r['slug']}: its aerial view site/static/plants/{r['file']} is missing")
+    return out
 
 
 def dump(p):
@@ -238,8 +266,7 @@ def dump(p):
 
 
 def main(check=False):
-    pages, idx = build()
-    problems = []
+    pages, idx, problems = build()
     have = {f[:-5] for f in os.listdir(OUT) if f.endswith('.json')} if os.path.isdir(OUT) else set()
     for s, p in pages.items():
         if p['image'] and not os.path.exists(os.path.join(IMAGES_DIR, p['image']['file'])):
