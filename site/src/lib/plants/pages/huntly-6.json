@@ -23,12 +23,121 @@
  "scheme": null,
  "metered": "September 2020: Generation_MD has no Huntly that month, so the history uses the grid meter for the whole station, split between units by their offers.",
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Unit 6 is a single open cycle gas turbine added to the Huntly station in 2004. It can run on gas or diesel and is used as a peaking unit, started when wholesale prices are high or for short spells when it pays to run it.",
+  "refs": [
+   1
+  ]
+ },
+ "facts": [
+  {
+   "k": "other_names",
+   "label": "Other names",
+   "value": "Huntly Unit 6",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2004",
+   "refs": [
+    1,
+    2
+   ]
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "1 open cycle gas turbine of 50.8 MW, able to burn gas or diesel",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Waikato",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Waikato",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Genesis Energy",
+   "refs": [
+    2,
+    1
+   ],
+   "note": "Genesis Energy Limited"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1
+   ],
+   "value": "50.8 MW (Genesis's rating for Unit 6)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Huntly (HLY2201)",
+   "refs": [
+    5
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Huntly Power Station",
+   "publisher": "Genesis Energy",
+   "url": "https://www.genesisenergy.co.nz/about/generation/huntly-power-station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

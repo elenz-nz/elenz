@@ -7,10 +7,19 @@ register = ["T002", "T013"]
 wikidata = "Q7621980"
 osm = ["relation/17609409"]
 reviewed = ""
-to_check = ["Capacity: Indicative aggregate; split units if possible."]
+to_check = [
+  "Location: the point is Wikidata's for the whole site; check it against the LINZ aerial (separate task).",
+  "Previous owners of the combined cycle unit between 1998 and 2002: the Commerce Commission (2003) has it owned by NGC's Stratford Power Ltd; NGC entered generation by buying TransAlta NZ in 2000. Who built and owned it before that?",
+  "TCC's last day: Contact says it retired in 2026 (FY26); Elenz's last output is Dec 2025 and its capacity step 1 Apr 2026. Find the date.",
+]
 notes = [
   "T002: Elenz shows Stratford as one plant (one meter, SFD2201): TCC and the two peakers. 212 MW from Apr 2026 (peakers).",
   "T013: Ran until March 2026 (Elenz: Stratford drops 542 → 212 MW on 1 Apr 2026).",
+  "Thermal batch 1 (19 Nov 2026): facts checked against Contact's Stratford Peakers page and its August 2026 market release, the EA register, the Commerce Commission's 2003 decision on TCC, the Gazette (ECNZ's sale to Contact) and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the site point (Wikidata, not yet checked) and the grid connection point in Stats NZ's boundaries, 19 Nov 2026: both Stratford District, no other district within 5 km.",
+  "Capacity: the EA register has the peakers at 2 × 106 MW (Elenz's 212); Contact gives 200 MW; Wikipedia's list 200. TCC: register 377 MW, then 360 (Jun 2022) and 330 (Nov 2023); the Commerce Commission gave 354 MW (+10 MW supplementary firing) in 2003.",
+  "Contact's 2022 releases say TCC was commissioned in 1996; the Commerce Commission (2003), Wikipedia and the EA register say 1998 (construction began 1996). 1998 used.",
+  "Stations kept unpublished: the units fact carries the peakers and the closed units.",
 ]
 
 [location]
@@ -25,33 +34,42 @@ value = [-39.33415, 174.32046]
 code = "SFD2201 STRATFORD"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.other_names]
-value = ["Taranaki Combined Cycle", "Stratford Peaker 1", "Stratford Peaker 2", "TCC"]
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "Names the EA register, Wikipedia and Elenz use for this plant; check each."
+value = ["Stratford Peakers", "Taranaki Combined Cycle (TCC)"]
+source = ["contact-stratford-peakers", "ea-register"]
+grade = "A"
+checked = "2026-11-19"
+note = "the register's units: Stratford Peaker 1, Stratford Peaker 2 and Taranaki Combined Cycle"
 
 [facts.commissioned]
-value = "Stratford CC 1998; Stratford peaker 2010"
-source = "wp-list"
+value = "1976"
+source = "wp-stratford"
 grade = "B"
-checked = ""
+checked = "2026-11-19"
+note = "the site's first station, four gas turbines, completed in June 1976 (Wikipedia, from an NZ Electricity brochure); the combined cycle unit followed in 1998 and the peakers in 2011"
 
 [[facts.commissioned.alt]]
 value = "1998"
-source = "ea-register"
+source = ["ea-register", "comcom-491"]
 grade = "A"
 checked = ""
-note = "the register's start date, 1998-01-01; 2011-01-01: often a year, not the day"
+note = "the combined cycle unit; the register's 1998-01-01 is a year"
 
-[facts.closed]
-value = "2026"
-source = "wp-list"
-grade = "B"
+[[facts.commissioned.alt]]
+value = "2011"
+source = ["contact-stratford-peakers", "ea-register"]
+grade = "A"
 checked = ""
+note = "the peakers"
+
+[facts.units]
+value = "2 gas turbine peakers, 200 MW in all (from 2011). Closed: a 377 MW combined cycle unit (1998 to 2026) and four 50 MW gas turbines (1976 to 2001)"
+source = ["contact-stratford-peakers", "contact-cdc-2026", "ea-register", "wp-stratford"]
+grade = "B"
+checked = "2026-11-19"
 
 [facts.scheme]
 value = "Taranaki generation complex"
@@ -61,29 +79,67 @@ checked = ""
 
 [facts.region]
 value = "Taranaki"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
+value = "Taranaki"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
 value = "Stratford"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Stratford"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Contact"
-source = "ea-register"
+value = "Contact Energy"
+source = ["ea-register", "contact-stratford-peakers"]
+grade = "A"
+checked = "2026-11-19"
+note = "Contact Energy Limited"
+
+[facts.previous_owners]
+value = "The first gas turbines: New Zealand Government, to 1987, and the Electricity Corporation of New Zealand (ECNZ), 1987–96. The combined cycle unit: Natural Gas Corporation (NGC), to 2003"
+source = ["gazette-1995-140", "gazette-1996-174", "comcom-491"]
+grade = "A"
+checked = "2026-11-19"
+note = "ECNZ sold Stratford to Contact Energy, then a new state-owned enterprise, on 1 February 1996. The Commerce Commission cleared Contact to buy Stratford Power Limited, NGC's subsidiary that owned TCC, on 4 February 2003."
+
+[[facts.previous_owners.alt]]
+value = "NZED, NZE, ECNZ (the FT4 units); TCC purchased by Contact in 2003"
+source = "wp-stratford"
 grade = "B"
 checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "The Stratford site east of Stratford has held three gas-fired stations. Four gas turbines ran here from 1976 until 2001; the Taranaki Combined Cycle unit, cooled with water from the Pātea River, ran from 1998 until it reached the end of its life in 2026; and two fast-start peakers, opened in 2011, remain. The peakers can go from a cold start to full output in about ten minutes, to cover peaks in demand and complement hydro and wind generation."
+source = ["wp-stratford", "contact-cdc-2026", "contact-stratford-peakers", "contact-tcc-2022"]
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 200
+basis = "Contact's maximum capacity for the two peakers; the EA register has two units of 106 MW"
+source = "contact-stratford-peakers"
+grade = "A"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 377
+basis = "The EA register's nameplate for the combined cycle unit, later 360 MW (2022) and 330 MW (2023)"
+source = "ea-register"
+grade = "A"
+checked = "2026-11-19"
 
 [[ratings]]
 value = "Stratford CC 377; Stratford peaker 200"

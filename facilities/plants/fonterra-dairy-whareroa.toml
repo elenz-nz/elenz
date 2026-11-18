@@ -6,24 +6,38 @@ name = "Fonterra Dairy - Whareroa"
 register = ["T009"]
 reviewed = ""
 to_check = [
-  "Location is the grid connection, not the station.",
-  "Capacity: Verify units, fuel and export capability.",
-  "Location: only the grid connection so far; find the station itself.",
+  "Location: only the grid connection (Hāwera substation) so far. The plant is at Fonterra's Whareroa site near Hāwera: find it on the LINZ aerial (separate task), then test the point against Stats NZ's boundaries.",
+  "Page name: the EA register's \"Fonterra Dairy - Whareroa\"; the owner calls it the Whareroa Cogeneration Plant. Rename the page? (Decision needed; the tracker's name stays.)",
+  "Capacity: Elenz uses 68 MW (the register's figure); the plant is four 10 MW gas turbines and a 28 MW steam turbine. Generation_MD is net of the site's load (see notes).",
 ]
-notes = ["68 MW; Generation_MD is net of ~50% local load."]
+notes = [
+  "68 MW; Generation_MD is net of ~50% local load.",
+  "Thermal batch 1 (19 Nov 2026): facts checked against Fonterra's July 2026 notice to the EA (transfer of ownership), the EA's register of approved industrial co-generators, Todd Energy's Kapuni page, the EA register and Stats NZ boundaries.",
+  "District and region from the grid connection point (Hāwera) in Stats NZ's boundaries, 19 Nov 2026: South Taranaki District, no other district within 5 km; the owner places the plant near Hāwera.",
+  "Commissioned: Todd's Kapuni page (gas supply contracts, 1996) and Wikipedia's list give 1996; the EA register's 1966 looks like the dairy site's date or a typo (its effective dates start in 1996).",
+  "The register's operator is still Nova Energy (Nov 2026).",
+]
 
 [grid_connection]
 value = [-39.5665, 174.31012]
 code = "HWA1101 HAWERA; HWA1102 HAWERA"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "codes and point match the EA's network supply points table of 17 Nov 2026; the owner's notice names both"
+
+[facts.other_names]
+value = ["Whareroa Cogeneration Plant"]
+source = "ea-whareroa-2026"
+grade = "A"
+checked = "2026-11-19"
 
 [facts.commissioned]
 value = "1996"
-source = "wp-list"
+source = ["todd-kapuni", "wp-list"]
 grade = "B"
-checked = ""
+checked = "2026-11-19"
+note = "Todd Energy: gas supply contracts to the Fonterra/Todd Energy co-generation plant at Whareroa (1996)"
 
 [[facts.commissioned.alt]]
 value = "1966"
@@ -31,6 +45,12 @@ source = "ea-register"
 grade = "A"
 checked = ""
 note = "the register's start date, 1966-01-01: often a year, not the day"
+
+[facts.units]
+value = "4 gas turbines of 10 MW, each with a heat recovery boiler, and a 28 MW steam turbine"
+source = "ea-whareroa-2026"
+grade = "A"
+checked = "2026-11-19"
 
 [facts.scheme]
 value = "Whareroa dairy factory"
@@ -40,26 +60,51 @@ checked = ""
 
 [facts.region]
 value = "Taranaki"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
+value = "Taranaki"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
 value = "South Taranaki"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "South Taranaki"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
+value = "Fonterra"
+source = "ea-whareroa-2026"
+grade = "A"
+checked = "2026-11-19"
+note = "Whareroa Cogeneration Limited, a wholly owned Fonterra subsidiary, from 1 August 2026"
+
+[[facts.owner.alt]]
 value = "Nova"
 source = "ea-register"
 grade = "B"
 checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+note = "the register's operator, as Elenz groups owners"
+
+[facts.previous_owners]
+value = "Whareroa Cogeneration Joint Venture of Fonterra and Nova Energy (earlier Todd Energy and Whareroa Power), to 2026"
+source = ["ea-whareroa-2026", "ea-cogen-register"]
+grade = "A"
+checked = "2026-11-19"
+note = "Fonterra bought Nova's remaining 50% from 1 August 2026. The 2022 co-generator register names the joint venture as Todd Energy Ltd and Whareroa Power Ltd."
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "This cogeneration plant supplies process steam and electricity to Fonterra's Whareroa dairy site near Hāwera, one of the largest dairy processing sites in the Southern Hemisphere. Its main job is steam: four gas turbines each feed a heat recovery boiler, and the steam drives a steam turbine or goes to the factory, so electricity is a co-product. Running since 1996, it was a Fonterra and Todd joint venture until Fonterra took full ownership in August 2026. Fonterra is adding two 34 MW electric boilers, but the site still needs the plant for the rest of its heat."
+source = ["ea-whareroa-2026", "todd-kapuni"]
+grade = "B"
+checked = "2026-11-19"

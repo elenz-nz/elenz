@@ -23,12 +23,131 @@
  "scheme": null,
  "metered": "The register lists it as gas. We show it as waste heat: it runs on waste gas and heat from NZ Steel's ironmaking, not pipeline gas.\nIts metered output (meter points GLN0111 and GLN0332) runs about 1.47 times the dispatch data's figure, so expect a step where the metered history meets the dispatch weeks.",
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "The Glenbrook Power Station is a cogeneration plant built into New Zealand Steel's mill at Glenbrook, south of Auckland. It generates electricity from surplus gas from the mill's iron-making kilns, cutting the mill's energy costs and the electricity it buys from the market. The first of its two plants was commissioned in 1987 and the second in 1997.",
+  "refs": [
+   1
+  ]
+ },
+ "facts": [
+  {
+   "k": "other_names",
+   "label": "Other names",
+   "value": "Glenbrook Power Station",
+   "refs": [
+    2,
+    1
+   ]
+  },
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1987",
+   "refs": [
+    3,
+    1
+   ],
+   "note": "the first plant; Wikipedia: a second followed in 1997"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "2 cogeneration plants, built in 1987 and 1997",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Auckland",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Auckland",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Alinta Energy",
+   "refs": [
+    3,
+    2
+   ],
+   "note": "Alinta ENZ Limited"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1,
+    3
+   ],
+   "value": "68 MW (The EA register's nameplate); 112 MW (Wikipedia: both plants, the figure we use)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Glenbrook (GLN0332)",
+   "refs": [
+    6
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Glenbrook Power Station",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Glenbrook_Power_Station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Register of generators approved as industrial co-generators (updated 17 August 2022)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.ea.govt.nz/documents/1932/Register_of_approved_industrial_co-generating_stations_mWHik6p.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [],
   "owner_all": true,

@@ -4,42 +4,67 @@ slug = "glenbrook-steel"
 plant = "Glenbrook Steel"
 name = "Glenbrook Steel"
 register = ["T007"]
+wikidata = "Q5568199"
 osm = ["way/1196861316"]
 reviewed = ""
 to_check = [
-  "Location is the grid connection, not the station.",
-  "Capacity: Establish configuration and rating.",
-  "Location: no station point yet (OpenStreetMap is research only); check one against the LINZ aerial or Wikidata.",
-  "Owner: not one of the main owners; find the current owner.",
+  "Location: the point is Wikidata's (added 19 Nov 2026); check it sits on the cogeneration plant at the steel mill against the LINZ aerial (separate task).",
+  "Capacity: Elenz uses 112 MW (Wikipedia: two plants, 1987 and 1997); the EA register says 68 MW. Find an owner or NZ Steel figure for each plant.",
+  "Previous owners: the NZ Herald reports Alinta bought the station from Duke Energy; find the year and who built each plant (NZ Steel?) from a public source.",
+  "Page name: the owner and the EA's co-generator register call it Glenbrook Power Station. Rename the page? (Decision needed; the tracker's name stays.)",
 ]
-notes = ["Shown as waste heat, 112 MW. The meter runs ~1.47× dispatch."]
+notes = [
+  "Shown as waste heat, 112 MW. The meter runs ~1.47× dispatch.",
+  "Thermal batch 1 (19 Nov 2026): facts checked against the EA register, the EA's register of approved industrial co-generators, Wikipedia and Stats NZ boundaries.",
+  "District and region from the Wikidata point and the grid connection point in Stats NZ's boundaries, 19 Nov 2026: Auckland for both.",
+  "Fuel: Elenz shows waste heat; the EA register says cogeneration on gas. Wikipedia: surplus gas from the iron-making kilns.",
+]
+
+[location]
+value = [-37.207636, 174.728143]
+basis = "station"
+source = "wd-q5568199"
+grade = "B"
+checked = ""
 
 [grid_connection]
 value = [-37.20484, 174.73248]
 code = "GLN0332 GLENBROOK"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.other_names]
+value = ["Glenbrook Power Station"]
+source = ["ea-cogen-register", "wp-glenbrook"]
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.other_names.alt]]
 value = ["NZ Steel Glenbrook"]
 source = "elenz-register"
 grade = "C"
 checked = ""
-note = "Names the EA register, Wikipedia and Elenz use for this plant; check each."
 
 [facts.commissioned]
+value = "1987"
+source = ["ea-register", "wp-glenbrook"]
+grade = "A"
+checked = "2026-11-19"
+note = "the first plant; Wikipedia: a second followed in 1997"
+
+[[facts.commissioned.alt]]
 value = "1997"
 source = "wp-list"
 grade = "B"
 checked = ""
 
-[[facts.commissioned.alt]]
-value = "1987"
-source = "ea-register"
-grade = "A"
-checked = ""
-note = "the register's start date, 1987-01-01: often a year, not the day"
+[facts.units]
+value = "2 cogeneration plants, built in 1987 and 1997"
+source = "wp-glenbrook"
+grade = "B"
+checked = "2026-11-19"
 
 [facts.scheme]
 value = "Glenbrook steel mill"
@@ -49,26 +74,51 @@ checked = ""
 
 [facts.region]
 value = "Auckland"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
+value = "Auckland"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
+value = "Auckland"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
 value = "Auckland (Franklin)"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = ""
-source = "ea-register"
-grade = "C"
-checked = ""
-note = "the register's operator(s): Alinta ENZ Limited"
+value = "Alinta Energy"
+source = ["ea-register", "ea-cogen-register"]
+grade = "A"
+checked = "2026-11-19"
+note = "Alinta ENZ Limited"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "The Glenbrook Power Station is a cogeneration plant built into New Zealand Steel's mill at Glenbrook, south of Auckland. It generates electricity from surplus gas from the mill's iron-making kilns, cutting the mill's energy costs and the electricity it buys from the market. The first of its two plants was commissioned in 1987 and the second in 1997."
+source = "wp-glenbrook"
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 68
+basis = "The EA register's nameplate"
+source = "ea-register"
+grade = "A"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 112
+basis = "Wikipedia: both plants, the figure we use"
+source = "wp-glenbrook"
+grade = "B"
+checked = "2026-11-19"

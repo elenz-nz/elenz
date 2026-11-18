@@ -7,40 +7,72 @@ register = ["T012"]
 osm = ["way/781973296"]
 reviewed = ""
 to_check = [
-  "No location yet.",
-  "Capacity: Establish rating and ownership.",
-  "Location: no station point yet (OpenStreetMap is research only); check one against the LINZ aerial or Wikidata.",
+  "Location: no station point yet (OpenStreetMap is research only, and there is no Wikidata item). The Taranaki Regional Council gives the address, 688 Junction Road, New Plymouth: find the plant there on the LINZ aerial (separate task), then test the point against Stats NZ's boundaries.",
+  "Grid connection: the EA's network supply points table has JRD1101 (Junction Road) without coordinates.",
+  "Capacity: Elenz uses 100 MW; the EA register says 130 MW. (Unchanged: plant_capacity.csv note.)",
 ]
-notes = ["100 MW from Feb 2020."]
+notes = [
+  "100 MW from Feb 2020.",
+  "Thermal batch 1 (19 Nov 2026): facts checked against Todd Energy's power plants page, the Taranaki Regional Council's 2023/24 monitoring report and the EA register.",
+  "District from the council's address (688 Junction Road, New Plymouth), not yet from a point in Stats NZ's boundaries; region: the Taranaki Regional Council monitors the plant.",
+  "Commissioned: commissioning in March 2020 and commercial operation from 15 May 2020 (council report); Todd and the EA register: 2020. Elenz's history has its output from Feb 2020.",
+  "Previous operator: the council says the site was formerly operated by Todd Generation Ltd, whose consents moved to Nova Energy on 1 June 2022. Ownership before and after isn't stated, so no previous owners fact yet.",
+]
+
+[facts.other_names]
+value = ["Junction Road Power Plant"]
+source = ["todd-power-plants", "trc-jrpp-2024"]
+grade = "A"
+checked = "2026-11-19"
 
 [facts.commissioned]
 value = "2020"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = ["todd-power-plants", "trc-jrpp-2024", "ea-register"]
+grade = "A"
+checked = "2026-11-19"
+note = "commissioned in March 2020; in commercial operation from 15 May 2020 (council report)"
+
+[facts.units]
+value = "2 open cycle gas turbines of 50 MW"
+source = "trc-jrpp-2024"
+grade = "A"
+checked = "2026-11-19"
+note = "aero-derivative gas turbines, side by side"
 
 [facts.region]
+value = "Taranaki"
+source = "trc-jrpp-2024"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
 value = "Taranaki"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
+value = "New Plymouth"
+source = "trc-jrpp-2024"
+grade = "A"
+checked = "2026-11-19"
+note = "from the address, 688 Junction Road, New Plymouth"
+
+[[facts.territorial_authority.alt]]
 value = "Taranaki"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Nova"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Nova Energy"
+source = ["ea-register", "trc-jrpp-2024"]
+grade = "A"
+checked = "2026-11-19"
+note = "the council: Nova Energy Ltd operates the plant; the register's operator: Nova Energy Limited"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Junction Road is a 100 MW gas-fired peaking plant about 7 km south of New Plymouth, near State Highway 3. Its two 50 MW gas turbines can reach full output in 15 minutes and are used when demand is high or other generation isn't available. Built by Todd Generation, it went into commercial operation in May 2020, and Nova Energy took over its operation in 2022."
+source = ["todd-power-plants", "trc-jrpp-2024", "todd-jrpp-2018"]
+grade = "A"
+checked = "2026-11-19"

@@ -4,10 +4,18 @@ slug = "southdown"
 plant = "Southdown"
 name = "Southdown"
 register = ["T017"]
+wikidata = "Q12002141"
 reviewed = ""
 photo_leads = ["P031"]
-to_check = ["Capacity: Verify capacity and retirement date."]
-notes = ["130 → 180 MW (Mar 2007), to Jan 2016. The 1 MW Southdown battery (2017–2022) is a separate Elenz plant."]
+to_check = ["Location: the point is Wikipedia's list's; the station was demolished in 2022–24, so check it against historical imagery or the LINZ aerial (separate task). Wikidata Q12002141 gives -36.9276, 174.827."]
+notes = [
+  "130 → 180 MW (Mar 2007), to Jan 2016. The 1 MW Southdown battery (2017–2022) is a separate Elenz plant.",
+  "Thermal batch 1 (19 Nov 2026): facts checked against the EA register, Wikipedia's Southdown article (the station's section), the Commerce Commission's 2003 decision and Stats NZ boundaries.",
+  "District and region from the station point and the grid connection point in Stats NZ's boundaries, 19 Nov 2026: Auckland for both.",
+  "Capacity: Wikipedia gives 2 × 42 MW gas turbines and a 37.8 MW steam turbine at commissioning, a third LM6000 (47 MW) in 2007, and 170 MW after upgrades; Mighty River Power called it 140 MW in 2015; the EA register 130 MW plus Southdown 5 at 50 MW (Elenz's 180).",
+  "Closed: Mighty River Power announced in March 2015 that it would close at the end of 2015 (Wikipedia; Elenz's last output is Dec 2015); the EA register's decommission date is 19 Jan 2016.",
+  "Owners: the Southdown Cogeneration Joint Venture (TransAlta and Mercury Energy) developed it; Mighty River Power bought 50% in 2000 and the rest in 2002 (Wikipedia). The Commerce Commission (Feb 2003) says NGC had owned 50% and sold it to its joint venture partner, Mighty River Power (NGC bought TransAlta NZ in 2000). Mighty River Power is now Mercury NZ.",
+]
 
 [location]
 value = [-36.92756, 174.82733]
@@ -21,9 +29,22 @@ value = [-36.93039, 174.81429]
 code = "SWN2201 SOUTHDOWN"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
+
+[facts.other_names]
+value = ["Southdown Co-generation Facility"]
+source = "wp-southdown"
+grade = "B"
+checked = "2026-11-19"
 
 [facts.commissioned]
+value = "1996-12"
+source = "wp-southdown"
+grade = "B"
+checked = "2026-11-19"
+
+[[facts.commissioned.alt]]
 value = "1997"
 source = "wp-list"
 grade = "B"
@@ -34,39 +55,78 @@ value = "1996"
 source = "ea-register"
 grade = "A"
 checked = ""
-note = "the register's start date, 1996-01-01; 2007-01-01: often a year, not the day"
+note = "the register's start date, 1996-01-01; 2007-01-01 for Southdown 5: years, not days"
 
 [facts.closed]
 value = "2015"
-source = "wp-list"
+source = "wp-southdown"
 grade = "B"
+checked = "2026-11-19"
+note = "closed at the end of 2015"
+
+[[facts.closed.alt]]
+value = "2016-01-19"
+source = "ea-register"
+grade = "A"
 checked = ""
+note = "the register's decommission date"
+
+[facts.units]
+value = "2 gas turbines and a steam turbine (1996), and a third gas turbine from 2007"
+source = ["wp-southdown", "ea-register"]
+grade = "B"
+checked = "2026-11-19"
+note = "GE LM6000 gas turbines; the third (Southdown 5 in the register) could run on gas or diesel"
 
 [facts.region]
+value = "Auckland"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
 value = "Auckland"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
+value = "Auckland"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
 value = "Auckland (Maungakiekie-Tamaki)"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Mercury"
-source = "ea-register"
+value = "Mighty River Power, now Mercury (when it closed)"
+source = ["ea-register", "wp-southdown"]
+grade = "A"
+checked = "2026-11-19"
+note = "the register's operator: Mercury NZ Limited"
+
+[facts.previous_owners]
+value = "Southdown Cogeneration Joint Venture (TransAlta and Mercury Energy), from 1996; Mighty River Power bought half in 2000 and the other half, from NGC, in 2002"
+source = ["wp-southdown", "comcom-491"]
 grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+checked = "2026-11-19"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Southdown was a gas-fired combined cycle cogeneration station in the Southdown industrial area of south Auckland, commissioned in December 1996. Besides electricity it piped steam to nearby industry, including a paper recycling mill. A third gas turbine was added in 2007. Mighty River Power closed it at the end of 2015, and it was demolished between 2022 and 2024."
+source = "wp-southdown"
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 170
+basis = "Wikipedia: output after upgrades"
+source = "wp-southdown"
+grade = "B"
+checked = "2026-11-19"
 
 [[ratings]]
 value = "170"

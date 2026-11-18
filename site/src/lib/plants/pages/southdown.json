@@ -42,12 +42,147 @@
  "scheme": null,
  "metered": "The metered history has one meter for the original cogeneration plant and unit 5 together. Southdown closed in January 2016, before the dispatch data starts.",
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Southdown was a gas-fired combined cycle cogeneration station in the Southdown industrial area of south Auckland, commissioned in December 1996. Besides electricity it piped steam to nearby industry, including a paper recycling mill. A third gas turbine was added in 2007. Mighty River Power closed it at the end of 2015, and it was demolished between 2022 and 2024.",
+  "refs": [
+   1
+  ]
+ },
+ "facts": [
+  {
+   "k": "other_names",
+   "label": "Other names",
+   "value": "Southdown Co-generation Facility",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "December 1996",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "closed",
+   "label": "Closed",
+   "value": "2015",
+   "refs": [
+    1
+   ],
+   "note": "closed at the end of 2015"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "2 gas turbines and a steam turbine (1996), and a third gas turbine from 2007",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "GE LM6000 gas turbines; the third (Southdown 5 in the register) could run on gas or diesel"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Auckland",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Auckland",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Mighty River Power, now Mercury (when it closed)",
+   "refs": [
+    2,
+    1
+   ],
+   "note": "the register's operator: Mercury NZ Limited"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "Southdown Cogeneration Joint Venture (TransAlta and Mercury Energy), from 1996; Mighty River Power bought half in 2000 and the other half, from NGC, in 2002",
+   "refs": [
+    1,
+    5
+   ]
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1
+   ],
+   "value": "170 MW (Wikipedia: output after upgrades)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Southdown (SWN2201)",
+   "refs": [
+    6
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Southdown, New Zealand (Southdown Co-generation Facility section)",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Southdown,_New_Zealand",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Decision 491: Contact Energy Limited and Natural Gas Corporation Holdings Limited (4 February 2003)",
+   "publisher": "Commerce Commission",
+   "url": "https://comcom.govt.nz/__data/assets/pdf_file/0026/73466/491.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

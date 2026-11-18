@@ -23,12 +23,106 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "McKee is a 100 MW gas-fired peaking plant at Todd Energy's McKee Production Station on Tariki Road, east of Inglewood in north Taranaki. Its two gas turbines can reach full output in 15 minutes, and Nova Energy uses it to supply electricity when demand is high or other generation isn't available. It has run since 2012 and was officially opened in March 2013.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "other_names",
+   "label": "Other names",
+   "value": "McKee Power Plant",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2012",
+   "refs": [
+    1
+   ],
+   "note": "Todd: in use since 2012; officially opened in March 2013 (Wikipedia)"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "2 gas turbines, 100 MW in all",
+   "refs": [
+    2,
+    1
+   ],
+   "note": "Wikipedia: two GE LM6000 gas turbines, open cycle"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Taranaki",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "New Plymouth",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "McKee (MKE1101)",
+   "refs": [
+    5
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Power plants",
+   "publisher": "Todd Energy",
+   "url": "https://toddenergy.co.nz/peakers/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "McKee power station",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/McKee_power_station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

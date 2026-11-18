@@ -275,7 +275,7 @@
    "status": "operating",
    "mw": 68.0,
    "owner": "Nova",
-   "commissioned": null,
+   "commissioned": "1996",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -313,13 +313,13 @@
    "status": "operating",
    "mw": 112.0,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "1987",
    "closed": null,
    "reviewed": false,
    "pt": {
-    "lat": -37.20484,
-    "lon": 174.73248,
-    "basis": "grid connection",
+    "lat": -37.207636,
+    "lon": 174.728143,
+    "basis": "station",
     "checked": false
    }
   },
@@ -370,7 +370,7 @@
    "status": "operating",
    "mw": 403.0,
    "owner": "Genesis",
-   "commissioned": null,
+   "commissioned": "2007",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -389,7 +389,7 @@
    "status": "operating",
    "mw": 50.0,
    "owner": "Genesis",
-   "commissioned": null,
+   "commissioned": "2004",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -427,7 +427,7 @@
    "status": "operating",
    "mw": 750.0,
    "owner": "Genesis",
-   "commissioned": null,
+   "commissioned": "1982",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -446,7 +446,7 @@
    "status": "operating",
    "mw": 100.0,
    "owner": "Nova",
-   "commissioned": null,
+   "commissioned": "2020",
    "closed": null,
    "reviewed": false,
    "pt": null
@@ -531,7 +531,7 @@
    "status": "operating",
    "mw": 25.0,
    "owner": "Nova",
-   "commissioned": null,
+   "commissioned": "1998",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -664,7 +664,7 @@
    "status": "operating",
    "mw": 40.0,
    "owner": "Oji Fibre Solutions",
-   "commissioned": null,
+   "commissioned": "1997",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -854,13 +854,13 @@
    "status": "operating",
    "mw": 100.0,
    "owner": "Nova",
-   "commissioned": null,
+   "commissioned": "2012",
    "closed": null,
    "reviewed": false,
    "pt": {
-    "lat": -39.08934,
-    "lon": 174.33297,
-    "basis": "grid connection",
+    "lat": -39.0977,
+    "lon": 174.336,
+    "basis": "station",
     "checked": false
    }
   },
@@ -911,13 +911,13 @@
    "status": "closed",
    "mw": 100.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "1974",
    "closed": "2008",
    "reviewed": false,
    "pt": {
-    "lat": -39.05831,
-    "lon": 174.02675,
-    "basis": "grid connection",
+    "lat": -39.05777778,
+    "lon": 174.02722222,
+    "basis": "station",
     "checked": false
    }
   },
@@ -1101,13 +1101,13 @@
    "status": "closed",
    "mw": 180.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "1968",
    "closed": "2004",
    "reviewed": false,
    "pt": {
-    "lat": -36.95471,
-    "lon": 174.86253,
-    "basis": "grid connection",
+    "lat": -36.9512,
+    "lon": 174.865,
+    "basis": "whole site",
     "checked": false
    }
   },
@@ -1120,13 +1120,13 @@
    "status": "closed",
    "mw": 404.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "2000",
    "closed": "2015",
    "reviewed": false,
    "pt": {
-    "lat": -36.95471,
-    "lon": 174.86253,
-    "basis": "grid connection",
+    "lat": -36.9512,
+    "lon": 174.865,
+    "basis": "whole site",
     "checked": false
    }
   },
@@ -1405,7 +1405,7 @@
    "status": "closed",
    "mw": 180.0,
    "owner": "Mercury",
-   "commissioned": null,
+   "commissioned": "1996",
    "closed": "2016",
    "reviewed": false,
    "pt": {
@@ -1443,7 +1443,7 @@
    "status": "operating",
    "mw": 212.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "1976",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1709,7 +1709,7 @@
    "status": "closed",
    "mw": 48.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "1999",
    "closed": "2023",
    "reviewed": false,
    "pt": {
@@ -2051,7 +2051,7 @@
    "status": "operating",
    "mw": 156.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "2004",
    "closed": null,
    "reviewed": false,
    "pt": {

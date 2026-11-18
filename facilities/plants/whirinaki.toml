@@ -7,8 +7,17 @@ register = ["T003"]
 wikidata = "Q288300"
 osm = ["way/95512220"]
 reviewed = ""
-to_check = ["Capacity: Indicative diesel capacity; confirm status and reserve role."]
-notes = ["156 MW from Apr 2004."]
+to_check = [
+  "Location: confirm the Wikidata point sits on the station against the LINZ aerial (separate task).",
+  "Previous owners: Wikipedia's dates (Crown-owned 2004–11, bought by Contact on 22 Dec 2011) rest on government and Contact releases it cites; find one of them to raise the grade.",
+]
+notes = [
+  "156 MW from Apr 2004.",
+  "Thermal batch 1 (19 Nov 2026): facts checked against Contact's Whirinaki page, the EA register, Wikipedia's Whirinaki Power Station article, the Gazette (ECNZ's sale of the earlier station to Contact) and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (Wikidata, not yet checked) and the grid connection point in Stats NZ's boundaries, 19 Nov 2026: both Hastings District. \"Area Outside Territorial Authority\" (the sea) is within 1 km and Napier City within 5 km.",
+  "Capacity: Contact's page says 155 MW in its text and 156 MW in its figures; the EA register 156 MW to Nov 2023, then three units of 52 MW (156 MW).",
+  "The earlier station on the site (NZED, 1978): four twin-pack units with Pratt & Whitney FT4 gas turbines, 220 MW, burning diesel and seldom run; one unit moved to the Te Awamutu dairy factory cogeneration plant in 1993 and the other three were sold to Australia in 2001 (Wikipedia). It was among the stations ECNZ sold to Contact on 1 Feb 1996 (Gazette 1996-174). Before Elenz's data begins (a few hours at WHI2201 in 1997–2000 have no known plant: plant_capacity.csv note).",
+]
 
 [location]
 value = [-39.38283, 176.88825]
@@ -22,15 +31,36 @@ value = [-39.38206, 176.88677]
 code = "WHI2201 WHIRINAKI"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
+
+[facts.other_names]
+value = ["Whirinaki Peaker Plant"]
+source = "contact-whirinaki"
+grade = "A"
+checked = "2026-11-19"
 
 [facts.commissioned]
 value = "2004"
-source = "wp-list"
+source = ["contact-whirinaki", "ea-register"]
+grade = "A"
+checked = "2026-11-19"
+note = "Wikipedia: opened in June 2004"
+
+[facts.units]
+value = "3 twin-pack units, each with two gas turbines, run on diesel"
+source = ["contact-whirinaki", "wp-whirinaki"]
 grade = "B"
-checked = ""
+checked = "2026-11-19"
+note = "Wikipedia: Pratt & Whitney FT8 gas turbines; the EA register: three units of 52 MW"
 
 [facts.region]
+value = "Hawke's Bay"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
 value = "Hawke's Bay"
 source = "elenz-register"
 grade = "C"
@@ -38,23 +68,42 @@ checked = ""
 
 [facts.territorial_authority]
 value = "Hastings"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Hastings"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Contact"
-source = "ea-register"
+value = "Contact Energy"
+source = ["ea-register", "contact-whirinaki"]
+grade = "A"
+checked = "2026-11-19"
+note = "Contact Energy Limited"
+
+[facts.previous_owners]
+value = "New Zealand Government, 2004–11 (reserve generation, run by Contact Energy)"
+source = "wp-whirinaki"
 grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+checked = "2026-11-19"
+note = "Contact bought it from the Crown on 22 December 2011, after Meridian declined to take it in the 2010 market reforms (Wikipedia)"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Whirinaki, north of Napier, is a diesel-fired peaker plant. The government had it built after the power shortages of 2001 and 2003 as reserve generation of last resort, run by Contact Energy, and it opened in June 2004; Contact bought it in 2011. Its three fast-start units can reach full output from a cold start in 20 to 30 minutes, and about four million litres of diesel stored on site will run it at full output for 92 hours. An earlier gas turbine station on the same site ran from 1978 to 2001."
+source = ["contact-whirinaki", "wp-whirinaki"]
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 155
+basis = "Contact's description of the plant; its figures, like the EA register, give 156 MW"
+source = "contact-whirinaki"
+grade = "A"
+checked = "2026-11-19"
 
 [[ratings]]
 value = "155"
