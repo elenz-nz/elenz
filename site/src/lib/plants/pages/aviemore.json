@@ -23,12 +23,184 @@
  "scheme": "Waitaki",
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-18",
+ "about": {
+  "text": "Aviemore was approved in October 1962 and fully running by 1968, completing the mid-Waitaki scheme with Benmore upstream and Waitaki below. Its dam is built in two parts, one of earth and one of concrete. The station's four 55 MW generators are physically the largest in New Zealand, with rotors almost 8 m across weighing 210 tonnes, and its 7 m penstocks are also the country's largest.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1968",
+   "refs": [
+    1
+   ],
+   "note": "construction began in 1962"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "4 units of 55 MW",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "scheme",
+   "label": "Scheme",
+   "value": "Waitaki hydro scheme",
+   "refs": [
+    3
+   ],
+   "note": "with Benmore and Waitaki, the mid-Waitaki scheme"
+  },
+  {
+   "k": "river",
+   "label": "River or lake",
+   "value": "Waitaki River (Lake Aviemore)",
+   "refs": [
+    4,
+    5
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Canterbury",
+   "refs": [
+    6
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Waitaki",
+   "refs": [
+    7
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Meridian Energy",
+   "refs": [
+    8,
+    3
+   ],
+   "note": "Meridian Energy Limited; the 1999 split directions call it Hydro Energy Limited"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–99",
+   "refs": [
+    9,
+    10,
+    11
+   ],
+   "note": "ECNZ took over the Crown's generation on 1 April 1987; the split directions of March 1999 moved Aviemore to the South Island SOE, Hydro Energy Limited (now Meridian Energy), from 1 April 1999"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Aviemore (AVI2201)",
+   "refs": [
+    12
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Aviemore Power Station",
+   "publisher": "Meridian Energy",
+   "url": "https://www.meridianenergy.co.nz/power-stations/hydro/aviemore",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 2,
+   "title": "About the Waitaki hydro scheme",
+   "publisher": "Meridian Energy",
+   "url": "https://www.meridianenergy.co.nz/power-stations/hydro/about-the-waitaki-hydro-scheme",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 3,
+   "title": "Hydro stations",
+   "publisher": "Meridian Energy",
+   "url": "https://www.meridianenergy.co.nz/power-stations/hydro",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 4,
+   "title": "Lake levels",
+   "publisher": "Meridian Energy",
+   "url": "https://www.meridianenergy.co.nz/power-stations/lake-levels",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 5,
+   "title": "Aviemore Dam",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Aviemore_Dam",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 6,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 7,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 8,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 9,
+   "title": "New Zealand Gazette, 27 November 1995, issue 140: ECNZ information for disclosure",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1995/1995%20ISSUE%20140.pdf",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 10,
+   "title": "New Zealand Gazette, 25 March 1999, issue 37: Directions relating to split of Electricity Corporation of New Zealand Limited",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1999/1999%20ISSUE%20037.pdf",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 11,
+   "title": "New Zealand Gazette, 1999, issue 170: ECNZ financial statements",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1999/1999%20ISSUE%20170.pdf",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 12,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-18"
+  }
+ ],
  "related": {
   "owner": [
    {

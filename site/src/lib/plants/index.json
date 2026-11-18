@@ -85,7 +85,7 @@
    "status": "operating",
    "mw": 220.0,
    "owner": "Meridian",
-   "commissioned": null,
+   "commissioned": "1968",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -104,7 +104,7 @@
    "status": "operating",
    "mw": 570.0,
    "owner": "Meridian",
-   "commissioned": null,
+   "commissioned": "1965",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -778,7 +778,7 @@
    "status": "operating",
    "mw": 800.0,
    "owner": "Meridian",
-   "commissioned": null,
+   "commissioned": "1969",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1025,7 +1025,7 @@
    "status": "operating",
    "mw": 264.0,
    "owner": "Meridian",
-   "commissioned": null,
+   "commissioned": "1979",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1044,7 +1044,7 @@
    "status": "operating",
    "mw": 220.0,
    "owner": "Meridian",
-   "commissioned": null,
+   "commissioned": "1984",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1063,7 +1063,7 @@
    "status": "operating",
    "mw": 220.0,
    "owner": "Meridian",
-   "commissioned": null,
+   "commissioned": "1985",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1766,7 +1766,7 @@
    "status": "operating",
    "mw": 30.0,
    "owner": "Genesis",
-   "commissioned": null,
+   "commissioned": "1951",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1785,7 +1785,7 @@
    "status": "operating",
    "mw": 160.0,
    "owner": "Genesis",
-   "commissioned": null,
+   "commissioned": "1977",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1975,7 +1975,7 @@
    "status": "operating",
    "mw": 95.0,
    "owner": "Meridian",
-   "commissioned": null,
+   "commissioned": "1935",
    "closed": null,
    "reviewed": false,
    "pt": {

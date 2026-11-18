@@ -8,8 +8,15 @@ wikidata = "Q1411290"
 osm = ["way/194912653"]
 reviewed = ""
 photo_leads = ["P009", "P010", "P011"]
-to_check = ["Capacity: Underground station; distinguish station from lake/outlet infrastructure."]
-notes = ["585 → 700 MW (May 2002) → 800 MW (Jan 2008)."]
+to_check = ["Location: the station is underground; confirm whether the point marks the machine hall or the surface intake and switchyard against the LINZ aerial (separate task), and set the basis to match."]
+notes = [
+  "585 → 700 MW (May 2002) → 800 MW (Jan 2008).",
+  "Hydro batch 3 (18 Nov 2026): facts checked against Meridian's station pages, the EA register and network supply points table, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district, and no other district or region is within 5 km.",
+  "Year: Meridian gives first power in September 1969 and full operation in 1972, when the seventh unit was commissioned; the EA register and Wikidata give 1972, Wikipedia's list 1971. The page shows 1969, the first generation, as for the other hydro stations.",
+  "Resolved: Capacity: Meridian gives seven 128 MW units, a maximum continuous rating of 850 MW with the second tailrace, and an operating maximum of 800 MW set by its resource consent; Elenz uses 800 MW (the EA register gives 802). Wikipedia's 850 MW rating is replaced by Meridian's.",
+  "Scheme fact dropped (18 Nov 2026): Meridian describes Manapōuri as a single station drawing on Lakes Manapōuri and Te Anau, not as a named scheme.",
+]
 
 [location]
 value = [-45.5214, 167.278]
@@ -23,9 +30,17 @@ value = [-45.52087, 167.2775]
 code = "MAN2201 MANAPOURI"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-18"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
+value = "1969"
+source = "meridian-manapouri"
+grade = "A"
+checked = "2026-11-18"
+note = "construction began in 1964; first power in September 1969, fully operational in 1972"
+
+[[facts.commissioned.alt]]
 value = "1971"
 source = "wp-list"
 grade = "B"
@@ -45,13 +60,27 @@ grade = "A"
 checked = ""
 note = "the register's start date, 1972-01-01: often a year, not the day"
 
-[facts.scheme]
-value = "Manapōuri hydro scheme"
-source = "elenz-register"
-grade = "C"
-checked = ""
+[facts.units]
+value = "7 units of 128 MW, underground"
+source = "meridian-manapouri"
+grade = "A"
+checked = "2026-11-18"
+note = "in a cavern about 200 m below the lake; resource consent limits output to 800 MW"
+
+[facts.river]
+value = "Lake Manapōuri (West Arm)"
+source = ["meridian-manapouri", "meridian-lake-levels"]
+grade = "A"
+checked = "2026-11-18"
+note = "Lakes Te Anau and Manapōuri supply the water; two tailrace tunnels take it 10 km to Deep Cove in Doubtful Sound"
 
 [facts.region]
+value = "Southland"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.region.alt]]
 value = "Southland"
 source = "elenz-register"
 grade = "C"
@@ -59,27 +88,33 @@ checked = ""
 
 [facts.territorial_authority]
 value = "Southland"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-18"
 
 [facts.owner]
-value = "Meridian"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Meridian Energy"
+source = ["ea-register", "meridian-hydro"]
+grade = "A"
+checked = "2026-11-18"
+note = "Meridian Energy Limited; the 1999 split directions call it Hydro Energy Limited"
+
+[facts.previous_owners]
+value = "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–99"
+source = ["gazette-1995-140", "gazette-1999-37", "gazette-1999-170"]
+grade = "A"
+checked = "2026-11-18"
+note = "ECNZ took over the Crown's generation on 1 April 1987; the split directions of March 1999 moved Manapouri to the South Island SOE, Hydro Energy Limited (now Meridian Energy), from 1 April 1999"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Manapōuri is New Zealand's largest hydro station, built in a cavern about 200 m below Lake Manapōuri's West Arm in Fiordland National Park. About 1,800 workers took eight years to build it: the first power came in September 1969 and all seven units were running by 1972. The water leaves through tailrace tunnels to Deep Cove in Doubtful Sound, and a second tunnel, finished in 2002, let the station reach its full rating, though its consent limits output to 800 MW. Plans in the 1960s to raise the lake by up to 30 m met wide public opposition, a landmark in New Zealand's environmental history."
+source = ["meridian-manapouri", "meridian-hydro"]
+grade = "A"
+checked = "2026-11-18"
 
 [[ratings]]
-value = "850"
-basis = "Wikipedia (basis not stated)"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = 850
+basis = "Meridian's maximum continuous rating with the second tailrace; consent limits output to 800 MW"
+source = "meridian-manapouri"
+grade = "A"
+checked = "2026-11-18"

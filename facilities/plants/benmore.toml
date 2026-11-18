@@ -4,11 +4,18 @@ slug = "benmore"
 plant = "Benmore"
 name = "Benmore"
 register = ["H003"]
+wikidata = "Q4889583"
 osm = ["relation/12455469"]
 reviewed = ""
 photo_leads = ["P004", "P005"]
-to_check = ["Capacity: Verify current rating and unit breakdown."]
-notes = ["Elenz has 570 MW from 30 Jul 2026 (540 → 552 → 570 after upgrades)."]
+to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+notes = [
+  "Elenz has 570 MW from 30 Jul 2026 (540 → 552 → 570 after upgrades).",
+  "Hydro batch 3 (18 Nov 2026): facts checked against Meridian's station pages, the EA register and network supply points table, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district. Waimate District is about 250–300 m from the point, across the river (150–200 m from the grid connection point); recheck if the point moves.",
+  "Resolved: Capacity: Meridian's station page still gives six 93 MW units and up to 552 MW; Meridian's 30 July 2026 announcement raised the station to 570 MW, the figure Elenz uses. The Wikipedia rating of 540 MW (the consent-limited output before 2024) is dropped.",
+  "Wikidata: Q4889583 (Benmore Dam) is also typed as a hydroelectric power station, so it stands for the station. The [location] point is still Wikipedia's.",
+]
 
 [location]
 value = [-44.56417, 170.19722]
@@ -22,21 +29,62 @@ value = [-44.5656, 170.19357]
 code = "BEN0162 BENMORE; BEN0163 BENMORE; BEN2202 BENMORE"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-18"
+note = "code and point match the EA's network supply points table of 17 Nov 2026; BEN0162 and BEN0163 ended in 2011–12, and BEN2202 is the current connection"
 
 [facts.commissioned]
+value = "1965"
+source = "meridian-benmore"
+grade = "A"
+checked = "2026-11-18"
+note = "construction began in 1958; first power in January 1965"
+
+[[facts.commissioned.alt]]
 value = "1965"
 source = "wp-list"
 grade = "B"
 checked = ""
 
+[[facts.commissioned.alt]]
+value = "1965"
+source = "ea-register"
+grade = "A"
+checked = ""
+note = "the register's start date, 1965-01-01: often a year, not the day"
+
+[facts.units]
+value = "6 units of 93 MW"
+source = "meridian-benmore"
+grade = "A"
+checked = "2026-11-18"
+note = "Meridian reassessed the station at 570 MW from 30 July 2026"
+
 [facts.scheme]
+value = "Waitaki hydro scheme"
+source = "meridian-hydro"
+grade = "A"
+checked = "2026-11-18"
+note = "with Aviemore and Waitaki, the mid-Waitaki scheme"
+
+[[facts.scheme.alt]]
 value = "Waitaki hydro scheme"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
+[facts.river]
+value = "Waitaki River (Lake Benmore)"
+source = ["meridian-benmore", "meridian-lake-levels"]
+grade = "A"
+checked = "2026-11-18"
+
 [facts.region]
+value = "Canterbury"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.region.alt]]
 value = "Canterbury"
 source = "elenz-register"
 grade = "C"
@@ -44,27 +92,26 @@ checked = ""
 
 [facts.territorial_authority]
 value = "Waitaki"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-18"
 
 [facts.owner]
-value = "Meridian"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Meridian Energy"
+source = ["ea-register", "meridian-hydro"]
+grade = "A"
+checked = "2026-11-18"
+note = "Meridian Energy Limited; the 1999 split directions call it Hydro Energy Limited"
+
+[facts.previous_owners]
+value = "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–99"
+source = ["gazette-1995-140", "gazette-1999-37", "gazette-1999-170"]
+grade = "A"
+checked = "2026-11-18"
+note = "ECNZ took over the Crown's generation on 1 April 1987; the split directions of March 1999 moved Benmore to the South Island SOE, Hydro Energy Limited (now Meridian Energy), from 1 April 1999"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
-
-[[ratings]]
-value = "540"
-basis = "Wikipedia (basis not stated)"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = "Benmore holds back Lake Benmore, New Zealand's largest artificial lake, behind the country's largest earth dam; it was first planned in concrete, like Waitaki. Approved in October 1957 together with the Cook Strait power cable, it was built from 1958, the lake filled in December 1964 and the first power came in January 1965. It is New Zealand's second-largest hydro station after Manapōuri, and Meridian raised its maximum operating capacity to 570 MW in July 2026."
+source = ["meridian-benmore", "meridian-waitaki-uprate"]
+grade = "A"
+checked = "2026-11-18"

@@ -7,7 +7,13 @@ register = ["H055"]
 wikidata = "Q7080628"
 osm = ["relation/12200234"]
 reviewed = ""
-notes = ["Added from Elenz's plant list (8 Nov 2026)."]
+to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+notes = [
+  "Added from Elenz's plant list (8 Nov 2026).",
+  "Hydro batch 3 (18 Nov 2026): facts checked against Meridian's station pages, the EA register and network supply points table, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district. Waitaki District is about 400–500 m from the point (250–300 m from the grid connection point); recheck if the point moves.",
+  "Year: Meridian gives 1979 (fully operational), as does Wikidata; the EA register and Wikipedia's list give 1980. The page shows 1979.",
+]
 
 [location]
 value = [-44.2644, 170.032]
@@ -21,9 +27,17 @@ value = [-44.26587, 170.02921]
 code = "OHA2201 OHAU A"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-18"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
+value = "1979"
+source = "meridian-ohau-a"
+grade = "A"
+checked = "2026-11-18"
+note = "construction began in 1971"
+
+[[facts.commissioned.alt]]
 value = "1980"
 source = "wp-list"
 grade = "B"
@@ -36,13 +50,46 @@ grade = "B"
 checked = ""
 note = "in service 1979"
 
+[[facts.commissioned.alt]]
+value = "1980"
+source = "ea-register"
+grade = "A"
+checked = ""
+note = "the register's start date, 1980-01-01: often a year, not the day"
+
+[facts.units]
+value = "4 units of 66 MW"
+source = "meridian-ohau-a"
+grade = "A"
+checked = "2026-11-18"
+
 [facts.scheme]
+value = "Waitaki hydro scheme"
+source = "meridian-hydro"
+grade = "A"
+checked = "2026-11-18"
+note = "the third station built for the Upper Waitaki scheme"
+
+[[facts.scheme.alt]]
 value = "Waitaki"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
+[facts.river]
+value = "Lakes Ōhau and Pūkaki, by canal"
+source = ["meridian-ohau-a", "meridian-ohau-b"]
+grade = "A"
+checked = "2026-11-18"
+note = "the Pūkaki and Ōhau canals meet above the station; Lake Ruataniwha below it feeds Ōhau B"
+
 [facts.region]
+value = "Canterbury"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.region.alt]]
 value = "Canterbury"
 source = "elenz-register"
 grade = "C"
@@ -50,20 +97,26 @@ checked = ""
 
 [facts.territorial_authority]
 value = "Mackenzie"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-18"
 
 [facts.owner]
-value = "Meridian"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Meridian Energy"
+source = ["ea-register", "meridian-hydro"]
+grade = "A"
+checked = "2026-11-18"
+note = "Meridian Energy Limited; the 1999 split directions call it Hydro Energy Limited"
+
+[facts.previous_owners]
+value = "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–99"
+source = ["gazette-1995-140", "gazette-1999-37", "gazette-1999-170"]
+grade = "A"
+checked = "2026-11-18"
+note = "ECNZ took over the Crown's generation on 1 April 1987; the split directions of March 1999 moved Ohau A to the South Island SOE, Hydro Energy Limited (now Meridian Energy), from 1 April 1999"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Ōhau A, near Twizel in the Mackenzie Basin, stands where the canals from Lakes Ōhau and Pūkaki meet. It was the third station built for the Upper Waitaki scheme: work began in 1971 and its four 66 MW units were fully running by 1979. Building it meant digging about two million cubic metres of rock and gravel from the bank of the Ōhau River. Lake Ruataniwha, which feeds Ōhau B, has a national rowing course that began as the idea of the scheme's project engineer."
+source = ["meridian-ohau-a", "meridian-ohau-b"]
+grade = "A"
+checked = "2026-11-18"

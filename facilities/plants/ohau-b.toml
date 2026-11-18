@@ -7,7 +7,13 @@ register = ["H056"]
 wikidata = "Q7080630"
 osm = ["relation/11111269"]
 reviewed = ""
-notes = ["Added from Elenz's plant list (8 Nov 2026)."]
+to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+notes = [
+  "Added from Elenz's plant list (8 Nov 2026).",
+  "Hydro batch 3 (18 Nov 2026): facts checked against Meridian's station pages, the EA register and network supply points table, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district. Mackenzie District is about 400–500 m from the point (700–800 m from the grid connection point); recheck if the point moves.",
+  "Resolved: Capacity: Meridian's station page gives four 53 MW units, up to 212 MW; Meridian reassessed the station from 216 MW to 220 MW from 30 July 2026, the figure Elenz uses. The Wikipedia rating of 212 MW is replaced by Meridian's.",
+]
 
 [location]
 value = [-44.2994, 170.112]
@@ -21,21 +27,70 @@ value = [-44.3018, 170.11055]
 code = "OHB2201 OHAU B"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-18"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
+value = "1984"
+source = "meridian-ohau-b"
+grade = "A"
+checked = "2026-11-18"
+note = "construction began in 1977"
+
+[[facts.commissioned.alt]]
 value = "1984"
 source = "wp-list"
 grade = "B"
 checked = ""
 
+[[facts.commissioned.alt]]
+value = "1984"
+source = "wd-q7080630"
+grade = "B"
+checked = ""
+note = "in service 1984"
+
+[[facts.commissioned.alt]]
+value = "1984"
+source = "ea-register"
+grade = "A"
+checked = ""
+note = "the register's start date, 1984-01-01: often a year, not the day"
+
+[facts.units]
+value = "4 units of 53 MW"
+source = "meridian-ohau-b"
+grade = "A"
+checked = "2026-11-18"
+note = "Meridian reassessed the station at 220 MW from 30 July 2026"
+
 [facts.scheme]
+value = "Waitaki hydro scheme"
+source = "meridian-hydro"
+grade = "A"
+checked = "2026-11-18"
+note = "a twin station with Ōhau C"
+
+[[facts.scheme.alt]]
 value = "Waitaki"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
+[facts.river]
+value = "Lake Ruataniwha, into the Ōhau C canal"
+source = "meridian-ohau-b"
+grade = "A"
+checked = "2026-11-18"
+note = "the canal carries the water on to Ōhau C"
+
 [facts.region]
+value = "Canterbury"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.region.alt]]
 value = "Canterbury"
 source = "elenz-register"
 grade = "C"
@@ -43,27 +98,33 @@ checked = ""
 
 [facts.territorial_authority]
 value = "Waitaki"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-18"
 
 [facts.owner]
-value = "Meridian"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Meridian Energy"
+source = ["ea-register", "meridian-hydro"]
+grade = "A"
+checked = "2026-11-18"
+note = "Meridian Energy Limited; the 1999 split directions call it Hydro Energy Limited"
+
+[facts.previous_owners]
+value = "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–99"
+source = ["gazette-1995-140", "gazette-1999-37", "gazette-1999-170"]
+grade = "A"
+checked = "2026-11-18"
+note = "ECNZ took over the Crown's generation on 1 April 1987; the split directions of March 1999 moved Ohau B to the South Island SOE, Hydro Energy Limited (now Meridian Energy), from 1 April 1999"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Ōhau B draws water from Lake Ruataniwha and sends it on by canal to Ōhau C, its twin downstream. The two stations share a design, with four 53 MW units each and similar equipment. Work began in 1977 and Ōhau B was fully running by 1984. After reassessing the station, Meridian raised its maximum operating capacity from 216 MW to 220 MW in July 2026."
+source = ["meridian-ohau-b", "meridian-waitaki-uprate"]
+grade = "A"
+checked = "2026-11-18"
 
 [[ratings]]
-value = "212"
-basis = "Wikipedia (basis not stated)"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = 212
+basis = "Meridian's station page: four 53 MW units, before the 2026 reassessment"
+source = "meridian-ohau-b"
+grade = "A"
+checked = "2026-11-18"
