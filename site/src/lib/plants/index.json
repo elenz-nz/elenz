@@ -9,7 +9,7 @@
    "status": "operating",
    "mw": 25.0,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "1981",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -116,20 +116,20 @@
   },
   {
    "slug": "branch-river-arnold",
-   "name": "Branch River (Arnold)",
+   "name": "Branch River",
    "plant": "Branch River (Arnold)",
    "fuel": "hydro",
    "island": "SI",
    "status": "operating",
    "mw": 12.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "1983",
    "closed": null,
    "reviewed": false,
    "pt": {
     "lat": -41.67076,
     "lon": 173.203316,
-    "basis": "station",
+    "basis": "Argyle station",
     "checked": false
    }
   },
@@ -180,13 +180,13 @@
    "status": "operating",
    "mw": 32.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "1944",
    "closed": null,
    "reviewed": false,
    "pt": {
-    "lat": -41.08637,
-    "lon": 172.73264,
-    "basis": "grid connection",
+    "lat": -41.086194,
+    "lon": 172.7325,
+    "basis": "station",
     "checked": false
    }
   },
@@ -199,7 +199,7 @@
    "status": "operating",
    "mw": 42.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "1914",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -237,7 +237,7 @@
    "status": "operating",
    "mw": 26.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "2008",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -351,13 +351,13 @@
    "status": "operating",
    "mw": 28.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "1945",
    "closed": null,
    "reviewed": false,
    "pt": {
-    "lat": -43.94164,
-    "lon": 171.80215,
-    "basis": "grid connection",
+    "lat": -43.5731,
+    "lon": 171.7355,
+    "basis": "station",
     "checked": false
    }
   },
@@ -460,7 +460,7 @@
    "status": "operating",
    "mw": 42.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "Lloy",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -721,7 +721,7 @@
    "status": "operating",
    "mw": 10.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "1928",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -797,13 +797,13 @@
    "status": "operating",
    "mw": 42.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "1924",
    "closed": null,
    "reviewed": false,
    "pt": {
-    "lat": -40.57658,
-    "lon": 175.44893,
-    "basis": "grid connection",
+    "lat": -40.576667,
+    "lon": 175.450278,
+    "basis": "station",
     "checked": false
    }
   },
@@ -835,12 +835,12 @@
    "status": "operating",
    "mw": 80.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "1967",
    "closed": null,
    "reviewed": false,
    "pt": {
-    "lat": -38.114908,
-    "lon": 176.814473,
+    "lat": -38.113917,
+    "lon": 176.814083,
     "basis": "station",
     "checked": false
    }
@@ -1139,7 +1139,7 @@
    "status": "operating",
    "mw": 12.5,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "1984",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1196,13 +1196,13 @@
    "status": "operating",
    "mw": 34.5,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "1984",
    "closed": null,
    "reviewed": false,
    "pt": {
-    "lat": -39.5665,
-    "lon": 174.31012,
-    "basis": "grid connection",
+    "lat": -39.545,
+    "lon": 174.569,
+    "basis": "Pātea Dam",
     "checked": false
    }
   },
@@ -1291,7 +1291,7 @@
    "status": "operating",
    "mw": 12.0,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "Lowe",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1804,7 +1804,7 @@
    "status": "operating",
    "mw": 22.0,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "Geor",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1937,13 +1937,13 @@
    "status": "operating",
    "mw": 74.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "1907",
    "closed": null,
    "reviewed": false,
    "pt": {
-    "lat": -45.94047,
-    "lon": 170.10217,
-    "basis": "grid connection",
+    "lat": -45.905543,
+    "lon": 169.985485,
+    "basis": "Waipori 2A station",
     "checked": false
    }
   },
@@ -2032,7 +2032,7 @@
    "status": "operating",
    "mw": 24.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "1982",
    "closed": null,
    "reviewed": false,
    "pt": {

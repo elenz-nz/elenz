@@ -23,12 +23,150 @@
  "scheme": null,
  "metered": "At this point metered generation is net of local load, about 10% of Mangahao's gross output. Where the embedded generation meter reads more, we add the difference.",
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Mangahao, near Shannon in Horowhenua, was the first North Island power station built by the government. Dams in the Tararua Range hold the Mangahao River's water, which runs through tunnels and pipelines to the powerhouse. The Prime Minister, William Massey, opened it in November 1924, after eight men had died building the tunnels, and its lines to Wellington, Palmerston North and Hawke's Bay became the start of the North Island grid. A joint venture of King Country Energy and Todd Energy bought it in 1997, and King Country Energy, now majority-owned by Contact Energy, has owned it outright since 2012.",
+  "refs": [
+   1,
+   2,
+   3
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1924",
+   "refs": [
+    1,
+    2,
+    3
+   ],
+   "note": "opened by the Prime Minister, William Massey, on 3 November 1924"
+  },
+  {
+   "k": "river",
+   "label": "River or lake",
+   "value": "Mangahao and Tokomaru rivers",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Manawatū-Whanganui",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Horowhenua",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "King Country Energy (75% Contact Energy)",
+   "refs": [
+    2,
+    6,
+    1
+   ],
+   "note": "King Country Energy Limited, 75% owned by Contact (through Manawa Energy, bought July 2025) and 25% by the King Country Trust; Contact runs the station"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "New Zealand Government, 1924–87; Electricity Corporation of New Zealand (ECNZ), 1987–97; King Country Energy and Todd Energy jointly, 1997–2012",
+   "refs": [
+    2,
+    7,
+    3
+   ],
+   "note": "KCE Mangahao and Todd Mangahao bought the station from the government (ECNZ) in 1997; KCE bought out Todd Energy in 2012. KCE: Trustpower the majority shareholder from 2015, Manawa Energy from 2022, Contact (75%) from 2025."
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1
+   ],
+   "value": "39.9 MW (Contact's maximum capacity (Elenz uses the EA register's 42 MW))"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Mangahao (MHO0331)",
+   "refs": [
+    8
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Mangahao hydro power station",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/about-us/our-story/our-generation-and-power-sites/hydro/mangahao",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Our story",
+   "publisher": "King Country Energy",
+   "url": "https://www.kce.co.nz/page/our-story/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Mangahao Power Station",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Mangahao_Power_Station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "New Zealand Gazette, 27 November 1995, issue 140: ECNZ information for disclosure",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1995/1995%20ISSUE%20140.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 8,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

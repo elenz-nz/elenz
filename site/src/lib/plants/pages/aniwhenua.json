@@ -23,12 +23,134 @@
  "scheme": "Rangitaiki",
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Aniwhenua is the middle of three hydro schemes on the Rangitāiki River in the eastern Bay of Plenty, between Murupara and Whakatāne. A 10 m barrage above the Aniwhenua Falls turns the river into a 2.2 km concrete-lined canal and a head pond, from which two buried penstocks feed the power station beside the falls. The Bay of Plenty Electric Power Board built it under a government scheme of the late 1970s that helped local bodies develop small hydro, and it began generating in October 1980. Nova Energy owned it from 1998 until 2016, when it passed to a partnership that Pioneer Energy has wholly owned since 2024.",
+  "refs": [
+   1,
+   2,
+   3
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1981",
+   "refs": [
+    1,
+    4
+   ],
+   "note": "first power 3 October 1980 (Wikipedia); see notes"
+  },
+  {
+   "k": "river",
+   "label": "River or lake",
+   "value": "Rangitāiki River",
+   "refs": [
+    1
+   ],
+   "note": "the middle of the river's three schemes"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Bay of Plenty",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Whakatane",
+   "refs": [
+    6
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Pioneer Energy",
+   "refs": [
+    3,
+    2,
+    1
+   ],
+   "note": "through Southern Generation Limited Partnership, wholly Pioneer's since 2024 (see notes)"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "Bay of Plenty Electric Power Board, 1980–94; Bay of Plenty Electricity, 1994–98; Nova Energy (Todd Corporation), 1998–2016",
+   "refs": [
+    2,
+    1
+   ],
+   "note": "the board vested its assets in Bay of Plenty Electricity in August 1994; Southern Generation (Pioneer and Roaring Forties) from April 2016, wholly Pioneer's from 2024"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Matahina (MAT1101)",
+   "refs": [
+    7
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Aniwhenua Hydro",
+   "publisher": "Pioneer Energy Renewables",
+   "url": "https://www.pioneerenergyrenewables.co.nz/our-locations/aniwhenua-hydro",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Aniwhenua Power Station",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Aniwhenua_Power_Station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Our history",
+   "publisher": "Pioneer Energy",
+   "url": "https://www.pioneerenergy.co.nz/our-history",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [],
   "owner_all": true,

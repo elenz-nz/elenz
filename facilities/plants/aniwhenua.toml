@@ -4,11 +4,19 @@ slug = "aniwhenua"
 plant = "Aniwhenua"
 name = "Aniwhenua"
 register = ["H049"]
+wikidata = "Q63382811"
 reviewed = ""
-to_check = ["Owner: not one of the main owners; find the current owner."]
+to_check = [
+  "Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task). Wikipedia's point (used) is about 180 m from the station's own supply point ANI0331; Wikidata's (Q63382811) is about 1.5 km south, probably the barrage.",
+]
 notes = [
   "Added from Elenz's plant list (8 Nov 2026).",
   "Images: Request from Pioneer Energy",
+  "Hydro batch 5 (19 Nov 2026): facts checked against Pioneer Energy's history and station pages, the EA register and network supply points table, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikipedia, not yet checked against the aerial) and Wikidata's in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. Both give the same; no other district within 5 km.",
+  "Resolved: Owner: Southern Generation Limited Partnership, set up in 2015 by Pioneer and Roaring Forties (The Power Company and Electricity Invercargill), bought it from Nova Energy (Todd) with ownership passing in April 2016 (Wikipedia); Pioneer bought all of Southern Generation in 2024 (Pioneer's history page). The register's operator, Pulse Energy Alliance LP, is Pioneer's (formed 2016). Pioneer Energy Renewables runs the station from Alexandra.",
+  "Commissioning: first power on 3 October 1980 (Wikipedia, from the power board's reports); Pioneer's page says built and commissioned by Bay of Plenty Electricity in 1981, and its summary says built in 1982 and opened by Sir Robert Muldoon; the register 1981. The page shows 1981.",
+  "Grid: the station has its own supply point, ANI0331 (Aniwhenua), embedded under MAT1101 in the network supply points table.",
 ]
 
 [location]
@@ -23,28 +31,44 @@ value = [-38.11343, 176.81462]
 code = "MAT1101 MATAHINA"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 18 Nov 2026; the station's own point ANI0331 sits under MAT1101"
 
 [facts.commissioned]
+value = "1981"
+source = ["pioneer-aniwhenua", "ea-register"]
+grade = "A"
+checked = "2026-11-19"
+note = "first power 3 October 1980 (Wikipedia); see notes"
+
+[[facts.commissioned.alt]]
 value = "1980"
 source = "wp-aniwhenua-power-station"
 grade = "B"
 checked = ""
+note = "began generating 3 October 1980"
 
 [[facts.commissioned.alt]]
-value = "1981"
-source = "ea-register"
+value = "1982"
+source = "pioneer-aniwhenua"
 grade = "A"
 checked = ""
-note = "the register's start date, 1981-01-01: often a year, not the day"
+note = "the page's summary: built 1982, opened by the Prime Minister"
 
-[facts.scheme]
-value = "Rangitaiki"
-source = "elenz-register"
-grade = "C"
-checked = ""
+[facts.river]
+value = "Rangitāiki River"
+source = "pioneer-aniwhenua"
+grade = "A"
+checked = "2026-11-19"
+note = "the middle of the river's three schemes"
 
 [facts.region]
+value = "Bay of Plenty"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
 value = "Bay of Plenty"
 source = "elenz-register"
 grade = "C"
@@ -52,20 +76,39 @@ checked = ""
 
 [facts.territorial_authority]
 value = "Whakatane"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Whakatane"
 source = "wp-aniwhenua-power-station"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = ""
+value = "Pioneer Energy"
+source = ["pioneer-history", "wp-aniwhenua-power-station", "pioneer-aniwhenua"]
+grade = "B"
+checked = "2026-11-19"
+note = "through Southern Generation Limited Partnership, wholly Pioneer's since 2024 (see notes)"
+
+[[facts.owner.alt]]
+value = "Pulse Energy Alliance LP"
 source = "ea-register"
-grade = "C"
+grade = "A"
 checked = ""
-note = "the register's operator(s): Todd Energy; Pulse Energy Alliance LP"
+note = "the register's operator (Todd Energy until April 2016)"
+
+[facts.previous_owners]
+value = "Bay of Plenty Electric Power Board, 1980–94; Bay of Plenty Electricity, 1994–98; Nova Energy (Todd Corporation), 1998–2016"
+source = ["wp-aniwhenua-power-station", "pioneer-aniwhenua"]
+grade = "B"
+checked = "2026-11-19"
+note = "the board vested its assets in Bay of Plenty Electricity in August 1994; Southern Generation (Pioneer and Roaring Forties) from April 2016, wholly Pioneer's from 2024"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Aniwhenua is the middle of three hydro schemes on the Rangitāiki River in the eastern Bay of Plenty, between Murupara and Whakatāne. A 10 m barrage above the Aniwhenua Falls turns the river into a 2.2 km concrete-lined canal and a head pond, from which two buried penstocks feed the power station beside the falls. The Bay of Plenty Electric Power Board built it under a government scheme of the late 1970s that helped local bodies develop small hydro, and it began generating in October 1980. Nova Energy owned it from 1998 until 2016, when it passed to a partnership that Pioneer Energy has wholly owned since 2024."
+source = ["pioneer-aniwhenua", "wp-aniwhenua-power-station", "pioneer-history"]
+grade = "B"
+checked = "2026-11-19"

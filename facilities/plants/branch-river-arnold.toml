@@ -2,20 +2,26 @@
 
 slug = "branch-river-arnold"
 plant = "Branch River (Arnold)"
-name = "Branch River (Arnold)"
+name = "Branch River"
 register = ["H024"]
+wikidata = "Q140959164"
 osm = ["relation/12568807"]
 reviewed = ""
 to_check = [
-  "MW: Elenz 12, Wikipedia 3.8.",
-  "Capacity: Confirm station boundary and rating.",
+  "Location: the point is Argyle station's (Wikidata Q140959164); confirm it against the LINZ aerial and find Wairau station (separate task).",
 ]
-notes = ["The EA register names it \"Branch River (Arnold)\" at ARG1101 (12 MW); Wikipedia lists Argyle 3.8 MW and the metered code is argyle_wairau, so the scheme is Argyle plus Wairau. Arnold is a separate West Coast station (E020)."]
+notes = [
+  "The EA register names it \"Branch River (Arnold)\" at ARG1101 (12 MW); the metered code is argyle_wairau, so the scheme is Argyle plus Wairau. Arnold is a separate West Coast station (E020; Contact: Arnold River, 3 MW). The page's name drops \"(Arnold)\" (19 Nov 2026); the tracker's plant name is unchanged.",
+  "Hydro batch 5 (19 Nov 2026): facts checked against Contact's scheme page, the Gazette (the 1983 consent to generate), the Ministry for the Environment's 2009 review, the EA register and network supply points table, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from Argyle station's Wikidata point in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. The grid connection point gives the same. No other district within 5 km.",
+  "Resolved: Capacity: the 1983 consent gives Argyle 3.8 MW and Wairau 7.2 MW (11 MW, as Contact says); the register has 12 MW (Elenz); Wikipedia's list's 3.8 is Argyle alone. Contact's 11 is a rating.",
+  "Wikipedia's river article says commissioned in 1983 and completed in 1984. The Ministry for the Environment's review says a scheme has existed in the valley since about 1973; not used.",
+]
 
 [location]
 value = [-41.67076, 173.203316]
-basis = "station"
-source = "wp-list"
+basis = "Argyle station"
+source = "wd-q140959164"
 grade = "B"
 checked = ""
 
@@ -24,21 +30,41 @@ value = [-41.67085, 173.20225]
 code = "ARG1101 ARGYLE"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 18 Nov 2026"
 
 [facts.commissioned]
+value = "1983"
+source = ["contact-branch-river", "library-1983-1983-20issue-20071"]
+grade = "A"
+checked = "2026-11-19"
+note = "the Minister of Energy's consent to generate was signed on 29 March 1983"
+
+[[facts.commissioned.alt]]
 value = "1983"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.scheme]
-value = "Branch River scheme"
-source = "elenz-register"
-grade = "C"
-checked = ""
+value = "Branch River Scheme"
+source = ["library-1983-1983-20issue-20071", "contact-branch-river"]
+grade = "A"
+checked = "2026-11-19"
+
+[facts.river]
+value = "Branch River, discharging to the Wairau River"
+source = ["contact-branch-river", "library-1983-1983-20issue-20071"]
+grade = "A"
+checked = "2026-11-19"
 
 [facts.region]
+value = "Marlborough"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
 value = "Marlborough"
 source = "elenz-register"
 grade = "C"
@@ -46,23 +72,53 @@ checked = ""
 
 [facts.territorial_authority]
 value = "Marlborough"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Marlborough"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = "Contact"
+value = "Contact Energy"
+source = ["contact-branch-river", "contact-manawa-2025"]
+grade = "A"
+checked = "2026-11-19"
+note = "The EA register's operator is still Manawa Energy Limited (Trustpower until 2022), which Contact bought on 11 July 2025."
+
+[[facts.owner.alt]]
+value = "Manawa Energy Limited"
 source = "ea-register"
-grade = "B"
+grade = "A"
 checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+
+[facts.previous_owners]
+value = "Marlborough Electric Power Board and its successor Marlborough Electric, 1983–98; Trustpower (Manawa Energy from 2022), 1998–2025"
+source = [
+  "library-1983-1983-20issue-20071",
+  "mfe-wairau-2009",
+  "nzx-announcements-391276",
+  "contact-manawa-2025",
+]
+grade = "A"
+checked = "2026-11-19"
+note = "the board was corporatised as Marlborough Electric in the early 1990s (Wikipedia: 1992–93); TrustPower bought the scheme from Marlborough Electric in 1998 (Ministry for the Environment)"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "The Branch River scheme, in the Wairau Valley in inland Marlborough, is a run-of-river scheme with two power stations. Water taken from the Branch River runs along a race to the Argyle powerhouse, then through a storage pond, Lake Argyle, and a second race to the Wairau powerhouse, which discharges into the Wairau River. The Marlborough Electric Power Board built it, gaining the government's consent to generate in March 1983. Lake Argyle and the Branch and Leatham rivers are popular with anglers."
+source = ["contact-branch-river", "library-1983-1983-20issue-20071", "mfe-wairau-2009"]
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 11
+basis = "Contact's maximum capacity (Elenz uses the EA register's 12 MW)"
+source = "contact-branch-river"
+grade = "A"
+checked = "2026-11-19"
 
 [[ratings]]
 value = "3.8"
@@ -70,3 +126,19 @@ basis = "Wikipedia (basis not stated)"
 source = "wp-list"
 grade = "B"
 checked = ""
+
+[[stations]]
+value = "Argyle"
+mw = 3.8
+source = "library-1983-1983-20issue-20071"
+grade = "A"
+checked = "2026-11-19"
+note = "a vertical Kaplan turbine (1983 consent)"
+
+[[stations]]
+value = "Wairau"
+mw = 7.2
+source = "library-1983-1983-20issue-20071"
+grade = "A"
+checked = "2026-11-19"
+note = "twin horizontal Francis turbine (1983 consent)"

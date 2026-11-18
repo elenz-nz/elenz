@@ -1,6 +1,6 @@
 {
  "slug": "branch-river-arnold",
- "name": "Branch River (Arnold)",
+ "name": "Branch River",
  "plant": "Branch River (Arnold)",
  "fuel": "hydro",
  "island": "SI",
@@ -23,12 +23,167 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "The Branch River scheme, in the Wairau Valley in inland Marlborough, is a run-of-river scheme with two power stations. Water taken from the Branch River runs along a race to the Argyle powerhouse, then through a storage pond, Lake Argyle, and a second race to the Wairau powerhouse, which discharges into the Wairau River. The Marlborough Electric Power Board built it, gaining the government's consent to generate in March 1983. Lake Argyle and the Branch and Leatham rivers are popular with anglers.",
+  "refs": [
+   1,
+   2,
+   3
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1983",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "the Minister of Energy's consent to generate was signed on 29 March 1983"
+  },
+  {
+   "k": "scheme",
+   "label": "Scheme",
+   "value": "Branch River Scheme",
+   "refs": [
+    2,
+    1
+   ]
+  },
+  {
+   "k": "river",
+   "label": "River or lake",
+   "value": "Branch River, discharging to the Wairau River",
+   "refs": [
+    1,
+    2
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Marlborough",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Marlborough",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Contact Energy",
+   "refs": [
+    1,
+    6
+   ],
+   "note": "The EA register's operator is still Manawa Energy Limited (Trustpower until 2022), which Contact bought on 11 July 2025."
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "Marlborough Electric Power Board and its successor Marlborough Electric, 1983–98; Trustpower (Manawa Energy from 2022), 1998–2025",
+   "refs": [
+    2,
+    3,
+    7,
+    6
+   ],
+   "note": "the board was corporatised as Marlborough Electric in the early 1990s (Wikipedia: 1992–93); TrustPower bought the scheme from Marlborough Electric in 1998 (Ministry for the Environment)"
+  },
+  {
+   "k": "stations",
+   "label": "Stations",
+   "refs": [
+    2
+   ],
+   "value": "Argyle (3.8 MW), Wairau (7.2 MW)"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1
+   ],
+   "value": "11 MW (Contact's maximum capacity (Elenz uses the EA register's 12 MW))"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Argyle (ARG1101)",
+   "refs": [
+    8
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Branch River hydro power scheme",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/about-us/our-story/our-generation-and-power-sites/hydro/branch-river",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "New Zealand Gazette, 1983, issue 71: consent for the Marlborough Electric Power Board to generate electricity (Branch River Scheme)",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1983/1983%20ISSUE%20071.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "The TrustPower Wairau River hydro power proposal: a review of the processing of the resource consent applications, 5: The environmental setting (October 2009)",
+   "publisher": "Ministry for the Environment",
+   "url": "https://environment.govt.nz/publications/the-trustpower-wairau-river-hydro-power-proposal-a-review-of-the-processing-of-the-resource-consent-applications/5-the-environmental-setting/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Contact buys Manawa Energy",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/support/notice/manawa",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "Update on retail sale and Manawa Energy launch (NZX, 2 May 2022)",
+   "publisher": "Trustpower (Manawa Energy)",
+   "url": "https://www.nzx.com/announcements/391276",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 8,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

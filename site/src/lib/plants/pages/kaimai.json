@@ -23,12 +23,130 @@
  "scheme": null,
  "metered": "Its one dispatched unit, Kaimai 5, carries the whole scheme, so we show it under the scheme's name.",
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "The Kaimai scheme gathers water from the Wairoa River and its tributaries on the Bay of Plenty side of the Kaimai Range and runs it through small storage lakes, canals and tunnels to four power stations. It grew out of Tauranga's own electricity undertakings: a joint committee of the city and the power board built Lloyd Mandeno, named after the engineer who brought electricity to the district, in 1972, then Lower Mangapapa in 1979 and Ruahihi in 1981. Releases from the Lake McLaren dam on up to 26 days a year give white-water kayakers and rafters high flows.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "Lloyd Mandeno 1972; Lower Mangapapa 1979; Ruahihi 1981",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "see notes"
+  },
+  {
+   "k": "scheme",
+   "label": "Scheme",
+   "value": "Kaimai scheme",
+   "refs": [
+    1,
+    2
+   ]
+  },
+  {
+   "k": "river",
+   "label": "River or lake",
+   "value": "Wairoa and Mangapapa rivers",
+   "refs": [
+    2
+   ],
+   "note": "small daily storage lakes linked by canals and tunnels (Contact)"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Bay of Plenty",
+   "refs": [
+    1
+   ],
+   "note": "Contact's location: Kaimai Range, Bay of Plenty"
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Contact Energy",
+   "refs": [
+    1,
+    3
+   ],
+   "note": "The EA register's operator is still Manawa Energy Limited (Trustpower until 2022), which Contact bought on 11 July 2025."
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "Tauranga Joint Generation Committee, shared by Tauranga's city electricity department and the Tauranga Electric Power Board (Trustpower from 1994), 1972–97; Trustpower (Manawa Energy from 2022), 1997–2025",
+   "refs": [
+    2,
+    4,
+    3
+   ],
+   "note": "the committee was set up in 1965; the city's half came to Trustpower with its merger with Tauranga Electricity on 31 October 1997"
+  },
+  {
+   "k": "stations",
+   "label": "Stations",
+   "refs": [
+    1,
+    2
+   ],
+   "value": "Lloyd Mandeno, Lower Mangapapa, Ruahihi"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Tauranga (TGA0331)",
+   "refs": [
+    5
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Kaimai hydro power scheme",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/about-us/our-story/our-generation-and-power-sites/hydro/kaimai",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Manawa Energy",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Manawa_Energy",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Contact buys Manawa Energy",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/support/notice/manawa",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Update on retail sale and Manawa Energy launch (NZX, 2 May 2022)",
+   "publisher": "Trustpower (Manawa Energy)",
+   "url": "https://www.nzx.com/announcements/391276",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {
