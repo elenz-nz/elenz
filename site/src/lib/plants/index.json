@@ -1,0 +1,2084 @@
+{
+ "plants": [
+  {
+   "slug": "aniwhenua",
+   "name": "Aniwhenua",
+   "plant": "Aniwhenua",
+   "fuel": "hydro",
+   "island": "NI",
+   "status": "operating",
+   "mw": 25.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.29369,
+    "lon": 176.79236,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "arapuni",
+   "name": "Arapuni",
+   "plant": "Arapuni",
+   "fuel": "hydro",
+   "island": "NI",
+   "status": "operating",
+   "mw": 196.7,
+   "owner": "Mercury",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.071389,
+    "lon": 175.643333,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "aratiatia",
+   "name": "Aratiatia",
+   "plant": "Aratiatia",
+   "fuel": "hydro",
+   "island": "NI",
+   "status": "operating",
+   "mw": 78.0,
+   "owner": "Mercury",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.615833,
+    "lon": 176.1425,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "atiamuri",
+   "name": "Ātiamuri",
+   "plant": "Ātiamuri",
+   "fuel": "hydro",
+   "island": "NI",
+   "status": "operating",
+   "mw": 77.0,
+   "owner": "Mercury",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.393003,
+    "lon": 176.023292,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "aviemore",
+   "name": "Aviemore",
+   "plant": "Aviemore",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 220.0,
+   "owner": "Meridian",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -44.656411,
+    "lon": 170.354764,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "benmore",
+   "name": "Benmore",
+   "plant": "Benmore",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 570.0,
+   "owner": "Meridian",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -44.56417,
+    "lon": 170.19722,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "branch-river-arnold",
+   "name": "Branch River (Arnold)",
+   "plant": "Branch River (Arnold)",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 12.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -41.67076,
+    "lon": 173.203316,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "clandeboye-solar-farm",
+   "name": "Clandeboye Solar Farm",
+   "plant": "Clandeboye Solar Farm",
+   "fuel": "solar",
+   "island": "SI",
+   "status": "operating",
+   "mw": 24.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -44.22364,
+    "lon": 171.29224,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "clyde",
+   "name": "Clyde",
+   "plant": "Clyde",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 464.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -45.17944,
+    "lon": 169.30694,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "cobb",
+   "name": "Cobb",
+   "plant": "Cobb",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 32.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -41.08637,
+    "lon": 172.73264,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "coleridge",
+   "name": "Coleridge",
+   "plant": "Coleridge",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 42.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -43.364167,
+    "lon": 171.526944,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "dannevirke-solar-farm",
+   "name": "Dannevirke Solar Farm",
+   "plant": "Dannevirke Solar Farm",
+   "fuel": "solar",
+   "island": "NI",
+   "status": "operating",
+   "mw": 23.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -40.1901,
+    "lon": 176.03077,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "deep-stream-waipori-a",
+   "name": "Deep Stream (Waipori A)",
+   "plant": "Deep Stream (Waipori A)",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 26.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -45.85487,
+    "lon": 170.4757,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "edgecumbe",
+   "name": "Edgecumbe",
+   "plant": "Edgecumbe",
+   "fuel": "gas",
+   "island": "NI",
+   "status": "closed",
+   "mw": 10.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": "2008",
+   "reviewed": false,
+   "pt": {
+    "lat": -37.98726,
+    "lon": 176.82888,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "fonterra-dairy-whareroa",
+   "name": "Fonterra Dairy - Whareroa",
+   "plant": "Fonterra Dairy - Whareroa",
+   "fuel": "gas",
+   "island": "NI",
+   "status": "operating",
+   "mw": 68.0,
+   "owner": "Nova",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -39.5665,
+    "lon": 174.31012,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "glenbrook-ohurua-battery",
+   "name": "Glenbrook-Ohurua Battery",
+   "plant": "Glenbrook-Ohurua Battery",
+   "fuel": "batt",
+   "island": "NI",
+   "status": "operating",
+   "mw": 100.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -37.20484,
+    "lon": 174.73248,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "glenbrook-steel",
+   "name": "Glenbrook Steel",
+   "plant": "Glenbrook Steel",
+   "fuel": "waste",
+   "island": "NI",
+   "status": "operating",
+   "mw": 112.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -37.20484,
+    "lon": 174.73248,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "harapaki",
+   "name": "Harapaki",
+   "plant": "Harapaki",
+   "fuel": "wind",
+   "island": "NI",
+   "status": "operating",
+   "mw": 176.0,
+   "owner": "Meridian",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -39.183889,
+    "lon": 176.693056,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "highbank",
+   "name": "Highbank",
+   "plant": "Highbank",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 28.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -43.94164,
+    "lon": 171.80215,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "huntly-5",
+   "name": "Huntly 5",
+   "plant": "Huntly 5",
+   "fuel": "gas",
+   "island": "NI",
+   "status": "operating",
+   "mw": 403.0,
+   "owner": "Genesis",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -37.543889,
+    "lon": 175.152778,
+    "basis": "whole site",
+    "checked": false
+   }
+  },
+  {
+   "slug": "huntly-6",
+   "name": "Huntly 6",
+   "plant": "Huntly 6",
+   "fuel": "gas",
+   "island": "NI",
+   "status": "operating",
+   "mw": 50.0,
+   "owner": "Genesis",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -37.543889,
+    "lon": 175.152778,
+    "basis": "whole site",
+    "checked": false
+   }
+  },
+  {
+   "slug": "huntly-battery",
+   "name": "Huntly Battery",
+   "plant": "Huntly Battery",
+   "fuel": "batt",
+   "island": "NI",
+   "status": "operating",
+   "mw": 100.0,
+   "owner": "Genesis",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -37.543889,
+    "lon": 175.152778,
+    "basis": "whole site",
+    "checked": false
+   }
+  },
+  {
+   "slug": "huntly-rankines",
+   "name": "Huntly Rankines",
+   "plant": "Huntly Rankines",
+   "fuel": "coal",
+   "island": "NI",
+   "status": "operating",
+   "mw": 750.0,
+   "owner": "Genesis",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -37.543889,
+    "lon": 175.152778,
+    "basis": "whole site",
+    "checked": false
+   }
+  },
+  {
+   "slug": "junction-road",
+   "name": "Junction Road",
+   "plant": "Junction Road",
+   "fuel": "gas",
+   "island": "NI",
+   "status": "operating",
+   "mw": 100.0,
+   "owner": "Nova",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": null
+  },
+  {
+   "slug": "kaimai",
+   "name": "Kaimai",
+   "plant": "Kaimai",
+   "fuel": "hydro",
+   "island": "NI",
+   "status": "operating",
+   "mw": 42.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -37.72772,
+    "lon": 176.13087,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "kaiwaikawe-wind-farm",
+   "name": "Kaiwaikawe Wind Farm",
+   "plant": "Kaiwaikawe Wind Farm",
+   "fuel": "wind",
+   "island": "NI",
+   "status": "operating",
+   "mw": 74.0,
+   "owner": "Mercury",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -35.869056,
+    "lon": 173.730792,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "kaiwera-downs-stage-2",
+   "name": "Kaiwera Downs (Stage 2)",
+   "plant": "Kaiwera Downs (Stage 2)",
+   "fuel": "wind",
+   "island": "SI",
+   "status": "operating",
+   "mw": 155.0,
+   "owner": "Mercury",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": null
+  },
+  {
+   "slug": "kaiwera-downs-wind-farm",
+   "name": "Kaiwera Downs Wind Farm",
+   "plant": "Kaiwera Downs Wind Farm",
+   "fuel": "wind",
+   "island": "SI",
+   "status": "operating",
+   "mw": 43.0,
+   "owner": "Mercury",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -46.11509,
+    "lon": 168.91165,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "kapuni",
+   "name": "Kapuni",
+   "plant": "Kapuni",
+   "fuel": "gas",
+   "island": "NI",
+   "status": "operating",
+   "mw": 25.0,
+   "owner": "Nova",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -39.4293,
+    "lon": 174.14954,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "karapiro",
+   "name": "Karāpiro",
+   "plant": "Karāpiro",
+   "fuel": "hydro",
+   "island": "NI",
+   "status": "operating",
+   "mw": 112.5,
+   "owner": "Mercury",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -37.923889,
+    "lon": 175.539167,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "kawerau",
+   "name": "Kawerau",
+   "plant": "Kawerau",
+   "fuel": "geo",
+   "island": "NI",
+   "status": "operating",
+   "mw": 109.0,
+   "owner": "Mercury",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.0634,
+    "lon": 176.7257,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "kawerau-onepu",
+   "name": "Kawerau (Onepu)",
+   "plant": "Kawerau (Onepu)",
+   "fuel": "geo",
+   "island": "NI",
+   "status": "operating",
+   "mw": 53.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.07673,
+    "lon": 176.72238,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "kawerau-te-ahi-o-maui",
+   "name": "Kawerau (Te Ahi O Maui)",
+   "plant": "Kawerau (Te Ahi O Maui)",
+   "fuel": "geo",
+   "island": "NI",
+   "status": "operating",
+   "mw": 27.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.07673,
+    "lon": 176.72238,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "kawerau-tg1-tg2",
+   "name": "Kawerau TG1/TG2",
+   "plant": "Kawerau TG1/TG2",
+   "fuel": "geo",
+   "island": "NI",
+   "status": "closed",
+   "mw": 6.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": "2008",
+   "reviewed": false,
+   "pt": {
+    "lat": -38.07673,
+    "lon": 176.72238,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "kawerau-topp2",
+   "name": "Kawerau (TOPP2)",
+   "plant": "Kawerau (TOPP2)",
+   "fuel": "geo",
+   "island": "NI",
+   "status": "operating",
+   "mw": 49.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.07472,
+    "lon": 176.69972,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "kinleith",
+   "name": "Kinleith",
+   "plant": "Kinleith",
+   "fuel": "bio",
+   "island": "NI",
+   "status": "operating",
+   "mw": 40.0,
+   "owner": "Oji Fibre Solutions",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.2734157065402,
+    "lon": 175.880681282426,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "kohira-solar-farm",
+   "name": "Kohirā Solar Farm",
+   "plant": "Kohirā Solar Farm",
+   "fuel": "solar",
+   "island": "NI",
+   "status": "operating",
+   "mw": 24.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -35.081667,
+    "lon": 173.219444,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "kowhai-park-solar-farm",
+   "name": "Kōwhai Park Solar Farm",
+   "plant": "Kōwhai Park Solar Farm",
+   "fuel": "solar",
+   "island": "SI",
+   "status": "operating",
+   "mw": 160.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -43.495833,
+    "lon": 172.510556,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "kumara",
+   "name": "Kūmara",
+   "plant": "Kūmara",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 10.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -42.63552,
+    "lon": 171.19555,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "lauriston-solar-farm",
+   "name": "Lauriston Solar Farm",
+   "plant": "Lauriston Solar Farm",
+   "fuel": "solar",
+   "island": "SI",
+   "status": "operating",
+   "mw": 47.0,
+   "owner": "Genesis",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -43.730989,
+    "lon": 171.789431,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "mahinerangi-waipori-b",
+   "name": "Mahinerangi (Waipori B)",
+   "plant": "Mahinerangi (Waipori B)",
+   "fuel": "wind",
+   "island": "SI",
+   "status": "operating",
+   "mw": 36.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -45.760556,
+    "lon": 169.905,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "manapouri",
+   "name": "Manapōuri",
+   "plant": "Manapōuri",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 800.0,
+   "owner": "Meridian",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -45.5214,
+    "lon": 167.278,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "mangahao",
+   "name": "Mangahao",
+   "plant": "Mangahao",
+   "fuel": "hydro",
+   "island": "NI",
+   "status": "operating",
+   "mw": 42.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -40.57658,
+    "lon": 175.44893,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "maraetai",
+   "name": "Maraetai",
+   "plant": "Maraetai",
+   "fuel": "hydro",
+   "island": "NI",
+   "status": "operating",
+   "mw": 360.0,
+   "owner": "Mercury",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.3525,
+    "lon": 175.743889,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "matahina",
+   "name": "Matahina",
+   "plant": "Matahina",
+   "fuel": "hydro",
+   "island": "NI",
+   "status": "operating",
+   "mw": 80.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.114908,
+    "lon": 176.814473,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "mckee",
+   "name": "McKee",
+   "plant": "McKee",
+   "fuel": "gas",
+   "island": "NI",
+   "status": "operating",
+   "mw": 100.0,
+   "owner": "Nova",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -39.08934,
+    "lon": 174.33297,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "mill-creek",
+   "name": "Mill Creek",
+   "plant": "Mill Creek",
+   "fuel": "wind",
+   "island": "NI",
+   "status": "operating",
+   "mw": 60.0,
+   "owner": "Meridian",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -41.212222,
+    "lon": 174.738889,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "mokai",
+   "name": "Mōkai",
+   "plant": "Mokai",
+   "fuel": "geo",
+   "island": "NI",
+   "status": "operating",
+   "mw": 112.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.5306,
+    "lon": 175.926,
+    "basis": "whole site",
+    "checked": false
+   }
+  },
+  {
+   "slug": "new-plymouth",
+   "name": "New Plymouth",
+   "plant": "New Plymouth",
+   "fuel": "gas",
+   "island": "NI",
+   "status": "closed",
+   "mw": 100.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": "2008",
+   "reviewed": false,
+   "pt": {
+    "lat": -39.05831,
+    "lon": 174.02675,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "nga-awa-purua",
+   "name": "Ngā Awa Pūrua",
+   "plant": "Ngā Awa Pūrua",
+   "fuel": "geo",
+   "island": "NI",
+   "status": "operating",
+   "mw": 148.0,
+   "owner": "Mercury",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.614167,
+    "lon": 176.184167,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "nga-tamariki",
+   "name": "Ngā Tamariki",
+   "plant": "Ngā Tamariki",
+   "fuel": "geo",
+   "island": "NI",
+   "status": "operating",
+   "mw": 132.0,
+   "owner": "Mercury",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.547222,
+    "lon": 176.195833,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "ngawha",
+   "name": "Ngāwhā",
+   "plant": "Ngāwhā",
+   "fuel": "geo",
+   "island": "NI",
+   "status": "operating",
+   "mw": 57.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -35.39616,
+    "lon": 173.81063,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "ohaaki",
+   "name": "Ōhaaki",
+   "plant": "Ōhaaki",
+   "fuel": "geo",
+   "island": "NI",
+   "status": "operating",
+   "mw": 43.7,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.526944,
+    "lon": 176.291944,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "ohakuri",
+   "name": "Ōhakuri",
+   "plant": "Ōhakuri",
+   "fuel": "hydro",
+   "island": "NI",
+   "status": "operating",
+   "mw": 109.0,
+   "owner": "Mercury",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.407878,
+    "lon": 176.088644,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "ohau-a",
+   "name": "Ōhau A",
+   "plant": "Ōhau A",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 264.0,
+   "owner": "Meridian",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -44.2644,
+    "lon": 170.032,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "ohau-b",
+   "name": "Ōhau B",
+   "plant": "Ōhau B",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 220.0,
+   "owner": "Meridian",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -44.2994,
+    "lon": 170.112,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "ohau-c",
+   "name": "Ōhau C",
+   "plant": "Ōhau C",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 220.0,
+   "owner": "Meridian",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -44.3419,
+    "lon": 170.182,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "omeheu-solar-farm",
+   "name": "Omeheu Solar Farm",
+   "plant": "Omeheu Solar Farm",
+   "fuel": "solar",
+   "island": "NI",
+   "status": "operating",
+   "mw": 28.7,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -37.98726,
+    "lon": 176.82888,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "otahuhu-a",
+   "name": "Ōtāhuhu A",
+   "plant": "Ōtāhuhu A",
+   "fuel": "gas",
+   "island": "NI",
+   "status": "closed",
+   "mw": 180.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": "2004",
+   "reviewed": false,
+   "pt": {
+    "lat": -36.95471,
+    "lon": 174.86253,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "otahuhu-b",
+   "name": "Ōtāhuhu B",
+   "plant": "Ōtāhuhu B",
+   "fuel": "gas",
+   "island": "NI",
+   "status": "closed",
+   "mw": 404.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": "2015",
+   "reviewed": false,
+   "pt": {
+    "lat": -36.95471,
+    "lon": 174.86253,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "paerau-gorge",
+   "name": "Paerau Gorge",
+   "plant": "Paerau Gorge",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 12.5,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -45.03318,
+    "lon": 170.09335,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "pamu-ra-ki-whitianga-solar-farm",
+   "name": "Pāmu Rā ki Whitianga Solar Farm",
+   "plant": "Pāmu Rā ki Whitianga Solar Farm",
+   "fuel": "solar",
+   "island": "NI",
+   "status": "operating",
+   "mw": 23.8,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -36.850558,
+    "lon": 175.663147,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "papareireia",
+   "name": "Papareireiā",
+   "plant": "Papareireiā",
+   "fuel": "solar",
+   "island": "NI",
+   "status": "operating",
+   "mw": 17.6,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -36.08667,
+    "lon": 174.35919,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "patea",
+   "name": "Pātea",
+   "plant": "Pātea",
+   "fuel": "hydro",
+   "island": "NI",
+   "status": "operating",
+   "mw": 34.5,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -39.5665,
+    "lon": 174.31012,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "poihipi",
+   "name": "Poihipi",
+   "plant": "Poihipi",
+   "fuel": "geo",
+   "island": "NI",
+   "status": "operating",
+   "mw": 55.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.63028,
+    "lon": 176.04167,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "pukenui-solar-farm",
+   "name": "Pukenui Solar Farm",
+   "plant": "Pukenui Solar Farm",
+   "fuel": "solar",
+   "island": "NI",
+   "status": "operating",
+   "mw": 20.8,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -34.818333,
+    "lon": 173.110556,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "rangipo",
+   "name": "Rangipo",
+   "plant": "Rangipo",
+   "fuel": "hydro",
+   "island": "NI",
+   "status": "operating",
+   "mw": 120.0,
+   "owner": "Genesis",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -39.15319,
+    "lon": 175.83744,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "rangitaiki-solar-farm",
+   "name": "Rangitaiki Solar Farm",
+   "plant": "Rangitaiki Solar Farm",
+   "fuel": "solar",
+   "island": "NI",
+   "status": "operating",
+   "mw": 24.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -37.996342,
+    "lon": 176.809961,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "roaring-meg",
+   "name": "Roaring Meg",
+   "plant": "Roaring Meg",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 12.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -45.05967,
+    "lon": 169.19173,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "rotohiko",
+   "name": "Rotohiko",
+   "plant": "Rotohiko",
+   "fuel": "batt",
+   "island": "NI",
+   "status": "operating",
+   "mw": 35.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -37.54159,
+    "lon": 175.15181,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "rotokawa",
+   "name": "Rotokawa",
+   "plant": "Rotokawa",
+   "fuel": "geo",
+   "island": "NI",
+   "status": "operating",
+   "mw": 35.0,
+   "owner": "Mercury",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.612222,
+    "lon": 176.193611,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "roxburgh",
+   "name": "Roxburgh",
+   "plant": "Roxburgh",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 328.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -45.47581,
+    "lon": 169.32255,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "ruakaka-energy-park",
+   "name": "Ruakākā Energy Park",
+   "plant": "Ruakākā Energy Park",
+   "fuel": "batt",
+   "island": "NI",
+   "status": "operating",
+   "mw": 100.0,
+   "owner": "Meridian",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -35.84867,
+    "lon": 174.47729,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "ruakaka-solar-farm",
+   "name": "Ruakākā Solar Farm",
+   "plant": "Ruakākā Solar Farm",
+   "fuel": "solar",
+   "island": "NI",
+   "status": "pending",
+   "mw": 120.0,
+   "owner": "Meridian",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -35.84903,
+    "lon": 174.47989,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "southdown",
+   "name": "Southdown",
+   "plant": "Southdown",
+   "fuel": "gas",
+   "island": "NI",
+   "status": "closed",
+   "mw": 180.0,
+   "owner": "Mercury",
+   "commissioned": null,
+   "closed": "2016",
+   "reviewed": false,
+   "pt": {
+    "lat": -36.92756,
+    "lon": 174.82733,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "southdown-battery",
+   "name": "Southdown Battery",
+   "plant": "Southdown Battery",
+   "fuel": "batt",
+   "island": "NI",
+   "status": "closed",
+   "mw": 1.0,
+   "owner": "Mercury",
+   "commissioned": null,
+   "closed": "2022",
+   "reviewed": false,
+   "pt": {
+    "lat": -36.93039,
+    "lon": 174.81429,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "stratford",
+   "name": "Stratford",
+   "plant": "Stratford",
+   "fuel": "gas",
+   "island": "NI",
+   "status": "operating",
+   "mw": 212.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -39.3322,
+    "lon": 174.319,
+    "basis": "whole site",
+    "checked": false
+   }
+  },
+  {
+   "slug": "taiohi-solar-farm",
+   "name": "Taiohi Solar Farm",
+   "plant": "Taiohi Solar Farm",
+   "fuel": "solar",
+   "island": "NI",
+   "status": "operating",
+   "mw": 22.4,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -37.54159,
+    "lon": 175.15181,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "tararua-stage-i",
+   "name": "Tararua stage I",
+   "plant": "Tararua stage I",
+   "fuel": "wind",
+   "island": "NI",
+   "status": "operating",
+   "mw": 36.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -40.3461,
+    "lon": 175.78,
+    "basis": "whole site",
+    "checked": false
+   }
+  },
+  {
+   "slug": "tararua-stage-ii",
+   "name": "Tararua stage II",
+   "plant": "Tararua stage II",
+   "fuel": "wind",
+   "island": "NI",
+   "status": "operating",
+   "mw": 37.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -40.3461,
+    "lon": 175.78,
+    "basis": "whole site",
+    "checked": false
+   }
+  },
+  {
+   "slug": "tararua-wind-farm-3",
+   "name": "Tararua Wind Farm 3",
+   "plant": "Tararua Wind Farm 3",
+   "fuel": "wind",
+   "island": "NI",
+   "status": "operating",
+   "mw": 93.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -40.3461,
+    "lon": 175.78,
+    "basis": "whole site",
+    "checked": false
+   }
+  },
+  {
+   "slug": "tauhara",
+   "name": "Tauhara",
+   "plant": "Tauhara",
+   "fuel": "geo",
+   "island": "NI",
+   "status": "operating",
+   "mw": 174.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.6681,
+    "lon": 176.151,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "tauhei-solar-farm",
+   "name": "Tauhei Solar Farm",
+   "plant": "Tauhei Solar Farm",
+   "fuel": "solar",
+   "island": "NI",
+   "status": "operating",
+   "mw": 147.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -37.588333,
+    "lon": 175.721667,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "te-apiti",
+   "name": "Te Āpiti",
+   "plant": "Te Āpiti",
+   "fuel": "wind",
+   "island": "NI",
+   "status": "operating",
+   "mw": 90.0,
+   "owner": "Meridian",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -40.2961,
+    "lon": 175.808,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "te-awamutu",
+   "name": "Te Awamutu",
+   "plant": "Te Awamutu",
+   "fuel": "gas",
+   "island": "NI",
+   "status": "closed",
+   "mw": 54.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": "2007",
+   "reviewed": false,
+   "pt": {
+    "lat": -38.00214,
+    "lon": 175.32017,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "te-herenga-o-te-ra-solar-farm",
+   "name": "Te Herenga o Te Rā Solar Farm",
+   "plant": "Te Herenga o Te Rā Solar Farm",
+   "fuel": "solar",
+   "island": "NI",
+   "status": "operating",
+   "mw": 33.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.025861,
+    "lon": 177.183,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "te-huka",
+   "name": "Te Huka",
+   "plant": "Te Huka",
+   "fuel": "geo",
+   "island": "NI",
+   "status": "operating",
+   "mw": 30.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.6669,
+    "lon": 176.118,
+    "basis": "whole site",
+    "checked": false
+   }
+  },
+  {
+   "slug": "te-huka-3",
+   "name": "Te Huka 3",
+   "plant": "Te Huka 3",
+   "fuel": "geo",
+   "island": "NI",
+   "status": "operating",
+   "mw": 54.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.6669,
+    "lon": 176.118,
+    "basis": "whole site",
+    "checked": false
+   }
+  },
+  {
+   "slug": "te-mihi",
+   "name": "Te Mihi",
+   "plant": "Te Mihi",
+   "fuel": "geo",
+   "island": "NI",
+   "status": "operating",
+   "mw": 166.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.619167,
+    "lon": 176.048056,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "te-puna-mauri-o-omaru-at-ruawai",
+   "name": "Te Puna Mauri ō Omaru at Ruawai",
+   "plant": "Te Puna Mauri ō Omaru at Ruawai",
+   "fuel": "solar",
+   "island": "NI",
+   "status": "operating",
+   "mw": 16.8,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -36.08667,
+    "lon": 174.35919,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "te-rapa",
+   "name": "Te Rapa",
+   "plant": "Te Rapa",
+   "fuel": "gas",
+   "island": "NI",
+   "status": "closed",
+   "mw": 48.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": "2023",
+   "reviewed": false,
+   "pt": {
+    "lat": -37.71639,
+    "lon": 175.21667,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "te-rere-hau",
+   "name": "Te Rere Hau",
+   "plant": "Te Rere Hau",
+   "fuel": "wind",
+   "island": "NI",
+   "status": "operating",
+   "mw": 48.5,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -40.35427,
+    "lon": 175.77371,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "te-uku",
+   "name": "Te Uku",
+   "plant": "Te Uku",
+   "fuel": "wind",
+   "island": "NI",
+   "status": "operating",
+   "mw": 64.4,
+   "owner": "Meridian",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -37.8783,
+    "lon": 174.963,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "tekapo-a",
+   "name": "Tekapo A",
+   "plant": "Tekapo A",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 30.0,
+   "owner": "Genesis",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -44.013775,
+    "lon": 170.460563,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "tekapo-b",
+   "name": "Tekapo B",
+   "plant": "Tekapo B",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 160.0,
+   "owner": "Genesis",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -44.122806,
+    "lon": 170.211972,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "teviot",
+   "name": "Teviot",
+   "plant": "Teviot",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 22.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -45.18039,
+    "lon": 169.30622,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "tokaanu",
+   "name": "Tokaanu",
+   "plant": "Tokaanu",
+   "fuel": "hydro",
+   "island": "NI",
+   "status": "operating",
+   "mw": 242.0,
+   "owner": "Genesis",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.98172,
+    "lon": 175.77022,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "turitea-wind-farm",
+   "name": "Turitea Wind Farm",
+   "plant": "Turitea Wind Farm",
+   "fuel": "wind",
+   "island": "NI",
+   "status": "operating",
+   "mw": 221.4,
+   "owner": "Mercury",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -40.4411,
+    "lon": 175.671,
+    "basis": "whole site",
+    "checked": false
+   }
+  },
+  {
+   "slug": "twin-rivers-solar-farm",
+   "name": "Twin Rivers Solar Farm",
+   "plant": "Twin Rivers Solar Farm",
+   "fuel": "solar",
+   "island": "NI",
+   "status": "operating",
+   "mw": 24.0,
+   "owner": "Other generators",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -35.39616,
+    "lon": 173.81063,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "waikaremoana",
+   "name": "Waikaremoana",
+   "plant": "Waikaremoana",
+   "fuel": "hydro",
+   "island": "NI",
+   "status": "operating",
+   "mw": 140.0,
+   "owner": "Genesis",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.806819,
+    "lon": 177.150844,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "waipapa",
+   "name": "Waipāpa",
+   "plant": "Waipāpa",
+   "fuel": "hydro",
+   "island": "NI",
+   "status": "operating",
+   "mw": 54.0,
+   "owner": "Mercury",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.291944,
+    "lon": 175.683611,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "waipipi",
+   "name": "Waipipi",
+   "plant": "Waipipi",
+   "fuel": "wind",
+   "island": "NI",
+   "status": "operating",
+   "mw": 133.0,
+   "owner": "Genesis",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -39.783333,
+    "lon": 174.55,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "waipori-2a-3-4",
+   "name": "Waipori (2A/3/4)",
+   "plant": "Waipori (2A/3/4)",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 74.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -45.94047,
+    "lon": 170.10217,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "wairakei",
+   "name": "Wairākei",
+   "plant": "Wairakei",
+   "fuel": "geo",
+   "island": "NI",
+   "status": "operating",
+   "mw": 136.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.6269,
+    "lon": 176.105,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "waitaki",
+   "name": "Waitaki",
+   "plant": "Waitaki",
+   "fuel": "hydro",
+   "island": "SI",
+   "status": "operating",
+   "mw": 95.0,
+   "owner": "Meridian",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -44.6921,
+    "lon": 170.42903,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "west-wind",
+   "name": "West Wind",
+   "plant": "West Wind",
+   "fuel": "wind",
+   "island": "NI",
+   "status": "operating",
+   "mw": 142.6,
+   "owner": "Meridian",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -41.2764,
+    "lon": 174.66,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "whakamaru",
+   "name": "Whakamaru",
+   "plant": "Whakamaru",
+   "fuel": "hydro",
+   "island": "NI",
+   "status": "operating",
+   "mw": 124.0,
+   "owner": "Mercury",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.419633,
+    "lon": 175.808217,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "wheao-and-flaxy",
+   "name": "Wheao and Flaxy",
+   "plant": "Wheao and Flaxy",
+   "fuel": "hydro",
+   "island": "NI",
+   "status": "operating",
+   "mw": 24.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -38.14825,
+    "lon": 176.22704,
+    "basis": "grid connection",
+    "checked": false
+   }
+  },
+  {
+   "slug": "whirinaki",
+   "name": "Whirinaki",
+   "plant": "Whirinaki",
+   "fuel": "diesel",
+   "island": "NI",
+   "status": "operating",
+   "mw": 156.0,
+   "owner": "Contact",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -39.38283,
+    "lon": 176.88825,
+    "basis": "station",
+    "checked": false
+   }
+  },
+  {
+   "slug": "white-hill",
+   "name": "White Hill",
+   "plant": "White Hill",
+   "fuel": "wind",
+   "island": "SI",
+   "status": "operating",
+   "mw": 58.0,
+   "owner": "Meridian",
+   "commissioned": null,
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -45.7525,
+    "lon": 168.272,
+    "basis": "station",
+    "checked": false
+   }
+  }
+ ]
+}

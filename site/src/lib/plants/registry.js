@@ -2,9 +2,10 @@
 //
 // PLANTS_PUBLIC (design decision, 17 Nov 2026): the pages are built on main but hidden while their facts and photos
 // are checked batch by batch: noindex, out of the sitemap, no menu item and no links in. Switching them on is one
-// small pull request once wave 1's facts are checked: set this true, add the pages to the sitemap
-// (src/routes/sitemap.xml) and Plants to the menu (Masthead.svelte, between Records and Articles), and link plant
-// names from Now and the tracker.
+// small pull request once wave 1's facts are checked: set this true, add /plants and the pages to the sitemap
+// (src/routes/sitemap.xml) and Plants to the menu (Masthead.svelte, between Records and Articles), link plant names
+// from Now and the tracker, and name LINZ Basemaps on the privacy page (the index map loads its tiles) and in the
+// methods' source register. The index (/plants) then drops its draft map points (its +page.server.ts).
 import { FUELS } from '#lib/tracker/fuels.js';
 
 export const PLANTS_PUBLIC = false;

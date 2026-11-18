@@ -104,6 +104,18 @@ check(pf['left'] == 1 and pf['src'] == 'dd' and pf['plants']['Manapōuri']['g'] 
       'plant history: plant-major months, months still to read counted')
 check(plant_history.build(plant_history.unpack(pf), ['2026-09', '2026-10', '2026-11'])['plants'] == pf['plants'],
       'plant history: the published file reads back unchanged')
+
+# plant index (plant_pages.point): a checked point, a draft from a public source, the grid connection, never OSM
+import plant_pages  # noqa: E402
+srcs = {'wd': {'kind': 'public'}, 'ea-nsp': {'kind': 'public'}, 'osm': {'kind': 'research'}}
+loc = lambda src, ch='': {'value': [-45.5, 167.3], 'source': src, 'grade': 'B', 'checked': ch}  # noqa: E731
+grid = {'value': [-45.6, 167.2], 'source': 'ea-nsp', 'grade': 'A', 'checked': ''}
+check(plant_pages.point({'location': loc('wd', '2026-11-18')}, srcs)['checked'] is True, 'plant index: a checked location')
+check(plant_pages.point({'location': loc('wd'), 'grid_connection': grid}, srcs) == {'lat': -45.5, 'lon': 167.3, 'basis': 'station', 'checked': False},
+      'plant index: an unchecked location from a public source is a draft point')
+check(plant_pages.point({'location': loc('osm'), 'grid_connection': grid}, srcs)['basis'] == 'grid connection',
+      'plant index: an OpenStreetMap point is never used; the grid connection is')
+check(plant_pages.point({'location': loc('osm')}, srcs) is None, 'plant index: no public point, no dot')
 json.dumps(pf, allow_nan=False)
 for k in ('p10', 'p90', 'pmin', 'pmax', 'n500', 'n1000', 'rv_hydro', 'rv_geo', 'batt_d', 'batt_c', 'rv_battc'):
     check(k in dd['NI'] and len(dd['NI'][k]) == len(dd['t']), f'daily: {k}')

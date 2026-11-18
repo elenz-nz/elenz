@@ -143,8 +143,9 @@ A provisional record leads (design decision, 12 Nov 2026; `headline(rec, prov)` 
 `/plants/<slug>`, one page per plant file (wave 1: the 110 tracker plants), built from the design mock-up of 17 Nov 2026
 (`src/routes/plants/[slug]/`, `src/lib/plants/`). Hidden while `PLANTS_PUBLIC` is false (`registry.js`; design decision,
 17 Nov 2026): noindex, out of the sitemap, no menu item and no links in, so the prerender finds them through `entries`
-in `+page.server.ts`. Switching them on is one pull request: the flag, the sitemap, Plants in the menu between Records and
-Articles, and links from Now and the tracker drill-in.
+in `+page.server.ts`. Switching them on is one pull request: the flag, the sitemap (the index and every page), Plants in the menu
+between Records and Articles, links from Now and the tracker drill-in, and LINZ Basemaps on the privacy page (the map
+loads its tiles from LINZ) and in the methods' source register.
 
 Three sources, so nothing waits on a site build. The static part is `src/lib/plants/pages/<slug>.json`, written by
 `ingest/plant_pages.py` from the plant files, `plant_capacity.csv` and `plants.json` and committed (`--check` in
@@ -172,6 +173,23 @@ their card's width (`Bars.svelte`, `CapSteps.svelte`, `Spark.svelte`; each wrapp
 its card at 720 px on a phone), and pointing at or tapping a bar puts its figures in the line above. A closed plant has
 no Now panel; a plant not generating yet (a pending capacity row) says so and shows no MW. Tests: `tests/plants.test.js`
 and the plant pages block in `tests/e2e/site.spec.js` (a small history file handed to the page, and the phone width).
+
+The index, `/plants` (`src/routes/plants/`, `src/lib/plants/list.js`, `PlantMap.svelte`), from the same mock-up: a map
+above a table of every plant, filtered by fuel (buttons with counts), island, owner, "Show closed" and a name search,
+sorted by any column, with the settings and the selected plant in the address (`list.js`, as Now's generator table).
+Its rows are `src/lib/plants/index.json`, written by `ingest/plant_pages.py` with the pages (and checked by its
+`--check`): name, fuel, island, status, installed MW, owner, the checked commissioning year, the year it closed, whether
+the page is reviewed, and the map point. The point is the checked location; while the pages are hidden it may also be a
+draft (design decision, 18 Nov 2026): the plant file's unchecked location from a public source, or else its grid
+connection, drawn faded and named "not checked yet". OpenStreetMap points are never used, and `+page.server.ts` drops
+every draft once `PLANTS_PUBLIC` is true. The Now column reads tracker.json's newest interval, polled as on Now. The
+map is MapLibre GL JS (a dependency loaded only on this page, with its worker file, about 450 KB gzipped together) on
+the LINZ Basemaps `topolite-v2` style (Toitū Te Whenua LINZ, CC BY 4.0, credited in the map's corner). It needs the
+build variable `LINZ_BASEMAPS_KEY` (declared in `src/env.ts`, set in Cloudflare's build settings, never committed;
+LINZ restricts a developer key to our sites, so it isn't a secret). Without the key, without WebGL 2, or if the style
+fails to load, the page keeps the outline map it is prerendered with (the Now map's outlines with `map.js` placing the
+dots), which is also what the browser tests see. An island filter frames that island; the corner button the whole
+country. Tests: the index tests in `tests/plants.test.js` and the plant index block in `tests/e2e/site.spec.js`.
 
 ## Tracker
 

@@ -19,6 +19,14 @@ Each plant page (/plants/<slug>) is prerendered from its file here; its live pan
   sources                [{n, title, publisher, url, opened}]: the sources the published facts cite, numbered
   related                {owner: [...], scheme: [...], fuel: [...]}: other plant pages, each {slug, name}
 
+and the index page (/plants) is built from site/src/lib/plants/index.json, one row per plant: slug, name, plant (its
+name in Elenz's data), fuel, island, status, mw, owner (plants.json's, "Other generators" included), commissioned (its checked year, or null),
+closed (the year its last capacity row ended), reviewed, and pt, its point on the map: {lat, lon, basis, checked}.
+`checked` is true for the station's checked location; otherwise pt is a draft, the plant file's unchecked location
+or, without one, its grid connection (the EA's network supply point), for the map while the pages are hidden (design
+decision, 18 Nov 2026). The index page drops every draft point once PLANTS_PUBLIC is true, and a draft never cites a
+research-only source (OpenStreetMap stays out).
+
 Only published facts reach these files (plant_files.published(): checked, grade A or B, public sources, which
 `plant_files.py --check` enforces), so nothing unchecked can reach the site. Research notes, grades, alternatives,
 OpenStreetMap IDs and the to-check list stay in the plant files.
@@ -38,6 +46,7 @@ import plant_files as pf
 from common import ROOT
 
 OUT = os.path.join(ROOT, 'site', 'src', 'lib', 'plants', 'pages')
+INDEX = os.path.join(ROOT, 'site', 'src', 'lib', 'plants', 'index.json')
 META = os.path.join(ROOT, 'site', 'src', 'lib', 'tracker', 'plants.json')
 IMAGES_DIR = os.path.join(ROOT, 'site', 'static', 'plants')
 
@@ -182,6 +191,36 @@ def related(pages, meta):
                         'fuel': [link(q) for q in fuel[:FUEL_LIST]]}
 
 
+def point(p, srcs):
+    """The plant's point for the index map: its checked location, else a draft (see the docstring), else None."""
+    loc = p.get('location')
+    if loc and pf.published(loc):
+        return {'lat': loc['value'][0], 'lon': loc['value'][1], 'basis': loc.get('basis', 'station'), 'checked': True}
+    public = lambda e: e and e.get('value') and all(srcs.get(x, {}).get('kind') == 'public' for x in pf.cited(e))  # noqa: E731
+    if public(loc):
+        return {'lat': loc['value'][0], 'lon': loc['value'][1], 'basis': loc.get('basis', 'station'), 'checked': False}
+    g = p.get('grid_connection')
+    if public(g):
+        return {'lat': g['value'][0], 'lon': g['value'][1], 'basis': 'grid connection', 'checked': False}
+    return None
+
+
+def index(plants, pages, meta, srcs):
+    """The index page's rows, by name (site/src/lib/plants/index.json)."""
+    rows = []
+    for s, pg in pages.items():
+        p = plants[s]
+        com = p.get('facts', {}).get('commissioned')
+        ends = [st['to'] for st in pg['steps'] if st['to']]
+        rows.append({'slug': s, 'name': pg['name'], 'plant': pg['plant'], 'fuel': pg['fuel'], 'island': pg['island'], 'status': pg['status'],
+                     'mw': pg['mw'], 'owner': meta.get(pg['plant'], {}).get('owner') or OTHER,
+                     'commissioned': str(com['value'])[:4] if com and pf.published(com) else None,
+                     'closed': max(ends)[:4] if pg['status'] == 'closed' and ends else None,
+                     'reviewed': bool(p.get('reviewed')), 'pt': point(p, srcs)})
+    rows.sort(key=lambda r: pf.slug(r['name']))
+    return {'plants': rows}
+
+
 def build():
     plants = pf.load()
     srcs = pf.sources()
@@ -191,7 +230,7 @@ def build():
         meta = json.load(f)
     pages = {s: page(s, p, cap, meta, srcs, images) for s, p in plants.items() if p.get('plant')}
     related(pages, meta)
-    return pages
+    return pages, index(plants, pages, meta, srcs)
 
 
 def dump(p):
@@ -199,7 +238,7 @@ def dump(p):
 
 
 def main(check=False):
-    pages = build()
+    pages, idx = build()
     problems = []
     have = {f[:-5] for f in os.listdir(OUT) if f.endswith('.json')} if os.path.isdir(OUT) else set()
     for s, p in pages.items():
@@ -217,6 +256,16 @@ def main(check=False):
             os.makedirs(OUT, exist_ok=True)
             with open(path, 'w', encoding='utf-8') as f:
                 f.write(dump(p))
+    if check:
+        try:
+            with open(INDEX, encoding='utf-8') as f:
+                if f.read() != dump(idx):
+                    problems.append('site/src/lib/plants/index.json is out of date')
+        except FileNotFoundError:
+            problems.append('site/src/lib/plants/index.json is missing')
+    else:
+        with open(INDEX, 'w', encoding='utf-8') as f:
+            f.write(dump(idx))
     for s in sorted(have - set(pages)):
         if check:
             problems.append(f'site/src/lib/plants/pages/{s}.json has no plant file')
