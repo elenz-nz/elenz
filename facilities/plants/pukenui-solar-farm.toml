@@ -8,7 +8,6 @@ wikidata = "Q107547911"
 osm = ["way/992983920"]
 reviewed = ""
 to_check = [
-  "Location: confirm the point sits on the solar farm against the LINZ aerial (separate task).",
   "Capacity (decision): Elenz uses the register's 20.8 MW, which is the panels' DC rating. BraveTrace gives 17.16 MW AC. Move plant_capacity.csv to 17.2 MW?",
   "Owner: the EA register still lists Far North Solar Farms; recheck after the next register refresh.",
   "Mounting (plan question): Far North Solar Farms said in 2021 the farm would use fixed rather than motorised panels (NZ Herald); not yet confirmed for the farm as built.",
@@ -19,22 +18,24 @@ notes = [
   "Dates: the register's row starts 23 May 2025 (Elenz's data from the same day); BraveTrace commissioned 16 June 2025; officially opened October 2025.",
   "Owner: PV Tech (July 2026) says Aquila took sole ownership in January 2026, ending its joint venture with Far North Solar Farm; Wikipedia cites an Overseas Investment Office decision of December 2025 (LINZ's page refused our read).",
   "Dropped the \"Northland\" scheme lead.",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point moved to the substation.",
 ]
 
 [location]
 value = [-34.818333, 173.110556]
 basis = "station"
-source = "wd-q107547911"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wd-q107547911, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
-value = [-35.39616, 173.81063]
+value = [-35.396089, 173.810432]
 code = "KOE1101 Kaikohe"
-source = "ea-nsp"
+source = ["ea-nsp", "linz-aerial"]
 grade = "A"
-checked = "2026-11-19"
-note = "code and point match the EA's network supply points table of 17 Nov 2026"
+checked = "2026-11-18"
+note = "code from the EA's network supply points table; the point is the substation, read from the LINZ aerial, 18 Nov 2026 (the table's point was [-35.396160, 173.810630])"
 
 [facts.commissioned]
 value = "2025"

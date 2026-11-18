@@ -6,22 +6,24 @@ name = "Tekapo A"
 register = ["H058"]
 wikidata = "Q21037313"
 osm = ["way/704227872"]
-reviewed = ""
-to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "Added from Elenz's plant list (8 Nov 2026).",
   "Hydro batch 3 (18 Nov 2026): Tekapo A and B were checked with Meridian's Waitaki stations, as the head of the Waitaki scheme; owner facts from Genesis's own releases, the EA register and network supply points table, the Gazette and Stats NZ boundaries. Genesis's Tekapo Power Scheme page could not be opened from our research tools, so the units rest on Wikipedia. The location is left for the LINZ aerial check.",
   "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district. No other district or region is within 5 km.",
   "Resolved: MW: Elenz uses 30 MW from 2016 (a step in metered output; Wikipedia and Wikidata give 30 MW, and Genesis's 190 MW for the scheme less Tekapo B's 160 MW agrees); the EA register still gives 25 MW, shown as another rating.",
   "The EA register spells the station Takapō A; the site keeps Tekapo A (design decision, 30 Oct 2026).",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 
 [location]
 value = [-44.013775, 170.460563]
 basis = "station"
-source = "wd-q21037313"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wd-q21037313, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-44.01381, 170.46085]

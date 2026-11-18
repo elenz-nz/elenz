@@ -5,10 +5,8 @@ plant = "Kaiwera Downs Wind Farm"
 name = "Kaiwera Downs Wind Farm"
 register = ["W022"]
 osm = ["relation/17250859"]
-reviewed = ""
-to_check = [
-  "Location: no station point yet (OpenStreetMap is research only); check one against the LINZ aerial or Wikidata.",
-]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "Kaiwera Downs is two Elenz plants: stage 1 (43 MW, GOR0331, from Aug 2023) and stage 2 (155 MW, KIW2201, from Apr 2026).",
   "Mercury's wind farm page has slips: stage 1 \"Commissioned in 2013\" (its text says November 2023), \"12km north-west of Gore\" (its fact sheet: 15 km south-east), and stage 2 \"35 wind turbines with an installed capacity of 43MW\" (elsewhere 36 and 155 MW). Facts here use the fact sheet, the September 2026 release and the page's consistent figures.",
@@ -17,7 +15,16 @@ notes = [
   "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. It has no location yet.",
   "District and region from Wikipedia's point (-46.24139, 169.05583) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026: Gore District, with Southland District within 5 km, not within 2 km. The grid connection (Gore) is also in Gore District.",
   "Resolved: Capacity: Mercury gives 10 turbines and 43 MW, matching Elenz and the register. Peak metered half-hour, Aug-Sep 2026: 40.7 MW.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
+
+[location]
+value = [-46.217765, 169.016115]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-46.11509, 168.91165]

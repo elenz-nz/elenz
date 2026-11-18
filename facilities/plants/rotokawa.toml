@@ -7,10 +7,7 @@ register = ["G008"]
 wikidata = "Q7370574"
 osm = ["way/99428426"]
 reviewed = ""
-to_check = [
-  "Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task).",
-  "Previous owners: whether anyone owned the station before Mighty River Power is not yet sourced.",
-]
+to_check = ["Previous owners: whether anyone owned the station before Mighty River Power is not yet sourced."]
 notes = [
   "29 → 35 MW (Jan 2003).",
   "Geothermal batch 1 (19 Nov 2026): facts checked against Mercury's station page, the EA register and network supply points table, the NZ Geothermal Association's Rotokawa page and 2023 generation report, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
@@ -18,14 +15,16 @@ notes = [
   "Resolved: Capacity: Elenz uses 35 MW from 2003 (29 before). Mercury gives 34 MW installed (25 MW in 1997, a 6 MW turbine in 2003, 3 MW since); NZGA 24 + 10 = 34 MW and a 2 MW upgrade in 2021; the register 36 MW; Wikipedia's list 28. Mercury's and the register's figures are shown as ratings.",
   "Steamfield: Mercury says Tauhara North No. 2 Trust holds 35% of it; NZGA describes the Rotokawa Joint Venture as 50:50. The station itself is Mercury's (Rotokawa Generation, NZGA).",
   "Grid connection: WRK0331 is the Wairakei substation's 33 kV bus, the register's connection for Rotokawa; the point is about 8 km west of the station.",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 
 [location]
 value = [-38.612222, 176.193611]
 basis = "station"
-source = "wd-q7370574"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wd-q7370574, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-38.62571, 176.10546]

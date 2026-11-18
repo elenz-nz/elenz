@@ -7,7 +7,6 @@ register = ["T016"]
 wikidata = "Q7108372"
 reviewed = ""
 to_check = [
-  "Location: the point is Wikidata's for the whole Ōtāhuhu site (added 19 Nov 2026); find Ōtāhuhu A's own building on historical imagery or the LINZ aerial (separate task).",
   "Closed: which date to publish? Elenz's data (EA meters) has its last output in Apr 2004; Wikipedia says it left generation in the late 1990s and kept running for reactive power until it was decommissioned in Nov 2013; the EA register's decommission date is 2 May 2014. (Decision needed.)",
   "Fuel: Elenz shows gas; the Commerce Commission (2003) lists Otahuhu A as diesel, 40 MW, and Wikipedia's Contact article says diesel; Wikipedia's list says gas open cycle. Which fuel did it burn, and when?",
   "Olympus twin-pack units (1978): their MW is still unknown.",
@@ -17,14 +16,16 @@ notes = [
   "Thermal batch 1 (19 Nov 2026): facts checked against the EA register, the Gazette (ECNZ's sale to Contact), Wikipedia's Ōtāhuhu Power Station article and Stats NZ boundaries.",
   "District and region from the Wikidata site point and the grid connection point in Stats NZ's boundaries, 19 Nov 2026: Auckland for both.",
   "Owner: closed under Contact Energy, which sold the Ōtāhuhu site in 2016 (Wikipedia).",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
 
 [location]
-value = [-36.9512, 174.865]
+value = [-36.950273, 174.862683]
 basis = "whole site"
-source = "wd-q7108372"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-36.951200, 174.865000] came from wd-q7108372"
 
 [grid_connection]
 value = [-36.95471, 174.86253]

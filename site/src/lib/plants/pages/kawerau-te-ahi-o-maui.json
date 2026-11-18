@@ -60,6 +60,14 @@
    "note": "from the grid connection point; the whole field is in the Bay of Plenty (NZGA)"
   },
   {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Whakatāne",
+   "refs": [
+    5
+   ]
+  },
+  {
    "k": "owner",
    "label": "Owner",
    "value": "Eastland Generation",
@@ -83,12 +91,39 @@
    "label": "Connection point",
    "value": "Topp2; Kaw0111 Kawerau To Sep 2025 (KAW2201)",
    "refs": [
-    5
+    6
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -38.0632,
+  "lon": 176.702952,
+  "basis": "station",
+  "refs": [
+   7
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/kawerau-te-ahi-o-maui-site.webp",
+   "across": 470,
+   "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2023)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/kawerau-te-ahi-o-maui-close.webp",
+   "across": 940,
+   "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2023)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/kawerau-te-ahi-o-maui-wide.webp",
+   "across": 7520,
+   "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2023)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -120,10 +155,24 @@
   },
   {
    "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

@@ -56,7 +56,7 @@
  "owner": "Meridian",
  "scheme": null,
  "metered": "Its first 16 months, May 2014 to August 2015, aren't in metered generation or embedded generation. They come from Meridian's injection at Wilton in the reconciliation data.",
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "Mill Creek is in the hills above the Ōhāriu Valley, north-west of Wellington, on private farms whose owners chose wind farming over a housing subdivision or forestry and picked Meridian to build it. Plans for 31 turbines were cut to 26 by the Environment Court in 2011. Building began in 2012, with about 800,000 cubic metres of earthworks and 19 km of tracks, and the 26 turbines (59.8 MW) were fully running in 2014, feeding the grid at Transpower's Wilton substation.",
@@ -115,12 +115,40 @@
    "label": "Connection point",
    "value": "Wilton (WIL0331)",
    "refs": [
-    6
+    6,
+    7
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -41.212222,
+  "lon": 174.738889,
+  "basis": "station",
+  "refs": [
+   7
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/mill-creek-site.webp",
+   "across": 450,
+   "imagery": "Wellington 0.2m Rural Aerial Photos (2025-2026)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/mill-creek-close.webp",
+   "across": 900,
+   "imagery": "Wellington 0.2m Rural Aerial Photos (2025-2026)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/mill-creek-wide.webp",
+   "across": 7190,
+   "imagery": "Wellington 0.2m Rural Aerial Photos (2025-2026)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -163,6 +191,13 @@
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

@@ -22,7 +22,7 @@
  "owner": "Contact",
  "scheme": null,
  "metered": "At this point metered generation is net of local load, about 35% of Cobb's gross output. Where the embedded generation meter reads more, we add the difference.",
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "Cobb stands where the Cobb River meets the Tākaka, on the edge of Kahurangi National Park in Golden Bay. Its water falls almost 600 m from the storage lake to the powerhouse, the greatest head of any power station in New Zealand, so a small flow makes a lot of power. A private company planned the scheme in the 1930s but could not raise the money; the government took it over, first power came in 1944, and a storage dam was finished in 1954. Until 1955, when a line from Stoke joined the region to the South Island grid, Cobb supplied Nelson and Tasman on its own.",
@@ -117,8 +117,35 @@
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -41.086303,
+  "lon": 172.732233,
+  "basis": "station",
+  "refs": [
+   11
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/cobb-site.webp",
+   "across": 450,
+   "imagery": "Tasman 0.25m Rural Aerial Photos (2024-2025)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/cobb-close.webp",
+   "across": 900,
+   "imagery": "Tasman 0.25m Rural Aerial Photos (2024-2025)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/cobb-wide.webp",
+   "across": 7200,
+   "imagery": "Tasman 0.25m Rural Aerial Photos (2024-2025)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -189,6 +216,13 @@
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 11,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

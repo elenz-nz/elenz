@@ -6,8 +6,8 @@ name = "Mōkai"
 register = ["G010", "G011", "G012"]
 wikidata = "Q15379053"
 osm = ["way/170176583"]
-reviewed = ""
-to_check = ["Location: confirm the point against the LINZ aerial (separate task); it is the whole site for now."]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "G010: Elenz shows Mōkai as one plant: 55 → 95 (May 2005) → 112 MW (Jun 2007).",
   "G011: See G010.",
@@ -17,22 +17,24 @@ notes = [
   "Resolved: Owner: the register's operator is Tuaropaki Power Company; Mercury says the station is owned by the Tūaropaki Trust (75%) and Mercury (25%), and Wikipedia that Tuaropaki Power Company is owned in those shares and Mercury operates the station.",
   "Resolved: Stations and capacity: NZGA lists Mokai 1 (1999, six units, 55 MW), Mokai 2 (2005, five units, 39 MW) and Mokai 1A (2007, one binary unit, 17 MW); Mercury gives 55 MW in 2000, +38 MW in 2005 and +20 MW in 2008, 113 MW in all, with 10 binary and 2 steam turbines. Elenz's 112 MW matches the register.",
   "Commissioned: Mercury and the register say 2000; NZGA and Wikipedia 1999; Elenz's metered history starts Oct 1999. The page shows 2000.",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point moved to the substation.",
 ]
 
 [location]
 value = [-38.5306, 175.926]
 basis = "whole site"
-source = "wd-q15379053"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wd-q15379053, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
-value = [-38.41908, 175.80036]
+value = [-38.419272, 175.802552]
 code = "WKM2201 WHAKAMARU"
-source = "ea-nsp"
+source = ["ea-nsp", "linz-aerial"]
 grade = "A"
-checked = "2026-11-19"
-note = "the register's connection for Mokai; the point is the Whakamaru substation, about 15 km northwest of the station"
+checked = "2026-11-18"
+note = "code from the EA's network supply points table; the point is the substation, read from the LINZ aerial, 18 Nov 2026 (the table's point was [-38.419080, 175.800360])"
 
 [facts.commissioned]
 value = "2000"

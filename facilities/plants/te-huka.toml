@@ -6,8 +6,8 @@ name = "Te Huka"
 register = ["G004"]
 wikidata = "Q7690821"
 osm = ["way/169516349"]
-reviewed = ""
-to_check = ["Location: confirm the point sits on the Te Huka 1 plant (not Te Huka 3 beside it) against the LINZ aerial (separate task)."]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "30 MW from Jan 2009.",
   "Geothermal batch 1 (19 Nov 2026): facts checked against Contact's station page, the EA register and network supply points table, the NZ Geothermal Association's Tauhara page, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
@@ -15,14 +15,16 @@ notes = [
   "Resolved: Capacity: Elenz uses the register's 30 MW. NZGA gives 24 MW when built (2010), 26 MW after a 2012 upgrade of its two units; Wikipedia 23 MW. Contact's station page gives about 82 MW, which appears to include Te Huka 3 (51.4 MW). Wikipedia's list figure, 79, is the two together.",
   "Grid connection: WRK0331 is the Wairakei substation's 33 kV bus (the register's connection for Te Huka); Wikipedia says a 33 kV line runs from the station to Transpower's Wairakei substation, so the point is the substation's, about 5 km north of the station.",
   "Elenz's history starts in Jan 2009 (metered output) though the station opened in May 2010; check whether the early months are commissioning output.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
 
 [location]
-value = [-38.6669, 176.118]
+value = [-38.667612, 176.116198]
 basis = "whole site"
-source = "wd-q7690821"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-38.666900, 176.118000] came from wd-q7690821"
 
 [grid_connection]
 value = [-38.62571, 176.10546]

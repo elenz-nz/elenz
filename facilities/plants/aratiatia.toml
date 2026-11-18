@@ -6,19 +6,21 @@ name = "Aratiatia"
 register = ["H050"]
 wikidata = "Q4784425"
 osm = ["way/410732354"]
-reviewed = ""
-to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "Hydro batch 1 (18 Nov 2026): facts checked against Mercury's station pages, the EA register, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district.",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 
 [location]
 value = [-38.615833, 176.1425]
 basis = "station"
-source = "wd-q4784425"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wd-q4784425, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-38.61589, 176.14304]

@@ -22,7 +22,7 @@
  "owner": null,
  "scheme": null,
  "metered": null,
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "Pāmu Rā ki Whitianga is Lodestone Energy's fourth solar farm, on the outskirts of Whitianga, and the first utility-scale solar farm on the Coromandel. Its 53,400 bifacial panels track the sun, and it started generating in November 2025. Ngāti Hei gifted the name, which means \"solar farm of Whitianga\".",
@@ -85,8 +85,35 @@
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -36.851743,
+  "lon": 175.664193,
+  "basis": "station",
+  "refs": [
+   7
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/pamu-ra-ki-whitianga-solar-farm-site.webp",
+   "across": 480,
+   "imagery": "Waikato 0.3m Rural Aerial Photos (2023-2024)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/pamu-ra-ki-whitianga-solar-farm-close.webp",
+   "across": 960,
+   "imagery": "Waikato 0.3m Rural Aerial Photos (2023-2024)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/pamu-ra-ki-whitianga-solar-farm-wide.webp",
+   "across": 7650,
+   "imagery": "Waikato 0.3m Rural Aerial Photos (2023-2024)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -129,6 +156,13 @@
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

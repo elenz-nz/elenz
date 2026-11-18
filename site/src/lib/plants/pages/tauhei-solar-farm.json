@@ -22,7 +22,7 @@
  "owner": null,
  "scheme": null,
  "metered": null,
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "Tauhei is a solar farm on 182 hectares near Te Aroha in the Waikato, built by Harmony Energy and its joint venture partners. It connects to Transpower's 110 kV network at Waihou substation, and Meridian Energy buys all its output for its first 10 years. It was energised in July 2026 and is expected to produce about 280 GWh a year.",
@@ -86,8 +86,35 @@
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -37.588333,
+  "lon": 175.721667,
+  "basis": "station",
+  "refs": [
+   7
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/tauhei-solar-farm-site.webp",
+   "across": 470,
+   "imagery": "Waikato 0.3m Rural Aerial Photos (2023-2024)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/tauhei-solar-farm-close.webp",
+   "across": 950,
+   "imagery": "Waikato 0.3m Rural Aerial Photos (2023-2024)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/tauhei-solar-farm-wide.webp",
+   "across": 7570,
+   "imagery": "Waikato 0.3m Rural Aerial Photos (2023-2024)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -130,6 +157,13 @@
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

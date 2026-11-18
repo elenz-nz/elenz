@@ -4,22 +4,25 @@ slug = "kawerau-topp2"
 plant = "Kawerau (TOPP2)"
 name = "Kawerau (TOPP2)"
 register = ["G018"]
-reviewed = ""
-to_check = ["Location: the point is from Wikipedia's list; check it against the LINZ aerial (separate task). Whakatāne District lies 100–150 m away, so recheck the district if it moves."]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "49 MW from Dec 2025; shares a metered code with Te Ahi O Maui.",
   "Geothermal batch 1 (19 Nov 2026): facts checked against Eastland Generation's geothermal page, the EA register and network supply points table, the NZ Geothermal Association's Kawerau page and Stats NZ boundaries.",
   "District and region from the station's point (the [location] value, from Wikipedia's list, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026: Kawerau District, with Whakatāne District 100–150 m away.",
   "Resolved (owner): Eastland Generation, the register's operator (Obayashi Corporation bought 50% of Eastland in April 2024). Ngāti Tūwharetoa Geothermal Assets supplies the geothermal heat and runs the wells and steamfield; the land is leased from Ngāti Tūwharetoa Holdings.",
   "Dates: construction began in July 2023; Eastland says it came online in December 2025 (its page labels it commissioned 2026); the register's entry starts 2025-12-03.",
+  "District from the checked point (Stats NZ, 19 Nov 2026): Kawerau; Whakatāne is within 300 m.",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 
 [location]
 value = [-38.07472, 176.69972]
 basis = "station"
-source = "wp-list"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wp-list, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-38.07673, 176.72238]

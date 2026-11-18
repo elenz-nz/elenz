@@ -6,14 +6,22 @@ name = "Ruakākā Solar Farm"
 register = ["S018"]
 reviewed = ""
 to_check = [
-  "Location: no station point yet (OpenStreetMap is research only); find one on the LINZ aerial (separate task), then test it against the Stats NZ boundaries.",
   "Capacity (decision): Elenz has it pending at 120 MW. Meridian gives 130 MW, and the EA register now lists \"Ruakākā Energy Park Solar Farm\" (RUS0) at 130 MW from 29 Oct 2026; not yet in Elenz's live data (19 Nov). Give it 130 MW and a start date once it dispatches.",
   "Commissioned: first generation was expected in late 2026, full generation in early 2027; add the year once it generates.",
 ]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against Meridian's two releases (final investment decision, March 2025; construction under way, October 2025), the EA register and network supply points table, and Stats NZ boundaries.",
   "Region from the grid connection point (no station point yet); the sources place the farm near it, in the same region (Bream Bay). District left unchecked: no station point.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
+
+[location]
+value = [-35.854860, 174.469867]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-35.84903, 174.47989]
@@ -47,8 +55,8 @@ note = "from the grid connection point (no station point yet); the sources place
 [facts.territorial_authority]
 value = "Whangārei"
 source = "statsnz-ta-2026"
-grade = "C"
-checked = ""
+grade = "A"
+checked = "2026-11-19"
 note = "the grid connection point (Bream Bay) only"
 
 [facts.owner]

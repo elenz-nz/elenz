@@ -22,7 +22,7 @@
  "owner": "Mercury",
  "scheme": null,
  "metered": null,
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "Tararua Wind Farm stands on about 700 hectares of farmland on the Tararua Range east of Palmerston North, built in three stages. Stage I, 48 Vestas V47 turbines of 660 kW on 40 m lattice towers, reached commercial operation on 24 December 1999, when it was the largest wind farm in the southern hemisphere, and its turbines have kept running well past their 20-year design life. Trustpower owned it from then until its wind farms passed to Tilt Renewables in 2016; Mercury bought it in 2021.",
@@ -71,12 +71,20 @@
    ]
   },
   {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Tararua",
+   "refs": [
+    5
+   ]
+  },
+  {
    "k": "owner",
    "label": "Owner",
    "value": "Mercury",
    "refs": [
     1,
-    5
+    6
    ],
    "note": "since 3 August 2021"
   },
@@ -86,8 +94,8 @@
    "value": "Trustpower, 1999–2016; Tilt Renewables, 2016–21",
    "refs": [
     2,
-    6,
-    5
+    7,
+    6
    ],
    "note": "Trustpower moved its wind farms to Tilt Renewables in its demerger of October 2016; Mercury bought Tilt's New Zealand operations on 3 August 2021"
   },
@@ -104,12 +112,39 @@
    "label": "Connection point",
    "value": "Linton (LTN0331)",
    "refs": [
-    7
+    8
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -40.338074,
+  "lon": 175.787747,
+  "basis": "whole site",
+  "refs": [
+   9
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/tararua-stage-i-site.webp",
+   "across": 460,
+   "imagery": "Manawatū-Whanganui 0.2m Rural Aerial Photos (2023-2024)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/tararua-stage-i-close.webp",
+   "across": 910,
+   "imagery": "Manawatū-Whanganui 0.2m Rural Aerial Photos (2023-2024)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/tararua-stage-i-wide.webp",
+   "across": 7280,
+   "imagery": "Manawatū-Whanganui 0.2m Rural Aerial Photos (2023-2024)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -141,24 +176,38 @@
   },
   {
    "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
    "title": "Mercury acquires Tilt Renewables' New Zealand operations (NZX, 3 August 2021)",
    "publisher": "Mercury NZ",
    "url": "https://www.nzx.com/announcements/376610",
    "opened": "2026-11-19"
   },
   {
-   "n": 6,
+   "n": 7,
    "title": "Tilt Renewables introduction booklet (2016)",
    "publisher": "Tilt Renewables",
    "url": "https://tiltrenewables.com/wp-content/uploads/2024/08/TILT12848_IntroductionBooklet_11F_Web.pdf",
    "opened": "2026-11-19"
   },
   {
-   "n": 7,
+   "n": 8,
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 9,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

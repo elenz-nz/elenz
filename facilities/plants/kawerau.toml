@@ -6,8 +6,8 @@ name = "Kawerau"
 register = ["G016"]
 wikidata = "Q11980453"
 osm = ["way/170175198"]
-reviewed = ""
-to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task); Whakatāne District lies 200–250 m away, so recheck the district if the point moves."]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "Mercury's Kawerau station (KAW1101 KAG0), 109 MW from Jun 2008.",
   "Geothermal batch 1 (19 Nov 2026): facts checked against Mercury's station and geothermal pages, POWER magazine (Jan 2009), the EA register and network supply points table, the NZ Geothermal Association's Kawerau page and 2023 generation report, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
@@ -15,14 +15,17 @@ notes = [
   "Resolved: Capacity: Elenz uses the register's 109 MW. Mercury gives 107 MW installed; NZGA lists 100 MW in 2008 plus a 7 MW rerate in 2017; Wikipedia 100 MW (built for 90 MW, ran at 100). Both owner figures kept as ratings.",
   "Dates: construction began January 2007; operating from August 2008 (POWER) or July 2008 (Wikipedia); officially opened in late November 2008. The page shows 2008.",
   "Built by Mighty River Power, Mercury's former name, so there are no previous owners.",
+  "District from the checked point (Stats NZ, 19 Nov 2026): Kawerau; Whakatāne is within 300 m.",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 
 [location]
 value = [-38.0634, 176.7257]
 basis = "station"
-source = "wd-q11980453"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wd-q11980453, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-38.07673, 176.72238]

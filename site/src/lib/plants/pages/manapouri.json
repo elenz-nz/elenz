@@ -52,7 +52,7 @@
  "owner": "Meridian",
  "scheme": "Manapōuri",
  "metered": null,
- "checking": true,
+ "checking": false,
  "checked": "2026-11-18",
  "about": {
   "text": "Manapōuri is New Zealand's largest hydro station, built in a cavern about 200 m below Lake Manapōuri's West Arm in Fiordland National Park. About 1,800 workers took eight years to build it: the first power came in September 1969 and all seven units were running by 1972. The water leaves through tailrace tunnels to Deep Cove in Doubtful Sound, and a second tunnel, finished in 2002, let the station reach its full rating, though its consent limits output to 800 MW. Plans in the 1960s to raise the lake by up to 30 m met wide public opposition, a landmark in New Zealand's environmental history.",
@@ -144,8 +144,35 @@
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -45.5214,
+  "lon": 167.278,
+  "basis": "station",
+  "refs": [
+   11
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/manapouri-site.webp",
+   "across": 420,
+   "imagery": "Southland 0.75m Rural Aerial Photos (2005-2011)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/manapouri-close.webp",
+   "across": 840,
+   "imagery": "Southland 0.75m Rural Aerial Photos (2005-2011)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/manapouri-wide.webp",
+   "across": 6690,
+   "imagery": "Southland 0.75m Rural Aerial Photos (2005-2011)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -216,6 +243,13 @@
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 11,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

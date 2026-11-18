@@ -22,7 +22,7 @@
  "owner": "Meridian",
  "scheme": "Waitaki",
  "metered": null,
- "checking": true,
+ "checking": false,
  "checked": "2026-11-18",
  "about": {
   "text": "Aviemore was approved in October 1962 and fully running by 1968, completing the mid-Waitaki scheme with Benmore upstream and Waitaki below. Its dam is built in two parts, one of earth and one of concrete. The station's four 55 MW generators are physically the largest in New Zealand, with rotors almost 8 m across weighing 210 tonnes, and its 7 m penstocks are also the country's largest.",
@@ -113,8 +113,35 @@
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -44.656411,
+  "lon": 170.354764,
+  "basis": "station",
+  "refs": [
+   13
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/aviemore-site.webp",
+   "across": 420,
+   "imagery": "Canterbury - Waitaki 0.3m Rural Aerial Photos (2021)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/aviemore-close.webp",
+   "across": 850,
+   "imagery": "Canterbury - Waitaki 0.3m Rural Aerial Photos (2021)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/aviemore-wide.webp",
+   "across": 6800,
+   "imagery": "Canterbury - Waitaki 0.3m Rural Aerial Photos (2021)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -199,6 +226,13 @@
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 13,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

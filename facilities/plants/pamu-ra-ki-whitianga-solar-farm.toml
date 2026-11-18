@@ -6,22 +6,24 @@ name = "Pāmu Rā ki Whitianga Solar Farm"
 register = ["S010"]
 wikidata = "Q133855880"
 osm = ["way/1441734217"]
-reviewed = ""
-to_check = ["Location: confirm the point sits on the solar farm against the LINZ aerial (separate task)."]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "Solar batch (19 Nov 2026): facts checked against BraveTrace's device sheet, Lodestone's release on Scoop, the EA register and network supply points table, and Stats NZ boundaries.",
   "District and region from the station's point (the [location] value, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; no other district within 3 km.",
   "Resolved: capacity. Elenz uses the register's 23.8 MW; BraveTrace gives 23.7 MW AC and 33 MWp DC. The Wikipedia list's 29 MW has no source and is dropped.",
   "First generation: BraveTrace says November 2025 (commissioned 17 Nov); Lodestone announced it on 4 Dec 2025.",
   "Dropped the \"Coromandel\" scheme lead.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
 
 [location]
-value = [-36.850558, 175.663147]
+value = [-36.851743, 175.664193]
 basis = "station"
-source = "wd-q133855880"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-36.850558, 175.663147] came from wd-q133855880"
 
 [grid_connection]
 value = [-37.19181, 175.60184]

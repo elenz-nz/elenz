@@ -6,29 +6,34 @@ name = "Ngāwhā"
 register = ["G015"]
 osm = ["relation/11871344"]
 reviewed = ""
-to_check = ["Location: a draft point from Wikipedia (the Top Energy article); check it against the LINZ aerial (separate task)."]
+to_check = [
+  "Stations: match the other sites on the aerial (notes) to OEC1 and OEC2, OEC3 and OEC4, then give each station its point.",
+]
 notes = [
   "10 → 25 (Aug 2008) → 57 MW (Dec 2020). Only Ngāwhā B is dispatched.",
   "Geothermal batch 1 (19 Nov 2026): facts checked against Ngāwhā Generation's (Top Energy's) pages, the EA register and network supply points table, the NZ Geothermal Association's 2023 generation report, Wikipedia and Stats NZ boundaries. NZGA's Ngāwhā field page wasn't reachable (the address returned its home page).",
   "District and region from the draft point and from the grid connection point in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026: both Far North. No other district within 5 km.",
   "Resolved: Capacity: Elenz shows the whole station, 57 MW since Dec 2020 (Top Energy: 25 MW from the two older stations plus OEC4's 32 MW). The register lists only OEC4, \"Ngāwhā B\", at 31.5 MW (kept as a rating). The register's name isn't published as another name, since it covers only part of the station.",
   "OEC4 exported its first power on New Year's Eve (31 Dec 2020) and was officially opened on 9 Jul 2021; NZGA dates it 2021. OEC5, a further 32 MW, is consented.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
+  "Other sites seen on the LINZ aerial (18 Nov 2026), not yet matched to OEC1 and OEC2, OEC3 and OEC4: [-35.403285, 173.853441] and Ngāwhā B's powerhouse [-35.417572, 173.867772]. The [location] point is the original station.",
 ]
 
 [location]
-value = [-35.4175, 173.85194]
+value = [-35.417424, 173.852112]
 basis = "station"
-source = "wp-top-energy"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-35.417500, 173.851940] came from wp-top-energy"
 
 [grid_connection]
-value = [-35.39616, 173.81063]
+value = [-35.396089, 173.810432]
 code = "KOE1101 Kaikohe"
-source = "ea-nsp"
+source = ["ea-nsp", "linz-aerial"]
 grade = "A"
-checked = "2026-11-19"
-note = "the register's connection for Ngāwhā B; the point is the Kaikohe substation, about 4.5 km northwest of the station"
+checked = "2026-11-18"
+note = "code from the EA's network supply points table; the point is the substation, read from the LINZ aerial, 18 Nov 2026 (the table's point was [-35.396160, 173.810630])"
 
 [facts.other_names]
 value = ["Ngāwhā B"]

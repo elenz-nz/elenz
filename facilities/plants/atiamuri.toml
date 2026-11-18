@@ -6,27 +6,30 @@ name = "Ātiamuri"
 register = ["H051"]
 wikidata = "Q4815757"
 osm = ["relation/19962528"]
-reviewed = ""
-to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "Hydro batch 1 (18 Nov 2026): facts checked against Mercury's station pages, the EA register, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district.",
+  "District from the checked point (Stats NZ, 19 Nov 2026): Taupō; South Waikato is within 300 m.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
 ]
 
 [location]
-value = [-38.393003, 176.023292]
+value = [-38.391880, 176.022032]
 basis = "station"
-source = "wd-q4815757"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-38.393003, 176.023292] came from wd-q4815757"
 
 [grid_connection]
-value = [-38.39283, 176.02273]
+value = [-38.393025, 176.022785]
 code = "ATI2201 ATIAMURI"
-source = "ea-nsp"
+source = ["ea-nsp", "linz-aerial"]
 grade = "A"
 checked = "2026-11-18"
-note = "code and point match the EA's network supply points table of 17 Nov 2026"
+note = "code from the EA's network supply points table; the point is the substation, read from the LINZ aerial, 18 Nov 2026 (the table's point was [-38.392830, 176.022730])"
 
 [facts.commissioned]
 value = "1958"

@@ -5,23 +5,25 @@ plant = "Ōtāhuhu B"
 name = "Ōtāhuhu B"
 register = ["T015"]
 wikidata = "Q7108372"
-reviewed = ""
+reviewed = "2026-11-19"
 photo_leads = ["P030"]
-to_check = ["Location: the point is Wikidata's for the whole Ōtāhuhu site (added 19 Nov 2026); find Ōtāhuhu B's own building on historical imagery or the LINZ aerial (separate task)."]
+to_check = []
 notes = [
   "385 → 404 MW, to Sep 2015.",
   "Thermal batch 1 (19 Nov 2026): facts checked against the EA register, Wikipedia's Ōtāhuhu Power Station article, the Commerce Commission's 2003 decision and Stats NZ boundaries. No previous owners: Contact bought the Ōtāhuhu site from ECNZ in 1996, before Ōtāhuhu B was commissioned (Gazette 1996-174); whether Contact or ECNZ started building it is not checked.",
   "District and region from the Wikidata site point and the grid connection point in Stats NZ's boundaries, 19 Nov 2026: Auckland for both.",
   "Commissioned: Wikipedia says January 2000; the EA register 2000 (a year). Elenz's history counts its full output from Mar 1999 (commissioning runs).",
   "Owner: closed under Contact Energy, which sold the Ōtāhuhu site in 2016 (Wikipedia). A third station, Ōtāhuhu C (400 MW, consented 2001), was never built.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
 
 [location]
-value = [-36.9512, 174.865]
+value = [-36.950273, 174.862683]
 basis = "whole site"
-source = "wd-q7108372"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-36.951200, 174.865000] came from wd-q7108372"
 
 [grid_connection]
 value = [-36.95471, 174.86253]

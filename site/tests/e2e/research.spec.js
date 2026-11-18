@@ -35,7 +35,7 @@ test.describe('plant research page', () => {
     const detail = page.locator('.detail');
     await expect(detail.getByRole('link', { name: 'Plant page' })).toHaveAttribute('href', '/plants/manapouri');
     await expect(detail.locator('tr.alt.diff').first()).toContainText('differs');   // Wikidata's 1972 beside Wikipedia's 1971
-    await expect(detail).toContainText('To check');
+    await expect(detail).toContainText(/reviewed \d{4}-\d{2}-\d{2}|not reviewed yet/);   // Manapōuri's to-check list emptied 19 Nov 2026
 
     const [dl] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: /Download workbook/ }).click()]);
     expect(dl.suggestedFilename()).toMatch(/^elenz-plant-research-\d{4}-\d{2}-\d{2}\.xlsx$/);

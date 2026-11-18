@@ -6,11 +6,8 @@ name = "Tararua stage II"
 register = ["W024"]
 wikidata = "Q7685516"
 osm = ["relation/6122226"]
-reviewed = ""
-to_check = [
-  "Location: confirm the point sits on the wind farm against the LINZ aerial (separate task).",
-  "District: the farm straddles the Palmerston North City / Tararua District boundary; test each stage's own point once located.",
-]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "Three Elenz plants: 36 + 37 + 93 = 166 MW. This is stage II.",
   "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
@@ -18,14 +15,17 @@ notes = [
   "Owner: Mercury since 3 August 2021. The EA register lists Manawa Energy (Trustpower until 2022), which is how Elenz's By owner view showed it under Contact; [plant_owners] now sets Mercury.",
   "Removed the scheme fact (Tararua Range, from our own register) and published \"Tararua Wind Farm\" as the scheme, joining the three stages.",
   "Capacity: stage II is 55 x 660 kW = 36.3 MW (Tilt, NZWEA); the register and Elenz use 37 MW. Peak metered half-hour, Aug-Sep 2026: 32.5 MW at Bunnythorpe. Unchanged; a design decision for the Elenz team.",
+  "District from the checked point (Stats NZ, 19 Nov 2026): Tararua; Palmerston North is within 300 m.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
 
 [location]
-value = [-40.3461, 175.78]
+value = [-40.357345, 175.770738]
 basis = "whole site"
-source = "wd-q7685516"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-40.346100, 175.780000] came from wd-q7685516"
 
 [grid_connection]
 value = [-40.28061, 175.64051]
@@ -88,10 +88,10 @@ grade = "C"
 checked = ""
 
 [facts.territorial_authority]
-value = "Palmerston North / Tararua"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = "Tararua"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
 
 [[facts.territorial_authority.alt]]
 value = "Tararua"

@@ -22,7 +22,7 @@
  "owner": "Mercury",
  "scheme": "Waikato",
  "metered": null,
- "checking": true,
+ "checking": false,
  "checked": "2026-11-18",
  "about": {
   "text": "Maraetai is two powerhouses, Maraetai I and II, fed by one concrete arch dam and run as one station; together they have the largest capacity in the Waikato Hydro System. Maraetai I opened in 1952. Work on Maraetai II began in 1959, stopped in 1961 when the government put the Cook Strait cable first, and finished in 1970, the last of the Waikato stations to be built.",
@@ -118,8 +118,35 @@
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -38.351965,
+  "lon": 175.743502,
+  "basis": "whole site",
+  "refs": [
+   11
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/maraetai-site.webp",
+   "across": 470,
+   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/maraetai-close.webp",
+   "across": 940,
+   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/maraetai-wide.webp",
+   "across": 7490,
+   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -190,6 +217,13 @@
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 11,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

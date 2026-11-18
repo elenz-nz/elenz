@@ -22,7 +22,7 @@
  "owner": "Meridian",
  "scheme": null,
  "metered": "It generates onto two buses (WWD1102 and WWD1103), so it can be split by grid connection. The dispatch data's West Wind 1 and 2 are one wind farm.",
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "West Wind stands on the coastal hills at Mākara, west of Wellington, where Cook Strait funnels strong, steady winds. Meridian began building it in 2007, bringing the turbine parts in through a temporary wharf at Oteranga Bay and 33 km of new roads to keep them off the city's streets. Its 62 turbines, up to 142.6 MW, were fully running in 2009, and a public recreation area lets visitors walk and bike among them.",
@@ -89,12 +89,40 @@
    "label": "Connection point",
    "value": "Westwind; Wwd1103 Westwind (WWD1102)",
    "refs": [
-    6
+    6,
+    7
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -41.278129,
+  "lon": 174.676272,
+  "basis": "station",
+  "refs": [
+   7
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/west-wind-site.webp",
+   "across": 450,
+   "imagery": "Wellington 0.2m Rural Aerial Photos (2025-2026)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/west-wind-close.webp",
+   "across": 900,
+   "imagery": "Wellington 0.2m Rural Aerial Photos (2025-2026)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/west-wind-wide.webp",
+   "across": 7180,
+   "imagery": "Wellington 0.2m Rural Aerial Photos (2025-2026)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -137,6 +165,13 @@
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

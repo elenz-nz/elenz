@@ -6,10 +6,8 @@ name = "Waipori (2A/3/4)"
 register = ["H038"]
 wikidata = "Q123943279"
 osm = ["relation/12550511", "relation/12550512", "relation/12550513", "relation/12550514"]
-reviewed = ""
-to_check = [
-  "Location: the point is Wikidata's for Waipori 2A (Q123943279); confirm it against the LINZ aerial and find Waipori 3 and 4 (separate task).",
-]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "Elenz: Waipori (2A/3/4) 74 MW at BWK1101, plus Deep Stream (Waipori A) 26 MW at HWB0331; the rest is other embedded at HWB0331 (grade A). The register's 'Waipori A' probably means Waipori 1A, the scheme's first station, counted with Deep Stream.",
   "Hydro batch 5 (19 Nov 2026): facts checked against Contact's scheme page, a TrustPower release (2007), the EA register and network supply points table, Wikipedia and Stats NZ boundaries. The locations are left for the LINZ aerial check.",
@@ -17,14 +15,17 @@ notes = [
   "Resolved: Capacity: Contact gives a maximum of 93 MW for all four stations (1A, 2A, 3 and 4); Elenz uses the register's 74 MW for 2A, 3 and 4; Wikipedia 87 MW for four. Contact's 93 is a rating for the whole scheme.",
   "Commissioned: Contact gives 1907–1963 for the whole scheme; the years of 2A, 3 and 4 alone are not yet found.",
   "Sale year: TrustPower's 2007 release says 1998 ($70 million); a Transpower report says the council or its subsidiaries owned it until 1999.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "Each station's own point is in its entry. Waipori 1A's point (LINZ aerial, 18 Nov 2026) is in the Deep Stream (Waipori A) file's notes.",
 ]
 
 [location]
-value = [-45.905543, 169.985485]
+value = [-45.905521, 169.985545]
 basis = "Waipori 2A station"
-source = "wd-q123943279"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-45.905543, 169.985485] came from wd-q123943279"
 
 [grid_connection]
 value = [-45.94047, 170.10217]
@@ -127,18 +128,21 @@ checked = ""
 
 [[stations]]
 value = "Waipori 2A"
+location = [-45.905521, 169.985545]
 source = "contact-waipori"
 grade = "A"
 checked = "2026-11-19"
 
 [[stations]]
 value = "Waipori 3"
+location = [-45.916803, 169.992205]
 source = "contact-waipori"
 grade = "A"
 checked = "2026-11-19"
 
 [[stations]]
 value = "Waipori 4"
+location = [-45.925228, 170.021095]
 source = "contact-waipori"
 grade = "A"
 checked = "2026-11-19"

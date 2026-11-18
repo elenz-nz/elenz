@@ -34,7 +34,7 @@ CAPACITY = os.path.join(FACILITIES, 'plant_capacity.csv')
 FACT_KEYS = {'other_names', 'commissioned', 'closed', 'units', 'scheme', 'field', 'river', 'region',
              'territorial_authority', 'owner', 'previous_owners', 'about'}
 # The other fact-shaped entries: [location] and [grid_connection] (value = [lat, lon]), [[ratings]] (value = MW),
-# [[stations]] (value = the station's name).
+# [[stations]] (value = the station's name; location = [lat, lon], the station's own point read from the LINZ aerial).
 TOP_KEYS = {'slug', 'plant', 'name', 'register', 'reviewed', 'to_check', 'notes', 'osm', 'wikidata', 'photo_leads',
             'facts', 'location', 'grid_connection', 'ratings', 'stations'}
 GRADES = {'A', 'B', 'C'}
@@ -156,6 +156,10 @@ def check():
                     isinstance(e['value'], list) and len(e['value']) == 2
                     and -48 <= e['value'][0] <= -34 and 166 <= e['value'][1] <= 179):
                 problems.append(f'{at}: value must be [latitude, longitude] in New Zealand')
+            if label.startswith('stations[') and 'location' in e and not (
+                    isinstance(e['location'], list) and len(e['location']) == 2
+                    and -48 <= e['location'][0] <= -34 and 166 <= e['location'][1] <= 179):
+                problems.append(f'{at}: location must be [latitude, longitude] in New Zealand')
             if published(e) and not alt:
                 if e.get('grade') not in ('A', 'B'):
                     problems.append(f'{at}: only grade A and B facts are published')

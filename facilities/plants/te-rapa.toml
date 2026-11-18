@@ -7,7 +7,6 @@ register = ["T008"]
 wikidata = "Q7690951"
 reviewed = ""
 to_check = [
-  "Location: the point is Wikipedia's list's (Wikidata Q7690951 gives -37.7164, 175.217); check it sits on the plant at Fonterra's Te Rapa site against the LINZ aerial (separate task). Waikato District is within 1 km.",
   "Closed: find Contact's 21 June 2022 release (or a later one) for the last day; Elenz's data ends 30 Jun 2023.",
 ]
 notes = [
@@ -16,22 +15,24 @@ notes = [
   "District and region: the station point (Wikipedia's list, not yet checked) is in Hamilton City, with Waikato District within 1 km; its grid connection, TWH0331 Te Kōwhai, is in Waikato District (an embedded plant, joined to the grid through the local network). Both in Waikato Region. Hamilton used, from the station point: recheck if the point moves.",
   "Capacity: the EA register 48 MW (Elenz); Wikipedia and the Commerce Commission (2003) 44 MW.",
   "No previous owners found: Contact applied for consents from 1997 and the plant is in Contact's portfolio from its start (Wikipedia).",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point moved to the substation.",
 ]
 
 [location]
 value = [-37.71639, 175.21667]
 basis = "station"
-source = "wp-list"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wp-list, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
-value = [-37.73833, 175.15414]
+value = [-37.729721, 175.122936]
 code = "TWH0331 TE KOWHAI"
-source = "ea-nsp"
+source = ["ea-nsp", "linz-aerial"]
 grade = "A"
-checked = "2026-11-19"
-note = "code and point match the EA's network supply points table of 17 Nov 2026"
+checked = "2026-11-18"
+note = "code from the EA's network supply points table; the point is the substation, read from the LINZ aerial, 18 Nov 2026 (the table's point was [-37.738330, 175.154140])"
 
 [facts.other_names]
 value = ["Te Rapa cogeneration plant"]

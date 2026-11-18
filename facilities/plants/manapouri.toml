@@ -6,9 +6,9 @@ name = "Manapōuri"
 register = ["H005"]
 wikidata = "Q1411290"
 osm = ["way/194912653"]
-reviewed = ""
+reviewed = "2026-11-19"
 photo_leads = ["P009", "P010", "P011"]
-to_check = ["Location: the station is underground; confirm whether the point marks the machine hall or the surface intake and switchyard against the LINZ aerial (separate task), and set the basis to match."]
+to_check = []
 notes = [
   "585 → 700 MW (May 2002) → 800 MW (Jan 2008).",
   "Hydro batch 3 (18 Nov 2026): facts checked against Meridian's station pages, the EA register and network supply points table, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
@@ -16,14 +16,16 @@ notes = [
   "Year: Meridian gives first power in September 1969 and full operation in 1972, when the seventh unit was commissioned; the EA register and Wikidata give 1972, Wikipedia's list 1971. The page shows 1969, the first generation, as for the other hydro stations.",
   "Resolved: Capacity: Meridian gives seven 128 MW units, a maximum continuous rating of 850 MW with the second tailrace, and an operating maximum of 800 MW set by its resource consent; Elenz uses 800 MW (the EA register gives 802). Wikipedia's 850 MW rating is replaced by Meridian's.",
   "Scheme fact dropped (18 Nov 2026): Meridian describes Manapōuri as a single station drawing on Lakes Manapōuri and Te Anau, not as a named scheme.",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 
 [location]
 value = [-45.5214, 167.278]
 basis = "station"
-source = "wd-q1411290"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wd-q1411290, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-45.52087, 167.2775]

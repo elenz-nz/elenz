@@ -48,7 +48,7 @@
  "owner": "Meridian",
  "scheme": "Waitaki",
  "metered": null,
- "checking": true,
+ "checking": false,
  "checked": "2026-11-18",
  "about": {
   "text": "Benmore holds back Lake Benmore, New Zealand's largest artificial lake, behind the country's largest earth dam; it was first planned in concrete, like Waitaki. Approved in October 1957 together with the Cook Strait power cable, it was built from 1958, the lake filled in December 1964 and the first power came in January 1965. It is New Zealand's second-largest hydro station after Manapōuri, and Meridian raised its maximum operating capacity to 570 MW in July 2026.",
@@ -136,12 +136,40 @@
    "label": "Connection point",
    "value": "Benmore; Ben0163 Benmore; Ben2202 Benmore (BEN0162)",
    "refs": [
-    11
+    11,
+    12
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -44.563459,
+  "lon": 170.193808,
+  "basis": "station",
+  "refs": [
+   12
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/benmore-site.webp",
+   "across": 430,
+   "imagery": "Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/benmore-close.webp",
+   "across": 850,
+   "imagery": "Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/benmore-wide.webp",
+   "across": 6810,
+   "imagery": "Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -219,6 +247,13 @@
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 12,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

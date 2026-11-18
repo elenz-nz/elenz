@@ -6,21 +6,23 @@ name = "Arapuni"
 register = ["H002"]
 wikidata = "Q4784238"
 osm = ["relation/11009688"]
-reviewed = ""
+reviewed = "2026-11-19"
 photo_leads = ["P002", "P003"]
-to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+to_check = []
 notes = [
   "Hydro batch 1 (18 Nov 2026): facts checked against Mercury's station pages, the EA register, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district. Waipā District is about 150–300 m away across the river.",
   "Resolved: Capacity: Mercury gives 198 MW (8 Francis turbines); Elenz keeps 196.7 MW (Wikipedia, 196.66) as installed.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
 
 [location]
-value = [-38.071389, 175.643333]
+value = [-38.071287, 175.643923]
 basis = "station"
-source = "wd-q4784238"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-38.071389, 175.643333] came from wd-q4784238"
 
 [grid_connection]
 value = [-38.07203, 175.64292]

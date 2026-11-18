@@ -181,8 +181,15 @@ and Umami, so the team's visits aren't counted and the key never reaches either.
 
 The page: name, a line from Elenz's data (`subtitle()`), tags (fuel, island, owner, status, installed MW); "We're still
 checking this page's facts" until the plant file's `reviewed` is set; the photo (once `plant_images.csv` has a row; the
-file goes in `static/plants/`, and `plant_pages.py --check` fails if it's missing) beside the Now panel, which takes the
-full width without one; three figures (the latest 12 whole months and their capacity factor, the most in a calendar year
+file goes in `static/plants/`, and `plant_pages.py --check` fails if it's missing) beside the Now panel, or without a
+photo the plant's LINZ aerial views (`Aerial.svelte`: Site, Close and Wide, about 450 m, 1 km and 7.5 km across, a
+switch that only swaps the image's address; credited with the imagery collection, Toitū Te Whenua LINZ, CC BY 4.0), which
+move into the Location panel once a photo leads (design decision, 19 Nov 2026: every plant with a checked point gets
+them, a licensed photo is added on top). The views are WebP files in `static/plants/aerial/`, made by
+`analysis/plant_aerials.py` from LINZ Basemaps' aerial tiles (with the `LINZ_BASEMAPS_KEY` key, never committed) and
+listed in `facilities/plant_aerials.csv` with the point each is centred on; a page gets them only while that point is
+its plant file's checked location, and `plant_pages.py --check` fails when a location has moved without new views or a
+file is missing. The Now panel takes the full width with neither; three figures (the latest 12 whole months and their capacity factor, the most in a calendar year
 in our records; for a closed plant its total, best year and last month); generation by year (Energy or Capacity factor,
 dashed lines where installed MW changed, the plant's metering note from `plants.json` under it); the last 24 whole months;
 installed capacity over time with each step's source in its ⓘ; the facts (installed MW and owner from Elenz's data, then

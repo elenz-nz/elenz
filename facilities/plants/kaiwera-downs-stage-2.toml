@@ -5,11 +5,8 @@ plant = "Kaiwera Downs (Stage 2)"
 name = "Kaiwera Downs (Stage 2)"
 register = ["W026"]
 osm = ["relation/17250859"]
-reviewed = ""
-to_check = [
-  "Location: no station point yet (OpenStreetMap is research only); check one against the LINZ aerial or Wikidata.",
-  "District: stage 2 is south-east of stage 1, towards Clutha District; test its own point once located (Gore District for stage 1).",
-]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "Kaiwera Downs is two Elenz plants: stage 1 (43 MW, GOR0331, from Aug 2023) and stage 2 (155 MW, KIW2201, from Apr 2026).",
   "Mercury's wind farm page has slips: stage 1 \"Commissioned in 2013\" (its text says November 2023), \"12km north-west of Gore\" (its fact sheet: 15 km south-east), and stage 2 \"35 wind turbines with an installed capacity of 43MW\" (elsewhere 36 and 155 MW). Facts here use the fact sheet, the September 2026 release and the page's consistent figures.",
@@ -17,9 +14,25 @@ notes = [
   "Removed the scheme fact (Southland, from our own register) and published \"Kaiwera Downs Wind Farm\" as the scheme, joining the two stages.",
   "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. It has no location yet.",
   "Region: Mercury's fact sheet thanks Environment Southland for stage 2, and Wikipedia's point for the farm has only Southland Region within 5 km; published Southland. District left open.",
-  "Grid connection: KIW2201 has no coordinates in the EA's network supply points table, so no [grid_connection] yet; about 4 km of 220 kV line to Transpower's North Makarewa to Three Mile Hill line (fact sheet; Wikipedia).",
   "Resolved: Capacity: Mercury gives 36 turbines and 155 MW, matching Elenz and the register. Elenz starts it on 31 Mar 2026, the register row on 1 Apr 2026; Mercury says it first generated in April 2026.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point added (the substation).",
 ]
+
+[location]
+value = [-46.220875, 169.060654]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026"
+
+[grid_connection]
+value = [-46.228330, 169.059052]
+code = "KIW2201 Kaiwera Downs"
+source = ["ea-nsp", "linz-aerial"]
+grade = "A"
+checked = "2026-11-18"
+note = "code from the EA's network supply points table (18 Nov 2026), which gives it no coordinates; the point is the substation, read from the LINZ aerial, 18 Nov 2026"
 
 [facts.commissioned]
 value = "2026"
@@ -65,6 +78,12 @@ value = "Southland"
 source = "elenz-register"
 grade = "C"
 checked = ""
+
+[facts.territorial_authority]
+value = "Gore"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
 
 [facts.owner]
 value = "Mercury"

@@ -6,11 +6,8 @@ name = "Te Huka 3"
 register = ["G005"]
 wikidata = "Q7690821"
 osm = ["way/169516349"]
-reviewed = ""
-to_check = [
-  "Location: give Te Huka 3 its own point on its plant, beside Te Huka, from the LINZ aerial (separate task); it shares Te Huka's Wikidata point for now.",
-  "Grid connection: the register connects it at TAB0331 (Tauhara), which has no coordinates in the EA's network supply points table (17 Nov 2026); add the point if the EA adds one.",
-]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "54 MW from 24 Sep 2024.",
   "Geothermal batch 1 (19 Nov 2026): facts checked against Contact's announcements (Microsoft agreement, May 2023; Tauhara opening, Nov 2024), ThinkGeoEnergy's report of Contact's first-power announcement (Oct 2024), the EA register, the NZ Geothermal Association's Tauhara page and Stats NZ boundaries. The location and grid connection are left open (to_check).",
@@ -18,14 +15,24 @@ notes = [
   "Resolved: Capacity: the register and Contact give 51.4 MW; Elenz uses 54 MW, what it runs at (design decision, 30 Oct 2026). Wikipedia's list figure, 79, is Te Huka and Te Huka 3 together.",
   "Dates: the register's start date is 2024-09-24; Contact announced its first supply to the grid on 14 October 2024, at 15 MW during three weeks of tests, with full operation expected by the end of 2024. It was in final commissioning on 22 Nov 2024.",
   "Units: NZGA calls it a 50 MWe Ormat binary plant but doesn't say how many units; not published.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point added (the substation).",
 ]
 
 [location]
-value = [-38.6669, 176.118]
+value = [-38.668768, 176.118708]
 basis = "whole site"
-source = "wd-q7690821"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-19"
+note = "read from the LINZ aerial, 19 Nov 2026; the earlier point [-38.666900, 176.118000] came from wd-q7690821"
+
+[grid_connection]
+value = [-38.625704, 176.105461]
+code = "TAB0331 Tauhara"
+source = ["ea-nsp", "linz-aerial"]
+grade = "A"
+checked = "2026-11-19"
+note = "code from the EA's network supply points table (18 Nov 2026), which gives it no coordinates; the point is the substation, read from the LINZ aerial, 19 Nov 2026"
 
 [facts.other_names]
 value = ["Te Huka Unit 3"]

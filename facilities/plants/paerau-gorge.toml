@@ -6,8 +6,6 @@ name = "Paerau Gorge"
 register = ["H035", "H036"]
 reviewed = ""
 to_check = [
-  "Location: no station point yet (OpenStreetMap is research only); find one on the LINZ aerial or in Wikidata (separate task). Two stations (Paerau and Patearoa).",
-  "District: Central Otago (Wikipedia's list); test once the stations' points are found.",
   "Previous owners: not yet found in a source we could open (designed for the Otago Electric Power Board around 1980; Trustpower by 1999).",
 ]
 notes = [
@@ -16,7 +14,17 @@ notes = [
   "Hydro batch 5 (19 Nov 2026): facts checked against Contact's page for the two stations, the EA register and network supply points table. The locations, district and previous owners are left open.",
   "Resolved: Capacity: Contact gives a maximum of 12 MW for both; the register 12.5 MW (Elenz); Wikipedia's list Paerau 10 and Patearoa 2.3. Contact's 12 is a rating.",
   "Other names: Patearoa dropped 19 Nov 2026: it is the scheme's second station, shown in the Stations row.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "The [location] point is Paerau's, the larger station; Patearoa's is in its entry.",
 ]
+
+[location]
+value = [-45.348745, 169.944590]
+basis = "Paerau station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-45.03318, 170.09335]
@@ -66,9 +74,9 @@ checked = ""
 
 [facts.territorial_authority]
 value = "Central Otago"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
 
 [facts.owner]
 value = "Contact Energy"
@@ -105,6 +113,7 @@ checked = ""
 
 [[stations]]
 value = "Paerau"
+location = [-45.348745, 169.944590]
 id = "H035"
 source = "contact-paerau-patearoa"
 grade = "A"
@@ -112,6 +121,7 @@ checked = "2026-11-19"
 
 [[stations]]
 value = "Patearoa"
+location = [-45.326420, 169.956577]
 id = "H036"
 source = "contact-paerau-patearoa"
 grade = "A"

@@ -5,14 +5,24 @@ plant = "Waitaki"
 name = "Waitaki"
 register = ["H061"]
 osm = ["way/90890913"]
-reviewed = ""
-to_check = ["Location: no station point yet (OpenStreetMap is research only); check one against the LINZ aerial or Wikidata."]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "Added from Elenz's plant list (8 Nov 2026).",
   "Hydro batch 3 (18 Nov 2026): facts checked against Meridian's station pages, the EA register and network supply points table, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "District and region from the grid connection point (no station point yet) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026. The powerhouse stands at the dam's south (Otago) abutment (Wikipedia), on the Waitaki District side; Waimate District is across the river, about 150–200 m from the grid connection point. Wikidata's Waitaki Dam item (Q34947424) has a point mid-river that falls in Waimate District; the station's own point needs the LINZ aerial check. The region is Canterbury on both banks here.",
   "Capacity: Meridian gives seven 15 MW units, 105 MW (rising to 120 MW after the upgrade due by 2036); the EA register gives 95 MW, which Elenz uses as installed. Wikipedia's list gives 90 MW. Shown: Meridian's 105 MW as another rating; Elenz's installed figure is a separate decision.",
+  "District from the checked point (Stats NZ, 19 Nov 2026): Waitaki; Waimate is within 300 m.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
+
+[location]
+value = [-44.690642, 170.426202]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-44.6921, 170.42903]

@@ -22,7 +22,7 @@
  "owner": "Mercury",
  "scheme": "Waikato",
  "metered": null,
- "checking": true,
+ "checking": false,
  "checked": "2026-11-18",
  "about": {
   "text": "Ōhakuri opened in 1961 behind an earth dam with concrete intake and spillway structures. Its lake, about 12 km², is the largest on the Waikato River; filling it drowned about two thirds of the Ōrākei Kōrako geothermal area. The four Francis turbines were replaced between 2011 and 2014.",
@@ -119,8 +119,35 @@
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -38.407878,
+  "lon": 176.088644,
+  "basis": "station",
+  "refs": [
+   11
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/ohakuri-site.webp",
+   "across": 470,
+   "imagery": "Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/ohakuri-close.webp",
+   "across": 940,
+   "imagery": "Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/ohakuri-wide.webp",
+   "across": 7490,
+   "imagery": "Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -191,6 +218,13 @@
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 11,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

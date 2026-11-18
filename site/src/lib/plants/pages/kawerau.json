@@ -22,7 +22,7 @@
  "owner": "Mercury",
  "scheme": null,
  "metered": null,
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "Kawerau was New Zealand's biggest geothermal project in 20 years when Mighty River Power, now Mercury, opened it in 2008, on a field that has supplied steam to the town's mills since 1957. Fluid from wells about 2 km away is separated twice, giving high- and low-pressure steam for a single turbine, and the used fluid is injected back into the ground north of the field. Built for 90 MW, it soon proved able to run at about 100 MW, and Mercury now gives its installed capacity as 107 MW.",
@@ -109,8 +109,35 @@
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -38.0634,
+  "lon": 176.7257,
+  "basis": "station",
+  "refs": [
+   10
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/kawerau-site.webp",
+   "across": 470,
+   "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2025)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/kawerau-close.webp",
+   "across": 940,
+   "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2025)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/kawerau-wide.webp",
+   "across": 7520,
+   "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2025)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -174,6 +201,13 @@
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 10,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

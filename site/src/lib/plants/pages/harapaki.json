@@ -37,7 +37,7 @@
  "owner": "Meridian",
  "scheme": null,
  "metered": null,
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "Harapaki runs along the Maungaharuru Range in Hawke's Bay, about 35 km north-west of Napier. Meridian built it over three years through three cyclones, Covid-19 and supply-chain delays, finishing in July 2024 within a month of the original date and within its $448 million budget. Its 41 turbines can produce up to 176 MW; a foundation design that needed less concrete and an on-site concrete plant cut truck trips from Napier.",
@@ -90,10 +90,46 @@
     5,
     1
    ]
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Harapaki (HRP2201)",
+   "refs": [
+    6,
+    7
+   ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -39.1867,
+  "lon": 176.708469,
+  "basis": "station",
+  "refs": [
+   7
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/harapaki-site.webp",
+   "across": 460,
+   "imagery": "Hawke's Bay 0.2m Rural Aerial Photos (2025-2026)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/harapaki-close.webp",
+   "across": 930,
+   "imagery": "Hawke's Bay 0.2m Rural Aerial Photos (2025-2026)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/harapaki-wide.webp",
+   "across": 7410,
+   "imagery": "Hawke's Bay 0.2m Rural Aerial Photos (2025-2026)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -129,6 +165,20 @@
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

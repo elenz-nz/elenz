@@ -8,7 +8,6 @@ wikidata = "Q6801737"
 osm = ["relation/13108944"]
 reviewed = ""
 to_check = [
-  "Location: the point is Wikidata's (added 19 Nov 2026); check it sits on the power plant at the McKee Production Station against the LINZ aerial (separate task).",
   "Owner: the EA register and Wikipedia name Nova Energy; Todd Energy says it operates the plant for Nova. Both are Todd Corporation companies. Find who owns it (the Commerce Commission or a Todd release) before publishing.",
 ]
 notes = [
@@ -17,22 +16,24 @@ notes = [
   "District and region from the Wikidata point and the grid connection point in Stats NZ's boundaries, 19 Nov 2026: both New Plymouth District, no other district within 5 km.",
   "Commissioned: Todd says in use since 2012 (Elenz's history has its output from Sep 2012); Wikipedia says it was officially opened in March 2013; the EA register 2013 (a year).",
   "The 2 MW reciprocating units in Wikipedia's list are Todd's 2008 waste-gas cogeneration at the McKee plant (Scoop, 16 Jun 2008), not part of this 100 MW peaker or of Elenz's McKee. Stations kept unpublished.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
 ]
 
 [location]
-value = [-39.0977, 174.336]
+value = [-39.097476, 174.335658]
 basis = "station"
-source = "wd-q6801737"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-39.097700, 174.336000] came from wd-q6801737"
 
 [grid_connection]
-value = [-39.08934, 174.33297]
+value = [-39.097604, 174.336365]
 code = "MKE1101 McKee"
-source = "ea-nsp"
+source = ["ea-nsp", "linz-aerial"]
 grade = "A"
-checked = "2026-11-19"
-note = "code and point match the EA's network supply points table of 17 Nov 2026"
+checked = "2026-11-18"
+note = "code from the EA's network supply points table; the point is the substation, read from the LINZ aerial, 18 Nov 2026 (the table's point was [-39.089340, 174.332970])"
 
 [facts.other_names]
 value = ["McKee Power Plant"]

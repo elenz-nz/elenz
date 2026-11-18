@@ -5,22 +5,24 @@ plant = "Papareireiā"
 name = "Papareireiā"
 register = ["S017"]
 wikidata = "Q137460644"
-reviewed = ""
-to_check = ["Location: confirm the point sits on the solar farm against the LINZ aerial (separate task)."]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "Solar batch (19 Nov 2026): facts checked against Te Ao Māori News, Wikipedia's article, the EA register and network supply points table, and Stats NZ boundaries.",
   "Location: Wikipedia's article gives a point near Maungaturoto (Wikidata Q137460644 has none yet), added as the draft location. District and region from the station's point (the [location] value, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; no other district within 3 km. The old lead (\"Maungaturoto\") was a town.",
   "Capacity: Elenz uses the register's 17.6 MW; Te Ao and Wikipedia give 21 MW (Wikipedia: MWp DC).",
   "Dates: the register's row starts 13 Nov 2025; officially commissioned in December 2025 (Wikipedia, citing Scoop). Elenz's capacity note says metered output from Feb 2025: check that.",
   "Owner: the register's operator is Maungaturoto Solar Farm Project LP; the project was first developed by Solar Bay (now Harbour Infrastructure) for Ryman Healthcare.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
 
 [location]
-value = [-36.09028, 174.34722]
+value = [-36.087942, 174.357662]
 basis = "station"
-source = "wp-papareireia"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-36.090280, 174.347220] came from wp-papareireia"
 
 [grid_connection]
 value = [-36.08667, 174.35919]

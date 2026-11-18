@@ -7,8 +7,6 @@ register = ["H028", "H029", "H030"]
 osm = ["relation/12568803"]
 reviewed = ""
 to_check = [
-  "Location: no station point yet (OpenStreetMap is research only); find one on the LINZ aerial or in Wikidata (separate task). Three stations (Kūmara, Dillmans, Duffers).",
-  "District: Westland (Wikipedia's list); test once the stations' points are found.",
   "Previous owners: not yet found in a source we could open (the Westland Electric Power Board and Westland Power Ltd appear in 1920s reports; Trustpower by 1999).",
 ]
 notes = [
@@ -17,7 +15,17 @@ notes = [
   "H030: In the Kūmara scheme.",
   "Hydro batch 5 (19 Nov 2026): facts checked against Contact's scheme page (listed under Dillmans) and the EA network supply points table. The locations, district and previous owners are left open.",
   "Resolved: Capacity: Contact gives a maximum of 11 MW for the three stations; Elenz 10 MW; Wikipedia's list Kumara 6.5, Dillmans 3.5, Duffers 0.5. Contact's 11 is a rating.",
+  "District from the checked point (Stats NZ, 19 Nov 2026): Westland; Grey is within 300 m.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
+
+[location]
+value = [-42.635999, 171.195270]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-42.63552, 171.19555]
@@ -68,9 +76,9 @@ checked = ""
 
 [facts.territorial_authority]
 value = "Westland"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
 
 [facts.owner]
 value = "Contact Energy"

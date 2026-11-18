@@ -92,10 +92,46 @@
     2
    ],
    "note": "the council: Nova Energy Ltd operates the plant; the register's operator: Nova Energy Limited"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Junction Road (JRD1101)",
+   "refs": [
+    5,
+    6
+   ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -39.116698,
+  "lon": 174.103689,
+  "basis": "station",
+  "refs": [
+   6
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/junction-road-site.webp",
+   "across": 460,
+   "imagery": "Taranaki 0.1m Urban Aerial Photos (2022)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/junction-road-close.webp",
+   "across": 930,
+   "imagery": "Taranaki 0.1m Urban Aerial Photos (2022)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/junction-road-wide.webp",
+   "across": 7410,
+   "imagery": "Taranaki 0.1m Urban Aerial Photos (2022)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -124,6 +160,20 @@
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

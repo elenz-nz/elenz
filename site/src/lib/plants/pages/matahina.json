@@ -26,7 +26,7 @@
  "owner": "Contact",
  "scheme": "Rangitaiki",
  "metered": "Metered generation has no rows for Matahina from October 2021, so dispatch figures stand in.",
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "Matahina's 86 m earth dam across the Rangitāiki River, inland from Whakatāne, is the largest dam of its kind in the North Island and holds back Lake Matahina. The Ministry of Works began the scheme in 1960 on difficult, faulted ground, and its two generators came into service in 1967. It is the lowest of the river's three hydro schemes, below Wheao and Flaxy and Aniwhenua. The Waiohau fault runs beneath the dam, which has since been strengthened against a large earthquake.",
@@ -122,8 +122,35 @@
    ]
   }
  ],
- "location": null,
+ "location": {
+  "lat": -38.113984,
+  "lon": 176.814089,
+  "basis": "station",
+  "refs": [
+   11
+  ]
+ },
  "image": null,
+ "aerial": [
+  {
+   "k": "site",
+   "file": "aerial/matahina-site.webp",
+   "across": 470,
+   "imagery": "Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025)"
+  },
+  {
+   "k": "close",
+   "file": "aerial/matahina-close.webp",
+   "across": 940,
+   "imagery": "Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025)"
+  },
+  {
+   "k": "wide",
+   "file": "aerial/matahina-wide.webp",
+   "across": 7520,
+   "imagery": "Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025)"
+  }
+ ],
  "sources": [
   {
    "n": 1,
@@ -194,6 +221,13 @@
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
+  },
+  {
+   "n": 11,
+   "title": "LINZ aerial imagery (LINZ Basemaps)",
+   "publisher": "Toitū Te Whenua LINZ",
+   "url": "https://basemaps.linz.govt.nz/",
+   "opened": "2026-11-18"
   }
  ],
  "related": {

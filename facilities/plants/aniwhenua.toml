@@ -5,10 +5,8 @@ plant = "Aniwhenua"
 name = "Aniwhenua"
 register = ["H049"]
 wikidata = "Q63382811"
-reviewed = ""
-to_check = [
-  "Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task). Wikipedia's point (used) is about 180 m from the station's own supply point ANI0331; Wikidata's (Q63382811) is about 1.5 km south, probably the barrage.",
-]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "Added from Elenz's plant list (8 Nov 2026).",
   "Images: Request from Pioneer Energy",
@@ -17,14 +15,16 @@ notes = [
   "Resolved: Owner: Southern Generation Limited Partnership, set up in 2015 by Pioneer and Roaring Forties (The Power Company and Electricity Invercargill), bought it from Nova Energy (Todd) with ownership passing in April 2016 (Wikipedia); Pioneer bought all of Southern Generation in 2024 (Pioneer's history page). The register's operator, Pulse Energy Alliance LP, is Pioneer's (formed 2016). Pioneer Energy Renewables runs the station from Alexandra.",
   "Commissioning: first power on 3 October 1980 (Wikipedia, from the power board's reports); Pioneer's page says built and commissioned by Bay of Plenty Electricity in 1981, and its summary says built in 1982 and opened by Sir Robert Muldoon; the register 1981. The page shows 1981.",
   "Grid: the station has its own supply point, ANI0331 (Aniwhenua), embedded under MAT1101 in the network supply points table.",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 
 [location]
 value = [-38.29369, 176.79236]
 basis = "station"
-source = "wp-aniwhenua-power-station"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wp-aniwhenua-power-station, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-38.11343, 176.81462]

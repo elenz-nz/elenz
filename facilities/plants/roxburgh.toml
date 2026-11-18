@@ -6,8 +6,8 @@ name = "Roxburgh"
 register = ["H039"]
 wikidata = "Q1246704"
 osm = ["relation/11819261"]
-reviewed = ""
-to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "Elenz has 328 MW on two buses (the EA register: 205 MW at ROX2201, 123 MW at ROX1101).",
   "Hydro batch 4 (18 Nov 2026): facts checked against Contact's station and scheme pages and releases, Voith's release, the EA register and network supply points table, the Gazette (ECNZ's 1996 financial statements), Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
@@ -16,14 +16,16 @@ notes = [
   "Turbine upgrade progress: Voith says the first new unit was finished in December 2024 (Contact: operational January 2025) and the second handed over in mid-August 2025; the third arrived at Port Chalmers on 31 August 2025. Not yet found: the third and fourth units' completion.",
   "Commissioning: first power July 1956 (Water Power magazine) or an official opening on 3 November 1956 (Wikipedia infobox); neither is published. Wikidata gives inception 1948, in service 1962.",
   "Wikidata: Q1246704 (Roxburgh Dam) is also typed as a hydroelectric power station, so it stands for the station. The [location] point is Wikidata's.",
+  "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 
 [location]
 value = [-45.47581, 169.32255]
 basis = "station"
-source = "wp-list"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "the point from wp-list, confirmed against the LINZ aerial, 18 Nov 2026"
 
 [grid_connection]
 value = [-45.47721, 169.31914]

@@ -6,9 +6,9 @@ name = "Ōhaaki"
 register = ["G014"]
 wikidata = "Q7080591"
 osm = ["way/143397051"]
-reviewed = ""
+reviewed = "2026-11-19"
 photo_leads = ["P021", "P022", "P032"]
-to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+to_check = []
 notes = [
   "65 MW to Dec 2012, 43.7 MW from Jan 2013.",
   "Geothermal batch 1 (19 Nov 2026): facts checked against Contact's station page, the EA register and network supply points table, the NZ Geothermal Association's Ōhaaki page, Engineering New Zealand's heritage record, Te Ara, Tu Tangata (April 1986), the Gazette (ECNZ's 1996 financial statements), Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
@@ -16,14 +16,16 @@ notes = [
   "Resolved: Capacity history. Built for about 104–114 MW (Wikipedia 104, Engineering New Zealand and Te Ara 108, NZGA 114, Te Ara's photo caption about 115); steamfield decline brought deratings, including retiring one high-pressure turbine (NZGA). Elenz's steps (65 MW to 2012, 43.7 MW from 2013, Contact's current maximum) come from metered output; no public source dates the earlier deratings.",
   "Commissioned: Contact, NZGA, Engineering New Zealand and Te Ara say 1989 (officially opened 31 October 1989); the EA register's start date is 1992-01-01 (kept as an alternative).",
   "Name: Te Ara spells it Ōhākī; Contact Ohaaki; the field is the Ohaaki–Broadlands system.",
+  "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]
 
 [location]
-value = [-38.526944, 176.291944]
+value = [-38.527960, 176.293910]
 basis = "station"
-source = "wd-q7080591"
+source = "linz-aerial"
 grade = "B"
-checked = ""
+checked = "2026-11-18"
+note = "read from the LINZ aerial, 18 Nov 2026; the earlier point [-38.526944, 176.291944] came from wd-q7080591"
 
 [grid_connection]
 value = [-38.52805, 176.29223]
