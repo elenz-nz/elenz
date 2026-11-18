@@ -23,12 +23,123 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Omeheu is a solar farm on 30 hectares of farmland on the outskirts of Edgecumbe in the Bay of Plenty, owned by Aquila Clean Energy APAC. Its 63,000 or so panels sit on fixed frames in east-west rows, like a shallow A-frame roof, so one side catches the morning sun and the other the afternoon. It feeds the grid through the nearby Edgecumbe substation and was switched on in mid-2026. Te Rūnanga o Ngāti Awa gifted the name in March 2024.",
+  "refs": [
+   1
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2026",
+   "refs": [
+    2,
+    1
+   ],
+   "note": "the register's row starts 18 May 2026; switch-on June 2026 (project site); energised July 2026 (PV Tech)"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Bay of Plenty",
+   "refs": [
+    3
+   ],
+   "note": "from the grid connection point (no station point yet); the sources place the farm near it, in the same region"
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Whakatāne",
+   "refs": [
+    4
+   ],
+   "note": "from the grid connection point (no station point yet); the sources place the farm near it, in the same region"
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Aquila Clean Energy APAC",
+   "refs": [
+    2,
+    1
+   ],
+   "note": "the register's operator: Aquila Clean Energy"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "Far North Solar Farm and Aquila Clean Energy APAC (joint venture), to January 2026",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    5
+   ],
+   "value": "38 MW (the panels' combined peak rating, DC)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Edgecumbe (EDG0331)",
+   "refs": [
+    6
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Omeheu Solar Farm (project site)",
+   "publisher": "Aquila Clean Energy APAC",
+   "url": "https://omeheusolarfarm.co.nz/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Aquila Clean Energy energises 38MW solar PV plant in New Zealand's Bay of Plenty (23 Jul 2026)",
+   "publisher": "PV Tech",
+   "url": "https://www.pv-tech.org/aquila-clean-energy-energises-38mw-solar-pv-plant-in-new-zealands-bay-of-plenty/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [],
   "owner_all": true,

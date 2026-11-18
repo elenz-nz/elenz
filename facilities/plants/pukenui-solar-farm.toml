@@ -8,13 +8,18 @@ wikidata = "Q107547911"
 osm = ["way/992983920"]
 reviewed = ""
 to_check = [
-  "Solar: Wikipedia 28 MWp (DC); Elenz uses the register's 20.8 MW (AC).",
-  "Keep both.",
-  "Location is the grid connection, not the station.",
-  "Capacity: Indicative MWp; verify AC capacity.",
-  "Owner: not one of the main owners; find the current owner.",
+  "Location: confirm the point sits on the solar farm against the LINZ aerial (separate task).",
+  "Capacity (decision): Elenz uses the register's 20.8 MW, which is the panels' DC rating. BraveTrace gives 17.16 MW AC. Move plant_capacity.csv to 17.2 MW?",
+  "Owner: the EA register still lists Far North Solar Farms; recheck after the next register refresh.",
+  "Mounting (plan question): Far North Solar Farms said in 2021 the farm would use fixed rather than motorised panels (NZ Herald); not yet confirmed for the farm as built.",
 ]
-notes = ["20.8 MW (register, AC)."]
+notes = [
+  "Solar batch (19 Nov 2026): facts checked against BraveTrace's device sheet (registrant Project Pukenui LP, sales through Aquila), PV Tech, the EA register and network supply points table, and Stats NZ boundaries.",
+  "District and region from the station's point (the [location] value, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; no other district within 3 km.",
+  "Dates: the register's row starts 23 May 2025 (Elenz's data from the same day); BraveTrace commissioned 16 June 2025; officially opened October 2025.",
+  "Owner: PV Tech (July 2026) says Aquila took sole ownership in January 2026, ending its joint venture with Far North Solar Farm; Wikipedia cites an Overseas Investment Office decision of December 2025 (LINZ's page refused our read).",
+  "Dropped the \"Northland\" scheme lead.",
+]
 
 [location]
 value = [-34.818333, 173.110556]
@@ -28,49 +33,69 @@ value = [-35.39616, 173.81063]
 code = "KOE1101 Kaikohe"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
+value = "2025"
+source = ["ea-register", "bt-pukenui"]
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.commissioned.alt]]
 value = "2025"
 source = "wp-list"
 grade = "B"
 checked = ""
 
-[facts.scheme]
-value = "Northland"
-source = "elenz-register"
-grade = "C"
-checked = ""
-
 [facts.region]
 value = "Northland"
-source = "elenz-register"
-grade = "C"
-checked = ""
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
 
 [facts.territorial_authority]
+value = "Far North"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
 value = "Te Aupōuri peninsula"
 source = "wp-list"
 grade = "B"
 checked = ""
+note = "a place, not a district"
 
 [facts.owner]
-value = ""
-source = "ea-register"
-grade = "C"
-checked = ""
-note = "the register's operator(s): Far North Solar Farms"
+value = "Aquila Clean Energy APAC"
+source = ["bt-pukenui", "pvtech-omeheu"]
+grade = "B"
+checked = "2026-11-19"
+note = "through Project Pukenui LP, BraveTrace's registrant"
+
+[facts.previous_owners]
+value = "Far North Solar Farm and Aquila Clean Energy APAC (joint venture), to January 2026"
+source = "pvtech-omeheu"
+grade = "B"
+checked = "2026-11-19"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Pukenui is a solar farm at Pukenui in the Far North, north of Kaitāia. Its 35,000 panels started generating in 2025. It was developed by Far North Solar Farm and Aquila Clean Energy APAC in consultation with Te Aupōuri, and Aquila became its sole owner in January 2026."
+source = ["bt-pukenui", "pvtech-omeheu"]
+grade = "B"
+checked = "2026-11-19"
 
 [[ratings]]
-value = "21"
-basis = "Wikipedia (basis not stated)"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = 20.8
+basis = "the panels' combined peak rating, DC"
+source = ["bt-pukenui", "pvtech-omeheu"]
+grade = "A"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 17.16
+basis = "inverter output, AC"
+source = "bt-pukenui"
+grade = "A"
+checked = "2026-11-19"

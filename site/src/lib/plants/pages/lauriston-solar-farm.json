@@ -23,12 +23,116 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Lauriston is a solar farm on 93 hectares of leased farmland on the Canterbury Plains near Ashburton, developed by a joint venture of Genesis Energy and FRV Australia. Its 90,000 or so panels reached full output in February 2025, and the land is still grazed by sheep. When it opened in April 2025, Genesis described it as the country's largest solar farm.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2025",
+   "refs": [
+    3,
+    1
+   ],
+   "note": "register 1 Feb 2025; BraveTrace 8 Feb 2025 (full generation February 2025); opened 29 April 2025"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Canterbury",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Ashburton",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Genesis Energy and FRV Australia (joint venture)",
+   "refs": [
+    3,
+    1,
+    2
+   ],
+   "note": "the register's operator: Genesis Energy Limited; PV Tech: developed through a joint venture of Genesis and FRV Australia"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1,
+    2
+   ],
+   "value": "63 MW (the panels' combined peak rating, DC)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Ashburton (ASB0661)",
+   "refs": [
+    6
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "BraveTrace NZECS production device info sheet: Lauriston Solar Farm (v1.0)",
+   "publisher": "BraveTrace",
+   "url": "https://bravetrace.co.nz/wp-content/uploads/2026/04/Genesis-Energy-Lauriston-Solar-Farm-BraveTrace-One-Pager-March-2026.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Genesis, FRV Australia open New Zealand's 'largest' solar PV power plant (30 Apr 2025)",
+   "publisher": "PV Tech",
+   "url": "https://www.pv-tech.org/genesis-frv-australia-open-new-zealands-largest-solar-pv-power-plant",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

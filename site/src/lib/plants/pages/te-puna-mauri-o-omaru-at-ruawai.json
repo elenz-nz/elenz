@@ -23,12 +23,123 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Te Puna Mauri ō Omaru is a solar farm at Ruawai in the Kaipara, owned by Northpower, which describes it as one of New Zealand's first large-scale community-owned solar farms. Its first stage was finished in December 2024, and an extension in July 2025 took it to about 20 MW of panels. Te Uri o Hau gifted the name, which means \"the energy source of Omaru\" (safe haven), the original name of this land.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "other_names",
+   "label": "Other names",
+   "value": "Ruawai solar farm",
+   "refs": [
+    1
+   ],
+   "note": "Northpower's description; dropped \"Northpower Solar Farm\""
+  },
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2024",
+   "refs": [
+    3,
+    1
+   ],
+   "note": "stage 1 December 2024 (register 5 Dec 2024; BraveTrace 19 Dec 2024); stage 2 July 2025"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Northland",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Kaipara",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Northpower",
+   "refs": [
+    3,
+    1
+   ],
+   "note": "the register's operator: Northpower Limited"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1
+   ],
+   "value": "20 MW (about; the panels' combined peak rating, DC, since the July 2025 extension)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Maungaturoto (MTO0331)",
+   "refs": [
+    6
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Te Puna Mauri ō Omaru Solar Farm: Bringing power home",
+   "publisher": "Northpower",
+   "url": "https://northpower.nz/case-study/te-puna-mauri-o-omaru-solar-farm-bringing-power-home/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "BraveTrace NZECS production device info sheet: Ruawai Te Puna Mauri ō Omaru (v1.0, December 2025)",
+   "publisher": "BraveTrace",
+   "url": "https://bravetrace.co.nz/wp-content/uploads/2026/02/Northpower-Ruawai-Te-Puna-Mauri-o-Omaru-BraveTrace-one-pager-Feb-2026.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [],
   "owner_all": true,

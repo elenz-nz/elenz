@@ -9,12 +9,15 @@ osm = ["way/1383072076"]
 reviewed = ""
 photo_leads = ["P034"]
 to_check = [
-  "Solar: Wikipedia 63 MWp (DC); Elenz uses the register's 47 MW (AC).",
-  "Keep both.",
-  "Location is the grid connection, not the station.",
-  "Capacity: Often MWp; preserve MWp and MWac separately.",
+  "Location: confirm the point sits on the solar farm against the LINZ aerial (separate task).",
+  "Mounting (plan question): fixed or tracking? Not stated in the sources read (Genesis's page is drawn by script and could not be read).",
 ]
-notes = ["Elenz has 47 MW (register, AC); your 63 is MWp."]
+notes = [
+  "Solar batch (19 Nov 2026): facts checked against BraveTrace's device sheet (registrant Genesis Energy), PV Tech, the EA register and network supply points table, and Stats NZ boundaries.",
+  "District and region from the station's point (the [location] value, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; no other district within 3 km.",
+  "Resolved: capacity. Elenz uses the register's 47 MW (AC); BraveTrace and PV Tech give 63 MWp.",
+  "Dropped the \"Canterbury\" scheme lead.",
+]
 
 [location]
 value = [-43.730989, 171.789431]
@@ -28,42 +31,57 @@ value = [-43.94164, 171.80215]
 code = "ASB0661 ASHBURTON"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
+value = "2025"
+source = ["ea-register", "bt-lauriston"]
+grade = "A"
+checked = "2026-11-19"
+note = "register 1 Feb 2025; BraveTrace 8 Feb 2025 (full generation February 2025); opened 29 April 2025"
+
+[[facts.commissioned.alt]]
 value = "2025"
 source = "wp-list"
 grade = "B"
 checked = ""
 
-[facts.scheme]
-value = "Canterbury"
-source = "elenz-register"
-grade = "C"
-checked = ""
-
 [facts.region]
 value = "Canterbury"
-source = "elenz-register"
-grade = "C"
-checked = ""
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
 
 [facts.territorial_authority]
+value = "Ashburton"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
 value = "Canterbury"
 source = "wp-list"
 grade = "B"
 checked = ""
+note = "a region, not a district"
 
 [facts.owner]
-value = "Genesis"
-source = "ea-register"
+value = "Genesis Energy and FRV Australia (joint venture)"
+source = ["ea-register", "bt-lauriston", "pvtech-lauriston"]
 grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+checked = "2026-11-19"
+note = "the register's operator: Genesis Energy Limited; PV Tech: developed through a joint venture of Genesis and FRV Australia"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Lauriston is a solar farm on 93 hectares of leased farmland on the Canterbury Plains near Ashburton, developed by a joint venture of Genesis Energy and FRV Australia. Its 90,000 or so panels reached full output in February 2025, and the land is still grazed by sheep. When it opened in April 2025, Genesis described it as the country's largest solar farm."
+source = ["bt-lauriston", "pvtech-lauriston"]
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 63.0
+basis = "the panels' combined peak rating, DC"
+source = ["bt-lauriston", "pvtech-lauriston"]
+grade = "A"
+checked = "2026-11-19"

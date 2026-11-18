@@ -23,12 +23,122 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Papareireiā is a solar farm on farmland near Maungaturoto in the Kaipara, built to supply Ryman Healthcare's retirement villages under a 10-year agreement. It is a joint venture of Tupu Tonu (the Ngāpuhi Investment Fund), Purpose Capital and Harbour Infrastructure. Construction began in late 2024 and the farm was commissioned in December 2025. Its name refers to the sun's rays being taken in by the land.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "other_names",
+   "label": "Other names",
+   "value": "Ryman Healthcare Solar Farm",
+   "refs": [
+    2
+   ]
+  },
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2025",
+   "refs": [
+    3,
+    2
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Northland",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Kaipara",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Tupu Tonu, Purpose Capital and Harbour Infrastructure (joint venture)",
+   "refs": [
+    3,
+    1
+   ],
+   "note": "the register's operator: Maungaturoto Solar Farm Project LP"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1,
+    2
+   ],
+   "value": "21 MW (the panels' combined peak rating, DC)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Maungaturoto (MTO0331)",
+   "refs": [
+    6
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Retirement villages to be powered by Ngāpuhi's new Northland solar farm (11 Nov 2024)",
+   "publisher": "Te Ao Māori News",
+   "url": "https://www.teaonews.co.nz/2024/11/11/forty-retirement-villages-to-be-powered-by-ngapuhis-new-northland-solar-farm/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Papareireiā Solar Farm",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Papareirei%C4%81_Solar_Farm",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [],
   "owner_all": true,

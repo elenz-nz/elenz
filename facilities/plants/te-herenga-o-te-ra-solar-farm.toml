@@ -8,13 +8,16 @@ wikidata = "Q133480513"
 osm = ["way/1410036411"]
 reviewed = ""
 to_check = [
-  "Solar: Wikipedia 42 MWp (DC); Elenz uses the register's 33 MW (AC).",
-  "Keep both.",
-  "Location is the grid connection, not the station.",
-  "Capacity: MBIE figure ~33 MW; operator cites 42 MWp. Do not conflate AC/DC.",
-  "Owner: not one of the main owners; find the current owner.",
+  "Location: confirm the point sits on the solar farm against the LINZ aerial (separate task).",
+  "Capacity (decision): Elenz uses the register's 33 MW; BraveTrace's sheet (May 2026) gives 30 MW AC. Keep 33 unless metered half-hour peaks say otherwise.",
 ]
-notes = ["33 MW (register, AC); Lodestone's Waiotahe project."]
+notes = [
+  "Solar batch (19 Nov 2026): facts checked against BraveTrace's device sheet, the EA register and network supply points table, and Stats NZ boundaries.",
+  "District and region from the station's point (the [location] value, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; no other district within 3 km. The old leads (Manawatū-Whanganui, \"Edgecumbe\") were wrong.",
+  "Commissioning: the register's row starts 22 Nov 2024; BraveTrace says it started generating in December 2024 and was commissioned on 20 January 2025. The page shows 2025.",
+  "Connects at Transpower's Waiotahi point (WAI0331), as grid-connected generation (reconciliation type GG).",
+  "Dropped the \"Manawatū\" scheme lead.",
+]
 
 [location]
 value = [-38.025861, 177.183]
@@ -28,56 +31,71 @@ value = [-38.02525, 177.19231]
 code = "WAI0331 WAIOTAHI"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.other_names]
 value = ["Waiotahe Solar Farm"]
 source = "elenz-register"
 grade = "C"
 checked = ""
-note = "Names the EA register, Wikipedia and Elenz use for this plant; check each."
+note = "Lodestone and BraveTrace pair the place with the name (\"Waiotahe Te Herenga o Te Rā\"); no source yet uses it as a name on its own"
 
 [facts.commissioned]
 value = "2025"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = "bt-te-herenga"
+grade = "A"
+checked = "2026-11-19"
+note = "first generation December 2024; commissioned 20 January 2025"
 
 [[facts.commissioned.alt]]
 value = "2024"
 source = "ea-register"
 grade = "A"
 checked = ""
-note = "the register's start date, 2024-11-22: often a year, not the day"
+note = "the register's start date, 22 Nov 2024 (first generation)"
 
-[facts.scheme]
-value = "Manawatū"
-source = "elenz-register"
-grade = "C"
-checked = ""
-
-[facts.region]
-value = "Manawatū-Whanganui"
-source = "elenz-register"
-grade = "C"
-checked = ""
-
-[facts.territorial_authority]
-value = "Edgecumbe"
+[[facts.commissioned.alt]]
+value = "2025"
 source = "wp-list"
 grade = "B"
 checked = ""
 
-[facts.owner]
-value = ""
-source = "ea-register"
-grade = "C"
+[facts.region]
+value = "Bay of Plenty"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[facts.territorial_authority]
+value = "Ōpōtiki"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
+value = "Edgecumbe"
+source = "wp-list"
+grade = "B"
 checked = ""
-note = "the register's operator(s): Lodestone Solar Limited"
+note = "wrong: the farm is at Waiotahe"
+
+[facts.owner]
+value = "Lodestone Energy"
+source = ["ea-register", "bt-te-herenga"]
+grade = "A"
+checked = "2026-11-19"
+note = "the register's operator: Lodestone Solar Limited; BraveTrace's registrant: Lodestone Energy (listed on the NZX since Oct 2026)"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Te Herenga o Te Rā is Lodestone Energy's third solar farm, at Waiotahe in the Bay of Plenty. About 71,600 bifacial panels track the sun. It started generating in December 2024 and was commissioned in January 2025. Te Ūpokorehe gifted the name, which means \"the mooring place of the sun\"."
+source = "bt-te-herenga"
+grade = "A"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 42.9
+basis = "the panels' combined peak rating, DC"
+source = "bt-te-herenga"
+grade = "A"
+checked = "2026-11-19"

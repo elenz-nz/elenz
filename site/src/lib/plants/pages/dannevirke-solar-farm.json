@@ -23,12 +23,117 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Dannevirke Solar Farm is on Tamaki River Road outside Dannevirke in the Tararua District, developed by Bright Fern Energy. Its panels sit on single-axis trackers that follow the sun, designed for the area's earthquakes, strong winds and rolling ground. It began feeding the grid in 2026.",
+  "refs": [
+   1,
+   2,
+   3
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2026",
+   "refs": [
+    3
+   ],
+   "note": "the register's row starts 30 Apr 2026; trackers commissioned August 2026"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Manawatū-Whanganui",
+   "refs": [
+    4
+   ],
+   "note": "from the grid connection point (no station point yet); the sources place the farm near it, in the same region"
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Tararua",
+   "refs": [
+    5,
+    2
+   ],
+   "note": "from the grid connection point (no station point yet); the sources place the farm near it, in the same region"
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Dannevirke Solar Farm Ltd (Bright Fern Energy)",
+   "refs": [
+    3,
+    1
+   ],
+   "note": "the register's operator: Dannevirke Solar Farm Ltd"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1
+   ],
+   "value": "23 MW (the panels' combined peak rating, DC)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Dannevirke (DVK0111)",
+   "refs": [
+    6
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "GameChange Energy Commissions Tracker System at 23 MWp Dannevirke Solar Farm in New Zealand (25 Aug 2026)",
+   "publisher": "SolarQuarter",
+   "url": "https://solarquarter.com/2026/08/25/gamechange-energy-commissions-tracker-system-at-23-mwp-dannevirke-solar-farm-in-new-zealand/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Response to request for copies of resource consents, solar farms, Dannevirke",
+   "publisher": "Tararua District Council",
+   "url": "https://www.tararuadc.govt.nz/__data/assets/pdf_file/0019/213364/Response-to-Request-for-copies-of-resource-consents-solar-farms-Dannevirke.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [],
   "owner_all": true,

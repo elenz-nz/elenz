@@ -23,12 +23,105 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Te Herenga o Te Rā is Lodestone Energy's third solar farm, at Waiotahe in the Bay of Plenty. About 71,600 bifacial panels track the sun. It started generating in December 2024 and was commissioned in January 2025. Te Ūpokorehe gifted the name, which means \"the mooring place of the sun\".",
+  "refs": [
+   1
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2025",
+   "refs": [
+    1
+   ],
+   "note": "first generation December 2024; commissioned 20 January 2025"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Bay of Plenty",
+   "refs": [
+    2
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Ōpōtiki",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Lodestone Energy",
+   "refs": [
+    4,
+    1
+   ],
+   "note": "the register's operator: Lodestone Solar Limited; BraveTrace's registrant: Lodestone Energy (listed on the NZX since Oct 2026)"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1
+   ],
+   "value": "42.9 MW (the panels' combined peak rating, DC)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Waiotahi (WAI0331)",
+   "refs": [
+    5
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "BraveTrace NZECS production device info sheet: Waiotahe Te Herenga o Te Rā (v1.1, May 2026)",
+   "publisher": "BraveTrace",
+   "url": "https://bravetrace.co.nz/wp-content/uploads/2026/05/WaiotaheTe-Herenga-O-Te-Ra-BraveTrace-Registered-Production-Device-One-Pager-V1.1-May-2026.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [],
   "owner_all": true,

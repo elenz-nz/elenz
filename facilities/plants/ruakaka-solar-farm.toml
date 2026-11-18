@@ -6,36 +6,67 @@ name = "Ruakākā Solar Farm"
 register = ["S018"]
 reviewed = ""
 to_check = [
-  "No Wikipedia row: use the operator's pages.",
-  "Location is the grid connection, not the station.",
-  "Capacity pending in Elenz.",
-  "Location: only the grid connection so far; find the station itself.",
+  "Location: no station point yet (OpenStreetMap is research only); find one on the LINZ aerial (separate task), then test it against the Stats NZ boundaries.",
+  "Capacity (decision): Elenz has it pending at 120 MW. Meridian gives 130 MW, and the EA register now lists \"Ruakākā Energy Park Solar Farm\" (RUS0) at 130 MW from 29 Oct 2026; not yet in Elenz's live data (19 Nov). Give it 130 MW and a start date once it dispatches.",
+  "Commissioned: first generation was expected in late 2026, full generation in early 2027; add the year once it generates.",
 ]
-notes = ["Added from Elenz's plant list (8 Nov 2026)."]
+notes = [
+  "Solar batch (19 Nov 2026): facts checked against Meridian's two releases (final investment decision, March 2025; construction under way, October 2025), the EA register and network supply points table, and Stats NZ boundaries.",
+  "Region from the grid connection point (no station point yet); the sources place the farm near it, in the same region (Bream Bay). District left unchecked: no station point.",
+]
 
 [grid_connection]
 value = [-35.84903, 174.47989]
 code = "BRB0331 BREAM BAY"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
+
+[facts.other_names]
+value = ["Ruakākā Energy Park Solar Farm"]
+source = "ea-register"
+grade = "A"
+checked = "2026-11-19"
+note = "the register's name for the plant"
+
+[facts.scheme]
+value = "Ruakākā Energy Park"
+source = "meridian-ruakaka-fid"
+grade = "A"
+checked = "2026-11-19"
+note = "with Meridian's Ruakākā battery"
 
 [facts.region]
 value = "Northland"
-source = "elenz-register"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+note = "from the grid connection point (no station point yet); the sources place the farm near it, in the same region"
+
+[facts.territorial_authority]
+value = "Whangārei"
+source = "statsnz-ta-2026"
 grade = "C"
 checked = ""
+note = "the grid connection point (Bream Bay) only"
 
 [facts.owner]
-value = "Meridian"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Meridian Energy"
+source = ["ea-register", "meridian-ruakaka-fid"]
+grade = "A"
+checked = "2026-11-19"
+note = "the register's operator: Meridian"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Ruakākā Solar Farm is Meridian Energy's first solar farm in New Zealand, south of Whangārei. It sits beside Meridian's 100 MW Ruakākā battery, and together they make up the Ruakākā Energy Park. About 250,000 panels are expected to produce up to 230 GWh a year. Construction began in 2025, with first generation expected in late 2026 and full generation in early 2027."
+source = ["meridian-ruakaka-fid", "meridian-ruakaka-construction"]
+grade = "A"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 130.0
+basis = "Meridian's figure; also the EA register's nameplate from Oct 2026"
+source = ["meridian-ruakaka-fid", "ea-register"]
+grade = "A"
+checked = "2026-11-19"

@@ -142,7 +142,7 @@
    "status": "operating",
    "mw": 24.0,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "2026",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -218,7 +218,7 @@
    "status": "operating",
    "mw": 23.0,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "2026",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -683,7 +683,7 @@
    "status": "operating",
    "mw": 24.0,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "2023",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -702,7 +702,7 @@
    "status": "operating",
    "mw": 160.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "2026",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -740,7 +740,7 @@
    "status": "operating",
    "mw": 47.0,
    "owner": "Genesis",
-   "commissioned": null,
+   "commissioned": "2025",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1082,7 +1082,7 @@
    "status": "operating",
    "mw": 28.7,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "2026",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1158,7 +1158,7 @@
    "status": "operating",
    "mw": 23.8,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "2025",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1177,13 +1177,13 @@
    "status": "operating",
    "mw": 17.6,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "2025",
    "closed": null,
    "reviewed": false,
    "pt": {
-    "lat": -36.08667,
-    "lon": 174.35919,
-    "basis": "grid connection",
+    "lat": -36.09028,
+    "lon": 174.34722,
+    "basis": "station",
     "checked": false
    }
   },
@@ -1234,7 +1234,7 @@
    "status": "operating",
    "mw": 20.8,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "2025",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1272,7 +1272,7 @@
    "status": "operating",
    "mw": 24.0,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "2024",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1462,7 +1462,7 @@
    "status": "operating",
    "mw": 22.4,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "2025",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1557,7 +1557,7 @@
    "status": "operating",
    "mw": 147.0,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "2026",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1614,7 +1614,7 @@
    "status": "operating",
    "mw": 33.0,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "2025",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1690,13 +1690,13 @@
    "status": "operating",
    "mw": 16.8,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "2024",
    "closed": null,
    "reviewed": false,
    "pt": {
-    "lat": -36.08667,
-    "lon": 174.35919,
-    "basis": "grid connection",
+    "lat": -36.115433,
+    "lon": 174.026719,
+    "basis": "station",
     "checked": false
    }
   },
@@ -1861,7 +1861,7 @@
    "status": "operating",
    "mw": 24.0,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "2025",
    "closed": null,
    "reviewed": false,
    "pt": {

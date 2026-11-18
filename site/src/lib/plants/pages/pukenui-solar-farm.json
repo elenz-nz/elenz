@@ -23,12 +23,122 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Pukenui is a solar farm at Pukenui in the Far North, north of Kaitāia. Its 35,000 panels started generating in 2025. It was developed by Far North Solar Farm and Aquila Clean Energy APAC in consultation with Te Aupōuri, and Aquila became its sole owner in January 2026.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2025",
+   "refs": [
+    3,
+    1
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Northland",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Far North",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Aquila Clean Energy APAC",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "through Project Pukenui LP, BraveTrace's registrant"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "Far North Solar Farm and Aquila Clean Energy APAC (joint venture), to January 2026",
+   "refs": [
+    2
+   ]
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1,
+    2
+   ],
+   "value": "20.8 MW (the panels' combined peak rating, DC); 17.16 MW (inverter output, AC)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Kaikohe (KOE1101)",
+   "refs": [
+    6
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "BraveTrace NZECS production device info sheet: Pukenui Solar Farm (v1.0, December 2025)",
+   "publisher": "BraveTrace",
+   "url": "https://bravetrace.co.nz/wp-content/uploads/2026/02/Aquila-Energy-Pukenui-Solar-Farm-BraveTrace-one-pager-Feb-2026.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Aquila Clean Energy energises 38MW solar PV plant in New Zealand's Bay of Plenty (23 Jul 2026)",
+   "publisher": "PV Tech",
+   "url": "https://www.pv-tech.org/aquila-clean-energy-energises-38mw-solar-pv-plant-in-new-zealands-bay-of-plenty/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [],
   "owner_all": true,

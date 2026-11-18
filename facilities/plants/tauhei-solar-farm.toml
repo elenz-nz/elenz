@@ -7,12 +7,14 @@ register = ["S019"]
 wikidata = "Q115803980"
 osm = ["relation/19726847"]
 reviewed = ""
-to_check = [
-  "No Wikipedia row: use the operator's pages.",
-  "Location is the grid connection, not the station.",
-  "Owner: not one of the main owners; find the current owner.",
+to_check = ["Location: confirm the point sits on the solar farm against the LINZ aerial (separate task)."]
+notes = [
+  "Solar batch (19 Nov 2026): facts checked against Harmony Energy's financial close release, PV Tech, the EA register and network supply points table, and Stats NZ boundaries.",
+  "District and region from the station's point (the [location] value, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; no other district within 3 km.",
+  "Owner: Harmony's January 2025 release names the joint venture partner as First Renewables (part of Clarus); PV Tech's July 2026 report names Igneo Infrastructure Partners. The page follows the newer report.",
+  "Capacity: Elenz uses the register's 147 MW; sources give 150 MW AC (not published, no owner source read) and 202 MWp.",
+  "Full commercial operation was targeted for September to October 2026 (PV Tech).",
 ]
-notes = ["Added from Elenz's plant list (8 Nov 2026)."]
 
 [location]
 value = [-37.588333, 175.721667]
@@ -26,24 +28,51 @@ value = [-37.56924, 175.68307]
 code = "WHU1101 Tauhei Solar Farm"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
+
+[facts.commissioned]
+value = "2026"
+source = ["ea-register", "pvtech-tauhei"]
+grade = "A"
+checked = "2026-11-19"
+note = "the register's row starts 1 May 2026; energised in July 2026"
 
 [facts.region]
 value = "Waikato"
-source = "elenz-register"
-grade = "C"
-checked = ""
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[facts.territorial_authority]
+value = "Matamata-Piako"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
 
 [facts.owner]
-value = ""
-source = "ea-register"
-grade = "C"
+value = "Harmony Energy New Zealand and Igneo Infrastructure Partners (joint venture)"
+source = ["ea-register", "pvtech-tauhei"]
+grade = "B"
+checked = "2026-11-19"
+note = "the register's operator: Harmony Energy"
+
+[[facts.owner.alt]]
+value = "Harmony Energy and First Renewables, part of Clarus (joint venture)"
+source = "harmony-tauhei-close"
+grade = "A"
 checked = ""
-note = "the register's operator(s): Harmony Energy"
+note = "January 2025"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Tauhei is a solar farm on 182 hectares near Te Aroha in the Waikato, built by Harmony Energy and its joint venture partners. It connects to Transpower's 110 kV network at Waihou substation, and Meridian Energy buys all its output for its first 10 years. It was energised in July 2026 and is expected to produce about 280 GWh a year."
+source = ["harmony-tauhei-close", "pvtech-tauhei"]
+grade = "A"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 202.0
+basis = "the panels' combined peak rating, DC"
+source = ["harmony-tauhei-close", "pvtech-tauhei"]
+grade = "A"
+checked = "2026-11-19"
