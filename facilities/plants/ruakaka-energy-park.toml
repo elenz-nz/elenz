@@ -7,8 +7,17 @@ register = ["B004"]
 wikidata = "Q133860797"
 osm = ["way/1395935526"]
 reviewed = ""
-to_check = ["Location is the grid connection, not the station."]
-notes = ["Added from Elenz's plant list (8 Nov 2026)."]
+to_check = [
+  "Location: Wikidata's point, not yet checked against the LINZ aerial (separate task: two hectares at Marsden Point, beside State Highway 15 and opposite Transpower's Bream Bay substation).",
+  "Name (decision): this page is the battery, which the register calls Ruakākā Energy Park; Meridian uses that name for the battery and the solar farm together. Rename the page to Ruakākā Battery (a site-only name)?",
+]
+notes = [
+  "Added from Elenz's plant list (8 Nov 2026).",
+  "Battery batch (19 Nov 2026): facts checked against Meridian's completion release (NZX, May 2025) and solar farm release (March 2025), RNZ's report of the opening, the EA register and network supply points table, and Stats NZ boundaries. Built by Meridian, so no previous owners.",
+  "Dates: the register's row starts 15 Oct 2024; RNZ: grid-connected since early 2025; Meridian: construction and commissioning complete and officially opened 23 May 2025, final test results still to be approved then. Commissioned given as 2025.",
+  "District and region from Wikidata's point (Whangārei District; only the sea, outside any district, within 3 km). The grid connection point gives the same.",
+  "Dropped the Wikipedia-list rating lead (100/200): battery ratings are MW / MWh, and the page shows ratings as MW. Storage (200 MWh) is in units and About. Cost $186 million (not published).",
+]
 
 [location]
 value = [-35.84867, 174.47729]
@@ -22,43 +31,65 @@ value = [-35.84903, 174.47989]
 code = "BRB0331 BREAM BAY"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
+
+[facts.other_names]
+value = ["Ruakākā Battery Energy Storage System (BESS)"]
+source = "meridian-ruakaka-bess-2025"
+grade = "A"
+checked = "2026-11-19"
+note = "Meridian's name for the battery"
 
 [facts.commissioned]
 value = "2025"
-source = "wp-list"
+source = "meridian-ruakaka-bess-2025"
+grade = "A"
+checked = "2026-11-19"
+note = "construction and commissioning complete, officially opened 23 May 2025"
+
+[[facts.commissioned.alt]]
+value = "2024"
+source = "ea-register"
+grade = "A"
+
+[facts.units]
+value = "80 Saft battery containers, storing 200 MWh (two hours at full output)"
+source = ["rnz-ruakaka-2025", "meridian-ruakaka-bess-2025"]
 grade = "B"
-checked = ""
+checked = "2026-11-19"
+note = "Meridian: 100 MW / 200 MWh, Saft the battery partner; RNZ: 80 containers"
+
+[facts.scheme]
+value = "Ruakākā Energy Park"
+source = ["meridian-ruakaka-bess-2025", "meridian-ruakaka-fid"]
+grade = "A"
+checked = "2026-11-19"
+note = "with Meridian's Ruakākā Solar Farm"
 
 [facts.region]
 value = "Northland"
-source = "elenz-register"
-grade = "C"
-checked = ""
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+note = "Wikidata's point and the grid connection point"
 
 [facts.territorial_authority]
-value = "Northland"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = "Whangārei"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+note = "Whangārei District, from Wikidata's point; the grid connection point gives the same"
 
 [facts.owner]
-value = "Meridian"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Meridian Energy"
+source = ["ea-register", "meridian-ruakaka-bess-2025"]
+grade = "A"
+checked = "2026-11-19"
+note = "the register's operator: Meridian Energy Limited"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
-
-[[ratings]]
-value = "100/200"
-basis = "Wikipedia (basis not stated)"
-source = "wp-list"
+value = "The Ruakākā battery is a grid-scale battery built by Meridian Energy at Marsden Point, south of Whangārei. Its 80 containers from Saft can deliver 100 MW for two hours, storing 200 MWh. Construction began in 2023 and it was officially opened in May 2025. It is the first stage of Meridian's Ruakākā Energy Park, with a 130 MW solar farm being built beside it."
+source = ["meridian-ruakaka-bess-2025", "rnz-ruakaka-2025", "meridian-ruakaka-fid"]
 grade = "B"
-checked = ""
+checked = "2026-11-19"

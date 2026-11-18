@@ -23,12 +23,126 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Glenbrook-Ohurua Battery is Contact Energy's first grid-scale battery, on land leased from New Zealand Steel at its Glenbrook site in South Auckland, close to Auckland's demand and to the national grid. Its 56 Tesla Megapack units can deliver 100 MW for about two hours, storing 200 MWh. Work began in July 2024, it started trading on 1 April 2026 and was officially opened in May 2026. A second, 200 MW battery is being built beside it, due online in early 2028.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "other_names",
+   "label": "Other names",
+   "value": "Glenbrook Ohurua Battery 1",
+   "refs": [
+    1
+   ],
+   "note": "Contact's name"
+  },
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2026",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "trading from 1 April 2026, officially opened 21 May 2026"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "56 Tesla Megapack 2 XL units, storing 200 MWh (two hours at full output)",
+   "refs": [
+    1,
+    2
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Auckland",
+   "refs": [
+    3
+   ],
+   "note": "from the grid connection point (no station point yet), on the Glenbrook site"
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Auckland",
+   "refs": [
+    4
+   ],
+   "note": "from the grid connection point; Auckland is a unitary authority and no other district is within 3 km"
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Contact Energy",
+   "refs": [
+    5,
+    1
+   ],
+   "note": "the register's operator: Contact Energy"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Glenbrook (GLN0332)",
+   "refs": [
+    6
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Glenbrook Ohurua Battery 1",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/aboutus/our-story/our-projects/glenbrook-battery",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Glenbrook Ohurua Battery officially opened (21 May 2026)",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/investor-centre/news/2026/glenbrook-ohurua-battery",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

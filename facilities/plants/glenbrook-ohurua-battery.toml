@@ -6,53 +6,74 @@ name = "Glenbrook-Ohurua Battery"
 register = ["B002"]
 reviewed = ""
 to_check = [
-  "Location is the grid connection, not the station.",
-  "Location: only the grid connection so far; find the station itself.",
+  "Location: no station point yet; find one on the LINZ aerial (separate task: the battery is on NZ Steel's Glenbrook site), then test it against the Stats NZ boundaries.",
+  "Battery 2 (200 MW beside it, online early 2028): decide whether it joins this page or gets its own, and add a capacity row when it dispatches. Contact also has an option to take Battery 1 from 100 MW to 130 MW.",
 ]
-notes = ["Added from Elenz's plant list (8 Nov 2026)."]
+notes = [
+  "Added from Elenz's plant list (8 Nov 2026).",
+  "Battery batch (19 Nov 2026): facts checked against Contact's project page and two releases (April 2025, May 2026), the EA register and network supply points table, and Stats NZ boundaries. Built by Contact, so no previous owners.",
+  "Dates: the register's row starts 4 Dec 2025; Contact: commissioned 2026, trading from 1 Apr 2026, officially opened 21 May 2026; work began July 2024.",
+  "Region and district from the grid connection point (GLN0332, on the Glenbrook site); Auckland is a unitary authority and no other district is within 3 km. The old lead \"Auckland (Manugakiekie-Tamaki)\" named a local board (and the wrong one): dropped.",
+  "Name: Contact calls it Glenbrook Ohurua Battery 1 (no hyphen, no macron); the register Glenbrook-Ohurua Battery. Contact leases the land from NZ Steel. Cost $151 million (not published).",
+  "Dropped the Wikipedia-list rating lead (100/200): battery ratings are MW / MWh, and the page shows ratings as MW. Storage (200 MWh) is in units and About.",
+]
 
 [grid_connection]
 value = [-37.20484, 174.73248]
 code = "GLN0332 GLENBROOK"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
+
+[facts.other_names]
+value = ["Glenbrook Ohurua Battery 1"]
+source = "contact-glenbrook-battery"
+grade = "A"
+checked = "2026-11-19"
+note = "Contact's name"
 
 [facts.commissioned]
 value = "2026"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = ["contact-glenbrook-battery", "contact-glenbrook-2026"]
+grade = "A"
+checked = "2026-11-19"
+note = "trading from 1 April 2026, officially opened 21 May 2026"
+
+[[facts.commissioned.alt]]
+value = "2025"
+source = "ea-register"
+grade = "A"
+
+[facts.units]
+value = "56 Tesla Megapack 2 XL units, storing 200 MWh (two hours at full output)"
+source = ["contact-glenbrook-battery", "contact-glenbrook-2026"]
+grade = "A"
+checked = "2026-11-19"
 
 [facts.region]
 value = "Auckland"
-source = "elenz-register"
-grade = "C"
-checked = ""
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+note = "from the grid connection point (no station point yet), on the Glenbrook site"
 
 [facts.territorial_authority]
-value = "Auckland (Manugakiekie-Tamaki)"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = "Auckland"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+note = "from the grid connection point; Auckland is a unitary authority and no other district is within 3 km"
 
 [facts.owner]
-value = "Contact"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Contact Energy"
+source = ["ea-register", "contact-glenbrook-battery"]
+grade = "A"
+checked = "2026-11-19"
+note = "the register's operator: Contact Energy"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
-
-[[ratings]]
-value = "100/200"
-basis = "Wikipedia (basis not stated)"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = "Glenbrook-Ohurua Battery is Contact Energy's first grid-scale battery, on land leased from New Zealand Steel at its Glenbrook site in South Auckland, close to Auckland's demand and to the national grid. Its 56 Tesla Megapack units can deliver 100 MW for about two hours, storing 200 MWh. Work began in July 2024, it started trading on 1 April 2026 and was officially opened in May 2026. A second, 200 MW battery is being built beside it, due online in early 2028."
+source = ["contact-glenbrook-battery", "contact-glenbrook-2026"]
+grade = "A"
+checked = "2026-11-19"

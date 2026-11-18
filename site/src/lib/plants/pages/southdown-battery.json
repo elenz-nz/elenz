@@ -23,12 +23,126 @@
  "scheme": null,
  "metered": "Generation_MD keeps the old station's code (SWN2201, \"southdown\", gas) for the battery after the station closed, so the metered history counts it as the battery from 2016. Its output there starts in September 2018. Before the dispatch data starts (10 Sep 2020) the history has its discharge only, not its charging.",
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Southdown Battery was a 1 MW Tesla Powerpack, storing 2 MWh, that Mercury installed at its research and development centre in South Auckland, connected to the grid at Southdown. Launched in August 2018, it was, in Mercury's words, the first large-scale battery in New Zealand connected directly to the national grid. Mercury ran it as a trial of how a battery could trade in the electricity market and work alongside its hydro and geothermal stations. The EA's register lists it until May 2022.",
+  "refs": [
+   1,
+   2,
+   3
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2018",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "launched 22 August 2018; the register's row starts 2017-01-01, before Mercury chose its supplier"
+  },
+  {
+   "k": "closed",
+   "label": "Closed",
+   "value": "23 May 2022",
+   "refs": [
+    3
+   ],
+   "note": "the register's end date"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "Tesla Powerpack 2, storing 2 MWh (two hours at full output)",
+   "refs": [
+    2
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Auckland",
+   "refs": [
+    4
+   ],
+   "note": "from the grid connection point (no station point yet)"
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Auckland",
+   "refs": [
+    5
+   ],
+   "note": "from the grid connection point; Auckland is a unitary authority and no other district is within 3 km"
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Mercury",
+   "refs": [
+    3,
+    1
+   ],
+   "note": "the register's operator: Mercury NZ Limited"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Southdown (SWN2201)",
+   "refs": [
+    6
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "A Kiwi first: direct grid-connected battery is large and in-charge (news release, 22 August 2018)",
+   "publisher": "Mercury (via Scoop)",
+   "url": "https://www.scoop.co.nz/stories/BU1808/S00710/direct-grid-connected-battery-is-large-and-in-charge.htm",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Mercury NZ picks Tesla for ground-breaking battery trial (24 January 2018)",
+   "publisher": "Mercury, as published by SEANZ",
+   "url": "https://www.seanz.org.nz/mercury_tesla_battery_trial",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

@@ -23,12 +23,144 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "The Ruakākā battery is a grid-scale battery built by Meridian Energy at Marsden Point, south of Whangārei. Its 80 containers from Saft can deliver 100 MW for two hours, storing 200 MWh. Construction began in 2023 and it was officially opened in May 2025. It is the first stage of Meridian's Ruakākā Energy Park, with a 130 MW solar farm being built beside it.",
+  "refs": [
+   1,
+   2,
+   3
+  ]
+ },
+ "facts": [
+  {
+   "k": "other_names",
+   "label": "Other names",
+   "value": "Ruakākā Battery Energy Storage System (BESS)",
+   "refs": [
+    1
+   ],
+   "note": "Meridian's name for the battery"
+  },
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2025",
+   "refs": [
+    1
+   ],
+   "note": "construction and commissioning complete, officially opened 23 May 2025"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "80 Saft battery containers, storing 200 MWh (two hours at full output)",
+   "refs": [
+    2,
+    1
+   ],
+   "note": "Meridian: 100 MW / 200 MWh, Saft the battery partner; RNZ: 80 containers"
+  },
+  {
+   "k": "scheme",
+   "label": "Scheme",
+   "value": "Ruakākā Energy Park",
+   "refs": [
+    1,
+    3
+   ],
+   "note": "with Meridian's Ruakākā Solar Farm"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Northland",
+   "refs": [
+    4
+   ],
+   "note": "Wikidata's point and the grid connection point"
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Whangārei",
+   "refs": [
+    5
+   ],
+   "note": "Whangārei District, from Wikidata's point; the grid connection point gives the same"
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Meridian Energy",
+   "refs": [
+    6,
+    1
+   ],
+   "note": "the register's operator: Meridian Energy Limited"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Bream Bay (BRB0331)",
+   "refs": [
+    7
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Completion of Ruakākā Battery Energy Storage System (NZX, 23 May 2025)",
+   "publisher": "Meridian Energy",
+   "url": "https://www.nzx.com/announcements/452136",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Giant battery: first stage of Ruakākā Energy Park switched on (23 May 2025)",
+   "publisher": "RNZ",
+   "url": "https://www.rnz.co.nz/news/top/561979/giant-battery-first-stage-of-ruakaka-energy-park-switched-on",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Meridian to proceed with $227m Ruakākā Solar Farm (25 Mar 2025)",
+   "publisher": "Meridian Energy",
+   "url": "https://www.meridianenergy.co.nz/news-and-events/meridian-to-proceed-with-227m-ruakaka-solar-farm",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

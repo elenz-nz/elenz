@@ -294,7 +294,7 @@
    "status": "operating",
    "mw": 100.0,
    "owner": "Contact",
-   "commissioned": null,
+   "commissioned": "2026",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -408,7 +408,7 @@
    "status": "operating",
    "mw": 100.0,
    "owner": "Genesis",
-   "commissioned": null,
+   "commissioned": "2026",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1310,7 +1310,7 @@
    "status": "operating",
    "mw": 35.0,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "2023",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1367,7 +1367,7 @@
    "status": "operating",
    "mw": 100.0,
    "owner": "Meridian",
-   "commissioned": null,
+   "commissioned": "2025",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1424,7 +1424,7 @@
    "status": "closed",
    "mw": 1.0,
    "owner": "Mercury",
-   "commissioned": null,
+   "commissioned": "2018",
    "closed": "2022",
    "reviewed": false,
    "pt": {
