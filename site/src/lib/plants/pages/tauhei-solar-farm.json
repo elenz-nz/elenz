@@ -23,12 +23,115 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Tauhei is a solar farm on 182 hectares near Te Aroha in the Waikato, built by Harmony Energy and its joint venture partners. It connects to Transpower's 110 kV network at Waihou substation, and Meridian Energy buys all its output for its first 10 years. It was energised in July 2026 and is expected to produce about 280 GWh a year.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2026",
+   "refs": [
+    3,
+    2
+   ],
+   "note": "the register's row starts 1 May 2026; energised in July 2026"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Waikato",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Matamata-Piako",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Harmony Energy New Zealand and Igneo Infrastructure Partners (joint venture)",
+   "refs": [
+    3,
+    2
+   ],
+   "note": "the register's operator: Harmony Energy"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1,
+    2
+   ],
+   "value": "202 MW (the panels' combined peak rating, DC)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Tauhei Solar Farm (WHU1101)",
+   "refs": [
+    6
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Harmony Energy and First Renewables Joint Venture successfully complete financial close on New Zealand's largest solar farm (Jan 2025)",
+   "publisher": "Harmony Energy",
+   "url": "https://harmonyenergy.co.uk/harmony-energy-and-first-renewables-joint-venture-successfully-complete-financial-close-on-new-zealands-largest-solar-farm/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Harmony Energy energises New Zealand's largest solar PV plant (16 Jul 2026)",
+   "publisher": "PV Tech",
+   "url": "https://www.pv-tech.org/harmony-energy-energises-new-zealands-largest-solar-pv-plant/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [],
   "owner_all": true,

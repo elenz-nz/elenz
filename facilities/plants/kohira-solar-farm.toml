@@ -7,14 +7,15 @@ register = ["S001"]
 wikidata = "Q122495380"
 osm = ["way/1126147888"]
 reviewed = ""
-to_check = [
-  "Solar: Wikipedia 32 MWp (DC); Elenz uses the register's 24 MW (AC).",
-  "Keep both.",
-  "Location is the grid connection, not the station.",
-  "Capacity: Indicative MWp/DC; verify AC export separately.",
-  "Owner: not one of the main owners; find the current owner.",
+to_check = ["Location: confirm the point sits on the solar farm against the LINZ aerial (separate task)."]
+notes = [
+  "Solar batch (19 Nov 2026): facts checked against BraveTrace's device sheet (registrant Lodestone Energy), the EA register and network supply points table, Lodestone's farm pages (read through search results; the site refuses automated reads) and Stats NZ boundaries.",
+  "District and region from the station's point (the [location] value, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; no other district within 3 km.",
+  "Resolved: capacity. Elenz uses the register's 24 MW. BraveTrace gives 23.7 MW AC and 33.3 MWp DC (Wikipedia's article cites it); the Wikipedia list's 32 MWp and 23 MW are older roundings.",
+  "Mounting: BraveTrace says bifacial panels that track the sun (single-axis trackers); the panels stand high enough for sheep (agrivoltaic).",
+  "Dropped the \"Northland\" scheme lead: solar farms have no scheme.",
+  "The iwi named in sources differs: BraveTrace says Ngāti Rarawa, Wikipedia Te Rarawa. The About text says \"local iwi\".",
 ]
-notes = ["Elenz has 24 MW (register, AC). Your 33 is likely MWp."]
 
 [location]
 value = [-35.081667, 173.219444]
@@ -28,63 +29,71 @@ value = [-35.39616, 173.81063]
 code = "KOE1101 Kaikohe"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.other_names]
 value = ["Kaitaia Solar Farm"]
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "Names the EA register, Wikipedia and Elenz use for this plant; check each."
-
-[facts.commissioned]
-value = "Began 2023"
 source = "wp-list"
 grade = "B"
-checked = ""
+checked = "2026-11-19"
+note = "the Wikipedia list's name; Wikidata also has \"Lodestone Two Solar Farm\""
+
+[facts.commissioned]
+value = "2023"
+source = ["ea-register", "bt-kohira"]
+grade = "A"
+checked = "2026-11-19"
+note = "register 25 Oct 2023; BraveTrace 24 Nov 2023 (first generation November 2023)"
 
 [[facts.commissioned.alt]]
 value = "2023"
-source = "ea-register"
-grade = "A"
+source = "wp-list"
+grade = "B"
 checked = ""
-note = "the register's start date, 2023-10-25: often a year, not the day"
-
-[facts.scheme]
-value = "Northland"
-source = "elenz-register"
-grade = "C"
-checked = ""
+note = "Began 2023"
 
 [facts.region]
 value = "Northland"
-source = "elenz-register"
-grade = "C"
-checked = ""
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
 
 [facts.territorial_authority]
+value = "Far North"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
 value = "Northland"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = ""
-source = "ea-register"
-grade = "C"
-checked = ""
-note = "the register's operator(s): Lodestone Solar Limited"
+value = "Lodestone Energy"
+source = ["ea-register", "bt-kohira"]
+grade = "A"
+checked = "2026-11-19"
+note = "the register's operator: Lodestone Solar Limited; BraveTrace's registrant: Lodestone Energy (listed on the NZX since Oct 2026)"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Kohirā is Lodestone Energy's first solar farm, on farmland near Kaitāia in the Far North. Its 61,000 or so bifacial panels track the sun through the day, and the land beneath them is still farmed. It started generating in November 2023. Local iwi gifted the name, which means \"suncatcher\"."
+source = ["bt-kohira", "lodestone-solar-farms"]
+grade = "A"
+checked = "2026-11-19"
 
 [[ratings]]
-value = "23"
-basis = "Wikipedia (basis not stated)"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = 33.3
+basis = "the panels' combined peak rating, DC"
+source = "bt-kohira"
+grade = "A"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 23.7
+basis = "inverter output, AC"
+source = "bt-kohira"
+grade = "A"
+checked = "2026-11-19"

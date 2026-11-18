@@ -6,37 +6,59 @@ name = "Clandeboye Solar Farm"
 register = ["S013"]
 osm = ["way/1442514369"]
 reviewed = ""
-to_check = [
-  "No Wikipedia row: use the operator's pages.",
-  "Location is the grid connection, not the station.",
-  "Location: no station point yet (OpenStreetMap is research only); check one against the LINZ aerial or Wikidata.",
-  "Owner: not one of the main owners; find the current owner.",
+to_check = ["Location: no station point yet (OpenStreetMap is research only); find one on the LINZ aerial (separate task), then test it against the Stats NZ boundaries."]
+notes = [
+  "Solar batch (19 Nov 2026): facts checked against the EA register and network supply points table, Lodestone's farm page and groundbreaking news (through search results), EVs & Beyond's first-power report and Stats NZ boundaries.",
+  "Region from the grid connection point (no station point yet); the sources place the farm near it, in the same region (Temuka; the farm is north of Temuka). District left unchecked until there is a station point: Temuka's point is in Timaru District.",
+  "First power: EVs & Beyond reported it on 7 Aug 2026; the register's row starts 11 Jun 2026, and Elenz's data from 10 Jun 2026.",
+  "Capacity: Elenz uses the register's 24 MW (AC); Lodestone gives 27.7 MWp. Mounting: single-portrait (1P) bifacial panels; tracking not stated.",
 ]
-notes = ["Added from Elenz's plant list (8 Nov 2026)."]
 
 [grid_connection]
 value = [-44.22364, 171.29224]
 code = "TMK0331 TEMUKA"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
+
+[facts.commissioned]
+value = "2026"
+source = ["ea-register", "evsandbeyond-clandeboye"]
+grade = "A"
+checked = "2026-11-19"
+note = "first power reported in August 2026"
 
 [facts.region]
 value = "Canterbury"
-source = "elenz-register"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+note = "from the grid connection point (no station point yet); the sources place the farm near it, in the same region"
+
+[facts.territorial_authority]
+value = "Timaru"
+source = "statsnz-ta-2026"
 grade = "C"
 checked = ""
+note = "the grid connection point (Temuka) only"
 
 [facts.owner]
-value = ""
-source = "ea-register"
-grade = "C"
-checked = ""
-note = "the register's operator(s): Lodestone Solar Limited"
+value = "Lodestone Energy"
+source = ["ea-register", "lodestone-clandeboye"]
+grade = "A"
+checked = "2026-11-19"
+note = "the register's operator: Lodestone Solar Limited"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Clandeboye is Lodestone Energy's fifth solar farm and its first in the South Island, on 42 hectares of former dairy land north of Temuka in South Canterbury. About 45,000 bifacial panels feed Alpine Energy's network, the first large solar farm on it, while the landowner runs sheep on the site. Construction began in 2025 and the farm first generated in 2026."
+source = ["lodestone-clandeboye", "lodestone-clandeboye-groundbreaking", "evsandbeyond-clandeboye"]
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 27.7
+basis = "the panels' combined peak rating, DC"
+source = "lodestone-clandeboye-groundbreaking"
+grade = "B"
+checked = "2026-11-19"

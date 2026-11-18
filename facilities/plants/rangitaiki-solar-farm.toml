@@ -7,14 +7,15 @@ register = ["S002"]
 wikidata = "Q125856182"
 osm = ["way/1389207750"]
 reviewed = ""
-to_check = [
-  "Solar: Wikipedia 32 MWp (DC); Elenz uses the register's 24 MW (AC).",
-  "Keep both.",
-  "Location is the grid connection, not the station.",
-  "Capacity: Indicative MWp/DC; verify AC export separately.",
-  "Owner: not one of the main owners; find the current owner.",
+to_check = ["Location: confirm the point sits on the solar farm against the LINZ aerial (separate task)."]
+notes = [
+  "Solar batch (19 Nov 2026): facts checked against BraveTrace's device sheet, the EA register and network supply points table, Lodestone's farm pages (through search results) and Stats NZ boundaries.",
+  "District and region from the station's point (the [location] value, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; no other district within 3 km.",
+  "Resolved: capacity. Elenz uses the register's 24 MW; BraveTrace gives 23.7 MW AC and 32.4 MWp DC.",
+  "Dropped the other name \"Edgecumbe Solar Farm\": Genesis's new Tihori Solar Farm near Edgecumbe was also known by that name, so it would mislead.",
+  "Dropped the \"Bay of Plenty\" scheme lead: solar farms have no scheme.",
+  "Mounting: bifacial panels that track the sun (BraveTrace).",
 ]
-notes = ["24 MW (register, AC); Lodestone's Edgecumbe project."]
 
 [location]
 value = [-37.996342, 176.809961]
@@ -28,49 +29,64 @@ value = [-37.98726, 176.82888]
 code = "EDG0331 EDGECUMBE"
 source = "ea-nsp"
 grade = "A"
-checked = ""
-
-[facts.other_names]
-value = ["Edgecumbe Solar Farm"]
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "Names the EA register, Wikipedia and Elenz use for this plant; check each."
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
+value = "2024"
+source = ["ea-register", "bt-rangitaiki"]
+grade = "A"
+checked = "2026-11-19"
+note = "register 7 Mar 2024; BraveTrace 6 Mar 2024"
+
+[[facts.commissioned.alt]]
 value = "2024"
 source = "wp-list"
 grade = "B"
 checked = ""
 
-[facts.scheme]
-value = "Bay of Plenty"
-source = "elenz-register"
-grade = "C"
-checked = ""
-
 [facts.region]
 value = "Bay of Plenty"
-source = "elenz-register"
-grade = "C"
-checked = ""
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
 
 [facts.territorial_authority]
+value = "Whakatāne"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
 value = "Edgecumbe"
 source = "wp-list"
 grade = "B"
 checked = ""
+note = "a town, not a district"
 
 [facts.owner]
-value = ""
-source = "ea-register"
-grade = "C"
-checked = ""
-note = "the register's operator(s): Lodestone Solar Limited"
+value = "Lodestone Energy"
+source = ["ea-register", "bt-rangitaiki"]
+grade = "A"
+checked = "2026-11-19"
+note = "the register's operator: Lodestone Solar Limited; BraveTrace's registrant: Lodestone Energy (listed on the NZX since Oct 2026)"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Rangitaiki is Lodestone Energy's second solar farm, on the Rangitaiki Plains near Edgecumbe in the Bay of Plenty. About 59,600 bifacial panels track the sun, and the land is still farmed. It started generating in March 2024. Ngāti Awa gifted the name, after the plains and the river."
+source = ["bt-rangitaiki", "lodestone-solar-farms"]
+grade = "A"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 32.4
+basis = "the panels' combined peak rating, DC"
+source = "bt-rangitaiki"
+grade = "A"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 23.7
+basis = "inverter output, AC"
+source = "bt-rangitaiki"
+grade = "A"
+checked = "2026-11-19"

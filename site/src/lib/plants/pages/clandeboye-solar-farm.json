@@ -23,12 +23,108 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Clandeboye is Lodestone Energy's fifth solar farm and its first in the South Island, on 42 hectares of former dairy land north of Temuka in South Canterbury. About 45,000 bifacial panels feed Alpine Energy's network, the first large solar farm on it, while the landowner runs sheep on the site. Construction began in 2025 and the farm first generated in 2026.",
+  "refs": [
+   1,
+   2,
+   3
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2026",
+   "refs": [
+    4,
+    3
+   ],
+   "note": "first power reported in August 2026"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Canterbury",
+   "refs": [
+    5
+   ],
+   "note": "from the grid connection point (no station point yet); the sources place the farm near it, in the same region"
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Lodestone Energy",
+   "refs": [
+    4,
+    1
+   ],
+   "note": "the register's operator: Lodestone Solar Limited"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    2
+   ],
+   "value": "27.7 MW (the panels' combined peak rating, DC)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Temuka (TMK0331)",
+   "refs": [
+    6
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Clandeboye Solar Farm",
+   "publisher": "Lodestone Energy",
+   "url": "https://lodestoneenergy.co.nz/clandeboye/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "From Dairy to Solar: Lodestone breaks ground at South Island Clandeboye site (22 Sep 2025)",
+   "publisher": "Lodestone Energy",
+   "url": "https://lodestone.co.nz/lodestone-breaks-ground-at-clandeboye/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Lodestone powers up first South Island solar farm (7 Aug 2026)",
+   "publisher": "EVs & Beyond",
+   "url": "https://evsandbeyond.co.nz/lodestone-powers-up-first-south-island-solar-farm/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [],
   "owner_all": true,

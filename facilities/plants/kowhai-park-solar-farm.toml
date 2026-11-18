@@ -7,11 +7,17 @@ register = ["S015"]
 wikidata = "Q130271374"
 osm = ["relation/21223567"]
 reviewed = ""
+photo_leads = ["P039"]
 to_check = [
-  "No Wikipedia row: use the operator's pages.",
-  "Location is the grid connection, not the station.",
+  "Location: confirm the point sits on the solar farm against the LINZ aerial (separate task).",
+  "Capacity (decision): Elenz uses 160 MW (an override from the distributed generation registry). Contact gives a maximum of 150 MWac, and the EA register now lists 150 MW (row from 13 Aug 2026). Move plant_capacity.csv to 150?",
 ]
-notes = ["Added from Elenz's plant list (8 Nov 2026)."]
+notes = [
+  "Solar batch (19 Nov 2026): facts checked against Contact's project page, the EA register and network supply points table, and Stats NZ boundaries.",
+  "District and region from the station's point (the [location] value, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; no other district within 3 km of the station point (Selwyn District is within 3 km of the grid point at Islington).",
+  "Wikidata has a Commons image (Kōwhai Park Solar Farm PA01.jpg): photo lead P039; licence not yet read.",
+  "Wikipedia gives 168 MWp; Contact's page no longer gives a DC figure, so none is published.",
+]
 
 [location]
 value = [-43.495833, 172.510556]
@@ -25,31 +31,51 @@ value = [-43.53649, 172.51182]
 code = "ISL0661 ISLINGTON"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.other_names]
 value = ["Christchurch Airport Solar Farm"]
 source = "elenz-register"
 grade = "C"
 checked = ""
-note = "Names the EA register, Wikipedia and Elenz use for this plant; check each."
+note = "a description; no source yet uses it as a name"
+
+[facts.commissioned]
+value = "2026"
+source = "contact-kowhai-park"
+grade = "A"
+checked = "2026-11-19"
+note = "operational as of October 2026; the register's row starts 13 Aug 2026"
 
 [facts.region]
 value = "Canterbury"
-source = "elenz-register"
-grade = "C"
-checked = ""
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[facts.territorial_authority]
+value = "Christchurch"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
 
 [facts.owner]
-value = "Contact"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Contact Energy and Lightsource bp (joint venture)"
+source = ["ea-register", "contact-kowhai-park"]
+grade = "A"
+checked = "2026-11-19"
+note = "the register's operator: Contact Energy Limited; the joint venture formed in April 2022"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Kōwhai Park is a solar farm on the Christchurch Airport campus, built by Contact Energy and Lightsource bp in joint venture, and the largest solar farm in the South Island. About 300,000 panels cover some 230 hectares and are expected to produce around 275 GWh a year. It became operational in October 2026, Contact's first completed solar farm."
+source = "contact-kowhai-park"
+grade = "A"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 150.0
+basis = "Contact's maximum capacity, AC; also the EA register's nameplate"
+source = ["contact-kowhai-park", "ea-register"]
+grade = "A"
+checked = "2026-11-19"

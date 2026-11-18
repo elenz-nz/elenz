@@ -27,12 +27,106 @@
  "scheme": null,
  "metered": "It isn't in the EA's plant register yet, so we add it from its dispatched unit (ISL0661 KPS0).",
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Kōwhai Park is a solar farm on the Christchurch Airport campus, built by Contact Energy and Lightsource bp in joint venture, and the largest solar farm in the South Island. About 300,000 panels cover some 230 hectares and are expected to produce around 275 GWh a year. It became operational in October 2026, Contact's first completed solar farm.",
+  "refs": [
+   1
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2026",
+   "refs": [
+    1
+   ],
+   "note": "operational as of October 2026; the register's row starts 13 Aug 2026"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Canterbury",
+   "refs": [
+    2
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Christchurch",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Contact Energy and Lightsource bp (joint venture)",
+   "refs": [
+    4,
+    1
+   ],
+   "note": "the register's operator: Contact Energy Limited; the joint venture formed in April 2022"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1,
+    4
+   ],
+   "value": "150 MW (Contact's maximum capacity, AC; also the EA register's nameplate)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Islington (ISL0661)",
+   "refs": [
+    5
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Kōwhai Park Solar Farm",
+   "publisher": "Contact Energy",
+   "url": "https://contact.co.nz/aboutus/our-story/our-projects/kowhai-park",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {
