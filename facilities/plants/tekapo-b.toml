@@ -7,7 +7,13 @@ register = ["H059"]
 wikidata = "Q21037318"
 osm = ["way/270012792"]
 reviewed = ""
-notes = ["Added from Elenz's plant list (8 Nov 2026)."]
+to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+notes = [
+  "Added from Elenz's plant list (8 Nov 2026).",
+  "Hydro batch 3 (18 Nov 2026): checked with Tekapo A and Meridian's Waitaki stations; owner facts from Genesis's own releases, the EA register and network supply points table, the Gazette and Stats NZ boundaries. Genesis's Tekapo Power Scheme page could not be opened from our research tools, so the units rest on Wikipedia. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district. No other district or region is within 5 km.",
+  "The EA register spells the station Takapō B; the site keeps Tekapo B (design decision, 30 Oct 2026).",
+]
 
 [location]
 value = [-44.122806, 170.211972]
@@ -21,28 +27,69 @@ value = [-44.12516, 170.21175]
 code = "TKB2201 Tekapo B"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-18"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.other_names]
-value = ["Takapō B", "Tekapo B"]
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "Names the EA register, Wikipedia and Elenz use for this plant; check each."
+value = ["Takapō B"]
+source = "ea-register"
+grade = "A"
+checked = "2026-11-18"
+note = "the EA register's name for the station"
 
 [facts.commissioned]
+value = "1977"
+source = "genesis-tekapo-intake"
+grade = "A"
+checked = "2026-11-18"
+note = "built from 1970"
+
+[[facts.commissioned.alt]]
 value = "1977"
 source = "wp-list"
 grade = "B"
 checked = ""
 
+[[facts.commissioned.alt]]
+value = "1977"
+source = "ea-register"
+grade = "A"
+checked = ""
+note = "the register's start date, 1977-01-01: often a year, not the day"
+
+[facts.units]
+value = "2 Francis turbines, 80 MW each"
+source = "wp-tekapo-b"
+grade = "B"
+checked = "2026-11-18"
+
 [facts.scheme]
+value = "Tekapo Power Scheme"
+source = ["genesis-tekapo-intake", "meridian-hydro", "meridian-waitaki-scheme"]
+grade = "A"
+checked = "2026-11-18"
+note = "the second of the Waitaki hydro scheme's eight stations"
+
+[[facts.scheme.alt]]
 value = "Tekapo"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
+[facts.river]
+value = "Tekapo Canal, into Lake Pūkaki"
+source = "genesis-tekapo-intake"
+grade = "A"
+checked = "2026-11-18"
+note = "the canal brings water from Tekapo A, 25.5 km away on Lake Tekapo"
+
 [facts.region]
+value = "Canterbury"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.region.alt]]
 value = "Canterbury"
 source = "elenz-register"
 grade = "C"
@@ -50,20 +97,26 @@ checked = ""
 
 [facts.territorial_authority]
 value = "Mackenzie"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-18"
 
 [facts.owner]
-value = "Genesis"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Genesis Energy"
+source = ["ea-register", "genesis-tekapo-sale"]
+grade = "A"
+checked = "2026-11-18"
+note = "Genesis Energy Limited, named Genesis Power Limited when it bought the station from Meridian Energy on 1 June 2011"
+
+[facts.previous_owners]
+value = "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–99; Meridian Energy, 1999–2011"
+source = ["gazette-1995-140", "gazette-1999-37", "gazette-1999-170", "genesis-tekapo-sale"]
+grade = "A"
+checked = "2026-11-18"
+note = "ECNZ took over the Crown's generation on 1 April 1987; the split directions of March 1999 moved Tekapo B to the South Island SOE (now Meridian Energy) from 1 April 1999; Genesis Energy bought it from Meridian on 1 June 2011"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Tekapo B sits at the end of the 25.5 km Tekapo Canal on the edge of Lake Pūkaki, using water that has already passed through Tekapo A. It was built from 1970 and opened in 1977, before the Upper Waitaki works raised the lake around it; Genesis says it is the only New Zealand power station finished with water all around it. Its two 80 MW units make it the larger of the two Tekapo stations, which Genesis Energy bought from Meridian Energy in 2011."
+source = ["genesis-tekapo-intake", "wp-tekapo-b", "genesis-tekapo-sale"]
+grade = "B"
+checked = "2026-11-18"

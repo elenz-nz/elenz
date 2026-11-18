@@ -7,7 +7,12 @@ register = ["H052"]
 wikidata = "Q81826971"
 osm = ["way/165277560"]
 reviewed = ""
-notes = ["Added from Elenz's plant list (8 Nov 2026)."]
+to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+notes = [
+  "Added from Elenz's plant list (8 Nov 2026).",
+  "Hydro batch 3 (18 Nov 2026): facts checked against Meridian's station pages, the EA register and network supply points table, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district. Waimate District is about 50–100 m from the point, across the river (200–250 m from the grid connection point); recheck if the point moves.",
+]
 
 [location]
 value = [-44.656411, 170.354764]
@@ -21,21 +26,68 @@ value = [-44.65844, 170.35433]
 code = "AVI2201 AVIEMORE"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-18"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
+value = "1968"
+source = "meridian-aviemore"
+grade = "A"
+checked = "2026-11-18"
+note = "construction began in 1962"
+
+[[facts.commissioned.alt]]
 value = "1968"
 source = "wp-list"
 grade = "B"
 checked = ""
 
+[[facts.commissioned.alt]]
+value = "1968"
+source = "wd-q81826971"
+grade = "B"
+checked = ""
+note = "in service 1968"
+
+[[facts.commissioned.alt]]
+value = "1968"
+source = "ea-register"
+grade = "A"
+checked = ""
+note = "the register's start date, 1968-01-01: often a year, not the day"
+
+[facts.units]
+value = "4 units of 55 MW"
+source = "meridian-aviemore"
+grade = "A"
+checked = "2026-11-18"
+
 [facts.scheme]
+value = "Waitaki hydro scheme"
+source = "meridian-hydro"
+grade = "A"
+checked = "2026-11-18"
+note = "with Benmore and Waitaki, the mid-Waitaki scheme"
+
+[[facts.scheme.alt]]
 value = "Waitaki"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
+[facts.river]
+value = "Waitaki River (Lake Aviemore)"
+source = ["meridian-lake-levels", "wp-aviemore-dam"]
+grade = "B"
+checked = "2026-11-18"
+
 [facts.region]
+value = "Canterbury"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.region.alt]]
 value = "Canterbury"
 source = "elenz-register"
 grade = "C"
@@ -43,20 +95,26 @@ checked = ""
 
 [facts.territorial_authority]
 value = "Waitaki"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-18"
 
 [facts.owner]
-value = "Meridian"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Meridian Energy"
+source = ["ea-register", "meridian-hydro"]
+grade = "A"
+checked = "2026-11-18"
+note = "Meridian Energy Limited; the 1999 split directions call it Hydro Energy Limited"
+
+[facts.previous_owners]
+value = "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–99"
+source = ["gazette-1995-140", "gazette-1999-37", "gazette-1999-170"]
+grade = "A"
+checked = "2026-11-18"
+note = "ECNZ took over the Crown's generation on 1 April 1987; the split directions of March 1999 moved Aviemore to the South Island SOE, Hydro Energy Limited (now Meridian Energy), from 1 April 1999"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Aviemore was approved in October 1962 and fully running by 1968, completing the mid-Waitaki scheme with Benmore upstream and Waitaki below. Its dam is built in two parts, one of earth and one of concrete. The station's four 55 MW generators are physically the largest in New Zealand, with rotors almost 8 m across weighing 210 tonnes, and its 7 m penstocks are also the country's largest."
+source = ["meridian-aviemore", "meridian-waitaki-scheme"]
+grade = "A"
+checked = "2026-11-18"

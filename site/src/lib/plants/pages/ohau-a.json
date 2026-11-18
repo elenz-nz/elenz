@@ -23,12 +23,171 @@
  "scheme": "Waitaki",
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-18",
+ "about": {
+  "text": "Ōhau A, near Twizel in the Mackenzie Basin, stands where the canals from Lakes Ōhau and Pūkaki meet. It was the third station built for the Upper Waitaki scheme: work began in 1971 and its four 66 MW units were fully running by 1979. Building it meant digging about two million cubic metres of rock and gravel from the bank of the Ōhau River. Lake Ruataniwha, which feeds Ōhau B, has a national rowing course that began as the idea of the scheme's project engineer.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1979",
+   "refs": [
+    1
+   ],
+   "note": "construction began in 1971"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "4 units of 66 MW",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "scheme",
+   "label": "Scheme",
+   "value": "Waitaki hydro scheme",
+   "refs": [
+    3
+   ],
+   "note": "the third station built for the Upper Waitaki scheme"
+  },
+  {
+   "k": "river",
+   "label": "River or lake",
+   "value": "Lakes Ōhau and Pūkaki, by canal",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "the Pūkaki and Ōhau canals meet above the station; Lake Ruataniwha below it feeds Ōhau B"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Canterbury",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Mackenzie",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Meridian Energy",
+   "refs": [
+    6,
+    3
+   ],
+   "note": "Meridian Energy Limited; the 1999 split directions call it Hydro Energy Limited"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–99",
+   "refs": [
+    7,
+    8,
+    9
+   ],
+   "note": "ECNZ took over the Crown's generation on 1 April 1987; the split directions of March 1999 moved Ohau A to the South Island SOE, Hydro Energy Limited (now Meridian Energy), from 1 April 1999"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Ōhau A (OHA2201)",
+   "refs": [
+    10
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Ōhau A Power Station",
+   "publisher": "Meridian Energy",
+   "url": "https://www.meridianenergy.co.nz/power-stations/hydro/ohau-a",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 2,
+   "title": "Ōhau B hydro station",
+   "publisher": "Meridian Energy",
+   "url": "https://www.meridianenergy.co.nz/power-stations/hydro/ohau-b",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 3,
+   "title": "Hydro stations",
+   "publisher": "Meridian Energy",
+   "url": "https://www.meridianenergy.co.nz/power-stations/hydro",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 6,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 7,
+   "title": "New Zealand Gazette, 27 November 1995, issue 140: ECNZ information for disclosure",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1995/1995%20ISSUE%20140.pdf",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 8,
+   "title": "New Zealand Gazette, 25 March 1999, issue 37: Directions relating to split of Electricity Corporation of New Zealand Limited",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1999/1999%20ISSUE%20037.pdf",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 9,
+   "title": "New Zealand Gazette, 1999, issue 170: ECNZ financial statements",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1999/1999%20ISSUE%20170.pdf",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 10,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-18"
+  }
+ ],
  "related": {
   "owner": [
    {
