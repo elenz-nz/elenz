@@ -2,13 +2,15 @@
 // facts, and the workbook download. The Worker's key check is tested in worker/tests (here the static build is served
 // without the Worker).
 import { test, expect } from '@playwright/test';
+import { OK_ERRORS, WEBKIT_CANCELLED } from './errors.js';
 
 test.describe('plant research page', () => {
-  test('filters, a plant\'s facts and the download', async ({ page }) => {
+  test('filters, a plant\'s facts and the download', async ({ page, browserName }) => {
     const errors = [];
+    const ignore = browserName === 'webkit' ? WEBKIT_CANCELLED : OK_ERRORS;
     // the visit counters: on elenz.co.nz the Worker takes them out of this page; here they're stubbed, as in site.spec.js
     await page.route(/cloudflareinsights\.com|umami\.is/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
-    page.on('pageerror', (e) => { if (!/access control checks|ResizeObserver loop/.test(e.message)) errors.push(e.message); });
+    page.on('pageerror', (e) => { if (!ignore.test(e.message)) errors.push(e.message); });
     await page.goto('/plants/research?key=k123');
     await expect(page.getByRole('heading', { name: 'Plant research' })).toBeVisible();
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
@@ -16,8 +18,12 @@ test.describe('plant research page', () => {
     await expect(count).toContainText(/of \d+ plants/);
     const all = Number((await count.textContent()).match(/^(\d+)/)[1]);
 
-    await page.getByLabel('Needs').selectOption('grid');
-    await expect(page).toHaveURL(/\?key=k123&need=grid/);
+    // a choice made before the page has hydrated is lost (the page then reads its settings from the address), and a
+    // phone Safari on GitHub's runners can still be hydrating here (test report, 19 Nov 2026), so choose until it takes
+    await expect(async () => {
+      await page.getByLabel('Needs').selectOption('grid');
+      await expect(page).toHaveURL(/\?key=k123&need=grid/, { timeout: 2_000 });
+    }).toPass({ timeout: 20_000 });
     const some = Number((await count.textContent()).match(/^(\d+)/)[1]);
     expect(some).toBeGreaterThan(0);
     expect(some).toBeLessThan(all);

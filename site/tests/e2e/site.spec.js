@@ -4,15 +4,16 @@
 // Each test comes from a fault that reached the live site on 2 Nov 2026: charts hidden after a click between pages
 // (Chrome), then the desktop layout on phones. A refresh hid the first, so these go through the site's own links.
 import { test as base, expect } from '@playwright/test';
+import { OK_ERRORS, WEBKIT_CANCELLED } from './errors.js';
 
-// any uncaught error in the page fails the test. WebKit also reports cancelled requests as page errors ("... due to access
-// control checks"), such as a data file cut off by a refresh; those aren't faults. The analytics scripts are blocked so
-// the tests reach nothing outside the build.
+// any uncaught error in the page fails the test, but for the cancelled loads in ./errors.js, which aren't faults. The
+// analytics scripts are blocked so the tests reach nothing outside the build.
 const test = base.extend({
-  page: async ({ page }, use) => {
+  page: async ({ page, browserName }, use) => {
     const errors = [];
+    const ignore = browserName === 'webkit' ? WEBKIT_CANCELLED : OK_ERRORS;
     await page.route(/cloudflareinsights\.com|umami\.is/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
-    page.on('pageerror', (e) => { if (!/access control checks|ResizeObserver loop/.test(e.message)) errors.push(e.message); });
+    page.on('pageerror', (e) => { if (!ignore.test(e.message)) errors.push(e.message); });
     await use(page);
     expect(errors, 'uncaught errors in the page').toEqual([]);
   },

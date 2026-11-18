@@ -1,13 +1,23 @@
-# Checks on every push and pull request: the ingest code (syntax and undefined names, then a smoke test on a
-# committed one-hour sample of real dispatch data) and the website (type check, tests, build, Worker and browser tests).
+# Checks on every pull request and every push to main: the ingest code (syntax and undefined names, then a smoke test
+# on a committed one-hour sample of real dispatch data) and the website (type check, tests, build, Worker and browser
+# tests).
 #
 # The ingest and site jobs are required checks on main (ruleset "protect main"): a pull request merges, and so
 # deploys the site and the live job's ingest code, only once both pass. Renaming a job means updating the ruleset.
+#
+# Once per change (design decision, 19 Nov 2026): a branch's push used to run the checks a second time beside its pull
+# request's run, on the same commit, so a pull request waited on both and a flaky or stuck browser test in either held
+# it up. A newer push to a pull request cancels its run still going. A branch with no pull request gets no checks.
 name: Checks
 
 on:
   push:
+    branches: [main]
   pull_request:
+
+concurrency:
+  group: checks-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
