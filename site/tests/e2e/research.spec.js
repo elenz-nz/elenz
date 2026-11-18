@@ -6,7 +6,9 @@ import { test, expect } from '@playwright/test';
 test.describe('plant research page', () => {
   test('filters, a plant\'s facts and the download', async ({ page }) => {
     const errors = [];
-    page.on('pageerror', (e) => errors.push(e.message));
+    // the visit counters: on elenz.co.nz the Worker takes them out of this page; here they're stubbed, as in site.spec.js
+    await page.route(/cloudflareinsights\.com|umami\.is/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
+    page.on('pageerror', (e) => { if (!/access control checks|ResizeObserver loop/.test(e.message)) errors.push(e.message); });
     await page.goto('/plants/research?key=k123');
     await expect(page.getByRole('heading', { name: 'Plant research' })).toBeVisible();
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
