@@ -1,0 +1,63 @@
+{
+ "slug": "twin-rivers-solar-farm",
+ "name": "Twin Rivers Solar Farm",
+ "plant": "Twin Rivers Solar Farm",
+ "fuel": "solar",
+ "island": "NI",
+ "status": "operating",
+ "mw": 24.0,
+ "steps": [
+  {
+   "from": "2025-09-17",
+   "to": null,
+   "mw": 24.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": null,
+ "scheme": null,
+ "metered": null,
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [],
+  "owner_all": true,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "tauhei-solar-farm",
+    "name": "Tauhei Solar Farm"
+   },
+   {
+    "slug": "te-herenga-o-te-ra-solar-farm",
+    "name": "Te Herenga o Te Rā Solar Farm"
+   },
+   {
+    "slug": "omeheu-solar-farm",
+    "name": "Omeheu Solar Farm"
+   },
+   {
+    "slug": "kohira-solar-farm",
+    "name": "Kohirā Solar Farm"
+   },
+   {
+    "slug": "rangitaiki-solar-farm",
+    "name": "Rangitaiki Solar Farm"
+   },
+   {
+    "slug": "pamu-ra-ki-whitianga-solar-farm",
+    "name": "Pāmu Rā ki Whitianga Solar Farm"
+   }
+  ]
+ }
+}

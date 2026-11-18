@@ -1,0 +1,131 @@
+{
+ "slug": "rotokawa",
+ "name": "Rotokawa",
+ "plant": "Rotokawa",
+ "fuel": "geo",
+ "island": "NI",
+ "status": "operating",
+ "mw": 35.0,
+ "steps": [
+  {
+   "from": "1999-04-01",
+   "to": "2002-12-31",
+   "mw": 29.0,
+   "sources": [
+    {
+     "label": "Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+     "url": ""
+    },
+    {
+     "label": "Wikipedia, List of power stations in New Zealand",
+     "url": "https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand"
+    }
+   ]
+  },
+  {
+   "from": "2003-01-01",
+   "to": null,
+   "mw": 35.0,
+   "sources": [
+    {
+     "label": "Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+     "url": ""
+    },
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Mercury",
+ "scheme": null,
+ "metered": null,
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "arapuni",
+    "name": "Arapuni"
+   },
+   {
+    "slug": "aratiatia",
+    "name": "Aratiatia"
+   },
+   {
+    "slug": "atiamuri",
+    "name": "Ātiamuri"
+   },
+   {
+    "slug": "kaiwera-downs-stage-2",
+    "name": "Kaiwera Downs (Stage 2)"
+   },
+   {
+    "slug": "karapiro",
+    "name": "Karāpiro"
+   },
+   {
+    "slug": "kawerau",
+    "name": "Kawerau"
+   },
+   {
+    "slug": "maraetai",
+    "name": "Maraetai"
+   },
+   {
+    "slug": "nga-awa-purua",
+    "name": "Ngā Awa Pūrua"
+   },
+   {
+    "slug": "nga-tamariki",
+    "name": "Ngā Tamariki"
+   },
+   {
+    "slug": "ohakuri",
+    "name": "Ōhakuri"
+   },
+   {
+    "slug": "turitea-wind-farm",
+    "name": "Turitea Wind Farm"
+   },
+   {
+    "slug": "whakamaru",
+    "name": "Whakamaru"
+   }
+  ],
+  "owner_all": false,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "tauhara",
+    "name": "Tauhara"
+   },
+   {
+    "slug": "te-mihi",
+    "name": "Te Mihi"
+   },
+   {
+    "slug": "nga-awa-purua",
+    "name": "Ngā Awa Pūrua"
+   },
+   {
+    "slug": "wairakei",
+    "name": "Wairākei"
+   },
+   {
+    "slug": "nga-tamariki",
+    "name": "Ngā Tamariki"
+   },
+   {
+    "slug": "mokai",
+    "name": "Mōkai"
+   }
+  ]
+ }
+}

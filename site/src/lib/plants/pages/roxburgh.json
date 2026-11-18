@@ -1,0 +1,117 @@
+{
+ "slug": "roxburgh",
+ "name": "Roxburgh",
+ "plant": "Roxburgh",
+ "fuel": "hydro",
+ "island": "SI",
+ "status": "operating",
+ "mw": 328.0,
+ "steps": [
+  {
+   "from": null,
+   "to": null,
+   "mw": 328.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Contact",
+ "scheme": "Clutha",
+ "metered": "It generates onto two buses (ROX2201 and ROX1101), so it can be split by grid connection.",
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "clyde",
+    "name": "Clyde"
+   },
+   {
+    "slug": "glenbrook-ohurua-battery",
+    "name": "Glenbrook-Ohurua Battery"
+   },
+   {
+    "slug": "kowhai-park-solar-farm",
+    "name": "Kōwhai Park Solar Farm"
+   },
+   {
+    "slug": "matahina",
+    "name": "Matahina"
+   },
+   {
+    "slug": "poihipi",
+    "name": "Poihipi"
+   },
+   {
+    "slug": "stratford",
+    "name": "Stratford"
+   },
+   {
+    "slug": "tararua-wind-farm-3",
+    "name": "Tararua Wind Farm 3"
+   },
+   {
+    "slug": "tauhara",
+    "name": "Tauhara"
+   },
+   {
+    "slug": "te-mihi",
+    "name": "Te Mihi"
+   },
+   {
+    "slug": "waipori-2a-3-4",
+    "name": "Waipori (2A/3/4)"
+   },
+   {
+    "slug": "wairakei",
+    "name": "Wairākei"
+   },
+   {
+    "slug": "whirinaki",
+    "name": "Whirinaki"
+   }
+  ],
+  "owner_all": false,
+  "scheme": [
+   {
+    "slug": "clyde",
+    "name": "Clyde"
+   }
+  ],
+  "fuel": [
+   {
+    "slug": "manapouri",
+    "name": "Manapōuri"
+   },
+   {
+    "slug": "benmore",
+    "name": "Benmore"
+   },
+   {
+    "slug": "clyde",
+    "name": "Clyde"
+   },
+   {
+    "slug": "ohau-a",
+    "name": "Ōhau A"
+   },
+   {
+    "slug": "aviemore",
+    "name": "Aviemore"
+   },
+   {
+    "slug": "ohau-b",
+    "name": "Ōhau B"
+   }
+  ]
+ }
+}

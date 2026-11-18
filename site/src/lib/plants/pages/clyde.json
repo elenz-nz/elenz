@@ -1,0 +1,136 @@
+{
+ "slug": "clyde",
+ "name": "Clyde",
+ "plant": "Clyde",
+ "fuel": "hydro",
+ "island": "SI",
+ "status": "operating",
+ "mw": 464.0,
+ "steps": [
+  {
+   "from": null,
+   "to": "2015-10-31",
+   "mw": 432.0,
+   "sources": [
+    {
+     "label": "Wikipedia, Clyde Dam",
+     "url": "https://en.wikipedia.org/wiki/Clyde_Dam"
+    },
+    {
+     "label": "Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+     "url": ""
+    }
+   ]
+  },
+  {
+   "from": "2015-11-01",
+   "to": null,
+   "mw": 464.0,
+   "sources": [
+    {
+     "label": "Wikipedia, Clyde Dam",
+     "url": "https://en.wikipedia.org/wiki/Clyde_Dam"
+    },
+    {
+     "label": "Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Contact",
+ "scheme": "Clutha",
+ "metered": null,
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "glenbrook-ohurua-battery",
+    "name": "Glenbrook-Ohurua Battery"
+   },
+   {
+    "slug": "kowhai-park-solar-farm",
+    "name": "Kōwhai Park Solar Farm"
+   },
+   {
+    "slug": "matahina",
+    "name": "Matahina"
+   },
+   {
+    "slug": "poihipi",
+    "name": "Poihipi"
+   },
+   {
+    "slug": "roxburgh",
+    "name": "Roxburgh"
+   },
+   {
+    "slug": "stratford",
+    "name": "Stratford"
+   },
+   {
+    "slug": "tararua-wind-farm-3",
+    "name": "Tararua Wind Farm 3"
+   },
+   {
+    "slug": "tauhara",
+    "name": "Tauhara"
+   },
+   {
+    "slug": "te-mihi",
+    "name": "Te Mihi"
+   },
+   {
+    "slug": "waipori-2a-3-4",
+    "name": "Waipori (2A/3/4)"
+   },
+   {
+    "slug": "wairakei",
+    "name": "Wairākei"
+   },
+   {
+    "slug": "whirinaki",
+    "name": "Whirinaki"
+   }
+  ],
+  "owner_all": false,
+  "scheme": [
+   {
+    "slug": "roxburgh",
+    "name": "Roxburgh"
+   }
+  ],
+  "fuel": [
+   {
+    "slug": "manapouri",
+    "name": "Manapōuri"
+   },
+   {
+    "slug": "benmore",
+    "name": "Benmore"
+   },
+   {
+    "slug": "roxburgh",
+    "name": "Roxburgh"
+   },
+   {
+    "slug": "ohau-a",
+    "name": "Ōhau A"
+   },
+   {
+    "slug": "aviemore",
+    "name": "Aviemore"
+   },
+   {
+    "slug": "ohau-b",
+    "name": "Ōhau B"
+   }
+  ]
+ }
+}

@@ -1,0 +1,88 @@
+{
+ "slug": "lauriston-solar-farm",
+ "name": "Lauriston Solar Farm",
+ "plant": "Lauriston Solar Farm",
+ "fuel": "solar",
+ "island": "SI",
+ "status": "operating",
+ "mw": 47.0,
+ "steps": [
+  {
+   "from": "2025-02-01",
+   "to": null,
+   "mw": 47.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Genesis",
+ "scheme": null,
+ "metered": null,
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "huntly-5",
+    "name": "Huntly 5"
+   },
+   {
+    "slug": "huntly-6",
+    "name": "Huntly 6"
+   },
+   {
+    "slug": "huntly-battery",
+    "name": "Huntly Battery"
+   },
+   {
+    "slug": "huntly-rankines",
+    "name": "Huntly Rankines"
+   },
+   {
+    "slug": "rangipo",
+    "name": "Rangipo"
+   },
+   {
+    "slug": "tekapo-a",
+    "name": "Tekapo A"
+   },
+   {
+    "slug": "tekapo-b",
+    "name": "Tekapo B"
+   },
+   {
+    "slug": "tokaanu",
+    "name": "Tokaanu"
+   },
+   {
+    "slug": "waikaremoana",
+    "name": "Waikaremoana"
+   },
+   {
+    "slug": "waipipi",
+    "name": "Waipipi"
+   }
+  ],
+  "owner_all": true,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "kowhai-park-solar-farm",
+    "name": "Kōwhai Park Solar Farm"
+   },
+   {
+    "slug": "clandeboye-solar-farm",
+    "name": "Clandeboye Solar Farm"
+   }
+  ]
+ }
+}

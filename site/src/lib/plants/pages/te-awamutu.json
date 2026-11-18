@@ -1,0 +1,63 @@
+{
+ "slug": "te-awamutu",
+ "name": "Te Awamutu",
+ "plant": "Te Awamutu",
+ "fuel": "gas",
+ "island": "NI",
+ "status": "closed",
+ "mw": 54.0,
+ "steps": [
+  {
+   "from": null,
+   "to": "2007-05-31",
+   "mw": 54.0,
+   "sources": [
+    {
+     "label": "Wikipedia, List of power stations in New Zealand",
+     "url": "https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand"
+    }
+   ]
+  }
+ ],
+ "owner": null,
+ "scheme": null,
+ "metered": null,
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [],
+  "owner_all": true,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "huntly-5",
+    "name": "Huntly 5"
+   },
+   {
+    "slug": "stratford",
+    "name": "Stratford"
+   },
+   {
+    "slug": "junction-road",
+    "name": "Junction Road"
+   },
+   {
+    "slug": "mckee",
+    "name": "McKee"
+   },
+   {
+    "slug": "fonterra-dairy-whareroa",
+    "name": "Fonterra Dairy - Whareroa"
+   },
+   {
+    "slug": "huntly-6",
+    "name": "Huntly 6"
+   }
+  ]
+ }
+}

@@ -1,0 +1,104 @@
+{
+ "slug": "southdown-battery",
+ "name": "Southdown Battery",
+ "plant": "Southdown Battery",
+ "fuel": "batt",
+ "island": "NI",
+ "status": "closed",
+ "mw": 1.0,
+ "steps": [
+  {
+   "from": "2017-01-01",
+   "to": "2022-05-23",
+   "mw": 1.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Mercury",
+ "scheme": null,
+ "metered": "Generation_MD keeps the old station's code (SWN2201, \"southdown\", gas) for the battery after the station closed, so the metered history counts it as the battery from 2016. Its output there starts in September 2018. Before the dispatch data starts (10 Sep 2020) the history has its discharge only, not its charging.",
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "arapuni",
+    "name": "Arapuni"
+   },
+   {
+    "slug": "aratiatia",
+    "name": "Aratiatia"
+   },
+   {
+    "slug": "atiamuri",
+    "name": "Ātiamuri"
+   },
+   {
+    "slug": "kaiwera-downs-stage-2",
+    "name": "Kaiwera Downs (Stage 2)"
+   },
+   {
+    "slug": "karapiro",
+    "name": "Karāpiro"
+   },
+   {
+    "slug": "kawerau",
+    "name": "Kawerau"
+   },
+   {
+    "slug": "maraetai",
+    "name": "Maraetai"
+   },
+   {
+    "slug": "nga-awa-purua",
+    "name": "Ngā Awa Pūrua"
+   },
+   {
+    "slug": "nga-tamariki",
+    "name": "Ngā Tamariki"
+   },
+   {
+    "slug": "ohakuri",
+    "name": "Ōhakuri"
+   },
+   {
+    "slug": "turitea-wind-farm",
+    "name": "Turitea Wind Farm"
+   },
+   {
+    "slug": "whakamaru",
+    "name": "Whakamaru"
+   }
+  ],
+  "owner_all": false,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "glenbrook-ohurua-battery",
+    "name": "Glenbrook-Ohurua Battery"
+   },
+   {
+    "slug": "huntly-battery",
+    "name": "Huntly Battery"
+   },
+   {
+    "slug": "ruakaka-energy-park",
+    "name": "Ruakākā Energy Park"
+   },
+   {
+    "slug": "rotohiko",
+    "name": "Rotohiko"
+   }
+  ]
+ }
+}

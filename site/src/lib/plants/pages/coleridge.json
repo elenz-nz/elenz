@@ -1,0 +1,127 @@
+{
+ "slug": "coleridge",
+ "name": "Coleridge",
+ "plant": "Coleridge",
+ "fuel": "hydro",
+ "island": "SI",
+ "status": "operating",
+ "mw": 42.0,
+ "steps": [
+  {
+   "from": null,
+   "to": "2026-05-26",
+   "mw": 40.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  },
+  {
+   "from": "2026-05-27",
+   "to": null,
+   "mw": 42.0,
+   "sources": [
+    {
+     "label": "Elenz: dispatch output (tracker.json live week",
+     "url": ""
+    },
+    {
+     "label": "daily history)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Contact",
+ "scheme": null,
+ "metered": null,
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "clyde",
+    "name": "Clyde"
+   },
+   {
+    "slug": "glenbrook-ohurua-battery",
+    "name": "Glenbrook-Ohurua Battery"
+   },
+   {
+    "slug": "kowhai-park-solar-farm",
+    "name": "Kōwhai Park Solar Farm"
+   },
+   {
+    "slug": "matahina",
+    "name": "Matahina"
+   },
+   {
+    "slug": "roxburgh",
+    "name": "Roxburgh"
+   },
+   {
+    "slug": "stratford",
+    "name": "Stratford"
+   },
+   {
+    "slug": "tararua-wind-farm-3",
+    "name": "Tararua Wind Farm 3"
+   },
+   {
+    "slug": "tauhara",
+    "name": "Tauhara"
+   },
+   {
+    "slug": "te-mihi",
+    "name": "Te Mihi"
+   },
+   {
+    "slug": "waipori-2a-3-4",
+    "name": "Waipori (2A/3/4)"
+   },
+   {
+    "slug": "wairakei",
+    "name": "Wairākei"
+   },
+   {
+    "slug": "whirinaki",
+    "name": "Whirinaki"
+   }
+  ],
+  "owner_all": false,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "manapouri",
+    "name": "Manapōuri"
+   },
+   {
+    "slug": "benmore",
+    "name": "Benmore"
+   },
+   {
+    "slug": "clyde",
+    "name": "Clyde"
+   },
+   {
+    "slug": "roxburgh",
+    "name": "Roxburgh"
+   },
+   {
+    "slug": "ohau-a",
+    "name": "Ōhau A"
+   },
+   {
+    "slug": "aviemore",
+    "name": "Aviemore"
+   }
+  ]
+ }
+}

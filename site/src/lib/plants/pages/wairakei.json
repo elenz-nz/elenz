@@ -1,0 +1,142 @@
+{
+ "slug": "wairakei",
+ "name": "Wairākei",
+ "plant": "Wairakei",
+ "fuel": "geo",
+ "island": "NI",
+ "status": "operating",
+ "mw": 136.0,
+ "steps": [
+  {
+   "from": null,
+   "to": "2005-05-31",
+   "mw": 167.0,
+   "sources": [
+    {
+     "label": "Wikipedia, Wairakei Power Station",
+     "url": "https://en.wikipedia.org/wiki/Wairakei_Power_Station"
+    },
+    {
+     "label": "Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+     "url": ""
+    }
+   ]
+  },
+  {
+   "from": "2005-06-01",
+   "to": "2014-04-30",
+   "mw": 181.0,
+   "sources": [
+    {
+     "label": "Wikipedia, Wairakei Power Station",
+     "url": "https://en.wikipedia.org/wiki/Wairakei_Power_Station"
+    }
+   ]
+  },
+  {
+   "from": "2014-05-01",
+   "to": null,
+   "mw": 136.0,
+   "sources": [
+    {
+     "label": "Wikipedia, Te Mihi Power Station",
+     "url": "https://en.wikipedia.org/wiki/Te_Mihi_Power_Station"
+    },
+    {
+     "label": "Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Contact",
+ "scheme": null,
+ "metered": null,
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "clyde",
+    "name": "Clyde"
+   },
+   {
+    "slug": "glenbrook-ohurua-battery",
+    "name": "Glenbrook-Ohurua Battery"
+   },
+   {
+    "slug": "kowhai-park-solar-farm",
+    "name": "Kōwhai Park Solar Farm"
+   },
+   {
+    "slug": "matahina",
+    "name": "Matahina"
+   },
+   {
+    "slug": "poihipi",
+    "name": "Poihipi"
+   },
+   {
+    "slug": "roxburgh",
+    "name": "Roxburgh"
+   },
+   {
+    "slug": "stratford",
+    "name": "Stratford"
+   },
+   {
+    "slug": "tararua-wind-farm-3",
+    "name": "Tararua Wind Farm 3"
+   },
+   {
+    "slug": "tauhara",
+    "name": "Tauhara"
+   },
+   {
+    "slug": "te-mihi",
+    "name": "Te Mihi"
+   },
+   {
+    "slug": "waipori-2a-3-4",
+    "name": "Waipori (2A/3/4)"
+   },
+   {
+    "slug": "whirinaki",
+    "name": "Whirinaki"
+   }
+  ],
+  "owner_all": false,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "tauhara",
+    "name": "Tauhara"
+   },
+   {
+    "slug": "te-mihi",
+    "name": "Te Mihi"
+   },
+   {
+    "slug": "nga-awa-purua",
+    "name": "Ngā Awa Pūrua"
+   },
+   {
+    "slug": "nga-tamariki",
+    "name": "Ngā Tamariki"
+   },
+   {
+    "slug": "mokai",
+    "name": "Mōkai"
+   },
+   {
+    "slug": "kawerau",
+    "name": "Kawerau"
+   }
+  ]
+ }
+}

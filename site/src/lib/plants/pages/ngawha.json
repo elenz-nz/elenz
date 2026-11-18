@@ -1,0 +1,97 @@
+{
+ "slug": "ngawha",
+ "name": "Ngāwhā",
+ "plant": "Ngāwhā",
+ "fuel": "geo",
+ "island": "NI",
+ "status": "operating",
+ "mw": 57.0,
+ "steps": [
+  {
+   "from": "1999-04-01",
+   "to": "2008-07-31",
+   "mw": 10.0,
+   "sources": [
+    {
+     "label": "Wikipedia, List of power stations in New Zealand",
+     "url": "https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand"
+    },
+    {
+     "label": "Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+     "url": ""
+    }
+   ]
+  },
+  {
+   "from": "2008-08-01",
+   "to": "2020-11-30",
+   "mw": 25.0,
+   "sources": [
+    {
+     "label": "thinkgeoenergy.com",
+     "url": "https://www.thinkgeoenergy.com/top-energy-kicks-off-commercial-operation-of-32-mw-ngawha-3-geothermal-power-plant/"
+    },
+    {
+     "label": "Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+     "url": ""
+    }
+   ]
+  },
+  {
+   "from": "2020-12-01",
+   "to": null,
+   "mw": 57.0,
+   "sources": [
+    {
+     "label": "thinkgeoenergy.com",
+     "url": "https://www.thinkgeoenergy.com/top-energy-kicks-off-commercial-operation-of-32-mw-ngawha-3-geothermal-power-plant/"
+    },
+    {
+     "label": "Wikipedia, List of power stations in New Zealand",
+     "url": "https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand"
+    }
+   ]
+  }
+ ],
+ "owner": null,
+ "scheme": null,
+ "metered": "The metered history counts the whole station (Ngāwhā A and B). The dispatch data has only Ngāwhā B (OEC4), so in the live week and the weeks since the newest metered month, the rest of the station is filled in as a calculated estimate.",
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [],
+  "owner_all": true,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "tauhara",
+    "name": "Tauhara"
+   },
+   {
+    "slug": "te-mihi",
+    "name": "Te Mihi"
+   },
+   {
+    "slug": "nga-awa-purua",
+    "name": "Ngā Awa Pūrua"
+   },
+   {
+    "slug": "wairakei",
+    "name": "Wairākei"
+   },
+   {
+    "slug": "nga-tamariki",
+    "name": "Ngā Tamariki"
+   },
+   {
+    "slug": "mokai",
+    "name": "Mōkai"
+   }
+  ]
+ }
+}

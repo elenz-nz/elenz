@@ -1,0 +1,121 @@
+{
+ "slug": "wheao-and-flaxy",
+ "name": "Wheao and Flaxy",
+ "plant": "Wheao and Flaxy",
+ "fuel": "hydro",
+ "island": "NI",
+ "status": "operating",
+ "mw": 24.0,
+ "steps": [
+  {
+   "from": null,
+   "to": null,
+   "mw": 24.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Contact",
+ "scheme": "Rangitaiki",
+ "metered": null,
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "clyde",
+    "name": "Clyde"
+   },
+   {
+    "slug": "glenbrook-ohurua-battery",
+    "name": "Glenbrook-Ohurua Battery"
+   },
+   {
+    "slug": "kowhai-park-solar-farm",
+    "name": "Kōwhai Park Solar Farm"
+   },
+   {
+    "slug": "matahina",
+    "name": "Matahina"
+   },
+   {
+    "slug": "roxburgh",
+    "name": "Roxburgh"
+   },
+   {
+    "slug": "stratford",
+    "name": "Stratford"
+   },
+   {
+    "slug": "tararua-wind-farm-3",
+    "name": "Tararua Wind Farm 3"
+   },
+   {
+    "slug": "tauhara",
+    "name": "Tauhara"
+   },
+   {
+    "slug": "te-mihi",
+    "name": "Te Mihi"
+   },
+   {
+    "slug": "waipori-2a-3-4",
+    "name": "Waipori (2A/3/4)"
+   },
+   {
+    "slug": "wairakei",
+    "name": "Wairākei"
+   },
+   {
+    "slug": "whirinaki",
+    "name": "Whirinaki"
+   }
+  ],
+  "owner_all": false,
+  "scheme": [
+   {
+    "slug": "aniwhenua",
+    "name": "Aniwhenua"
+   },
+   {
+    "slug": "matahina",
+    "name": "Matahina"
+   }
+  ],
+  "fuel": [
+   {
+    "slug": "maraetai",
+    "name": "Maraetai"
+   },
+   {
+    "slug": "tokaanu",
+    "name": "Tokaanu"
+   },
+   {
+    "slug": "arapuni",
+    "name": "Arapuni"
+   },
+   {
+    "slug": "waikaremoana",
+    "name": "Waikaremoana"
+   },
+   {
+    "slug": "whakamaru",
+    "name": "Whakamaru"
+   },
+   {
+    "slug": "rangipo",
+    "name": "Rangipo"
+   }
+  ]
+ }
+}

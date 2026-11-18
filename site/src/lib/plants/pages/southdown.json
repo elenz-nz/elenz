@@ -1,0 +1,131 @@
+{
+ "slug": "southdown",
+ "name": "Southdown",
+ "plant": "Southdown",
+ "fuel": "gas",
+ "island": "NI",
+ "status": "closed",
+ "mw": 180.0,
+ "steps": [
+  {
+   "from": null,
+   "to": "2007-02-28",
+   "mw": 130.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    },
+    {
+     "label": "Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+     "url": ""
+    }
+   ]
+  },
+  {
+   "from": "2007-03-01",
+   "to": "2016-01-19",
+   "mw": 180.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    },
+    {
+     "label": "Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Mercury",
+ "scheme": null,
+ "metered": "The metered history has one meter for the original cogeneration plant and unit 5 together. Southdown closed in January 2016, before the dispatch data starts.",
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "arapuni",
+    "name": "Arapuni"
+   },
+   {
+    "slug": "aratiatia",
+    "name": "Aratiatia"
+   },
+   {
+    "slug": "atiamuri",
+    "name": "Ātiamuri"
+   },
+   {
+    "slug": "kaiwera-downs-stage-2",
+    "name": "Kaiwera Downs (Stage 2)"
+   },
+   {
+    "slug": "karapiro",
+    "name": "Karāpiro"
+   },
+   {
+    "slug": "kawerau",
+    "name": "Kawerau"
+   },
+   {
+    "slug": "maraetai",
+    "name": "Maraetai"
+   },
+   {
+    "slug": "nga-awa-purua",
+    "name": "Ngā Awa Pūrua"
+   },
+   {
+    "slug": "nga-tamariki",
+    "name": "Ngā Tamariki"
+   },
+   {
+    "slug": "ohakuri",
+    "name": "Ōhakuri"
+   },
+   {
+    "slug": "turitea-wind-farm",
+    "name": "Turitea Wind Farm"
+   },
+   {
+    "slug": "whakamaru",
+    "name": "Whakamaru"
+   }
+  ],
+  "owner_all": false,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "huntly-5",
+    "name": "Huntly 5"
+   },
+   {
+    "slug": "stratford",
+    "name": "Stratford"
+   },
+   {
+    "slug": "junction-road",
+    "name": "Junction Road"
+   },
+   {
+    "slug": "mckee",
+    "name": "McKee"
+   },
+   {
+    "slug": "fonterra-dairy-whareroa",
+    "name": "Fonterra Dairy - Whareroa"
+   },
+   {
+    "slug": "huntly-6",
+    "name": "Huntly 6"
+   }
+  ]
+ }
+}

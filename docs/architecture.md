@@ -10,6 +10,7 @@ How each part of the site, the data jobs and the Worker works, and the design de
 - [Dashboards](#dashboards)
 - [Articles](#articles)
 - [Records](#records)
+- [Plant pages](#plant-pages)
 - [Tracker](#tracker)
 - [About, Using Elenz and Data and methods](#about-using-elenz-and-data-and-methods)
 - [Other embedded generation on the site](#other-embedded-generation-on-the-site)
@@ -136,6 +137,41 @@ A provisional record leads (design decision, 12 Nov 2026; `headline(rec, prov)` 
 `hist/records-detail.json` (records.py `build_detail`, published with records.json when it changes; served by the Worker; loaded only by record pages via `loadDetail`): `bg`, each record's best by month (by year for year records) against `months`/`years`, the faint line behind `Progression` (`bgOf`; its hover follows the pointer's date and gives the record in force and that month's best; the month or year still running (design decision, 25 Oct 2026: a tracker-style wash barely showed on a single line, so a hatched band instead) sits in a hatched band over its whole span (the axis runs on to its end, `bgEnd`), its line dotted only up to the latest data, while the record (or provisional record) runs on to the right edge (test report, 9 Nov 2026: the record stands until broken, the figure so far is unfinished, so the unfinished line stops at now) (`band`; no label on the chart, design decision: the tooltip says "so far"; the key above the chart names the hatch), and the tooltip there says how long is left (`hoursToGo`, counted from the start of today like "Heading for a record"); month and year records' files leave the running period out, so the page passes its figure so far as `now`, from `periodNow`/`figureSoFar`, the same sums as "Heading for a record"); `period`, each period record's own series (`period_series`: half-hours for a day, hours for a week, days for a month, weeks for a year), charted on its page by `DayChart` with `periodAxis`'s ticks and the record as a dashed average line.
 
 `udem` (records.py VERSION 5, 25 Oct 2026): for the demand records, the same as `bg` for demand with embedded solar added back (half-hours from each month summary's `info.udem`, i.e. metered + roof; days to years as the period's average demand plus its average embedded solar from the existing day sums), drawn dashed above the faint line (`udemOf`, Progression's `info`/`infoNow`, its running period from `figureSoFar` of demand plus `roof_max`) and named in a key over the chart: information only, never a record (embedded solar is modelled; zero before Aug 2013). Design decision, 25 Oct 2026. Summaries made before VERSION 5 have no `info`, so the half-hour dashed line appears once the history job has remade them (it reads every month back from `hist/hh`, within `MONTH_LIMIT` a run). Until the history is complete the file isn't published and the page says the records are being worked out.
+
+## Plant pages
+
+`/plants/<slug>`, one page per plant file (wave 1: the 110 tracker plants), built from the design mock-up of 17 Nov 2026
+(`src/routes/plants/[slug]/`, `src/lib/plants/`). Hidden while `PLANTS_PUBLIC` is false (`registry.js`; design decision,
+17 Nov 2026): noindex, out of the sitemap, no menu item and no links in, so the prerender finds them through `entries`
+in `+page.server.ts`. Switching them on is one pull request: the flag, the sitemap, Plants in the menu between Records and
+Articles, and links from Now and the tracker drill-in.
+
+Three sources, so nothing waits on a site build. The static part is `src/lib/plants/pages/<slug>.json`, written by
+`ingest/plant_pages.py` from the plant files, `plant_capacity.csv` and `plants.json` and committed (`--check` in
+checks.yml fails if one is stale). Only checked facts reach it (`plant_files.published()`), numbered by their sources in
+page order, so nothing unchecked can reach the site; grades, alternatives, notes and OpenStreetMap IDs stay in the plant
+files. A server load (`+page.server.ts`) puts only the page's own file in its HTML. The live panel reads tracker.json
+(`live.js`: the newest interval, the live week as half-hours, Ngāwhā's and Teviot's fill as Now has it, marked est.) and
+polls it as Now does (`#lib/site/poll.js`). The history reads `/data/history/plants.json` (`ingest/plant_history.py`: each
+plant's MWh by month since 1997, about 140 KB, 65 KB gzipped) and works out years, the last 24 whole months and the latest
+12 in `history.js`, with capacity factors against the page's capacity steps over the NZ clock's hours (743 or 745 at the
+clock changes; the running month to the history's end). A month inside a plant's span with no figure is zero: a month
+file leaves out a plant with no output. A part year (hatched) has fewer than 12 whole months of the plant's data.
+
+The page: name, a line from Elenz's data (`subtitle()`), tags (fuel, island, owner, status, installed MW); "We're still
+checking this page's facts" until the plant file's `reviewed` is set; the photo (once `plant_images.csv` has a row; the
+file goes in `static/plants/`, and `plant_pages.py --check` fails if it's missing) beside the Now panel, which takes the
+full width without one; three figures (the latest 12 whole months and their capacity factor, the most in a calendar year
+in our records; for a closed plant its total, best year and last month); generation by year (Energy or Capacity factor,
+dashed lines where installed MW changed, the plant's metering note from `plants.json` under it); the last 24 whole months;
+installed capacity over time with each step's source in its ⓘ; the facts (installed MW and owner from Elenz's data, then
+the checked facts), the location (a dot on the Now map's outlines, `map.js`: NZTM2000 fitted to `nzmap.js`'s reference
+points) once checked; related pages (the scheme's other stations upstream first, the owner's other plants, at most 12,
+the largest of its fuel on its island); and the sources, numbered, ending with Elenz's own data. Charts are drawn to
+their card's width (`Bars.svelte`, `CapSteps.svelte`, `Spark.svelte`; each wrapper `min-width: 0`, or a chart holds
+its card at 720 px on a phone), and pointing at or tapping a bar puts its figures in the line above. A closed plant has
+no Now panel; a plant not generating yet (a pending capacity row) says so and shows no MW. Tests: `tests/plants.test.js`
+and the plant pages block in `tests/e2e/site.spec.js` (a small history file handed to the page, and the phone width).
 
 ## Tracker
 
@@ -380,6 +416,12 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   adds `oemb` to tracker.json (`live_block`: those typical days by month, which the site lays over the week, and `named`,
   each named plant's typical day less what the live data has, per interval). `analysis/` holds the development scripts and `analysis/README.md` the evidence
   behind every constant in them.
+- `plant_history.py`: `hist/plants.json`, each plant's MWh by month for the plant pages (plant-major: a first-month
+  index and one value a month per plant, a battery's charging beside its discharge; one letter a month for metered or
+  dispatch). The history job redoes the months it rebuilt and reads back up to `READS` (200) missing ones a run from
+  `hist/hh`, like tod.py; one KV write when it changed; served by the Worker as `/data/history/plants.json`.
+- `ingest/plant_pages.py` writes `site/src/lib/plants/pages/<slug>.json` (Plant pages, above) from the plant files; rerun
+  it and commit after editing a plant file, its sources or images, `plant_capacity.csv` or `plants.json`.
 - `ingest/plant_meta.py` writes `site/src/lib/tracker/plants.json` (plant → owner, hydro scheme, `aka`, `metered`) from the register and
   those tables. Rerun it and commit the JSON after refreshing the register or editing the tables.
 
@@ -498,7 +540,7 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   research register workbook (`analysis/plants_import.py`, run once); the files are the record from then on.
   `ingest/plant_files.py` reads them (`load()`), prints progress, and with `--check` (in checks.yml) fails if a tracker
   plant has no file or a file breaks the rules in `facilities/PLANTS.md`, which also says how to check a plant. Not in
-  the rebuild fingerprint.
+  the rebuild fingerprint. `ingest/plant_pages.py` turns them into the pages' data (Plant pages, above).
 - `facilities/NEXT_REBUILD.md`: changes waiting for the next full history rebuild (they touch fingerprinted files).
   Bundle them into one rebuild; never start one while another is running. While a build is being collected, its items
   go on the branch `next-rebuild` (a draft PR), not on `main`.

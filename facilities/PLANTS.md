@@ -102,6 +102,8 @@ as years.
 4. Location: confirm the point sits on the station (not the switchyard or grid connection) against the LINZ aerial
    imagery or Wikidata, then mark it checked.
 5. Empty `to_check`, set `reviewed` to today, and run `python3 ingest/plant_files.py --check`.
+6. Run `python3 ingest/plant_pages.py` and commit the page files it changes (`site/src/lib/plants/pages/`): the page
+   shows the checked facts on the batch's preview. Its `--check` (in checks.yml) fails while one is out of date.
 
 Research goes in batches by fuel, one pull request per batch, for the Elenz team to review on the preview.
 

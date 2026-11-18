@@ -1,0 +1,124 @@
+{
+ "slug": "tekapo-a",
+ "name": "Tekapo A",
+ "plant": "Tekapo A",
+ "fuel": "hydro",
+ "island": "SI",
+ "status": "operating",
+ "mw": 30.0,
+ "steps": [
+  {
+   "from": null,
+   "to": "2015-12-31",
+   "mw": 25.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  },
+  {
+   "from": "2016-01-01",
+   "to": null,
+   "mw": 30.0,
+   "sources": [
+    {
+     "label": "Wikipedia, List of power stations in New Zealand",
+     "url": "https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand"
+    },
+    {
+     "label": "Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Genesis",
+ "scheme": "Tekapo",
+ "metered": null,
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "huntly-5",
+    "name": "Huntly 5"
+   },
+   {
+    "slug": "huntly-6",
+    "name": "Huntly 6"
+   },
+   {
+    "slug": "huntly-battery",
+    "name": "Huntly Battery"
+   },
+   {
+    "slug": "huntly-rankines",
+    "name": "Huntly Rankines"
+   },
+   {
+    "slug": "lauriston-solar-farm",
+    "name": "Lauriston Solar Farm"
+   },
+   {
+    "slug": "rangipo",
+    "name": "Rangipo"
+   },
+   {
+    "slug": "tekapo-b",
+    "name": "Tekapo B"
+   },
+   {
+    "slug": "tokaanu",
+    "name": "Tokaanu"
+   },
+   {
+    "slug": "waikaremoana",
+    "name": "Waikaremoana"
+   },
+   {
+    "slug": "waipipi",
+    "name": "Waipipi"
+   }
+  ],
+  "owner_all": true,
+  "scheme": [
+   {
+    "slug": "tekapo-b",
+    "name": "Tekapo B"
+   }
+  ],
+  "fuel": [
+   {
+    "slug": "manapouri",
+    "name": "Manapōuri"
+   },
+   {
+    "slug": "benmore",
+    "name": "Benmore"
+   },
+   {
+    "slug": "clyde",
+    "name": "Clyde"
+   },
+   {
+    "slug": "roxburgh",
+    "name": "Roxburgh"
+   },
+   {
+    "slug": "ohau-a",
+    "name": "Ōhau A"
+   },
+   {
+    "slug": "aviemore",
+    "name": "Aviemore"
+   }
+  ]
+ }
+}

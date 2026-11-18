@@ -1,0 +1,104 @@
+{
+ "slug": "huntly-5",
+ "name": "Huntly 5",
+ "plant": "Huntly 5",
+ "fuel": "gas",
+ "island": "NI",
+ "status": "operating",
+ "mw": 403.0,
+ "steps": [
+  {
+   "from": "2007-02-01",
+   "to": null,
+   "mw": 403.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Genesis",
+ "scheme": null,
+ "metered": "September 2020: Generation_MD has no Huntly that month, so the history uses the grid meter for the whole station, split between units by their offers.",
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "huntly-6",
+    "name": "Huntly 6"
+   },
+   {
+    "slug": "huntly-battery",
+    "name": "Huntly Battery"
+   },
+   {
+    "slug": "huntly-rankines",
+    "name": "Huntly Rankines"
+   },
+   {
+    "slug": "lauriston-solar-farm",
+    "name": "Lauriston Solar Farm"
+   },
+   {
+    "slug": "rangipo",
+    "name": "Rangipo"
+   },
+   {
+    "slug": "tekapo-a",
+    "name": "Tekapo A"
+   },
+   {
+    "slug": "tekapo-b",
+    "name": "Tekapo B"
+   },
+   {
+    "slug": "tokaanu",
+    "name": "Tokaanu"
+   },
+   {
+    "slug": "waikaremoana",
+    "name": "Waikaremoana"
+   },
+   {
+    "slug": "waipipi",
+    "name": "Waipipi"
+   }
+  ],
+  "owner_all": true,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "stratford",
+    "name": "Stratford"
+   },
+   {
+    "slug": "junction-road",
+    "name": "Junction Road"
+   },
+   {
+    "slug": "mckee",
+    "name": "McKee"
+   },
+   {
+    "slug": "fonterra-dairy-whareroa",
+    "name": "Fonterra Dairy - Whareroa"
+   },
+   {
+    "slug": "huntly-6",
+    "name": "Huntly 6"
+   },
+   {
+    "slug": "kapuni",
+    "name": "Kapuni"
+   }
+  ]
+ }
+}

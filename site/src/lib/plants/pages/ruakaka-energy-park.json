@@ -1,0 +1,100 @@
+{
+ "slug": "ruakaka-energy-park",
+ "name": "Ruakākā Energy Park",
+ "plant": "Ruakākā Energy Park",
+ "fuel": "batt",
+ "island": "NI",
+ "status": "operating",
+ "mw": 100.0,
+ "steps": [
+  {
+   "from": "2024-10-15",
+   "to": null,
+   "mw": 100.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Meridian",
+ "scheme": null,
+ "metered": null,
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "aviemore",
+    "name": "Aviemore"
+   },
+   {
+    "slug": "benmore",
+    "name": "Benmore"
+   },
+   {
+    "slug": "harapaki",
+    "name": "Harapaki"
+   },
+   {
+    "slug": "manapouri",
+    "name": "Manapōuri"
+   },
+   {
+    "slug": "mill-creek",
+    "name": "Mill Creek"
+   },
+   {
+    "slug": "ohau-a",
+    "name": "Ōhau A"
+   },
+   {
+    "slug": "ohau-b",
+    "name": "Ōhau B"
+   },
+   {
+    "slug": "ohau-c",
+    "name": "Ōhau C"
+   },
+   {
+    "slug": "te-apiti",
+    "name": "Te Āpiti"
+   },
+   {
+    "slug": "te-uku",
+    "name": "Te Uku"
+   },
+   {
+    "slug": "waitaki",
+    "name": "Waitaki"
+   },
+   {
+    "slug": "west-wind",
+    "name": "West Wind"
+   }
+  ],
+  "owner_all": false,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "glenbrook-ohurua-battery",
+    "name": "Glenbrook-Ohurua Battery"
+   },
+   {
+    "slug": "huntly-battery",
+    "name": "Huntly Battery"
+   },
+   {
+    "slug": "rotohiko",
+    "name": "Rotohiko"
+   }
+  ]
+ }
+}

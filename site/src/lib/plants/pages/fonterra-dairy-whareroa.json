@@ -1,0 +1,80 @@
+{
+ "slug": "fonterra-dairy-whareroa",
+ "name": "Fonterra Dairy - Whareroa",
+ "plant": "Fonterra Dairy - Whareroa",
+ "fuel": "gas",
+ "island": "NI",
+ "status": "operating",
+ "mw": 68.0,
+ "steps": [
+  {
+   "from": "1998-09-01",
+   "to": null,
+   "mw": 68.0,
+   "sources": [
+    {
+     "label": "Wikipedia, List of power stations in New Zealand",
+     "url": "https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand"
+    },
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Nova",
+ "scheme": null,
+ "metered": "At this point metered generation is net of local load, about 50% of Whareroa's gross output. Where the embedded generation meter reads more, we add the difference.",
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "junction-road",
+    "name": "Junction Road"
+   },
+   {
+    "slug": "kapuni",
+    "name": "Kapuni"
+   },
+   {
+    "slug": "mckee",
+    "name": "McKee"
+   }
+  ],
+  "owner_all": true,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "huntly-5",
+    "name": "Huntly 5"
+   },
+   {
+    "slug": "stratford",
+    "name": "Stratford"
+   },
+   {
+    "slug": "junction-road",
+    "name": "Junction Road"
+   },
+   {
+    "slug": "mckee",
+    "name": "McKee"
+   },
+   {
+    "slug": "huntly-6",
+    "name": "Huntly 6"
+   },
+   {
+    "slug": "kapuni",
+    "name": "Kapuni"
+   }
+  ]
+ }
+}

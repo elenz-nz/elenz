@@ -1,0 +1,63 @@
+{
+ "slug": "kawerau-onepu",
+ "name": "Kawerau (Onepu)",
+ "plant": "Kawerau (Onepu)",
+ "fuel": "geo",
+ "island": "NI",
+ "status": "operating",
+ "mw": 53.0,
+ "steps": [
+  {
+   "from": "2013-01-01",
+   "to": null,
+   "mw": 53.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": null,
+ "scheme": null,
+ "metered": "This meter is a whole site's grid connection, not one generator's. It counts power going into the grid there, so it leaves out what the site uses itself and the power it takes from the grid at the same time. Generation_MD has no row for it before 2020, so 2013–2019 use the same figure from the grid meter (Grid_import). The dispatch data (the live week and the weeks since the newest metered month) reads higher.",
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [],
+  "owner_all": true,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "tauhara",
+    "name": "Tauhara"
+   },
+   {
+    "slug": "te-mihi",
+    "name": "Te Mihi"
+   },
+   {
+    "slug": "nga-awa-purua",
+    "name": "Ngā Awa Pūrua"
+   },
+   {
+    "slug": "wairakei",
+    "name": "Wairākei"
+   },
+   {
+    "slug": "nga-tamariki",
+    "name": "Ngā Tamariki"
+   },
+   {
+    "slug": "mokai",
+    "name": "Mōkai"
+   }
+  ]
+ }
+}

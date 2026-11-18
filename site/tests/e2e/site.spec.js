@@ -379,6 +379,38 @@ test('a site picked from far down the list goes back up to the chart (GRP-03)', 
   await expect.poll(() => page.evaluate(() => document.getElementById('charts').getBoundingClientRect().top)).toBeGreaterThan(-5);
 });
 
+// plant pages (hidden until PLANTS_PUBLIC): the history file comes from the history job, so the tests hand them a small
+// one (two years of Manapōuri, the newest month running)
+const PLANT_MONTHS = Array.from({ length: 34 }, (_, k) => `${2024 + Math.floor(k / 12)}-${String((k % 12) + 1).padStart(2, '0')}`);
+const PLANT_HISTORY = { v: 1, months: PLANT_MONTHS, src: 'm'.repeat(33) + 'd', end: Date.UTC(2026, 9, 15, 11), left: 0,
+  plants: { 'Manapōuri': { i: 0, g: PLANT_MONTHS.map((m, k) => 400000 + 5000 * k) } } };
+
+test.describe('plant pages', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/data/history/plants.json', (r) => r.fulfill({ contentType: 'application/json', body: JSON.stringify(PLANT_HISTORY) }));
+  });
+
+  test('a plant page shows its live output, history and capacity, and stays out of search', async ({ page }) => {
+    await page.goto('/plants/manapouri');
+    await expect(page.locator('h1')).toHaveText('Manapōuri');
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+    await expect(page.locator('.now .big .num')).toHaveText(/^\d/);
+    await expect(page.locator('section[aria-labelledby="hist-h"] svg > rect')).toHaveCount(3);   // 2024, 2025, 2026
+    await expect(page.locator('section[aria-labelledby="mon-h"] svg > rect')).toHaveCount(24);
+    await page.getByRole('button', { name: 'Capacity factor' }).click();
+    await expect(page.locator('section[aria-labelledby="hist-h"] .ctx')).toContainText('% of installed capacity');
+    await expect(page.locator('#capacity .box svg path')).toHaveCount(2);
+    await expect(page.locator('.stats')).toContainText('October 2025 to September 2026');   // October is still running
+  });
+
+  test('a closed plant has no live panel', async ({ page }) => {
+    await page.goto('/plants/otahuhu-b');
+    await expect(page.locator('.tags')).toContainText('Closed');
+    await expect(page.locator('section[aria-labelledby="hist-h"]')).toBeVisible();
+    await expect(page.locator('.now')).toHaveCount(0);
+  });
+});
+
 test.describe('on a phone', () => {
   test.beforeEach(({}, testInfo) => test.skip(!isPhone(testInfo), 'phones only'));
 
@@ -391,7 +423,7 @@ test.describe('on a phone', () => {
     });
   }
 
-  for (const path of ['/', '/now', '/tracker', '/tracker/prices', '/records', '/articles', '/about']) {
+  for (const path of ['/', '/now', '/tracker', '/tracker/prices', '/records', '/articles', '/about', '/plants/manapouri']) {
     test(`${path} fits the screen`, async ({ page }) => {
       await page.goto(path);
       await expect.poll(() => page.evaluate(sticksOut), { message: 'what sticks out past the side of the screen' }).toBe('');

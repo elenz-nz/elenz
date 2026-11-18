@@ -1,0 +1,100 @@
+{
+ "slug": "white-hill",
+ "name": "White Hill",
+ "plant": "White Hill",
+ "fuel": "wind",
+ "island": "SI",
+ "status": "operating",
+ "mw": 58.0,
+ "steps": [
+  {
+   "from": "2007-06-01",
+   "to": null,
+   "mw": 58.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Meridian",
+ "scheme": null,
+ "metered": null,
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "aviemore",
+    "name": "Aviemore"
+   },
+   {
+    "slug": "benmore",
+    "name": "Benmore"
+   },
+   {
+    "slug": "harapaki",
+    "name": "Harapaki"
+   },
+   {
+    "slug": "manapouri",
+    "name": "Manapōuri"
+   },
+   {
+    "slug": "ohau-a",
+    "name": "Ōhau A"
+   },
+   {
+    "slug": "ohau-b",
+    "name": "Ōhau B"
+   },
+   {
+    "slug": "ohau-c",
+    "name": "Ōhau C"
+   },
+   {
+    "slug": "ruakaka-energy-park",
+    "name": "Ruakākā Energy Park"
+   },
+   {
+    "slug": "te-apiti",
+    "name": "Te Āpiti"
+   },
+   {
+    "slug": "te-uku",
+    "name": "Te Uku"
+   },
+   {
+    "slug": "waitaki",
+    "name": "Waitaki"
+   },
+   {
+    "slug": "west-wind",
+    "name": "West Wind"
+   }
+  ],
+  "owner_all": false,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "kaiwera-downs-stage-2",
+    "name": "Kaiwera Downs (Stage 2)"
+   },
+   {
+    "slug": "kaiwera-downs-wind-farm",
+    "name": "Kaiwera Downs Wind Farm"
+   },
+   {
+    "slug": "mahinerangi-waipori-b",
+    "name": "Mahinerangi (Waipori B)"
+   }
+  ]
+ }
+}

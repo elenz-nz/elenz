@@ -1,0 +1,72 @@
+{
+ "slug": "aniwhenua",
+ "name": "Aniwhenua",
+ "plant": "Aniwhenua",
+ "fuel": "hydro",
+ "island": "NI",
+ "status": "operating",
+ "mw": 25.0,
+ "steps": [
+  {
+   "from": "1999-04-01",
+   "to": null,
+   "mw": 25.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": null,
+ "scheme": "Rangitaiki",
+ "metered": null,
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [],
+  "owner_all": true,
+  "scheme": [
+   {
+    "slug": "wheao-and-flaxy",
+    "name": "Wheao and Flaxy"
+   },
+   {
+    "slug": "matahina",
+    "name": "Matahina"
+   }
+  ],
+  "fuel": [
+   {
+    "slug": "maraetai",
+    "name": "Maraetai"
+   },
+   {
+    "slug": "tokaanu",
+    "name": "Tokaanu"
+   },
+   {
+    "slug": "arapuni",
+    "name": "Arapuni"
+   },
+   {
+    "slug": "waikaremoana",
+    "name": "Waikaremoana"
+   },
+   {
+    "slug": "whakamaru",
+    "name": "Whakamaru"
+   },
+   {
+    "slug": "rangipo",
+    "name": "Rangipo"
+   }
+  ]
+ }
+}

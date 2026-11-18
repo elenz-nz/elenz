@@ -1,0 +1,194 @@
+{
+ "slug": "stratford",
+ "name": "Stratford",
+ "plant": "Stratford",
+ "fuel": "gas",
+ "island": "NI",
+ "status": "operating",
+ "mw": 212.0,
+ "steps": [
+  {
+   "from": null,
+   "to": "1998-02-28",
+   "mw": 200.0,
+   "sources": [
+    {
+     "label": "Wikipedia, Stratford Power Station",
+     "url": "https://en.wikipedia.org/wiki/Stratford_Power_Station"
+    }
+   ]
+  },
+  {
+   "from": "1998-03-01",
+   "to": "2001-12-31",
+   "mw": 577.0,
+   "sources": [
+    {
+     "label": "Wikipedia, Stratford Power Station",
+     "url": "https://en.wikipedia.org/wiki/Stratford_Power_Station"
+    },
+    {
+     "label": "Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+     "url": ""
+    }
+   ]
+  },
+  {
+   "from": "2002-01-01",
+   "to": "2011-05-30",
+   "mw": 377.0,
+   "sources": [
+    {
+     "label": "Wikipedia, Stratford Power Station",
+     "url": "https://en.wikipedia.org/wiki/Stratford_Power_Station"
+    }
+   ]
+  },
+  {
+   "from": "2011-05-31",
+   "to": "2022-05-30",
+   "mw": 589.0,
+   "sources": [
+    {
+     "label": "Wikipedia, Stratford Power Station",
+     "url": "https://en.wikipedia.org/wiki/Stratford_Power_Station"
+    },
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  },
+  {
+   "from": "2022-05-31",
+   "to": "2023-10-30",
+   "mw": 572.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  },
+  {
+   "from": "2023-10-31",
+   "to": "2026-03-31",
+   "mw": 542.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    },
+    {
+     "label": "investing.com",
+     "url": "https://www.investing.com/news/company-news/contact-energy-fy26-slides-renewable-pivot-drives-31-ebitdaf-gain-93CH-4847780"
+    }
+   ]
+  },
+  {
+   "from": "2026-04-01",
+   "to": null,
+   "mw": 212.0,
+   "sources": [
+    {
+     "label": "investing.com",
+     "url": "https://www.investing.com/news/company-news/contact-energy-fy26-slides-renewable-pivot-drives-31-ebitdaf-gain-93CH-4847780"
+    },
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": "Contact",
+ "scheme": null,
+ "metered": "The metered history has one meter (SFD2201) for Taranaki Combined Cycle (1998–2025) and the two peakers (from 2011), and until 2001 the old Stratford gas turbines too, so it shows the station whole. The dispatch data (the live week and the weeks since the newest metered month) shows each unit.",
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [
+   {
+    "slug": "clyde",
+    "name": "Clyde"
+   },
+   {
+    "slug": "glenbrook-ohurua-battery",
+    "name": "Glenbrook-Ohurua Battery"
+   },
+   {
+    "slug": "kowhai-park-solar-farm",
+    "name": "Kōwhai Park Solar Farm"
+   },
+   {
+    "slug": "matahina",
+    "name": "Matahina"
+   },
+   {
+    "slug": "poihipi",
+    "name": "Poihipi"
+   },
+   {
+    "slug": "roxburgh",
+    "name": "Roxburgh"
+   },
+   {
+    "slug": "tararua-wind-farm-3",
+    "name": "Tararua Wind Farm 3"
+   },
+   {
+    "slug": "tauhara",
+    "name": "Tauhara"
+   },
+   {
+    "slug": "te-mihi",
+    "name": "Te Mihi"
+   },
+   {
+    "slug": "waipori-2a-3-4",
+    "name": "Waipori (2A/3/4)"
+   },
+   {
+    "slug": "wairakei",
+    "name": "Wairākei"
+   },
+   {
+    "slug": "whirinaki",
+    "name": "Whirinaki"
+   }
+  ],
+  "owner_all": false,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "huntly-5",
+    "name": "Huntly 5"
+   },
+   {
+    "slug": "junction-road",
+    "name": "Junction Road"
+   },
+   {
+    "slug": "mckee",
+    "name": "McKee"
+   },
+   {
+    "slug": "fonterra-dairy-whareroa",
+    "name": "Fonterra Dairy - Whareroa"
+   },
+   {
+    "slug": "huntly-6",
+    "name": "Huntly 6"
+   },
+   {
+    "slug": "kapuni",
+    "name": "Kapuni"
+   }
+  ]
+ }
+}

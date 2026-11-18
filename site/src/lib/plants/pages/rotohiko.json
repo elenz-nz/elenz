@@ -1,0 +1,51 @@
+{
+ "slug": "rotohiko",
+ "name": "Rotohiko",
+ "plant": "Rotohiko",
+ "fuel": "batt",
+ "island": "NI",
+ "status": "operating",
+ "mw": 35.0,
+ "steps": [
+  {
+   "from": "2023-11-23",
+   "to": null,
+   "mw": 35.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    }
+   ]
+  }
+ ],
+ "owner": null,
+ "scheme": null,
+ "metered": null,
+ "checking": true,
+ "checked": null,
+ "about": null,
+ "facts": [],
+ "location": null,
+ "image": null,
+ "sources": [],
+ "related": {
+  "owner": [],
+  "owner_all": true,
+  "scheme": [],
+  "fuel": [
+   {
+    "slug": "glenbrook-ohurua-battery",
+    "name": "Glenbrook-Ohurua Battery"
+   },
+   {
+    "slug": "huntly-battery",
+    "name": "Huntly Battery"
+   },
+   {
+    "slug": "ruakaka-energy-park",
+    "name": "Ruakākā Energy Park"
+   }
+  ]
+ }
+}
