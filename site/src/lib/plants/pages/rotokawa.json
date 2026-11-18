@@ -42,12 +42,133 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Rotokawa stands on the Rotokawa geothermal field, 14 km northeast of Taupō, beside the larger Ngā Awa Pūrua. It is a combined-cycle plant: a steam turbine runs first, and binary units then make more electricity from the heat that is left. It opened in 1997 at about 25 MW, gained a 6 MW turbine in 2003 and has been upgraded since, to 34 MW. Its steamfield is shared with the Tauhara North No. 2 Trust.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1997",
+   "refs": [
+    1,
+    2
+   ],
+   "note": "extended in 2003"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "5 units",
+   "refs": [
+    2
+   ],
+   "note": "one steam turbine and three binary units in 1997, a further binary unit in 2003 (NZGA)"
+  },
+  {
+   "k": "field",
+   "label": "Geothermal field",
+   "value": "Rotokawa geothermal field",
+   "refs": [
+    1,
+    2
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Waikato",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Taupō",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Mercury",
+   "refs": [
+    5,
+    1
+   ],
+   "note": "Mercury NZ Limited; Tauhara North No. 2 Trust has a stake in the steamfield"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1,
+    5
+   ],
+   "value": "34 MW (Mercury: installed capacity); 36 MW (The EA register's nameplate)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Wairakei (WRK0331)",
+   "refs": [
+    6
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Rotokawa Geothermal Station",
+   "publisher": "Mercury",
+   "url": "https://www.mercury.co.nz/about-us/renewable-energy/geothermal/rotokawa-geothermal-station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Rotokawa Geothermal System",
+   "publisher": "New Zealand Geothermal Association",
+   "url": "https://www.nzgeothermal.org.nz/geothermal-in-nz/nz-geothermal-fields/rotokawa/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

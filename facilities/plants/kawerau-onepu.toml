@@ -6,27 +6,37 @@ name = "Kawerau (Onepu)"
 register = ["T006"]
 reviewed = ""
 to_check = [
-  "No Wikipedia row: use the operator's pages.",
-  "Location is the grid connection, not the station.",
-  "Capacity: Identify plants, fuel and grid node separately.",
-  "Location: only the grid connection so far; find the station itself.",
-  "Owner: not one of the main owners; find the current owner.",
+  "Location: only the grid connection; this meter is a whole site's connection to the grid (see /methods/generation#onepu), so there may be no single station point to add.",
+  "Owner: not published. The register's operator for KAW0112 ONU0 is Oji Fibre Solutions (Norske Skog Tasman before 6 May 2023), but no public document found says which plant is behind the meter.",
+  "Commissioned: the register's 1966 is not published, for the same reason.",
+  "About: not written. If one is wanted, it should say no more than the Kawerau (Onepu) note on /methods/generation (a design decision for the Elenz team).",
 ]
-notes = ["The EA register's names for KAW0112 ONU0 include \"Kawerau Mill CoGen\" and \"Norske Skog CoGen\". Elenz shows the meter as Kawerau (Onepu), geothermal, from Jan 2013."]
+notes = [
+  "The EA register's names for KAW0112 ONU0 include \"Kawerau Mill CoGen\" and \"Norske Skog CoGen\". Elenz shows the meter as Kawerau (Onepu), geothermal, from Jan 2013.",
+  "Geothermal batch 1 (19 Nov 2026): checked against the EA register and network supply points table and Stats NZ boundaries only. Public wording for this meter follows the generation method page's note.",
+  "Region from the grid connection point in Stats NZ's 2025 region boundaries, 19 Nov 2026. No district published: the point is a substation, and Whakatāne District is 150–200 m from it.",
+]
 
 [grid_connection]
 value = [-38.07673, 176.72238]
 code = "KAW0112 Kawerau"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026 and the register's connection for ONU0"
 
 [facts.other_names]
+value = ["Carter Holt Harvey Energy Ltd CoGen", "Norske Skog CoGen"]
+source = "ea-register"
+grade = "A"
+checked = "2026-11-19"
+note = "the EA register's names for KAW0112 ONU0: Norske Skog CoGen to 5 May 2023, Carter Holt Harvey Energy Ltd CoGen since"
+
+[[facts.other_names.alt]]
 value = ["Norske Skog CoGen", "Carter Holt Harvey Energy Ltd CoGen", "Kawerau Mill CoGen"]
 source = "elenz-register"
 grade = "C"
 checked = ""
-note = "Names the EA register, Wikipedia and Elenz use for this plant; check each."
 
 [facts.commissioned]
 value = "1966"
@@ -42,6 +52,12 @@ grade = "C"
 checked = ""
 
 [facts.region]
+value = "Bay of Plenty"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
 value = "Bay of Plenty"
 source = "elenz-register"
 grade = "C"

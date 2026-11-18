@@ -27,12 +27,116 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "TG1 and TG2 were two small binary plants on the Kawerau geothermal field, which made electricity from hot geothermal water using the Ormat binary cycle. TG1, New Zealand's first binary plant, started in 1989 and TG2 followed in 1993. Both were air-cooled, so their output dipped in warm weather. TG1 was retired in 2014 and TG2 in 2017.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1989",
+   "refs": [
+    1
+   ],
+   "note": "TG1 in 1989, TG2 in 1993"
+  },
+  {
+   "k": "closed",
+   "label": "Closed",
+   "value": "2017",
+   "refs": [
+    1
+   ],
+   "note": "TG1 retired in 2014, TG2 in 2017"
+  },
+  {
+   "k": "field",
+   "label": "Geothermal field",
+   "value": "Kawerau geothermal field",
+   "refs": [
+    3,
+    2
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Bay of Plenty",
+   "refs": [
+    4
+   ],
+   "note": "from the grid connection point and Wikipedia's points; the whole field is in the Bay of Plenty (NZGA)"
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Nova Energy and Ngāti Tūwharetoa Geothermal Assets",
+   "refs": [
+    1
+   ],
+   "note": "the owners when they were retired"
+  },
+  {
+   "k": "stations",
+   "label": "Stations",
+   "refs": [
+    1
+   ],
+   "value": "TG1 (2.4 MW), TG2 (3.5 MW)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Kawerau (KAW0111)",
+   "refs": [
+    5
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Geothermal electricity generation activities report 2023",
+   "publisher": "New Zealand Geothermal Association",
+   "url": "https://www.nzgeothermal.org.nz/downloads/NZGA-Geothermal-Electricity-Generation-activities-report-2023.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Kawerau Power Station",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Kawerau_Power_Station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Kawerau Geothermal Field",
+   "publisher": "New Zealand Geothermal Association",
+   "url": "https://www.nzgeothermal.org.nz/geothermal-in-nz/nz-geothermal-fields/kawerau/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [],
   "owner_all": true,

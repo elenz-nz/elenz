@@ -8,11 +8,17 @@ wikidata = "Q7370574"
 osm = ["way/99428426"]
 reviewed = ""
 to_check = [
-  "MW: Elenz 35, Wikipedia 28.",
-  "MW: this row has 41, Elenz 35.",
-  "Capacity: Check current rating and unit configuration.",
+  "Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task).",
+  "Previous owners: whether anyone owned the station before Mighty River Power is not yet sourced.",
 ]
-notes = ["29 → 35 MW (Jan 2003)."]
+notes = [
+  "29 → 35 MW (Jan 2003).",
+  "Geothermal batch 1 (19 Nov 2026): facts checked against Mercury's station page, the EA register and network supply points table, the NZ Geothermal Association's Rotokawa page and 2023 generation report, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. No other district within 5 km.",
+  "Resolved: Capacity: Elenz uses 35 MW from 2003 (29 before). Mercury gives 34 MW installed (25 MW in 1997, a 6 MW turbine in 2003, 3 MW since); NZGA 24 + 10 = 34 MW and a 2 MW upgrade in 2021; the register 36 MW; Wikipedia's list 28. Mercury's and the register's figures are shown as ratings.",
+  "Steamfield: Mercury says Tauhara North No. 2 Trust holds 35% of it; NZGA describes the Rotokawa Joint Venture as 50:50. The station itself is Mercury's (Rotokawa Generation, NZGA).",
+  "Grid connection: WRK0331 is the Wairakei substation's 33 kV bus, the register's connection for Rotokawa; the point is about 8 km west of the station.",
+]
 
 [location]
 value = [-38.612222, 176.193611]
@@ -26,15 +32,43 @@ value = [-38.62571, 176.10546]
 code = "WRK0331 WAIRAKEI"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "the register's connection for Rotokawa; the point is Transpower's Wairakei substation"
 
 [facts.commissioned]
+value = "1997"
+source = ["mercury-rotokawa", "nzga-rotokawa"]
+grade = "A"
+checked = "2026-11-19"
+note = "extended in 2003"
+
+[[facts.commissioned.alt]]
+value = "1997"
+source = "ea-register"
+grade = "A"
+checked = ""
+note = "the register's start date, 1997-01-01: a year, not the day"
+
+[[facts.commissioned.alt]]
 value = "1997"
 source = "wp-list"
 grade = "B"
 checked = ""
 
+[facts.units]
+value = "5 units"
+source = "nzga-rotokawa"
+grade = "B"
+checked = "2026-11-19"
+note = "one steam turbine and three binary units in 1997, a further binary unit in 2003 (NZGA)"
+
 [facts.field]
+value = "Rotokawa geothermal field"
+source = ["mercury-rotokawa", "nzga-rotokawa"]
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.field.alt]]
 value = "Rotokawa field"
 source = "elenz-register"
 grade = "C"
@@ -42,11 +76,23 @@ checked = ""
 
 [facts.region]
 value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
+value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
+value = "Taupō"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.territorial_authority.alt]]
 value = "Taupō"
 source = "wp-list"
 grade = "B"
@@ -54,17 +100,30 @@ checked = ""
 
 [facts.owner]
 value = "Mercury"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+source = ["ea-register", "mercury-rotokawa"]
+grade = "A"
+checked = "2026-11-19"
+note = "Mercury NZ Limited; Tauhara North No. 2 Trust has a stake in the steamfield"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Rotokawa stands on the Rotokawa geothermal field, 14 km northeast of Taupō, beside the larger Ngā Awa Pūrua. It is a combined-cycle plant: a steam turbine runs first, and binary units then make more electricity from the heat that is left. It opened in 1997 at about 25 MW, gained a 6 MW turbine in 2003 and has been upgraded since, to 34 MW. Its steamfield is shared with the Tauhara North No. 2 Trust."
+source = ["mercury-rotokawa", "nzga-rotokawa"]
+grade = "B"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 34
+basis = "Mercury: installed capacity"
+source = "mercury-rotokawa"
+grade = "A"
+checked = "2026-11-19"
+
+[[ratings]]
+value = 36
+basis = "The EA register's nameplate"
+source = "ea-register"
+grade = "A"
+checked = "2026-11-19"
 
 [[ratings]]
 value = "28"

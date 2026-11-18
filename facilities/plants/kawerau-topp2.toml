@@ -5,11 +5,14 @@ plant = "Kawerau (TOPP2)"
 name = "Kawerau (TOPP2)"
 register = ["G018"]
 reviewed = ""
-to_check = [
-  "Capacity: Verify full name, owner and station identity.",
-  "Owner: not one of the main owners; find the current owner.",
+to_check = ["Location: the point is from Wikipedia's list; check it against the LINZ aerial (separate task). Whakatāne District lies 100–150 m away, so recheck the district if it moves."]
+notes = [
+  "49 MW from Dec 2025; shares a metered code with Te Ahi O Maui.",
+  "Geothermal batch 1 (19 Nov 2026): facts checked against Eastland Generation's geothermal page, the EA register and network supply points table, the NZ Geothermal Association's Kawerau page and Stats NZ boundaries.",
+  "District and region from the station's point (the [location] value, from Wikipedia's list, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026: Kawerau District, with Whakatāne District 100–150 m away.",
+  "Resolved (owner): Eastland Generation, the register's operator (Obayashi Corporation bought 50% of Eastland in April 2024). Ngāti Tūwharetoa Geothermal Assets supplies the geothermal heat and runs the wells and steamfield; the land is leased from Ngāti Tūwharetoa Holdings.",
+  "Dates: construction began in July 2023; Eastland says it came online in December 2025 (its page labels it commissioned 2026); the register's entry starts 2025-12-03.",
 ]
-notes = ["49 MW from Dec 2025; shares a metered code with Te Ahi O Maui."]
 
 [location]
 value = [-38.07472, 176.69972]
@@ -23,15 +26,36 @@ value = [-38.07673, 176.72238]
 code = "KAW2201 TOPP2"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "the register's connection for TOPP2, shared with Te Ahi O Maui since Sep 2025; the point is the Kawerau substation"
 
 [facts.commissioned]
+value = "2025"
+source = ["eastlandgeneration-renewable-generation-geotherm", "ea-register"]
+grade = "A"
+checked = "2026-11-19"
+note = "online in December 2025 after construction from July 2023"
+
+[[facts.commissioned.alt]]
+value = "2026"
+source = "eastlandgeneration-renewable-generation-geotherm"
+grade = "A"
+checked = ""
+note = "the label on Eastland's page; its text says online in December 2025"
+
+[[facts.commissioned.alt]]
 value = "2025"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.field]
+value = "Kawerau geothermal field"
+source = ["eastlandgeneration-renewable-generation-geotherm", "nzga-kawerau"]
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.field.alt]]
 value = "Kawerau field"
 source = "elenz-register"
 grade = "C"
@@ -39,26 +63,38 @@ checked = ""
 
 [facts.region]
 value = "Bay of Plenty"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+
+[[facts.region.alt]]
+value = "Bay of Plenty"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
+value = "Kawerau"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+note = "Whakatāne District is 100–150 m away"
+
+[[facts.territorial_authority.alt]]
 value = "|Kawerau"
 source = "wp-list"
 grade = "B"
 checked = ""
 
 [facts.owner]
-value = ""
-source = "ea-register"
-grade = "C"
-checked = ""
-note = "the register's operator(s): Eastland Generation Limited"
+value = "Eastland Generation"
+source = ["ea-register", "eastlandgeneration-renewable-generation-geotherm"]
+grade = "A"
+checked = "2026-11-19"
+note = "Eastland Generation Limited, half-owned by Obayashi Corporation since April 2024"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "TOPP2 is Eastland Generation's newest geothermal power station on the Kawerau geothermal field and, at 49 MW, twice the size of its Te Ahi O Māui station. Built from July 2023, it came online in December 2025. It is a partnership with Ngāti Tūwharetoa Geothermal Assets, which supplies the geothermal heat and runs the wells and steamfield, and the land is leased from Ngāti Tūwharetoa Holdings."
+source = "eastlandgeneration-renewable-generation-geotherm"
+grade = "A"
+checked = "2026-11-19"

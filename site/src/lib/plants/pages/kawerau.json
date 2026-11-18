@@ -23,12 +23,159 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Kawerau was New Zealand's biggest geothermal project in 20 years when Mighty River Power, now Mercury, opened it in 2008, on a field that has supplied steam to the town's mills since 1957. Fluid from wells about 2 km away is separated twice, giving high- and low-pressure steam for a single turbine, and the used fluid is injected back into the ground north of the field. Built for 90 MW, it soon proved able to run at about 100 MW, and Mercury now gives its installed capacity as 107 MW.",
+  "refs": [
+   1,
+   2,
+   3,
+   4
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2008",
+   "refs": [
+    3,
+    1
+   ],
+   "note": "operating from August 2008 and officially opened in late November 2008; construction began in January 2007"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "1 unit",
+   "refs": [
+    3,
+    1
+   ],
+   "note": "one Fuji Electric single-shaft, dual-flash steam turbine"
+  },
+  {
+   "k": "field",
+   "label": "Geothermal field",
+   "value": "Kawerau geothermal field",
+   "refs": [
+    5,
+    2
+   ],
+   "note": "shared with other operators; Ngāti Tūwharetoa Geothermal Assets owns and runs part of the steamfield and supplies steam to the station (NZGA, 2023)"
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Bay of Plenty",
+   "refs": [
+    6
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Kawerau",
+   "refs": [
+    7
+   ],
+   "note": "Whakatāne District is 200–250 m away"
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Mercury",
+   "refs": [
+    8,
+    3
+   ],
+   "note": "Mercury NZ Limited, which built it as Mighty River Power"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    3,
+    8
+   ],
+   "value": "109 MW (The EA register's nameplate); 107 MW (Mercury: total installed capacity)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Kawerau Geothermal (KAW1101)",
+   "refs": [
+    9
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "New Zealand Geothermal Station Opens (1 January 2009)",
+   "publisher": "POWER Magazine",
+   "url": "https://www.powermag.com/new-zealand-geothermal-station-opens/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Kawerau Geothermal Field",
+   "publisher": "New Zealand Geothermal Association",
+   "url": "https://www.nzgeothermal.org.nz/geothermal-in-nz/nz-geothermal-fields/kawerau/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Kawerau Geothermal Station",
+   "publisher": "Mercury",
+   "url": "https://www.mercury.co.nz/about-us/renewable-energy/geothermal/kawerau-geothermal-station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "Kawerau Power Station",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Kawerau_Power_Station",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Geothermal generation",
+   "publisher": "Mercury",
+   "url": "https://www.mercury.co.nz/about-us/renewable-energy/geothermal",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 8,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 9,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [
    {

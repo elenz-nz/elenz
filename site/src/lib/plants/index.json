@@ -569,7 +569,7 @@
    "status": "operating",
    "mw": 109.0,
    "owner": "Mercury",
-   "commissioned": null,
+   "commissioned": "2008",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -607,7 +607,7 @@
    "status": "operating",
    "mw": 27.0,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "2018",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -626,7 +626,7 @@
    "status": "closed",
    "mw": 6.0,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "1989",
    "closed": "2008",
    "reviewed": false,
    "pt": {
@@ -645,7 +645,7 @@
    "status": "operating",
    "mw": 49.0,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "2025",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -892,7 +892,7 @@
    "status": "operating",
    "mw": 112.0,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "2000",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -930,7 +930,7 @@
    "status": "operating",
    "mw": 148.0,
    "owner": "Mercury",
-   "commissioned": null,
+   "commissioned": "2010",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -949,7 +949,7 @@
    "status": "operating",
    "mw": 132.0,
    "owner": "Mercury",
-   "commissioned": null,
+   "commissioned": "2013",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -968,13 +968,13 @@
    "status": "operating",
    "mw": 57.0,
    "owner": "Other generators",
-   "commissioned": null,
+   "commissioned": "1998",
    "closed": null,
    "reviewed": false,
    "pt": {
-    "lat": -35.39616,
-    "lon": 173.81063,
-    "basis": "grid connection",
+    "lat": -35.4175,
+    "lon": 173.85194,
+    "basis": "station",
     "checked": false
    }
   },
@@ -1329,7 +1329,7 @@
    "status": "operating",
    "mw": 35.0,
    "owner": "Mercury",
-   "commissioned": null,
+   "commissioned": "1997",
    "closed": null,
    "reviewed": false,
    "pt": {
