@@ -103,6 +103,11 @@ as years.
 3. Fill what's missing: owner and previous owners (with the year of each change), units, closing date, and the
    `about` text (2 to 4 plain sentences in our own words, written from the cited sources; short quotes only where the
    exact words matter).
+   Region and district: test the station's point against Stats NZ's boundaries (`statsnz-regc-2025`,
+   `statsnz-ta-2026`, ArcGIS feature services that answer a point query) and cross-check with the grid connection point;
+   note in `notes` when another district is within a few hundred metres. Previous owners of the former state stations:
+   the New Zealand Gazette's ECNZ notices (`gazette-1995-140` for 1 April 1987, `gazette-1999-170` for the 1 April 1999
+   split to Mighty River Power, Genesis Energy and Meridian Energy).
 4. Location: confirm the point sits on the station (not the switchyard or grid connection) against the LINZ aerial
    imagery or Wikidata, then mark it checked.
 5. Empty `to_check`, set `reviewed` to today, and run `python3 ingest/plant_files.py --check`.

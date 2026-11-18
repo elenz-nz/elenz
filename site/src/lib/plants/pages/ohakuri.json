@@ -23,12 +23,176 @@
  "scheme": "Waikato",
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-18",
+ "about": {
+  "text": "Ōhakuri opened in 1961 behind an earth dam with concrete intake and spillway structures. Its lake, about 12 km², is the largest on the Waikato River; filling it drowned about two thirds of the Ōrākei Kōrako geothermal area. The four Francis turbines were replaced between 2011 and 2014.",
+  "refs": [
+   1,
+   2
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "1961",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "4 Francis turbines",
+   "refs": [
+    1
+   ],
+   "note": "replaced in 2011–14"
+  },
+  {
+   "k": "scheme",
+   "label": "Scheme",
+   "value": "Waikato Hydro System",
+   "refs": [
+    3
+   ]
+  },
+  {
+   "k": "river",
+   "label": "River or lake",
+   "value": "Waikato River (Lake Ōhakuri)",
+   "refs": [
+    1
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Waikato",
+   "refs": [
+    4
+   ]
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Taupō",
+   "refs": [
+    5
+   ]
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Mercury",
+   "refs": [
+    6,
+    3,
+    7
+   ],
+   "note": "Mercury NZ Limited, named Mighty River Power from 1999 until 29 July 2016"
+  },
+  {
+   "k": "previous_owners",
+   "label": "Previous owners",
+   "value": "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–99",
+   "refs": [
+    8,
+    9
+   ],
+   "note": "ECNZ took over the Crown's generation on 1 April 1987 and passed the Waikato stations to Mighty River Power (now Mercury) on 1 April 1999"
+  },
+  {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    1
+   ],
+   "value": "112 MW (Mercury's total capacity)"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Ōhakuri (OHK2201)",
+   "refs": [
+    10
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Ōhākurī Hydro Station",
+   "publisher": "Mercury",
+   "url": "https://www.mercury.co.nz/about-us/renewable-energy/hydro-generation/ohakuri-hydro-station",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 2,
+   "title": "Ōhakuri Dam",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/%C5%8Chakuri_Dam",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 3,
+   "title": "Hydro generation: the Waikato Hydro System",
+   "publisher": "Mercury",
+   "url": "https://www.mercury.co.nz/About/Renewable-Energy/Hydro-Generation",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 6,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 7,
+   "title": "Mercury NZ Limited (MCY): company page",
+   "publisher": "NZX",
+   "url": "https://nzx.com/companies/MCY/analysis",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 8,
+   "title": "New Zealand Gazette, 27 November 1995, issue 140: ECNZ information for disclosure",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1995/1995%20ISSUE%20140.pdf",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 9,
+   "title": "New Zealand Gazette, 1999, issue 170: ECNZ financial statements",
+   "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
+   "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1999/1999%20ISSUE%20170.pdf",
+   "opened": "2026-11-18"
+  },
+  {
+   "n": 10,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-18"
+  }
+ ],
  "related": {
   "owner": [
    {

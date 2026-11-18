@@ -8,8 +8,13 @@ wikidata = "Q11988091"
 osm = ["relation/8056852"]
 reviewed = ""
 photo_leads = ["P001"]
-to_check = ["Capacity: Verify current net/gross rating and unit configuration."]
-notes = ["Elenz shows Maraetai I and II as one plant, 360 MW."]
+to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+notes = [
+  "Elenz shows Maraetai I and II as one plant, 360 MW.",
+  "Hydro batch 1 (18 Nov 2026): facts checked against Mercury's station pages, the EA register, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district. South Waikato District is about 150–300 m away across the river.",
+  "Resolved: Capacity: Mercury gives 180 MW for each powerhouse (360 MW, as the register); 5 Francis turbines each.",
+]
 
 [location]
 value = [-38.3525, 175.743889]
@@ -23,9 +28,16 @@ value = [-38.35274, 175.74427]
 code = "MTI2201 MARAETAI"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-18"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
+value = "Maraetai I 1952; Maraetai II 1970"
+source = "mercury-maraetai"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.commissioned.alt]]
 value = "Maraetai I 1954; Maraetai II 1971"
 source = "wp-list"
 grade = "B"
@@ -45,19 +57,49 @@ grade = "A"
 checked = ""
 note = "the register's start date, 1971-01-01: often a year, not the day"
 
+[facts.units]
+value = "10 Francis turbines, 5 in each powerhouse"
+source = "mercury-maraetai"
+grade = "A"
+checked = "2026-11-18"
+
 [facts.scheme]
+value = "Waikato Hydro System"
+source = "mercury-hydro"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.scheme.alt]]
 value = "Waikato hydro scheme"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
+[facts.river]
+value = "Waikato River (Lake Maraetai)"
+source = ["mercury-maraetai", "wp-maraetai"]
+grade = "B"
+checked = "2026-11-18"
+
 [facts.region]
+value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.region.alt]]
 value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
+value = "Taupō"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.territorial_authority.alt]]
 value = "South Waikato / Taupō"
 source = "wp-list"
 grade = "B"
@@ -65,33 +107,34 @@ checked = ""
 
 [facts.owner]
 value = "Mercury"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+source = ["ea-register", "mercury-hydro", "nzx-mcy"]
+grade = "A"
+checked = "2026-11-18"
+note = "Mercury NZ Limited, named Mighty River Power from 1999 until 29 July 2016"
+
+[facts.previous_owners]
+value = "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–99"
+source = ["gazette-1995-140", "gazette-1999-170"]
+grade = "A"
+checked = "2026-11-18"
+note = "ECNZ took over the Crown's generation on 1 April 1987 and passed the Waikato stations to Mighty River Power (now Mercury) on 1 April 1999"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
-
-[[ratings]]
-value = "Maraetai I 252; Maraetai II 108"
-basis = "Wikipedia (basis not stated)"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = "Maraetai is two powerhouses, Maraetai I and II, fed by one concrete arch dam and run as one station; together they have the largest capacity in the Waikato Hydro System. Maraetai I opened in 1952. Work on Maraetai II began in 1959, stopped in 1961 when the government put the Cook Strait cable first, and finished in 1970, the last of the Waikato stations to be built."
+source = "mercury-maraetai"
+grade = "A"
+checked = "2026-11-18"
 
 [[stations]]
 value = "Maraetai I"
-source = "wp-list"
-grade = "B"
-checked = ""
+mw = 180
+source = "mercury-maraetai"
+grade = "A"
+checked = "2026-11-18"
 
 [[stations]]
 value = "Maraetai II"
-source = "wp-list"
-grade = "B"
-checked = ""
+mw = 180
+source = "mercury-maraetai"
+grade = "A"
+checked = "2026-11-18"

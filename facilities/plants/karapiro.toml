@@ -7,8 +7,13 @@ register = ["H053"]
 wikidata = "Q6368582"
 osm = ["relation/10987561"]
 reviewed = ""
-to_check = ["MW: Elenz 112.5, Wikipedia 90."]
-notes = ["Added from Elenz's plant list (8 Nov 2026)."]
+to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+notes = [
+  "Hydro batch 1 (18 Nov 2026): facts checked against Mercury's station pages, the EA register, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district.",
+  "Resolved: MW: Elenz 112.5, Wikipedia 90 (Wikipedia predates the 2025 upgrade; Mercury gives 112.5).",
+  "Dropped the Wikipedia rating of 90 MW: it predates the 2025 upgrade.",
+]
 
 [location]
 value = [-37.923889, 175.539167]
@@ -22,9 +27,17 @@ value = [-37.92435, 175.53746]
 code = "KPO1101 KARAPIRO"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-18"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
+value = "1947"
+source = "mercury-karapiro"
+grade = "A"
+checked = "2026-11-18"
+note = "the three units were commissioned in 1947–48"
+
+[[facts.commissioned.alt]]
 value = "1948"
 source = "wp-list"
 grade = "B"
@@ -37,19 +50,50 @@ grade = "B"
 checked = ""
 note = "in service 1947-04-01"
 
+[facts.units]
+value = "3 Kaplan turbines, 37.5 MW each"
+source = "mercury-karapiro"
+grade = "A"
+checked = "2026-11-18"
+note = "replaced in an upgrade completed in September 2025"
+
 [facts.scheme]
+value = "Waikato Hydro System"
+source = "mercury-hydro"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.scheme.alt]]
 value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
+[facts.river]
+value = "Waikato River (Lake Karāpiro)"
+source = "mercury-karapiro"
+grade = "A"
+checked = "2026-11-18"
+
 [facts.region]
+value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.region.alt]]
 value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
+value = "Waipā"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.territorial_authority.alt]]
 value = "Waipa"
 source = "wp-list"
 grade = "B"
@@ -57,21 +101,20 @@ checked = ""
 
 [facts.owner]
 value = "Mercury"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+source = ["ea-register", "mercury-hydro", "nzx-mcy"]
+grade = "A"
+checked = "2026-11-18"
+note = "Mercury NZ Limited, named Mighty River Power from 1999 until 29 July 2016"
+
+[facts.previous_owners]
+value = "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–99"
+source = ["gazette-1995-140", "gazette-1999-170"]
+grade = "A"
+checked = "2026-11-18"
+note = "ECNZ took over the Crown's generation on 1 April 1987 and passed the Waikato stations to Mighty River Power (now Mercury) on 1 April 1999"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
-
-[[ratings]]
-value = "90"
-basis = "Wikipedia (basis not stated)"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = "Karāpiro is the last station in the Waikato Hydro System, 188 km downstream of Lake Taupō near Cambridge, and its lake is home to New Zealand rowing. Building began in 1940 but was slowed by the Second World War, and its three Kaplan turbines came into service in 1947 and 1948. A $90 million upgrade, finished in September 2025, replaced all three units and raised the station from 96 MW to 112.5 MW."
+source = "mercury-karapiro"
+grade = "A"
+checked = "2026-11-18"

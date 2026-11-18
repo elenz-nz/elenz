@@ -7,7 +7,11 @@ register = ["H051"]
 wikidata = "Q4815757"
 osm = ["relation/19962528"]
 reviewed = ""
-notes = ["Added from Elenz's plant list (8 Nov 2026)."]
+to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+notes = [
+  "Hydro batch 1 (18 Nov 2026): facts checked against Mercury's station pages, the EA register, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district.",
+]
 
 [location]
 value = [-38.393003, 176.023292]
@@ -21,9 +25,17 @@ value = [-38.39283, 176.02273]
 code = "ATI2201 ATIAMURI"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-18"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
+value = "1958"
+source = ["mercury-atiamuri", "mercury-hydro"]
+grade = "A"
+checked = "2026-11-18"
+note = "three units in 1958, the fourth in 1962"
+
+[[facts.commissioned.alt]]
 value = "1962"
 source = "wp-list"
 grade = "B"
@@ -36,19 +48,49 @@ grade = "B"
 checked = ""
 note = "in service 1958; inception 1953"
 
+[facts.units]
+value = "4 Francis turbines"
+source = "mercury-atiamuri"
+grade = "A"
+checked = "2026-11-18"
+
 [facts.scheme]
+value = "Waikato Hydro System"
+source = "mercury-hydro"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.scheme.alt]]
 value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
+[facts.river]
+value = "Waikato River (Lake Ātiamuri)"
+source = ["mercury-atiamuri", "wp-atiamuri"]
+grade = "B"
+checked = "2026-11-18"
+
 [facts.region]
+value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.region.alt]]
 value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
+value = "Taupō"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.territorial_authority.alt]]
 value = "South Waikato / Taupō"
 source = "wp-list"
 grade = "B"
@@ -56,21 +98,27 @@ checked = ""
 
 [facts.owner]
 value = "Mercury"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+source = ["ea-register", "mercury-hydro", "nzx-mcy"]
+grade = "A"
+checked = "2026-11-18"
+note = "Mercury NZ Limited, named Mighty River Power from 1999 until 29 July 2016"
+
+[facts.previous_owners]
+value = "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–99"
+source = ["gazette-1995-140", "gazette-1999-170"]
+grade = "A"
+checked = "2026-11-18"
+note = "ECNZ took over the Crown's generation on 1 April 1987 and passed the Waikato stations to Mighty River Power (now Mercury) on 1 April 1999"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Ātiamuri sits just downstream of Ōhakuri and takes its water directly from the larger station above it. It was designed for three generators and opened with them in 1958; a fourth was added in 1962. Mercury plans to replace its turbines and generators between 2031 and 2034."
+source = ["mercury-hydro", "mercury-atiamuri", "wp-atiamuri"]
+grade = "B"
+checked = "2026-11-18"
 
 [[ratings]]
-value = "84"
-basis = "Wikipedia (basis not stated)"
-source = "wp-list"
-grade = "B"
-checked = ""
+value = 84
+basis = "Mercury's total capacity"
+source = "mercury-atiamuri"
+grade = "A"
+checked = "2026-11-18"

@@ -8,7 +8,12 @@ wikidata = "Q4784238"
 osm = ["relation/11009688"]
 reviewed = ""
 photo_leads = ["P002", "P003"]
-to_check = ["Capacity: Historic station; verify rating and unit details."]
+to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+notes = [
+  "Hydro batch 1 (18 Nov 2026): facts checked against Mercury's station pages, the EA register, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district. Waipā District is about 150–300 m away across the river.",
+  "Resolved: Capacity: Mercury gives 198 MW (8 Francis turbines); Elenz keeps 196.7 MW (Wikipedia, 196.66) as installed.",
+]
 
 [location]
 value = [-38.071389, 175.643333]
@@ -22,9 +27,17 @@ value = [-38.07203, 175.64292]
 code = "ARI1101 ARAPUNI; ARI1102 Arapuni"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-18"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
+value = "1929"
+source = "mercury-arapuni"
+grade = "A"
+checked = "2026-11-18"
+note = "units 5 and 6 in 1938, units 7 and 8 in 1946"
+
+[[facts.commissioned.alt]]
 value = "1929, 1946"
 source = "wp-list"
 grade = "B"
@@ -44,13 +57,38 @@ grade = "A"
 checked = ""
 note = "the register's start date, 1929-01-01: often a year, not the day"
 
+[facts.units]
+value = "8 Francis turbines"
+source = "mercury-arapuni"
+grade = "A"
+checked = "2026-11-18"
+note = "units 5 to 8 replaced in 2012–13"
+
 [facts.scheme]
+value = "Waikato Hydro System"
+source = "mercury-hydro"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.scheme.alt]]
 value = "Waikato hydro scheme"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
+[facts.river]
+value = "Waikato River (Lake Arapuni)"
+source = ["mercury-arapuni", "wp-arapuni"]
+grade = "B"
+checked = "2026-11-18"
+
 [facts.region]
+value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.region.alt]]
 value = "Waikato"
 source = "elenz-register"
 grade = "C"
@@ -58,20 +96,33 @@ checked = ""
 
 [facts.territorial_authority]
 value = "South Waikato"
-source = "wp-list"
-grade = "B"
-checked = ""
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-18"
 
 [facts.owner]
 value = "Mercury"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+source = ["ea-register", "mercury-hydro", "nzx-mcy"]
+grade = "A"
+checked = "2026-11-18"
+note = "Mercury NZ Limited, named Mighty River Power from 1999 until 29 July 2016"
+
+[facts.previous_owners]
+value = "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–99"
+source = ["gazette-1995-140", "gazette-1999-170"]
+grade = "A"
+checked = "2026-11-18"
+note = "ECNZ took over the Crown's generation on 1 April 1987 and passed the Waikato stations to Mighty River Power (now Mercury) on 1 April 1999"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Arapuni is the oldest station in the Waikato Hydro System. It opened in 1929 behind the first high dam the government built on the Waikato River, a listed heritage item today. Its eight Francis turbines came in stages, the last two in 1946, and Mercury replaced units 5 to 8 in 2012 and 2013."
+source = "mercury-arapuni"
+grade = "A"
+checked = "2026-11-18"
+
+[[ratings]]
+value = 198
+basis = "Mercury's total capacity"
+source = "mercury-arapuni"
+grade = "A"
+checked = "2026-11-18"

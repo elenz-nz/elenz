@@ -7,7 +7,11 @@ register = ["H062"]
 wikidata = "Q12010561"
 osm = ["relation/13342076"]
 reviewed = ""
-notes = ["Added from Elenz's plant list (8 Nov 2026)."]
+to_check = ["Location: confirm the point sits on the powerhouse against the LINZ aerial (separate task)."]
+notes = [
+  "Hydro batch 1 (18 Nov 2026): facts checked against Mercury's station pages, the EA register, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
+  "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district. South Waikato District is about 150–200 m away.",
+]
 
 [location]
 value = [-38.419633, 175.808217]
@@ -21,27 +25,66 @@ value = [-38.41908, 175.80036]
 code = "WKM2201 WHAKAMARU"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-18"
+note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
+value = "1956"
+source = "mercury-whakamaru"
+grade = "A"
+checked = "2026-11-18"
+note = "construction began in 1949"
+
+[[facts.commissioned.alt]]
 value = "1956"
 source = "wp-list"
 grade = "B"
 checked = ""
 
+[facts.units]
+value = "4 Francis turbines"
+source = "mercury-whakamaru"
+grade = "A"
+checked = "2026-11-18"
+note = "replaced in 2017–20, adding about 5 MW each"
+
 [facts.scheme]
+value = "Waikato Hydro System"
+source = "mercury-hydro"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.scheme.alt]]
 value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
+[facts.river]
+value = "Waikato River (Lake Whakamaru)"
+source = ["mercury-whakamaru", "wp-whakamaru"]
+grade = "B"
+checked = "2026-11-18"
+
 [facts.region]
+value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.region.alt]]
 value = "Waikato"
 source = "elenz-register"
 grade = "C"
 checked = ""
 
 [facts.territorial_authority]
+value = "Taupō"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-18"
+
+[[facts.territorial_authority.alt]]
 value = "South Waikato / Taupō"
 source = "wp-list"
 grade = "B"
@@ -49,14 +92,20 @@ checked = ""
 
 [facts.owner]
 value = "Mercury"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+source = ["ea-register", "mercury-hydro", "nzx-mcy"]
+grade = "A"
+checked = "2026-11-18"
+note = "Mercury NZ Limited, named Mighty River Power from 1999 until 29 July 2016"
+
+[facts.previous_owners]
+value = "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–99"
+source = ["gazette-1995-140", "gazette-1999-170"]
+grade = "A"
+checked = "2026-11-18"
+note = "ECNZ took over the Crown's generation on 1 April 1987 and passed the Waikato stations to Mighty River Power (now Mercury) on 1 April 1999"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Whakamaru, about 40 km north of Taupō, was built from 1949 and began generating in 1956; State Highway 30 runs across the top of its dam. Its four turbines, generators and governors were replaced between 2017 and 2020, raising the station to 124 MW. It is also the main switching point for the upper Waikato's generation on its way north."
+source = "mercury-whakamaru"
+grade = "A"
+checked = "2026-11-18"
