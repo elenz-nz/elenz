@@ -28,7 +28,7 @@
    "status": "operating",
    "mw": 196.7,
    "owner": "Mercury",
-   "commissioned": null,
+   "commissioned": "1929",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -47,7 +47,7 @@
    "status": "operating",
    "mw": 78.0,
    "owner": "Mercury",
-   "commissioned": null,
+   "commissioned": "1964",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -66,7 +66,7 @@
    "status": "operating",
    "mw": 77.0,
    "owner": "Mercury",
-   "commissioned": null,
+   "commissioned": "1958",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -550,7 +550,7 @@
    "status": "operating",
    "mw": 112.5,
    "owner": "Mercury",
-   "commissioned": null,
+   "commissioned": "1947",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -816,7 +816,7 @@
    "status": "operating",
    "mw": 360.0,
    "owner": "Mercury",
-   "commissioned": null,
+   "commissioned": "Mara",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1006,7 +1006,7 @@
    "status": "operating",
    "mw": 109.0,
    "owner": "Mercury",
-   "commissioned": null,
+   "commissioned": "1961",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -1899,7 +1899,7 @@
    "status": "operating",
    "mw": 54.0,
    "owner": "Mercury",
-   "commissioned": null,
+   "commissioned": "1961",
    "closed": null,
    "reviewed": false,
    "pt": {
@@ -2013,7 +2013,7 @@
    "status": "operating",
    "mw": 124.0,
    "owner": "Mercury",
-   "commissioned": null,
+   "commissioned": "1956",
    "closed": null,
    "reviewed": false,
    "pt": {
