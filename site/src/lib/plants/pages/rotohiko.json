@@ -23,12 +23,133 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": null,
- "about": null,
- "facts": [],
+ "checked": "2026-11-19",
+ "about": {
+  "text": "Rotohiko is a grid-scale battery near Huntly power station, built for WEL Networks' NewPower Energy, which owns, runs and trades it. It can deliver 35 MW for an hour, storing 35 MWh, and connects through WEL Networks' local network rather than directly to the national grid. Commissioned in 2023, it began charging and discharging into the grid in 2024, and has mostly been dispatched to stand by as instantaneous reserve rather than for energy.",
+  "refs": [
+   1,
+   2,
+   3,
+   4
+  ]
+ },
+ "facts": [
+  {
+   "k": "commissioned",
+   "label": "Commissioned",
+   "value": "2023",
+   "refs": [
+    5,
+    2
+   ],
+   "note": "the register's row starts 23 Nov 2023; the EA: commissioned in 2023, began charging and discharging into the grid in 2024"
+  },
+  {
+   "k": "units",
+   "label": "Units",
+   "value": "Storing 35 MWh (one hour at full output)",
+   "refs": [
+    3,
+    1
+   ]
+  },
+  {
+   "k": "region",
+   "label": "Region",
+   "value": "Waikato",
+   "refs": [
+    6
+   ],
+   "note": "from the grid connection point (no station point yet); the sources place it near Huntly power station"
+  },
+  {
+   "k": "territorial_authority",
+   "label": "District",
+   "value": "Waikato",
+   "refs": [
+    7
+   ],
+   "note": "Waikato District, from the grid connection point; no other district within 3 km"
+  },
+  {
+   "k": "owner",
+   "label": "Owner",
+   "value": "NewPower Energy (WEL Networks group)",
+   "refs": [
+    5,
+    1
+   ],
+   "note": "the register's operator: Newpower Energy Limited"
+  },
+  {
+   "k": "grid_connection",
+   "label": "Connection point",
+   "value": "Huntly (HLY0331)",
+   "refs": [
+    8
+   ]
+  }
+ ],
  "location": null,
  "image": null,
- "sources": [],
+ "sources": [
+  {
+   "n": 1,
+   "title": "Submission on wholesale market arrangements for battery energy storage systems (30 June 2026)",
+   "publisher": "NewPower Energy Services (published by the Electricity Authority)",
+   "url": "https://www.ea.govt.nz/documents/10403/NewPower_-_Wholesale_Market_Arrangements_for_BESS_Consultation.pdf",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 2,
+   "title": "Unlocking the potential for batteries to contribute to security of supply (16 April 2024)",
+   "publisher": "Electricity Authority",
+   "url": "https://ea.govt.nz/news/eye-on-electricity/unlocking-the-potential-for-batteries-to-contribute-to-security-of-supply",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 3,
+   "title": "Eye on electricity: battery performance in New Zealand (19 May 2026)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.ea.govt.nz/news/eye-on-electricity/eye-on-electricity-battery-performance-in-new-zealand/",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
+   "title": "WEL Networks opens first utility-scale battery (Nine To Noon, 31 October 2023)",
+   "publisher": "RNZ",
+   "url": "https://www.rnz.co.nz/national/programmes/ninetonoon/audio/2018913328/wel-networks-opens-first-utility-scale-battery",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 8,
+   "title": "Network supply points table",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
+   "opened": "2026-11-19"
+  }
+ ],
  "related": {
   "owner": [],
   "owner_all": true,

@@ -8,10 +8,16 @@ wikidata = "Q5945709"
 osm = ["way/167293886"]
 reviewed = ""
 to_check = [
-  "No Wikipedia row: use the operator's pages.",
-  "Location is the grid connection, not the station.",
+  "Location: the point is Wikidata's for the whole Huntly site (the power station); find the battery's own point on the LINZ aerial (separate task), then retest it against the Stats NZ boundaries.",
+  "Stage 2 (another 100 MW / 200 MWh, FID April 2026, commercial operation expected Q3 FY28): add a capacity row and update the About text when it dispatches.",
 ]
-notes = ["Elenz has four plants here: the Rankines (units 1–4 as one, Coal/gas, 1,000 MW → 750 MW from Jan 2014), Huntly 5 (403 MW), Huntly 6 (50 MW) and the battery (100 MW, Jul 2026). Split from T001."]
+notes = [
+  "Elenz has four plants here: the Rankines (units 1–4 as one, Coal/gas, 1,000 MW → 750 MW from Jan 2014), Huntly 5 (403 MW), Huntly 6 (50 MW) and the battery (100 MW, Jul 2026). Split from T001.",
+  "Battery batch (19 Nov 2026): facts checked against Genesis's NZX releases (stage 2 FID, April 2026; FY26 results, August 2026), ESS News on the opening, the EA register and network supply points table, and Stats NZ boundaries. Built by Genesis, so no previous owners.",
+  "Dates: the register's row starts 1 Jul 2026; Genesis said in August 2026 that commissioning was under way and it would be fully operational by September 2026; officially opened 15 Oct 2026 (ESS News and other reports).",
+  "District and region from Wikidata's site point (Waikato District; no other district within 3 km). The grid connection point (HLY2201) gives the same.",
+  "Dropped the Wikipedia-list rating lead: battery ratings are MW / MWh, and the page shows ratings as MW. Storage (200 MWh) is in units and About. Genesis gives the cost as about NZ$130 million (not published).",
+]
 
 [location]
 value = [-37.543889, 175.152778]
@@ -25,7 +31,29 @@ value = [-37.54159, 175.15181]
 code = "HLY2201 HUNTLY"
 source = "ea-nsp"
 grade = "A"
-checked = ""
+checked = "2026-11-19"
+note = "code and point match the EA's network supply points table of 17 Nov 2026; the battery connects through Transpower's Huntly substation (ESS News)"
+
+[facts.other_names]
+value = ["Huntly BESS"]
+source = ["genesis-nzx-bess2", "genesis-nzx-fy26"]
+grade = "A"
+checked = "2026-11-19"
+note = "Genesis's name: Huntly Battery Energy Storage System, stage 1"
+
+[facts.commissioned]
+value = "2026"
+source = ["ea-register", "genesis-nzx-fy26"]
+grade = "A"
+checked = "2026-11-19"
+note = "the register's row starts 1 Jul 2026; fully operational by September 2026; officially opened October 2026"
+
+[facts.units]
+value = "70 Saft battery containers, storing 200 MWh (two hours at full output)"
+source = ["essnews-huntly-2026", "genesis-nzx-fy26"]
+grade = "B"
+checked = "2026-11-19"
+note = "Genesis: 100 MW / 200 MWh; ESS News: 70 Saft units, installed by Northpower"
 
 [facts.scheme]
 value = "Huntly complex"
@@ -35,20 +63,27 @@ checked = ""
 
 [facts.region]
 value = "Waikato"
-source = "elenz-register"
-grade = "C"
-checked = ""
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-19"
+note = "Wikidata's site point and the grid connection point"
+
+[facts.territorial_authority]
+value = "Waikato"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-19"
+note = "Waikato District, from Wikidata's site point; no other district within 3 km"
 
 [facts.owner]
-value = "Genesis"
-source = "ea-register"
-grade = "B"
-checked = ""
-note = "the register's operator, as Elenz groups owners; check the owner"
+value = "Genesis Energy"
+source = ["ea-register", "genesis-nzx-bess2"]
+grade = "A"
+checked = "2026-11-19"
+note = "the register's operator: Genesis Energy Limited"
 
 [facts.about]
-value = ""
-source = "elenz-register"
-grade = "C"
-checked = ""
-note = "To write: 2-4 plain sentences in our own words, from cited sources."
+value = "Huntly Battery is Genesis Energy's first grid-scale battery, built on the Huntly Power Station site in Waikato. It can deliver 100 MW for two hours, storing 200 MWh in 70 battery containers supplied by Saft, and connects to the grid through the Transpower substation on the site. It began operating in 2026 and was officially opened in October that year. A second stage of the same size has been approved, which would bring the site to 200 MW and 400 MWh."
+source = ["genesis-nzx-fy26", "genesis-nzx-bess2", "essnews-huntly-2026"]
+grade = "B"
+checked = "2026-11-19"
