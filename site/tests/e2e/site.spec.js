@@ -412,14 +412,26 @@ test.describe('plant pages', () => {
   });
 
   test('the aerial views switch scale and credit their imagery', async ({ page }) => {
-    await page.goto('/plants/manapouri');
-    const img = page.locator('.aerial img');
-    await expect(img).toHaveAttribute('src', '/plants/aerial/manapouri-site.webp');
+    await page.goto('/plants/aviemore');   // no photo, so the views lead the page
+    const img = page.locator('.photo .aerial img');
+    await expect(img).toHaveAttribute('src', '/plants/aerial/aviemore-site.webp');
     await expect(img).toHaveJSProperty('complete', true);
     expect(await img.evaluate((el) => el.naturalWidth)).toBe(1000);   // the file is there
     await page.getByRole('button', { name: 'Wide' }).click();
-    await expect(img).toHaveAttribute('src', '/plants/aerial/manapouri-wide.webp');
+    await expect(img).toHaveAttribute('src', '/plants/aerial/aviemore-wide.webp');
     await expect(page.locator('.aerial figcaption')).toContainText('Toitū Te Whenua LINZ');
+  });
+
+  test('a licensed photo leads, credited, and the aerial views move to Location', async ({ page }) => {
+    await page.goto('/plants/manapouri');
+    const photo = page.locator('figure.photo img');
+    await expect(photo).toHaveAttribute('src', '/plants/manapouri.webp');
+    await expect(photo).toHaveJSProperty('complete', true);
+    expect(await photo.evaluate((el) => el.naturalWidth)).toBe(1600);   // the file is there
+    await expect(page.locator('figure.photo figcaption')).toContainText('CC BY-SA 3.0');
+    const aerial = page.locator('section[aria-labelledby="loc-h"] .aerial');
+    await expect(aerial).toHaveCount(1);
+    await expect(page.locator('.photo .aerial')).toHaveCount(0);
   });
 });
 

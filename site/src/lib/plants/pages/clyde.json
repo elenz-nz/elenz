@@ -151,7 +151,14 @@
    11
   ]
  },
- "image": null,
+ "image": {
+  "file": "clyde.webp",
+  "title": "Clyde Dam with its power station",
+  "author": "Ulrich Lange",
+  "source_url": "https://commons.wikimedia.org/wiki/File:Clyde_Dam_with_Power_Station_(frontview).jpg",
+  "licence": "CC BY 3.0",
+  "licence_url": "https://creativecommons.org/licenses/by/3.0/"
+ },
  "aerial": [
   {
    "k": "site",

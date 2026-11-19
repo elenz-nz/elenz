@@ -96,7 +96,14 @@
    6
   ]
  },
- "image": null,
+ "image": {
+  "file": "kowhai-park-solar-farm.webp",
+  "title": "Kōwhai Park Solar Farm",
+  "author": "Paora",
+  "source_url": "https://commons.wikimedia.org/wiki/File:K%C5%8Dwhai_Park_Solar_Farm_PA01.jpg",
+  "licence": "CC0 1.0",
+  "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+ },
  "aerial": [
   {
    "k": "site",

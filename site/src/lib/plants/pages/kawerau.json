@@ -117,7 +117,14 @@
    10
   ]
  },
- "image": null,
+ "image": {
+  "file": "kawerau.webp",
+  "title": "Geothermal power plant at Kawerau",
+  "author": "Rjglewis",
+  "source_url": "https://commons.wikimedia.org/wiki/File:100_MW_Geothermal_Power_Plant_at_Kawerau_NZ.jpg",
+  "licence": "CC BY-SA 3.0",
+  "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
+ },
  "aerial": [
   {
    "k": "site",

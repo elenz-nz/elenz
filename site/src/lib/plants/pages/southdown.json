@@ -146,7 +146,14 @@
    7
   ]
  },
- "image": null,
+ "image": {
+  "file": "southdown.webp",
+  "title": "Southdown Power Station",
+  "author": "russellstreet (Flickr)",
+  "source_url": "https://commons.wikimedia.org/wiki/File:Southdown_Power_Station.jpg",
+  "licence": "CC BY-SA 2.0",
+  "licence_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+ },
  "aerial": [
   {
    "k": "site",

@@ -165,7 +165,14 @@
    12
   ]
  },
- "image": null,
+ "image": {
+  "file": "wairakei.webp",
+  "title": "Wairākei geothermal power plant",
+  "author": "Ingolfson",
+  "source_url": "https://commons.wikimedia.org/wiki/File:Wairakei_Geothermal_Power_Plant.jpg",
+  "licence": "Public domain",
+  "licence_url": ""
+ },
  "aerial": [
   {
    "k": "site",
