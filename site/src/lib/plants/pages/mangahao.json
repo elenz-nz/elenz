@@ -115,7 +115,14 @@
    9
   ]
  },
- "image": null,
+ "image": {
+  "file": "mangahao.webp",
+  "title": "Mangahao Power Station turbine room, 1924 (Alexander Turnbull Library)",
+  "author": "Albert Percy Godber",
+  "source_url": "https://commons.wikimedia.org/wiki/File:Mangahao_Power_Station,_1924_ATLIB_301155.png",
+  "licence": "Public domain",
+  "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+ },
  "aerial": [
   {
    "k": "site",
