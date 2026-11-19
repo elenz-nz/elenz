@@ -16,6 +16,7 @@ export const NEEDS = /** @type {[string, string, (p: any) => boolean][]} */ ([
   ['nophoto', 'No photo', (p) => p.images.length === 0],
   ['location', 'Location not checked', (p) => p.loc !== 'checked'],
   ['grid', 'Location at the grid connection', (p) => p.loc === 'grid' || p.loc === 'none'],
+  ['mine', 'Has team notes', (p) => !!p.my_note],   // the team's own notes (notes.js), joined in by the page
   ['reviewed', 'Reviewed (done)', (p) => !!p.reviewed],
 ]);
 const NEED = Object.fromEntries(NEEDS.map(([k, , f]) => [k, f]));
@@ -140,14 +141,14 @@ export function progress(/** @type {any[]} */ plants) {
 export const sourceName = (/** @type {Record<string, any>} */ sources, /** @type {string} */ id) => sources[id]?.title || id;
 
 /** The download: one sheet each for the plants, every fact (other sources' values as their own rows), the sources and
- * the two leads files. [{name, header, rows}], for xlsx.js. */
-export function workbook(/** @type {any} */ d) {
+ * the two leads files; the team's notes (notes.js, by slug) in the Plants sheet. [{name, header, rows}], for xlsx.js. */
+export function workbook(/** @type {any} */ d, /** @type {Record<string, { text: string }>} */ notes = {}) {
   const srcs = d.sources, names = (/** @type {string[]} */ ids) => ids.map((x) => sourceName(srcs, x)).join('; ');
   const plants = [...d.plants].sort((a, b) => norm(a.name).localeCompare(norm(b.name)));
   const plantRows = plants.map((p) => [
     p.name, p.slug, fuelName(p.fuel), p.island, STATUS[/** @type {keyof typeof STATUS} */ (p.status)] ?? p.status, p.mw, p.owner, p.scheme,
     p.reviewed, p.facts, p.checked, LOC[/** @type {keyof typeof LOC} */ (p.loc)], p.disagree.join('; '), p.images.length, p.photo_leads.join(' '),
-    p.to_check.join('\n'), p.notes.join('\n'), p.wikidata, p.osm.join(' '), p.register.join(' '), `https://elenz.co.nz/plants/${p.slug}`,
+    p.to_check.join('\n'), p.notes.join('\n'), notes[p.slug]?.text ?? '', p.wikidata, p.osm.join(' '), p.register.join(' '), `https://elenz.co.nz/plants/${p.slug}`,
   ]);
   const factRows = plants.flatMap((p) => p.entries.flatMap((/** @type {any} */ e) => [
     [p.name, p.slug, e.label, 'Main', e.value, e.source.join(' '), names(e.source), e.grade, e.checked, e.published ? 'Yes' : 'No', e.note ?? ''],
@@ -158,7 +159,7 @@ export function workbook(/** @type {any} */ d) {
   const leadKeys = keys(d.photo_leads), stationKeys = keys(d.station_leads);
   return [
     { name: 'Plants', header: ['Plant', 'Slug', 'Fuel', 'Island', 'Status', 'Installed MW', 'Owner', 'Scheme', 'Reviewed', 'Facts', 'Facts checked',
-      'Location', 'Sources disagree on', 'Photos', 'Photo leads', 'To check', 'Notes', 'Wikidata', 'OpenStreetMap', 'Register IDs', 'Page'], rows: plantRows },
+      'Location', 'Sources disagree on', 'Photos', 'Photo leads', 'To check', 'Notes', 'Team notes', 'Wikidata', 'OpenStreetMap', 'Register IDs', 'Page'], rows: plantRows },
     { name: 'Facts', header: ['Plant', 'Slug', 'Fact', 'Main or other source', 'Value', 'Source IDs', 'Sources', 'Grade', 'Checked', 'Published', 'Note'], rows: factRows },
     { name: 'Sources', header: ['ID', 'Title', 'Publisher', 'Address', 'Kind', 'Opened', 'Note'], rows: sourceRows },
     { name: 'Photo leads', header: leadKeys, rows: d.photo_leads.map((/** @type {any} */ r) => leadKeys.map((k) => r[k] ?? '')) },

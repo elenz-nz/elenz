@@ -7,7 +7,9 @@ register = ["S006"]
 wikidata = "Q133480513"
 osm = ["way/1410036411"]
 reviewed = "2026-11-19"
-to_check = []
+to_check = [
+  "Sources: Lodestone's site refuses automated reads, so this farm's facts rest mainly on BraveTrace's device sheet (Lodestone's page read only through search results). Check Lodestone's page by hand.",
+]
 notes = [
   "Capacity: Elenz keeps the register's 33 MW (design decision 19 Nov 2026); BraveTrace's sheet (May 2026) gives 30 MW AC.",
   "Solar batch (19 Nov 2026): facts checked against BraveTrace's device sheet, the EA register and network supply points table, and Stats NZ boundaries.",

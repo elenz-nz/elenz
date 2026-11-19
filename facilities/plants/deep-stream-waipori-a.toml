@@ -6,8 +6,8 @@ name = "Deep Stream (Waipori A)"
 register = ["H037"]
 reviewed = ""
 to_check = [
-  "Boundary (open): the register's row, Deep Stream (Waipori A), has 26 MW, but Contact gives Deep Stream 6 MW. It probably also covers Waipori 1A (Contact lists 1A in its Waipori scheme). Confirm, then add 1A as a station with its own years and history. The Elenz team agrees it probably includes 1A (19 Nov 2026); left open until a source confirms it.",
-  "Previous owners: Trustpower built Deep Stream (2008); publish once the row's boundary is settled (Waipori 1A has the Waipori scheme's history).",
+  "Boundary (open): the register's row, Deep Stream (Waipori A), has 26 MW, but Contact gives Deep Stream 6 MW. It probably also covers Waipori 1A (Contact lists 1A in its Waipori scheme). Confirm, then add Deep Stream 1 and 2 and Waipori 1A as stations, with their own years and history and the points in its notes. The Elenz team agrees it probably includes 1A (19 Nov 2026); left open until a source confirms it.",
+  "Previous owners: Trustpower built Deep Stream (2008); publish once the row's boundary is settled (Waipori 1A has the Waipori scheme's history). Papers Past and NZLII refuse automated reads, so this may need a look by hand.",
 ]
 notes = [
   "The register's \"Deep Stream (Waipori A)\" is 26 MW at HWB0331; Wikipedia lists Deep Stream at 5 MW and Waipori 1A at 10 MW, so the register entry is probably more than Deep Stream alone.",

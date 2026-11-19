@@ -4,8 +4,11 @@
 	// site will publish: every plant's state, filters for what still needs work, each plant's facts with their source,
 	// grade and date checked (other sources' values beneath), the leads files, and the whole lot as an Excel workbook.
 	// Data: src/lib/plants/research.json (ingest/plant_research.py). On elenz.co.nz the Worker serves it only with the
-	// key (worker/index.js, research). docs/architecture.md, Plant pages (the research page).
+	// key (worker/index.js, research). Each plant also has the team's own notes, saved through the Worker in KV, not in
+	// the repository (#lib/plants/notes.js, worker/notes.js). Every link opens in a new tab (newTabs), so the page's
+	// filters and open plant stay put. docs/architecture.md, Plant pages (the research page).
 	import { onMount } from 'svelte';
+	import { beforeNavigate } from '$app/navigation';
 	import { replaceState } from '$app/navigation';
 	import Masthead from '#lib/site/Masthead.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
@@ -15,11 +18,15 @@
 	import { slug } from '#lib/site/viewurl.js';
 	import { DEFAULTS, NEEDS, LOC, STATUS, fuelsOf, fuelName, ownersOf, readSettings, writeSettings, filtered, needCounts, pick, progress, workbook, type Settings } from '#lib/plants/research.js';
 	import { xlsx, XLSX_TYPE } from '#lib/plants/xlsx.js';
+	import { keyOf, loadNotes, saveNote, dateStamp, savedAt, PROBLEMS, MAX_NOTE, type Note, type NotesProblem } from '#lib/plants/notes.js';
+	import { newTabs } from '#lib/site/newtabs.js';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 	const d = $derived(data.d as any);
-	const plants = $derived(d.plants as any[]);
+	// the team's notes, joined in for the "Has team notes" filter and the table's mark
+	let notes = $state<Record<string, Note>>({});
+	const plants = $derived((d.plants as any[]).map((p) => ({ ...p, my_note: notes[p.slug]?.text ?? '' })));
 	const sources = $derived(d.sources as Record<string, any>);
 	const REPO = 'https://github.com/elenz-nz/elenz/blob/main/facilities';
 
@@ -39,9 +46,66 @@
 	const mw = (v: number | null) => (v == null ? '–' : fmtMw(v));
 	const osmUrl = (x: string) => `https://www.openstreetmap.org/${x}`;
 
+	// ---------- the team's notes ----------
+	// notesState: loading, ready, or why they can't be read. drafts: what's typed and not yet saved, by plant.
+	let notesState = $state<'loading' | 'ready' | NotesProblem>('loading');
+	let drafts = $state<Record<string, string>>({});
+	let saving = $state<Record<string, boolean>>({});
+	let noteErr = $state<Record<string, string>>({});
+	let clash = $state<Record<string, Note | null | undefined>>({});   // another device saved since: what it saved
+	let key = '';
+	const textOf = (slug: string) => drafts[slug] ?? notes[slug]?.text ?? '';
+	const dirty = (slug: string) => slug in drafts && drafts[slug].replace(/\s+$/, '') !== (notes[slug]?.text ?? '');
+	const unsaved = $derived(Object.keys(drafts).filter(dirty));
+
+	async function readNotes() {
+		notesState = 'loading';
+		const r = await loadNotes(key);
+		if (r.ok) { notes = r.notes; notesState = 'ready'; } else notesState = r.problem;
+	}
+	async function saveFor(slug: string, base?: number | null | 'any') {
+		if (notesState !== 'ready' || saving[slug] || !dirty(slug)) return;
+		saving[slug] = true;
+		noteErr[slug] = '';
+		const r = await saveNote(key, slug, drafts[slug], base ?? notes[slug]?.at ?? null);
+		saving[slug] = false;
+		if (r.ok) {
+			const { [slug]: _, ...rest } = notes;
+			notes = r.note.text ? { ...notes, [slug]: r.note } : rest;
+			if ((drafts[slug] ?? '').replace(/\s+$/, '') === r.note.text) delete drafts[slug];
+			delete clash[slug];
+		} else if ('conflict' in r) clash[slug] = r.conflict;
+		else noteErr[slug] = r.error;
+	}
+	// another device saved first: take theirs (dropping what was typed here), or save this one over it
+	function useTheirs(slug: string) {
+		const theirs = clash[slug];
+		const { [slug]: _, ...rest } = notes;
+		notes = theirs ? { ...notes, [slug]: theirs } : rest;
+		delete drafts[slug];
+		delete clash[slug];
+	}
+	const keepMine = (slug: string) => saveFor(slug, 'any');
+	function stamp(slug: string, area: HTMLTextAreaElement | null) {
+		const text = textOf(slug), add = (text && !text.endsWith('\n') ? '\n' : '') + dateStamp();
+		drafts[slug] = text + add;
+		requestAnimationFrame(() => { if (area) { area.focus(); area.setSelectionRange(area.value.length, area.value.length); } });
+	}
+	const areas: Record<string, HTMLTextAreaElement | null> = {};
+	function keys(e: KeyboardEvent, slug: string) {
+		if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); saveFor(slug); }
+	}
+	beforeNavigate((nav) => { if (unsaved.length && nav.type !== 'leave' && !confirm('Leave with notes not saved?')) nav.cancel(); });
+
 	onMount(() => {
 		s = readSettings(location.search, plants);
 		ready = true;
+		key = keyOf(location.search);
+		readNotes();
+		// closing the tab with a note not yet saved: the browser asks first
+		const warn = (e: BeforeUnloadEvent) => { if (unsaved.length) { e.preventDefault(); e.returnValue = ''; } };
+		addEventListener('beforeunload', warn);
+		return () => removeEventListener('beforeunload', warn);
 	});
 	// keep the address in step with the settings, keeping its key (replace, so Back leaves the page)
 	$effect(() => {
@@ -68,7 +132,7 @@
 		setTimeout(() => {
 			try {
 				const day = new Intl.DateTimeFormat('en-CA', { timeZone: 'Pacific/Auckland' }).format(new Date());
-				save(new Blob([xlsx(workbook(d))], { type: XLSX_TYPE }), `elenz-plant-research-${day}.xlsx`);
+				save(new Blob([xlsx(workbook(d, notes))], { type: XLSX_TYPE }), `elenz-plant-research-${day}.xlsx`);
 			} finally {
 				busy = false;
 			}
@@ -84,7 +148,35 @@
 
 {#snippet srcs(ids: string[])}{#each ids as id, i (id)}{i ? '; ' : ''}{#if sources[id]?.url}<a href={sources[id].url}>{sources[id].title || id}</a>{:else}{sources[id]?.title || id}{/if}{#if sources[id]?.kind === 'research'}<span class="tag">research only</span>{/if}{/each}{/snippet}
 
-<div class="wrap">
+{#snippet teamNotes(slug: string)}
+	<div class="mine">
+		<h3><label for="note-{slug}">Team notes</label> <span class="quiet">private: kept by the Worker, not in the repository; Ctrl+Enter or leaving the box saves</span></h3>
+		{#if notesState === 'ready'}
+			<textarea id="note-{slug}" bind:this={areas[slug]} rows="4" maxlength={MAX_NOTE} spellcheck="true"
+				placeholder="Anything to remember about this plant: questions, leads, research updates…"
+				value={textOf(slug)} oninput={(e) => (drafts[slug] = e.currentTarget.value)}
+				onblur={() => saveFor(slug)} onkeydown={(e) => keys(e, slug)}></textarea>
+			<div class="note-bar">
+				<button type="button" class="btn" onclick={() => saveFor(slug)} disabled={!dirty(slug) || saving[slug]}>{saving[slug] ? 'Saving…' : 'Save'}</button>
+				<button type="button" class="btn quietbtn" onmousedown={(e) => e.preventDefault()} onclick={() => stamp(slug, areas[slug])}>Add today’s date</button>
+				<span class="quiet" role="status">{#if noteErr[slug]}<span class="err">{noteErr[slug]}</span>{:else if dirty(slug)}Not saved yet{:else if notes[slug]}{savedAt(notes[slug].at)}{/if}</span>
+			</div>
+			{#if clash[slug] !== undefined}
+				<div class="clash" role="alert">
+					<p>{clash[slug] ? `Another device saved this note (${savedAt(clash[slug]!.at)}) since this page read it:` : 'Another device emptied this note since this page read it.'}</p>
+					{#if clash[slug]}<blockquote>{clash[slug]!.text}</blockquote>{/if}
+					<p><button type="button" class="btn" onclick={() => useTheirs(slug)}>Use that one</button> <button type="button" class="btn" onclick={() => keepMine(slug)}>Save mine over it</button></p>
+				</div>
+			{/if}
+		{:else if notesState === 'loading'}
+			<p class="quiet">Reading the notes…</p>
+		{:else}
+			<p class="quiet">{PROBLEMS[notesState]} {#if notesState === 'error'}<button type="button" class="btn" onclick={readNotes}>Try again</button>{/if}</p>
+		{/if}
+	</div>
+{/snippet}
+
+<div class="wrap" use:newTabs>
 	<Masthead />
 
 	<main class="res">
@@ -158,7 +250,7 @@
 					<tbody>
 						{#each rows as p (p.slug)}
 							<tr class:on={p.slug === s.open} class:shut={p.status === 'closed'}>
-								<td class="c-name"><span class="sw" style="--c:var({fuelOf(p.fuel).tok})" title={fuelName(p.fuel)}></span><button type="button" class="open" aria-expanded={p.slug === s.open} onclick={() => toggle(p.slug)}>{p.name}</button></td>
+								<td class="c-name"><span class="sw" style="--c:var({fuelOf(p.fuel).tok})" title={fuelName(p.fuel)}></span><button type="button" class="open" aria-expanded={p.slug === s.open} onclick={() => toggle(p.slug)}>{p.name}</button>{#if p.my_note || dirty(p.slug)}<span class="has-note" title={dirty(p.slug) ? 'Team notes not saved yet' : 'Has team notes'} class:unsaved={dirty(p.slug)}>✎</span>{/if}</td>
 								<td class="w">{fuelName(p.fuel)}</td>
 								<td class="w">{p.island ? islandName(p.island).replace(' Island', '') : '–'}</td>
 								<td class="w">{p.owner}</td>
@@ -184,8 +276,9 @@
 										{#if p.to_check.length}
 											<div><h3>To check</h3><ul>{#each p.to_check as t, i (i)}<li>{t}</li>{/each}</ul></div>
 										{/if}
+										{@render teamNotes(p.slug)}
 										{#if p.notes.length}
-											<div><h3>Research notes</h3><ul>{#each p.notes as t, i (i)}<li>{t}</li>{/each}</ul></div>
+											<div><h3>Research notes <span class="quiet">(from the plant file)</span></h3><ul>{#each p.notes as t, i (i)}<li>{t}</li>{/each}</ul></div>
 										{/if}
 										<div class="facts">
 											<h3>Facts</h3>
@@ -348,6 +441,18 @@
 	.g { font-family: var(--font-data); font-weight: 600; text-align: center; }
 	.gC { color: var(--muted); }
 
+	.has-note { margin-left: 6px; color: var(--accent); font-size: 0.82rem; }
+	.has-note.unsaved { color: var(--warn-ink); }
+	.mine { display: grid; gap: 6px; }
+	.mine h3 { display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: baseline; }
+	.mine textarea { font: inherit; font-size: 0.88rem; line-height: 1.5; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 8px 10px; width: 100%; box-sizing: border-box; resize: vertical; min-height: 92px; }
+	.mine textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+	.note-bar { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+	.quietbtn { color: var(--ink-2); font-weight: 500; }
+	.err { color: var(--warn-ink); }
+	.clash { background: var(--warn-bg); color: var(--warn-ink); border-radius: 4px; padding: 8px 10px; font-size: 0.84rem; display: grid; gap: 6px; }
+	.clash p { margin: 0; }
+	.clash blockquote { margin: 0; padding: 6px 8px; background: var(--surface); color: var(--ink); border-radius: 3px; white-space: pre-wrap; max-height: 12em; overflow: auto; }
 	.leads summary { cursor: pointer; list-style-position: inside; }
 	.leads table { min-width: 760px; }
 	.leads .notes { min-width: 280px; font-size: 0.8rem; color: var(--ink-2); line-height: 1.45; }

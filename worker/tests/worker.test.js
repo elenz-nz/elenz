@@ -495,3 +495,92 @@ test('/plants/research opens without a key on a branch preview, still noindex', 
   // a plant page is not the research page
   assert.notEqual((await mf.dispatchFetch('https://elenz.co.nz/plants/researcher')).headers.get('referrer-policy'), 'no-referrer');
 });
+
+// ---------- /data/plant-notes: the Elenz team's notes on each plant (worker/notes.js) ----------
+test('/data/plant-notes needs the key on every host; a preview with no key set says so', async () => {
+  const keyed = start({ SCREENS_KEY: KEY });
+  try {
+    const call = (m, host, path, init = {}) => m.dispatchFetch(host + path, init);
+    for (const host of ['https://elenz.co.nz', 'https://plant-research-elenz.elenz.workers.dev']) {
+      for (const k of [undefined, '', 'wrong', KEY + 'x']) {
+        const headers = k === undefined ? {} : { 'x-elenz-key': k };
+        assert.equal((await call(keyed, host, '/data/plant-notes', { headers })).status, 404, `${host} ${k}`);
+        assert.equal((await call(keyed, host, '/data/plant-notes/benmore', { method: 'PUT', headers, body: '{"text":"x","base":null}' })).status, 404);
+      }
+      // the key in the address isn't enough: only the header counts
+      assert.equal((await call(keyed, host, `/data/plant-notes?key=${KEY}`)).status, 404);
+    }
+    assert.equal((await call(mf, 'https://elenz.co.nz', '/data/plant-notes', { headers: { 'x-elenz-key': KEY } })).status, 404, 'no key set: closed on the real site');
+    const r = await call(mf, 'https://plant-research-elenz.elenz.workers.dev', '/data/plant-notes', { headers: { 'x-elenz-key': KEY } });
+    assert.equal(r.status, 503, 'no key set on a preview: says so');
+    assert.match((await r.json()).error, /no key/);
+    assert.equal((await kv.list({ prefix: 'plant-notes/' })).keys.length, 0, 'nothing written');
+  } finally { await keyed.dispose(); }
+});
+
+test('/data/plant-notes saves, reads back, refuses a stale save, and deletes an emptied note', async () => {
+  const keyed = start({ SCREENS_KEY: KEY });
+  try {
+    const store = await keyed.getKVNamespace('DATA');
+    const h = { 'x-elenz-key': KEY };
+    const list = async () => (await (await keyed.dispatchFetch('https://elenz.co.nz/data/plant-notes', { headers: h })).json()).notes;
+    const put = (slug, body) => keyed.dispatchFetch(`https://elenz.co.nz/data/plant-notes/${slug}`, { method: 'PUT', headers: h, body: JSON.stringify(body) });
+
+    assert.deepEqual(await list(), {});
+    let r = await put('benmore', { text: 'Ask Meridian about unit 6.\r\nAlso the 1965 date.  ', base: null });
+    assert.equal(r.status, 200);
+    assert.equal(r.headers.get('cache-control'), 'no-store');
+    const first = await r.json();
+    assert.equal(first.text, 'Ask Meridian about unit 6.\nAlso the 1965 date.', 'line ends tidied, trailing space trimmed');
+    assert.ok(first.at > 0);
+    assert.deepEqual(JSON.parse(await store.get('plant-notes/benmore')), first, 'one KV key per plant');
+    await put('mahinerangi-waipori-b', { text: 'Second plant', base: null });
+    const all = await list();
+    assert.deepEqual(Object.keys(all).sort(), ['benmore', 'mahinerangi-waipori-b']);
+    assert.equal(all.benmore.text, first.text);
+
+    // another device saved since this page read it: refused, with what's stored, and nothing written
+    r = await put('benmore', { text: 'stale', base: first.at - 1 });
+    assert.equal(r.status, 409);
+    assert.equal((await r.json()).note.text, first.text);
+    assert.equal(JSON.parse(await store.get('plant-notes/benmore')).text, first.text);
+    r = await put('benmore', { text: 'new page, nothing read', base: null });
+    assert.equal(r.status, 409, 'a page that saw no note may not overwrite one');
+    // with the right base, or "any", it saves
+    r = await put('benmore', { text: 'Updated', base: first.at });
+    assert.equal(r.status, 200);
+    const second = await r.json();
+    assert.equal((await put('benmore', { text: 'Mine wins', base: 'any' })).status, 200);
+    assert.equal((await list()).benmore.text, 'Mine wins');
+    assert.ok(second.at >= first.at);
+
+    // emptied: deleted
+    const now = (await list()).benmore.at;
+    r = await put('benmore', { text: '  \n ', base: now });
+    assert.deepEqual(await r.json(), { text: '', at: null });
+    assert.equal(await store.get('plant-notes/benmore'), null);
+    assert.deepEqual(Object.keys(await list()), ['mahinerangi-waipori-b']);
+  } finally { await keyed.dispose(); }
+});
+
+test('/data/plant-notes turns away bad addresses, methods and bodies', async () => {
+  const keyed = start({ SCREENS_KEY: KEY });
+  try {
+    const h = { 'x-elenz-key': KEY };
+    const send = (path, init) => keyed.dispatchFetch('https://elenz.co.nz' + path, { headers: h, ...init });
+    for (const slug of ['Benmore', 'a/b', '..', '-x', 'x'.repeat(81)]) {
+      assert.equal((await send(`/data/plant-notes/${slug}`, { method: 'PUT', body: '{"text":"x","base":null}' })).status, 404, slug);
+    }
+    assert.equal((await send('/data/plant-notes', { method: 'POST', body: '{}' })).status, 405);
+    assert.equal((await send('/data/plant-notes/benmore')).status, 405);
+    assert.equal((await send('/data/plant-notes/benmore', { method: 'PUT', body: 'not json' })).status, 400);
+    assert.equal((await send('/data/plant-notes/benmore', { method: 'PUT', body: '{"base":null}' })).status, 400);
+    assert.equal((await send('/data/plant-notes/benmore', { method: 'PUT', body: JSON.stringify({ text: 'x'.repeat(20001), base: null }) })).status, 413);
+    // KV down: the page is told, in words
+    const r = await keyed.dispatchFetch('https://elenz.co.nz/data/plant-notes', { headers: { ...h, 'x-test-kv-down': '1' } });
+    assert.equal(r.status, 503);
+    assert.match((await r.json()).error, /try again/);
+    // a neighbouring address isn't the notes
+    assert.notEqual((await send('/data/plant-notesx')).status, 405);
+  } finally { await keyed.dispose(); }
+});

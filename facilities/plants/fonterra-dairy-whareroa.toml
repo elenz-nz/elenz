@@ -8,6 +8,7 @@ reviewed = ""
 to_check = [
   "Page name: the EA register's \"Fonterra Dairy - Whareroa\"; the owner calls it the Whareroa Cogeneration Plant. Rename the page? (Decision needed; the tracker's name stays.)",
   "Capacity: Elenz uses 68 MW (the register's figure); the plant is four 10 MW gas turbines and a 28 MW steam turbine. Generation_MD is net of the site's load (see notes).",
+  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
   "68 MW; Generation_MD is net of ~50% local load.",

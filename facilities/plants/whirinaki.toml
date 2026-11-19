@@ -9,6 +9,7 @@ osm = ["way/95512220"]
 reviewed = ""
 to_check = [
   "Previous owners: Wikipedia's dates (Crown-owned 2004–11, bought by Contact on 22 Dec 2011) rest on government and Contact releases it cites; find one of them to raise the grade.",
+  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
   "156 MW from Apr 2004.",

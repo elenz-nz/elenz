@@ -42,6 +42,63 @@ test.describe('plant research page', () => {
     expect(errors).toEqual([]);
   });
 
+  test('team notes: read with the key, saved on leaving the box, and every link opens in a new tab', async ({ page, browserName }) => {
+    const errors = [];
+    const ignore = browserName === 'webkit' ? WEBKIT_CANCELLED : OK_ERRORS;
+    page.on('pageerror', (e) => { if (!ignore.test(e.message)) errors.push(e.message); });
+    await page.route(/cloudflareinsights\.com|umami\.is/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
+    // the Worker's notes store (worker/notes.js), stood in for: the static build here has no Worker
+    const saved = [];
+    let stored = { benmore: { text: 'Ask Meridian about unit 6.', at: 1795000000000 } };
+    await page.route('**/data/plant-notes**', async (route) => {
+      const req = route.request();
+      if (req.headers()['x-elenz-key'] !== 'k123') return route.fulfill({ status: 404, body: 'Not found' });
+      if (req.method() === 'GET') return route.fulfill({ json: { notes: stored } });
+      const slug = new URL(req.url()).pathname.split('/').pop(), body = req.postDataJSON();
+      saved.push({ slug, ...body });
+      const note = { text: body.text.trim(), at: 1795000100000 + saved.length };
+      stored = { ...stored, [slug]: note };
+      return route.fulfill({ json: note });
+    });
+    await page.goto('/plants/research?key=k123&plant=benmore');
+    const detail = page.locator('.detail');
+    const box = detail.getByLabel('Team notes');
+    await expect(box).toHaveValue('Ask Meridian about unit 6.');
+    await expect(page.locator('tr.on .has-note')).toBeVisible();
+    await expect(detail).toContainText(/saved \d+ Nov 2026/);
+
+    await box.fill('Ask Meridian about unit 6.\nAlso the 1965 date.');
+    await expect(detail).toContainText('Not saved yet');
+    await detail.getByRole('heading', { name: /Facts/ }).click();   // leaving the box saves it
+    await expect.poll(() => saved.length).toBe(1);
+    expect(saved[0]).toEqual({ slug: 'benmore', text: 'Ask Meridian about unit 6.\nAlso the 1965 date.', base: 1795000000000 });
+    await expect(detail).not.toContainText('Not saved yet');
+
+    // the Needs filter finds the plants with notes
+    await page.getByLabel('Needs').selectOption('mine');
+    await expect(page.locator('#tbl-h')).toContainText(/^1 of/);
+
+    // every link on the page, the masthead's and footer's too, opens in a new tab; links within the page don't
+    const links = await page.locator('a[href]').evaluateAll((as) => as.map((a) => ({ href: a.getAttribute('href'), target: a.target, rel: a.rel })));
+    expect(links.length).toBeGreaterThan(10);
+    for (const l of links) {
+      if (/^(#|mailto:|tel:)/.test(l.href)) continue;
+      expect(l, l.href).toMatchObject({ target: '_blank' });
+      expect(l.rel, l.href).toContain('noopener');
+    }
+    const [tab] = await Promise.all([page.context().waitForEvent('page'), detail.getByRole('link', { name: 'Plant page' }).click()]);
+    expect(new URL(tab.url()).pathname).toBe('/plants/benmore');
+    await tab.close();
+    await expect(page).toHaveURL(/\/plants\/research\?key=k123&need=mine&plant=benmore/);   // this tab stays put
+    expect(errors).toEqual([]);
+  });
+
+  test('team notes say why they can\'t be read without the key', async ({ page }) => {
+    await page.goto('/plants/research?plant=benmore');
+    await expect(page.locator('.detail')).toContainText('Notes need the page’s key');
+    await expect(page.locator('.detail').getByLabel('Team notes')).toHaveCount(0);
+  });
+
   test('on a phone the table fits and a plant opens', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/plants/research?plant=benmore');

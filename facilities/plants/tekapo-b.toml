@@ -7,7 +7,9 @@ register = ["H059"]
 wikidata = "Q21037318"
 osm = ["way/270012792"]
 reviewed = "2026-11-19"
-to_check = []
+to_check = [
+  "Units: the unit count rests on Wikipedia, since Genesis's Tekapo page couldn't be opened. Check it on Genesis's page.",
+]
 notes = [
   "Added from Elenz's plant list (8 Nov 2026).",
   "Hydro batch 3 (18 Nov 2026): checked with Tekapo A and Meridian's Waitaki stations; owner facts from Genesis's own releases, the EA register and network supply points table, the Gazette and Stats NZ boundaries. Genesis's Tekapo Power Scheme page could not be opened from our research tools, so the units rest on Wikipedia. The location is left for the LINZ aerial check.",

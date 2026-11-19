@@ -10,6 +10,7 @@ reviewed = ""
 to_check = [
   "Previous owners of the combined cycle unit between 1998 and 2002: the Commerce Commission (2003) has it owned by NGC's Stratford Power Ltd; NGC entered generation by buying TransAlta NZ in 2000. Who built and owned it before that?",
   "TCC's last day: Contact says it retired in 2026 (FY26); Elenz's last output is Dec 2025 and its capacity step 1 Apr 2026. Find the date.",
+  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
   "T002: Elenz shows Stratford as one plant (one meter, SFD2201): TCC and the two peakers. 212 MW from Apr 2026 (peakers).",

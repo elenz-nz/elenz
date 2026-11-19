@@ -8,6 +8,7 @@ osm = ["relation/11871344"]
 reviewed = ""
 to_check = [
   "Stations: match the other sites on the aerial (notes) to OEC1 and OEC2, OEC3 and OEC4, then give each station its point.",
+  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
   "10 → 25 (Aug 2008) → 57 MW (Dec 2020). Only Ngāwhā B is dispatched.",

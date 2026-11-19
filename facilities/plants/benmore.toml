@@ -8,7 +8,9 @@ wikidata = "Q4889583"
 osm = ["relation/12455469"]
 reviewed = "2026-11-19"
 photo_leads = ["P004", "P005"]
-to_check = []
+to_check = [
+  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
+]
 notes = [
   "Elenz has 570 MW from 30 Jul 2026 (540 → 552 → 570 after upgrades).",
   "Hydro batch 3 (18 Nov 2026): facts checked against Meridian's station pages, the EA register and network supply points table, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",

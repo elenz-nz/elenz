@@ -7,7 +7,9 @@ register = ["S002"]
 wikidata = "Q125856182"
 osm = ["way/1389207750"]
 reviewed = "2026-11-19"
-to_check = []
+to_check = [
+  "Sources: Lodestone's site refuses automated reads, so this farm's facts rest mainly on BraveTrace's device sheet (Lodestone's page read only through search results). Check Lodestone's page by hand.",
+]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against BraveTrace's device sheet, the EA register and network supply points table, Lodestone's farm pages (through search results) and Stats NZ boundaries.",
   "District and region from the station's point (the [location] value, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; no other district within 3 km.",

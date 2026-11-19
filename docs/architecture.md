@@ -176,8 +176,16 @@ Facts, Sources, Photo leads, Station leads; the first row bold, frozen and filte
 secret `SCREENS_KEY` (the screens page's key), else the not-found page, `__data.json` included; on a branch preview it opens
 without one, so a research batch is reviewed on its pull request's preview (previews may not carry the Worker's secrets,
 and they are noindex). It is never cached or indexed, sends no referrer, and the Worker takes out Cloudflare Web Analytics
-and Umami, so the team's visits aren't counted and the key never reaches either. Tests: `tests/research.test.js`,
-`tests/e2e/research.spec.js` and the `/plants/research` block in the Worker tests.
+and Umami, so the team's visits aren't counted and the key never reaches either. Each opened plant also has a Team
+notes box (design decision, 19 Nov 2026): the team's own notes, saved through the Worker in KV and never in the
+repository (`#lib/plants/notes.js`; Worker, `/data/plant-notes`). The page sends the key from its address; it saves on
+leaving the box, with Ctrl+Enter or Save, warns before closing with a note unsaved, offers "Use that one" or "Save mine
+over it" when another device saved first, and says in words when there is no key, a wrong key, or no key set on that
+address (a branch preview needs `SCREENS_KEY` in its Previews settings). A ✎ marks plants with notes, the Needs filter has
+"Has team notes", and the workbook's Plants sheet a Team notes column. Every link on the page, masthead and footer
+included, opens in a new tab (`#lib/site/newtabs.js`, design decision 19 Nov 2026), so the page's filters and open plant
+stay put. Tests: `tests/research.test.js`, `tests/e2e/research.spec.js` and the `/plants/research` and
+`/data/plant-notes` blocks in the Worker tests.
 
 The page: name, a line from Elenz's data (`subtitle()`), tags (fuel, island, owner, status, installed MW); "We're still
 checking this page's facts" until the plant file's `reviewed` is set; the photo (once `plant_images.csv` has a row; the
@@ -550,6 +558,14 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   Worker tests: the `/data/screens` block, with a stand-in for the SQL API.
 - The plant research page, `/plants/research`: on elenz.co.nz only with `?key=<SCREENS_KEY>` (`research` in
   `worker/index.js`; Plant pages, the research page).
+- The team's plant notes, `/data/plant-notes` (`worker/notes.js`; design decision, 19 Nov 2026): what the research
+  page's Team notes boxes save. One KV key per plant, `plant-notes/<slug>` (`{ text, at }`), in the site's own namespace,
+  never in the repository. Every request needs `SCREENS_KEY` in the `x-elenz-key` header, on every host, else 404; a
+  preview with no key set answers 503 "no key is set" so its page can say so. `GET /data/plant-notes` lists the prefix and
+  reads each note; `PUT /data/plant-notes/<slug>` with `{ text, base }` saves one (empty text deletes it; at most 20,000
+  characters) unless the stored note's `at` isn't `base` (another device saved since), which answers 409 with the stored
+  note and writes nothing; `base: "any"` writes over it. KV is eventually consistent, so another device may take up to
+  a minute to see a save. Worker tests: the `/data/plant-notes` block.
 
 ## Facilities
 
