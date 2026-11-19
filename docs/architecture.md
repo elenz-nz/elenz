@@ -206,9 +206,10 @@ its plant file's checked location, and `plant_pages.py --check` fails when a loc
 file is missing. The Now panel takes the full width with neither; three figures (the latest 12 whole months and their capacity factor, the most in a calendar year
 in our records; for a closed plant its total, best year and last month); generation by year (Energy or Capacity factor,
 dashed lines where installed MW changed, the plant's metering note from `plants.json` under it); the last 24 whole months;
-installed capacity over time with each step's source in its ⓘ; related pages, in the main column (the scheme's other
-stations upstream first, the owner's other plants, at most 12, the largest of its fuel on its island); in the side
-column the facts (installed MW and owner from Elenz's data, then the checked facts, each fact's note in its own ⓘ so the
+installed capacity over time with each step's source in its ⓘ; related pages (the scheme's other stations upstream
+first, the owner's other plants, at most 12, the largest of its fuel on its island), under the charts on a wide screen
+and straight under the facts on a phone (a grid with areas from 900 px; below it the side column's cards join the
+page's grid with `display: contents` and `order`); in the side column the facts (installed MW and owner from Elenz's data, then the checked facts, each fact's note in its own ⓘ so the
 column stays short) and a call to share what you know, linking to `/plants/share?plant=<slug>`; and the sources, numbered, ending with Elenz's own data. Charts are drawn to
 their card's width (`Bars.svelte`, `CapSteps.svelte`, `Spark.svelte`; each wrapper `min-width: 0`, or a chart holds
 its card at 720 px on a phone), and pointing at or tapping a bar puts its figures in the line above. A closed plant has

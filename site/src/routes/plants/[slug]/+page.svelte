@@ -282,24 +282,10 @@
 				{/if}
 				{/if}
 
-				{#if p.related.owner.length || p.related.scheme.length || p.related.fuel.length}
-					<section class="panel related" aria-labelledby="rel-h">
-						<h2 id="rel-h">Related</h2>
-						{#if p.related.scheme.length}
-							<div><p class="k">Other stations on the {p.scheme} hydro scheme</p><div class="chips">{#each p.related.scheme as r}<a href="/plants/{r.slug}">{r.name}</a>{/each}</div></div>
-						{/if}
-						{#if p.related.owner.length}
-							<div><p class="k">{relatedOwner}</p><div class="chips">{#each p.related.owner as r}<a href="/plants/{r.slug}">{r.name}</a>{/each}</div></div>
-						{/if}
-						{#if p.related.fuel.length}
-							<div><p class="k">Largest other {kinds(p.fuel)} in the {islandName(p.island)}</p><div class="chips">{#each p.related.fuel as r}<a href="/plants/{r.slug}">{r.name}</a>{/each}</div></div>
-						{/if}
-					</section>
-				{/if}
 			</div>
 
 			<aside class="side">
-				<section class="panel" aria-labelledby="facts-h">
+				<section class="panel fact-card" aria-labelledby="facts-h">
 					<h2 id="facts-h">Facts</h2>
 					<dl class="facts">
 						{#if p.mw && p.status !== 'pending'}<div><dt>Installed</dt><dd><span class="num">{fmtMw(p.mw)} MW</span>{p.status === 'closed' ? ' when it closed' : ''}</dd></div>{/if}
@@ -317,6 +303,21 @@
 					<a class="link" href="/plants/share?plant={p.slug}">Share what you know</a>
 				</section>
 			</aside>
+
+			{#if p.related.owner.length || p.related.scheme.length || p.related.fuel.length}
+				<section class="panel related" aria-labelledby="rel-h">
+					<h2 id="rel-h">Related</h2>
+					{#if p.related.scheme.length}
+						<div><p class="k">Other stations on the {p.scheme} hydro scheme</p><div class="chips">{#each p.related.scheme as r}<a href="/plants/{r.slug}">{r.name}</a>{/each}</div></div>
+					{/if}
+					{#if p.related.owner.length}
+						<div><p class="k">{relatedOwner}</p><div class="chips">{#each p.related.owner as r}<a href="/plants/{r.slug}">{r.name}</a>{/each}</div></div>
+					{/if}
+					{#if p.related.fuel.length}
+						<div><p class="k">Largest other {kinds(p.fuel)} in the {islandName(p.island)}</p><div class="chips">{#each p.related.fuel as r}<a href="/plants/{r.slug}">{r.name}</a>{/each}</div></div>
+					{/if}
+				</section>
+			{/if}
 		</div>
 
 		<section id="sources" class="panel" aria-labelledby="src-h">
@@ -385,9 +386,23 @@
 	.stats .v { font-family: var(--font-data); font-variant-numeric: tabular-nums; font-size: 1.35rem; font-weight: 500; }
 	.stats .k { font-size: 0.8rem; color: var(--muted); }
 
-	.cols { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
-	.main { flex: 999 1 560px; min-width: 0; display: grid; gap: 16px; }
-	.side { flex: 1 1 300px; min-width: 0; display: grid; gap: 16px; }
+	/* phones: the main column, Facts, Related, then the call to share (the side column's cards join the page's grid);
+	   wider: Related under the main column, the side column beside both (page review, 19 Nov 2026). The second row takes
+	   the side column's extra height, so Related sits right under the charts. */
+	.cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+	.main, .side { min-width: 0; display: grid; gap: 16px; }
+	@media (max-width: 899.98px) {
+		.side { display: contents; }
+		.fact-card { order: 1; }
+		.cols > .related { order: 2; }
+		.ask { order: 3; }
+	}
+	@media (min-width: 900px) {
+		.cols { grid-template-columns: minmax(0, 1fr) 300px; grid-template-rows: auto 1fr; grid-template-areas: 'main side' 'related side'; }
+		.main { grid-area: main; }
+		.side { grid-area: side; }
+		.cols > .related { grid-area: related; }
+	}
 	.about { display: grid; gap: 8px; }
 	.about h2 { font-size: 1.15rem; }
 	.about p { margin: 0; font-size: 1rem; line-height: 1.6; max-width: 68ch; }

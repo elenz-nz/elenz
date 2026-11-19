@@ -448,8 +448,18 @@ test.describe('plant pages', () => {
     await page.waitForTimeout(300);
     await tip.click();
     await expect(page.locator('.info-pop-tip:visible')).toContainText('Construction began in 1958');
-    await expect(page.locator('.main .related')).toContainText('Aviemore');
-    await expect(page.locator('.side .related')).toHaveCount(0);
+    const related = page.locator('.cols > .related');
+    await expect(related).toContainText('Aviemore');
+    // desktop: Related under the charts, left of Facts; phone: Related straight under Facts, the call to share last
+    const box = async (sel) => (await page.locator(sel).boundingBox());
+    const [rel, fc, main, ask] = [await box('.cols > .related'), await box('.fact-card'), await box('.main'), await box('.ask')];
+    if ((page.viewportSize()?.width ?? 0) >= 900) {
+      expect(rel.x).toBeLessThan(fc.x);
+      expect(rel.y).toBeGreaterThanOrEqual(main.y + main.height);
+    } else {
+      expect(rel.y).toBeGreaterThan(fc.y + fc.height);
+      expect(ask.y).toBeGreaterThan(rel.y + rel.height);
+    }
     await page.getByRole('link', { name: 'Share what you know' }).click();
     await expect(page).toHaveURL(/\/plants\/share\?plant=benmore/);
     await expect(page.locator('h1')).toHaveText('Share what you know about Benmore');
