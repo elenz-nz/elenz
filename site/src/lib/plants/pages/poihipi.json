@@ -5,16 +5,16 @@
  "fuel": "geo",
  "island": "NI",
  "status": "operating",
- "mw": 55.0,
+ "mw": 51.0,
  "steps": [
   {
    "from": null,
    "to": null,
-   "mw": 55.0,
+   "mw": 51.0,
    "sources": [
     {
-     "label": "EA plant register (DispatchedGenerationPlant.csv)",
-     "url": ""
+     "label": "contact.co.nz",
+     "url": "https://contact.co.nz/about-us/our-story/our-generation-and-power-sites/geothermal/poihipi-road"
     }
    ]
   }
@@ -111,9 +111,9 @@
    "label": "Other ratings",
    "refs": [
     1,
-    2
+    3
    ],
-   "value": "51 MW (Contact's station page: capacity); 50 MW (NZ Geothermal Association: installed capacity, one 50 MW unit)"
+   "value": "55 MW (The EA register's nameplate); 50 MW (NZ Geothermal Association: installed capacity, one 50 MW unit)"
   },
   {
    "k": "grid_connection",

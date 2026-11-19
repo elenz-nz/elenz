@@ -207,10 +207,6 @@
     "name": "Matahina"
    },
    {
-    "slug": "poihipi",
-    "name": "Poihipi"
-   },
-   {
     "slug": "roxburgh",
     "name": "Roxburgh"
    },
@@ -221,6 +217,10 @@
    {
     "slug": "tauhara",
     "name": "Tauhara"
+   },
+   {
+    "slug": "te-huka-3",
+    "name": "Te Huka 3"
    },
    {
     "slug": "te-mihi",

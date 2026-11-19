@@ -5,11 +5,10 @@ plant = "Dannevirke Solar Farm"
 name = "Dannevirke Solar Farm"
 register = ["S014"]
 osm = ["way/1516694558"]
-reviewed = ""
-to_check = [
-  "Capacity (decision): Elenz uses 23 MW from the earlier register copy; the EA register (17 Nov 2026) now lists 19 MW. 23 MWp is the DC rating (SolarQuarter). Move plant_capacity.csv to 19 MW at the next register refresh?",
-]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
+  "Capacity: Elenz uses the register's 19 MW since 19 Nov 2026 (design decision); the earlier 23 MW is the panels' DC rating.",
   "Solar batch (19 Nov 2026): facts checked against the EA register and network supply points table, Tararua District Council's consent documents (through search results), SolarQuarter and Stats NZ boundaries.",
   "Region and district from the grid connection point (no station point yet); the sources place the farm near it, in the same region (Dannevirke); the consent is for 440 Tamaki River Road, Dannevirke, granted by Tararua District Council.",
   "Mounting: single-axis trackers (GameChange Genius Tracker 1P; tracker commissioning finished 25 Aug 2026).",

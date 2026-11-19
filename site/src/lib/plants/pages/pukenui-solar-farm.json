@@ -5,16 +5,16 @@
  "fuel": "solar",
  "island": "NI",
  "status": "operating",
- "mw": 20.8,
+ "mw": 17.2,
  "steps": [
   {
    "from": "2025-05-23",
    "to": null,
-   "mw": 20.8,
+   "mw": 17.2,
    "sources": [
     {
-     "label": "EA plant register (DispatchedGenerationPlant.csv)",
-     "url": ""
+     "label": "bravetrace.co.nz",
+     "url": "https://bravetrace.co.nz/wp-content/uploads/2026/02/Aquila-Energy-Pukenui-Solar-Farm-BraveTrace-one-pager-Feb-2026.pdf"
     }
    ]
   }

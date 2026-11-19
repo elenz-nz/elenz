@@ -5,11 +5,11 @@
  "fuel": "geo",
  "island": "NI",
  "status": "operating",
- "mw": 27.0,
+ "mw": 26.0,
  "steps": [
   {
    "from": "2018-10-01",
-   "to": null,
+   "to": "2025-09-18",
    "mw": 27.0,
    "sources": [
     {
@@ -17,12 +17,27 @@
      "url": ""
     }
    ]
+  },
+  {
+   "from": "2025-09-19",
+   "to": null,
+   "mw": 26.0,
+   "sources": [
+    {
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    },
+    {
+     "label": "eastlandgeneration.nz",
+     "url": "https://eastlandgeneration.nz/renewable-generation/geothermal"
+    }
+   ]
   }
  ],
  "owner": null,
  "scheme": null,
  "metered": "Since December 2025 one metered code at KAW2201 carries Te Ahi O Maui and TOPP2 together. The metered history splits it 35% Te Ahi O Maui, 65% TOPP2, by their shares in the dispatch data. The dispatch data (the live week and the weeks since the newest metered month) has each plant's own output.",
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "Te Ahi O Māui is a 26 MW geothermal power station on the Kawerau geothermal field, built in partnership by Eastland Generation and the Kawerau A8D Ahu Whenua Trust. Running since 2018, it was the first geothermal station Eastland built from the ground up. Since September 2025 it has fed the grid through the same connection as Eastland's newer TOPP2 station.",

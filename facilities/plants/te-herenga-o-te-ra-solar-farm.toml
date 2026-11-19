@@ -6,11 +6,10 @@ name = "Te Herenga o Te Rā Solar Farm"
 register = ["S006"]
 wikidata = "Q133480513"
 osm = ["way/1410036411"]
-reviewed = ""
-to_check = [
-  "Capacity (decision): Elenz uses the register's 33 MW; BraveTrace's sheet (May 2026) gives 30 MW AC. Keep 33 unless metered half-hour peaks say otherwise.",
-]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
+  "Capacity: Elenz keeps the register's 33 MW (design decision 19 Nov 2026); BraveTrace's sheet (May 2026) gives 30 MW AC.",
   "Solar batch (19 Nov 2026): facts checked against BraveTrace's device sheet, the EA register and network supply points table, and Stats NZ boundaries.",
   "District and region from the station's point (the [location] value, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; no other district within 3 km. The old leads (Manawatū-Whanganui, \"Edgecumbe\") were wrong.",
   "Commissioning: the register's row starts 22 Nov 2024; BraveTrace says it started generating in December 2024 and was commissioned on 20 January 2025. The page shows 2025.",

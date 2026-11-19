@@ -14,7 +14,7 @@ notes = [
   "District and region from the [location] point (one point, Wikidata's, for the whole wind farm) (not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. The point is in Tararua District, but Palmerston North City is within 2 km and all three grid connections (Linton, Bunnythorpe and the stage III tee) are in Palmerston North City: the farm sits on the boundary, so the district is left until each stage has its own point.",
   "Owner: Mercury since 3 August 2021. The EA register lists Manawa Energy (Trustpower until 2022), which is how Elenz's By owner view showed it under Contact; [plant_owners] now sets Mercury.",
   "Removed the scheme fact (Tararua Range, from our own register) and published \"Tararua Wind Farm\" as the scheme, joining the three stages.",
-  "Capacity: stage II is 55 x 660 kW = 36.3 MW (Tilt, NZWEA); the register and Elenz use 37 MW. Peak metered half-hour, Aug-Sep 2026: 32.5 MW at Bunnythorpe. Unchanged; a design decision for the Elenz team.",
+  "Capacity: stage II is 55 x 660 kW = 36.3 MW (Tilt, NZWEA); the register and Elenz use 37 MW. Peak metered half-hour, Aug-Sep 2026: 32.5 MW at Bunnythorpe. Kept at the register's figure (design decision, 19 Nov 2026).",
   "District from the checked point (Stats NZ, 19 Nov 2026): Tararua; Palmerston North is within 300 m.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]

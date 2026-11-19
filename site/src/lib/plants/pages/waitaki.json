@@ -5,16 +5,16 @@
  "fuel": "hydro",
  "island": "SI",
  "status": "operating",
- "mw": 95.0,
+ "mw": 105.0,
  "steps": [
   {
    "from": null,
    "to": null,
-   "mw": 95.0,
+   "mw": 105.0,
    "sources": [
     {
-     "label": "EA plant register (DispatchedGenerationPlant.csv)",
-     "url": ""
+     "label": "meridianenergy.co.nz",
+     "url": "https://www.meridianenergy.co.nz/power-stations/hydro/waitaki"
     }
    ]
   }
@@ -23,7 +23,7 @@
  "scheme": "Waitaki",
  "metered": null,
  "checking": false,
- "checked": "2026-11-18",
+ "checked": "2026-11-19",
  "about": {
   "text": "Waitaki was the first station of the Waitaki scheme, begun in 1928 as a Depression \"make work\" project. Dug almost entirely by pick and shovel, it was the last New Zealand station built without modern machinery, and its first two 15 MW units, running from 1935, could meet nearly half the South Island's needs. Five more units followed by 1954. In 2026 Meridian began a $440–510 million upgrade, due by 2036, that will replace all seven and take the station from 105 MW to 120 MW.",
   "refs": [
@@ -113,9 +113,9 @@
    "k": "ratings",
    "label": "Other ratings",
    "refs": [
-    1
+    9
    ],
-   "value": "105 MW (Meridian's total: seven 15 MW units)"
+   "value": "95 MW (The EA register's nameplate)"
   },
   {
    "k": "grid_connection",

@@ -5,15 +5,13 @@ plant = "Te Rere Hau"
 name = "Te Rere Hau"
 register = ["W008"]
 osm = ["relation/6122225"]
-reviewed = ""
-to_check = [
-  "Capacity: Meridian now gives 91 turbines and 45.5 MW; Elenz uses 48.5 MW. A design decision for the Elenz team (when did it change?).",
-]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "5 → 32.5 → 48.5 MW (2008–2011).",
   "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. It has no location yet.",
   "Owner: Meridian bought NZ Windfarms Limited, which owns the wind farm, on 30 July 2025 (court-approved scheme of arrangement). The EA register still lists NZ Windfarms Limited, now Meridian's subsidiary, as the operator, so Elenz's By owner view showed it under Other generators until [plant_owners] was set in this batch.",
-  "Capacity: Meridian's project page (19 Nov 2026) says it \"currently has 91 turbines with a total installed capacity of 45.5MW\" (97 were built). Elenz's output: about 100 GWh a year to 2024, 65 GWh in 2025 and 59 GWh in 2026 to date; peak metered half-hour Aug-Sep 2026 only 28.4 MW. Left at 48.5 MW pending a decision.",
+  "Capacity: Meridian's project page (19 Nov 2026) says it \"currently has 91 turbines with a total installed capacity of 45.5MW\" (97 were built). Elenz's output: about 100 GWh a year to 2024, 65 GWh in 2025 and 59 GWh in 2026 to date; peak metered half-hour Aug-Sep 2026 only 28.4 MW. Elenz uses Meridian's 45.5 MW from Jan 2025 (design decision 19 Nov 2026: the date of the change isn't public, and output fell from 2025; strings of turbines may be shut down ahead of the repowering), 48.5 MW before.",
   "Repowering: Meridian plans up to 40 new turbines and 172 MW, with a final investment decision expected in early 2027 and completion about 2030. Not a page fact until built.",
   "Region from Wikipedia's point (-40.38833, 175.72417), Stats NZ 2025 boundaries; only Manawatū-Whanganui within 5 km.",
   "Removed the scheme fact (Tararua Range, from our own register): a single wind farm has no scheme.",

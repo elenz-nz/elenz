@@ -5,12 +5,12 @@
  "fuel": "solar",
  "island": "NI",
  "status": "operating",
- "mw": 23.0,
+ "mw": 19.0,
  "steps": [
   {
    "from": "2026-04-29",
    "to": null,
-   "mw": 23.0,
+   "mw": 19.0,
    "sources": [
     {
      "label": "EA plant register (DispatchedGenerationPlant.csv)",
@@ -22,7 +22,7 @@
  "owner": null,
  "scheme": null,
  "metered": null,
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "Dannevirke Solar Farm is on Tamaki River Road outside Dannevirke in the Tararua District, developed by Bright Fern Energy. Its panels sit on single-axis trackers that follow the sun, designed for the area's earthquakes, strong winds and rolling ground. It began feeding the grid in 2026.",

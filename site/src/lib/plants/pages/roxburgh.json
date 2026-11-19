@@ -5,16 +5,16 @@
  "fuel": "hydro",
  "island": "SI",
  "status": "operating",
- "mw": 328.0,
+ "mw": 320.0,
  "steps": [
   {
    "from": null,
    "to": null,
-   "mw": 328.0,
+   "mw": 320.0,
    "sources": [
     {
-     "label": "EA plant register (DispatchedGenerationPlant.csv)",
-     "url": ""
+     "label": "contact.co.nz",
+     "url": "https://contact.co.nz/about-us/our-story/our-generation-and-power-sites/hydro/roxburgh"
     }
    ]
   }
@@ -23,7 +23,7 @@
  "scheme": "Clutha",
  "metered": "It generates onto two buses (ROX2201 and ROX1101), so it can be split by grid connection.",
  "checking": false,
- "checked": "2026-11-18",
+ "checked": "2026-11-19",
  "about": {
   "text": "Roxburgh holds back Lake Roxburgh on the Clutha River, about 9 km north of the town of Roxburgh. The government approved it in December 1947, and its first generator ran in 1956: four Canadian-built turbines went in during 1956–57 and four more in 1960–61, giving eight units and 320 MW. Contact is replacing four of the original turbines with more efficient ones made by Voith between 2024 and 2026, which it expects to add about 44 GWh a year from the same water.",
   "refs": [
@@ -113,9 +113,9 @@
    "k": "ratings",
    "label": "Other ratings",
    "refs": [
-    1
+    8
    ],
-   "value": "320 MW (Contact's maximum capacity (Elenz uses the EA register's 328 MW))"
+   "value": "328 MW (The EA register's nameplate, on two buses (205 + 123 MW); reached only for a few hours)"
   },
   {
    "k": "grid_connection",

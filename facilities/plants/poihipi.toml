@@ -9,10 +9,10 @@ osm = ["way/171571719"]
 reviewed = "2026-11-19"
 to_check = []
 notes = [
-  "55 MW.",
+  "51 MW (Contact) since 19 Nov 2026; 55 MW (the register) before.",
   "Geothermal batch 1 (19 Nov 2026): facts checked against Contact's station page, the EA register and network supply points table, the NZ Geothermal Association's Wairakei page, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "District and region from the station's point (the [location] value, from Wikipedia's list, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; the grid connection point gives the same. No other district within 5 km.",
-  "Capacity (open): Elenz uses the register's 55 MW. Contact gives 51 MW, NZGA 50 MW installed, Wikipedia's article 55 MW (its list had 40). Wikipedia says maximum output plateaued just under 52 MW in 2012–15 and has fallen since (unsourced). Worth checking metered half-hour peaks before deciding whether plant_capacity.csv should move to 51.",
+  "Capacity: decided 19 Nov 2026 (design decision): Elenz uses Contact's 51 MW; the register gives 55 MW. Contact gives 51 MW, NZGA 50 MW installed, Wikipedia's article 55 MW (its list had 40). Wikipedia says maximum output plateaued just under 52 MW in 2012–15 and has fallen since (unsourced). The register's 55 MW shows as another rating.",
   "Commissioned: Contact and the register say 1997; NZGA and Wikipedia 1996. The page shows 1997.",
   "Wikipedia's development section (unsourced) names the venture Mercury Geotherm Ltd, a joint venture of Mercury Energy's network company and the landowners' Waituruturu trust, and says the turbine was a Fuji set built for The Geysers in California but never run. Not published: no public source checked yet. NZGA calls the builder the Geotherm Joint Venture.",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
@@ -125,9 +125,9 @@ grade = "B"
 checked = "2026-11-19"
 
 [[ratings]]
-value = 51
-basis = "Contact's station page: capacity"
-source = "contact-poihipi"
+value = 55
+basis = "The EA register's nameplate"
+source = "ea-register"
 grade = "A"
 checked = "2026-11-19"
 
