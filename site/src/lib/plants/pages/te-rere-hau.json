@@ -5,7 +5,7 @@
  "fuel": "wind",
  "island": "NI",
  "status": "operating",
- "mw": 48.5,
+ "mw": 45.5,
  "steps": [
   {
    "from": "2008-11-01",
@@ -39,7 +39,7 @@
   },
   {
    "from": "2011-05-01",
-   "to": null,
+   "to": "2024-12-31",
    "mw": 48.5,
    "sources": [
     {
@@ -51,12 +51,23 @@
      "url": ""
     }
    ]
+  },
+  {
+   "from": "2025-01-01",
+   "to": null,
+   "mw": 45.5,
+   "sources": [
+    {
+     "label": "meridianenergy.co.nz",
+     "url": "https://www.meridianenergy.co.nz/new-projects/te-rere-hau"
+    }
+   ]
   }
  ],
  "owner": "Meridian",
  "scheme": null,
  "metered": null,
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "Te Rere Hau is on the Tararua Range about 11 km east of Palmerston North. NZ Windfarms built it in four stages from 2006 to 2011 with 97 two-bladed Windflow 500 turbines of 500 kW, designed and made in New Zealand, which set it apart from its neighbours. Meridian, already its partner in a plan to replace them with far larger turbines, bought NZ Windfarms in July 2025.",

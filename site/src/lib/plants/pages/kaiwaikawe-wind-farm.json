@@ -5,16 +5,20 @@
  "fuel": "wind",
  "island": "NI",
  "status": "operating",
- "mw": 74.0,
+ "mw": 77.0,
  "steps": [
   {
    "from": "2026-06-01",
    "to": null,
-   "mw": 74.0,
+   "mw": 77.0,
    "sources": [
     {
-     "label": "Wikipedia, List of power stations in New Zealand",
-     "url": "https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand"
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
+     "url": ""
+    },
+    {
+     "label": "mercury.co.nz",
+     "url": "https://www.mercury.co.nz/about-us/renewable-energy/wind-generation/kaiwaikawe-wind-farm"
     }
    ]
   }
@@ -22,7 +26,7 @@
  "owner": "Mercury",
  "scheme": null,
  "metered": "It isn't in the EA's plant register yet, so we add it from its dispatched unit (MPE1101 KWK0).",
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "Kaiwaikawe Wind Farm is 12 km north-west of Dargaville in Northland and 3 km inland from the Tasman Sea, with its 12 turbines in two clusters. They are Vestas V162 machines of 6.4 MW, 206 m to the blade tip, the first of their kind built in New Zealand and its largest and tallest wind turbines. Tilt Renewables first proposed it, as Omamari, and Mercury took it over in 2021; it first generated in July 2026, sending its power through Northpower's substation near Dargaville to the grid at Maungatapere.",

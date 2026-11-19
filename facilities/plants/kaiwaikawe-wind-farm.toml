@@ -6,15 +6,13 @@ name = "Kaiwaikawe Wind Farm"
 register = ["W027"]
 wikidata = "Q108122994"
 osm = ["relation/19754078"]
-reviewed = ""
-to_check = [
-  "Capacity: Elenz uses 74 MW; the register gives 77 MW and Mercury 12 x 6.4 MW (76.8 MW). A design decision for the Elenz team.",
-]
+reviewed = "2026-11-19"
+to_check = []
 notes = [
   "Added from Elenz's plant list (8 Nov 2026).",
   "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "District and region from the [location] point (not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. No other district within 2 km. The old to-check item said this was the grid connection: it isn't. The point is near Dargaville; the grid connection, Maungatapere, is about 45 km east in Whangārei District.",
-  "Capacity: Elenz's 74 MW came from Wikipedia's list; the EA register (from 13 Jul 2026) gives 77 MW, as do Wikipedia's article and 12 x 6.4 MW = 76.8 MW (Mercury). Tilt's 2021 offtake release said 75 MW. Left at 74 pending a decision; final commissioning continues to early 2027.",
+  "Capacity: Elenz's 74 MW came from Wikipedia's list; the EA register (from 13 Jul 2026) gives 77 MW, as do Wikipedia's article and 12 x 6.4 MW = 76.8 MW (Mercury). Tilt's 2021 offtake release said 75 MW. Elenz uses the register's 77 MW since 19 Nov 2026 (design decision); final commissioning continues to early 2027.",
   "Offtake: Tilt signed a 20-year agreement for Genesis to buy its output in 2021 (NZX, 3 Aug 2021); the register lists Mercury as operator. Not published until checked against a current source.",
   "Not in Generation_MD for Aug-Sep 2026 (no metered peak to compare).",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",

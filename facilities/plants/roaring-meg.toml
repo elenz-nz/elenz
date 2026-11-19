@@ -7,7 +7,7 @@ register = ["E011"]
 osm = ["relation/12568869", "relation/12568870"]
 reviewed = ""
 to_check = [
-  "Capacity (open): Elenz uses the register's 12 MW, but Wikipedia gives the two stations 3.0 and 1.26 MW (about 4.3 MW). Does the register's row at CML0331 count other Pioneer stations too? Its unit code, TVT0, is also Teviot's.",
+  "Capacity (open): Elenz uses the register's 12 MW, but Wikipedia gives the two stations 3.0 and 1.26 MW (about 4.3 MW). Does the register's row at CML0331 count other Pioneer stations too? Its unit code, TVT0, is also Teviot's. Keep 12 MW meanwhile (design decision 19 Nov 2026).",
 ]
 notes = [
   "Elenz plant (CML0331, 12 MW register) and grade A at CML0331 in other embedded generation.",

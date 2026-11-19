@@ -5,16 +5,27 @@
  "fuel": "solar",
  "island": "NI",
  "status": "operating",
- "mw": 16.8,
+ "mw": 20.0,
  "steps": [
   {
    "from": "2024-12-05",
-   "to": null,
+   "to": "2025-06-30",
    "mw": 16.8,
    "sources": [
     {
      "label": "EA plant register (DispatchedGenerationPlant.csv)",
      "url": ""
+    }
+   ]
+  },
+  {
+   "from": "2025-07-01",
+   "to": null,
+   "mw": 20.0,
+   "sources": [
+    {
+     "label": "northpower.nz",
+     "url": "https://northpower.nz/case-study/te-puna-mauri-o-omaru-solar-farm-bringing-power-home/"
     }
    ]
   }

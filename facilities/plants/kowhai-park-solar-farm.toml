@@ -6,16 +6,15 @@ name = "Kōwhai Park Solar Farm"
 register = ["S015"]
 wikidata = "Q130271374"
 osm = ["relation/21223567"]
-reviewed = ""
+reviewed = "2026-11-19"
 photo_leads = ["P039"]
-to_check = [
-  "Capacity (decision): Elenz uses 160 MW (an override from the distributed generation registry). Contact gives a maximum of 150 MWac, and the EA register now lists 150 MW (row from 13 Aug 2026). Move plant_capacity.csv to 150?",
-]
+to_check = []
 notes = [
   "Solar batch (19 Nov 2026): facts checked against Contact's project page, the EA register and network supply points table, and Stats NZ boundaries.",
   "District and region from the station's point (the [location] value, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; no other district within 3 km of the station point (Selwyn District is within 3 km of the grid point at Islington).",
   "Wikidata has a Commons image (Kōwhai Park Solar Farm PA01.jpg): photo lead P039; licence not yet read.",
   "Wikipedia gives 168 MWp; Contact's page no longer gives a DC figure, so none is published.",
+  "Capacity: Elenz used 160 MW, the AC figure read from the July 2026 step in the distributed generation registry. Elenz uses Contact's and the register's 150 MW since 19 Nov 2026 (design decision).",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
 ]
 

@@ -331,11 +331,13 @@ under macron names the history doesn't use, and has no end date for TCC (closed 
 before Apr 1999, Highbank before Mar 2002, Mill Creek before Sep 2015, Kawerau (Onepu) before 2013 ...), capacity starts
 with the data, so a gap doesn't pull a capacity factor down.
 
+**Owners' figures over the register** (design decisions, 19 Nov 2026, from the plant pages' research): Waitaki 105 (Meridian; register 95), Roxburgh 320 (Contact; register 328, reached only for a few hours), Poihipi 51 (Contact; register 55), Te Ahi O Māui 26 from 19 Sep 2025 (register and Eastland), Te Rere Hau 45.5 from Jan 2025 (Meridian: 91 of 97 turbines; the date isn't public), Kaiwaikawe 77 (register; was Wikipedia's 74), and the solar farms on their AC figure where the register gave DC: Kōwhai Park 150, Pukenui 17.2, Dannevirke 19; Te Puna Mauri ō Omaru 20 from Jul 2025 (its extension; DC). Detail in each plant file's notes.
+
 **Check** (`python3 analysis/capacity_check.py`): plant-years where the peak runs more than 8% over capacity or the
 capacity factor tops 98%. What's left is explained: Trustpower's double-reading meters to Jul 2005 (the build halves
 them, the script doesn't); shared embedded meters the script counts for both plants (WRK0331, TWH0331, TWC2201,
 KOE1101); West Wind's connections each carrying more than half the farm at times; Mahinerangi (a 70/30 split of a
-shared meter); Waitaki at ~104 MW in 2025-26 against the register's 95 (left as the register); a few hours of output
+shared meter); Waitaki at ~104 MW in 2025-26 against the register's 95 (moved to Meridian's 105 MW, design decision 19 Nov 2026); a few hours of output
 before a plant's start (Huntly 5 testing in 2006, Ōtāhuhu B Nov 1998, traces at Whirinaki 1997-2000 with no known plant).
 
 **Uncertain:** New Plymouth's units were run down before Dec 2007 (output ~300-400 MW 2002-07; dates not found);

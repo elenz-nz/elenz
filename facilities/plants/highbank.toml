@@ -8,7 +8,7 @@ wikidata = "Q131745148"
 osm = ["relation/12618188"]
 reviewed = ""
 to_check = [
-  "Capacity (open): Contact says the 27 MW 1945 unit is being replaced by a new 19 MW GE unit; Wikipedia says a new 29 MW turbine and generator (Nov 2024 to May 2026). Check which, and whether the new unit is running, before changing Elenz's 28 MW.",
+  "Capacity (open): Contact says the 27 MW 1945 unit is being replaced by a new 19 MW GE unit; Wikipedia says a new 29 MW turbine and generator (Nov 2024 to May 2026). Check which, and whether the new unit is running, before changing Elenz's 28 MW. The Elenz team thinks it isn't running yet (19 Nov 2026), so 28 MW stays for now.",
 ]
 notes = [
   "28 MW (register). Separate from Montalto (H034), which is other embedded at ASB0661.",

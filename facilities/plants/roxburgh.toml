@@ -9,10 +9,10 @@ osm = ["relation/11819261"]
 reviewed = "2026-11-19"
 to_check = []
 notes = [
-  "Elenz has 328 MW on two buses (the EA register: 205 MW at ROX2201, 123 MW at ROX1101).",
+  "The EA register has 328 MW on two buses (205 MW at ROX2201, 123 MW at ROX1101).",
   "Hydro batch 4 (18 Nov 2026): facts checked against Contact's station and scheme pages and releases, Voith's release, the EA register and network supply points table, the Gazette (ECNZ's 1996 financial statements), Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same. No other district within 5 km.",
-  "Capacity (open): Contact's station page gives 320 MW from eight units (eight original 40 MW units, per Voith); the EA register, which Elenz uses, gives 328 MW. Contact says the four new turbines (2024–26) give more energy from the same water, not more megawatts. Kept 328 for now: a question for the brief.",
+  "Capacity: Contact's station page gives 320 MW from eight units (eight original 40 MW units, per Voith); the EA register gives 328 MW. Contact says the four new turbines (2024–26) give more energy from the same water, not more megawatts. Elenz uses Contact's 320 MW since 19 Nov 2026 (design decision: metered output reached about 328 MW only for a few hours and mostly tops out at 320).",
   "Turbine upgrade progress: Voith says the first new unit was finished in December 2024 (Contact: operational January 2025) and the second handed over in mid-August 2025; the third arrived at Port Chalmers on 31 August 2025. Not yet found: the third and fourth units' completion.",
   "Commissioning: first power July 1956 (Water Power magazine) or an official opening on 3 November 1956 (Wikipedia infobox); neither is published. Wikidata gives inception 1948, in service 1962.",
   "Wikidata: Q1246704 (Roxburgh Dam) is also typed as a hydroelectric power station, so it stands for the station. The [location] point is Wikidata's.",
@@ -134,8 +134,8 @@ grade = "B"
 checked = "2026-11-18"
 
 [[ratings]]
-value = 320
-basis = "Contact's maximum capacity (Elenz uses the EA register's 328 MW)"
-source = "contact-roxburgh"
+value = 328
+basis = "The EA register's nameplate, on two buses (205 + 123 MW); reached only for a few hours"
+source = "ea-register"
 grade = "A"
-checked = "2026-11-18"
+checked = "2026-11-19"

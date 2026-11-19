@@ -5,19 +5,19 @@
  "fuel": "solar",
  "island": "SI",
  "status": "operating",
- "mw": 160.0,
+ "mw": 150.0,
  "steps": [
   {
    "from": "2026-07-01",
    "to": null,
-   "mw": 160.0,
+   "mw": 150.0,
    "sources": [
     {
-     "label": "Wikipedia, List of power stations in New Zealand",
-     "url": "https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand"
+     "label": "contact.co.nz",
+     "url": "https://contact.co.nz/aboutus/our-story/our-projects/kowhai-park"
     },
     {
-     "label": "Elenz: step in metered output (Generation_MD, monthly peak half-hour)",
+     "label": "EA plant register (DispatchedGenerationPlant.csv)",
      "url": ""
     }
    ]
@@ -26,7 +26,7 @@
  "owner": "Contact",
  "scheme": null,
  "metered": "It isn't in the EA's plant register yet, so we add it from its dispatched unit (ISL0661 KPS0).",
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "Kōwhai Park is a solar farm on the Christchurch Airport campus, built by Contact Energy and Lightsource bp in joint venture, and the largest solar farm in the South Island. About 300,000 panels cover some 230 hectares and are expected to produce around 275 GWh a year. It became operational in October 2026, Contact's first completed solar farm.",

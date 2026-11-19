@@ -15,9 +15,9 @@ osm = [
 reviewed = ""
 to_check = [
   "Location: no station point yet (OpenStreetMap is research only); find one on the LINZ aerial or in Wikidata (separate task). Six stations along the Teviot River east of Roxburgh.",
-  "Capacity (open): Elenz uses the register's 22 MW; Wikipedia's list totals 17.7 MW for the six stations (Ellis 7.8, Horseshoe Bend 4.3, Kowhai 1.9, Michelle 1.6, Teviot Bridge 1.1, George 1). Pioneer gives only Horseshoe Bend (4.3), Michelle (1.6) and George (1.0).",
 ]
 notes = [
+  "Capacity: Elenz keeps the register's 22 MW (design decision 19 Nov 2026); Wikipedia's list totals 17.7 MW for the six stations (Ellis 7.8, Horseshoe Bend 4.3, Kowhai 1.9, Michelle 1.6, Teviot Bridge 1.1, George 1). Pioneer gives only Horseshoe Bend (4.3), Michelle (1.6) and George (1.0).",
   "Elenz plant Teviot (22 MW register, CYD0331, never dispatched). Wikipedia lists Ellis, George, Horseshoe Bend, Kowhai, Michelle and Teviot Bridge in the scheme, 17.7 MW together.",
   "Hydro batch 5 (19 Nov 2026): facts checked against Pioneer Energy's history and scheme pages, the EA register and network supply points table and Wikipedia's list. The locations are left for the LINZ aerial check.",
   "District and region: Pioneer places the scheme in Central Otago (all of which is in Otago Region); the stations' points are not yet tested against Stats NZ's boundaries.",
