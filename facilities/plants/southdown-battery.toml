@@ -7,6 +7,7 @@ register = ["B005"]
 reviewed = ""
 to_check = [
   "Closed: only the register's end date; no public notice of the trial ending or the battery's removal found yet (Mercury's FY22 annual report is worth a look).",
+  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
   "Added from Elenz's plant list (8 Nov 2026).",

@@ -7,7 +7,9 @@ register = ["G006"]
 wikidata = "Q7690882"
 osm = ["way/275188675"]
 reviewed = "2026-11-19"
-to_check = []
+to_check = [
+  "When it happens: Te Mihi Stage 2 (101 MW, due 2027). A station row here, or its own page?",
+]
 notes = [
   "166 MW; Te Mihi 1 and 2 shown as one.",
   "Geothermal batch 1 (19 Nov 2026): facts checked against Contact's station page and its 13 Nov 2024 Wairakei announcement, the EA register and network supply points table, the NZ Geothermal Association's Wairakei page, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",

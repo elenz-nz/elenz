@@ -22,11 +22,14 @@
 //  screens:   GET /data/screens?key=..., a private page of those heartbeats for the Elenz team (worker/screens.js).
 //  research:  /plants/research, the private plant research page (prerendered by the site): on elenz.co.nz only with
 //             ?key=<SCREENS_KEY>, else the not-found page; on previews without a key, so a batch's preview shows it.
+//  notes:     /data/plant-notes, the Elenz team's own notes on each plant, written on the research page and kept in KV
+//             (worker/notes.js); every request needs SCREENS_KEY, on every host.
 //  tests:     worker/tests/worker.test.js runs this file in Cloudflare's own runtime (cd worker && npm ci && npm test).
 import { readQuery, writeQuery, describe, SITE_URL } from '../site/src/lib/site/viewurl.js';
 import { RECORD_PAGE, RECORD_IMAGE, recordPage, recordImage } from './og.js';
 import { BEAT_URL, readBeat } from '../site/src/lib/site/beat.js';
 import { SCREENS_URL, screens, keyMatches } from './screens.js';
+import { NOTES_URL, plantNotes } from './notes.js';
 
 const WORKFLOWS = 'https://api.github.com/repos/elenz-nz/elenz/actions/workflows';
 const HISTORY_CRON = '40 */6 * * *'; // must match wrangler.jsonc
@@ -164,6 +167,10 @@ async function serve(request, env, url, ctx) {
   if (url.pathname === BEAT_URL) return beat(request, env, url);
   if (url.pathname === SCREENS_URL) return screens(request, env, url);
   if (RESEARCH.test(url.pathname)) return research(request, env, url);
+  if (url.pathname.startsWith(NOTES_URL)) {
+    const res = await plantNotes(request, env, url, { keyMatches, siteHost: SITE_HOST });
+    if (res) return res;
+  }
   if (url.pathname === '/data/health' && env.DATA) {
     // for an outside uptime monitor: 200 while the data is fresh, 503 (with the reasons) when it isn't. Unlike the
     // GitHub watchdog, it doesn't depend on the Worker's cron, so it also catches the cron itself stopping.

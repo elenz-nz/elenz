@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { inflateRawSync } from 'node:zlib';
 import { readSettings, writeSettings, pick, filtered, needCounts, progress, workbook, DEFAULTS } from '#lib/plants/research.js';
+import { keyOf, loadNotes, saveNote, dateStamp, savedAt } from '#lib/plants/notes.js';
 import { xlsx, zip, crc32, col } from '#lib/plants/xlsx.js';
 import RESEARCH from '#lib/plants/research.json' with { type: 'json' };
 
@@ -104,4 +105,44 @@ test('the download holds every plant, fact and lead', () => {
   assert.equal(wb[3].rows.length, RESEARCH.photo_leads.length);
   assert.equal(wb[4].rows.length, RESEARCH.station_leads.length);
   for (const s of wb) for (const r of s.rows) assert.equal(r.length, s.header.length, s.name);
+});
+
+test('the "Has team notes" filter and the notes in the download', () => {
+  const withNote = RESEARCH.plants.map((p) => ({ ...p, my_note: p.slug === 'benmore' ? 'Ask about unit 6' : '' }));
+  assert.deepEqual(pick(withNote, { ...DEFAULTS, need: 'mine' }).map((p) => p.slug), ['benmore']);
+  assert.equal(readSettings('?key=k&need=mine', withNote).need, 'mine');
+  const wb = workbook(RESEARCH, { benmore: { text: 'Ask about unit 6' } });
+  const col = wb[0].header.indexOf('Team notes');
+  assert.ok(col > 0);
+  assert.equal(wb[0].rows.find((r) => r[1] === 'benmore')[col], 'Ask about unit 6');
+  assert.equal(wb[0].rows.find((r) => r[1] === 'arapuni')[col], '');
+  for (const r of wb[0].rows) assert.equal(r.length, wb[0].header.length);
+});
+
+test('the team notes: reading and saving through the Worker, with the key in a header', async () => {
+  const calls = [];
+  const answer = (status, body) => async (url, init) => { calls.push({ url, init }); return new Response(JSON.stringify(body), { status }); };
+  assert.equal(keyOf('?key=abc&need=todo'), 'abc');
+  assert.deepEqual(await loadNotes('', answer(200, {})), { ok: false, problem: 'nokey' });
+  assert.equal(calls.length, 0, 'no key: not even asked');
+  const ok = await loadNotes('abc', answer(200, { notes: { benmore: { text: 'x', at: 1 } } }));
+  assert.deepEqual(ok, { ok: true, notes: { benmore: { text: 'x', at: 1 } } });
+  assert.equal(calls[0].url, '/data/plant-notes');
+  assert.equal(calls[0].init.headers['x-elenz-key'], 'abc');
+  assert.deepEqual(await loadNotes('abc', answer(404, {})), { ok: false, problem: 'badkey' });
+  assert.deepEqual(await loadNotes('abc', answer(503, { error: 'no key is set for this address' })), { ok: false, problem: 'unset' });
+  assert.deepEqual(await loadNotes('abc', answer(503, { error: 'store down' })), { ok: false, problem: 'error' });
+  assert.deepEqual(await loadNotes('abc', async () => { throw new Error('offline'); }), { ok: false, problem: 'error' });
+
+  calls.length = 0;
+  assert.deepEqual(await saveNote('abc', 'benmore', 'hello', 5, answer(200, { text: 'hello', at: 9 })), { ok: true, note: { text: 'hello', at: 9 } });
+  assert.equal(calls[0].url, '/data/plant-notes/benmore');
+  assert.equal(calls[0].init.method, 'PUT');
+  assert.deepEqual(JSON.parse(calls[0].init.body), { text: 'hello', base: 5 });
+  assert.deepEqual(await saveNote('abc', 'benmore', 'x', 5, answer(409, { conflict: true, note: { text: 'theirs', at: 7 } })), { ok: false, conflict: { text: 'theirs', at: 7 } });
+  assert.match((await saveNote('abc', 'benmore', 'x', 5, answer(413, { error: 'too long' }))).error, /too long/);
+  assert.match((await saveNote('abc', 'benmore', 'x', 5, async () => { throw new Error('offline'); })).error, /no connection/);
+  assert.equal(dateStamp(new Date('2026-11-19T03:30:00Z')), '19 Nov 2026: ');
+  assert.match(savedAt(Date.parse('2026-11-19T03:40:00Z')), /^saved 19 Nov 2026, 4:40\s?pm$/);
+  assert.equal(savedAt(null), '');
 });

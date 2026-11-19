@@ -9,6 +9,7 @@ osm = ["way/1395935526"]
 reviewed = ""
 to_check = [
   "Name (decision): this page is the battery, which the register calls Ruakākā Energy Park; Meridian uses that name for the battery and the solar farm together. Rename the page to Ruakākā Battery (a site-only name)?",
+  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
   "Added from Elenz's plant list (8 Nov 2026).",

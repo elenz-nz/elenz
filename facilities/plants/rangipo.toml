@@ -7,7 +7,9 @@ register = ["H057"]
 wikidata = "Q61448285"
 osm = ["way/989021414"]
 reviewed = "2026-11-19"
-to_check = []
+to_check = [
+  "Optional: rename the tracker's \"Rangipo\" to \"Rangipō\" ([plant_names] in overrides.toml is fingerprinted, so on next-rebuild).",
+]
 notes = [
   "Added from Elenz's plant list (8 Nov 2026).",
   "Hydro batch 2 (18 Nov 2026): facts checked against Genesis's Tongariro Power Scheme page, the EA register, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",

@@ -6,7 +6,9 @@ name = "Kaimai"
 register = ["H010"]
 osm = ["way/616229609", "way/619975647", "way/987248229"]
 reviewed = "2026-11-19"
-to_check = []
+to_check = [
+  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
+]
 notes = [
   "One dispatched unit (Kaimai 5) carries the whole scheme: Lloyd Mandeno, Lower Mangapapa, Ruahihi and Kaimai 5. 42 MW.",
   "Hydro batch 5 (19 Nov 2026): facts checked against Contact's scheme page, the EA register and network supply points table and Wikipedia (the Manawa Energy article's history of the Tauranga electricity undertakings). The locations and district are left for the LINZ aerial check.",

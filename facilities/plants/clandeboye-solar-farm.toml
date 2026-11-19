@@ -6,7 +6,10 @@ name = "Clandeboye Solar Farm"
 register = ["S013"]
 osm = ["way/1442514369"]
 reviewed = "2026-11-19"
-to_check = []
+to_check = [
+  "Mounting: add \"single-axis trackers\", sourced to Ethical Power's project page and Lodestone's (our dispatch check agrees, but isn't a source).",
+  "Metered zeros: the EA's metered data (Generation_MD) has Clandeboye at 0 every half hour in Sep and Oct 2026, though its dispatch shows output and so does our history. Trace where our figure comes from.",
+]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against the EA register and network supply points table, Lodestone's farm page and groundbreaking news (through search results), EVs & Beyond's first-power report and Stats NZ boundaries.",
   "Region from the grid connection point (no station point yet); the sources place the farm near it, in the same region (Temuka; the farm is north of Temuka). District left unchecked until there is a station point: Temuka's point is in Timaru District.",

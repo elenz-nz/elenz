@@ -10,6 +10,7 @@ to_check = [
   "Owner: not published. The register's operator for KAW0112 ONU0 is Oji Fibre Solutions (Norske Skog Tasman before 6 May 2023), but no public document found says which plant is behind the meter.",
   "Commissioned: the register's 1966 is not published, for the same reason.",
   "About: not written. If one is wanted, it should say no more than the Kawerau (Onepu) note on /methods/generation (a design decision for the Elenz team).",
+  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
   "The EA register's names for KAW0112 ONU0 include \"Kawerau Mill CoGen\" and \"Norske Skog CoGen\". Elenz shows the meter as Kawerau (Onepu), geothermal, from Jan 2013.",

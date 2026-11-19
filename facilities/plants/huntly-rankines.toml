@@ -9,6 +9,7 @@ osm = ["way/167293886"]
 reviewed = ""
 to_check = [
   "Unit history: Genesis's August 2025 release says one Rankine unit was due to be decommissioned in February 2026; Elenz still counts 750 MW (three units). Check whether it closed and, if so, add a capacity row.",
+  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
   "Elenz has four plants here: the Rankines (units 1–4 as one, Coal/gas, 1,000 MW → 750 MW from Jan 2014), Huntly 5 (403 MW), Huntly 6 (50 MW) and the battery (100 MW, Jul 2026).",

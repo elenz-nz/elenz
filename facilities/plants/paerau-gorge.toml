@@ -6,7 +6,7 @@ name = "Paerau Gorge"
 register = ["H035", "H036"]
 reviewed = ""
 to_check = [
-  "Previous owners: not yet found in a source we could open (designed for the Otago Electric Power Board around 1980; Trustpower by 1999).",
+  "Previous owners: not yet found in a source we could open (designed for the Otago Electric Power Board around 1980; Trustpower by 1999). Papers Past and NZLII refuse automated reads, so this may need a look by hand.",
 ]
 notes = [
   "H035: Elenz shows Paerau with Patearoa (its metered codes count both), 12.5 MW.",

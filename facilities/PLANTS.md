@@ -99,6 +99,11 @@ as years.
 
 ## Checking a plant
 
+A plant's `to_check` is the one list of its open questions (since 19 Nov 2026 every per-plant question from the plant
+pages plan lives there; questions across plants stay in the plan). Items marked "for the Elenz team" (decisions, pages
+to look over) are left for the team. The team's own notes on a plant are on the research page (Team notes, kept by the
+Worker, never in these files); read them there before a batch, and put anything that should be public into the file.
+
 1. Work through `to_check` and every fact's source. Open the source, confirm the value, and set `checked` to today.
    Fix the value if the source says otherwise; replace a grade C source with a public one.
 2. Add any source you used to `plant_sources.csv` (a short ID such as `meridian-manapouri`, `kind = public`) and set
@@ -119,7 +124,7 @@ as years.
    its code stays the EA's. If the point moved, test the district and region again (step 3).
    Then refresh the aerial views: `LINZ_BASEMAPS_KEY=... python3 analysis/plant_aerials.py` (only plants whose point
    moved are fetched), before step 6.
-5. Empty `to_check`, set `reviewed` to today, and run `python3 ingest/plant_files.py --check`.
+5. Empty `to_check` (bar items for the Elenz team), set `reviewed` to today, and run `python3 ingest/plant_files.py --check`.
 6. Run `python3 ingest/plant_pages.py` and `python3 ingest/plant_research.py`, and commit the files they change
    (`site/src/lib/plants/pages/`, `site/src/lib/plants/research.json`): the page shows the checked facts on the batch's
    preview, and the research page its progress. Their `--check` (in checks.yml) fails while one is out of date.

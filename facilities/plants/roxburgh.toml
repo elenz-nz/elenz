@@ -7,7 +7,10 @@ register = ["H039"]
 wikidata = "Q1246704"
 osm = ["relation/11819261"]
 reviewed = "2026-11-19"
-to_check = []
+to_check = [
+  "New units: when were the third and fourth new units finished?",
+  "First power: July 1956, or the opening on 3 Nov 1956? Not published yet.",
+]
 notes = [
   "The EA register has 328 MW on two buses (205 MW at ROX2201, 123 MW at ROX1101).",
   "Hydro batch 4 (18 Nov 2026): facts checked against Contact's station and scheme pages and releases, Voith's release, the EA register and network supply points table, the Gazette (ECNZ's 1996 financial statements), Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
