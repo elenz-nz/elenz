@@ -9,18 +9,16 @@
 	import Masthead from '#lib/site/Masthead.svelte';
 	import SiteFooter from '#lib/site/SiteFooter.svelte';
 	import InfoTip from '#lib/site/InfoTip.svelte';
-	import Aerial from '#lib/plants/Aerial.svelte';
+	import Media from '#lib/plants/Media.svelte';
 	import ReportLink from '#lib/site/ReportLink.svelte';
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
 	import { slug as toSlug } from '#lib/site/viewurl.js';
-	import { VIEW, NI as NI_PATH, SI as SI_PATH } from '#lib/home/nzmap.js';
 	import Bars from '#lib/plants/Bars.svelte';
 	import CapSteps from '#lib/plants/CapSteps.svelte';
 	import Spark from '#lib/plants/Spark.svelte';
 	import { PLANTS_PUBLIC, STATUS, subtitle, description, fuelOf, kinds, islandName } from '#lib/plants/registry.js';
 	import { HISTORY_URL, plantMonths, years, lastMonths, latestYear, bestYear, capChanges, monthName, fmtGwh, fmtPct, fmtMw } from '#lib/plants/history.js';
 	import { LIVE_URL, livePlant } from '#lib/plants/live.js';
-	import { toView } from '#lib/plants/map.js';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -93,11 +91,12 @@
 	const fresh = $derived(!!L && clock - L.end < LIVE_MINUTES * 60_000);
 	const pct = $derived(L && p.mw ? Math.abs(L.mw) / p.mw : null);
 	const trackerHref = $derived(`/tracker?fuel=${p.fuel}&plant=${toSlug(p.plant)}`);
-	const pin = $derived(p.location ? toView(p.location.lat, p.location.lon) : null);
 	const DATE = new Intl.DateTimeFormat('en-NZ', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 	const longDate = (d: string) => DATE.format(new Date(d + 'T00:00:00Z'));
 	const relatedOwner = $derived(p.related.owner.length ? (p.related.owner_all ? `${p.owner}'s other plants` : `${p.owner}'s largest other plants`) : '');
 	const nSources = $derived(p.sources.length);
+	// a fact's note, shown in its ⓘ as a sentence
+	const sentence = (t: string) => t[0].toUpperCase() + t.slice(1) + (/[.!?]$/.test(t) ? '' : '.');
 </script>
 
 <svelte:head>
@@ -130,18 +129,15 @@
 			<p class="checking" role="note">We’re still checking this page’s facts against their sources. The live and history figures are Elenz’s own. <a href={PLANTS_MD}>How we check plants</a></p>
 		{/if}
 
-		{#if p.image || p.aerial || operating}
+		{#snippet coords()}<span class="num">{Math.abs(p.location.lat).toFixed(3)}° S, {p.location.lon.toFixed(3)}° E</span>{p.location.basis !== 'station' ? ` · ${p.location.basis}` : ''}{@render refs(p.location.refs)}{/snippet}
+
+		{#if p.images.length || p.location || operating}
 			<div class="top">
-				{#if p.image}
-					<figure class="photo">
-						<img src="/plants/{p.image.file}" alt={p.image.title} />
-						<figcaption>Photo: {p.image.author}, <a href={p.image.source_url}>{p.image.title}</a>, {#if p.image.licence_url}<a href={p.image.licence_url}>{p.image.licence}</a>{:else}{p.image.licence}{/if}</figcaption>
-					</figure>
-				{:else if p.aerial}
-					<div class="photo"><Aerial views={p.aerial} name={p.name} eager /></div>
+				{#if p.images.length || p.location}
+					<div class="photo"><Media images={p.images} aerial={p.aerial} location={p.location} island={p.island} name={p.name} {tok} note={p.location ? coords : undefined} /></div>
 				{/if}
 				{#if operating}
-					<section class="panel now" class:wide={!p.image && !p.aerial} aria-labelledby="now-h">
+					<section class="panel now" class:wide={!p.images.length && !p.location} aria-labelledby="now-h">
 						<div class="p-head">
 							<h2 id="now-h">Now</h2>
 							{#if L}<span class="pill" class:live={fresh}>{fresh ? 'Live' : 'Delayed'}</span><span class="when">{clockOf(L.end)}</span>{/if}
@@ -149,7 +145,7 @@
 								<p>This shows {p.name}’s output in the newest 5-minute interval and over the last 7 days.</p>
 								<ul>
 									<li>Output is from the market’s dispatch data, not a meter reading.</li>
-									<li>The chart has one point a half-hour.</li>
+									<li>The chart has one point per half-hour.</li>
 									{#if p.mw}<li>Dashed line: the installed capacity, {fmtMw(p.mw)} MW.</li>{/if}
 									{#if isBatt}<li>Below zero: the battery is charging.</li>{/if}
 									{#if L?.est}<li>Part of this station’s output isn’t dispatched, so it is a calculated estimate.</li>{/if}
@@ -220,7 +216,7 @@
 							<p>This shows {p.name}’s {isBatt ? 'discharge' : 'generation'} in each calendar year{isBatt ? '' : ', or its capacity factor'}.</p>
 							<ul>
 								{#if partYears.length}<li>Hatched bars: part years ({partYears.join(', ')}).</li>{/if}
-								{#if !isBatt}<li>Capacity factor: the year’s output as a share of what the installed capacity could make running all year.</li>{/if}
+								{#if !isBatt}<li>Capacity factor: the year’s output as a share of what the installed capacity could make if it ran at full capacity all year.</li>{/if}
 								{#if yearMarks.length}<li>Dashed lines: where the installed capacity changed.</li>{/if}
 								{#if lastMetered}<li>Metered history to {monthName(lastMetered)}, then dispatch data.</li>{/if}
 							</ul>
@@ -285,32 +281,6 @@
 					</section>
 				{/if}
 				{/if}
-			</div>
-
-			<aside class="side">
-				<section class="panel" aria-labelledby="facts-h">
-					<h2 id="facts-h">Facts</h2>
-					<dl class="facts">
-						{#if p.mw && p.status !== 'pending'}<div><dt>Installed</dt><dd><span class="num">{fmtMw(p.mw)} MW</span>{p.status === 'closed' ? ' when it closed' : ''}</dd></div>{/if}
-						{#if p.owner && !p.facts.some((f: any) => f.k === 'owner')}<div><dt>Owner</dt><dd>{p.owner}</dd></div>{/if}
-						{#each p.facts as f}
-							<div><dt>{f.label}</dt><dd>{f.value}{#if f.note}<span class="fnote"> ({f.note})</span>{/if}{@render refs(f.refs)}</dd></div>
-						{/each}
-					</dl>
-					{#if p.checking}<p class="quiet">More facts appear here once they’re checked.</p>{:else if p.checked}<p class="quiet">Checked {longDate(p.checked)}</p>{/if}
-				</section>
-
-				{#if p.location && pin}
-					<section class="panel" aria-labelledby="loc-h">
-						<h2 id="loc-h">Location</h2>
-						<svg class="map" viewBox="0 0 {VIEW.w} {VIEW.h}" role="img" aria-label="Map of New Zealand with {p.name} marked">
-							<path d={NI_PATH} class="land" /><path d={SI_PATH} class="land" />
-							<circle cx={pin[0]} cy={pin[1]} r="14" class="halo" /><circle cx={pin[0]} cy={pin[1]} r="7" class="dot" />
-						</svg>
-						<p class="quiet"><span class="num">{Math.abs(p.location.lat).toFixed(3)}° S, {p.location.lon.toFixed(3)}° E</span>{p.location.basis !== 'station' ? ` · ${p.location.basis}` : ''}{@render refs(p.location.refs)}</p>
-						{#if p.image && p.aerial}<Aerial views={p.aerial} name={p.name} />{/if}
-					</section>
-				{/if}
 
 				{#if p.related.owner.length || p.related.scheme.length || p.related.fuel.length}
 					<section class="panel related" aria-labelledby="rel-h">
@@ -326,6 +296,26 @@
 						{/if}
 					</section>
 				{/if}
+			</div>
+
+			<aside class="side">
+				<section class="panel" aria-labelledby="facts-h">
+					<h2 id="facts-h">Facts</h2>
+					<dl class="facts">
+						{#if p.mw && p.status !== 'pending'}<div><dt>Installed</dt><dd><span class="num">{fmtMw(p.mw)} MW</span>{p.status === 'closed' ? ' when it closed' : ''}</dd></div>{/if}
+						{#if p.owner && !p.facts.some((f: any) => f.k === 'owner')}<div><dt>Owner</dt><dd>{p.owner}</dd></div>{/if}
+						{#each p.facts as f}
+							<div><dt>{f.label}</dt><dd><span>{f.value}{@render refs(f.refs)}</span>{#if f.note}<span class="f-tip"><InfoTip label="More about {f.label.toLowerCase()}"><p>{sentence(f.note)}</p></InfoTip></span>{/if}</dd></div>
+						{/each}
+					</dl>
+					{#if p.checking}<p class="quiet">More facts appear here once they’re checked.</p>{:else if p.checked}<p class="quiet">Checked {longDate(p.checked)}</p>{/if}
+				</section>
+
+				<section class="panel ask" aria-labelledby="share-h">
+					<h2 id="share-h">Know {p.name}?</h2>
+					<p>If you’ve worked on or with {p.name}, we’d like to hear what you know, and see any photos you’ve taken.</p>
+					<a class="link" href="/plants/share?plant={p.slug}">Share what you know</a>
+				</section>
 			</aside>
 		</div>
 
@@ -371,10 +361,7 @@
 	.num { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
 
 	.top { display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch; }
-	.photo { margin: 0; flex: 999 1 520px; min-width: 0; display: grid; gap: 6px; align-content: start; }
-	.photo img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 4px; display: block; }
-	.photo figcaption { font-size: 0.78rem; color: var(--muted); }
-	.photo figcaption a { color: inherit; }
+	.photo { margin: 0; flex: 999 1 520px; min-width: 0; display: grid; align-content: start; }
 	.now { flex: 1 1 300px; }
 	.now .when { color: var(--muted); font-size: 0.8rem; }
 	.now .pill { height: 24px; font-size: 0.68rem; }
@@ -411,14 +398,13 @@
 	.metered p { color: var(--ink-2); font-size: 0.82rem; line-height: 1.5; }
 
 	.facts { margin: 0; }
-	.facts > div { display: grid; grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr); gap: 4px 12px; padding: 8px 0; border-top: 1px solid var(--grid); }
+	.facts > div { display: grid; grid-template-columns: minmax(0, 7rem) minmax(0, 1fr); gap: 4px 10px; padding: 8px 0; border-top: 1px solid var(--grid); }
 	.facts dt { color: var(--muted); font-size: 0.84rem; }
 	.facts dd { margin: 0; font-size: 0.88rem; line-height: 1.45; }
-	.fnote { color: var(--muted); }
-	.map { width: 100%; max-height: 260px; display: block; background: var(--accent-soft); border-radius: 3px; }
-	.map .land { fill: var(--land); stroke: var(--line); stroke-width: 1; }
-	.map .halo { fill: var(--c); opacity: 0.25; }
-	.map .dot { fill: var(--c); stroke: var(--surface); stroke-width: 2.5; }
+	.facts dd { display: flex; align-items: flex-start; gap: 4px; }
+	.facts dd > span:first-child { flex: 1 1 auto; min-width: 0; }
+	.f-tip { flex: none; margin: -4px -6px -4px 0; }
+	.ask p { font-size: 0.88rem; line-height: 1.5; color: var(--ink-2); }
 	.related > div { display: grid; gap: 6px; }
 	.related .k { font-size: 0.82rem; color: var(--muted); }
 	.chips { display: flex; flex-wrap: wrap; gap: 6px; }

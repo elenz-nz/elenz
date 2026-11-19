@@ -413,25 +413,47 @@ test.describe('plant pages', () => {
 
   test('the aerial views switch scale and credit their imagery', async ({ page }) => {
     await page.goto('/plants/aviemore');   // no photo, so the views lead the page
-    const img = page.locator('.photo .aerial img');
+    const img = page.locator('.photo .loc img');
     await expect(img).toHaveAttribute('src', '/plants/aerial/aviemore-site.webp');
     await expect(img).toHaveJSProperty('complete', true);
     expect(await img.evaluate((el) => el.naturalWidth)).toBe(1000);   // the file is there
     await page.getByRole('button', { name: 'Wide' }).click();
     await expect(img).toHaveAttribute('src', '/plants/aerial/aviemore-wide.webp');
-    await expect(page.locator('.aerial figcaption')).toContainText('Toitū Te Whenua LINZ');
+    await expect(page.locator('.loc figcaption')).toContainText('Toitū Te Whenua LINZ');
+    await expect(page.locator('.loc .locator')).toBeVisible();   // the island locator in the corner
+    await expect(page.getByRole('button', { name: 'Photo' })).toHaveCount(0);   // no photo, so no tabs
   });
 
-  test('a licensed photo leads, credited, and the aerial views move to Location', async ({ page }) => {
+  test('a licensed photo leads, credited, and the Location tab has the aerial views', async ({ page }) => {
     await page.goto('/plants/manapouri');
-    const photo = page.locator('figure.photo img');
+    const photo = page.locator('.photo .photos img');
     await expect(photo).toHaveAttribute('src', '/plants/manapouri.webp');
     await expect(photo).toHaveJSProperty('complete', true);
     expect(await photo.evaluate((el) => el.naturalWidth)).toBe(1600);   // the file is there
-    await expect(page.locator('figure.photo figcaption')).toContainText('CC BY-SA 3.0');
-    const aerial = page.locator('section[aria-labelledby="loc-h"] .aerial');
-    await expect(aerial).toHaveCount(1);
-    await expect(page.locator('.photo .aerial')).toHaveCount(0);
+    const credit = page.locator('.photos figcaption');
+    await expect(credit).toContainText('CC BY-SA 3.0');
+    for (const a of await credit.locator('a').all()) await expect(a).toHaveAttribute('target', '_blank');
+    await page.getByRole('button', { name: 'Location' }).click();
+    await expect(page.locator('.photo .loc img')).toHaveAttribute('src', '/plants/aerial/manapouri-site.webp');
+    await expect(page.locator('.photo .photos')).toHaveCount(0);
+    await expect(page.locator('.loc figcaption')).toContainText('° S');   // the coordinates moved here from the side
+  });
+
+  test('facts keep their notes in an info button; related plants and the call to share sit below', async ({ page }) => {
+    await page.goto('/plants/benmore');
+    const facts = page.locator('section[aria-labelledby="facts-h"]');
+    await expect(facts).not.toContainText('construction began');
+    const tip = facts.getByRole('button', { name: 'More about commissioned' });
+    await tip.scrollIntoViewIfNeeded();   // a scroll closes an open ⓘ, so be there before tapping it
+    await page.waitForTimeout(300);
+    await tip.click();
+    await expect(page.locator('.info-pop-tip:visible')).toContainText('Construction began in 1958');
+    await expect(page.locator('.main .related')).toContainText('Aviemore');
+    await expect(page.locator('.side .related')).toHaveCount(0);
+    await page.getByRole('link', { name: 'Share what you know' }).click();
+    await expect(page).toHaveURL(/\/plants\/share\?plant=benmore/);
+    await expect(page.locator('h1')).toHaveText('Share what you know about Benmore');
+    await expect(page.getByRole('link', { name: 'Email us about Benmore' })).toHaveAttribute('href', /^mailto:hello@elenz\.co\.nz\?subject=About%20Benmore/);
   });
 });
 
@@ -452,17 +474,38 @@ test.describe('plant index', () => {
     await page.locator('.outline .dot[aria-label^="Wairākei,"]').focus();
     await page.keyboard.press('Enter');
     await expect(page.locator('#sel-h')).toHaveText('Wairākei');
+    await expect(page.locator('#sel-h a')).toHaveAttribute('href', '/plants/wairakei');   // the name opens the page too
+    await expect(page.locator('.side .thumb img')).toHaveAttribute('src', '/plants/wairakei.webp');
+    await expect(page.locator('.side .ov')).toHaveText(/^A 136 MW geothermal station on the Wairākei geothermal field/);
     await expect(page.getByRole('link', { name: 'Open Wairākei’s page' })).toHaveAttribute('href', '/plants/wairakei');
     await expect(page).toHaveURL(/plant=wairakei/);
     await page.reload();
     await expect(page.locator('#sel-h')).toHaveText('Wairākei');
-    await expect(page.locator('.fuels button[aria-pressed="true"]')).toContainText('Geothermal');
+    await expect(page.locator('.fuels .fb.alone')).toContainText('Geothermal');
   });
 
-  test('closed plants show when asked for', async ({ page }) => {
+  test('the fuel squares mix fuels, and the dots can show output now', async ({ page }) => {
+    await page.goto('/plants');
+    await page.getByRole('button', { name: 'Show Wind' }).click();
+    await page.getByRole('button', { name: 'Show Hydro' }).click();
+    await expect(page).toHaveURL(/fuel=(?!.*hydro)(?!.*wind)[a-z,]+/);
+    await page.getByRole('button', { name: /^All fuels/ }).click();
+    await page.locator('.fuels .nm', { hasText: 'Wind' }).click();   // the name: wind alone
+    await page.getByRole('button', { name: 'Show Solar' }).click();   // then solar with it
+    await expect(page).toHaveURL(/fuel=wind,solar|fuel=solar,wind/);
+    await expect(page.locator('.tbl tbody tr').first()).toContainText(/Wind|Solar/);
+    await page.getByRole('button', { name: 'Output now' }).click();
+    await expect(page).toHaveURL(/size=now/);
+    await expect(page.locator('.key')).toContainText('Size shows output now');
+  });
+
+  test('closed plants show when asked for, with the rest or on their own', async ({ page }) => {
     await page.goto('/plants?closed=1&q=otahuhu');
     await expect(page.locator('.tbl tbody tr')).toHaveCount(2);
     await expect(page.locator('.tbl tbody')).toContainText('Closed 2015');
+    await page.goto('/plants?closed=only');
+    await expect(page.locator('.tbl tbody tr')).toHaveCount(9);
+    await expect(page.locator('select').filter({ hasText: 'Closed only' })).toHaveValue('only');
   });
 });
 

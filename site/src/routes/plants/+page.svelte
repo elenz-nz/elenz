@@ -16,7 +16,7 @@
 	import { PLANTS_PUBLIC, islandName, fuelOf } from '#lib/plants/registry.js';
 	import { fmtMw } from '#lib/plants/history.js';
 	import { LIVE_URL } from '#lib/plants/live.js';
-	import { DEFAULTS, fuelsOf, fuelName, ownersOf, readSettings, writeSettings, filtered, pick, nowMw, dotSize, statusText, type Plant, type Settings } from '#lib/plants/list.js';
+	import { DEFAULTS, CLOSED, fuelsOf, fuelName, ownersOf, readSettings, writeSettings, filtered, pick, nowMw, dotSize, statusText, toggleFuel, onlyFuel, type Plant, type Settings } from '#lib/plants/list.js';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -37,10 +37,14 @@
 	const drafts = $derived(plants.some((p) => p.pt && !p.pt.checked));
 	const noPoint = $derived(plants.filter((p) => !p.pt).length);
 	const base = $derived(filtered(plants, s));
-	const fuels = $derived(fuelsOf(plants).map((f) => ({ ...f, count: base.filter((p) => p.fuel === f.k).length })));
+	const allFuels = $derived(fuelsOf(plants).map((f) => f.k));
+	const fuels = $derived(fuelsOf(plants).map((f) => ({ ...f, count: base.filter((p) => p.fuel === f.k).length, on: !s.fuels || s.fuels.includes(f.k) })));
+	const alone = (k: string) => s.fuels?.length === 1 && s.fuels[0] === k;
+	// the map's dot sizes: installed MW, or output now (batteries charging count by size too); null until the live data is in
+	const sizes = $derived(s.size === 'now' && nowAt != null ? new Map(plants.map((p) => [p.slug, p.status === 'operating' ? Math.abs(now.get(p.plant) ?? 0) : 0])) : null);
 	const owners = $derived(ownersOf(plants));
 	const rows = $derived(pick(plants, s, now));
-	const narrowed = $derived(!!(s.fuel || s.island || s.owner || s.text.trim()));
+	const narrowed = $derived(!!(s.fuels || s.island || s.owner || s.text.trim()));
 	const visible = $derived(all || narrowed ? rows : rows.slice(0, SHOW));
 	const sel = $derived(plants.find((p) => p.slug === s.sel) ?? null);
 	const CLOCK = new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', hour: 'numeric', minute: '2-digit', hour12: true });
@@ -81,7 +85,7 @@
 	}
 	const ariaSort = (by: string) => (s.by === by ? (s.asc ? 'ascending' : 'descending') : 'none');
 	const mark = (by: string) => (s.by === by ? (s.asc ? '↑' : '↓') : '');
-	const reset = () => { s = { ...DEFAULTS, sel: s.sel }; all = false; };
+	const reset = () => { s = { ...DEFAULTS, sel: s.sel, size: s.size }; all = false; };
 	const pickPlant = (k: string) => { s.sel = s.sel === k ? '' : k; };
 </script>
 
@@ -99,7 +103,7 @@
 		<div class="head">
 			<div class="intro">
 				<h1>Plants</h1>
-				<p class="sub">Every plant Elenz tracks: {operating} operating and {closedN} closed. Each has a page with its output now, its history back to 1997 where the data has it, and facts with their sources.</p>
+				<p class="sub">Every generating station Elenz tracks: {operating} operating and {closedN} closed. Each has a page with its output now, its history back to 1997 where the data has it, and facts with their sources.</p>
 			</div>
 			<div class="progress">
 				<span class="quiet">Pages checked so far</span>
@@ -113,10 +117,14 @@
 
 		<div class="panel ctl">
 			<div class="fuels" role="group" aria-label="Fuel">
-				<button type="button" aria-pressed={!s.fuel} onclick={() => { s.fuel = ''; all = false; }}><span class="sw" style="--c:var(--muted)"></span>All fuels<span class="n">{base.length}</span></button>
+				<button type="button" class="all" aria-pressed={!s.fuels} onclick={() => { s.fuels = null; all = false; }}>All fuels<span class="n">{base.length}</span></button>
 				{#each fuels as f (f.k)}
-					{#if f.count || s.fuel === f.k}
-						<button type="button" aria-pressed={s.fuel === f.k} onclick={() => { s.fuel = s.fuel === f.k ? '' : f.k; all = false; }}><span class="sw" style="--c:var({f.tok})"></span>{f.name}<span class="n">{f.count}</span></button>
+					{#if f.count || !s.fuels || s.fuels.includes(f.k)}
+						<span class="fb" class:on={f.on} class:alone={alone(f.k)}>
+							<button type="button" class="sq" aria-pressed={f.on} aria-label="Show {f.name}" title="Show or hide {f.name}"
+								onclick={() => { s.fuels = toggleFuel(s.fuels, f.k, allFuels); all = false; }}><span class="sw" style="--c:var({f.tok})"></span></button>
+							<button type="button" class="nm" aria-pressed={alone(f.k)} onclick={() => { s.fuels = onlyFuel(s.fuels, f.k); all = false; }}>{f.name}<span class="n">{f.count}</span></button>
+						</span>
 					{/if}
 				{/each}
 			</div>
@@ -129,7 +137,9 @@
 				<label class="lab">Owner
 					<select bind:value={s.owner}><option value="">All owners</option>{#each owners as o (o)}<option value={slug(o)}>{o}</option>{/each}</select>
 				</label>
-				<label class="lab"><input type="checkbox" bind:checked={s.closed} /> Show closed</label>
+				<label class="lab">Status
+					<select bind:value={s.closed}>{#each Object.entries(CLOSED) as [k, name] (k)}<option value={k}>{name}</option>{/each}</select>
+				</label>
 				{#if narrowed || s.closed}<button type="button" class="clear" onclick={reset}>Clear</button>{/if}
 				<label class="lab find">Find
 					<input type="search" placeholder="Plant name" bind:value={s.text} maxlength="40" autocomplete="off" />
@@ -139,14 +149,21 @@
 
 		<div class="split">
 			<section class="panel mapcard" aria-label="Map of plants">
-				<PlantMap plants={rows} sel={s.sel} island={s.island} onpick={pickPlant} />
+				<PlantMap plants={rows} sel={s.sel} island={s.island} {sizes} onpick={pickPlant} />
 			</section>
 
 			<aside class="side">
 				<section class="panel" aria-labelledby="sel-h" aria-live="polite">
 					{#if sel}
 						<p class="ctx"><span class="sw" style="--c:var({fuelOf(sel.fuel).tok})"></span>{fuelName(sel.fuel)} · {islandName(sel.island)}</p>
-						<h2 id="sel-h">{sel.name}</h2>
+						<h2 id="sel-h"><a href="/plants/{sel.slug}">{sel.name}</a></h2>
+						{#if sel.thumb}
+							<figure class="thumb">
+								<a href="/plants/{sel.slug}" tabindex="-1" aria-hidden="true"><img src="/plants/{sel.thumb.file}" alt="" width="1000" height="640" loading="lazy" decoding="async" /></a>
+								<figcaption>{sel.thumb.credit}</figcaption>
+							</figure>
+						{/if}
+						{#if sel.overview}<p class="ov">{sel.overview}</p>{/if}
 						<dl>
 							<dt>Owner</dt><dd>{sel.owner}</dd>
 							<dt>Installed</dt><dd class="num">{mw(sel.mw)}</dd>
@@ -162,7 +179,11 @@
 					{/if}
 				</section>
 				<section class="panel key" aria-label="Map key">
-					<span class="quiet">Size shows installed MW</span>
+					<div class="seg" role="group" aria-label="Dot size shows">
+						<button type="button" aria-pressed={s.size !== 'now'} onclick={() => (s.size = 'mw')}>Installed</button>
+						<button type="button" aria-pressed={s.size === 'now'} onclick={() => (s.size = 'now')}>Output now</button>
+					</div>
+					<span class="quiet">{s.size === 'now' ? `Size shows output now${nowAt ? `, at ${clockOf(nowAt)}` : ''}` : 'Size shows installed MW'}</span>
 					<div class="sizes">
 						{#each [10, 100, 500] as m (m)}<span><i style="width:{dotSize(m)}px;height:{dotSize(m)}px"></i><span class="num">{m}{m === 500 ? ' MW' : ''}</span></span>{/each}
 						<span class="closed"><i style="width:15px;height:15px"></i>Closed</span>
@@ -239,8 +260,15 @@
 
 	.ctl { padding: 12px 14px; }
 	.fuels { display: flex; flex-wrap: wrap; gap: 6px; }
-	.fuels button { font: inherit; font-size: 0.8rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 2px 10px; border-radius: 4px; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
-	.fuels button[aria-pressed='true'] { background: var(--accent-soft); border-color: var(--accent); }
+	.fuels .all, .fb { font-size: 0.8rem; font-weight: 500; display: inline-flex; align-items: center; min-height: 32px; border-radius: 4px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+	.fuels button { font: inherit; font-size: inherit; font-weight: inherit; color: inherit; background: none; border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; min-height: 30px; }
+	.fuels .all { cursor: pointer; padding: 2px 10px; gap: 6px; font: inherit; font-size: 0.8rem; }
+	.fuels .all[aria-pressed='true'], .fb.alone { background: var(--accent-soft); border-color: var(--accent); }
+	.fb .sq { padding: 2px 4px 2px 9px; border-radius: 4px 0 0 4px; }
+	.fb .nm { padding: 2px 10px 2px 3px; border-radius: 0 4px 4px 0; }
+	.fb .sq:focus-visible, .fb .nm:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+	.fb:not(.on) .sw { background: none; box-shadow: inset 0 0 0 1.5px var(--c); }
+	.fb:not(.on) .nm { color: var(--muted); }
 	.fuels .n { font-family: var(--font-data); font-size: 0.74rem; color: var(--muted); }
 	.row { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
 	.seg { display: inline-flex; gap: 2px; border-radius: 4px; padding: 2px; background: var(--grid); }
@@ -248,7 +276,6 @@
 	.seg button[aria-pressed='true'] { background: var(--surface); border-color: var(--line); }
 	.lab { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--ink-2); }
 	.lab select, .lab input[type='search'] { font: inherit; font-size: 0.86rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; min-height: 32px; }
-	.lab input[type='checkbox'] { width: 16px; height: 16px; accent-color: var(--accent); }
 	.find { margin-left: auto; }
 	.find input { width: 180px; }
 	.clear, .more { font: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--accent); border-radius: 4px; font-size: 0.8rem; font-weight: 600; padding: 3px 10px; min-height: 30px; }
@@ -259,6 +286,12 @@
 	.side { flex: 1 1 300px; min-width: 0; display: grid; gap: 16px; }
 	.ctx { margin: 0; display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 0.8rem; }
 	#sel-h { font-size: 1.35rem; }
+	#sel-h a { color: inherit; text-decoration: none; }
+	#sel-h a:hover { color: var(--accent); text-decoration: underline; }
+	.thumb { margin: 0; display: grid; gap: 4px; }
+	.thumb img { width: 100%; height: auto; aspect-ratio: 1000 / 640; object-fit: cover; border-radius: 4px; display: block; background: var(--grid); }
+	.thumb figcaption { font-size: 0.72rem; color: var(--muted); }
+	.ov { margin: 0; font-size: 0.9rem; line-height: 1.5; color: var(--ink-2); }
 	dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; font-size: 0.88rem; }
 	dt { color: var(--muted); }
 	dd { margin: 0; }
@@ -297,7 +330,7 @@
 		table { min-width: 0; }
 		.c-fuel, .c-isl, .c-own, .c-com, .c-st { display: none; }
 		.fuels { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -14px; padding: 0 14px; }
-		.fuels button { flex: none; }
+		.fuels > * { flex: none; }
 		.find { margin-left: 0; flex: 1 1 100%; }
 		.find input { flex: 1; width: auto; min-width: 0; }
 	}

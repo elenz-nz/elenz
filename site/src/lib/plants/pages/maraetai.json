@@ -126,14 +126,16 @@
    11
   ]
  },
- "image": {
-  "file": "maraetai.webp",
-  "title": "Maraetai Power Station",
-  "author": "Majorconvenience",
-  "source_url": "https://commons.wikimedia.org/wiki/File:Maraetai_Power_Station.jpg",
-  "licence": "CC BY-SA 4.0",
-  "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/"
- },
+ "images": [
+  {
+   "file": "maraetai.webp",
+   "title": "Maraetai Power Station",
+   "author": "Majorconvenience",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Maraetai_Power_Station.jpg",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

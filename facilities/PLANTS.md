@@ -8,7 +8,7 @@ like the rest of the repository, so they hold only what public sources say.
 | --- | --- |
 | `plants/<slug>.toml` | One plant page: its facts, each with a source, a grade and the date it was checked |
 | `plant_sources.csv` | One row per source: `id`, `title`, `publisher`, `url`, `kind` (`public` or `research`), `opened` (the date we last read it), `note` |
-| `plant_images.csv` | One row per image we may use: `slug`, `file`, `title`, `author`, `source_url`, `licence`, `licence_url`, `checked`, `crop`. The file is `site/static/plants/<slug>.webp`, at most 1,600 px wide (WebP, quality 70 to 80), made from the source's own copy; `source_url` is the file's page, where the licence was read |
+| `plant_images.csv` | One row per image we may use (a plant can have several: the first leads its page, readers step through the rest): `slug`, `file`, `title`, `author`, `source_url`, `licence`, `licence_url`, `checked`, `crop`. The file is `site/static/plants/<slug>.webp` (a second photo `<slug>-2.webp`, and so on), at most 1,600 px wide (WebP, quality 70 to 80), made from the source's own copy; `source_url` is the file's page, where the licence was read |
 | `plant_aerials.csv` | The LINZ aerial views each page shows (`analysis/plant_aerials.py`): `slug`, `view` (site, close, wide), `file`, the point it is centred on, `zoom`, `across_m`, the `imagery` collection, `fetched` |
 | `plant_photo_leads.csv` | Photos worth checking; a lead stays listed after its photo is cleared and added to `plant_images.csv` |
 | `station_leads.csv` | Stations without a page yet: embedded stations, stations not in Elenz's data, new-station leads |

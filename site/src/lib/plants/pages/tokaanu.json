@@ -126,14 +126,16 @@
    9
   ]
  },
- "image": {
-  "file": "tokaanu.webp",
-  "title": "Tokaanu Power Station",
-  "author": "Ulrich Lange",
-  "source_url": "https://commons.wikimedia.org/wiki/File:Tokaanu_Power_Station.jpg",
-  "licence": "CC BY-SA 3.0",
-  "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
- },
+ "images": [
+  {
+   "file": "tokaanu.webp",
+   "title": "Tokaanu Power Station",
+   "author": "Ulrich Lange",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Tokaanu_Power_Station.jpg",
+   "licence": "CC BY-SA 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",
