@@ -1,5 +1,6 @@
 <script lang="ts">
-	// The plant index's map: each plant at its point, coloured by fuel and sized by installed MW, on the LINZ topolite
+	// The plant index's map: each plant at its point, coloured by fuel and sized by installed MW (or, with `sizes`, by
+	// its output now: the index's "Output now" switch, review of 19 Nov 2026), on the LINZ topolite
 	// basemap (Toitū Te Whenua LINZ, CC BY 4.0) drawn by MapLibre GL JS. The library (about 300 KB gzipped, and its
 	// worker) loads only on this page, after the first paint. Without a LINZ key (LINZ_BASEMAPS_KEY, a build variable in
 	// src/env.ts, never committed), without WebGL, or if the basemap fails, the page keeps the drawn outline map it is
@@ -12,7 +13,8 @@
 	import { fuelOf } from './registry.js';
 	import { fmtMw } from './history.js';
 
-	let { plants, sel = '', island = '', onpick }: { plants: Plant[]; sel?: string; island?: string; onpick: (slug: string) => void } = $props();
+	let { plants, sel = '', island = '', sizes = null, onpick }: { plants: Plant[]; sel?: string; island?: string; sizes?: Map<string, number> | null; onpick: (slug: string) => void } = $props();
+	const mwOf = (p: Plant) => (sizes ? sizes.get(p.slug) ?? 0 : p.mw ?? 0);
 
 	const KEY = LINZ_BASEMAPS_KEY;
 	const STYLE = `https://basemaps.linz.govt.nz/v1/styles/topolite-v2.json?api=${KEY}`;
@@ -27,21 +29,21 @@
 	let ml: any = null;
 	let colours: Record<string, string> = {};
 
-	const label = (p: Plant) => `${p.name}, ${fuelName(p.fuel).toLowerCase()}, ${fmtMw(p.mw)} MW${p.status === 'closed' ? ', closed' : ''}${p.pt && !p.pt.checked ? ' (location not checked yet)' : ''}`;
+	const label = (p: Plant) => `${p.name}, ${fuelName(p.fuel).toLowerCase()}, ${fmtMw(p.mw)} MW${sizes && p.status === 'operating' ? `, ${fmtMw(sizes.get(p.slug) ?? 0)} MW now` : ''}${p.status === 'closed' ? ', closed' : ''}${p.pt && !p.pt.checked ? ' (location not checked yet)' : ''}`;
 	const shown = $derived(plants.filter((p) => p.pt));
 	// the outline map: largest first, so small dots sit on top
-	const dots = $derived(shown.slice().sort((a, b) => (b.mw ?? 0) - (a.mw ?? 0)).map((p) => {
+	const dots = $derived(shown.slice().sort((a, b) => mwOf(b) - mwOf(a)).map((p) => {
 		const [x, y] = toView(p.pt!.lat, p.pt!.lon);
-		return { p, x: (100 * x) / VIEW.w, y: (100 * y) / VIEW.h, d: dotSize(p.mw) };
+		return { p, x: (100 * x) / VIEW.w, y: (100 * y) / VIEW.h, d: dotSize(mwOf(p)) };
 	}));
 
 	function features(list: Plant[]) {
 		return {
 			type: 'FeatureCollection',
-			features: list.slice().sort((a, b) => (b.mw ?? 0) - (a.mw ?? 0)).map((p) => ({
+			features: list.slice().sort((a, b) => mwOf(b) - mwOf(a)).map((p) => ({
 				type: 'Feature', id: p.slug,
 				geometry: { type: 'Point', coordinates: [p.pt!.lon, p.pt!.lat] },
-				properties: { slug: p.slug, name: p.name, r: dotSize(p.mw) / 2, c: colours[p.fuel] ?? '#7a8a89', closed: p.status === 'closed' ? 1 : 0,
+				properties: { slug: p.slug, name: p.name, r: dotSize(mwOf(p)) / 2, c: colours[p.fuel] ?? '#7a8a89', closed: p.status === 'closed' ? 1 : 0,
 					draft: p.pt!.checked ? 0 : 1, tip: label(p) }
 			}))
 		};

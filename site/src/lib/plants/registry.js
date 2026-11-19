@@ -5,7 +5,8 @@
 // small pull request once wave 1's facts are checked: set this true, add /plants and the pages to the sitemap
 // (src/routes/sitemap.xml) and Plants to the menu (Masthead.svelte, between Records and Articles), link plant names
 // from Now and the tracker, and name LINZ Basemaps on the privacy page (the index map loads its tiles) and in the
-// methods' source register. The index (/plants) then drops its draft map points (its +page.server.ts).
+// methods' source register. The index (/plants) then drops its draft map points (its +page.server.ts). /plants/share
+// (the call for first-hand knowledge) goes in the sitemap too.
 import { FUELS } from '#lib/tracker/fuels.js';
 
 export const PLANTS_PUBLIC = false;

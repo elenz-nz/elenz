@@ -41,3 +41,11 @@ export function toView(lat, lon) {
   const [e, n] = nztm(lat, lon);
   return [(e - fit.x0) * fit.s, (fit.y1 - n) * fit.s];
 }
+
+/** [x, y, w, h] around one island's outline (an absolute "M…L…" path from nzmap.js), padded by `pad` on each side. */
+export function islandBox(path, pad = 8) {
+  const xs = [], ys = [];
+  for (const m of path.matchAll(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g)) { xs.push(+m[1]); ys.push(+m[2]); }
+  const x0 = Math.min(...xs) - pad, y0 = Math.min(...ys) - pad;
+  return [x0, y0, Math.max(...xs) + pad - x0, Math.max(...ys) + pad - y0];
+}

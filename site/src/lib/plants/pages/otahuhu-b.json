@@ -123,14 +123,16 @@
    6
   ]
  },
- "image": {
-  "file": "otahuhu-b.webp",
-  "title": "Ōtāhuhu B combined cycle turbine",
-  "author": "Stug.stug",
-  "source_url": "https://commons.wikimedia.org/wiki/File:Otahuhu_B_combined_cycle_turbine.jpg",
-  "licence": "CC BY-SA 3.0",
-  "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
- },
+ "images": [
+  {
+   "file": "otahuhu-b.webp",
+   "title": "Ōtāhuhu B combined cycle turbine",
+   "author": "Stug.stug",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Otahuhu_B_combined_cycle_turbine.jpg",
+   "licence": "CC BY-SA 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

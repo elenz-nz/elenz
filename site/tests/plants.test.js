@@ -3,10 +3,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { plantMonths, years, lastMonths, latestYear, bestYear, capAt, hoursIn, capChanges, fmtGwh, fmtMw } from '#lib/plants/history.js';
 import { livePlant } from '#lib/plants/live.js';
-import { toView } from '#lib/plants/map.js';
-import { readSettings, writeSettings, pick, filtered, fuelsOf, ownersOf, dotSize, statusText, DEFAULTS } from '#lib/plants/list.js';
+import { toView, islandBox } from '#lib/plants/map.js';
+import { readSettings, writeSettings, pick, filtered, fuelsOf, ownersOf, dotSize, statusText, toggleFuel, onlyFuel, DEFAULTS } from '#lib/plants/list.js';
 import INDEX from '#lib/plants/index.json' with { type: 'json' };
-import { PTS } from '#lib/home/nzmap.js';
+import { PTS, NI, SI, VIEW } from '#lib/home/nzmap.js';
 import MANAPOURI from '#lib/plants/pages/manapouri.json' with { type: 'json' };
 
 const STEPS = [{ from: null, to: '2002-04-30', mw: 585 }, { from: '2002-05-01', to: '2007-12-31', mw: 700 }, { from: '2008-01-01', to: null, mw: 800 }];
@@ -89,7 +89,11 @@ const ROWS = [
 
 test('the index: closed plants hidden until asked for, largest first', () => {
   assert.deepEqual(pick(ROWS, DEFAULTS).map((p) => p.slug), ['big', 'oho', 'sun']);
-  assert.deepEqual(pick(ROWS, { ...DEFAULTS, closed: true }).map((p) => p.slug), ['big', 'gas', 'oho', 'sun']);
+  assert.deepEqual(pick(ROWS, { ...DEFAULTS, closed: 'all' }).map((p) => p.slug), ['big', 'gas', 'oho', 'sun']);
+  assert.deepEqual(pick(ROWS, { ...DEFAULTS, closed: 'only' }).map((p) => p.slug), ['gas']);
+  // several fuels at once, or none
+  assert.deepEqual(pick(ROWS, { ...DEFAULTS, fuels: ['hydro', 'solar'] }).map((p) => p.slug), ['big', 'oho', 'sun']);
+  assert.deepEqual(pick(ROWS, { ...DEFAULTS, fuels: [] }), []);
   assert.deepEqual(pick(ROWS, { ...DEFAULTS, text: 'ohau' }).map((p) => p.slug), ['oho']);   // macrons don't matter
   assert.deepEqual(pick(ROWS, { ...DEFAULTS, owner: 'meridian', island: 'SI' }).map((p) => p.slug), ['big', 'oho']);
   assert.deepEqual(pick(ROWS, { ...DEFAULTS, by: 'name', asc: true }).map((p) => p.slug), ['big', 'oho', 'sun']);
@@ -97,18 +101,31 @@ test('the index: closed plants hidden until asked for, largest first', () => {
   assert.deepEqual(pick(ROWS, { ...DEFAULTS, by: 'now' }, new Map([['Sunny', 15], ['Big', 600]])).map((p) => p.slug), ['big', 'sun', 'oho']);
   assert.deepEqual(pick(ROWS, { ...DEFAULTS, by: 'commissioned', asc: true }).map((p) => p.slug), ['big', 'oho', 'sun']);
   // the fuel buttons count everything the other filters let through
-  assert.equal(filtered(ROWS, { ...DEFAULTS, fuel: 'solar' }).length, 3);
+  assert.equal(filtered(ROWS, { ...DEFAULTS, fuels: ['solar'] }).length, 3);
   assert.deepEqual(fuelsOf(ROWS).map((f) => f.k), ['hydro', 'solar', 'gas']);
   assert.deepEqual(ownersOf(ROWS), ['Contact', 'Meridian', 'Other generators']);
   assert.equal(statusText(ROWS[2]), 'Closed 2015');
   assert.ok(dotSize(500) > dotSize(100) && dotSize(100) > dotSize(10));
 });
 
+test('the fuel squares turn one fuel on or off; a fuel name shows it alone', () => {
+  const all = ['hydro', 'solar', 'gas'];
+  assert.deepEqual(toggleFuel(null, 'gas', all), ['hydro', 'solar']);
+  assert.equal(toggleFuel(['hydro', 'solar'], 'gas', all), null);   // every fuel on again
+  assert.deepEqual(toggleFuel(['hydro'], 'hydro', all), []);
+  assert.deepEqual(onlyFuel(null, 'solar'), ['solar']);
+  assert.deepEqual(onlyFuel(['hydro', 'solar'], 'solar'), ['solar']);
+  assert.equal(onlyFuel(['solar'], 'solar'), null);
+});
+
 test('the index keeps its settings in the address, and ignores what it does not know', () => {
-  const s = { ...DEFAULTS, fuel: 'hydro', island: 'SI', owner: 'meridian', closed: true, text: 'Ō', by: 'name', asc: true, sel: 'big' };
+  const s = { ...DEFAULTS, fuels: ['hydro'], island: 'SI', owner: 'meridian', closed: 'all', text: 'Ō', by: 'name', asc: true, sel: 'big', size: 'now' };
   const q = writeSettings(s);
-  assert.equal(q, '?fuel=hydro&island=SI&owner=meridian&closed=1&q=%C5%8C&sort=name&plant=big');
+  assert.equal(q, '?fuel=hydro&island=SI&owner=meridian&closed=1&q=%C5%8C&sort=name&plant=big&size=now');
   assert.deepEqual(readSettings(q, ROWS), s);
+  assert.deepEqual(readSettings('?fuel=hydro,solar&closed=only', ROWS), { ...DEFAULTS, fuels: ['hydro', 'solar'], closed: 'only' });
+  assert.deepEqual(readSettings('?fuel=none', ROWS), { ...DEFAULTS, fuels: [] });
+  assert.equal(writeSettings({ ...DEFAULTS, fuels: [] }), '?fuel=none');
   assert.equal(writeSettings(DEFAULTS), '');
   assert.deepEqual(readSettings('?fuel=coal&owner=nobody&plant=gone&sort=bogus', ROWS), DEFAULTS);
   assert.deepEqual(readSettings('?sort=mw-asc', ROWS), { ...DEFAULTS, asc: true });
@@ -118,6 +135,16 @@ test('the index file: every plant, each point in New Zealand', () => {
   assert.equal(INDEX.plants.length, 110);
   for (const p of INDEX.plants) {
     assert.ok(p.slug && p.name && p.fuel && p.island && p.status, p.slug);
+    assert.match(p.overview, /^An? \d[\d.]* MW .+\.$/, p.slug);
     if (p.pt) assert.ok(p.pt.lat < -34 && p.pt.lat > -48 && p.pt.lon > 166 && p.pt.lon < 179, `${p.slug}: ${p.pt.lat}, ${p.pt.lon}`);
   }
+});
+
+test('the locator frames one island', () => {
+  const [x, y, w, h] = islandBox(NI);
+  assert.ok(x > VIEW.w * 0.4 && y + h < VIEW.h * 0.6, 'the North Island sits top right');
+  const pt = toView(-38.62, 176.14);   // Aratiatia
+  assert.ok(pt[0] > x && pt[0] < x + w && pt[1] > y && pt[1] < y + h);
+  const s = islandBox(SI);
+  assert.ok(s[1] > y + h * 0.5, 'the South Island sits below the North Island');
 });

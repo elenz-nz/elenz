@@ -143,14 +143,16 @@
    11
   ]
  },
- "image": {
-  "file": "arapuni.webp",
-  "title": "Arapuni Power Station",
-  "author": "Schwede66",
-  "source_url": "https://commons.wikimedia.org/wiki/File:Arapuni_power_station.JPG",
-  "licence": "CC BY-SA 3.0",
-  "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
- },
+ "images": [
+  {
+   "file": "arapuni.webp",
+   "title": "Arapuni Power Station",
+   "author": "Schwede66",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Arapuni_power_station.JPG",
+   "licence": "CC BY-SA 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

@@ -188,33 +188,53 @@ stay put. Tests: `tests/research.test.js`, `tests/e2e/research.spec.js` and the 
 `/data/plant-notes` blocks in the Worker tests.
 
 The page: name, a line from Elenz's data (`subtitle()`), tags (fuel, island, owner, status, installed MW); "We're still
-checking this page's facts" until the plant file's `reviewed` is set; the photo (once `plant_images.csv` has a row; the
-file goes in `static/plants/`, and `plant_pages.py --check` fails if it's missing) beside the Now panel, or without a
-photo the plant's LINZ aerial views (`Aerial.svelte`: Site, Close and Wide, about 450 m, 1 km and 7.5 km across, a
-switch that only swaps the image's address; credited with the imagery collection, Toitū Te Whenua LINZ, CC BY 4.0), which
-move into the Location panel once a photo leads (design decision, 19 Nov 2026: every plant with a checked point gets
-them, a licensed photo is added on top). The views are WebP files in `static/plants/aerial/`, made by
+checking this page's facts" until the plant file's `reviewed` is set; then, beside the Now panel, the picture panel
+(`Media.svelte`, design decision of the page review, 19 Nov 2026) with a Photos tab and a Location tab, shown only when
+the plant has both. Photos: every row of `plant_images.csv` for the plant, in file order (the files go in
+`static/plants/`, and `plant_pages.py --check` fails if one is missing), in a strip that swipes on a phone (CSS scroll
+snap), with arrows and "1 of 3" when there is more than one; each credited under it, the credit's links opening in a new
+tab. Location: the plant's LINZ aerial views (Site, Close and Wide, about 450 m, 1 km and 7.5 km across; a switch that
+only swaps the image's address; credited with the imagery collection, Toitū Te Whenua LINZ, CC BY 4.0) and, with the
+LINZ key, a Map view (the index's MapLibre and `topolite-v2` style, loaded only when Map is chosen, centred on the point,
+with cooperative gestures so it doesn't catch the page's scrolling), a small locator of the plant's island in the corner
+(`islandBox()` in `map.js` frames the one island's outline: the whole-country map was hard to read in light mode), and
+the coordinates with their source under it. With no photo, the Location tab leads alone; every plant with a checked
+point has aerial views (design decision, 19 Nov 2026). Without JavaScript the first tab's first view shows. The views are WebP files in `static/plants/aerial/`, made by
 `analysis/plant_aerials.py` from LINZ Basemaps' aerial tiles (with the `LINZ_BASEMAPS_KEY` key, never committed) and
 listed in `facilities/plant_aerials.csv` with the point each is centred on; a page gets them only while that point is
 its plant file's checked location, and `plant_pages.py --check` fails when a location has moved without new views or a
 file is missing. The Now panel takes the full width with neither; three figures (the latest 12 whole months and their capacity factor, the most in a calendar year
 in our records; for a closed plant its total, best year and last month); generation by year (Energy or Capacity factor,
 dashed lines where installed MW changed, the plant's metering note from `plants.json` under it); the last 24 whole months;
-installed capacity over time with each step's source in its ⓘ; the facts (installed MW and owner from Elenz's data, then
-the checked facts), the location (a dot on the Now map's outlines, `map.js`: NZTM2000 fitted to `nzmap.js`'s reference
-points) once checked; related pages (the scheme's other stations upstream first, the owner's other plants, at most 12,
-the largest of its fuel on its island); and the sources, numbered, ending with Elenz's own data. Charts are drawn to
+installed capacity over time with each step's source in its ⓘ; related pages (the scheme's other stations upstream
+first, the owner's other plants, at most 12, the largest of its fuel on its island), under the charts on a wide screen
+and straight under the facts on a phone (a grid with areas from 900 px; below it the side column's cards join the
+page's grid with `display: contents` and `order`); in the side column the facts (installed MW and owner from Elenz's data, then the checked facts, each fact's note in its own ⓘ so the
+column stays short) and a call to share what you know, linking to `/plants/share?plant=<slug>`; and the sources, numbered, ending with Elenz's own data. Charts are drawn to
 their card's width (`Bars.svelte`, `CapSteps.svelte`, `Spark.svelte`; each wrapper `min-width: 0`, or a chart holds
 its card at 720 px on a phone), and pointing at or tapping a bar puts its figures in the line above. A closed plant has
-no Now panel; a plant not generating yet (a pending capacity row) says so and shows no MW. Tests: `tests/plants.test.js`
+no Now panel; a plant not generating yet (a pending capacity row) says so and shows no MW.
+
+`/plants/share` (`src/routes/plants/share/`) asks for first-hand knowledge and photos from people who have worked on or
+with a station: an email to hello@elenz.co.nz, not a form, so nothing is stored on the site, started with `?plant=`'s
+name in the subject and a template body (what you know, how you know it, how to be credited, and the photo licence
+line: the sender owns the copyright and lets Elenz publish under CC BY 4.0). The page says the Elenz team checks
+everything first and may publish it with the sender's name or anonymously. Hidden with the plant pages. Tests: `tests/plants.test.js`
 and the plant pages block in `tests/e2e/site.spec.js` (a small history file handed to the page, and the phone width).
 
 The index, `/plants` (`src/routes/plants/`, `src/lib/plants/list.js`, `PlantMap.svelte`), from the same mock-up: a map
-above a table of every plant, filtered by fuel (buttons with counts), island, owner, "Show closed" and a name search,
-sorted by any column, with the settings and the selected plant in the address (`list.js`, as Now's generator table).
+above a table of every plant, filtered by fuel, island, owner, status (Operating, Operating and closed, or Closed only)
+and a name search, sorted by any column, with the settings and the selected plant in the address (`list.js`, as Now's
+generator table). Each fuel button is two (review of 19 Nov 2026): its square turns that fuel on or off, as the
+tracker's legend squares, so the map can show any mix (`fuel=wind,solar`; `fuel=none` for none), and its name shows
+that fuel alone, or every fuel again if it already was. The key's switch sizes the dots by installed MW or by output
+now (`size=now`; batteries by the size of their charge or discharge; closed plants smallest). The side panel shows the
+picked plant's name (a link to its page), its first photo or else its aerial Site view, credited, and a one-sentence
+overview (`overview()` in `plant_pages.py`, from the checked facts only: MW, kind, river or geothermal field where the
+fact names one, region, and the years).
 Its rows are `src/lib/plants/index.json`, written by `ingest/plant_pages.py` with the pages (and checked by its
-`--check`): name, fuel, island, status, installed MW, owner, the checked commissioning year, the year it closed, whether
-the page is reviewed, and the map point. The point is the checked location; while the pages are hidden it may also be a
+`--check`): name, fuel, island, status, installed MW, owner, the checked commissioning year (the earliest year in the
+fact), the year it closed, whether the page is reviewed, the map point, the side panel's picture and the overview. The point is the checked location; while the pages are hidden it may also be a
 draft (design decision, 18 Nov 2026): the plant file's unchecked location from a public source, or else its grid
 connection, drawn faded and named "not checked yet". OpenStreetMap points are never used, and `+page.server.ts` drops
 every draft once `PLANTS_PUBLIC` is true. The Now column reads tracker.json's newest interval, polled as on Now. The

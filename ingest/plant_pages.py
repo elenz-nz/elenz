@@ -15,7 +15,8 @@ Each plant page (/plants/<slug>) is prerendered from its file here; its live pan
   about                  {text, refs} once its about text is checked
   facts                  [{k, label, value, refs, note?}]: the checked facts, in page order
   location               {lat, lon, basis, refs} once the station's point is checked
-  image                  the first row of plant_images.csv for the plant, or null
+  images                 [{file, title, author, source_url, licence, licence_url}]: the plant's rows of
+                         plant_images.csv, in file order (the first leads; the page lets readers step through the rest)
   aerial                 [{k, file, across, imagery}]: the plant's LINZ aerial views (site, close, wide;
                          analysis/plant_aerials.py), once its location is checked and while the views are centred on it
   sources                [{n, title, publisher, url, opened}]: the sources the published facts cite, numbered
@@ -23,7 +24,9 @@ Each plant page (/plants/<slug>) is prerendered from its file here; its live pan
 
 and the index page (/plants) is built from site/src/lib/plants/index.json, one row per plant: slug, name, plant (its
 name in Elenz's data), fuel, island, status, mw, owner (plants.json's, "Other generators" included), commissioned (its checked year, or null),
-closed (the year its last capacity row ended), reviewed, and pt, its point on the map: {lat, lon, basis, checked}.
+closed (the year its last capacity row ended), reviewed, pt, its point on the map: {lat, lon, basis, checked}, thumb,
+the picture the index's side panel shows (its first photo, else its aerial site view, else null: {kind, file, credit}),
+and overview, one sentence built from its checked facts (overview() below).
 `checked` is true for the station's checked location; otherwise pt is a draft, the plant file's unchecked location
 or, without one, its grid connection (the EA's network supply point), for the map while the pages are hidden (design
 decision, 18 Nov 2026). The index page drops every draft point once PLANTS_PUBLIC is true, and a draft never cites a
@@ -41,6 +44,7 @@ commit the JSON:
 import csv
 import json
 import os
+import re
 import sys
 from urllib.parse import unquote, urlparse
 
@@ -156,7 +160,7 @@ def page(s, p, cap, meta, srcs, images, aerials):
     location = ({'lat': loc['value'][0], 'lon': loc['value'][1], 'basis': loc.get('basis', 'station'), 'refs': refs(loc)}
                 if loc and pf.published(loc) else None)
     dates = [e.get('checked') for _, e, alt in pf.entries(p) if not alt and pf.published(e)]
-    img = next((r for r in images if r['slug'] == s), None)
+    imgs = [r for r in images if r['slug'] == s]
     views = [r for r in aerials if r['slug'] == s]
     aerial = ([{'k': r['view'], 'file': r['file'], 'across': int(r['across_m']), 'imagery': r['imagery']} for r in views]
               if location and views and all(aerial_on(r, loc) for r in views) else None)
@@ -174,7 +178,7 @@ def page(s, p, cap, meta, srcs, images, aerials):
         'about': about,
         'facts': facts,
         'location': location,
-        'image': ({k: img[k] for k in ('file', 'title', 'author', 'source_url', 'licence', 'licence_url')} if img else None),
+        'images': [{k: r[k] for k in ('file', 'title', 'author', 'source_url', 'licence', 'licence_url')} for r in imgs],
         'aerial': aerial,
         'sources': [{'n': n, **{k: srcs[x][k] for k in ('title', 'publisher', 'url', 'opened')}} for x, n in numbers.items()],
     }
@@ -217,6 +221,67 @@ def point(p, srcs):
     return None
 
 
+# how the overview names each fuel's plants (registry.js's KIND, lower case), and the regions that take "the"
+KIND = {'hydro': 'hydro station', 'geo': 'geothermal station', 'wind': 'wind farm', 'solar': 'solar farm',
+        'gas': 'gas-fired station', 'coal': 'coal and gas station', 'diesel': 'diesel station', 'batt': 'battery',
+        'bio': 'bioenergy plant', 'waste': 'waste heat plant'}
+REGION_IN = {'Bay of Plenty': 'in the Bay of Plenty', 'West Coast': 'on the West Coast'}
+
+
+def overview(pg, closed_year=None):
+    """One sentence for the index's side panel, from the page's checked facts only:
+    'A 570 MW hydro station on the Waitaki River in Canterbury, generating since 1965.' The river or geothermal field
+    is named only where the fact starts with one ('Waitaki River (Lake Benmore)' gives 'the Waitaki River'); the
+    region falls back to the island; the years are the earliest year in Commissioned and, for a closed plant, the
+    year in Closed (else the year its last capacity row ended)."""
+    f = {x['k']: x['value'] for x in pg['facts']}
+    mw = f"{text(round(pg['mw'], 1))} MW " if pg['mw'] else ''
+    what = KIND.get(pg['fuel'], 'power station')
+    on = ''
+    head = re.split(r'[,(;]', f.get('river', ''))[0].strip()
+    if pg['fuel'] == 'hydro' and re.fullmatch(r"[^ ].* River", head) and ' and ' not in head:
+        on = f' on the {head}'
+    field = f.get('field', '')
+    if pg['fuel'] == 'geo' and field.endswith('geothermal field') and ';' not in field:
+        on = f' on the {field}'
+    region = f.get('region')
+    where = REGION_IN.get(region, f'in {region}') if region else f"in the {'South' if pg['island'] == 'SI' else 'North'} Island"
+    years = [int(y) for y in re.findall(r'\b(1[89]\d\d|20\d\d)\b', f.get('commissioned', ''))]
+    first = min(years) if years else None
+    run = 'in service' if pg['fuel'] == 'batt' else 'generating'
+    if pg['status'] == 'pending':
+        tail = 'not generating yet'
+    elif pg['status'] == 'closed':
+        end = (re.findall(r'\b(?:1[89]|20)\d\d\b', f.get('closed', '')) or [closed_year])[-1]
+        tail = (f'{run} from {first} to {end}' if first and end and str(first) != str(end)
+                else f'closed in {end}' if end else 'now closed')
+    else:
+        tail = f'{run} since {first}' if first else ''
+    # "an" before a number said with a vowel sound: 8, 11, 18, 80s, 800s (eight, eleven, eighteen, eighty, ...)
+    n = mw.split(' ')[0].split('.')[0] if mw else ''
+    article = 'An' if n.startswith('8') or n in ('11', '18') else 'A'
+    if pg['status'] == 'closed':
+        tail = tail if tail.startswith('closed') or tail == 'now closed' else f'{tail}; now closed'
+    return f"{article} {mw}{what}{on} {where}{', ' + tail if tail else ''}."
+
+
+def first_year(v):
+    """The earliest year in a Commissioned value: '1952' for 'Maraetai I 1952; Maraetai II 1970'."""
+    ys = re.findall(r'\b(?:1[89]|20)\d\d\b', str(v))
+    return min(ys) if ys else None
+
+
+def thumb(pg):
+    """The index side panel's picture: the first photo, else the aerial site view."""
+    if pg['images']:
+        im = pg['images'][0]
+        return {'kind': 'photo', 'file': im['file'], 'credit': f"Photo: {im['author']}, {im['licence']}"}
+    site = next((v for v in pg['aerial'] or [] if v['k'] == 'site'), None)
+    if site:
+        return {'kind': 'aerial', 'file': site['file'], 'credit': 'Aerial: Toitū Te Whenua LINZ, CC BY 4.0'}
+    return None
+
+
 def index(plants, pages, meta, srcs):
     """The index page's rows, by name (site/src/lib/plants/index.json)."""
     rows = []
@@ -226,9 +291,10 @@ def index(plants, pages, meta, srcs):
         ends = [st['to'] for st in pg['steps'] if st['to']]
         rows.append({'slug': s, 'name': pg['name'], 'plant': pg['plant'], 'fuel': pg['fuel'], 'island': pg['island'], 'status': pg['status'],
                      'mw': pg['mw'], 'owner': meta.get(pg['plant'], {}).get('owner') or OTHER,
-                     'commissioned': str(com['value'])[:4] if com and pf.published(com) else None,
+                     'commissioned': first_year(com['value']) if com and pf.published(com) else None,
                      'closed': max(ends)[:4] if pg['status'] == 'closed' and ends else None,
-                     'reviewed': bool(p.get('reviewed')), 'pt': point(p, srcs)})
+                     'reviewed': bool(p.get('reviewed')), 'pt': point(p, srcs), 'thumb': thumb(pg)})
+        rows[-1]['overview'] = overview(pg, rows[-1]['closed'])
     rows.sort(key=lambda r: pf.slug(r['name']))
     return {'plants': rows}
 
@@ -269,8 +335,9 @@ def main(check=False):
     pages, idx, problems = build()
     have = {f[:-5] for f in os.listdir(OUT) if f.endswith('.json')} if os.path.isdir(OUT) else set()
     for s, p in pages.items():
-        if p['image'] and not os.path.exists(os.path.join(IMAGES_DIR, p['image']['file'])):
-            problems.append(f'{s}: its image site/static/plants/{p["image"]["file"]} is missing')
+        for im in p['images']:
+            if not os.path.exists(os.path.join(IMAGES_DIR, im['file'])):
+                problems.append(f'{s}: its image site/static/plants/{im["file"]} is missing')
         path = os.path.join(OUT, f'{s}.json')
         if check:
             try:
