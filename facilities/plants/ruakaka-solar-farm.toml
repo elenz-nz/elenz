@@ -8,6 +8,7 @@ reviewed = ""
 to_check = [
   "Capacity (decision): Elenz has it pending at 120 MW. Meridian gives 130 MW, and the EA register now lists \"Ruakākā Energy Park Solar Farm\" (RUS0) at 130 MW from 29 Oct 2026; not yet in Elenz's live data (19 Nov). Give it 130 MW and a start date once it dispatches.",
   "Commissioned: first generation was expected in late 2026, full generation in early 2027; add the year once it generates.",
+  "Lead (20 Nov 2026): the System Operator's September 2026 report expects commissioning from December 2026; Meridian's Ruakākā Energy Park page describes the 33 kV connection through the battery site's switching station to Bream Bay, about 163 ha of panels on a 201 ha site. Read both.",
 ]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against Meridian's two releases (final investment decision, March 2025; construction under way, October 2025), the EA register and network supply points table, and Stats NZ boundaries.",

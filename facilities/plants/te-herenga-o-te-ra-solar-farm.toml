@@ -9,6 +9,8 @@ osm = ["way/1410036411"]
 reviewed = "2026-11-19"
 to_check = [
   "Sources: Lodestone's site refuses automated reads, so this farm's facts rest mainly on BraveTrace's device sheet (Lodestone's page read only through search results). Check Lodestone's page by hand.",
+  "Lead (20 Nov 2026): full commissioning July 2025 (from Lodestone or New Energy), against BraveTrace's 20 January 2025. The About text says commissioned in January 2025: check which is right.",
+  "Optional, About text: the developer's estimate of about 69 GWh a year (Lodestone) could be added, worded as an estimate, not as metered output.",
 ]
 notes = [
   "Capacity: Elenz keeps the register's 33 MW (design decision 19 Nov 2026); BraveTrace's sheet (May 2026) gives 30 MW AC.",

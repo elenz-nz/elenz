@@ -10,6 +10,7 @@ reviewed = ""
 photo_leads = ["P034"]
 to_check = [
   "Mounting (plan question): fixed or tracking? Not stated in the sources read (Genesis's page is drawn by script and could not be read).",
+  "Optional, About text: the developer's estimate of about 100 GWh a year (Genesis) could be added, worded as an estimate, not as metered output.",
 ]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against BraveTrace's device sheet (registrant Genesis Energy), PV Tech, the EA register and network supply points table, and Stats NZ boundaries.",

@@ -6,7 +6,11 @@ name = "Papareireiā"
 register = ["S017"]
 wikidata = "Q137460644"
 reviewed = "2026-11-19"
-to_check = []
+to_check = [
+  "Lead (20 Nov 2026): construction began Sep 2024 and first generation was Nov 2025 (United Civil, Green Gold Energy); Green Gold gives formal commissioning on 6 Jan 2026, against December 2025 (Wikipedia, citing Scoop). Both make plant_capacity.csv's start of 2025-02-01 (\"metered output from 2025-02\") look wrong: trace which metered series starts then before changing it.",
+  "Lead (20 Nov 2026): Ryman takes all the output through a sleeved PPA with Mercury (Ryman's release). Read it and add Mercury to the About text if it checks out.",
+  "Optional, About text: the developer's estimate of about 32 GWh a year (Purpose Capital) could be added, worded as an estimate, not as metered output.",
+]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against Te Ao Māori News, Wikipedia's article, the EA register and network supply points table, and Stats NZ boundaries.",
   "Location: Wikipedia's article gives a point near Maungaturoto (Wikidata Q137460644 has none yet), added as the draft location. District and region from the station's point (the [location] value, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; no other district within 3 km. The old lead (\"Maungaturoto\") was a town.",

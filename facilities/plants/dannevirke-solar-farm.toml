@@ -6,7 +6,9 @@ name = "Dannevirke Solar Farm"
 register = ["S014"]
 osm = ["way/1516694558"]
 reviewed = "2026-11-19"
-to_check = []
+to_check = [
+  "Lead (20 Nov 2026): LINZ's Overseas Investment Office decision on Dannevirke SF LP records 37.4 ha of leased land at 440 Tamaki River Road. Add it to plant_sources.csv if its page can be read (LINZ's pages have refused automated reads before).",
+]
 notes = [
   "Capacity: Elenz uses the register's 19 MW since 19 Nov 2026 (design decision); the earlier 23 MW is the panels' DC rating.",
   "Solar batch (19 Nov 2026): facts checked against the EA register and network supply points table, Tararua District Council's consent documents (through search results), SolarQuarter and Stats NZ boundaries.",
