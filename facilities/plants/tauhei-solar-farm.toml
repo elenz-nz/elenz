@@ -7,7 +7,9 @@ register = ["S019"]
 wikidata = "Q115803980"
 osm = ["relation/19726847"]
 reviewed = "2026-11-19"
-to_check = []
+to_check = [
+  "Lead (20 Nov 2026): commissioning completed 25 Sep 2026 per the System Operator's September 2026 report, and Harmony Energy's Tauhei page gives 150 MW AC at Waihou. Read both: update the commissioned note, and use Harmony's page as the owner source for the AC figure.",
+]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against Harmony Energy's financial close release, PV Tech, the EA register and network supply points table, and Stats NZ boundaries.",
   "District and region from the station's point (the [location] value, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; no other district within 3 km.",

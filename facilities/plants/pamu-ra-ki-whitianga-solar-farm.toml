@@ -9,6 +9,7 @@ osm = ["way/1441734217"]
 reviewed = "2026-11-19"
 to_check = [
   "Sources: Lodestone's site refuses automated reads, so this farm's facts rest mainly on BraveTrace's device sheet (Lodestone's page read only through search results). Check Lodestone's page by hand.",
+  "Optional, About text: the developer's estimate of about 49 GWh a year (Lodestone) could be added, worded as an estimate, not as metered output.",
 ]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against BraveTrace's device sheet, Lodestone's release on Scoop, the EA register and network supply points table, and Stats NZ boundaries.",
