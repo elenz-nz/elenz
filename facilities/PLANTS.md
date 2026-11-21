@@ -85,12 +85,18 @@ Facts a file may hold, under `[facts]`: `other_names`, `commissioned`, `closed`,
 `region`, `territorial_authority`, `owner`, `previous_owners`, `about`. The header (fuel, island, status, installed
 MW), the live panel and the history come from Elenz's own data, not from these files.
 
-**Which date `commissioned` gives** (design decision, 21 Nov 2026): the first metered date, the first half-hour of
-output in the EA's metered generation (Generation_MD, or the grid meter for a plant without its own row). For a plant
-with no metered output, the owner's commissioning date. Other dates (the register's start, Transpower's adjustment
-event dates in its Assumptions Book Appendix D, an owner's opening or "fully commissioned" date) go in the fact's
-`note` or as `alt` values. For plants older than the metered history (Aug 1997), the published year stays. This sets
-the page's fact only: `plant_capacity.csv` rows keep their own dates.
+**Which date `commissioned` gives** (design decisions, 21 Nov 2026):
+
+- A plant metered from the start: the first metered date, the first half-hour of output in the EA's metered
+  generation (Generation_MD, or the grid meter for a plant without its own row).
+- A plant commissioned before the metered history starts (Aug 1997), or one that ran for some time before it was
+  metered, or one never metered: the owner's commissioning date.
+- A meter covering several stations commissioned at different times (Kawerau (Onepu)): no commissioned date; the
+  `units` fact names the stations.
+
+Other dates (the register's start, Transpower's adjustment event dates in its Assumptions Book Appendix D, an owner's
+opening or "fully commissioned" date) go in the fact's `note` or as `alt` values. This sets the page's fact only:
+`plant_capacity.csv` rows keep their own dates.
 
 ## Grades and what gets published
 

@@ -23,7 +23,7 @@
  "scheme": null,
  "metered": "This meter is a whole site's grid connection, not one generator's. Transpower's Assumptions Book (June 2026) puts four geothermal units behind it: Eastland's TOPP1 and GDL, and two it calls TA2 and TA3. It counts power going into the grid there, so it leaves out what the site uses itself and the power it takes from the grid at the same time. Generation_MD has no row for it before 2020, so 2013–2019 use the same figure from the grid meter (Grid_import). The dispatch data (the live week and the weeks since the newest metered month) reads higher.",
  "checking": true,
- "checked": "2026-11-19",
+ "checked": "2026-11-21",
  "about": null,
  "facts": [
   {
@@ -36,11 +36,21 @@
    "note": "the EA register's names for KAW0112 ONU0: Norske Skog CoGen to 5 May 2023, Carter Holt Harvey Energy Ltd CoGen since"
   },
   {
+   "k": "units",
+   "label": "Units",
+   "value": "4 geothermal units: TOPP1 (24 MW) and GDL (8 MW, which Transpower calls KA24), both Eastland Generation's, and two Transpower calls TA2 (16 MW) and TA3 (8 MW)",
+   "refs": [
+    2,
+    3
+   ],
+   "note": "Transpower's Assumptions Book v3.0 (footnote 22; Appendix F): the units behind the meter. Eastland gives GDL as 9 MW."
+  },
+  {
    "k": "region",
    "label": "Region",
    "value": "Bay of Plenty",
    "refs": [
-    2
+    4
    ]
   },
   {
@@ -48,7 +58,7 @@
    "label": "Connection point",
    "value": "Kawerau (KAW0112)",
    "refs": [
-    3
+    5
    ]
   }
  ],
@@ -65,13 +75,27 @@
   },
   {
    "n": 2,
+   "title": "TPM determination: Assumptions book v3.0 (30 June 2026)",
+   "publisher": "Transpower",
+   "url": "https://www.transpower.co.nz/our-work/industry/grid-pricing/assumptions-book",
+   "opened": "2026-11-21"
+  },
+  {
+   "n": 3,
+   "title": "Geothermal",
+   "publisher": "Eastland Generation",
+   "url": "https://eastlandgeneration.nz/renewable-generation/geothermal",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 4,
    "title": "Regional Council 2025 (boundaries)",
    "publisher": "Stats NZ",
    "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
    "opened": "2026-11-19"
   },
   {
-   "n": 3,
+   "n": 5,
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",

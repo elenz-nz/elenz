@@ -19,7 +19,6 @@ notes = [
   "Dates: the register's row starts 13 Nov 2025; officially commissioned in December 2025 (Wikipedia, citing Scoop). Elenz's capacity note says metered output from Feb 2025: check that.",
   "Owner: the register's operator is Maungaturoto Solar Farm Project LP; the project was first developed by Solar Bay (now Harbour Infrastructure) for Ryman Healthcare.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
-  "Earlier name: Golden Stairs Solar Farm, after Golden Stairs Road, Maungaturoto (the register's unit code GDS0; Transpower's Appendix D still uses it). Worth adding as other_names once a public source gives both names.",
 ]
 
 [location]
@@ -39,10 +38,11 @@ checked = "2026-11-19"
 note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.other_names]
-value = ["Ryman Healthcare Solar Farm"]
-source = "wp-papareireia"
+value = ["Ryman Healthcare Solar Farm", "Golden Stairs Solar Farm"]
+source = ["wp-papareireia", "transpower-appendix-d-2026"]
 grade = "B"
-checked = "2026-11-19"
+checked = "2026-11-21"
+note = "Golden Stairs Solar Farm: its earlier name, after Golden Stairs Road, Maungaturoto; Transpower's Appendix D still uses it, and the register's unit code is GDS0"
 
 [facts.commissioned]
 value = "2025"
