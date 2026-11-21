@@ -9,6 +9,7 @@ to_check = [
   "Still running? Elenz's data ends 2008-03-31, but Fonterra said in January 2025 that its Edgecumbe site still uses steam and electricity from a co-generation plant, to be replaced by an electrode boiler. So the plant probably didn't close in 2008: find why it leaves Elenz's data (the EA's network supply points table shows EDG0331's embedded generation record changing on 1 May 2008), and whether it has closed since. (Data question for the Elenz team.)",
   "Owner: Wikipedia's list gives Nova Energy; Fonterra's site hosts it. Find the owner (the Commerce Commission, the EA or the owners).",
   "Capacity: Elenz uses 10 MW (Wikipedia's list); check against an owner or official source.",
+  "Closure lead: Transpower's Assumptions Book v3.0 (30 Jun 2026; source transpower-assumptions-2026) models Edgecumbe (and Hawera) to retire in 2026, \"consistent with recent information provided by Fonterra\" (para 151 e). Look for Fonterra's date for the electrode boiler, then set the status.",
 ]
 notes = [
   "Elenz: 10 MW gas, Jan 1999 to Mar 2008.",

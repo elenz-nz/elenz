@@ -16,6 +16,7 @@ notes = [
   "Region from Wikipedia's point (-40.38833, 175.72417), Stats NZ 2025 boundaries; only Manawatū-Whanganui within 5 km.",
   "Removed the scheme fact (Tararua Range, from our own register): a single wind farm has no scheme.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "Transpower's Assumptions Book v3.0 (30 Jun 2026; source transpower-assumptions-2026), para 136 a: Transpower models the repowering as staged commissioning from 2029, the developer's stated intention, and notes the project hadn't reached financial close.",
 ]
 
 [location]

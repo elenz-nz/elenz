@@ -379,6 +379,12 @@ export const REFERENCES: Reference[] = [
 		topics: ['generation', 'emissions'],
 	},
 	{
+		id: 'tp-assumptions', title: 'TPM determination: Assumptions book, version 3.0', by: 'Transpower', date: '30 June 2026',
+		url: 'https://www.transpower.co.nz/our-work/industry/grid-pricing/assumptions-book',
+		use: 'Says the value reported for KAW110 ONU covers four units, Onepu_KA24 (GDL), Onepu_TA2, Onepu_TA3 and Onepu_TOPP1, which the security of supply assessment counts as one 60 MW unit (footnote 22; embedded generation table, page 21).',
+		topics: ['generation', 'emissions'],
+	},
+	{
 		id: 'mclean2021', title: 'Geothermal Greenhouse Gas Emissions in New Zealand in 2020: Lifecycle and Operational Emissions',
 		by: 'McLean and Richardson, New Zealand Geothermal Workshop', date: '2021',
 		url: 'https://worldgeothermal.org/pdf/IGAstandard/NZGW/2021/111.pdf',

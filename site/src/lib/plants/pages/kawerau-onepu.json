@@ -21,7 +21,7 @@
  ],
  "owner": null,
  "scheme": null,
- "metered": "This meter is a whole site's grid connection, not one generator's. It counts power going into the grid there, so it leaves out what the site uses itself and the power it takes from the grid at the same time. Generation_MD has no row for it before 2020, so 2013–2019 use the same figure from the grid meter (Grid_import). The dispatch data (the live week and the weeks since the newest metered month) reads higher.",
+ "metered": "This meter is a whole site's grid connection, not one generator's. Transpower's Assumptions Book (June 2026) puts four units behind it: Eastland's TOPP1 and GDL, and two it calls TA2 and TA3. It counts power going into the grid there, so it leaves out what the site uses itself and the power it takes from the grid at the same time. Generation_MD has no row for it before 2020, so 2013–2019 use the same figure from the grid meter (Grid_import). The dispatch data (the live week and the weeks since the newest metered month) reads higher.",
  "checking": true,
  "checked": "2026-11-19",
  "about": null,
