@@ -68,6 +68,7 @@ HLY91 = "HLY11"  # Huntly battery
 "West Wind 1" = "West Wind"   # one farm on two connections (WWD1102, WWD1103), each sometimes carrying most of it
 "West Wind 2" = "West Wind"
 "Nga Awa Pūrua" = "Ngā Awa Pūrua"   # the register leaves off the first macron
+"Rangipo" = "Rangipō"     # the register's spelling; Genesis spells it Rangipō (design decision, 21 Nov 2026)
 "Takapō A" = "Tekapo A"   # the register's spelling; the site keeps Tekapo (design decision, 30 Oct 2026)
 "Takapō B" = "Tekapo B"
 
@@ -144,7 +145,7 @@ Waitaki = ["Ōhau A", "Ōhau B", "Ōhau C", "Benmore", "Aviemore", "Waitaki"]
 Waikato = ["Aratiatia", "Ōhakuri", "Ātiamuri", "Whakamaru", "Maraetai", "Waipāpa", "Arapuni", "Karāpiro"]
 "Manapōuri" = ["Manapōuri"]
 Clutha = ["Clyde", "Roxburgh"]
-Tongariro = ["Rangipo", "Tokaanu"]
+Tongariro = ["Rangipō", "Tokaanu"]
 Waikaremoana = ["Waikaremoana"]
 Rangitaiki = ["Aniwhenua", "Wheao and Flaxy", "Matahina"]
 Waipori = ["Deep Stream (Waipori A)", "Waipori (2A/3/4)"]
