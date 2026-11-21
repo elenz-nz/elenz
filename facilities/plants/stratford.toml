@@ -9,9 +9,7 @@ osm = ["relation/17609409"]
 reviewed = ""
 to_check = [
   "Previous owners of the combined cycle unit between 1998 and 2002: the Commerce Commission (2003) has it owned by NGC's Stratford Power Ltd; NGC entered generation by buying TransAlta NZ in 2000. Who built and owned it before that?",
-  "TCC's last day: Contact says it retired in 2026 (FY26); Elenz's last output is Dec 2025 and its capacity step 1 Apr 2026. Find the date.",
   "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
-  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large plant disconnected\" adjustment event at SFD (Contact; TCC), effective 28 Jan 2026. Elenz drops TCC from Stratford's capacity on 1 Apr 2026 (Contact's FY26 slides). Check the closing date and move the capacity row if needed.",
 ]
 notes = [
   "T002: Elenz shows Stratford as one plant (one meter, SFD2201): TCC and the two peakers. 212 MW from Apr 2026 (peakers).",
@@ -22,6 +20,7 @@ notes = [
   "Contact's 2022 releases say TCC was commissioned in 1996; the Commerce Commission (2003), Wikipedia and the EA register say 1998 (construction began 1996). 1998 used.",
   "Stations kept unpublished: the units fact carries the peakers and the closed units.",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
+  "TCC closing date (design decision 21 Nov 2026): not pursued. Its last metered output is Dec 2025, Transpower's charging records disconnect it from 28 Jan 2026, and Elenz drops it from Stratford's capacity on 1 Apr 2026 (Contact's FY26 slides); the exact day doesn't change anything that matters between January and April, so the capacity row stays.",
 ]
 
 [location]
