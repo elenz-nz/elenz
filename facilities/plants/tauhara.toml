@@ -16,6 +16,7 @@ notes = [
   "Dates: the register's start date is 2023-10-05 and Elenz counts it from then; Contact says it first supplied the grid on 6 May 2024 and was officially opened on 22 Nov 2024. Construction began on 31 March 2021 (Wikipedia). The page shows 2024.",
   "Names: Wikipedia says it was previously known as Tauhara 2 (Tauhara Stage 2); NZGA's page, written during construction, calls it Tauhara I. Wikipedia says Contact developed it with the Tauhara Moana Trust; Contact's pages don't say so, so it isn't published.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point added (the substation).",
+  "Commissioned date rule (21 Nov 2026): first metered day 2024-05-06, from TAB2201 Tauhara: one reading of 0.05 MW on 17 Nov 2023 (a test), then output from 6 May 2024. The previous value moved to alt.",
 ]
 
 [location]
@@ -48,10 +49,17 @@ grade = "C"
 checked = ""
 
 [facts.commissioned]
+value = "2024-05-06"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; Contact: first supplied the grid on 6 May 2024; officially opened on 22 November 2024; the register's start date is 5 October 2023"
+
+[[facts.commissioned.alt]]
 value = "2024"
 source = ["contact-tauhara", "contact-tauhara-opening-2024"]
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "first supplied the grid on 6 May 2024; officially opened on 22 November 2024"
 
 [[facts.commissioned.alt]]

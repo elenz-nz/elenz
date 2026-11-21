@@ -23,7 +23,7 @@
  "scheme": null,
  "metered": null,
  "checking": false,
- "checked": "2026-11-19",
+ "checked": "2026-11-21",
  "about": {
   "text": "Twin Rivers is Rānui Generation's first solar farm, on a 34-hectare site near Kaitāia in the Far North, between the Victoria and Takahue rivers. Its 55,832 panels feed Top Energy's network, sheep graze the site, and an urupā on the land is protected by covenant. It was developed with Te Paatu and commissioned in December 2025.",
   "refs": [
@@ -38,7 +38,8 @@
    "refs": [
     2,
     1
-   ]
+   ],
+   "note": "the register's row starts 17 September 2025; the EA's metered data has no row of its own for the farm"
   },
   {
    "k": "region",

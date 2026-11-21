@@ -15,6 +15,7 @@ notes = [
   "Resolved: Capacity: Elenz uses 148 MW from Apr 2023 (the register's 144 MW before; NZGA lists a 3 MW upgrade in 2021). Mercury gives 139 MW installed, NZGA 138–140, Wikipedia 140. The register's and Mercury's figures are shown as ratings.",
   "Owner: Mercury gives Mercury 65%, Tauhara North No. 2 Trust 35%; Wikipedia's 75/25 is older. The register's operator is the Nga Awa Purua Joint Venture.",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point moved to the substation.",
+  "Commissioned date rule (21 Nov 2026): first metered day 2010-01-18, from NAP2201 nap; matches Wikipedia's first generation date. The previous value moved to alt.",
 ]
 
 [location]
@@ -40,10 +41,17 @@ grade = "B"
 checked = "2026-11-19"
 
 [facts.commissioned]
+value = "2010-01-18"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; officially opened on 15 May 2010 (Wikipedia); construction began in May 2008"
+
+[[facts.commissioned.alt]]
 value = "2010"
 source = ["mercury-nga-awa-purua", "ea-register"]
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "first generated on 18 January 2010 and officially opened on 15 May 2010 (Wikipedia); construction began in May 2008"
 
 [[facts.commissioned.alt]]

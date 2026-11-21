@@ -27,7 +27,7 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": "2026-11-19",
+ "checked": "2026-11-21",
  "about": {
   "text": "Junction Road is a 100 MW gas-fired peaking plant about 7 km south of New Plymouth, near State Highway 3. Its two 50 MW gas turbines can reach full output in 15 minutes and are used when demand is high or other generation isn't available. Built by Todd Generation, it went into commercial operation in May 2020, and Nova Energy took over its operation in 2022.",
   "refs": [
@@ -49,13 +49,11 @@
   {
    "k": "commissioned",
    "label": "Commissioned",
-   "value": "2020",
+   "value": "5 February 2020",
    "refs": [
-    1,
-    2,
     4
    ],
-   "note": "commissioned in March 2020; in commercial operation from 15 May 2020 (council report)"
+   "note": "the first day of output in the EA's metered data; commissioned in March 2020; in commercial operation from 15 May 2020 (council report)"
   },
   {
    "k": "units",
@@ -88,7 +86,7 @@
    "label": "Owner",
    "value": "Nova Energy",
    "refs": [
-    4,
+    5,
     2
    ],
    "note": "the council: Nova Energy Ltd operates the plant; the register's operator: Nova Energy Limited"
@@ -98,8 +96,8 @@
    "label": "Connection point",
    "value": "Junction Road (JRD1101)",
    "refs": [
-    5,
-    6
+    6,
+    7
    ]
   }
  ],
@@ -108,7 +106,7 @@
   "lon": 174.103689,
   "basis": "station",
   "refs": [
-   6
+   7
   ]
  },
  "images": [],
@@ -156,20 +154,27 @@
   },
   {
    "n": 4,
+   "title": "Generation output by plant (Generation_MD)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/Generation_MD",
+   "opened": "2026-11-21"
+  },
+  {
+   "n": 5,
    "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
    "opened": "2026-11-19"
   },
   {
-   "n": 5,
+   "n": 6,
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
   },
   {
-   "n": 6,
+   "n": 7,
    "title": "LINZ aerial imagery (LINZ Basemaps)",
    "publisher": "Toitū Te Whenua LINZ",
    "url": "https://basemaps.linz.govt.nz/",

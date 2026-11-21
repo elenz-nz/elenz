@@ -254,6 +254,21 @@ year pattern matches (the 2001 and 2005-06 peaks, the 2007 dip, the 2011 low). R
 quarterly generation from coal less Glenbrook's metered output, over the Rankines' metered output; over FY21-FY25 it
 reproduces Genesis's figures to a few points in most quarters (FY23 Q1 24 against 24 GWh of coal, FY24 Q1 201 against 200).
 
+## First metered output (`first_metered.py`, 21 Nov 2026)
+
+For the plant pages' commissioned date (`facilities/PLANTS.md`, "Which date `commissioned` gives"). Reads every
+Generation_MD (Aug 1997 on) and Embedded_generation (Oct 1998 on, injection only, by connection point and participant)
+file and lists each code's first month, first half-hour of output, first half-hour of at least 1 MW and first day of at
+least 1 MWh (NZ time); the result goes to `data/first_metered.csv` (not committed). Run on 21 Nov 2026 (426 codes and
+meters), it set 34 plants' dates. Checks that it reads right: Ngā Awa Pūrua's first day, 18 Jan 2010, is Wikipedia's
+first generation date; Harapaki's, 17 Nov 2023, the register's; Tauhara's, 6 May 2024, Contact's "first supplied the
+grid"; Te Huka 3's, 14 Oct 2024, ThinkGeoEnergy's. The 1 MWh day is the one used: Huntly 5 (0.4 MW on 14 Sep 2006),
+Te Uku (a few kWh from 8 Nov 2010), Turitea (from 19 Jul 2021) and Tauhara (0.05 MW on 17 Nov 2023) read a little well
+before they ran. A code whose first month starts at midnight on the 1st with the plant already running (Kaiwera Downs,
+Te Huka, Pukenui, Lauriston, Tararua stage I; and every embedded station when Generation_MD added them in Jan 2009 or
+Embedded_generation in Apr 1999) began after the plant did. Codes that read zero while dispatch shows output: Kōwhai
+Park, Clandeboye and Kaiwaikawe to Oct 2026 (Kōwhai Park's embedded meter at ISL0661 reads from 17 Aug 2026).
+
 ## Price explainer triggers (`price_triggers.py`, 17 Oct 2026)
 
 Added 5 Nov 2026 (test report NOW-07): under $100/MWh the islands count as apart from more than $20 and 25%, where the

@@ -15,6 +15,7 @@ notes = [
   "Resolved: Capacity and status: Meridian gives 29 turbines and 58 MW, operating; matches Elenz and the register.",
   "Removed the scheme fact (Southland, from our own register): a single wind farm has no scheme.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "Commissioned date rule (21 Nov 2026): first metered day 2007-06-01, from embedded meter WHL0661: its first month is June 2007 and output starts at 4 pm on 1 Jun 2007 at under 1 MW, rising over the following days, so taken as the first turbines. The previous value moved to alt.",
 ]
 
 [location]
@@ -34,10 +35,17 @@ checked = "2026-11-19"
 note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
+value = "2007-06-01"
+source = "ea-embedded-generation"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; construction began in 2006; complete in October 2007 (Wikipedia)"
+
+[[facts.commissioned.alt]]
 value = "2007"
 source = "meridian-white-hill"
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "construction began in 2006"
 
 [[facts.commissioned.alt]]

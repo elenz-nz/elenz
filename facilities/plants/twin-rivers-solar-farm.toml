@@ -7,9 +7,7 @@ register = ["S011"]
 wikidata = "Q130302252"
 osm = ["way/1418281925"]
 reviewed = "2026-11-19"
-to_check = [
-  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded plant connected\" adjustment event at KOE (Top Energy), effective 19 Dec 2025. Elenz counts it from 17 Sep 2025 (the register). For the page's commissioned date, use the first metered date (facilities/PLANTS.md, design decision 21 Nov 2026); put this date and the register's in the fact's note.",
-]
+to_check = []
 notes = [
   "Solar batch (19 Nov 2026): facts checked against BraveTrace's device sheet (registrant Rānui Twin Rivers Asset LP), the EA register and network supply points table, and Stats NZ boundaries.",
   "Region and district from the grid connection point (no station point yet); the sources place the farm near it, in the same region (Kaikohe); BraveTrace places it near Kaitāia in the Far North, on Top Energy's network. The old leads (Canterbury) were wrong.",
@@ -17,6 +15,7 @@ notes = [
   "Dates: the register's row starts 18 Sep 2025; BraveTrace commissioned 16 Dec 2025.",
   "Wikidata Q130302252 has no coordinates. Dropped the \"Canterbury\" scheme lead.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
+  "Resolved: Appendix D commissioning lead. Commissioned date rule (21 Nov 2026): owner's date kept: no Generation_MD code or separate embedded reading for the farm to Oct 2026, so the owner's date stays.",
 ]
 
 [location]
@@ -39,7 +38,15 @@ note = "code from the EA's network supply points table; the point is the substat
 value = "2025"
 source = ["ea-register", "bt-twin-rivers"]
 grade = "A"
-checked = "2026-11-19"
+checked = "2026-11-21"
+note = "the register's row starts 17 September 2025; the EA's metered data has no row of its own for the farm"
+
+[[facts.commissioned.alt]]
+value = "2025-12-19"
+source = "transpower-appendix-d-2026"
+grade = "A"
+checked = ""
+note = "Transpower's transmission charging date, not necessarily first output"
 
 [[facts.commissioned.alt]]
 value = "2025"

@@ -17,6 +17,7 @@ notes = [
   "Mercury's page also says Siemens Gamesa \"SWT130\" and $277 million; Tilt said $276 million (2019).",
   "Removed the scheme fact (South Taranaki, from our own register): a single wind farm has no scheme.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "Commissioned date rule (21 Nov 2026): first metered day 2020-11-16, from WVY1101 waipipi. The previous value moved to alt.",
 ]
 
 [location]
@@ -49,10 +50,17 @@ grade = "C"
 checked = ""
 
 [facts.commissioned]
+value = "2020-11-16"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; the first turbines fed the grid in November 2020; complete in March 2021"
+
+[[facts.commissioned.alt]]
 value = "2021"
 source = ["genesis-waipipi-2021", "mercury-waipipi"]
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "the first turbines fed the grid in November 2020; complete in March 2021"
 
 [[facts.commissioned.alt]]

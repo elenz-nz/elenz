@@ -23,7 +23,7 @@
  "scheme": null,
  "metered": null,
  "checking": false,
- "checked": "2026-11-19",
+ "checked": "2026-11-21",
  "about": {
   "text": "Tararua Wind Farm stands on about 700 hectares of farmland on the Tararua Range east of Palmerston North, built in three stages. Stage III, 31 Vestas V90 turbines of 3 MW, opened in September 2007 and made Tararua New Zealand's largest wind farm until Turitea was finished in 2023. Unlike the first two stages it connects straight to Transpower's grid, teed off one circuit of the Bunnythorpe to Linton 220 kV line. Trustpower built it; the farm passed to Tilt Renewables in 2016 and to Mercury in 2021.",
   "refs": [
@@ -37,11 +37,11 @@
   {
    "k": "commissioned",
    "label": "Commissioned",
-   "value": "2007",
+   "value": "24 February 2007",
    "refs": [
-    1
+    5
    ],
-   "note": "opened in September 2007"
+   "note": "the first day of output in the EA's metered data; opened in September 2007"
   },
   {
    "k": "units",
@@ -68,7 +68,7 @@
    "label": "Region",
    "value": "Manawatū-Whanganui",
    "refs": [
-    5
+    6
    ]
   },
   {
@@ -76,7 +76,7 @@
    "label": "District",
    "value": "Palmerston North",
    "refs": [
-    6
+    7
    ]
   },
   {
@@ -85,7 +85,7 @@
    "value": "Mercury",
    "refs": [
     1,
-    7
+    8
    ],
    "note": "since 3 August 2021"
   },
@@ -96,7 +96,7 @@
    "refs": [
     2,
     4,
-    7
+    8
    ],
    "note": "Trustpower moved its wind farms to Tilt Renewables in its demerger of October 2016; Mercury bought Tilt's New Zealand operations on 3 August 2021"
   },
@@ -105,7 +105,7 @@
    "label": "Connection point",
    "value": "Nz Windfarms (TWC2201)",
    "refs": [
-    8
+    9
    ]
   }
  ],
@@ -114,7 +114,7 @@
   "lon": 175.752989,
   "basis": "whole site",
   "refs": [
-   9
+   10
   ]
  },
  "images": [],
@@ -169,34 +169,41 @@
   },
   {
    "n": 5,
+   "title": "Generation output by plant (Generation_MD)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/Generation_MD",
+   "opened": "2026-11-21"
+  },
+  {
+   "n": 6,
    "title": "Regional Council 2025 (boundaries)",
    "publisher": "Stats NZ",
    "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
    "opened": "2026-11-19"
   },
   {
-   "n": 6,
+   "n": 7,
    "title": "Territorial Authority 2026 (boundaries)",
    "publisher": "Stats NZ",
    "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
    "opened": "2026-11-19"
   },
   {
-   "n": 7,
+   "n": 8,
    "title": "Mercury acquires Tilt Renewables' New Zealand operations (NZX, 3 August 2021)",
    "publisher": "Mercury NZ",
    "url": "https://www.nzx.com/announcements/376610",
    "opened": "2026-11-19"
   },
   {
-   "n": 8,
+   "n": 9,
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
   },
   {
-   "n": 9,
+   "n": 10,
    "title": "LINZ aerial imagery (LINZ Basemaps)",
    "publisher": "Toitū Te Whenua LINZ",
    "url": "https://basemaps.linz.govt.nz/",

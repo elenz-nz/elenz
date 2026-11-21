@@ -10,7 +10,6 @@ reviewed = "2026-11-19"
 to_check = [
   "Sources: Lodestone's site refuses automated reads, so this farm's facts rest mainly on BraveTrace's device sheet (Lodestone's page read only through search results). Check Lodestone's page by hand.",
   "Optional, About text: the developer's estimate of about 56 GWh a year (Lodestone) could be added, worded as an estimate, not as metered output.",
-  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded plant connected\" adjustment event at KOE (Top Energy), effective 27 Jan 2024 (an earlier KOE event than Twin Rivers; Lodestone officially switched Kaitāia on 28 Feb 2024). Elenz counts it from 25 Oct 2023 (the register). For the page's commissioned date, use the first metered date (facilities/PLANTS.md, design decision 21 Nov 2026); put this date and the register's in the fact's note.",
 ]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against BraveTrace's device sheet (registrant Lodestone Energy), the EA register and network supply points table, Lodestone's farm pages (read through search results; the site refuses automated reads) and Stats NZ boundaries.",
@@ -20,6 +19,7 @@ notes = [
   "Dropped the \"Northland\" scheme lead: solar farms have no scheme.",
   "The iwi named in sources differs: BraveTrace says Ngāti Rarawa, Wikipedia Te Rarawa. The About text says \"local iwi\".",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point moved to the substation.",
+  "Resolved: Appendix D commissioning lead. Commissioned date rule (21 Nov 2026): first metered day 2023-11-23, from embedded meter KOE1101, the farm's own injection there, from 23 Nov 2023; its Generation_MD code starts in Jan 2024. The previous value moved to alt.",
 ]
 
 [location]
@@ -46,11 +46,25 @@ checked = "2026-11-19"
 note = "the Wikipedia list's name; Wikidata also has \"Lodestone Two Solar Farm\""
 
 [facts.commissioned]
+value = "2023-11-23"
+source = "ea-embedded-generation"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; the register's row starts 25 October 2023; BraveTrace gives 24 November 2023"
+
+[[facts.commissioned.alt]]
 value = "2023"
 source = ["ea-register", "bt-kohira"]
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "register 25 Oct 2023; BraveTrace 24 Nov 2023 (first generation November 2023)"
+
+[[facts.commissioned.alt]]
+value = "2024-01-27"
+source = "transpower-appendix-d-2026"
+grade = "A"
+checked = ""
+note = "Transpower's transmission charging date, not necessarily first output"
 
 [[facts.commissioned.alt]]
 value = "2023"

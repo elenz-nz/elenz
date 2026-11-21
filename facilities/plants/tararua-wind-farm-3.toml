@@ -16,6 +16,7 @@ notes = [
   "Removed the scheme fact (Tararua Range, from our own register) and published \"Tararua Wind Farm\" as the scheme, joining the three stages.",
   "Resolved: Capacity: Mercury and Tilt give 93 MW (31 x 3 MW), matching Elenz and the register. Peak metered half-hour, Aug-Sep 2026: 90.9 MW.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "Commissioned date rule (21 Nov 2026): first metered day 2007-02-24, from TWC2201 twf_3 (and the embedded meter there) from 24 Feb 2007. The previous value moved to alt.",
 ]
 
 [location]
@@ -35,10 +36,17 @@ checked = "2026-11-19"
 note = "code and point match the EA's network supply points table of 17 Nov 2026; shared with Te Rere Hau"
 
 [facts.commissioned]
+value = "2007-02-24"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; opened in September 2007"
+
+[[facts.commissioned.alt]]
 value = "2007"
 source = "mercury-tararua"
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "opened in September 2007"
 
 [[facts.commissioned.alt]]

@@ -16,6 +16,7 @@ notes = [
   "Dates: the register's start date is 2024-09-24; Contact announced its first supply to the grid on 14 October 2024, at 15 MW during three weeks of tests, with full operation expected by the end of 2024. It was in final commissioning on 22 Nov 2024.",
   "Units: NZGA calls it a 50 MWe Ormat binary plant but doesn't say how many units; not published.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point added (the substation).",
+  "Commissioned date rule (21 Nov 2026): first metered day 2024-10-14, from TAB0331 te_huka_3. The previous value moved to alt.",
 ]
 
 [location]
@@ -41,10 +42,17 @@ grade = "A"
 checked = "2026-11-19"
 
 [facts.commissioned]
+value = "2024-10-14"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; first supplied the grid on 14 October 2024, then ran up to full output after testing"
+
+[[facts.commissioned.alt]]
 value = "2024"
 source = ["ea-register", "thinkgeo-te-huka-3-2024"]
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "first supplied the grid on 14 October 2024, then ran up to full output after testing"
 
 [[facts.commissioned.alt]]

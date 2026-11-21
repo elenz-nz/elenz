@@ -434,7 +434,7 @@
    "status": "operating",
    "mw": 176.0,
    "owner": "Meridian",
-   "commissioned": "2024",
+   "commissioned": "2023",
    "closed": null,
    "reviewed": true,
    "pt": {
@@ -448,7 +448,7 @@
     "file": "aerial/harapaki-site.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
-   "overview": "A 176 MW wind farm in Hawke's Bay, generating since 2024."
+   "overview": "A 176 MW wind farm in Hawke's Bay, generating since 2023."
   },
   {
    "slug": "highbank",
@@ -1180,7 +1180,7 @@
    "status": "operating",
    "mw": 112.0,
    "owner": "Other generators",
-   "commissioned": "2000",
+   "commissioned": "1999",
    "closed": null,
    "reviewed": true,
    "pt": {
@@ -1194,7 +1194,7 @@
     "file": "aerial/mokai-site.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
-   "overview": "A 112 MW geothermal station on the Mōkai geothermal field in Waikato, generating since 2000."
+   "overview": "A 112 MW geothermal station on the Mōkai geothermal field in Waikato, generating since 1999."
   },
   {
    "slug": "new-plymouth",
@@ -1480,7 +1480,7 @@
    "status": "closed",
    "mw": 404.0,
    "owner": "Contact",
-   "commissioned": "2000",
+   "commissioned": "1998",
    "closed": "2015",
    "reviewed": true,
    "pt": {
@@ -1494,7 +1494,7 @@
     "file": "otahuhu-b.webp",
     "credit": "Photo: Stug.stug, CC BY-SA 3.0"
    },
-   "overview": "A 404 MW gas-fired station in Auckland, generating from 2000 to 2015; now closed."
+   "overview": "A 404 MW gas-fired station in Auckland, generating from 1998 to 2015; now closed."
   },
   {
    "slug": "paerau-gorge",
@@ -2130,7 +2130,7 @@
    "status": "operating",
    "mw": 33.0,
    "owner": "Other generators",
-   "commissioned": "2025",
+   "commissioned": "2024",
    "closed": null,
    "reviewed": true,
    "pt": {
@@ -2144,7 +2144,7 @@
     "file": "aerial/te-herenga-o-te-ra-solar-farm-site.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
-   "overview": "A 33 MW solar farm in the Bay of Plenty, generating since 2025."
+   "overview": "A 33 MW solar farm in the Bay of Plenty, generating since 2024."
   },
   {
    "slug": "te-huka",
@@ -2205,7 +2205,7 @@
    "status": "operating",
    "mw": 166.0,
    "owner": "Contact",
-   "commissioned": "2014",
+   "commissioned": "2013",
    "closed": null,
    "reviewed": true,
    "pt": {
@@ -2219,7 +2219,7 @@
     "file": "aerial/te-mihi-site.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
-   "overview": "A 166 MW geothermal station on the Wairākei geothermal field in Waikato, generating since 2014."
+   "overview": "A 166 MW geothermal station on the Wairākei geothermal field in Waikato, generating since 2013."
   },
   {
    "slug": "te-puna-mauri-o-omaru-at-ruawai",
@@ -2305,7 +2305,7 @@
    "status": "operating",
    "mw": 64.4,
    "owner": "Meridian",
-   "commissioned": "2011",
+   "commissioned": "2010",
    "closed": null,
    "reviewed": true,
    "pt": {
@@ -2319,7 +2319,7 @@
     "file": "aerial/te-uku-site.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
-   "overview": "A 64.4 MW wind farm in Waikato, generating since 2011."
+   "overview": "A 64.4 MW wind farm in Waikato, generating since 2010."
   },
   {
    "slug": "tekapo-a",
@@ -2526,7 +2526,7 @@
    "status": "operating",
    "mw": 133.0,
    "owner": "Mercury",
-   "commissioned": "2021",
+   "commissioned": "2020",
    "closed": null,
    "reviewed": true,
    "pt": {
@@ -2540,7 +2540,7 @@
     "file": "aerial/waipipi-site.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
-   "overview": "A 133 MW wind farm in Taranaki, generating since 2021."
+   "overview": "A 133 MW wind farm in Taranaki, generating since 2020."
   },
   {
    "slug": "waipori-2a-3-4",

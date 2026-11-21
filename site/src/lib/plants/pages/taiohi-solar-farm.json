@@ -23,7 +23,7 @@
  "scheme": null,
  "metered": null,
  "checking": false,
- "checked": "2026-11-19",
+ "checked": "2026-11-21",
  "about": {
   "text": "Taiohi is a solar farm on 32 hectares at Rangiriri in northern Waikato, owned by NewPower Energy, part of the WEL Networks group. Its more than 47,000 panels are expected to produce about 44.6 GWh a year. The name, which means \"youthful\", was gifted by mana whenua, and the farm was built in partnership with Maurea Marae.",
   "refs": [
@@ -39,7 +39,8 @@
    "refs": [
     3,
     4
-   ]
+   ],
+   "note": "the register's row starts 15 September 2025; the EA's metered data has no row of its own for the farm"
   },
   {
    "k": "region",

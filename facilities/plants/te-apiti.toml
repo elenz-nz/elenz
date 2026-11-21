@@ -16,6 +16,7 @@ notes = [
   "Resolved: Capacity: Meridian gives 90.75 MW (55 x 1.65 MW); Elenz and the register use 90 MW. Kept 90 with 90.75 as a rating. Peak metered half-hour, Aug-Sep 2026: 57 MW, and output has fallen since 2024 (258 GWh a year expected; 187 GWh in 2025): worth a look later, not a page fact.",
   "Removed the scheme fact (Tararua Range, from our own register): a single wind farm has no scheme.",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
+  "Commissioned date rule (21 Nov 2026): first metered day 2004-07-21, from WDV1101 te_apiti. The previous value moved to alt.",
 ]
 
 [location]
@@ -35,10 +36,17 @@ checked = "2026-11-19"
 note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
+value = "2004-07-21"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; construction began in 2003; complete in December 2004 (Wikipedia)"
+
+[[facts.commissioned.alt]]
 value = "2004"
 source = "meridian-te-apiti"
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "construction began in 2003"
 
 [[facts.commissioned.alt]]

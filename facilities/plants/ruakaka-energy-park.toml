@@ -18,6 +18,7 @@ notes = [
   "District and region from Wikidata's point (Whangārei District; only the sea, outside any district, within 3 km). The grid connection point gives the same.",
   "Dropped the Wikipedia-list rating lead (100/200): battery ratings are MW / MWh, and the page shows ratings as MW. Storage (200 MWh) is in units and About. Cost $186 million (not published).",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
+  "Commissioned date rule (21 Nov 2026): first metered day 2025-01-16, from BRB0331 ruakākā_energy_park; the code appears in October 2024. The previous value moved to alt.",
 ]
 
 [location]
@@ -44,10 +45,17 @@ checked = "2026-11-19"
 note = "Meridian's name for the battery"
 
 [facts.commissioned]
+value = "2025-01-16"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; officially opened 23 May 2025; the register gives 2024"
+
+[[facts.commissioned.alt]]
 value = "2025"
 source = "meridian-ruakaka-bess-2025"
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "construction and commissioning complete, officially opened 23 May 2025"
 
 [[facts.commissioned.alt]]

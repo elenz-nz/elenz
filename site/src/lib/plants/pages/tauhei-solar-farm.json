@@ -23,7 +23,7 @@
  "scheme": null,
  "metered": null,
  "checking": false,
- "checked": "2026-11-19",
+ "checked": "2026-11-21",
  "about": {
   "text": "Tauhei is a solar farm on 182 hectares near Te Aroha in the Waikato, built by Harmony Energy and its joint venture partners. It connects to Transpower's 110 kV network at Waihou substation, and Meridian Energy buys all its output for its first 10 years. It was energised in July 2026 and is expected to produce about 280 GWh a year.",
   "refs": [
@@ -35,12 +35,11 @@
   {
    "k": "commissioned",
    "label": "Commissioned",
-   "value": "2026",
+   "value": "30 June 2026",
    "refs": [
-    3,
-    2
+    3
    ],
-   "note": "the register's row starts 1 May 2026; energised in July 2026"
+   "note": "the first day of output in the EA's metered data; the register's row starts 1 May 2026; energised in July 2026 (PV Tech)"
   },
   {
    "k": "region",
@@ -63,7 +62,7 @@
    "label": "Owner",
    "value": "Harmony Energy New Zealand and Igneo Infrastructure Partners (joint venture)",
    "refs": [
-    3,
+    6,
     2
    ],
    "note": "the register's operator: Harmony Energy"
@@ -82,7 +81,7 @@
    "label": "Connection point",
    "value": "Tauhei Solar Farm (WHU1101)",
    "refs": [
-    6
+    7
    ]
   }
  ],
@@ -91,7 +90,7 @@
   "lon": 175.721667,
   "basis": "station",
   "refs": [
-   7
+   8
   ]
  },
  "images": [],
@@ -132,10 +131,10 @@
   },
   {
    "n": 3,
-   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "title": "Generation output by plant (Generation_MD)",
    "publisher": "Electricity Authority",
-   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
-   "opened": "2026-11-19"
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/Generation_MD",
+   "opened": "2026-11-21"
   },
   {
    "n": 4,
@@ -153,13 +152,20 @@
   },
   {
    "n": 6,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 7,
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
   },
   {
-   "n": 7,
+   "n": 8,
    "title": "LINZ aerial imagery (LINZ Basemaps)",
    "publisher": "Toitū Te Whenua LINZ",
    "url": "https://basemaps.linz.govt.nz/",

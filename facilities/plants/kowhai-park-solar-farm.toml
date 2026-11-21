@@ -10,7 +10,6 @@ reviewed = "2026-11-19"
 photo_leads = ["P039"]
 to_check = [
   "Lead (20 Nov 2026): Lightsource bp's Kōwhai Park page may publish the 168 MWp DC rating (Contact's page no longer does). Contact's opening release: commissioned 16 Sep 2026, opened 15 Oct 2026, about NZ$273m, connected through Orion's network, Synlait buying 25% of the output. Read them and add what checks out.",
-  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded plant connected\" adjustment event at ISL (Orion), with no effective date given (event processed 10 Nov 2026). Elenz counts it from 1 Jul 2026 (the register). For the page's commissioned date, use the first metered date (facilities/PLANTS.md, design decision 21 Nov 2026); put this date and the register's in the fact's note.",
 ]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against Contact's project page, the EA register and network supply points table, and Stats NZ boundaries.",
@@ -19,6 +18,7 @@ notes = [
   "Wikipedia gives 168 MWp; Contact's page no longer gives a DC figure, so none is published.",
   "Capacity: Elenz used 160 MW, the AC figure read from the July 2026 step in the distributed generation registry. Elenz uses Contact's and the register's 150 MW since 19 Nov 2026 (design decision).",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
+  "Resolved: Appendix D commissioning lead. Commissioned date rule (21 Nov 2026): first metered day 2026-08-17, from embedded meter ISL0661, the farm's own injection there: 13 MWh on 17 Aug 2026. Its Generation_MD code (ISL0661 kōwhai_park_solar_farm) reads zero to Oct 2026, so the tracker uses dispatch. The previous value moved to alt.",
 ]
 
 [location]
@@ -45,10 +45,17 @@ checked = ""
 note = "a description; no source yet uses it as a name"
 
 [facts.commissioned]
+value = "2026-08-17"
+source = "ea-embedded-generation"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; the register's row starts 13 August 2026; operational as of October 2026 (Contact)"
+
+[[facts.commissioned.alt]]
 value = "2026"
 source = "contact-kowhai-park"
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "operational as of October 2026; the register's row starts 13 Aug 2026"
 
 [facts.region]

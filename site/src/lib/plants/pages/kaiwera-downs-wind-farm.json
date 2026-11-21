@@ -23,7 +23,7 @@
  "scheme": null,
  "metered": null,
  "checking": false,
- "checked": "2026-11-19",
+ "checked": "2026-11-21",
  "about": {
   "text": "Kaiwera Downs Wind Farm is on a plateau about 15 km south-east of Gore in Southland, a site with strong, steady south-westerly winds. Trustpower won consent for it in 2008, and Mercury, which bought the project in 2021, built a first stage of 10 Vestas turbines (43 MW) from 2022 and opened it in November 2023. Stage 1 sends its power to Transpower's Gore substation through an 18 km, 33 kV line; a second stage of 36 turbines followed in 2026.",
   "refs": [
@@ -41,7 +41,7 @@
     1,
     2
    ],
-   "note": "opened in November 2023"
+   "note": "opened in November 2023; opened in November 2023; the register gives 1 August 2023; the EA's metered data starts in September 2023, after the farm began"
   },
   {
    "k": "units",

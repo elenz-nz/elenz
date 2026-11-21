@@ -16,6 +16,7 @@ notes = [
   "Resolved: Capacity: Meridian gives 62 turbines and 142.6 MW, the figure Elenz uses; the register's 160 MW (two rows of 80 MW) is kept as a rating. Peak metered half-hours, Aug-Sep 2026: 65.1 and 63.3 MW on the two connections.",
   "Removed the scheme fact (Mākara, from our own register): a single wind farm has no scheme; Mākara is in the about text.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
+  "Commissioned date rule (21 Nov 2026): first metered day 2009-03-07, from WWD1103 west_wind from 7 Mar 2009; WWD1102 from 10 Apr 2009. The previous value moved to alt.",
 ]
 
 [location]
@@ -35,10 +36,17 @@ checked = "2026-11-18"
 note = "code from the EA's network supply points table; the point is the substation, read from the LINZ aerial, 18 Nov 2026 (the table's point was [-41.295620, 174.660500])"
 
 [facts.commissioned]
+value = "2009-03-07"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; construction began in 2007; the first 15 turbines were switched on in April 2009"
+
+[[facts.commissioned.alt]]
 value = "2009"
 source = "meridian-west-wind"
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "construction began in 2007; the first 15 turbines were switched on in April 2009"
 
 [[facts.commissioned.alt]]

@@ -21,6 +21,7 @@ notes = [
   "Dropped the \"Manawatū\" scheme lead.",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
   "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) lists Lodestone Energy as a customer at WAI in the PY2026 allocations (from 1 May 2025).",
+  "Commissioned date rule (21 Nov 2026): first metered day 2024-12-18, from WAI0331 te_herenga_o_te_rā_solar_farm: a few kWh in the evening of 17 Dec 2024, 15 MWh on 18 Dec. The previous value moved to alt.",
 ]
 
 [location]
@@ -47,10 +48,17 @@ checked = ""
 note = "Lodestone and BraveTrace pair the place with the name (\"Waiotahe Te Herenga o Te Rā\"); no source yet uses it as a name on its own"
 
 [facts.commissioned]
+value = "2024-12-18"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; the register's start date is 22 November 2024; commissioned 20 January 2025 (BraveTrace)"
+
+[[facts.commissioned.alt]]
 value = "2025"
 source = "bt-te-herenga"
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "first generation December 2024; commissioned 20 January 2025"
 
 [[facts.commissioned.alt]]

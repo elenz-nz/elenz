@@ -7,9 +7,7 @@ register = ["W007"]
 wikidata = "Q5684897"
 osm = ["relation/13730358"]
 reviewed = "2026-11-19"
-to_check = [
-  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large plant connected\" adjustment event at HRP (Meridian), effective 13 Jun 2023. Elenz counts it from 1 Nov 2023 (88 MW, then 176 MW from May 2024). For the page's commissioned date, use the first metered date (facilities/PLANTS.md, design decision 21 Nov 2026); put this date and the register's in the fact's note.",
-]
+to_check = []
 notes = [
   "88 MW from Nov 2023, 176 MW from May 2024.",
   "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
@@ -19,6 +17,7 @@ notes = [
   "Removed the scheme fact (Maungaharuru Range, from our own register): a range, not a scheme; it is in the about text.",
   "Previous owners: none for the station. Meridian bought Hawke's Bay Wind Farm Ltd (2010) and Unison's consent (2011) before building it (Wikipedia).",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point added (the substation).",
+  "Resolved: Appendix D commissioning lead. Commissioned date rule (21 Nov 2026): first metered day 2023-11-17, from HRP2201 Harapaki; the code appears in February 2023. The previous value moved to alt.",
 ]
 
 [location]
@@ -38,11 +37,25 @@ checked = "2026-11-18"
 note = "code from the EA's network supply points table (18 Nov 2026), which gives it no coordinates; the point is the substation, read from the LINZ aerial, 18 Nov 2026"
 
 [facts.commissioned]
+value = "2023-11-17"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; also the register's commissioning date; complete in July 2024"
+
+[[facts.commissioned.alt]]
 value = "2024"
 source = "meridian-harapaki"
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "first power in November 2023; complete in July 2024"
+
+[[facts.commissioned.alt]]
+value = "2023-06-13"
+source = "transpower-appendix-d-2026"
+grade = "A"
+checked = ""
+note = "Transpower's transmission charging date, not necessarily first output"
 
 [[facts.commissioned.alt]]
 value = "2023"

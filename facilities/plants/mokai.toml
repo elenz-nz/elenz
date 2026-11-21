@@ -20,6 +20,7 @@ notes = [
   "Resolved: Stations and capacity: NZGA lists Mokai 1 (1999, six units, 55 MW), Mokai 2 (2005, five units, 39 MW) and Mokai 1A (2007, one binary unit, 17 MW); Mercury gives 55 MW in 2000, +38 MW in 2005 and +20 MW in 2008, 113 MW in all, with 10 binary and 2 steam turbines. Elenz's 112 MW matches the register.",
   "Commissioned: Mercury and the register say 2000; NZGA and Wikipedia 1999; Elenz's metered history starts Oct 1999. The page shows 2000.",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point moved to the substation.",
+  "Commissioned date rule (21 Nov 2026): first metered day 1999-10-06, from WKM2201 mokai; the code appears in September 1999, about 0.9 MW from 11 pm on 5 Oct 1999, the first 1 MWh day 6 Oct. The previous value moved to alt.",
 ]
 
 [location]
@@ -39,10 +40,17 @@ checked = "2026-11-18"
 note = "code from the EA's network supply points table; the point is the substation, read from the LINZ aerial, 18 Nov 2026 (the table's point was [-38.419080, 175.800360])"
 
 [facts.commissioned]
+value = "1999-10-06"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; NZGA dates the first stage to 1999 and the register to 2000; enlarged in 2005 and 2007–08"
+
+[[facts.commissioned.alt]]
 value = "2000"
 source = ["mercury-mokai", "ea-register"]
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "NZGA dates the first stage to 1999; enlarged in 2005 and 2007–08"
 
 [[facts.commissioned.alt]]
