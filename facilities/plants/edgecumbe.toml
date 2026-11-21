@@ -6,10 +6,8 @@ name = "Edgecumbe"
 register = ["T021"]
 reviewed = ""
 to_check = [
-  "Owner: Wikipedia's list gives Nova Energy; Fonterra's site hosts it. Find the owner (the Commerce Commission, the EA or the owners).",
-  "Capacity: Elenz uses 10 MW (Wikipedia's list); check against an owner or official source.",
-  "Closure lead: Transpower's Assumptions Book v3.0 (30 Jun 2026; source transpower-assumptions-2026) models Edgecumbe (and Hawera) to retire in 2026, \"consistent with recent information provided by Fonterra\" (para 151 e). Look for Fonterra's date for the electrode boiler, then set the status.",
   "Size and output lead: Transpower's Assumptions Book v3.0, Appendix F (model inputs of 4 Jun 2026; source transpower-assumptions-2026) models Edgecumbe as a 10 MW gas cogeneration plant averaging 1.7 MW a week (0.6–3.1), retiring in 2026 in every scenario.",
+  "Closure (21 Nov 2026, Fonterra deep dive): no closing date is public. Fonterra's $57m electrode boiler replaces the plant's steam and electricity (Fonterra, January 2025); its builder lists a 30 MW electrode boiler and a 4 MW resistive element boiler due for completion in Q2 2026 (Fosters Construction); Fonterra's co-generation deals with Nova end in 2026 (NBR); Transpower models it retiring in 2026 on Fonterra's information. Decision for the Elenz team: publish as closed in 2026 (month unknown), or wait for a date.",
 ]
 notes = [
   "Elenz: 10 MW gas, Jan 1999 to Mar 2008.",
@@ -17,6 +15,7 @@ notes = [
   "District and region from the grid connection point (Edgecumbe) in Stats NZ's boundaries, 19 Nov 2026: Whakatāne District, no other district within 5 km.",
   "Fonterra's release (29 Jan 2025): the Edgecumbe site will move from steam and electricity from its co-generation plant to a new electrode boiler ($57 million).",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
+  "Fonterra deep dive (21 Nov 2026): searched Fonterra's releases, annual and interim results (FY26, HY26), Farm Source, the EA's co-generation register and Type B applications (Whareroa only), EECA's Bay of Plenty report and news. Owner: NBR calls it Fonterra's plant, with Nova supplying gas (owner now Fonterra, grade B; Wikipedia's Nova kept as an alternative). Capacity 10 MW confirmed by NBR and Transpower. Closing date not found (to_check).",
 ]
 
 [location]
@@ -73,11 +72,17 @@ grade = "B"
 checked = ""
 
 [facts.owner]
+value = "Fonterra"
+source = "nbr-fonterra-nova-2025"
+grade = "B"
+checked = "2026-11-21"
+note = "the plant at Fonterra's Edgecumbe factory, with gas from Nova Energy under a co-generation deal Fonterra is ending in 2026 (NBR, January 2025)"
+
+[[facts.owner.alt]]
 value = "Nova Energy"
 source = "wp-list"
 grade = "B"
 checked = ""
-note = "see to_check"
 
 [facts.about]
 value = "Edgecumbe is a gas-fired cogeneration plant at Fonterra's dairy factory at Edgecumbe in the Bay of Plenty, making steam and electricity for the site. It dates from 1996. Its output stops in the EA's metered data after March 2008, but the plant kept running on site, supplying the factory, until 2026. In January 2025 Fonterra announced a new electrode boiler for the site, to replace the steam and electricity it gets from the plant."
@@ -85,3 +90,10 @@ source = ["fonterra-electrification-2025", "wp-list", "transpower-assumptions-20
 grade = "B"
 checked = ""
 note = "not published until the owner is settled (to_check). Running until 2026: design decision (21 Nov 2026), on Fonterra's release and Transpower's retirement year."
+
+[[ratings]]
+value = 10
+basis = "NBR: Fonterra's 10 MW plant at Edgecumbe; also Transpower's model input"
+source = ["nbr-fonterra-nova-2025", "transpower-assumptions-2026"]
+grade = "B"
+checked = "2026-11-21"
