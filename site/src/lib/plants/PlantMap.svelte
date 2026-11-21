@@ -8,7 +8,7 @@
 	import { onMount } from 'svelte';
 	import { LINZ_BASEMAPS_KEY } from '$app/env/public';
 	import { VIEW, NI as NI_PATH, SI as SI_PATH } from '#lib/home/nzmap.js';
-	import { toView } from './map.js';
+	import { toView, aerialSource } from './map.js';
 	import { dotSize, fuelName, type Plant } from './list.js';
 	import { fuelOf } from './registry.js';
 	import { fmtMw } from './history.js';
@@ -28,6 +28,12 @@
 	let map: any = null;
 	let ml: any = null;
 	let colours: Record<string, string> = {};
+	let base = $state<'map' | 'sat'>('map');
+	// Satellite: LINZ's aerial tiles drawn over the topolite basemap and under the plants' dots
+	$effect(() => {
+		const b = base;
+		if (mode === 'map' && map?.getLayer('aerial')) map.setLayoutProperty('aerial', 'visibility', b === 'sat' ? 'visible' : 'none');
+	});
 
 	const label = (p: Plant) => `${p.name}, ${fuelName(p.fuel).toLowerCase()}, ${fmtMw(p.mw)} MW${sizes && p.status === 'operating' ? `, ${fmtMw(sizes.get(p.slug) ?? 0)} MW now` : ''}${p.status === 'closed' ? ', closed' : ''}${p.pt && !p.pt.checked ? ' (location not checked yet)' : ''}`;
 	const shown = $derived(plants.filter((p) => p.pt));
@@ -111,6 +117,8 @@
 			map.on('error', (e: any) => { if (mode !== 'map' && /style|Failed to fetch|40[13]/i.test(String(e?.error?.message ?? ''))) fail(); });
 			map.on('load', () => {
 				if (gone) return;
+				map.addSource('aerial', aerialSource(KEY));
+				map.addLayer({ id: 'aerial', type: 'raster', source: 'aerial', layout: { visibility: base === 'sat' ? 'visible' : 'none' } });
 				map.addSource('plants', { type: 'geojson', data: features(shown) });
 				map.addLayer({ id: 'plants', type: 'circle', source: 'plants', paint: {
 					'circle-radius': ['get', 'r'],
@@ -147,6 +155,12 @@
 
 <div class="pmap" class:live={mode !== 'outline'}>
 	<div class="ml" bind:this={box} aria-label="Map of the plants. The table below lists the same plants." role="region"></div>
+	{#if mode === 'map'}
+		<div class="bm" role="group" aria-label="Map style">
+			<button type="button" aria-pressed={base === 'map'} onclick={() => (base = 'map')}>Map</button>
+			<button type="button" aria-pressed={base === 'sat'} onclick={() => (base = 'sat')}>Satellite</button>
+		</div>
+	{/if}
 	{#if mode !== 'map'}
 		<div class="outline" class:fading={mode === 'loading'}>
 			<svg viewBox="0 0 {VIEW.w} {VIEW.h}" aria-hidden="true"><path d={NI_PATH} /><path d={SI_PATH} /></svg>
@@ -158,7 +172,7 @@
 		</div>
 	{/if}
 </div>
-<p class="cap">{#if mode === 'map'}Drag to move, pinch or scroll to zoom. Tap a dot for its plant. Basemap: Toitū Te Whenua LINZ, CC BY 4.0.{:else}Tap a dot for its plant. Outline: Electricity Authority network zones, CC BY 4.0.{/if}</p>
+<p class="cap">{#if mode === 'map'}Drag to move, pinch or scroll to zoom. Tap a dot for its plant. {base === 'sat' ? 'Imagery' : 'Basemap'}: Toitū Te Whenua LINZ, CC BY 4.0.{:else}Tap a dot for its plant. Outline: Electricity Authority network zones, CC BY 4.0.{/if}</p>
 
 <style>
 	.pmap { position: relative; width: 100%; }
@@ -176,6 +190,10 @@
 	.dot.closed { background: var(--surface); border: 2px solid var(--c); }
 	.dot.on { box-shadow: 0 0 0 2.5px var(--ink); opacity: 1; z-index: 1; }
 	.dot:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; z-index: 2; }
+	.bm { position: absolute; top: 10px; left: 10px; z-index: 2; display: flex; background: var(--surface); border-radius: 4px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.3); overflow: hidden; }
+	.bm button { font: 0.8rem/1 var(--font-ui); padding: 7px 10px; border: 0; background: transparent; color: var(--ink); cursor: pointer; }
+	.bm button[aria-pressed='true'] { background: var(--ink); color: var(--surface); }
+	.bm button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 	.cap { margin: 6px 4px 0; color: var(--muted); font-size: 0.76rem; line-height: 1.45; }
 	.pmap :global(.nz-all) { display: grid; place-items: center; color: #333; }
 	.pmap :global(.plant-tip .maplibregl-popup-content) { font: 0.82rem/1.35 var(--font-ui); padding: 5px 9px; color: #132020; }
