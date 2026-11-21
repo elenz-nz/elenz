@@ -8,12 +8,13 @@ reviewed = ""
 to_check = [
   "Capacity (decision): Elenz has it pending at 120 MW. Meridian gives 130 MW, and the EA register now lists \"Ruakākā Energy Park Solar Farm\" (RUS0) at 130 MW from 29 Oct 2026; not yet in Elenz's live data (19 Nov). Give it 130 MW and a start date once it dispatches.",
   "Commissioned: first generation was expected in late 2026, full generation in early 2027; add the year once it generates.",
-  "Lead (20 Nov 2026): the System Operator's September 2026 report expects commissioning from December 2026; Meridian's Ruakākā Energy Park page describes the 33 kV connection through the battery site's switching station to Bream Bay, about 163 ha of panels on a 201 ha site. Read both.",
+  "Commissioning (21 Nov 2026): the System Operator's September 2026 report (commissioning expected from December 2026) and Meridian's Ruakākā Energy Park page (33 kV connection through the battery's switching station to Bream Bay) weren't read. Read both when the farm first generates, and add its commissioned date then.",
 ]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against Meridian's two releases (final investment decision, March 2025; construction under way, October 2025), the EA register and network supply points table, and Stats NZ boundaries.",
   "Region from the grid connection point (no station point yet); the sources place the farm near it, in the same region (Bream Bay). District left unchecked: no station point.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "Solar leads (21 Nov 2026): 201 ha across three sites (NZ Herald, 2 Nov 2025) added to the About text.",
 ]
 
 [location]
@@ -68,10 +69,10 @@ checked = "2026-11-19"
 note = "the register's operator: Meridian"
 
 [facts.about]
-value = "Ruakākā Solar Farm is Meridian Energy's first solar farm in New Zealand, south of Whangārei. It sits beside Meridian's 100 MW Ruakākā battery, and together they make up the Ruakākā Energy Park. About 250,000 panels are expected to produce up to 230 GWh a year. Construction began in 2025, with first generation expected in late 2026 and full generation in early 2027."
-source = ["meridian-ruakaka-fid", "meridian-ruakaka-construction"]
+value = "Ruakākā Solar Farm is Meridian Energy's first solar farm in New Zealand, south of Whangārei. It sits beside Meridian's 100 MW Ruakākā battery, and together they make up the Ruakākā Energy Park. About 250,000 panels on 201 hectares across three sites are expected to produce up to 230 GWh a year. Construction began in 2025, with first generation expected in late 2026 and full generation in early 2027."
+source = ["meridian-ruakaka-fid", "meridian-ruakaka-construction", "nzherald-ruakaka-construction"]
 grade = "A"
-checked = "2026-11-19"
+checked = "2026-11-21"
 
 [[ratings]]
 value = 130.0

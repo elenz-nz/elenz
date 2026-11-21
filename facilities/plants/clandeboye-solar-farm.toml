@@ -9,7 +9,6 @@ reviewed = "2026-11-19"
 to_check = [
   "Mounting: add \"single-axis trackers\", sourced to Ethical Power's project page and Lodestone's (our dispatch check agrees, but isn't a source).",
   "Metered zeros: the EA's metered data (Generation_MD) has Clandeboye at 0 every half hour in Sep and Oct 2026, though its dispatch shows output and so does our history. Trace where our figure comes from.",
-  "Optional, About text: the developer's estimate of about 43 GWh a year (Lodestone) could be added, worded as an estimate, not as metered output.",
 ]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against the EA register and network supply points table, Lodestone's farm page and groundbreaking news (through search results), EVs & Beyond's first-power report and Stats NZ boundaries.",
@@ -18,6 +17,7 @@ notes = [
   "Capacity: Elenz uses the register's 24 MW (AC); Lodestone gives 27.7 MWp. Mounting: single-portrait (1P) bifacial panels; tracking not stated.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
   "Resolved: Appendix D commissioning lead. Commissioned date rule (21 Nov 2026): owner's date kept: TMK0331 clandeboye_solar_farm reads zero to Oct 2026 (the tracker uses dispatch), so the owner's date stays. Appendix D prints the connection as effective 24 Aug 2024 (the sheet was updated in Sep 2026, so 2026 may be meant); kept out of the page.",
+  "Solar leads (21 Nov 2026): the developer's annual estimate added to the About text, worded as an estimate (lodestone-clandeboye).",
 ]
 
 [location]
@@ -65,10 +65,10 @@ checked = "2026-11-19"
 note = "the register's operator: Lodestone Solar Limited"
 
 [facts.about]
-value = "Clandeboye is Lodestone Energy's fifth solar farm and its first in the South Island, on 42 hectares of former dairy land north of Temuka in South Canterbury. About 45,000 bifacial panels feed Alpine Energy's network, the first large solar farm on it, while the landowner runs sheep on the site. Construction began in 2025 and the farm first generated in 2026."
+value = "Clandeboye is Lodestone Energy's fifth solar farm and its first in the South Island, on 42 hectares of former dairy land north of Temuka in South Canterbury. About 45,000 bifacial panels feed Alpine Energy's network, the first large solar farm on it, while the landowner runs sheep on the site. Construction began in 2025 and the farm first generated in 2026; it is expected to produce about 43 GWh a year."
 source = ["lodestone-clandeboye", "lodestone-clandeboye-groundbreaking", "evsandbeyond-clandeboye"]
 grade = "B"
-checked = "2026-11-19"
+checked = "2026-11-21"
 
 [[ratings]]
 value = 27.7

@@ -8,7 +8,7 @@ wikidata = "Q115803980"
 osm = ["relation/19726847"]
 reviewed = "2026-11-19"
 to_check = [
-  "Lead (20 Nov 2026): commissioning completed 25 Sep 2026 per the System Operator's September 2026 report, and Harmony Energy's Tauhei page gives 150 MW AC at Waihou. Read both: update the commissioned note, and use Harmony's page as the owner source for the AC figure.",
+  "Commissioning (21 Nov 2026): the System Operator's September 2026 report (commissioning completed 25 Sep 2026) and Harmony Energy's own Tauhei page weren't read (the site needs a person's approval to fetch). PV Tech (Jul 2026) had full commercial operation targeted for September to October 2026. Read both, add the completion date to the commissioned note, and move the AC rating's source to Harmony's page.",
 ]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against Harmony Energy's financial close release, PV Tech, the EA register and network supply points table, and Stats NZ boundaries.",
@@ -19,6 +19,7 @@ notes = [
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
   "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) adds Harmony Energy NZ Ltd as a new customer at WHU for the Tauhei solar farm (event processed 10 Nov 2026).",
   "Commissioned date rule (21 Nov 2026): first metered day 2026-06-30, from WHU1101 tauhei_solar_farm; the code appears in May 2026. The previous value moved to alt.",
+  "Solar leads (21 Nov 2026): 150 MW AC (202 MWp) from Harmony as reported by pv magazine (15 Jul 2026), added as a rating, grade B until Harmony's page is read.",
 ]
 
 [location]
@@ -89,3 +90,10 @@ basis = "the panels' combined peak rating, DC"
 source = ["harmony-tauhei-close", "pvtech-tauhei"]
 grade = "A"
 checked = "2026-11-19"
+
+[[ratings]]
+value = 150.0
+basis = "Harmony Energy's full plant capacity, AC; also the EA register's nameplate"
+source = ["pvmag-tauhei-energised", "ea-register"]
+grade = "B"
+checked = "2026-11-21"

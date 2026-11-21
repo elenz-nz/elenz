@@ -8,9 +8,7 @@ wikidata = "Q130271374"
 osm = ["relation/21223567"]
 reviewed = "2026-11-19"
 photo_leads = ["P039"]
-to_check = [
-  "Lead (20 Nov 2026): Lightsource bp's Kōwhai Park page may publish the 168 MWp DC rating (Contact's page no longer does). Contact's opening release: commissioned 16 Sep 2026, opened 15 Oct 2026, about NZ$273m, connected through Orion's network, Synlait buying 25% of the output. Read them and add what checks out.",
-]
+to_check = []
 notes = [
   "Solar batch (19 Nov 2026): facts checked against Contact's project page, the EA register and network supply points table, and Stats NZ boundaries.",
   "District and region from the station's point (the [location] value, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; no other district within 3 km of the station point (Selwyn District is within 3 km of the grid point at Islington).",
@@ -19,6 +17,7 @@ notes = [
   "Capacity: Elenz used 160 MW, the AC figure read from the July 2026 step in the distributed generation registry. Elenz uses Contact's and the register's 150 MW since 19 Nov 2026 (design decision).",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
   "Resolved: Appendix D commissioning lead. Commissioned date rule (21 Nov 2026): first metered day 2026-08-17, from embedded meter ISL0661, the farm's own injection there: 13 MWh on 17 Aug 2026. Its Generation_MD code (ISL0661 kōwhai_park_solar_farm) reads zero to Oct 2026, so the tracker uses dispatch. The previous value moved to alt.",
+  "Solar leads (21 Nov 2026): Lightsource bp's opening release (15 Oct 2026) gives 168 MWdc (added as a rating), commissioning from August 2026 and the opening on 15 Oct 2026, and Synlait's 25% (About). The lead's \"commissioned 16 Sep 2026\" isn't in it; not used. Cost (NZ$273m) left off the page.",
 ]
 
 [location]
@@ -49,7 +48,7 @@ value = "2026-08-17"
 source = "ea-embedded-generation"
 grade = "A"
 checked = "2026-11-21"
-note = "the first day of output in the EA's metered data; the register's row starts 13 August 2026; operational as of October 2026 (Contact)"
+note = "the first day of output in the EA's metered data; the register's row starts 13 August 2026; Lightsource bp: commissioning began in August 2026 and the farm was officially opened on 15 October 2026"
 
 [[facts.commissioned.alt]]
 value = "2026"
@@ -78,10 +77,10 @@ checked = "2026-11-19"
 note = "the register's operator: Contact Energy Limited; the joint venture formed in April 2022"
 
 [facts.about]
-value = "Kōwhai Park is a solar farm on the Christchurch Airport campus, built by Contact Energy and Lightsource bp in joint venture, and the largest solar farm in the South Island. About 300,000 panels cover some 230 hectares and are expected to produce around 275 GWh a year. It became operational in October 2026, Contact's first completed solar farm."
-source = "contact-kowhai-park"
+value = "Kōwhai Park is a solar farm on the Christchurch Airport campus, built by Contact Energy and Lightsource bp in joint venture, and the largest solar farm in the South Island. About 300,000 panels cover some 230 hectares and are expected to produce around 275 GWh a year. Synlait buys a quarter of its output, and Christchurch Airport also buys from it under a long-term agreement. It was officially opened in October 2026, Contact's first completed solar farm."
+source = ["contact-kowhai-park", "lightsourcebp-kowhai-opening"]
 grade = "A"
-checked = "2026-11-19"
+checked = "2026-11-21"
 
 [[ratings]]
 value = 150.0
@@ -89,3 +88,10 @@ basis = "Contact's maximum capacity, AC; also the EA register's nameplate"
 source = ["contact-kowhai-park", "ea-register"]
 grade = "A"
 checked = "2026-11-19"
+
+[[ratings]]
+value = 168.0
+basis = "the panels' combined peak rating, DC"
+source = "lightsourcebp-kowhai-opening"
+grade = "A"
+checked = "2026-11-21"
