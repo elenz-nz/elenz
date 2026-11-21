@@ -42,12 +42,13 @@
  "scheme": null,
  "metered": "Shown as Coal/gas: units 1, 2 and 4 can burn coal or gas, and the market data doesn't say which.\nThe metered history has one meter for units 1–4 together, so it shows them as one. The dispatch data (the live week and the weeks since the newest metered month) shows each unit.\nSeptember 2020: Generation_MD has no Huntly that month, so the history uses the grid meter for the whole station, split between units by their offers.",
  "checking": true,
- "checked": "2026-11-19",
+ "checked": "2026-11-21",
  "about": {
-  "text": "Huntly, on the Waikato River, is New Zealand's largest power station by capacity, and its Rankine units are its original part. Built as four 250 MW steam units able to burn either gas or coal, they were commissioned between 1982 and 1985. One unit was decommissioned in 2014 and three remain, run for baseload, to back up the hydro lakes in dry years, and for peaks.",
+  "text": "Huntly, on the Waikato River, is New Zealand's largest power station by capacity, and its Rankine units are its original part. Built as four 250 MW steam units able to burn either gas or coal, they were commissioned between 1982 and 1985. One unit was decommissioned in 2014 and three remain, run for baseload, to back up the hydro lakes in dry years, and for peaks. Genesis had planned to retire one of them in early 2026; in November 2025 the Commerce Commission authorised an arrangement under which Mercury, Meridian and Contact share its costs, keeping it available to the end of 2035.",
   "refs": [
    1,
-   2
+   2,
+   3
   ]
  },
  "facts": [
@@ -75,7 +76,7 @@
    "label": "Region",
    "value": "Waikato",
    "refs": [
-    3
+    4
    ]
   },
   {
@@ -83,7 +84,7 @@
    "label": "District",
    "value": "Waikato",
    "refs": [
-    4
+    5
    ]
   },
   {
@@ -101,9 +102,9 @@
    "label": "Previous owners",
    "value": "New Zealand Government, to 1987; Electricity Corporation of New Zealand (ECNZ), 1987–99",
    "refs": [
-    5,
     6,
-    7
+    7,
+    8
    ],
    "note": "ECNZ took over the Crown's generation on 1 April 1987; on 1 April 1999 the Huntly station passed to the new Huntly SOE, Genesis Power (now Genesis Energy)."
   },
@@ -112,7 +113,7 @@
    "label": "Other ratings",
    "refs": [
     2,
-    8
+    9
    ],
    "value": "720 MW (Genesis, August 2025: three Rankine units of 240 MW each); 1000 MW (The original four units of 250 MW (the EA register's nameplates), to 2014)"
   },
@@ -121,8 +122,8 @@
    "label": "Connection point",
    "value": "Huntly (HLY2201)",
    "refs": [
-    9,
-    10
+    10,
+    11
    ]
   }
  ],
@@ -131,7 +132,7 @@
   "lon": 175.149956,
   "basis": "whole site",
   "refs": [
-   10
+   11
   ]
  },
  "images": [],
@@ -172,55 +173,62 @@
   },
   {
    "n": 3,
+   "title": "Genesis Energy, Contact Energy, Meridian Energy and Mercury NZ: authorisation final determination [2025] NZCC 22 (5 Nov 2025)",
+   "publisher": "Commerce Commission",
+   "url": "https://www.comcom.govt.nz/assets/Documents/timeline/2025-NZCC-22-Genesis-Energy-Limited-Contact-Energy-Limited-Meridian-Energy-Limited-and-Mercury-NZ-Limited-Authorisation-Final-Determination-5-November-2025.pdf",
+   "opened": "2026-11-21"
+  },
+  {
+   "n": 4,
    "title": "Regional Council 2025 (boundaries)",
    "publisher": "Stats NZ",
    "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
    "opened": "2026-11-19"
   },
   {
-   "n": 4,
+   "n": 5,
    "title": "Territorial Authority 2026 (boundaries)",
    "publisher": "Stats NZ",
    "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
    "opened": "2026-11-19"
   },
   {
-   "n": 5,
+   "n": 6,
    "title": "New Zealand Gazette, 27 November 1995, issue 140: ECNZ information for disclosure",
    "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
    "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1995/1995%20ISSUE%20140.pdf",
    "opened": "2026-11-19"
   },
   {
-   "n": 6,
+   "n": 7,
    "title": "New Zealand Gazette, 25 March 1999, issue 37: Directions relating to split of Electricity Corporation of New Zealand Limited",
    "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
    "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1999/1999%20ISSUE%20037.pdf",
    "opened": "2026-11-19"
   },
   {
-   "n": 7,
+   "n": 8,
    "title": "New Zealand Gazette, 1999, issue 170: ECNZ financial statements",
    "publisher": "New Zealand Gazette (Victoria University of Wellington Library archive)",
    "url": "https://library.victoria.ac.nz/databases/nzgazettearchive/pubs/gazettes/1999/1999%20ISSUE%20170.pdf",
    "opened": "2026-11-19"
   },
   {
-   "n": 8,
+   "n": 9,
    "title": "Agreements signed for Huntly capacity (market release, 4 August 2025)",
    "publisher": "Genesis Energy",
    "url": "https://www.nzx.com/announcements/456084",
    "opened": "2026-11-19"
   },
   {
-   "n": 9,
+   "n": 10,
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
   },
   {
-   "n": 10,
+   "n": 11,
    "title": "LINZ aerial imagery (LINZ Basemaps)",
    "publisher": "Toitū Te Whenua LINZ",
    "url": "https://basemaps.linz.govt.nz/",
