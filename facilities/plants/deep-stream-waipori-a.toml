@@ -6,9 +6,7 @@ name = "Deep Stream (Waipori A)"
 register = ["H037"]
 reviewed = ""
 to_check = [
-  "Boundary (open): the register's row, Deep Stream (Waipori A), has 26 MW, but Contact gives Deep Stream 6 MW. It probably also covers Waipori 1A (Contact lists 1A in its Waipori scheme). Confirm, then add Deep Stream 1 and 2 and Waipori 1A as stations, with their own years and history and the points in its notes. The Elenz team agrees it probably includes 1A (19 Nov 2026); left open until a source confirms it.",
   "Previous owners: Trustpower built Deep Stream (2008); publish once the row's boundary is settled (Waipori 1A has the Waipori scheme's history). Papers Past and NZLII refuse automated reads, so this may need a look by hand.",
-  "Boundary lead: Transpower's Assumptions Book v3.0, Appendix F (model inputs of 4 Jun 2026; source transpower-assumptions-2026) gives Waipori 1A 12 MW, three Waipori 2A units of 19 MW, Waipori 3 7 MW and Waipori 4 8 MW, and the book (para 113, embedded generation table p. 21) puts 1A and one 2A unit at Halfway Bush (HWB220), the other two 2A units, 3 and 4 at Berwick (BWK110); Deep Stream isn't modelled (under 10 MW). The register's 74 MW at BWK1101 is close to all three 2A units with 3 and 4 (72 MW), so the register and Transpower's node split may differ. Use with the register and the metering to settle Deep Stream (Waipori A)'s 26 MW at HWB0331.",
 ]
 notes = [
   "The register's \"Deep Stream (Waipori A)\" is 26 MW at HWB0331; Wikipedia lists Deep Stream at 5 MW and Waipori 1A at 10 MW, so the register entry is probably more than Deep Stream alone.",
@@ -16,11 +14,12 @@ notes = [
   "Capacity: Contact gives Deep Stream a maximum of 6 MW (a rating); Elenz uses the register's 26 MW.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
   "Points read from the LINZ aerial (18 Nov 2026), for station entries once the register row's boundary is settled: the [location] point is Deep Stream 2's powerhouse; Deep Stream 1 [-45.773435, 169.893654]; Waipori 1A [-45.881606, 169.977428]; the scheme's inlet [-45.738313, 169.842368] and a small lake on the race [-45.748501, 169.862881].",
+  "Boundary (design decision 21 Nov 2026): the register's Deep Stream (Waipori A) at HWB0331 is taken to cover Deep Stream 1 and 2 and Waipori 1A (Transpower puts 1A at Halfway Bush; the other Waipori stations are at Berwick). Stations added with the points read from the aerial on 18 Nov; [location] stays on Deep Stream 2 (its aerial views). Capacity stays the register's 26 MW. Previous owners can now go ahead (to_check).",
 ]
 
 [location]
 value = [-45.809597, 169.905336]
-basis = "station"
+basis = "Deep Stream 2 station"
 source = "linz-aerial"
 grade = "B"
 checked = "2026-11-18"
@@ -92,10 +91,10 @@ grade = "A"
 checked = ""
 
 [facts.about]
-value = "Deep Stream is a small station above the Waipori scheme west of Dunedin, commissioned in 2008. Water from an existing diversion of Deep Stream is held in a storage reservoir and released through the station into Lake Mahinerangi, where the Waipori stations use it again. The EA register's row for this plant, Deep Stream (Waipori A), has 26 MW, well above Deep Stream's own 6 MW, so it covers more than this one station."
-source = ["contact-deep-stream", "ea-register"]
+value = "Deep Stream is a small scheme above the Waipori scheme west of Dunedin, commissioned in 2008: two stations on a canal from an existing diversion of Deep Stream, which release the water into Lake Mahinerangi, where the Waipori stations use it again. Elenz's data for this plant, the EA register's Deep Stream (Waipori A), also covers Waipori 1A, the top station of the Waipori scheme, built in the 1960s and 1970s just upstream of the scheme's original 1907 station."
+source = ["contact-deep-stream", "engnz-waipori", "ea-register", "transpower-assumptions-2026"]
 grade = "B"
-checked = "2026-11-19"
+checked = "2026-11-21"
 
 [[ratings]]
 value = 6
@@ -110,3 +109,29 @@ basis = "Wikipedia (basis not stated)"
 source = "wp-list"
 grade = "B"
 checked = ""
+
+[[stations]]
+value = "Deep Stream 1"
+location = [-45.773435, 169.893654]
+source = ["contact-deep-stream", "engnz-waipori"]
+grade = "B"
+checked = "2026-11-21"
+commissioned = "2008"
+note = "TrustPower planned one 2.5 MW unit from its Coleridge upgrade for each station (2005); Contact gives 6 MW for the two together"
+
+[[stations]]
+value = "Deep Stream 2"
+location = [-45.809597, 169.905336]
+source = ["contact-deep-stream", "engnz-waipori"]
+grade = "B"
+checked = "2026-11-21"
+commissioned = "2008"
+
+[[stations]]
+value = "Waipori 1A"
+location = [-45.881606, 169.977428]
+mw = 12
+source = ["transpower-assumptions-2026", "engnz-waipori", "contact-waipori"]
+grade = "B"
+checked = "2026-11-21"
+note = "Transpower's model input; Wikipedia's list gives 10 MW. Built on a new site just upstream of the 1907 station in the 1960s and 1970s"

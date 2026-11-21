@@ -2,13 +2,12 @@
 
 slug = "ruakaka-energy-park"
 plant = "Ruakākā Energy Park"
-name = "Ruakākā Energy Park"
+name = "Ruakākā Battery"
 register = ["B004"]
 wikidata = "Q133860797"
 osm = ["way/1395935526"]
 reviewed = ""
 to_check = [
-  "Name (decision): this page is the battery, which the register calls Ruakākā Energy Park; Meridian uses that name for the battery and the solar farm together. Rename the page to Ruakākā Battery (a site-only name)?",
   "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
@@ -19,6 +18,7 @@ notes = [
   "Dropped the Wikipedia-list rating lead (100/200): battery ratings are MW / MWh, and the page shows ratings as MW. Storage (200 MWh) is in units and About. Cost $186 million (not published).",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
   "Commissioned date rule (21 Nov 2026): first metered day 2025-01-16, from BRB0331 ruakākā_energy_park; the code appears in October 2024. The previous value moved to alt.",
+  "Page name (design decision 21 Nov 2026): Ruakākā Battery, a site-only name; the tracker keeps the register's Ruakākā Energy Park, listed under other names. The slug stays ruakaka-energy-park.",
 ]
 
 [location]
@@ -38,11 +38,11 @@ checked = "2026-11-19"
 note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.other_names]
-value = ["Ruakākā Battery Energy Storage System (BESS)"]
-source = "meridian-ruakaka-bess-2025"
+value = ["Ruakākā Energy Park", "Ruakākā Battery Energy Storage System (BESS)"]
+source = ["ea-register", "meridian-ruakaka-bess-2025"]
 grade = "A"
-checked = "2026-11-19"
-note = "Meridian's name for the battery"
+checked = "2026-11-21"
+note = "the EA register's name, which Meridian uses for the battery and the solar farm together; and Meridian's name for the battery"
 
 [facts.commissioned]
 value = "2025-01-16"

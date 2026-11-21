@@ -8,9 +8,7 @@ wikidata = "Q5945709"
 osm = ["way/167293886"]
 reviewed = ""
 to_check = [
-  "Unit history: Genesis's August 2025 release says one Rankine unit was due to be decommissioned in February 2026; Elenz still counts 750 MW (three units). Check whether it closed and, if so, add a capacity row.",
   "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
-  "Unit lead: Transpower's Assumptions Book v3.0, Appendix F (model inputs of 4 Jun 2026; source transpower-assumptions-2026) still models three Rankine units of 240 MW (units 1, 2 and 4), retiring between 2036 and 2040 depending on the scenario (sheet 2b). Weighs against a unit having closed in February 2026.",
 ]
 notes = [
   "Elenz has four plants here: the Rankines (units 1–4 as one, Coal/gas, 1,000 MW → 750 MW from Jan 2014), Huntly 5 (403 MW), Huntly 6 (50 MW) and the battery (100 MW, Jul 2026).",
@@ -20,6 +18,7 @@ notes = [
   "Unit 3: the EA register's decommission date is 23 Jan 2014 (Elenz's 1,000 → 750 MW step). Wikipedia says one unit went into long-term storage in Dec 2012 and the second was retired in Jun 2015 after storage from 2013; Wikipedia's list gives Huntly 3 closed 2012. Elenz counts the stored unit until 2021 (plant_capacity.csv note).",
   "The closed fact (2012, Wikipedia's list) was unit 3's, not the plant's: removed, as the plant is operating.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
+  "Rankine units (21 Nov 2026): the Commerce Commission's final determination ([2025] NZCC 22, 5 Nov 2025) authorises the Huntly Strategic Energy Reserve Huntly Firming Option to 31 Dec 2035, keeping Unit 2, which Genesis had intended to retire in January 2026. Three units stay (750 MW in plant_capacity.csv, Genesis's 3 × 240 MW as a rating), matching Transpower's Appendix F. The units share one meter code (HLY2201 huntly_1_4), which peaked at about 480 MW both before and after Feb 2026, so the metering can't count units.",
 ]
 
 [location]
@@ -111,10 +110,10 @@ checked = "2026-11-19"
 note = "ECNZ took over the Crown's generation on 1 April 1987; on 1 April 1999 the Huntly station passed to the new Huntly SOE, Genesis Power (now Genesis Energy)."
 
 [facts.about]
-value = "Huntly, on the Waikato River, is New Zealand's largest power station by capacity, and its Rankine units are its original part. Built as four 250 MW steam units able to burn either gas or coal, they were commissioned between 1982 and 1985. One unit was decommissioned in 2014 and three remain, run for baseload, to back up the hydro lakes in dry years, and for peaks."
-source = ["genesis-huntly", "ea-register"]
+value = "Huntly, on the Waikato River, is New Zealand's largest power station by capacity, and its Rankine units are its original part. Built as four 250 MW steam units able to burn either gas or coal, they were commissioned between 1982 and 1985. One unit was decommissioned in 2014 and three remain, run for baseload, to back up the hydro lakes in dry years, and for peaks. Genesis had planned to retire one of them in early 2026; in November 2025 the Commerce Commission authorised an arrangement under which Mercury, Meridian and Contact share its costs, keeping it available to the end of 2035."
+source = ["genesis-huntly", "ea-register", "comcom-2025-nzcc-22"]
 grade = "A"
-checked = "2026-11-19"
+checked = "2026-11-21"
 
 [[ratings]]
 value = 720

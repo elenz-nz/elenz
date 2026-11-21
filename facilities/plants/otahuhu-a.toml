@@ -7,8 +7,6 @@ register = ["T016"]
 wikidata = "Q7108372"
 reviewed = ""
 to_check = [
-  "Closed: which date to publish? Elenz's data (EA meters) has its last output in Apr 2004; Wikipedia says it left generation in the late 1990s and kept running for reactive power until it was decommissioned in Nov 2013; the EA register's decommission date is 2 May 2014. (Decision needed.)",
-  "Fuel: Elenz shows gas; the Commerce Commission (2003) lists Otahuhu A as diesel, 40 MW, and Wikipedia's Contact article says diesel; Wikipedia's list says gas open cycle. Which fuel did it burn, and when?",
   "Olympus twin-pack units (1978): their MW is still unknown.",
 ]
 notes = [
@@ -17,6 +15,7 @@ notes = [
   "District and region from the Wikidata site point and the grid connection point in Stats NZ's boundaries, 19 Nov 2026: Auckland for both.",
   "Owner: closed under Contact Energy, which sold the Ōtāhuhu site in 2016 (Wikipedia).",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "Design decisions (21 Nov 2026): closed date = the register's decommission date (2 May 2014), with a note on the reactive power years; fuel = gas throughout Elenz's data (from Aug 1997). The Auckland Council heritage survey (2014, p. 54) says the turbines ran on fuel oil at first, with one converted to Kapuni gas in 1971 (in the About text). The Commerce Commission's 2003 \"diesel, 40 MW\" stays as an alternative rating.",
 ]
 
 [location]
@@ -45,8 +44,8 @@ checked = "2026-11-19"
 value = "2014-05-02"
 source = "ea-register"
 grade = "A"
-checked = ""
-note = "the register's decommission date; see to_check"
+checked = "2026-11-21"
+note = "the register's decommission date; it left generation in the late 1990s, and its machines kept supplying reactive power to the grid until they were retired"
 
 [[facts.closed.alt]]
 value = "late 1990s"
@@ -104,10 +103,10 @@ checked = "2026-11-19"
 note = "ECNZ sold Otahuhu to Contact Energy, then a new state-owned enterprise, on 1 February 1996"
 
 [facts.about]
-value = "Ōtāhuhu A was the first power station on the Ōtāhuhu site in south Auckland: four 45 MW open cycle gas turbines commissioned in 1968, joined by two more twin-pack units in 1978. After it stopped generating, its machines were kept running to supply reactive power to the national grid, until they were retired and decommissioned in 2013. Ōtāhuhu B, a combined cycle station, was built beside it."
-source = ["wp-otahuhu", "ea-register"]
+value = "Ōtāhuhu A was the first power station on the Ōtāhuhu site in south Auckland, and the first large gas turbine station in Australia and New Zealand: four 45 MW open cycle gas turbines commissioned in 1968, joined by two more twin-pack units in 1978. The turbines burned fuel oil at first; the first was converted to natural gas from the Kapuni pipeline in 1971. It was returned to full operation during the 1992 power shortage. After it stopped generating in the late 1990s, its machines were kept running to supply reactive power to the national grid, until they were retired and decommissioned in 2013. Ōtāhuhu B, a combined cycle station, was built beside it."
+source = ["wp-otahuhu", "ea-register", "auckland-otahuhu-heritage-2014"]
 grade = "B"
-checked = "2026-11-19"
+checked = "2026-11-21"
 
 [[ratings]]
 value = 180
