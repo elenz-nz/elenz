@@ -80,9 +80,9 @@ Poihipi,geo,NI,,,51,override,https://contact.co.nz/about-us/our-story/our-genera
 Pukenui Solar Farm,solar,NI,2025-05-23,,17.2,override,https://bravetrace.co.nz/wp-content/uploads/2026/02/Aquila-Energy-Pukenui-Solar-Farm-BraveTrace-one-pager-Feb-2026.pdf,"inverter output, AC (BraveTrace: 17.16 MW); the register's 20.8 MW is the panels' DC rating (design decision 19 Nov 2026)"
 Pāmu Rā ki Whitianga Solar Farm,solar,NI,2025-11-18,,23.8,register,EA plant register (DispatchedGenerationPlant.csv),
 Pātea,hydro,NI,,,34.5,register,EA plant register (DispatchedGenerationPlant.csv),
-Rangipo,hydro,NI,,,120.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Rangipō,hydro,NI,,,120.0,register,EA plant register (DispatchedGenerationPlant.csv),
 Rangitaiki Solar Farm,solar,NI,2024-03-01,,24.0,register,EA plant register (DispatchedGenerationPlant.csv),"metered output from 2024-03, before the register commissioning date 2024-03"
-Roaring Meg,hydro,SI,,,12.0,register,EA plant register (DispatchedGenerationPlant.csv),
+Roaring Meg,hydro,SI,,,4.3,override,https://en.wikipedia.org/wiki/Roaring_Meg_hydro_scheme; https://www.pioneerenergyrenewables.co.nz/our-locations/roaring-meg-hydro,"lower 3.0 + upper 1.26 MW (Wikipedia); Pioneer's 21.8 + 6.1 GWh a year fits (~75% capacity factor); the register's 12 MW isn't supported (design decision 21 Nov 2026)"
 Rotohiko,batt,NI,2023-11-23,,35.0,register,EA plant register (DispatchedGenerationPlant.csv),
 Rotokawa,geo,NI,1999-04-01,2002-12-31,29,override,"Elenz: step in metered output (Generation_MD, monthly peak half-hour); https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand","metered output (halved: Trustpower meters read double to Jul 2005); counted from 1999-04, the first month the history has its output"
 Rotokawa,geo,NI,2003-01-01,,35,override,"Elenz: step in metered output (Generation_MD, monthly peak half-hour); EA plant register (DispatchedGenerationPlant.csv)",extension 2003; register 36

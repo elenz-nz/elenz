@@ -90,7 +90,7 @@
 			<li>Waikato: Aratiatia to Karāpiro, eight stations</li>
 			<li>Manapōuri</li>
 			<li>Clutha: Clyde and Roxburgh</li>
-			<li>Tongariro: Tokaanu and Rangipo</li>
+			<li>Tongariro: Tokaanu and Rangipō</li>
 			<li>Waikaremoana</li>
 			<li>Rangitaiki: Aniwhenua, Wheao and Flaxy, and Matahina</li>
 			<li>Waipori: Deep Stream and Waipori 2A, 3 and 4</li>

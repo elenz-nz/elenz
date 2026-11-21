@@ -7,7 +7,7 @@ register = ["T021"]
 reviewed = ""
 to_check = [
   "Size and output lead: Transpower's Assumptions Book v3.0, Appendix F (model inputs of 4 Jun 2026; source transpower-assumptions-2026) models Edgecumbe as a 10 MW gas cogeneration plant averaging 1.7 MW a week (0.6–3.1), retiring in 2026 in every scenario.",
-  "Closure (21 Nov 2026, Fonterra deep dive): no closing date is public. Fonterra's $57m electrode boiler replaces the plant's steam and electricity (Fonterra, January 2025); its builder lists a 30 MW electrode boiler and a 4 MW resistive element boiler due for completion in Q2 2026 (Fosters Construction); Fonterra's co-generation deals with Nova end in 2026 (NBR); Transpower models it retiring in 2026 on Fonterra's information. Decision for the Elenz team: publish as closed in 2026 (month unknown), or wait for a date.",
+  "Closure: shown as still running (design decision 21 Nov 2026) until a closing date is confirmed. Leads: Fonterra's electrode boiler (due Q2 2026, Fosters Construction), the Nova co-generation deal ending in 2026 (NBR), Transpower's 2026 retirement year. Look again when Fonterra or the EA publishes something.",
 ]
 notes = [
   "Elenz: 10 MW gas, Jan 1999 to Mar 2008.",
@@ -85,11 +85,11 @@ grade = "B"
 checked = ""
 
 [facts.about]
-value = "Edgecumbe is a gas-fired cogeneration plant at Fonterra's dairy factory at Edgecumbe in the Bay of Plenty, making steam and electricity for the site. It dates from 1996. Its output stops in the EA's metered data after March 2008, but the plant kept running on site, supplying the factory, until 2026. In January 2025 Fonterra announced a new electrode boiler for the site, to replace the steam and electricity it gets from the plant."
-source = ["fonterra-electrification-2025", "wp-list", "transpower-assumptions-2026"]
+value = "Edgecumbe is a gas-fired cogeneration plant at Fonterra's dairy factory at Edgecumbe in the Bay of Plenty, making steam and electricity for the site. It dates from 1996. Its output stops in the EA's metered data after March 2008, but the plant keeps running on site, supplying the factory. In January 2025 Fonterra announced a new electrode boiler for the site, to replace the steam and electricity it gets from the plant."
+source = ["fonterra-electrification-2025", "wp-list", "nbr-fonterra-nova-2025"]
 grade = "B"
-checked = ""
-note = "not published until the owner is settled (to_check). Running until 2026: design decision (21 Nov 2026), on Fonterra's release and Transpower's retirement year."
+checked = "2026-11-21"
+note = "Still running: design decision (21 Nov 2026), until a closing date is confirmed; Transpower models it retiring in 2026."
 
 [[ratings]]
 value = 10

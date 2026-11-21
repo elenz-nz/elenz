@@ -6,8 +6,11 @@ tables, the register, the BUILD number), so pushing any of
 them starts a rebuild of every month (under an hour, in the next history run). Bundle them and push them together, and never
 while a rebuild is still running (check `/data/history/progress.json`: `rebuild_left` empty).
 
-The last rebuild (BUILD 12, 9 Nov 2026: Southdown Battery from the metered history, MW series to one decimal below
-10 MW) took 16 minutes in one run (352 months, 742 KV writes). Its items were checked on the published data and removed:
+BUILD 13 (21 Nov 2026: Rangipō's name in place of the register's Rangipo) ran in one history run and was checked
+on the published data (one Rangipō plant, history from Aug 1997); Offers was rerun with "resummarise".
+
+The rebuild before it (BUILD 12, 9 Nov 2026: Southdown Battery from the metered history, MW series to one decimal
+below 10 MW) took 16 minutes in one run (352 months, 742 KV writes). Its items were checked on the published data and removed:
 Southdown (gas) ends in December 2015 and Southdown Battery has its metered discharge from September 2018 to May 2022
 (at most 0.4 MW a day), with no gas entry and no double count in the dispatch months; `day.json` grew 3.6% (8.8 to
 9.1 MB); Offers was rerun with "resummarise". (BUILD 10, which downloaded 213 months' reconciliation files into the

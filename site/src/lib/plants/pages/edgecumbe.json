@@ -24,14 +24,21 @@
  "metered": "Its metered output ends in March 2008: after that the EA's metered data no longer records it. The plant kept running on site, supplying Fonterra's Edgecumbe factory, until 2026.",
  "checking": true,
  "checked": "2026-11-21",
- "about": null,
+ "about": {
+  "text": "Edgecumbe is a gas-fired cogeneration plant at Fonterra's dairy factory at Edgecumbe in the Bay of Plenty, making steam and electricity for the site. It dates from 1996. Its output stops in the EA's metered data after March 2008, but the plant keeps running on site, supplying the factory. In January 2025 Fonterra announced a new electrode boiler for the site, to replace the steam and electricity it gets from the plant.",
+  "refs": [
+   1,
+   2,
+   3
+  ]
+ },
  "facts": [
   {
    "k": "region",
    "label": "Region",
    "value": "Bay of Plenty",
    "refs": [
-    1
+    4
    ]
   },
   {
@@ -39,7 +46,7 @@
    "label": "District",
    "value": "Whakatāne",
    "refs": [
-    2
+    5
    ]
   },
   {
@@ -56,7 +63,7 @@
    "label": "Other ratings",
    "refs": [
     3,
-    4
+    6
    ],
    "value": "10 MW (NBR: Fonterra's 10 MW plant at Edgecumbe; also Transpower's model input)"
   },
@@ -65,8 +72,8 @@
    "label": "Connection point",
    "value": "Edgecumbe (EDG0331)",
    "refs": [
-    5,
-    6
+    7,
+    8
    ]
   }
  ],
@@ -75,7 +82,7 @@
   "lon": 176.83225,
   "basis": "station",
   "refs": [
-   6
+   8
   ]
  },
  "images": [],
@@ -102,16 +109,16 @@
  "sources": [
   {
    "n": 1,
-   "title": "Regional Council 2025 (boundaries)",
-   "publisher": "Stats NZ",
-   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "title": "Fonterra announces electrification plans to future-proof operations (29 January 2025)",
+   "publisher": "Fonterra",
+   "url": "https://www.fonterra.com/nz/en/our-stories/media/fonterra-announces-electrification-plans-to-future-proof-operations.html",
    "opened": "2026-11-19"
   },
   {
    "n": 2,
-   "title": "Territorial Authority 2026 (boundaries)",
-   "publisher": "Stats NZ",
-   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "title": "List of power stations in New Zealand",
+   "publisher": "Wikipedia",
+   "url": "https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand",
    "opened": "2026-11-19"
   },
   {
@@ -123,20 +130,34 @@
   },
   {
    "n": 4,
+   "title": "Regional Council 2025 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
+   "title": "Territorial Authority 2026 (boundaries)",
+   "publisher": "Stats NZ",
+   "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 6,
    "title": "TPM determination: Assumptions book v3.0 (30 June 2026)",
    "publisher": "Transpower",
    "url": "https://www.transpower.co.nz/our-work/industry/grid-pricing/assumptions-book",
    "opened": "2026-11-21"
   },
   {
-   "n": 5,
+   "n": 7,
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
   },
   {
-   "n": 6,
+   "n": 8,
    "title": "LINZ aerial imagery (LINZ Basemaps)",
    "publisher": "Toitū Te Whenua LINZ",
    "url": "https://basemaps.linz.govt.nz/",
