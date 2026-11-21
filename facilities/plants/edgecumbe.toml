@@ -10,6 +10,7 @@ to_check = [
   "Owner: Wikipedia's list gives Nova Energy; Fonterra's site hosts it. Find the owner (the Commerce Commission, the EA or the owners).",
   "Capacity: Elenz uses 10 MW (Wikipedia's list); check against an owner or official source.",
   "Closure lead: Transpower's Assumptions Book v3.0 (30 Jun 2026; source transpower-assumptions-2026) models Edgecumbe (and Hawera) to retire in 2026, \"consistent with recent information provided by Fonterra\" (para 151 e). Look for Fonterra's date for the electrode boiler, then set the status.",
+  "Size and output lead: Transpower's Assumptions Book v3.0, Appendix F (model inputs of 4 Jun 2026; source transpower-assumptions-2026) models Edgecumbe as a 10 MW gas cogeneration plant averaging 1.7 MW a week (0.6–3.1), retiring in 2026 in every scenario.",
 ]
 notes = [
   "Elenz: 10 MW gas, Jan 1999 to Mar 2008.",

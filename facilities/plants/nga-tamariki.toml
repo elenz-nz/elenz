@@ -17,6 +17,7 @@ notes = [
   "Resolved: Capacity: Mercury gives 132 MW installed since the fifth unit (86 MW before), which Elenz uses. The EA register still lists 87 MW (17 Nov 2026), kept as a rating; the fifth unit's net capacity is 50 MW, the station's net gain 46 MW (Mercury, Sep 2023).",
   "Grid connection: NAP2202 is at the Ngā Awa Pūrua substation, reached by a 220 kV line from the station (Wikipedia).",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point moved to the substation.",
+  "Transpower's Assumptions Book v3.0, Appendix F (model inputs of 4 Jun 2026; source transpower-assumptions-2026): Ngatamariki modelled at 86 MW, with Ngatamariki2 as a committed project from 2025 (sheet 10); Mercury gives 132 MW since Jan 2026.",
 ]
 
 [location]

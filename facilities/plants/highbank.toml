@@ -9,6 +9,7 @@ osm = ["relation/12618188"]
 reviewed = ""
 to_check = [
   "Capacity (open): Contact says the 27 MW 1945 unit is being replaced by a new 19 MW GE unit; Wikipedia says a new 29 MW turbine and generator (Nov 2024 to May 2026). Check which, and whether the new unit is running, before changing Elenz's 28 MW. The Elenz team thinks it isn't running yet (19 Nov 2026), so 28 MW stays for now.",
+  "Capacity lead: Transpower's Assumptions Book v3.0, Appendix F (model inputs of 4 Jun 2026; source transpower-assumptions-2026) models Highbank at 27 MW, the old unit's rating, which suggests the new unit wasn't in service when the inputs were set (4 Jun 2026).",
 ]
 notes = [
   "28 MW (register). Separate from Montalto (H034), which is other embedded at ASB0661.",
