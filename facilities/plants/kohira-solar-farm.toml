@@ -10,6 +10,7 @@ reviewed = "2026-11-19"
 to_check = [
   "Sources: Lodestone's site refuses automated reads, so this farm's facts rest mainly on BraveTrace's device sheet (Lodestone's page read only through search results). Check Lodestone's page by hand.",
   "Optional, About text: the developer's estimate of about 56 GWh a year (Lodestone) could be added, worded as an estimate, not as metered output.",
+  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded plant connected\" adjustment event at KOE (Top Energy), effective 27 Jan 2024 (an earlier KOE event than Twin Rivers; Lodestone officially switched Kaitāia on 28 Feb 2024). Elenz counts it from 25 Oct 2023 (the register). Check which date the page should give.",
 ]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against BraveTrace's device sheet (registrant Lodestone Energy), the EA register and network supply points table, Lodestone's farm pages (read through search results; the site refuses automated reads) and Stats NZ boundaries.",

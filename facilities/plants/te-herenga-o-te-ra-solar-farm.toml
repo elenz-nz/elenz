@@ -20,6 +20,7 @@ notes = [
   "Connects at Transpower's Waiotahi point (WAI0331), as grid-connected generation (reconciliation type GG).",
   "Dropped the \"Manawatū\" scheme lead.",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
+  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) lists Lodestone Energy as a customer at WAI in the PY2026 allocations (from 1 May 2025).",
 ]
 
 [location]

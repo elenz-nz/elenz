@@ -15,6 +15,7 @@ notes = [
   "Resolved: Capacity: Contact gives a maximum of 32 MW; the register 34.5 MW (Elenz); Wikipedia 33 (three 10.5 MW sets and a 700 kW auxiliary). Contact's 32 is a rating.",
   "Ownership: Wikipedia's Powerco article says Powerco bought Egmont Electricity in September 1997 and, after the 1998 reforms, sold its five hydro stations to TrustPower; the Pātea Dam article says owned and operated by Trustpower/Manawa since 1999.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"changed point of connection\" adjustment event at HWA to OHG (Manawa), effective 26 Jun 2026; matches the move to OHG1101 in June 2026.",
 ]
 
 [location]

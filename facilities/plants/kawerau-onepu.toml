@@ -19,6 +19,7 @@ notes = [
   "LINZ aerial check (18 Nov 2026): station point not set, grid connection point confirmed.",
   "Transpower's Assumptions Book v3.0 (30 Jun 2026; source transpower-assumptions-2026), footnote 22: em6's 'KAW110 ONU' value covers Onepu_KA24, Onepu_TA2, Onepu_TA3 and Onepu_TOPP1; Transpower's security of supply assessment counts them as one 60 MW unit. Its embedded generation table (p. 21) lists the same four, plus Kawerau_TAM, at KAW110 (customers Horizon and Norske Skog). Added 21 Nov 2026; the generation method page's note names them.",
   "Transpower's Assumptions Book v3.0, Appendix F (model inputs of 4 Jun 2026; source transpower-assumptions-2026): all four Onepu units are existing geothermal generators: TOPP1 24 MW, TA2 16, TA3 8, KA24 8 (56 MW), with emission rates 52, 60, 60 and 58 g CO2e/kWh (about 56 weighted by size). The same four units are listed in v2.0 (Nov 2024). Added 21 Nov 2026.",
+  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026): Norske Skog's exit and Carter Holt Harvey Energy (CHHE, Oji) as a new customer at KAW, both effective 9 May 2023, matching the register's operator change; Norske Skog's KAW row is gone by the June 2026 sheet.",
 ]
 
 [grid_connection]

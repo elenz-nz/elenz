@@ -6,7 +6,9 @@ name = "Taiohi Solar Farm"
 register = ["S009"]
 osm = ["way/1411807433"]
 reviewed = "2026-11-19"
-to_check = []
+to_check = [
+  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded plant connected\" adjustment event at HLY (WEL Networks), effective 12 Dec 2025. Elenz counts it from 15 Sep 2025 (the register). Check which marks first output and which full commissioning.",
+]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against WEL Networks' two releases, BraveTrace's device sheet (registrant NewPower Energy), the EA register and network supply points table, and Stats NZ boundaries.",
   "Region from the grid connection point (no station point yet); the sources place the farm near it, in the same region (Huntly; the farm is at Rangiriri). District left unchecked until there is a station point: Huntly's point is in Waikato District. The old leads (Northland) were wrong.",

@@ -10,6 +10,7 @@ to_check = [
   "Mounting: add \"single-axis trackers\", sourced to Ethical Power's project page and Lodestone's (our dispatch check agrees, but isn't a source).",
   "Metered zeros: the EA's metered data (Generation_MD) has Clandeboye at 0 every half hour in Sep and Oct 2026, though its dispatch shows output and so does our history. Trace where our figure comes from.",
   "Optional, About text: the developer's estimate of about 43 GWh a year (Lodestone) could be added, worded as an estimate, not as metered output.",
+  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded plant connected\" adjustment event at TMK (Alpine Energy), effective 24 Aug 2024 (as printed; the sheet was updated in September 2026, so 2026 may be meant). Elenz counts it from 10 Jun 2026 (the register). Check the date.",
 ]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against the EA register and network supply points table, Lodestone's farm page and groundbreaking news (through search results), EVs & Beyond's first-power report and Stats NZ boundaries.",
