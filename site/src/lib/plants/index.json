@@ -315,7 +315,7 @@
    "pt": {
     "lat": -45.809597,
     "lon": 169.905336,
-    "basis": "station",
+    "basis": "Deep Stream 2 station",
     "checked": true
    },
    "thumb": {
@@ -1469,7 +1469,7 @@
     "file": "aerial/otahuhu-a-site.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
-   "overview": "A 180 MW gas-fired station in Auckland, generating from 1968 to 2004; now closed."
+   "overview": "A 180 MW gas-fired station in Auckland, generating from 1968 to 2014; now closed."
   },
   {
    "slug": "otahuhu-b",
@@ -1703,7 +1703,7 @@
    "fuel": "hydro",
    "island": "SI",
    "status": "operating",
-   "mw": 12.0,
+   "mw": 4.3,
    "owner": "Other generators",
    "commissioned": "1936",
    "closed": null,
@@ -1719,7 +1719,7 @@
     "file": "aerial/roaring-meg-site.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
-   "overview": "A 12 MW hydro station in Otago, generating since 1936."
+   "overview": "A 4.3 MW hydro station in Otago, generating since 1936."
   },
   {
    "slug": "rotohiko",
@@ -1798,7 +1798,7 @@
   },
   {
    "slug": "ruakaka-energy-park",
-   "name": "Ruakākā Energy Park",
+   "name": "Ruakākā Battery",
    "plant": "Ruakākā Energy Park",
    "fuel": "batt",
    "island": "NI",

@@ -1,6 +1,6 @@
 {
  "slug": "ruakaka-energy-park",
- "name": "Ruakākā Energy Park",
+ "name": "Ruakākā Battery",
  "plant": "Ruakākā Energy Park",
  "fuel": "batt",
  "island": "NI",
@@ -36,18 +36,19 @@
   {
    "k": "other_names",
    "label": "Other names",
-   "value": "Ruakākā Battery Energy Storage System (BESS)",
+   "value": "Ruakākā Energy Park, Ruakākā Battery Energy Storage System (BESS)",
    "refs": [
+    4,
     1
    ],
-   "note": "Meridian's name for the battery"
+   "note": "the EA register's name, which Meridian uses for the battery and the solar farm together; and Meridian's name for the battery"
   },
   {
    "k": "commissioned",
    "label": "Commissioned",
    "value": "16 January 2025",
    "refs": [
-    4
+    5
    ],
    "note": "the first day of output in the EA's metered data; officially opened 23 May 2025; the register gives 2024"
   },
@@ -76,7 +77,7 @@
    "label": "Region",
    "value": "Northland",
    "refs": [
-    5
+    6
    ],
    "note": "Wikidata's point and the grid connection point"
   },
@@ -85,7 +86,7 @@
    "label": "District",
    "value": "Whangārei",
    "refs": [
-    6
+    7
    ],
    "note": "Whangārei District, from Wikidata's point; the grid connection point gives the same"
   },
@@ -94,7 +95,7 @@
    "label": "Owner",
    "value": "Meridian Energy",
    "refs": [
-    7,
+    4,
     1
    ],
    "note": "the register's operator: Meridian Energy Limited"
@@ -161,30 +162,30 @@
   },
   {
    "n": 4,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 5,
    "title": "Generation output by plant (Generation_MD)",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/Generation_MD",
    "opened": "2026-11-21"
   },
   {
-   "n": 5,
+   "n": 6,
    "title": "Regional Council 2025 (boundaries)",
    "publisher": "Stats NZ",
    "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
    "opened": "2026-11-19"
   },
   {
-   "n": 6,
+   "n": 7,
    "title": "Territorial Authority 2026 (boundaries)",
    "publisher": "Stats NZ",
    "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
-   "opened": "2026-11-19"
-  },
-  {
-   "n": 7,
-   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
-   "publisher": "Electricity Authority",
-   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
    "opened": "2026-11-19"
   },
   {
