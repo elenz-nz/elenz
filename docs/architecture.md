@@ -193,7 +193,10 @@ checking this page's facts" until the plant file's `reviewed` is set; then, besi
 the plant has both. Photos: every row of `plant_images.csv` for the plant, in file order (the files go in
 `static/plants/`, and `plant_pages.py --check` fails if one is missing), in a strip that swipes on a phone (CSS scroll
 snap), with arrows and "1 of 3" when there is more than one; each credited under it, the credit's links opening in a new
-tab. Location: the plant's LINZ aerial views (Site, Close and Wide, about 450 m, 1 km and 7.5 km across; a switch that
+tab. A click or tap on a photo (or the corner button) opens all the plant's photos uncropped in a native `<dialog>` (design
+decision, 22 Nov 2026: the frame crops to 1000:640, which cuts tall photos hard): arrows, the arrow keys, a swipe, Esc, each photo
+credited; closing leaves the strip on the photo last viewed. `plant_images.csv`'s optional `focus` ("50% 12%", across then down)
+sets `object-position` for the cropped frame, so a tall photo's subject stays in view; blank centres it. Location: the plant's LINZ aerial views (Site, Close and Wide, about 450 m, 1 km and 7.5 km across; a switch that
 only swaps the image's address; credited with the imagery collection, Toitū Te Whenua LINZ, CC BY 4.0) and, with the
 LINZ key, a Map view (the index's MapLibre and `topolite-v2` style, loaded only when Map is chosen, centred on the point,
 with cooperative gestures so it doesn't catch the page's scrolling), a small locator of the plant's island in the corner

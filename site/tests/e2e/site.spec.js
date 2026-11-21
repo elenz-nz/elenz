@@ -439,6 +439,24 @@ test.describe('plant pages', () => {
     await expect(page.locator('.loc figcaption')).toContainText('° S');   // the coordinates moved here from the side
   });
 
+  test('a photo opens full size and the gallery steps through, and a photo can anchor its crop', async ({ page }) => {
+    await page.goto('/plants/manapouri');
+    await page.locator('.photo .photos img').first().click();
+    const dlg = page.locator('dialog.lightbox');
+    await expect(dlg).toBeVisible();
+    await expect(dlg.locator('.stage img')).toHaveAttribute('src', '/plants/manapouri.webp');
+    await expect(dlg.locator('.n')).toHaveText('1 of 2');
+    await page.keyboard.press('ArrowRight');
+    await expect(dlg.locator('.stage img')).toHaveAttribute('src', '/plants/manapouri-2.webp');
+    await expect(dlg.locator('.n')).toHaveText('2 of 2');
+    await expect(dlg.getByRole('button', { name: 'Next photo' })).toBeDisabled();
+    await dlg.getByRole('button', { name: 'Close' }).click();
+    await expect(dlg).toBeHidden();
+    await expect(page.locator('.photo .photos .count')).toHaveText('2 of 2');   // the page follows the last photo looked at
+    await page.goto('/plants/te-rere-hau');
+    await expect(page.locator('.photo .photos img').first()).toHaveCSS('object-position', /50% 30%|50% 30/);
+  });
+
   test('facts keep their notes in an info button; related plants and the call to share sit below', async ({ page }) => {
     await page.goto('/plants/benmore');
     const facts = page.locator('section[aria-labelledby="facts-h"]');
