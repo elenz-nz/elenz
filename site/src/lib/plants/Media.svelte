@@ -56,7 +56,14 @@
 	let map: any = null;
 	let mapState = $state<'idle' | 'loading' | 'ready' | 'failed'>('idle');
 	$effect(() => {
-		if (shown !== 'location' || vk !== 'map' || !mapEl || map || mapState === 'failed' || !location) return;
+		// Leaving the Map view removes its container, so drop the map with it; the next visit builds a new one in the new
+		// container (a kept map would still point at the removed one and the view would stay blank).
+		if (!mapEl) {
+			if (map) { map.remove(); map = null; }
+			if (mapState !== 'idle') mapState = 'idle';
+			return;
+		}
+		if (shown !== 'location' || vk !== 'map' || map || mapState === 'failed' || !location) return;
 		mapState = 'loading';
 		const el = mapEl, at: [number, number] = [location.lon, location.lat];
 		const colour = getComputedStyle(document.documentElement).getPropertyValue(tok).trim() || '#2f6f6a';
@@ -64,6 +71,7 @@
 			const [lib, worker] = await Promise.all([
 				import('maplibre-gl'), import('maplibre-gl/dist/maplibre-gl-worker.mjs?url'), import('maplibre-gl/dist/maplibre-gl.css')
 			]);
+			if (!el.isConnected) { mapState = 'idle'; return; }   // the view was switched away while the library loaded
 			const ml = (lib as any).default ?? lib;
 			ml.setWorkerUrl(worker.default);
 			map = new ml.Map({
