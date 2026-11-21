@@ -158,7 +158,11 @@
 						{:else if live === 'error'}
 							<p class="quiet">Elenz can’t reach its live data right now. It will try again every minute.</p>
 						{:else if !L}
-							<p class="quiet">{p.name} isn’t in the live dispatch data. Its output appears in the history once the Electricity Authority publishes each month’s metered data, about 6 weeks after the month.</p>
+							{#if p.fuel === 'diesel'}
+								<p class="quiet">{p.name} is a standby plant and hasn’t run in the last 7 days. It shows here when it next generates. Its past output is in the history, which the Electricity Authority updates each month, about 6 weeks after the month.</p>
+							{:else}
+								<p class="quiet">{p.name} isn’t in the live dispatch data. Its output appears in the history once the Electricity Authority publishes each month’s metered data, about 6 weeks after the month.</p>
+							{/if}
 						{:else}
 							<div class="now-body">
 								<div class="now-fig">
