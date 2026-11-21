@@ -25,6 +25,17 @@ To start it (only when the Elenz team says go): bring the branch up to date with
 hand, or wait for the next run. Afterwards check each item, run the Offers workflow with "resummarise" if an item changes
 generation, and clear the done items from this file.
 
+## In this build (BUILD 13, on `next-rebuild`)
+
+1. **Rangipō's name** (design decision, 21 Nov 2026): the tracker shows Rangipō, as Genesis spells it, in place of the
+   register's Rangipo. `[plant_names]` maps the register's name; `metered_plants.csv` (RPO2201), `plant_capacity.csv`,
+   `[hydro_schemes]` Tongariro, the plant file's `plant` and the groupings method page use the new name. Check
+   afterwards: the Tracker's By plant view and the Tongariro scheme list Rangipō once (no second "Rangipo" row),
+   its history runs from Aug 1997 unbroken, `/plants/rangipo` shows its history and live panel, and records name it
+   Rangipō. Offered capacity by plant (`hist/offp/*`) written before this build names it Rangipo: rerun the Offers
+   workflow with "resummarise", or map it through `[plant_names]` when the plant pages read those files (as for
+   Ngā Awa Pūrua, below).
+
 ## Not fixable from EMI data
 
 - Highbank before Oct 2001: no meter in `Generation_MD` or `Embedded_generation`, and reconciliation starts in 2005.
