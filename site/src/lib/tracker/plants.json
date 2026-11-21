@@ -56,7 +56,8 @@
 "metered":"Since June 2011 one meter (WPG0331) carries Deep Stream and Mahinerangi wind farm together. The metered history splits it 30% Deep Stream, 70% Mahinerangi, their average shares in the dispatch data 2020–26. The dispatch data (the live week and the weeks since the newest metered month) has each plant's own output."
 },
 "Edgecumbe":{
-"owner":"Other generators"
+"owner":"Other generators",
+"metered":"Its metered output ends in March 2008: after that the EA's metered data no longer records it. The plant kept running on site, supplying Fonterra's Edgecumbe factory, until 2026."
 },
 "Fonterra Dairy - Whareroa":{
 "owner":"Nova",

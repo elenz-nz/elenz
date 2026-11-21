@@ -8,11 +8,11 @@ reviewed = ""
 to_check = [
   "Location: only the grid connection; this meter is a whole site's connection to the grid (see /methods/generation#onepu), so there may be no single station point to add.",
   "Owner: not published as one owner. The register's operator for KAW0112 ONU0 is Oji Fibre Solutions (Norske Skog Tasman before 6 May 2023). Transpower's Assumptions Book v3.0 (30 Jun 2026; source transpower-assumptions-2026) puts four units behind the meter: TOPP1 and GDL (KA24), both Eastland Generation's, and TA2 and TA3, which it doesn't describe. Decide whether the page names owners per unit (a design decision for the Elenz team).",
-  "Commissioned: the register's 1966 is not published, for the same reason.",
   "About: not written. If one is wanted, it should say no more than the Kawerau (Onepu) note on /methods/generation (a design decision for the Elenz team).",
   "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
+  "Commissioned: no date is given (design decision, 21 Nov 2026): the meter covers several stations commissioned at different times. The register's start, 1966-01-01, isn't used.",
   "The EA register's names for KAW0112 ONU0 include \"Kawerau Mill CoGen\" and \"Norske Skog CoGen\". Elenz shows the meter as Kawerau (Onepu), geothermal, from Jan 2013.",
   "Geothermal batch 1 (19 Nov 2026): checked against the EA register and network supply points table and Stats NZ boundaries only. Public wording for this meter follows the generation method page's note.",
   "Region from the grid connection point in Stats NZ's 2025 region boundaries, 19 Nov 2026. No district published: the point is a substation, and Whakatāne District is 150–200 m from it.",
@@ -43,12 +43,12 @@ source = "elenz-register"
 grade = "C"
 checked = ""
 
-[facts.commissioned]
-value = "1966"
-source = "ea-register"
+[facts.units]
+value = "4 geothermal units: TOPP1 (24 MW) and GDL (8 MW, which Transpower calls KA24), both Eastland Generation's, and two Transpower calls TA2 (16 MW) and TA3 (8 MW)"
+source = ["transpower-assumptions-2026", "eastlandgeneration-renewable-generation-geotherm"]
 grade = "A"
-checked = ""
-note = "the register's start date, 1966-01-01: often a year, not the day"
+checked = "2026-11-21"
+note = "Transpower's Assumptions Book v3.0 (footnote 22; Appendix F): the units behind the meter. Eastland gives GDL as 9 MW."
 
 [facts.field]
 value = "Kawerau industrial complex"
