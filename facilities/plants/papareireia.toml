@@ -6,11 +6,7 @@ name = "Papareireiā"
 register = ["S017"]
 wikidata = "Q137460644"
 reviewed = "2026-11-19"
-to_check = [
-  "Lead (20 Nov 2026): construction began Sep 2024 and first generation was Nov 2025 (United Civil, Green Gold Energy); Green Gold gives formal commissioning on 6 Jan 2026, against December 2025 (Wikipedia, citing Scoop). Both make plant_capacity.csv's start of 2025-02-01 (\"metered output from 2025-02\") look wrong: trace which metered series starts then before changing it.",
-  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded generating plant connected\" adjustment event for Golden Stairs Solar Farm at MTO (Northpower), effective 30 Dec 2025. Golden Stairs is this plant's earlier name (the register's unit code is GDS0). The register starts 13 Nov 2025; the developer gives first generation in Nov 2025 and commissioning on 6 Jan 2026. For the page's commissioned date, use the first metered date (facilities/PLANTS.md, design decision 21 Nov 2026); put this date and the register's in the fact's note.",
-  "Commissioned date (21 Nov 2026, analysis/first_metered.py): the Generation_MD code MTO0331 papareireiā_solar_at_maungaturoto first reads on 3 Jan 2025 (1 MW from 13 Jan 2025) but stays under about 330 MWh a month until Jan 2026 (1.5 GWh), which fits first generation in Nov 2025 and commissioning on 6 Jan 2026 better than a start in early 2025. Settle what the 2025 readings are before setting the date; until then the owner's date stays.",
-]
+to_check = []
 notes = [
   "Solar batch (19 Nov 2026): facts checked against Te Ao Māori News, Wikipedia's article, the EA register and network supply points table, and Stats NZ boundaries.",
   "Location: Wikipedia's article gives a point near Maungaturoto (Wikidata Q137460644 has none yet), added as the draft location. District and region from the station's point (the [location] value, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026; no other district within 3 km. The old lead (\"Maungaturoto\") was a town.",
@@ -19,6 +15,7 @@ notes = [
   "Owner: the register's operator is Maungaturoto Solar Farm Project LP; the project was first developed by Solar Bay (now Harbour Infrastructure) for Ryman Healthcare.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
   "Solar leads (21 Nov 2026): Ryman's release (5 Dec 2025) confirms the sleeved PPA with Mercury and the go-live on 4 Dec 2025 (the Herald's opening photo has the same date), and about 32 GWh a year; all in the About text. The commissioned date and plant_capacity.csv's Feb 2025 start stay open (to_check).",
+  "Commissioned date (design decision 21 Nov 2026): the owner's date, 4 Dec 2025 (went live), not the first metered day: the farm's Generation_MD code read small amounts through 2025 (from 3 Jan 2025, under about 330 MWh a month) before full output from Jan 2026, which fits a long commissioning. The note says so. Transpower's charging records give 30 Dec 2025. plant_capacity.csv keeps its start of 1 Feb 2025, since the meter does read output from then.",
 ]
 
 [location]
@@ -45,11 +42,17 @@ checked = "2026-11-21"
 note = "Golden Stairs Solar Farm: its earlier name, after Golden Stairs Road, Maungaturoto; Transpower's Appendix D still uses it, and the register's unit code is GDS0"
 
 [facts.commissioned]
+value = "2025-12-04"
+source = ["ryman-papareireia-live", "nzherald-ryman-solar-opening"]
+grade = "A"
+checked = "2026-11-21"
+note = "officially went live on 4 December 2025; the developer gives first generation in November 2025 and formal commissioning on 6 January 2026; the register's row starts 13 November 2025. The EA's metered data shows small amounts of output under the farm's code from January 2025, never more than about 330 MWh a month before it went live"
+
+[[facts.commissioned.alt]]
 value = "2025"
 source = ["ea-register", "wp-papareireia"]
 grade = "A"
-checked = "2026-11-19"
-note = "officially went live on 4 December 2025 (Ryman Healthcare; NZ Herald)"
+checked = ""
 
 [[facts.commissioned.alt]]
 value = "2025"
