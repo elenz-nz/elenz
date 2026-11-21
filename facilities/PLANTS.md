@@ -163,6 +163,12 @@ Research goes in batches by fuel, one pull request per batch, for the Elenz team
 - **Images:** a row in `plant_images.csv` only once the licence has been read on the file's own page. CC BY, CC BY-SA,
   CC0, public domain, "no known copyright restrictions", or an owner's written permission. Never NonCommercial or
   NoDerivatives. Never an AI-made picture presented as a photo. Credit as "Photo: Author, Collection, Licence".
+  `analysis/plant_photo_candidates.py` lists Wikidata's image (P18) and Commons category (P373) for plants with no
+  photo, with each file's licence; look at each picture before using it (Wikidata's image is sometimes another plant's:
+  Ōtāhuhu A's is Ōtāhuhu B's). `analysis/plant_photos.py fetch` then `add` downloads the picks and writes the WebP and
+  the CSV row. Several plants may share one file (the three Tararua stages): one row each, the same `file`.
+  Te Ara, the National Library and DigitalNZ pages answer this workspace with a bot check, and owners' pages are
+  copyright reserved: those leads need a person's browser or a written permission.
 - "Owner" means the plant's owner.
 
 ## The checks (`ingest/plant_files.py --check`)

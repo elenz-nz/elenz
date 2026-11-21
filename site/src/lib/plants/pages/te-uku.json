@@ -95,7 +95,16 @@
    8
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "te-uku.webp",
+   "title": "Te Uku Wind Farm",
+   "author": "Symac",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Te_Uku_Wind_Farm_(2).jpg",
+   "licence": "CC BY-SA 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

@@ -134,7 +134,16 @@
    12
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "roxburgh.webp",
+   "title": "Roxburgh Power Station",
+   "author": "Kelisi (CJMoss)",
+   "source_url": "https://commons.wikimedia.org/wiki/File:RoxburghHydroStnNZ.JPG",
+   "licence": "CC BY-SA 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

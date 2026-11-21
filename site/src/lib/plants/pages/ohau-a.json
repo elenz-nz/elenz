@@ -122,7 +122,16 @@
    11
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "ohau-a.webp",
+   "title": "Ōhau A Power Station",
+   "author": "Ulrich Lange",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Hydroelectric_Power_Station_Ohau_A.jpg",
+   "licence": "CC BY 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by/3.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

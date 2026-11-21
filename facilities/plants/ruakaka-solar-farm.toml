@@ -8,13 +8,14 @@ reviewed = ""
 to_check = [
   "Capacity (decision): Elenz has it pending at 120 MW. Meridian gives 130 MW, and the EA register now lists \"Ruakākā Energy Park Solar Farm\" (RUS0) at 130 MW from 29 Oct 2026; not yet in Elenz's live data (19 Nov). Give it 130 MW and a start date once it dispatches.",
   "Commissioned: first generation was expected in late 2026, full generation in early 2027; add the year once it generates.",
-  "Commissioning (21 Nov 2026): the System Operator's September 2026 report (commissioning expected from December 2026) and Meridian's Ruakākā Energy Park page (33 kV connection through the battery's switching station to Bream Bay) weren't read. Read both when the farm first generates, and add its commissioned date then.",
+  "Commissioning (21 Nov 2026): the System Operator's September 2026 report (commissioning expected from December 2026) wasn't read (not yet found online; attach it to the chat). Read it when the farm first generates, and add its commissioned date then.",
 ]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against Meridian's two releases (final investment decision, March 2025; construction under way, October 2025), the EA register and network supply points table, and Stats NZ boundaries.",
   "Region from the grid connection point (no station point yet); the sources place the farm near it, in the same region (Bream Bay). District left unchecked: no station point.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
   "Solar leads (21 Nov 2026): 201 ha across three sites (NZ Herald, 2 Nov 2025) added to the About text.",
+  "Meridian's Ruakākā Energy Park page read (21 Nov 2026; source meridian-ruakaka-energy-park): 130 MW in its text and 120 MW in its metadata, AC or DC not stated; about 250,000 panels on about 163 ha of the 201 ha site; up to 230 GWh a year; connects through inverter stations and 33 kV to a switching station at the battery site, then to Transpower's Bream Bay substation. It gives no first-generation or commissioning date. The 130 MW rating stays; its basis (AC or DC) is still open.",
 ]
 
 [location]
@@ -77,6 +78,6 @@ checked = "2026-11-21"
 [[ratings]]
 value = 130.0
 basis = "Meridian's figure; also the EA register's nameplate from Oct 2026"
-source = ["meridian-ruakaka-fid", "ea-register"]
+source = ["meridian-ruakaka-fid", "meridian-ruakaka-energy-park", "ea-register"]
 grade = "A"
-checked = "2026-11-19"
+checked = "2026-11-21"

@@ -94,9 +94,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/atiamuri-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "atiamuri.webp",
+    "credit": "Photo: Ulrich Lange, CC BY-SA 3.0"
    },
    "overview": "A 77 MW hydro station on the Waikato River in Waikato, generating since 1958."
   },
@@ -119,9 +119,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/aviemore-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "aviemore.webp",
+    "credit": "Photo: Ingolfson, Public domain"
    },
    "overview": "A 220 MW hydro station on the Waitaki River in Canterbury, generating since 1968."
   },
@@ -244,9 +244,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/cobb-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "cobb.webp",
+    "credit": "Photo: Pseudopanax at English Wikipedia, Public domain"
    },
    "overview": "A 32 MW hydro station on the Cobb River in Tasman, generating since 1944."
   },
@@ -469,9 +469,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/highbank-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "highbank.webp",
+    "credit": "Photo: Bevanw58, CC BY-SA 4.0"
    },
    "overview": "A 28 MW hydro station in Canterbury, generating since 1945."
   },
@@ -494,9 +494,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/huntly-5-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "huntly-rankines.webp",
+    "credit": "Photo: Follash, Public domain"
    },
    "overview": "A 403 MW gas-fired station in Waikato, generating since 2007."
   },
@@ -519,9 +519,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/huntly-6-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "huntly-rankines.webp",
+    "credit": "Photo: Follash, Public domain"
    },
    "overview": "A 50 MW gas-fired station in Waikato, generating since 2004."
   },
@@ -569,9 +569,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/huntly-rankines-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "huntly-rankines.webp",
+    "credit": "Photo: Follash, Public domain"
    },
    "overview": "A 750 MW coal and gas station in Waikato, generating since 1982."
   },
@@ -1015,9 +1015,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/mahinerangi-waipori-b-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "mahinerangi-waipori-b.webp",
+    "credit": "Photo: Samuel Mann, CC BY 2.0"
    },
    "overview": "A 36 MW wind farm in Otago, generating since 2011."
   },
@@ -1115,9 +1115,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/matahina-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "matahina.webp",
+    "credit": "Photo: Ulrich Lange, CC BY-SA 3.0"
    },
    "overview": "An 80 MW hydro station on the Rangitāiki River in the Bay of Plenty, generating since 1967."
   },
@@ -1165,9 +1165,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/mill-creek-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "mill-creek.webp",
+    "credit": "Photo: Wainuiomartian, CC0 1.0"
    },
    "overview": "A 60 MW wind farm in Wellington, generating since 2014."
   },
@@ -1315,9 +1315,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/ohaaki-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "ohaaki.webp",
+    "credit": "Photo: SmokeySteve, Public domain"
    },
    "overview": "A 43.7 MW geothermal station on the Ōhaaki–Broadlands geothermal field in Waikato, generating since 1989."
   },
@@ -1340,9 +1340,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/ohakuri-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "ohakuri.webp",
+    "credit": "Photo: Elenz team, CC BY 4.0"
    },
    "overview": "A 109 MW hydro station on the Waikato River in Waikato, generating since 1961."
   },
@@ -1365,9 +1365,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/ohau-a-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "ohau-a.webp",
+    "credit": "Photo: Ulrich Lange, CC BY 3.0"
    },
    "overview": "A 264 MW hydro station in Canterbury, generating since 1979."
   },
@@ -1390,9 +1390,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/ohau-b-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "ohau-b.webp",
+    "credit": "Photo: Ulrich Lange, CC BY 3.0"
    },
    "overview": "A 220 MW hydro station in Canterbury, generating since 1984."
   },
@@ -1790,9 +1790,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/roxburgh-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "roxburgh.webp",
+    "credit": "Photo: Kelisi (CJMoss), CC BY-SA 3.0"
    },
    "overview": "A 320 MW hydro station on the Clutha River in Otago, generating since 1956."
   },
@@ -1965,9 +1965,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/tararua-stage-i-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "tararua-1.webp",
+    "credit": "Photo: Elenz team, CC BY 4.0"
    },
    "overview": "A 36 MW wind farm in Manawatū-Whanganui, generating since 1999."
   },
@@ -1990,9 +1990,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/tararua-stage-ii-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "tararua-3.webp",
+    "credit": "Photo: Elenz team, CC BY 4.0"
    },
    "overview": "A 37 MW wind farm in Manawatū-Whanganui, generating since 2004."
   },
@@ -2015,9 +2015,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/tararua-wind-farm-3-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "tararua-central-1.webp",
+    "credit": "Photo: Elenz team, CC BY 4.0"
    },
    "overview": "A 93 MW wind farm in Manawatū-Whanganui, generating since 2007."
   },
@@ -2090,9 +2090,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/te-apiti-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "te-apiti.webp",
+    "credit": "Photo: Pseudopanax at English Wikipedia, Public domain"
    },
    "overview": "A 90 MW wind farm in Manawatū-Whanganui, generating since 2004."
   },
@@ -2290,9 +2290,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/te-rere-hau-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "te-rere-hau.webp",
+    "credit": "Photo: Elenz team, CC BY 4.0"
    },
    "overview": "A 45.5 MW wind farm in Manawatū-Whanganui, generating since 2006."
   },
@@ -2315,9 +2315,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/te-uku-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "te-uku.webp",
+    "credit": "Photo: Symac, CC BY-SA 3.0"
    },
    "overview": "A 64.4 MW wind farm in Waikato, generating since 2010."
   },
@@ -2340,9 +2340,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/tekapo-a-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "tekapo-a.webp",
+    "credit": "Photo: Philipp Weigell, CC BY-SA 4.0"
    },
    "overview": "A 30 MW hydro station in Canterbury, generating since 1951."
   },
@@ -2365,9 +2365,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/tekapo-b-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "tekapo-b.webp",
+    "credit": "Photo: Pseudopanax at English Wikipedia, Public domain"
    },
    "overview": "A 160 MW hydro station in Canterbury, generating since 1977."
   },
@@ -2436,9 +2436,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/turitea-wind-farm-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "turitea-wind-farm.webp",
+    "credit": "Photo: Elenz team, CC BY 4.0"
    },
    "overview": "A 221.4 MW wind farm in Manawatū-Whanganui, generating since 2021."
   },
@@ -2486,9 +2486,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/waikaremoana-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "waikaremoana.webp",
+    "credit": "Photo: Searlenz, CC BY-SA 4.0"
    },
    "overview": "A 140 MW hydro station in Hawke's Bay, generating since 1929."
   },
@@ -2511,9 +2511,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/waipapa-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "waipapa.webp",
+    "credit": "Photo: russellstreet, CC BY-SA 2.0"
    },
    "overview": "A 54 MW hydro station on the Waikato River in Waikato, generating since 1961."
   },
@@ -2536,9 +2536,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/waipipi-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "waipipi.webp",
+    "credit": "Photo: Majorconvenience, CC BY-SA 4.0"
    },
    "overview": "A 133 MW wind farm in Taranaki, generating since 2020."
   },
@@ -2661,9 +2661,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/whakamaru-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "whakamaru.webp",
+    "credit": "Photo: Paradoxsm, Public domain"
    },
    "overview": "A 124 MW hydro station on the Waikato River in Waikato, generating since 1956."
   },
@@ -2736,9 +2736,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/white-hill-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "white-hill.webp",
+    "credit": "Photo: Daveosaurus, CC BY-SA 3.0"
    },
    "overview": "A 58 MW wind farm in Southland, generating since 2007."
   }

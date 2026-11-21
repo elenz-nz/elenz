@@ -148,7 +148,16 @@
    13
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "ohaaki.webp",
+   "title": "Ōhaaki geothermal power station",
+   "author": "SmokeySteve",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Ohaaki_geothermal_power_station.jpg",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

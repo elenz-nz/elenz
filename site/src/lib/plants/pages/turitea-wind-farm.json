@@ -129,7 +129,16 @@
    8
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "turitea-wind-farm.webp",
+   "title": "Turitea Wind Farm",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

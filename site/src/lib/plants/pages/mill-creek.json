@@ -128,7 +128,16 @@
    7
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "mill-creek.webp",
+   "title": "Mill Creek Wind Farm from Ohariu Bay",
+   "author": "Wainuiomartian",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Mill_Creek_wind_farm_from_Ohariu_Bay.jpg",
+   "licence": "CC0 1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

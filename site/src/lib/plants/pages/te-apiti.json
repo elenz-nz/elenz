@@ -102,7 +102,32 @@
    8
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "te-apiti.webp",
+   "title": "Te Apiti Wind Farm in early evening sunlight",
+   "author": "Pseudopanax at English Wikipedia",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Te_Apiti_wind_farm_in_early_evening_sunlight.jpg",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  {
+   "file": "te-apiti-2.webp",
+   "title": "Te Apiti Wind Farm",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "file": "te-apiti-3.webp",
+   "title": "Te Apiti Wind Farm",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

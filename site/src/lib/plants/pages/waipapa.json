@@ -126,7 +126,32 @@
    10
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "waipapa.webp",
+   "title": "Waipapa Power Station",
+   "author": "russellstreet",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Waipapa_Power_Station_-_4590618767.jpg",
+   "licence": "CC BY-SA 2.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+  },
+  {
+   "file": "waipapa-2.webp",
+   "title": "Waipapa Hydro Power Station from the air, 14 Oct 1966 (Alexander Turnbull Library)",
+   "author": "Whites Aviation",
+   "source_url": "https://digitalnz.org/records/23135737",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "file": "waipapa-3.webp",
+   "title": "Waipapa Hydro Power Station from the air, 6 Jan 1976 (Alexander Turnbull Library)",
+   "author": "Whites Aviation",
+   "source_url": "https://digitalnz.org/records/23206198",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

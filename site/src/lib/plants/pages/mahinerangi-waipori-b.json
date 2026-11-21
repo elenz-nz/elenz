@@ -108,7 +108,16 @@
    9
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "mahinerangi-waipori-b.webp",
+   "title": "Mahinerangi Wind Farm",
+   "author": "Samuel Mann",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Mahinerangi_Wind_Farm.jpg",
+   "licence": "CC BY 2.0",
+   "licence_url": "https://creativecommons.org/licenses/by/2.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

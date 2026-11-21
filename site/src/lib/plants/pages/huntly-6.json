@@ -108,7 +108,16 @@
    7
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "huntly-rankines.webp",
+   "title": "Huntly Power Station",
+   "author": "Follash",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Huntly_Power_Station.JPG",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

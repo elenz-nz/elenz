@@ -124,7 +124,32 @@
    9
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "tararua-1.webp",
+   "title": "Tararua Wind Farm",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "file": "tararua-2.webp",
+   "title": "Tararua Wind Farm",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "file": "tararua-stage-i.webp",
+   "title": "Tararua Wind Farm",
+   "author": "SmokeySteve",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Tararua_wind_farm.jpg",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",
