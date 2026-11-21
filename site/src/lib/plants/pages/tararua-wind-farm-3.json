@@ -119,15 +119,7 @@
  },
  "images": [
   {
-   "file": "tararua-stage-i.webp",
-   "title": "Tararua Wind Farm",
-   "author": "SmokeySteve",
-   "source_url": "https://commons.wikimedia.org/wiki/File:Tararua_wind_farm.jpg",
-   "licence": "Public domain",
-   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
-  },
-  {
-   "file": "tararua-stage-i-2.webp",
+   "file": "tararua-central-1.webp",
    "title": "Tararua Wind Farm",
    "author": "Elenz team",
    "source_url": "https://elenz.co.nz",
@@ -135,8 +127,8 @@
    "licence_url": "https://creativecommons.org/licenses/by/4.0/"
   },
   {
-   "file": "tararua-stage-i-3.webp",
-   "title": "Tararua Wind Farm, view across the hills",
+   "file": "tararua-central-2.webp",
+   "title": "Tararua Wind Farm",
    "author": "Elenz team",
    "source_url": "https://elenz.co.nz",
    "licence": "CC BY 4.0",
