@@ -8,7 +8,7 @@ wikidata = "Q123943279"
 osm = ["relation/12550511", "relation/12550512", "relation/12550513", "relation/12550514"]
 reviewed = "2026-11-19"
 to_check = [
-  "Boundary lead: Transpower's Assumptions Book v3.0 (30 Jun 2026; source transpower-assumptions-2026) puts one of Waipori 2A's three units at Halfway Bush (HWB220) with Waipori 1A, and the other two, with 3 and 4, at Berwick (BWK110) (para 113). If so, BWK1101's 74 MW is 2A less one unit, 3 and 4: check against the register's stations and Contact's ratings, together with Deep Stream (Waipori A)'s boundary question.",
+  "Boundary lead: Transpower's Assumptions Book v3.0, Appendix F (model inputs of 4 Jun 2026; source transpower-assumptions-2026) gives Waipori 1A 12 MW, three Waipori 2A units of 19 MW, Waipori 3 7 MW and Waipori 4 8 MW, and the book (para 113, embedded generation table p. 21) puts 1A and one 2A unit at Halfway Bush (HWB220), the other two 2A units, 3 and 4 at Berwick (BWK110); Deep Stream isn't modelled (under 10 MW). The register's 74 MW at BWK1101 is close to all three 2A units with 3 and 4 (72 MW), so the register and Transpower's node split may differ. Use with the register and the metering to settle Deep Stream (Waipori A)'s 26 MW at HWB0331.",
 ]
 notes = [
   "Elenz: Waipori (2A/3/4) 74 MW at BWK1101, plus Deep Stream (Waipori A) 26 MW at HWB0331; the rest is other embedded at HWB0331 (grade A). The register's 'Waipori A' probably means Waipori 1A, the scheme's first station, counted with Deep Stream.",

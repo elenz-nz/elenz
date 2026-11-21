@@ -103,7 +103,8 @@ export const GEO_YEARS = {
   kawerau_kgl:   [ 119,  126,  122],
   te_ahi_o_maui: [  49,   60,   61],
   // Kawerau (Onepu), KAW0112 ONU0: TOPP1 and GDL weighted by size (24 and 9 MW, Eastland Generation). Transpower's
-  // Assumptions Book v3.0 (Jun 2026) puts them behind ONU with TA2 and TA3, whose output and fuel aren't published. TOPP1 58, 74, 56;
+  // Assumptions Book v3.0 (Jun 2026) puts them behind ONU with two more geothermal units, TA2 (16 MW) and
+  // TA3 (8 MW); its Appendix F gives the four 52-60 g/kWh, ~56 by size, as 2023 here. TOPP1 58, 74, 56;
   // GDL 45, 53, 56. The first figure is CY2021, the earliest found for both (lifecycle, less the same 10 g/kWh).
   kawerau_onepu: [  54,   68,   56],
   ngawha_oec4:   [ 313,  313,   95],   // commissioned 2021; until 2023 the field's pre-reinjection figure (2020, OEC1–3)

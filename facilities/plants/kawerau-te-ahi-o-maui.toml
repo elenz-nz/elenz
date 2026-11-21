@@ -13,6 +13,7 @@ notes = [
   "Resolved (owner): Eastland Generation, the register's operator; a partnership with the Kawerau A8D Ahu Whenua Trust (Eastland; NZGA names the Te Ahi O Māui Partnership as a consent holder). Obayashi Corporation bought 50% of Eastland Generation in April 2024.",
   "Grid connection: the register moved it from KAW0111 (to 3 Sep 2025) to KAW2201, the connection it now shares with TOPP2; both are at the Kawerau substation's point.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "Transpower's Assumptions Book v3.0, Appendix F (model inputs of 4 Jun 2026; source transpower-assumptions-2026): Kawerau_TAM modelled at 27 MW and 66 g CO2e/kWh.",
 ]
 
 [location]

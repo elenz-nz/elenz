@@ -18,6 +18,7 @@ notes = [
   "Region from the grid connection point in Stats NZ's 2025 region boundaries, 19 Nov 2026. No district published: the point is a substation, and Whakatāne District is 150–200 m from it.",
   "LINZ aerial check (18 Nov 2026): station point not set, grid connection point confirmed.",
   "Transpower's Assumptions Book v3.0 (30 Jun 2026; source transpower-assumptions-2026), footnote 22: em6's 'KAW110 ONU' value covers Onepu_KA24, Onepu_TA2, Onepu_TA3 and Onepu_TOPP1; Transpower's security of supply assessment counts them as one 60 MW unit. Its embedded generation table (p. 21) lists the same four, plus Kawerau_TAM, at KAW110 (customers Horizon and Norske Skog). Added 21 Nov 2026; the generation method page's note names them.",
+  "Transpower's Assumptions Book v3.0, Appendix F (model inputs of 4 Jun 2026; source transpower-assumptions-2026): all four Onepu units are existing geothermal generators: TOPP1 24 MW, TA2 16, TA3 8, KA24 8 (56 MW), with emission rates 52, 60, 60 and 58 g CO2e/kWh (about 56 weighted by size). The same four units are listed in v2.0 (Nov 2024). Added 21 Nov 2026.",
 ]
 
 [grid_connection]
