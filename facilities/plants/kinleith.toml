@@ -18,6 +18,7 @@ notes = [
   "Fuel: the EA register says cogeneration on gas; Wikipedia and the bioenergy association say it burns wood waste. Elenz shows bioenergy (design decision, 2 Nov 2026).",
   "Previous owners (not published until the owner is settled): ECNZ, through Kinleith Cogeneration Limited, to 1999; Genesis Power, from 1999 (Gazette 1999-37; Genesis still had it in 2003, Commerce Commission decision 490).",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
+  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026): a changed point of connection for CHHE load, with CHHE added at KIN, effective 1 Jan 2026 (Oji Fibre and Powerco). About the mill's load, not the cogeneration.",
 ]
 
 [location]

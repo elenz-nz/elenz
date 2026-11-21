@@ -8,6 +8,7 @@ osm = ["way/1516694558"]
 reviewed = "2026-11-19"
 to_check = [
   "Lead (20 Nov 2026): LINZ's Overseas Investment Office decision on Dannevirke SF LP records 37.4 ha of leased land at 440 Tamaki River Road. Add it to plant_sources.csv if its page can be read (LINZ's pages have refused automated reads before).",
+  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large plant connected\" adjustment event at DVK (new customer Dannevirke SF Limited), effective 10 Jul 2026. Elenz counts it from 29 Apr 2026 (the register). Check which date the page should give.",
 ]
 notes = [
   "Capacity: Elenz uses the register's 19 MW since 19 Nov 2026 (design decision); the earlier 23 MW is the panels' DC rating.",

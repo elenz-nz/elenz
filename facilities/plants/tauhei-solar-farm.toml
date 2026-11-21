@@ -17,6 +17,7 @@ notes = [
   "Capacity: Elenz uses the register's 147 MW; sources give 150 MW AC (not published, no owner source read) and 202 MWp.",
   "Full commercial operation was targeted for September to October 2026 (PV Tech).",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
+  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) adds Harmony Energy NZ Ltd as a new customer at WHU for the Tauhei solar farm (event processed 10 Nov 2026).",
 ]
 
 [location]

@@ -7,7 +7,9 @@ register = ["W007"]
 wikidata = "Q5684897"
 osm = ["relation/13730358"]
 reviewed = "2026-11-19"
-to_check = []
+to_check = [
+  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large plant connected\" adjustment event at HRP (Meridian), effective 13 Jun 2023. Elenz counts it from 1 Nov 2023 (88 MW, then 176 MW from May 2024). Check whether first power was in June 2023.",
+]
 notes = [
   "88 MW from Nov 2023, 176 MW from May 2024.",
   "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",

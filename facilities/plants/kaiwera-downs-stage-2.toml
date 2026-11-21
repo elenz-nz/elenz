@@ -6,7 +6,9 @@ name = "Kaiwera Downs (Stage 2)"
 register = ["W026"]
 osm = ["relation/17250859"]
 reviewed = "2026-11-19"
-to_check = []
+to_check = [
+  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded plant connected\" adjustment event at KIW (Tararua Wind Power), with no effective date given (event processed 5 Oct 2026). Elenz counts it from 31 Mar 2026 (the register). Check whether stage 2 was fully commissioned later.",
+]
 notes = [
   "Kaiwera Downs is two Elenz plants: stage 1 (43 MW, GOR0331, from Aug 2023) and stage 2 (155 MW, KIW2201, from Apr 2026).",
   "Mercury's wind farm page has slips: stage 1 \"Commissioned in 2013\" (its text says November 2023), \"12km north-west of Gore\" (its fact sheet: 15 km south-east), and stage 2 \"35 wind turbines with an installed capacity of 43MW\" (elsewhere 36 and 155 MW). Facts here use the fact sheet, the September 2026 release and the page's consistent figures.",

@@ -19,6 +19,7 @@ notes = [
   "Dropped the \"Bay of Plenty\" scheme lead: solar farms have no scheme.",
   "Mounting: bifacial panels that track the sun (BraveTrace).",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point moved to the substation.",
+  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded plant connected\" adjustment event at EDG (Horizon), effective 6 Mar 2024; consistent with Elenz's Mar 2024 start.",
 ]
 
 [location]
