@@ -5,16 +5,20 @@
  "fuel": "hydro",
  "island": "SI",
  "status": "operating",
- "mw": 12.0,
+ "mw": 4.3,
  "steps": [
   {
    "from": null,
    "to": null,
-   "mw": 12.0,
+   "mw": 4.3,
    "sources": [
     {
-     "label": "EA plant register (DispatchedGenerationPlant.csv)",
-     "url": ""
+     "label": "Wikipedia, Roaring Meg hydro scheme",
+     "url": "https://en.wikipedia.org/wiki/Roaring_Meg_hydro_scheme"
+    },
+    {
+     "label": "pioneerenergyrenewables.co.nz",
+     "url": "https://www.pioneerenergyrenewables.co.nz/our-locations/roaring-meg-hydro"
     }
    ]
   }
@@ -104,7 +108,7 @@
    "refs": [
     2
    ],
-   "value": "4.3 MW (Wikipedia: lower station 3.0 MW and upper 1.26 MW, two turbines each (Elenz uses the EA register's 12 MW))"
+   "value": "4.3 MW (Wikipedia: lower station 3.0 MW and upper 1.26 MW, two turbines each; Elenz uses it in place of the EA register's 12 MW)"
   },
   {
    "k": "grid_connection",
