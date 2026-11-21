@@ -247,7 +247,7 @@
 		background: rgb(255 255 255 / 0.88); color: #132020; }
 	.lightbox .shut:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 	@media (max-width: 600px) { .lightbox .stage { padding: 56px 0 0; } .lightbox .cap { padding: 0 12px; } }
-	.basemap { position: absolute; bottom: 24px; left: 8px; right: auto; top: auto; z-index: 2; background: var(--surface); box-shadow: 0 1px 3px rgb(0 0 0 / 0.3); }
+	.basemap { position: absolute; top: 46px; right: 8px; left: auto; bottom: auto; z-index: 2; background: var(--surface); box-shadow: 0 1px 3px rgb(0 0 0 / 0.3); }
 	.views { position: absolute; top: 8px; right: 8px; background: var(--surface); box-shadow: 0 1px 3px rgb(0 0 0 / 0.3); }
 	.locator { position: absolute; left: 8px; bottom: 8px; width: auto; height: 34%; max-height: 120px; aspect-ratio: auto;
 		background: rgb(255 255 255 / 0.9); border-radius: 4px; padding: 4px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.3); pointer-events: none; }

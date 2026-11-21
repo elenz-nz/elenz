@@ -199,7 +199,7 @@ credited; closing leaves the strip on the photo last viewed. `plant_images.csv`'
 sets `object-position` for the cropped frame, so a tall photo's subject stays in view; blank centres it. Location: the plant's LINZ aerial views (Site, Close and Wide, about 450 m, 1 km and 7.5 km across; a switch that
 only swaps the image's address; credited with the imagery collection, Toitū Te Whenua LINZ, CC BY 4.0) and, with the
 LINZ key, a Map view (the index's MapLibre and `topolite-v2` style, loaded only when Map is chosen, centred on the point,
-with cooperative gestures so it doesn't catch the page's scrolling), a Map / Satellite switch (design decision, 22 Nov 2026: LINZ's aerial tiles as a raster layer over the basemap, `aerialSource()` in `map.js`, shown or hidden without reloading the map), a small locator of the plant's island in the corner
+with cooperative gestures so it doesn't catch the page's scrolling), a Map / Satellite switch just under the Site / Map switch, only while Map is chosen (design decision, 22 Nov 2026: LINZ's aerial tiles as a raster layer over the basemap, `aerialSource()` in `map.js`, shown or hidden without reloading the map), a small locator of the plant's island in the corner
 (`islandBox()` in `map.js` frames the one island's outline: the whole-country map was hard to read in light mode), and
 the coordinates with their source under it. With no photo, the Location tab leads alone; every plant with a checked
 point has aerial views (design decision, 19 Nov 2026). Without JavaScript the first tab's first view shows. The views are WebP files in `static/plants/aerial/`, made by
