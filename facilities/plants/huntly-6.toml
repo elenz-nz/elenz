@@ -15,6 +15,7 @@ notes = [
   "Thermal batch 1 (19 Nov 2026): facts checked against Genesis's Huntly page, the EA register and Stats NZ boundaries. Built by Genesis, so no previous owners. District and region as for the Rankines (same site).",
   "Capacity: Genesis gives 50.8 MW, the EA register 50 MW (Elenz uses 50); Wikipedia's list 48.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
+  "Commissioned date rule (21 Nov 2026): first metered day 2004-05-20, from HLY2201 huntly_p40. The previous value moved to alt.",
 ]
 
 [location]
@@ -47,10 +48,17 @@ checked = ""
 note = "Wikipedia's Genesis Energy article: Huntly P40 (Unit 6)"
 
 [facts.commissioned]
+value = "2004-05-20"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; the register's start date is 2004, a year"
+
+[[facts.commissioned.alt]]
 value = "2004"
 source = ["genesis-huntly", "ea-register"]
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 
 [facts.units]
 value = "1 open cycle gas turbine of 50.8 MW, able to burn gas or diesel"

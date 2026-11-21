@@ -10,6 +10,7 @@ reviewed = ""
 to_check = [
   "Previous owners: Wikipedia's dates (Crown-owned 2004–11, bought by Contact on 22 Dec 2011) rest on government and Contact releases it cites; find one of them to raise the grade.",
   "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
+  "History: Elenz's monthly history shows small amounts under Whirinaki before the station was built (Aug 1997 to May 2000, up to 323 MWh in a month), from the Generation_MD code WHI2201 whirinaki. Find what generated there then and whether metered_plants.csv should give those months to another plant or drop them (analysis/first_metered.py, 21 Nov 2026).",
 ]
 notes = [
   "156 MW from Apr 2004.",
@@ -18,6 +19,7 @@ notes = [
   "Capacity: Contact's page says 155 MW in its text and 156 MW in its figures; the EA register 156 MW to Nov 2023, then three units of 52 MW (156 MW).",
   "The earlier station on the site (NZED, 1978): four twin-pack units with Pratt & Whitney FT4 gas turbines, 220 MW, burning diesel and seldom run; one unit moved to the Te Awamutu dairy factory cogeneration plant in 1993 and the other three were sold to Australia in 2001 (Wikipedia). It was among the stations ECNZ sold to Contact on 1 Feb 1996 (Gazette 1996-174). Before Elenz's data begins (a few hours at WHI2201 in 1997–2000 have no known plant: plant_capacity.csv note).",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
+  "Commissioned date rule (21 Nov 2026): first metered day 2004-04-05, from WHI2201 whirinaki: the station first ran on 5 Apr 2004 (52 MW). The same code shows small amounts between Aug 1997 and May 2000 (see to_check). The previous value moved to alt.",
 ]
 
 [location]
@@ -43,10 +45,17 @@ grade = "A"
 checked = "2026-11-19"
 
 [facts.commissioned]
+value = "2004-04-05"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; opened in June 2004 (Wikipedia)"
+
+[[facts.commissioned.alt]]
 value = "2004"
 source = ["contact-whirinaki", "ea-register"]
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "Wikipedia: opened in June 2004"
 
 [facts.units]

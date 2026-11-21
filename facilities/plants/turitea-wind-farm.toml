@@ -18,6 +18,7 @@ notes = [
   "Removed the scheme fact (Tararua Range, from our own register): a single wind farm has no scheme.",
   "Previous owners: none. Mercury was called Mighty River Power until 2016 (nzx-mcy); the same company.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "Commissioned date rule (21 Nov 2026): first metered day 2021-07-30, from LTN2201 turitea: readings of a few kWh from 19 Jul 2021, the first 1 MWh day 30 Jul 2021. The previous value moved to alt.",
 ]
 
 [location]
@@ -37,10 +38,17 @@ checked = "2026-11-19"
 note = "code matches the EA's network supply points table of 17 Nov 2026; its point is Transpower's Linton substation, where the 220 kV line from the farm ends"
 
 [facts.commissioned]
+value = "2021-07-30"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; the northern stage; first power on 30 July 2021 (Wikipedia); the southern stage followed and the farm was formally opened in May 2023"
+
+[[facts.commissioned.alt]]
 value = "2021 (northern stage), 2023 (southern stage)"
 source = ["wp-turitea", "mercury-turitea"]
 grade = "B"
-checked = "2026-11-19"
+checked = ""
 note = "first power on 30 July 2021; formally opened in May 2023"
 
 [[facts.commissioned.alt]]

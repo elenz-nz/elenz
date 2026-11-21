@@ -10,7 +10,6 @@ reviewed = "2026-11-19"
 to_check = [
   "Sources: Lodestone's site refuses automated reads, so this farm's facts rest mainly on BraveTrace's device sheet (Lodestone's page read only through search results). Check Lodestone's page by hand.",
   "Optional, About text: the developer's estimate of about 49 GWh a year (Lodestone) could be added, worded as an estimate, not as metered output.",
-  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded plant connected\" adjustment event at KPU (Powerco), effective 17 Dec 2025. Elenz counts it from 18 Nov 2025 (the register). For the page's commissioned date, use the first metered date (facilities/PLANTS.md, design decision 21 Nov 2026); put this date and the register's in the fact's note.",
 ]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against BraveTrace's device sheet, Lodestone's release on Scoop, the EA register and network supply points table, and Stats NZ boundaries.",
@@ -19,6 +18,7 @@ notes = [
   "First generation: BraveTrace says November 2025 (commissioned 17 Nov); Lodestone announced it on 4 Dec 2025.",
   "Dropped the \"Coromandel\" scheme lead.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "Resolved: Appendix D commissioning lead. Commissioned date rule (21 Nov 2026): owner's date kept: KPU0661 pāmu_rā_ki_whitianga_solar_farm: under 1 MW until 15 Feb 2026 while dispatch had 3.7 GWh in Dec 2025, so the meter's start isn't the farm's; the owner's date stays.",
 ]
 
 [location]
@@ -48,8 +48,15 @@ note = "Lodestone's page address uses it; not yet seen as a name in its own righ
 value = "2025"
 source = ["bt-whitianga", "ea-register"]
 grade = "A"
-checked = "2026-11-19"
-note = "BraveTrace 17 Nov 2025; the register's row starts 19 Nov 2025"
+checked = "2026-11-21"
+note = "BraveTrace 17 Nov 2025; the register's row starts 19 Nov 2025; BraveTrace 17 November 2025; the register's row starts 19 November 2025; the EA's metered data shows little output before February 2026, after the farm began"
+
+[[facts.commissioned.alt]]
+value = "2025-12-17"
+source = "transpower-appendix-d-2026"
+grade = "A"
+checked = ""
+note = "Transpower's transmission charging date, not necessarily first output"
 
 [[facts.commissioned.alt]]
 value = "2025"

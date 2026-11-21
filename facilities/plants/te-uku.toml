@@ -17,6 +17,7 @@ notes = [
   "Ownership: Wikipedia says WEL Networks and Meridian own it jointly. Meridian's page and its 2011 release describe an alliance: Meridian built and runs the turbines, WEL built and runs the 33 kV line. The EA register names Meridian. Published Meridian, with the alliance in the about text.",
   "Removed the scheme fact (Waikato, from our own register): a single wind farm has no scheme.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
+  "Commissioned date rule (21 Nov 2026): first metered day 2010-11-23, from TWH0331 te_uku: readings of a few kWh from 8 Nov 2010, the first 1 MWh day 23 Nov 2010. The previous value moved to alt.",
 ]
 
 [location]
@@ -36,10 +37,17 @@ checked = "2026-11-18"
 note = "code from the EA's network supply points table; the point is the substation, read from the LINZ aerial, 18 Nov 2026 (the table's point was [-37.738330, 175.154140])"
 
 [facts.commissioned]
+value = "2010-11-23"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; Meridian: the first turbine went live on 13 November 2010; switched on formally in February 2011"
+
+[[facts.commissioned.alt]]
 value = "2011"
 source = ["meridian-te-uku-2011", "ea-register"]
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "the first turbine went live on 13 November 2010; switched on formally in February 2011"
 
 [[facts.commissioned.alt]]

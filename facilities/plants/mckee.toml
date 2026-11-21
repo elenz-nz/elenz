@@ -17,6 +17,7 @@ notes = [
   "Commissioned: Todd says in use since 2012 (Elenz's history has its output from Sep 2012); Wikipedia says it was officially opened in March 2013; the EA register 2013 (a year).",
   "The 2 MW reciprocating units in Wikipedia's list are Todd's 2008 waste-gas cogeneration at the McKee plant (Scoop, 16 Jun 2008), not part of this 100 MW peaker or of Elenz's McKee. Stations kept unpublished.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
+  "Commissioned date rule (21 Nov 2026): first metered day 2012-09-17, from MKE1101 McKee. The previous value moved to alt.",
 ]
 
 [location]
@@ -42,10 +43,17 @@ grade = "A"
 checked = "2026-11-19"
 
 [facts.commissioned]
+value = "2012-09-17"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; Todd: in use since 2012; officially opened in March 2013 (Wikipedia)"
+
+[[facts.commissioned.alt]]
 value = "2012"
 source = "todd-power-plants"
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "Todd: in use since 2012; officially opened in March 2013 (Wikipedia)"
 
 [[facts.commissioned.alt]]

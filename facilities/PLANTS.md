@@ -88,7 +88,15 @@ MW), the live panel and the history come from Elenz's own data, not from these f
 **Which date `commissioned` gives** (design decisions, 21 Nov 2026):
 
 - A plant metered from the start: the first metered date, the first half-hour of output in the EA's metered
-  generation (Generation_MD, or the grid meter for a plant without its own row).
+  generation (Generation_MD, or the grid meter for a plant without its own row). In practice the first day the meter
+  records at least 1 MWh: readings of a few kWh days or months before that are meter tests or station supply, not
+  output (Huntly 5, Te Uku, Turitea, Tauhara). `analysis/first_metered.py` lists every code's and embedded meter's
+  first output (sources `ea-generation-md`, `ea-embedded-generation`). A meter whose first month already shows the
+  plant running (Kaiwera Downs, Tararua stage I), or one that read far less than dispatch at first (Pāmu Rā ki
+  Whitianga, Rotohiko), started after the plant did: use the owner's date. A plant sharing a code with another
+  (Kawerau (TOPP2) with Te Ahi O Māui) or with no reading of its own (Taiohi, Twin Rivers, the Glenbrook-Ohurua
+  and Huntly batteries; Kōwhai Park, Clandeboye and Kaiwaikawe read zero in Generation_MD) uses the owner's date too,
+  unless an embedded meter shows its own first output (Kōwhai Park).
 - A plant commissioned before the metered history starts (Aug 1997), or one that ran for some time before it was
   metered, or one never metered: the owner's commissioning date.
 - A meter covering several stations commissioned at different times (Kawerau (Onepu)): no commissioned date; the

@@ -68,7 +68,7 @@
  "scheme": null,
  "metered": null,
  "checking": false,
- "checked": "2026-11-19",
+ "checked": "2026-11-21",
  "about": {
   "text": "Te Rere Hau is on the Tararua Range about 11 km east of Palmerston North. NZ Windfarms built it in four stages from 2006 to 2011 with 97 two-bladed Windflow 500 turbines of 500 kW, designed and made in New Zealand, which set it apart from its neighbours. Meridian, already its partner in a plan to replace them with far larger turbines, bought NZ Windfarms in July 2025.",
   "refs": [
@@ -81,11 +81,11 @@
   {
    "k": "commissioned",
    "label": "Commissioned",
-   "value": "2006",
+   "value": "1 September 2006",
    "refs": [
-    2
+    4
    ],
-   "note": "built in four stages, 2006 to 2011"
+   "note": "the first day of output in the EA's metered data; the first stage; built in four stages, 2006 to 2011; the register's start date, 2011, is the last stage's"
   },
   {
    "k": "units",
@@ -102,7 +102,7 @@
    "label": "Region",
    "value": "Manawatū-Whanganui",
    "refs": [
-    4
+    5
    ]
   },
   {
@@ -110,7 +110,7 @@
    "label": "District",
    "value": "Palmerston North",
    "refs": [
-    5
+    6
    ]
   },
   {
@@ -139,7 +139,7 @@
    "label": "Connection point",
    "value": "Nz Windfarms (TWC2201)",
    "refs": [
-    6
+    7
    ]
   }
  ],
@@ -148,7 +148,7 @@
   "lon": 175.734445,
   "basis": "station",
   "refs": [
-   7
+   8
   ]
  },
  "images": [],
@@ -196,27 +196,34 @@
   },
   {
    "n": 4,
+   "title": "Embedded generation (Embedded_generation)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Metered_data/Embedded_generation",
+   "opened": "2026-11-21"
+  },
+  {
+   "n": 5,
    "title": "Regional Council 2025 (boundaries)",
    "publisher": "Stats NZ",
    "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
    "opened": "2026-11-19"
   },
   {
-   "n": 5,
+   "n": 6,
    "title": "Territorial Authority 2026 (boundaries)",
    "publisher": "Stats NZ",
    "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
    "opened": "2026-11-19"
   },
   {
-   "n": 6,
+   "n": 7,
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
   },
   {
-   "n": 7,
+   "n": 8,
    "title": "LINZ aerial imagery (LINZ Basemaps)",
    "publisher": "Toitū Te Whenua LINZ",
    "url": "https://basemaps.linz.govt.nz/",

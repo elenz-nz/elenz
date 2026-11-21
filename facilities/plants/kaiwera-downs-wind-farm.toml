@@ -6,9 +6,7 @@ name = "Kaiwera Downs Wind Farm"
 register = ["W022"]
 osm = ["relation/17250859"]
 reviewed = "2026-11-19"
-to_check = [
-  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded plant connected\" adjustment event at GOR (PowerNet), effective 15 Oct 2023. Elenz counts stage 1 from 1 Aug 2023. For the page's commissioned date, use the first metered date (facilities/PLANTS.md, design decision 21 Nov 2026); put this date and the register's in the fact's note.",
-]
+to_check = []
 notes = [
   "Kaiwera Downs is two Elenz plants: stage 1 (43 MW, GOR0331, from Aug 2023) and stage 2 (155 MW, KIW2201, from Apr 2026).",
   "Mercury's wind farm page has slips: stage 1 \"Commissioned in 2013\" (its text says November 2023), \"12km north-west of Gore\" (its fact sheet: 15 km south-east), and stage 2 \"35 wind turbines with an installed capacity of 43MW\" (elsewhere 36 and 155 MW). Facts here use the fact sheet, the September 2026 release and the page's consistent figures.",
@@ -18,6 +16,7 @@ notes = [
   "District and region from Wikipedia's point (-46.24139, 169.05583) in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026: Gore District, with Southland District within 5 km, not within 2 km. The grid connection (Gore) is also in Gore District.",
   "Resolved: Capacity: Mercury gives 10 turbines and 43 MW, matching Elenz and the register. Peak metered half-hour, Aug-Sep 2026: 40.7 MW.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "Resolved: Appendix D commissioning lead. Commissioned date rule (21 Nov 2026): owner's date kept: GOR0331 KaiweraDowns and the embedded meter both start at midnight on 1 Sep 2023 with the farm already running, so the owner's date stays.",
 ]
 
 [location]
@@ -40,8 +39,15 @@ note = "code and point match the EA's network supply points table of 17 Nov 2026
 value = "2023"
 source = ["mercury-kaiwera-downs", "mercury-kaiwera-downs-factsheet"]
 grade = "A"
-checked = "2026-11-19"
-note = "opened in November 2023"
+checked = "2026-11-21"
+note = "opened in November 2023; opened in November 2023; the register gives 1 August 2023; the EA's metered data starts in September 2023, after the farm began"
+
+[[facts.commissioned.alt]]
+value = "2023-10-15"
+source = "transpower-appendix-d-2026"
+grade = "A"
+checked = ""
+note = "Transpower's transmission charging date, not necessarily first output"
 
 [[facts.commissioned.alt]]
 value = "2023"

@@ -23,7 +23,7 @@
  "scheme": null,
  "metered": null,
  "checking": false,
- "checked": "2026-11-19",
+ "checked": "2026-11-21",
  "about": {
   "text": "Pāmu Rā ki Whitianga is Lodestone Energy's fourth solar farm, on the outskirts of Whitianga, and the first utility-scale solar farm on the Coromandel. Its 53,400 bifacial panels track the sun, and it started generating in November 2025. Ngāti Hei gifted the name, which means \"solar farm of Whitianga\".",
   "refs": [
@@ -40,7 +40,7 @@
     1,
     3
    ],
-   "note": "BraveTrace 17 Nov 2025; the register's row starts 19 Nov 2025"
+   "note": "BraveTrace 17 Nov 2025; the register's row starts 19 Nov 2025; BraveTrace 17 November 2025; the register's row starts 19 November 2025; the EA's metered data shows little output before February 2026, after the farm began"
   },
   {
    "k": "region",

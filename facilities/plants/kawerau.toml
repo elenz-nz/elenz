@@ -17,6 +17,7 @@ notes = [
   "Built by Mighty River Power, Mercury's former name, so there are no previous owners.",
   "District from the checked point (Stats NZ, 19 Nov 2026): Kawerau; Whakatāne is within 300 m.",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
+  "Commissioned date rule (21 Nov 2026): first metered day 2008-06-26, from KAW1101 kawerau_new. The previous value moved to alt.",
 ]
 
 [location]
@@ -36,10 +37,17 @@ checked = "2026-11-19"
 note = "code and point match the EA's network supply points table of 17 Nov 2026 and the register's connection for Kawerau; the substation is near the mill (POWER)"
 
 [facts.commissioned]
+value = "2008-06-26"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; operating from August 2008 and officially opened in late November 2008; construction began in January 2007"
+
+[[facts.commissioned.alt]]
 value = "2008"
 source = ["mercury-kawerau", "powermag-kawerau-2009"]
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "operating from August 2008 and officially opened in late November 2008; construction began in January 2007"
 
 [[facts.commissioned.alt]]

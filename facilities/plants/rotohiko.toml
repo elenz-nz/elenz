@@ -8,7 +8,6 @@ osm = ["way/1363799736"]
 reviewed = "2026-11-19"
 to_check = [
   "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
-  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded plant connected\" adjustment event at HLY (WEL Networks; RHO), effective 1 Nov 2023. Elenz counts it from 23 Nov 2023 (the register). For the page's commissioned date, use the first metered date (facilities/PLANTS.md, design decision 21 Nov 2026); put this date and the register's in the fact's note.",
 ]
 notes = [
   "Added from Elenz's plant list (8 Nov 2026).",
@@ -18,6 +17,7 @@ notes = [
   "Connection: embedded in WEL Networks' network (Infratec: its 33 kV network); the EA's grid point is HLY0331 Huntly, the same coordinates as HLY2201. Region and district from that point (Waikato District; no other district within 3 km); the sources place the battery near Huntly power station.",
   "Dropped the Wikipedia-list rating lead (35/33, basis unknown): the EA gives 35 MW / 35 MWh. Storage is in units and About.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
+  "Resolved: Appendix D commissioning lead. Commissioned date rule (21 Nov 2026): owner's date kept: HLY0331 rotohiko: the code appears in Aug 2024 and reads from 21 Nov 2024, while dispatch has it discharging from Dec 2023, so the owner's date stays.",
 ]
 
 [location]
@@ -40,8 +40,15 @@ note = "code from the EA's network supply points table; the point is the substat
 value = "2023"
 source = ["ea-register", "ea-batteries-2024"]
 grade = "A"
-checked = "2026-11-19"
-note = "the register's row starts 23 Nov 2023; the EA: commissioned in 2023, began charging and discharging into the grid in 2024"
+checked = "2026-11-21"
+note = "the register's row starts 23 Nov 2023; the EA: commissioned in 2023, began charging and discharging into the grid in 2024; the register's row starts 23 November 2023; the EA: commissioned in 2023, began charging and discharging into the grid in 2024; the EA's metered data starts in November 2024, after the battery began"
+
+[[facts.commissioned.alt]]
+value = "2023-11-01"
+source = "transpower-appendix-d-2026"
+grade = "A"
+checked = ""
+note = "Transpower's transmission charging date, not necessarily first output"
 
 [facts.units]
 value = "Storing 35 MWh (one hour at full output)"

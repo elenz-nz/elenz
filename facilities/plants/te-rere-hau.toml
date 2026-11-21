@@ -18,6 +18,7 @@ notes = [
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
   "Transpower's Assumptions Book v3.0 (30 Jun 2026; source transpower-assumptions-2026), para 136 a: Transpower models the repowering as staged commissioning from 2029, the developer's stated intention, and notes the project hadn't reached financial close.",
   "Transpower's Assumptions Book v3.0, Appendix F (model inputs of 4 Jun 2026; source transpower-assumptions-2026): 46 MW now, repowered to 170 MW in 2030 (sheet 5b).",
+  "Commissioned date rule (21 Nov 2026): first metered day 2006-09-01, from embedded meter TRH0111: readings of a few kWh from 29 Aug 2006, the first 1 MWh day 1 Sep 2006; the tracker's own series for Te Rere Hau starts at TWC2201 in Sep 2008. The previous value moved to alt.",
 ]
 
 [location]
@@ -37,10 +38,17 @@ checked = "2026-11-19"
 note = "code and point match the EA's network supply points table of 17 Nov 2026; shared with Tararua stage III"
 
 [facts.commissioned]
+value = "2006-09-01"
+source = "ea-embedded-generation"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; the first stage; built in four stages, 2006 to 2011; the register's start date, 2011, is the last stage's"
+
+[[facts.commissioned.alt]]
 value = "2006"
 source = "meridian-te-rere-hau"
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "built in four stages, 2006 to 2011"
 
 [[facts.commissioned.alt]]

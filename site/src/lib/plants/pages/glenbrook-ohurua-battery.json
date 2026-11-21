@@ -23,7 +23,7 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": "2026-11-19",
+ "checked": "2026-11-21",
  "about": {
   "text": "Glenbrook-Ohurua Battery is Contact Energy's first grid-scale battery, on land leased from New Zealand Steel at its Glenbrook site in South Auckland, close to Auckland's demand and to the national grid. Its 56 Tesla Megapack units can deliver 100 MW for about two hours, storing 200 MWh. Work began in July 2024, it started trading on 1 April 2026 and was officially opened in May 2026. A second, 200 MW battery is being built beside it, due online in early 2028.",
   "refs": [
@@ -49,7 +49,7 @@
     1,
     2
    ],
-   "note": "trading from 1 April 2026, officially opened 21 May 2026"
+   "note": "trading from 1 April 2026, officially opened 21 May 2026; trading from 1 April 2026, officially opened 21 May 2026; the register gives 2025; the EA's metered data has no row of its own for the battery"
   },
   {
    "k": "units",

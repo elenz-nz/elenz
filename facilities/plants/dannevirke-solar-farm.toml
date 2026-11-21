@@ -8,7 +8,6 @@ osm = ["way/1516694558"]
 reviewed = "2026-11-19"
 to_check = [
   "Lead (20 Nov 2026): LINZ's Overseas Investment Office decision on Dannevirke SF LP records 37.4 ha of leased land at 440 Tamaki River Road. Add it to plant_sources.csv if its page can be read (LINZ's pages have refused automated reads before).",
-  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large plant connected\" adjustment event at DVK (new customer Dannevirke SF Limited), effective 10 Jul 2026. Elenz counts it from 29 Apr 2026 (the register). For the page's commissioned date, use the first metered date (facilities/PLANTS.md, design decision 21 Nov 2026); put this date and the register's in the fact's note.",
 ]
 notes = [
   "Capacity: Elenz uses the register's 19 MW since 19 Nov 2026 (design decision); the earlier 23 MW is the panels' DC rating.",
@@ -17,6 +16,7 @@ notes = [
   "Mounting: single-axis trackers (GameChange Genius Tracker 1P; tracker commissioning finished 25 Aug 2026).",
   "Owner: the register's operator is Dannevirke Solar Farm Ltd (the consent applicant); SolarQuarter calls it Bright Fern Energy's farm.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "Resolved: Appendix D commissioning lead. Commissioned date rule (21 Nov 2026): first metered day 2026-06-12, from DVK0111 dannevirke_solar_farm; the code appears in May 2026. The previous value moved to alt.",
 ]
 
 [location]
@@ -36,11 +36,25 @@ checked = "2026-11-19"
 note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
+value = "2026-06-12"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; the register's row starts 30 April 2026; trackers commissioned August 2026"
+
+[[facts.commissioned.alt]]
 value = "2026"
 source = "ea-register"
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "the register's row starts 30 Apr 2026; trackers commissioned August 2026"
+
+[[facts.commissioned.alt]]
+value = "2026-07-10"
+source = "transpower-appendix-d-2026"
+grade = "A"
+checked = ""
+note = "Transpower's transmission charging date, not necessarily first output"
 
 [facts.region]
 value = "Manawatū-Whanganui"

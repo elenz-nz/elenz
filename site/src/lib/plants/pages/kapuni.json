@@ -23,7 +23,7 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": "2026-11-19",
+ "checked": "2026-11-21",
  "about": {
   "text": "Kapuni is a gas-fired cogeneration plant at the Kapuni gas treatment plant in South Taranaki, which processes the gas from the Kapuni field. Run by the Kapuni Energy Joint Venture, it makes both electricity and steam for the site. It has generated since 1998.",
   "refs": [
@@ -37,12 +37,11 @@
   {
    "k": "commissioned",
    "label": "Commissioned",
-   "value": "1998",
+   "value": "18 March 1998",
    "refs": [
-    4,
     5
    ],
-   "note": "the register's start date, 1998-01-01: a year; our data has its output from March 1998"
+   "note": "the first day of output in the EA's metered data; the register's start date is 1998, a year"
   },
   {
    "k": "units",
@@ -152,10 +151,10 @@
   },
   {
    "n": 5,
-   "title": "List of power stations in New Zealand",
-   "publisher": "Wikipedia",
-   "url": "https://en.wikipedia.org/wiki/List_of_power_stations_in_New_Zealand",
-   "opened": "2026-11-19"
+   "title": "Generation output by plant (Generation_MD)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/Generation_MD",
+   "opened": "2026-11-21"
   },
   {
    "n": 6,

@@ -6,9 +6,7 @@ name = "Kaiwera Downs (Stage 2)"
 register = ["W026"]
 osm = ["relation/17250859"]
 reviewed = "2026-11-19"
-to_check = [
-  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded plant connected\" adjustment event at KIW (Tararua Wind Power), with no effective date given (event processed 5 Oct 2026). Elenz counts it from 31 Mar 2026 (the register). For the page's commissioned date, use the first metered date (facilities/PLANTS.md, design decision 21 Nov 2026); put this date and the register's in the fact's note.",
-]
+to_check = []
 notes = [
   "Kaiwera Downs is two Elenz plants: stage 1 (43 MW, GOR0331, from Aug 2023) and stage 2 (155 MW, KIW2201, from Apr 2026).",
   "Mercury's wind farm page has slips: stage 1 \"Commissioned in 2013\" (its text says November 2023), \"12km north-west of Gore\" (its fact sheet: 15 km south-east), and stage 2 \"35 wind turbines with an installed capacity of 43MW\" (elsewhere 36 and 155 MW). Facts here use the fact sheet, the September 2026 release and the page's consistent figures.",
@@ -18,6 +16,7 @@ notes = [
   "Region: Mercury's fact sheet thanks Environment Southland for stage 2, and Wikipedia's point for the farm has only Southland Region within 5 km; published Southland. District left open.",
   "Resolved: Capacity: Mercury gives 36 turbines and 155 MW, matching Elenz and the register. Elenz starts it on 31 Mar 2026, the register row on 1 Apr 2026; Mercury says it first generated in April 2026.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point added (the substation).",
+  "Resolved: Appendix D commissioning lead. Commissioned date rule (21 Nov 2026): first metered day 2026-04-01, from KIW2201 kaiwera_downs_(stage_2); the code appears in March 2026. The previous value moved to alt.",
 ]
 
 [location]
@@ -37,10 +36,17 @@ checked = "2026-11-18"
 note = "code from the EA's network supply points table (18 Nov 2026), which gives it no coordinates; the point is the substation, read from the LINZ aerial, 18 Nov 2026"
 
 [facts.commissioned]
+value = "2026-04-01"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; Mercury: first power in April 2026; opened on 9 September 2026; the register's row starts 31 March 2026"
+
+[[facts.commissioned.alt]]
 value = "2026"
 source = ["mercury-kaiwera-downs-2026", "mercury-kaiwera-downs"]
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "first power in April 2026; opened on 9 September 2026"
 
 [[facts.commissioned.alt]]

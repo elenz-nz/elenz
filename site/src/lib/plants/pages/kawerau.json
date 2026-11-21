@@ -23,7 +23,7 @@
  "scheme": null,
  "metered": null,
  "checking": false,
- "checked": "2026-11-19",
+ "checked": "2026-11-21",
  "about": {
   "text": "Kawerau was New Zealand's biggest geothermal project in 20 years when Mighty River Power, now Mercury, opened it in 2008, on a field that has supplied steam to the town's mills since 1957. Fluid from wells about 2 km away is separated twice, giving high- and low-pressure steam for a single turbine, and the used fluid is injected back into the ground north of the field. Built for 90 MW, it soon proved able to run at about 100 MW, and Mercury now gives its installed capacity as 107 MW.",
   "refs": [
@@ -37,12 +37,11 @@
   {
    "k": "commissioned",
    "label": "Commissioned",
-   "value": "2008",
+   "value": "26 June 2008",
    "refs": [
-    3,
-    1
+    5
    ],
-   "note": "operating from August 2008 and officially opened in late November 2008; construction began in January 2007"
+   "note": "the first day of output in the EA's metered data; operating from August 2008 and officially opened in late November 2008; construction began in January 2007"
   },
   {
    "k": "units",
@@ -59,7 +58,7 @@
    "label": "Geothermal field",
    "value": "Kawerau geothermal field",
    "refs": [
-    5,
+    6,
     2
    ],
    "note": "shared with other operators; Ngāti Tūwharetoa Geothermal Assets owns and runs part of the steamfield and supplies steam to the station (NZGA, 2023)"
@@ -69,7 +68,7 @@
    "label": "Region",
    "value": "Bay of Plenty",
    "refs": [
-    6
+    7
    ]
   },
   {
@@ -77,7 +76,7 @@
    "label": "District",
    "value": "Kawerau",
    "refs": [
-    7
+    8
    ],
    "note": "Whakatāne District is 200–250 m away"
   },
@@ -86,7 +85,7 @@
    "label": "Owner",
    "value": "Mercury",
    "refs": [
-    8,
+    9,
     3
    ],
    "note": "Mercury NZ Limited, which built it as Mighty River Power"
@@ -96,7 +95,7 @@
    "label": "Other ratings",
    "refs": [
     3,
-    8
+    9
    ],
    "value": "109 MW (The EA register's nameplate); 107 MW (Mercury: total installed capacity)"
   },
@@ -105,7 +104,7 @@
    "label": "Connection point",
    "value": "Kawerau Geothermal (KAW1101)",
    "refs": [
-    9
+    10
    ]
   }
  ],
@@ -114,7 +113,7 @@
   "lon": 176.7257,
   "basis": "station",
   "refs": [
-   10
+   11
   ]
  },
  "images": [
@@ -178,41 +177,48 @@
   },
   {
    "n": 5,
+   "title": "Generation output by plant (Generation_MD)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/Generation_MD",
+   "opened": "2026-11-21"
+  },
+  {
+   "n": 6,
    "title": "Geothermal generation",
    "publisher": "Mercury",
    "url": "https://www.mercury.co.nz/about-us/renewable-energy/geothermal",
    "opened": "2026-11-19"
   },
   {
-   "n": 6,
+   "n": 7,
    "title": "Regional Council 2025 (boundaries)",
    "publisher": "Stats NZ",
    "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
    "opened": "2026-11-19"
   },
   {
-   "n": 7,
+   "n": 8,
    "title": "Territorial Authority 2026 (boundaries)",
    "publisher": "Stats NZ",
    "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
    "opened": "2026-11-19"
   },
   {
-   "n": 8,
+   "n": 9,
    "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
    "opened": "2026-11-19"
   },
   {
-   "n": 9,
+   "n": 10,
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
   },
   {
-   "n": 10,
+   "n": 11,
    "title": "LINZ aerial imagery (LINZ Basemaps)",
    "publisher": "Toitū Te Whenua LINZ",
    "url": "https://basemaps.linz.govt.nz/",

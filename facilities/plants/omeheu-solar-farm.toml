@@ -6,9 +6,7 @@ name = "Omeheu Solar Farm"
 register = ["S016"]
 osm = ["way/1444631953"]
 reviewed = "2026-11-19"
-to_check = [
-  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large plant connected\" adjustment event at EDG (Horizon), effective 19 Jun 2026. Elenz counts it from 1 May 2026 (the register). For the page's commissioned date, use the first metered date (facilities/PLANTS.md, design decision 21 Nov 2026); put this date and the register's in the fact's note.",
-]
+to_check = []
 notes = [
   "Solar batch (19 Nov 2026): facts checked against the owner's project site, PV Tech, the EA register and network supply points table, and Stats NZ boundaries.",
   "Region and district from the grid connection point (no station point yet); the sources place the farm near it, in the same region (Edgecumbe substation, which the project site says is close by). Whakatāne District Council issued the resource consent (RNZ).",
@@ -16,6 +14,7 @@ notes = [
   "Capacity: Elenz uses the register's 28.7 MW (AC); the owner gives 38 MW (PV Tech: 38 MWp). The project site says \"38MW ... each year\", so its basis is unclear; PV Tech's MWp is used.",
   "Owner: the register still shows Aquila Clean Energy (AQNZ).",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
+  "Resolved: Appendix D commissioning lead. Commissioned date rule (21 Nov 2026): first metered day 2026-05-21, from embedded meter EDG0331, the farm's own injection there: a few readings on 20 May 2026, 2.5 MWh on 21 May. The previous value moved to alt.",
 ]
 
 [location]
@@ -35,11 +34,25 @@ checked = "2026-11-19"
 note = "code from the EA's network supply points table; the point is the substation, read from the LINZ aerial, 19 Nov 2026 (the table's point was [-37.987260, 176.828880])"
 
 [facts.commissioned]
+value = "2026-05-21"
+source = "ea-embedded-generation"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; the register's row starts 18 May 2026; switch-on June 2026 (project site); energised July 2026 (PV Tech)"
+
+[[facts.commissioned.alt]]
 value = "2026"
 source = ["ea-register", "omeheu-site"]
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "the register's row starts 18 May 2026; switch-on June 2026 (project site); energised July 2026 (PV Tech)"
+
+[[facts.commissioned.alt]]
+value = "2026-06-19"
+source = "transpower-appendix-d-2026"
+grade = "A"
+checked = ""
+note = "Transpower's transmission charging date, not necessarily first output"
 
 [facts.region]
 value = "Bay of Plenty"

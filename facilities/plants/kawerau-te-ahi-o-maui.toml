@@ -15,6 +15,7 @@ notes = [
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
   "Transpower's Assumptions Book v3.0, Appendix F (model inputs of 4 Jun 2026; source transpower-assumptions-2026): Kawerau_TAM modelled at 27 MW and 66 g CO2e/kWh.",
   "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"changed point of connection\" adjustment event at KAW (Eastland Generation and Horizon), effective 1 Apr 2026 (processed Nov 2025); consistent with its move off KAW0111 (Sep 2025) and the shared KAW2201 code from Dec 2025.",
+  "Commissioned date rule (21 Nov 2026): first metered day 2018-10-01, from embedded meter KAW0111, the station's own injection there (it shares the point with TG1/TG2): first output 1 Oct 2018, 104 MWh that day. The previous value moved to alt.",
 ]
 
 [location]
@@ -34,10 +35,17 @@ checked = "2026-11-19"
 note = "codes from the register's two entries for Te Ahi O Maui; the point is the Kawerau substation"
 
 [facts.commissioned]
+value = "2018-10-01"
+source = "ea-embedded-generation"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; the register and Eastland Generation give 2018"
+
+[[facts.commissioned.alt]]
 value = "2018"
 source = ["eastlandgeneration-renewable-generation-geotherm", "ea-register"]
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 
 [[facts.commissioned.alt]]
 value = "2018"

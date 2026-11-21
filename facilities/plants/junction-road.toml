@@ -14,6 +14,7 @@ notes = [
   "Commissioned: commissioning in March 2020 and commercial operation from 15 May 2020 (council report); Todd and the EA register: 2020. Elenz's history has its output from Feb 2020.",
   "Previous operator: the council says the site was formerly operated by Todd Generation Ltd, whose consents moved to Nova Energy on 1 June 2022. Ownership before and after isn't stated, so no previous owners fact yet.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point added (the substation).",
+  "Commissioned date rule (21 Nov 2026): first metered day 2020-02-05, from JRD1101 junctionroad; the code appears in January 2020. The previous value moved to alt.",
 ]
 
 [location]
@@ -39,10 +40,17 @@ grade = "A"
 checked = "2026-11-19"
 
 [facts.commissioned]
+value = "2020-02-05"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; commissioned in March 2020; in commercial operation from 15 May 2020 (council report)"
+
+[[facts.commissioned.alt]]
 value = "2020"
 source = ["todd-power-plants", "trc-jrpp-2024", "ea-register"]
 grade = "A"
-checked = "2026-11-19"
+checked = ""
 note = "commissioned in March 2020; in commercial operation from 15 May 2020 (council report)"
 
 [facts.units]

@@ -17,6 +17,7 @@ notes = [
   "Commissioned: Wikipedia says January 2000; the EA register 2000 (a year). Elenz's history counts its full output from Mar 1999 (commissioning runs).",
   "Owner: closed under Contact Energy, which sold the Ōtāhuhu site in 2016 (Wikipedia). A third station, Ōtāhuhu C (400 MW, consented 2001), was never built.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "Commissioned date rule (21 Nov 2026): first metered day 1998-11-26, from OTA2202 otahuhu_b; the code appears in October 1998, first output 26 Nov 1998 ramping to 70 MW. The previous value moved to alt.",
 ]
 
 [location]
@@ -36,10 +37,17 @@ checked = "2026-11-19"
 note = "code and point match the EA's network supply points table of 17 Nov 2026"
 
 [facts.commissioned]
+value = "1998-11-26"
+source = "ea-generation-md"
+grade = "A"
+checked = "2026-11-21"
+note = "the first day of output in the EA's metered data; first firing during commissioning; Wikipedia gives January 2000 and the register 2000, a year"
+
+[[facts.commissioned.alt]]
 value = "2000-01"
 source = "wp-otahuhu"
 grade = "B"
-checked = "2026-11-19"
+checked = ""
 
 [[facts.commissioned.alt]]
 value = "2000"

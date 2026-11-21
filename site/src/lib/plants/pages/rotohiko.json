@@ -23,7 +23,7 @@
  "scheme": null,
  "metered": null,
  "checking": false,
- "checked": "2026-11-19",
+ "checked": "2026-11-21",
  "about": {
   "text": "Rotohiko is a grid-scale battery near Huntly power station, built for WEL Networks' NewPower Energy, which owns, runs and trades it. It can deliver 35 MW for an hour, storing 35 MWh, and connects through WEL Networks' local network rather than directly to the national grid. Commissioned in 2023, it began charging and discharging into the grid in 2024, and has mostly been dispatched to stand by as instantaneous reserve rather than for energy.",
   "refs": [
@@ -42,7 +42,7 @@
     5,
     2
    ],
-   "note": "the register's row starts 23 Nov 2023; the EA: commissioned in 2023, began charging and discharging into the grid in 2024"
+   "note": "the register's row starts 23 Nov 2023; the EA: commissioned in 2023, began charging and discharging into the grid in 2024; the register's row starts 23 November 2023; the EA: commissioned in 2023, began charging and discharging into the grid in 2024; the EA's metered data starts in November 2024, after the battery began"
   },
   {
    "k": "units",

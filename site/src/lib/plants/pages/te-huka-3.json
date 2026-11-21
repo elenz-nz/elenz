@@ -27,7 +27,7 @@
  "scheme": null,
  "metered": null,
  "checking": false,
- "checked": "2026-11-19",
+ "checked": "2026-11-21",
  "about": {
   "text": "Te Huka 3 is a binary plant built at Te Huka, on the Tauhara geothermal field near Taupō, beside the station's two original units. Geothermal fluid heats pentane, which drives the turbine, and the plant was designed to put all its potential emissions back into the reservoir, making it one of the first geothermal stations built to be carbon neutral. Microsoft agreed to buy its renewable energy attributes for ten years, which helped Contact decide to build it, and it first supplied the grid in October 2024.",
   "refs": [
@@ -48,12 +48,11 @@
   {
    "k": "commissioned",
    "label": "Commissioned",
-   "value": "2024",
+   "value": "14 October 2024",
    "refs": [
-    4,
-    1
+    4
    ],
-   "note": "first supplied the grid on 14 October 2024, then ran up to full output after testing"
+   "note": "the first day of output in the EA's metered data; first supplied the grid on 14 October 2024, then ran up to full output after testing"
   },
   {
    "k": "field",
@@ -85,7 +84,7 @@
    "label": "Owner",
    "value": "Contact Energy",
    "refs": [
-    4,
+    7,
     2
    ],
    "note": "Contact Energy Limited, which built it"
@@ -95,7 +94,7 @@
    "label": "Other ratings",
    "refs": [
     2,
-    4
+    7
    ],
    "value": "51.4 MW (The EA register's nameplate and Contact's full capacity)"
   },
@@ -104,8 +103,8 @@
    "label": "Connection point",
    "value": "Tauhara (TAB0331)",
    "refs": [
-    7,
-    8
+    8,
+    9
    ]
   }
  ],
@@ -114,7 +113,7 @@
   "lon": 176.118708,
   "basis": "whole site",
   "refs": [
-   8
+   9
   ]
  },
  "images": [],
@@ -162,10 +161,10 @@
   },
   {
    "n": 4,
-   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "title": "Generation output by plant (Generation_MD)",
    "publisher": "Electricity Authority",
-   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
-   "opened": "2026-11-19"
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/Generation_MD",
+   "opened": "2026-11-21"
   },
   {
    "n": 5,
@@ -183,13 +182,20 @@
   },
   {
    "n": 7,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 8,
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
   },
   {
-   "n": 8,
+   "n": 9,
    "title": "LINZ aerial imagery (LINZ Basemaps)",
    "publisher": "Toitū Te Whenua LINZ",
    "url": "https://basemaps.linz.govt.nz/",
