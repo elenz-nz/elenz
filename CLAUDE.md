@@ -131,7 +131,7 @@ Each is explained in `docs/architecture.md`.
 
 ## Status
 
-Live at https://elenz.co.nz: live data every 5 minutes, history since Aug 1997 (BUILD 12, 9 Nov 2026). The tag
+Live at https://elenz.co.nz: live data every 5 minutes, history since Aug 1997 (BUILD 13, 21 Nov 2026). The tag
 `v0.9.0` (9 Nov 2026) marks the version that passed user acceptance testing.
 Next: plant pages (`/plants/<slug>`), the map, a hydro panel, offer stacks and downloads.
 

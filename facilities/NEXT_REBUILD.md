@@ -6,8 +6,11 @@ tables, the register, the BUILD number), so pushing any of
 them starts a rebuild of every month (under an hour, in the next history run). Bundle them and push them together, and never
 while a rebuild is still running (check `/data/history/progress.json`: `rebuild_left` empty).
 
-The last rebuild (BUILD 12, 9 Nov 2026: Southdown Battery from the metered history, MW series to one decimal below
-10 MW) took 16 minutes in one run (352 months, 742 KV writes). Its items were checked on the published data and removed:
+BUILD 13 (21 Nov 2026: Rangipō's name in place of the register's Rangipo) ran in one history run and was checked
+on the published data (one Rangipō plant, history from Aug 1997); Offers was rerun with "resummarise".
+
+The rebuild before it (BUILD 12, 9 Nov 2026: Southdown Battery from the metered history, MW series to one decimal
+below 10 MW) took 16 minutes in one run (352 months, 742 KV writes). Its items were checked on the published data and removed:
 Southdown (gas) ends in December 2015 and Southdown Battery has its metered discharge from September 2018 to May 2022
 (at most 0.4 MW a day), with no gas entry and no double count in the dispatch months; `day.json` grew 3.6% (8.8 to
 9.1 MB); Offers was rerun with "resummarise". (BUILD 10, which downloaded 213 months' reconciliation files into the
@@ -24,17 +27,6 @@ To start it (only when the Elenz team says go): bring the branch up to date with
 `/data/history/progress.json` has `rebuild_left` empty, let the checks pass and merge. Start the History workflow by
 hand, or wait for the next run. Afterwards check each item, run the Offers workflow with "resummarise" if an item changes
 generation, and clear the done items from this file.
-
-## In this build (BUILD 13, on `next-rebuild`)
-
-1. **Rangipō's name** (design decision, 21 Nov 2026): the tracker shows Rangipō, as Genesis spells it, in place of the
-   register's Rangipo. `[plant_names]` maps the register's name; `metered_plants.csv` (RPO2201), `plant_capacity.csv`,
-   `[hydro_schemes]` Tongariro, the plant file's `plant` and the groupings method page use the new name. Check
-   afterwards: the Tracker's By plant view and the Tongariro scheme list Rangipō once (no second "Rangipo" row),
-   its history runs from Aug 1997 unbroken, `/plants/rangipo` shows its history and live panel, and records name it
-   Rangipō. Offered capacity by plant (`hist/offp/*`) written before this build names it Rangipo: rerun the Offers
-   workflow with "resummarise", or map it through `[plant_names]` when the plant pages read those files (as for
-   Ngā Awa Pūrua, below).
 
 ## Not fixable from EMI data
 
