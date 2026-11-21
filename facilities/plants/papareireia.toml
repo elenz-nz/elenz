@@ -10,6 +10,7 @@ to_check = [
   "Lead (20 Nov 2026): construction began Sep 2024 and first generation was Nov 2025 (United Civil, Green Gold Energy); Green Gold gives formal commissioning on 6 Jan 2026, against December 2025 (Wikipedia, citing Scoop). Both make plant_capacity.csv's start of 2025-02-01 (\"metered output from 2025-02\") look wrong: trace which metered series starts then before changing it.",
   "Lead (20 Nov 2026): Ryman takes all the output through a sleeved PPA with Mercury (Ryman's release). Read it and add Mercury to the About text if it checks out.",
   "Optional, About text: the developer's estimate of about 32 GWh a year (Purpose Capital) could be added, worded as an estimate, not as metered output.",
+  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded generating plant connected\" adjustment event for Golden Stairs Solar Farm at MTO (Northpower), effective 30 Dec 2025. Golden Stairs is this plant's earlier name (the register's unit code is GDS0). The register starts 13 Nov 2025; the developer gives first generation in Nov 2025 and commissioning on 6 Jan 2026. For the page's commissioned date, use the first metered date (facilities/PLANTS.md, design decision 21 Nov 2026); put this date and the register's in the fact's note.",
 ]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against Te Ao Māori News, Wikipedia's article, the EA register and network supply points table, and Stats NZ boundaries.",
@@ -18,6 +19,7 @@ notes = [
   "Dates: the register's row starts 13 Nov 2025; officially commissioned in December 2025 (Wikipedia, citing Scoop). Elenz's capacity note says metered output from Feb 2025: check that.",
   "Owner: the register's operator is Maungaturoto Solar Farm Project LP; the project was first developed by Solar Bay (now Harbour Infrastructure) for Ryman Healthcare.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "Earlier name: Golden Stairs Solar Farm, after Golden Stairs Road, Maungaturoto (the register's unit code GDS0; Transpower's Appendix D still uses it). Worth adding as other_names once a public source gives both names.",
 ]
 
 [location]

@@ -7,7 +7,7 @@ register = ["W022"]
 osm = ["relation/17250859"]
 reviewed = "2026-11-19"
 to_check = [
-  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded plant connected\" adjustment event at GOR (PowerNet), effective 15 Oct 2023. Elenz counts stage 1 from 1 Aug 2023. Check which date the page should give.",
+  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded plant connected\" adjustment event at GOR (PowerNet), effective 15 Oct 2023. Elenz counts stage 1 from 1 Aug 2023. For the page's commissioned date, use the first metered date (facilities/PLANTS.md, design decision 21 Nov 2026); put this date and the register's in the fact's note.",
 ]
 notes = [
   "Kaiwera Downs is two Elenz plants: stage 1 (43 MW, GOR0331, from Aug 2023) and stage 2 (155 MW, KIW2201, from Apr 2026).",
