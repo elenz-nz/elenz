@@ -8,7 +8,7 @@ osm = ["way/1363799736"]
 reviewed = "2026-11-19"
 to_check = [
   "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
-  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded plant connected\" adjustment event at HLY (WEL Networks; RHO), effective 1 Nov 2023. Elenz counts it from 23 Nov 2023 (the register). Check which date the page should give.",
+  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded plant connected\" adjustment event at HLY (WEL Networks; RHO), effective 1 Nov 2023. Elenz counts it from 23 Nov 2023 (the register). For the page's commissioned date, use the first metered date (facilities/PLANTS.md, design decision 21 Nov 2026); put this date and the register's in the fact's note.",
 ]
 notes = [
   "Added from Elenz's plant list (8 Nov 2026).",

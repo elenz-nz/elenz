@@ -8,7 +8,7 @@ reviewed = ""
 to_check = [
   "Battery 2 (200 MW beside it, online early 2028): decide whether it joins this page or gets its own, and add a capacity row when it dispatches. Contact also has an option to take Battery 1 from 100 MW to 130 MW.",
   "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
-  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large plant connected\" adjustment event at GLN (Contact), effective 30 Mar 2026. The register starts it on 4 Dec 2025. Check which is commissioning.",
+  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large plant connected\" adjustment event at GLN (Contact), effective 30 Mar 2026. The register starts it on 4 Dec 2025. For the page's commissioned date, use the first metered date (facilities/PLANTS.md, design decision 21 Nov 2026); put this date and the register's in the fact's note.",
 ]
 notes = [
   "Added from Elenz's plant list (8 Nov 2026).",

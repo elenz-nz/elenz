@@ -10,7 +10,7 @@ reviewed = "2026-11-19"
 photo_leads = ["P039"]
 to_check = [
   "Lead (20 Nov 2026): Lightsource bp's Kōwhai Park page may publish the 168 MWp DC rating (Contact's page no longer does). Contact's opening release: commissioned 16 Sep 2026, opened 15 Oct 2026, about NZ$273m, connected through Orion's network, Synlait buying 25% of the output. Read them and add what checks out.",
-  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded plant connected\" adjustment event at ISL (Orion), with no effective date given (event processed 10 Nov 2026). Elenz counts it from 1 Jul 2026 (the register). Check whether full commissioning was later.",
+  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded plant connected\" adjustment event at ISL (Orion), with no effective date given (event processed 10 Nov 2026). Elenz counts it from 1 Jul 2026 (the register). For the page's commissioned date, use the first metered date (facilities/PLANTS.md, design decision 21 Nov 2026); put this date and the register's in the fact's note.",
 ]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against Contact's project page, the EA register and network supply points table, and Stats NZ boundaries.",

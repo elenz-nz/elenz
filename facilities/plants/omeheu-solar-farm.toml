@@ -7,7 +7,7 @@ register = ["S016"]
 osm = ["way/1444631953"]
 reviewed = "2026-11-19"
 to_check = [
-  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large plant connected\" adjustment event at EDG (Horizon), effective 19 Jun 2026. Elenz counts it from 1 May 2026 (the register). Check which date the page should give.",
+  "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large plant connected\" adjustment event at EDG (Horizon), effective 19 Jun 2026. Elenz counts it from 1 May 2026 (the register). For the page's commissioned date, use the first metered date (facilities/PLANTS.md, design decision 21 Nov 2026); put this date and the register's in the fact's note.",
 ]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against the owner's project site, PV Tech, the EA register and network supply points table, and Stats NZ boundaries.",
