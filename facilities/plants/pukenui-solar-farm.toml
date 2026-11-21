@@ -10,7 +10,6 @@ reviewed = ""
 to_check = [
   "Owner: the EA register still lists Far North Solar Farms; recheck after the next register refresh.",
   "Mounting (plan question): Far North Solar Farms said in 2021 the farm would use fixed rather than motorised panels (NZ Herald); not yet confirmed for the farm as built.",
-  "Panel count: 35,000 panels at 545 W is about 19.1 MWp, not the 20.8 MWp DC rating. Find whether the count is rounded (the project's own site gives 35,000 panels of 545 W, five inverters and about 17 ha).",
 ]
 notes = [
   "Capacity: Elenz uses the AC output, 17.2 MW, since 19 Nov 2026 (design decision); the register's 20.8 MW is the panels' DC rating.",
@@ -20,6 +19,7 @@ notes = [
   "Owner: PV Tech (July 2026) says Aquila took sole ownership in January 2026, ending its joint venture with Far North Solar Farm; Wikipedia cites an Overseas Investment Office decision of December 2025 (LINZ's page refused our read).",
   "Dropped the \"Northland\" scheme lead.",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point moved to the substation.",
+  "Solar leads (21 Nov 2026): the Herald (16 Oct 2025) gives \"around 35,000\" panels, so the count is rounded; 35,000 × 545 W (19.1 MWp) against the 20.8 MWp rating isn't settled, so the About text says \"35,000 or so\" and gives no panel rating. Opening in October 2025 added.",
 ]
 
 [location]
@@ -42,7 +42,8 @@ note = "code from the EA's network supply points table; the point is the substat
 value = "2025"
 source = ["ea-register", "bt-pukenui"]
 grade = "A"
-checked = "2026-11-19"
+checked = "2026-11-21"
+note = "officially opened in October 2025 (NZ Herald)"
 
 [[facts.commissioned.alt]]
 value = "2025"
@@ -83,10 +84,10 @@ grade = "B"
 checked = "2026-11-19"
 
 [facts.about]
-value = "Pukenui is a solar farm at Pukenui in the Far North, north of Kaitāia. Its 35,000 panels started generating in 2025. It was developed by Far North Solar Farm and Aquila Clean Energy APAC in consultation with Te Aupōuri, and Aquila became its sole owner in January 2026."
-source = ["bt-pukenui", "pvtech-omeheu"]
+value = "Pukenui is a solar farm on 17 hectares at Pukenui in the Far North, north of Kaitāia. Its 35,000 or so panels started generating in 2025, and the farm was officially opened in October 2025. It was developed by Far North Solar Farm and Aquila Clean Energy APAC in consultation with Te Aupōuri, and Aquila became its sole owner in January 2026."
+source = ["bt-pukenui", "pvtech-omeheu", "nzherald-pukenui-opening"]
 grade = "B"
-checked = "2026-11-19"
+checked = "2026-11-21"
 
 [[ratings]]
 value = 20.8

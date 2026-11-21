@@ -6,9 +6,7 @@ name = "Dannevirke Solar Farm"
 register = ["S014"]
 osm = ["way/1516694558"]
 reviewed = "2026-11-19"
-to_check = [
-  "Lead (20 Nov 2026): LINZ's Overseas Investment Office decision on Dannevirke SF LP records 37.4 ha of leased land at 440 Tamaki River Road. Add it to plant_sources.csv if its page can be read (LINZ's pages have refused automated reads before).",
-]
+to_check = []
 notes = [
   "Capacity: Elenz uses the register's 19 MW since 19 Nov 2026 (design decision); the earlier 23 MW is the panels' DC rating.",
   "Solar batch (19 Nov 2026): facts checked against the EA register and network supply points table, Tararua District Council's consent documents (through search results), SolarQuarter and Stats NZ boundaries.",
@@ -17,6 +15,7 @@ notes = [
   "Owner: the register's operator is Dannevirke Solar Farm Ltd (the consent applicant); SolarQuarter calls it Bright Fern Energy's farm.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
   "Resolved: Appendix D commissioning lead. Commissioned date rule (21 Nov 2026): first metered day 2026-06-12, from DVK0111 dannevirke_solar_farm; the code appears in May 2026. The previous value moved to alt.",
+  "Solar leads (21 Nov 2026): the OIO decision (case 202500586, 27 Jan 2026) read: leasehold of about 37.4 ha at 440 Tamaki River Road for a solar farm of about 23 MWp (matching the DC rating), grazing to continue; the applicant, Dannevirke SF LP, is 58% Australian and 42% New Zealand owned. Area and grazing added to the About text.",
 ]
 
 [location]
@@ -78,10 +77,10 @@ checked = "2026-11-19"
 note = "the register's operator: Dannevirke Solar Farm Ltd"
 
 [facts.about]
-value = "Dannevirke Solar Farm is on Tamaki River Road outside Dannevirke in the Tararua District, developed by Bright Fern Energy. Its panels sit on single-axis trackers that follow the sun, designed for the area's earthquakes, strong winds and rolling ground. It began feeding the grid in 2026."
-source = ["solarquarter-dannevirke", "tararua-dc-solar-consents", "ea-register"]
+value = "Dannevirke Solar Farm is on about 37 hectares of leased farmland on Tamaki River Road outside Dannevirke in the Tararua District, developed by Bright Fern Energy; the land is still grazed. Its panels sit on single-axis trackers that follow the sun, designed for the area's earthquakes, strong winds and rolling ground. It began feeding the grid in 2026."
+source = ["solarquarter-dannevirke", "tararua-dc-solar-consents", "ea-register", "linz-oio-202500586"]
 grade = "B"
-checked = "2026-11-19"
+checked = "2026-11-21"
 
 [[ratings]]
 value = 23.0

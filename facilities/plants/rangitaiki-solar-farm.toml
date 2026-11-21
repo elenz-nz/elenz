@@ -9,7 +9,6 @@ osm = ["way/1389207750"]
 reviewed = "2026-11-19"
 to_check = [
   "Sources: Lodestone's site refuses automated reads, so this farm's facts rest mainly on BraveTrace's device sheet (Lodestone's page read only through search results). Check Lodestone's page by hand.",
-  "Optional, About text: the developer's estimate of about 49 GWh a year (Lodestone) could be added, worded as an estimate, not as metered output.",
 ]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against BraveTrace's device sheet, the EA register and network supply points table, Lodestone's farm pages (through search results) and Stats NZ boundaries.",
@@ -21,6 +20,7 @@ notes = [
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point moved to the substation.",
   "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded plant connected\" adjustment event at EDG (Horizon), effective 6 Mar 2024; consistent with Elenz's Mar 2024 start.",
   "Commissioned date rule (21 Nov 2026): first metered day 2024-03-06, from EDG0331 Rangitaiki. The previous value moved to alt.",
+  "Solar leads (21 Nov 2026): the developer's annual estimate added to the About text, worded as an estimate (lodestone-solar-farms). Lodestone's own figure is 54 GWh (its farms page); the Herald's 49 GWh is an average it reported.",
 ]
 
 [location]
@@ -86,10 +86,10 @@ checked = "2026-11-19"
 note = "the register's operator: Lodestone Solar Limited; BraveTrace's registrant: Lodestone Energy (listed on the NZX since Oct 2026)"
 
 [facts.about]
-value = "Rangitaiki is Lodestone Energy's second solar farm, on the Rangitaiki Plains near Edgecumbe in the Bay of Plenty. About 59,600 bifacial panels track the sun, and the land is still farmed. It started generating in March 2024. Ngāti Awa gifted the name, after the plains and the river."
+value = "Rangitaiki is Lodestone Energy's second solar farm, on the Rangitaiki Plains near Edgecumbe in the Bay of Plenty. About 59,600 bifacial panels track the sun, and the land is still farmed. It started generating in March 2024 and is expected to produce about 54 GWh a year. Ngāti Awa gifted the name, after the plains and the river."
 source = ["bt-rangitaiki", "lodestone-solar-farms"]
 grade = "A"
-checked = "2026-11-19"
+checked = "2026-11-21"
 
 [[ratings]]
 value = 32.4

@@ -10,7 +10,6 @@ reviewed = ""
 photo_leads = ["P034"]
 to_check = [
   "Mounting (plan question): fixed or tracking? Not stated in the sources read (Genesis's page is drawn by script and could not be read).",
-  "Optional, About text: the developer's estimate of about 100 GWh a year (Genesis) could be added, worded as an estimate, not as metered output.",
 ]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against BraveTrace's device sheet (registrant Genesis Energy), PV Tech, the EA register and network supply points table, and Stats NZ boundaries.",
@@ -18,6 +17,7 @@ notes = [
   "Resolved: capacity. Elenz uses the register's 47 MW (AC); BraveTrace and PV Tech give 63 MWp.",
   "Dropped the \"Canterbury\" scheme lead.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "Solar leads (21 Nov 2026): the developer's annual estimate added to the About text, worded as an estimate (pvmag-lauriston-launch).",
 ]
 
 [location]
@@ -76,10 +76,10 @@ checked = "2026-11-19"
 note = "the register's operator: Genesis Energy Limited; PV Tech: developed through a joint venture of Genesis and FRV Australia"
 
 [facts.about]
-value = "Lauriston is a solar farm on 93 hectares of leased farmland on the Canterbury Plains near Ashburton, developed by a joint venture of Genesis Energy and FRV Australia. Its 90,000 or so panels reached full output in February 2025, and the land is still grazed by sheep. When it opened in April 2025, Genesis described it as the country's largest solar farm."
-source = ["bt-lauriston", "pvtech-lauriston"]
+value = "Lauriston is a solar farm on 93 hectares of leased farmland on the Canterbury Plains near Ashburton, developed by a joint venture of Genesis Energy and FRV Australia. Its 90,000 or so panels reached full output in February 2025, and the land is still grazed by sheep. It is expected to produce up to 100 GWh a year. When it opened in April 2025, Genesis described it as the country's largest solar farm."
+source = ["bt-lauriston", "pvtech-lauriston", "pvmag-lauriston-launch"]
 grade = "B"
-checked = "2026-11-19"
+checked = "2026-11-21"
 
 [[ratings]]
 value = 63.0

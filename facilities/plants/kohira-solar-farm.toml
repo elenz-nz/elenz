@@ -9,7 +9,6 @@ osm = ["way/1126147888"]
 reviewed = "2026-11-19"
 to_check = [
   "Sources: Lodestone's site refuses automated reads, so this farm's facts rest mainly on BraveTrace's device sheet (Lodestone's page read only through search results). Check Lodestone's page by hand.",
-  "Optional, About text: the developer's estimate of about 56 GWh a year (Lodestone) could be added, worded as an estimate, not as metered output.",
 ]
 notes = [
   "Solar batch (19 Nov 2026): facts checked against BraveTrace's device sheet (registrant Lodestone Energy), the EA register and network supply points table, Lodestone's farm pages (read through search results; the site refuses automated reads) and Stats NZ boundaries.",
@@ -20,6 +19,7 @@ notes = [
   "The iwi named in sources differs: BraveTrace says Ngāti Rarawa, Wikipedia Te Rarawa. The About text says \"local iwi\".",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point moved to the substation.",
   "Resolved: Appendix D commissioning lead. Commissioned date rule (21 Nov 2026): first metered day 2023-11-23, from embedded meter KOE1101, the farm's own injection there, from 23 Nov 2023; its Generation_MD code starts in Jan 2024. The previous value moved to alt.",
+  "Solar leads (21 Nov 2026): the developer's annual estimate added to the About text, worded as an estimate (lodestone-solar-farms).",
 ]
 
 [location]
@@ -99,10 +99,10 @@ checked = "2026-11-19"
 note = "the register's operator: Lodestone Solar Limited; BraveTrace's registrant: Lodestone Energy (listed on the NZX since Oct 2026)"
 
 [facts.about]
-value = "Kohirā is Lodestone Energy's first solar farm, on farmland near Kaitāia in the Far North. Its 61,000 or so bifacial panels track the sun through the day, and the land beneath them is still farmed. It started generating in November 2023. Local iwi gifted the name, which means \"suncatcher\"."
+value = "Kohirā is Lodestone Energy's first solar farm, on farmland near Kaitāia in the Far North. Its 61,000 or so bifacial panels track the sun through the day, and the land beneath them is still farmed. It started generating in November 2023 and is expected to produce about 56 GWh a year. Local iwi gifted the name, which means \"suncatcher\"."
 source = ["bt-kohira", "lodestone-solar-farms"]
 grade = "A"
-checked = "2026-11-19"
+checked = "2026-11-21"
 
 [[ratings]]
 value = 33.3

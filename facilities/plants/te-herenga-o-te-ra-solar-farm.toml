@@ -9,8 +9,6 @@ osm = ["way/1410036411"]
 reviewed = "2026-11-19"
 to_check = [
   "Sources: Lodestone's site refuses automated reads, so this farm's facts rest mainly on BraveTrace's device sheet (Lodestone's page read only through search results). Check Lodestone's page by hand.",
-  "Lead (20 Nov 2026): full commissioning July 2025 (from Lodestone or New Energy), against BraveTrace's 20 January 2025. The About text says commissioned in January 2025: check which is right.",
-  "Optional, About text: the developer's estimate of about 69 GWh a year (Lodestone) could be added, worded as an estimate, not as metered output.",
 ]
 notes = [
   "Capacity: Elenz keeps the register's 33 MW (design decision 19 Nov 2026); BraveTrace's sheet (May 2026) gives 30 MW AC.",
@@ -22,6 +20,7 @@ notes = [
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
   "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) lists Lodestone Energy as a customer at WAI in the PY2026 allocations (from 1 May 2025).",
   "Commissioned date rule (21 Nov 2026): first metered day 2024-12-18, from WAI0331 te_herenga_o_te_rā_solar_farm: a few kWh in the evening of 17 Dec 2024, 15 MWh on 18 Dec. The previous value moved to alt.",
+  "Solar leads (21 Nov 2026): Lodestone's page says first generation in December 2024 with commissioning work continuing in early 2025; nothing found for \"full commissioning July 2025\". The About text now says that instead of \"commissioned in January 2025\" (BraveTrace's 20 Jan 2025 stays in the commissioned note). 69 GWh a year added.",
 ]
 
 [location]
@@ -101,10 +100,10 @@ checked = "2026-11-19"
 note = "the register's operator: Lodestone Solar Limited; BraveTrace's registrant: Lodestone Energy (listed on the NZX since Oct 2026)"
 
 [facts.about]
-value = "Te Herenga o Te Rā is Lodestone Energy's third solar farm, at Waiotahe in the Bay of Plenty. About 71,600 bifacial panels track the sun. It started generating in December 2024 and was commissioned in January 2025. Te Ūpokorehe gifted the name, which means \"the mooring place of the sun\"."
-source = "bt-te-herenga"
+value = "Te Herenga o Te Rā is Lodestone Energy's third solar farm, at Waiotahe in the Bay of Plenty. About 71,600 bifacial panels track the sun. It started generating in December 2024, with commissioning continuing into early 2025, and is expected to produce about 69 GWh a year. Te Ūpokorehe gifted the name, which means \"the mooring place of the sun\"."
+source = ["bt-te-herenga", "lodestone-waiotahe"]
 grade = "A"
-checked = "2026-11-19"
+checked = "2026-11-21"
 
 [[ratings]]
 value = 42.9

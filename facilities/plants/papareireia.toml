@@ -8,8 +8,6 @@ wikidata = "Q137460644"
 reviewed = "2026-11-19"
 to_check = [
   "Lead (20 Nov 2026): construction began Sep 2024 and first generation was Nov 2025 (United Civil, Green Gold Energy); Green Gold gives formal commissioning on 6 Jan 2026, against December 2025 (Wikipedia, citing Scoop). Both make plant_capacity.csv's start of 2025-02-01 (\"metered output from 2025-02\") look wrong: trace which metered series starts then before changing it.",
-  "Lead (20 Nov 2026): Ryman takes all the output through a sleeved PPA with Mercury (Ryman's release). Read it and add Mercury to the About text if it checks out.",
-  "Optional, About text: the developer's estimate of about 32 GWh a year (Purpose Capital) could be added, worded as an estimate, not as metered output.",
   "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large embedded generating plant connected\" adjustment event for Golden Stairs Solar Farm at MTO (Northpower), effective 30 Dec 2025. Golden Stairs is this plant's earlier name (the register's unit code is GDS0). The register starts 13 Nov 2025; the developer gives first generation in Nov 2025 and commissioning on 6 Jan 2026. For the page's commissioned date, use the first metered date (facilities/PLANTS.md, design decision 21 Nov 2026); put this date and the register's in the fact's note.",
   "Commissioned date (21 Nov 2026, analysis/first_metered.py): the Generation_MD code MTO0331 papareireiā_solar_at_maungaturoto first reads on 3 Jan 2025 (1 MW from 13 Jan 2025) but stays under about 330 MWh a month until Jan 2026 (1.5 GWh), which fits first generation in Nov 2025 and commissioning on 6 Jan 2026 better than a start in early 2025. Settle what the 2025 readings are before setting the date; until then the owner's date stays.",
 ]
@@ -20,6 +18,7 @@ notes = [
   "Dates: the register's row starts 13 Nov 2025; officially commissioned in December 2025 (Wikipedia, citing Scoop). Elenz's capacity note says metered output from Feb 2025: check that.",
   "Owner: the register's operator is Maungaturoto Solar Farm Project LP; the project was first developed by Solar Bay (now Harbour Infrastructure) for Ryman Healthcare.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "Solar leads (21 Nov 2026): Ryman's release (5 Dec 2025) confirms the sleeved PPA with Mercury and the go-live on 4 Dec 2025 (the Herald's opening photo has the same date), and about 32 GWh a year; all in the About text. The commissioned date and plant_capacity.csv's Feb 2025 start stay open (to_check).",
 ]
 
 [location]
@@ -50,6 +49,7 @@ value = "2025"
 source = ["ea-register", "wp-papareireia"]
 grade = "A"
 checked = "2026-11-19"
+note = "officially went live on 4 December 2025 (Ryman Healthcare; NZ Herald)"
 
 [[facts.commissioned.alt]]
 value = "2025"
@@ -84,10 +84,10 @@ checked = "2026-11-19"
 note = "the register's operator: Maungaturoto Solar Farm Project LP"
 
 [facts.about]
-value = "Papareireiā is a solar farm on farmland near Maungaturoto in the Kaipara, built to supply Ryman Healthcare's retirement villages under a 10-year agreement. It is a joint venture of Tupu Tonu (the Ngāpuhi Investment Fund), Purpose Capital and Harbour Infrastructure. Construction began in late 2024 and the farm was commissioned in December 2025. Its name refers to the sun's rays being taken in by the land."
-source = ["teao-papareireia", "wp-papareireia"]
+value = "Papareireiā is a solar farm on farmland near Maungaturoto in the Kaipara, built to supply Ryman Healthcare's retirement villages under a 10-year agreement. It is a joint venture of Tupu Tonu (the Ngāpuhi Investment Fund), Purpose Capital and Harbour Infrastructure. Ryman's supply is sleeved through Mercury, which tops it up when the sun is low. Construction began in late 2024 and the farm officially went live on 4 December 2025; it is expected to produce about 32 GWh a year. Its name refers to the sun's rays being taken in by the land."
+source = ["teao-papareireia", "wp-papareireia", "ryman-papareireia-live"]
 grade = "B"
-checked = "2026-11-19"
+checked = "2026-11-21"
 
 [[ratings]]
 value = 21.0
