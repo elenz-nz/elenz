@@ -1965,9 +1965,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/tararua-stage-i-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "tararua-stage-i.webp",
+    "credit": "Photo: SmokeySteve, Public domain"
    },
    "overview": "A 36 MW wind farm in Manawatū-Whanganui, generating since 1999."
   },
@@ -1990,9 +1990,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/tararua-stage-ii-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "tararua-stage-i.webp",
+    "credit": "Photo: SmokeySteve, Public domain"
    },
    "overview": "A 37 MW wind farm in Manawatū-Whanganui, generating since 2004."
   },
@@ -2015,9 +2015,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/tararua-wind-farm-3-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "tararua-stage-i.webp",
+    "credit": "Photo: SmokeySteve, Public domain"
    },
    "overview": "A 93 MW wind farm in Manawatū-Whanganui, generating since 2007."
   },
@@ -2090,9 +2090,9 @@
     "checked": true
    },
    "thumb": {
-    "kind": "aerial",
-    "file": "aerial/te-apiti-site.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+    "kind": "photo",
+    "file": "te-apiti.webp",
+    "credit": "Photo: Pseudopanax at English Wikipedia, Public domain"
    },
    "overview": "A 90 MW wind farm in Manawatū-Whanganui, generating since 2004."
   },

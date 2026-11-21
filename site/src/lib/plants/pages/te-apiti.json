@@ -102,7 +102,16 @@
    8
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "te-apiti.webp",
+   "title": "Te Apiti Wind Farm in early evening sunlight",
+   "author": "Pseudopanax at English Wikipedia",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Te_Apiti_wind_farm_in_early_evening_sunlight.jpg",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

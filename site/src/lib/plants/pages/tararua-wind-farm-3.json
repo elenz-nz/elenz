@@ -117,7 +117,16 @@
    10
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "tararua-stage-i.webp",
+   "title": "Tararua Wind Farm",
+   "author": "SmokeySteve",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Tararua_wind_farm.jpg",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",
