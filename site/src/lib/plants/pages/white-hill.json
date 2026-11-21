@@ -92,7 +92,16 @@
    8
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "white-hill.webp",
+   "title": "White Hill Wind Farm",
+   "author": "Daveosaurus",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Whitehill.JPG",
+   "licence": "CC BY-SA 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

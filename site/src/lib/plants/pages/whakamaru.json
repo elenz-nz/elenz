@@ -180,7 +180,16 @@
    11
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "whakamaru.webp",
+   "title": "Whakamaru Power Station",
+   "author": "Paradoxsm",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Whakamaru_Power_Station.jpg",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

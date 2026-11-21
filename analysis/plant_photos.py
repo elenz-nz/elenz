@@ -15,6 +15,9 @@ Two steps, so a person looks at each picture and its licence before it goes in:
       file pages (the file page is `source_url` in the row). Then run ingest/plant_files.py --check,
       ingest/plant_pages.py and ingest/plant_research.py (PLANTS.md, Checking a plant).
 
+  python3 analysis/plant_photos.py local spec.json SRCDIR
+      The same for photos a person supplied (the team's own, or Commons files they saved): see local().
+
 Commons returns HTTP 429 to this workspace when asked too fast: the script waits as the response says (default a
 minute) and tries again.
 """
@@ -121,10 +124,45 @@ def add(out):
         w.writerows(rows)
 
 
+def local(spec_path, srcdir):
+    """Add photos from files a person supplied (not fetched). The spec is a list of {"slug", "n", "src" (a path under
+    srcdir), "file" (the WebP's name; rows for several plants may share one), "title", "author", "source_url",
+    "licence", "licence_url"}. A spec row whose "file" was already written just adds its CSV row. Orientation is
+    applied and all metadata (camera, location) is dropped by the WebP conversion."""
+    from PIL import ImageOps
+    spec = json.load(open(spec_path, encoding='utf-8'))
+    rows = list(csv.DictReader(open(CSV, newline='', encoding='utf-8')))
+    have = {(r['slug'], r['file']) for r in rows}
+    today = datetime.date.today().isoformat()
+    for m in spec:
+        out = os.path.join(STATIC, m['file'])
+        note = 'none; resized to 1600 px wide, WebP'
+        if not os.path.exists(out):
+            im = ImageOps.exif_transpose(Image.open(os.path.join(srcdir, m['src']))).convert('RGB')
+            if im.width > 1600:
+                im = im.resize((1600, round(im.height * 1600 / im.width)), Image.LANCZOS)
+            im.save(out, 'WEBP', quality=75)
+            note = f'none; resized to {im.width} px wide, WebP'
+            print('wrote', m['file'], im.size)
+        else:
+            note = 'none; the same photo as ' + m['file'] if (m['slug'], m['file']) not in have else note
+        if (m['slug'], m['file']) in have:
+            continue
+        rows.append(dict(slug=m['slug'], file=m['file'], title=m['title'], author=m['author'],
+                         source_url=m['source_url'], licence=m['licence'], licence_url=m['licence_url'],
+                         checked=today, crop=note))
+    with open(CSV, 'w', newline='', encoding='utf-8') as f:
+        w = csv.DictWriter(f, FIELDS, lineterminator='\n')
+        w.writeheader()
+        w.writerows(rows)
+
+
 if __name__ == '__main__':
     if len(sys.argv) == 4 and sys.argv[1] == 'fetch':
         fetch(sys.argv[2], sys.argv[3])
     elif len(sys.argv) == 3 and sys.argv[1] == 'add':
         add(sys.argv[2])
+    elif len(sys.argv) == 4 and sys.argv[1] == 'local':
+        local(sys.argv[2], sys.argv[3])
     else:
         sys.exit(__doc__)

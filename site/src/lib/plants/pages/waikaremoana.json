@@ -134,7 +134,16 @@
    8
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "waikaremoana.webp",
+   "title": "Art Deco power house at Tuai",
+   "author": "Searlenz",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Art_Deco_power_house_in_Tuai.jpg",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

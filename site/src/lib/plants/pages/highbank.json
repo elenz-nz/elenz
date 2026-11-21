@@ -117,7 +117,16 @@
    11
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "highbank.webp",
+   "title": "Highbank Power Station",
+   "author": "Bevanw58",
+   "source_url": "https://commons.wikimedia.org/wiki/File:RDR_Highbank_Power_station_1.jpg",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

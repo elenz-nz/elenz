@@ -115,7 +115,16 @@
    10
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "waipipi.webp",
+   "title": "Four turbines of the Waipipi Wind Farm",
+   "author": "Majorconvenience",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Four_turbines_of_the_Waipipi_Wind_Farm.jpg",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

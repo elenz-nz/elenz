@@ -134,7 +134,16 @@
    13
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "tekapo-b.webp",
+   "title": "Tekapo B Power Station on Lake Pukaki",
+   "author": "Pseudopanax at English Wikipedia",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Pukaki_Power_Station_(Tekapo_B).jpg",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

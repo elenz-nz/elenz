@@ -159,7 +159,16 @@
    13
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "tekapo-a.webp",
+   "title": "Tekapo A Power Station",
+   "author": "Philipp Weigell",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Power_plant_Tekapo_A.jpg",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

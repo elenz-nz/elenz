@@ -151,7 +151,24 @@
    8
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "te-rere-hau.webp",
+   "title": "Te Rere Hau Wind Farm",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "file": "te-rere-hau-2.webp",
+   "title": "Te Rere Hau Wind Farm, view across the hills",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",

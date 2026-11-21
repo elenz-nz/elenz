@@ -130,7 +130,16 @@
    11
   ]
  },
- "images": [],
+ "images": [
+  {
+   "file": "matahina.webp",
+   "title": "Matahina Dam",
+   "author": "Ulrich Lange",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Lake_Matahina_-_Dam.jpg",
+   "licence": "CC BY-SA 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  }
+ ],
  "aerial": [
   {
    "k": "site",
