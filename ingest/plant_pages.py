@@ -15,7 +15,7 @@ Each plant page (/plants/<slug>) is prerendered from its file here; its live pan
   about                  {text, refs} once its about text is checked
   facts                  [{k, label, value, refs, note?}]: the checked facts, in page order
   location               {lat, lon, basis, refs} once the station's point is checked
-  images                 [{file, title, author, source_url, licence, licence_url}]: the plant's rows of
+  images                 [{file, title, author, source_url, licence, licence_url, focus?}]: the plant's rows of
                          plant_images.csv, in file order (the first leads; the page lets readers step through the rest)
   aerial                 [{k, file, across, imagery}]: the plant's LINZ aerial views (site, close, wide;
                          analysis/plant_aerials.py), once its location is checked and while the views are centred on it
@@ -178,7 +178,8 @@ def page(s, p, cap, meta, srcs, images, aerials):
         'about': about,
         'facts': facts,
         'location': location,
-        'images': [{k: r[k] for k in ('file', 'title', 'author', 'source_url', 'licence', 'licence_url')} for r in imgs],
+        'images': [{**{k: r[k] for k in ('file', 'title', 'author', 'source_url', 'licence', 'licence_url')},
+                    **({'focus': r['focus']} if r['focus'] else {})} for r in imgs],
         'aerial': aerial,
         'sources': [{'n': n, **{k: srcs[x][k] for k in ('title', 'publisher', 'url', 'opened')}} for x, n in numbers.items()],
     }

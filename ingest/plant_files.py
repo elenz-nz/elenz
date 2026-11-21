@@ -42,7 +42,7 @@ SOURCE_KINDS = {'public', 'research'}   # research: never cited by a published f
 # Licences an image may carry (plan: CC BY, BY-SA, CC0, public domain, or an owner's written permission).
 LICENCE = re.compile(r'^(CC BY(-SA)? \d\.\d( [A-Z]{2})?|CC0 1\.0|Public domain|No known copyright restrictions|'
                      r'Used with permission)$')
-IMAGE_FIELDS = ['slug', 'file', 'title', 'author', 'source_url', 'licence', 'licence_url', 'checked', 'crop']
+IMAGE_FIELDS = ['slug', 'file', 'title', 'author', 'source_url', 'licence', 'licence_url', 'checked', 'crop', 'focus']
 
 
 def slug(s):
@@ -181,6 +181,8 @@ def check():
         if not LICENCE.match(r['licence']):
             problems.append(f'{where}: licence {r["licence"]!r} isn\'t one we can use (CC BY, CC BY-SA, CC0, public '
                             'domain, no known copyright restrictions, or used with permission)')
+        if r['focus'] and not re.fullmatch(r'\d{1,3}% \d{1,3}%', r['focus']):
+            problems.append(f'{where}: focus {r["focus"]!r} must look like "50% 30%" (where the crop is anchored: across, down)')
         for k in ('file', 'title', 'author', 'source_url', 'checked'):
             if not r[k]:
                 problems.append(f'{where}: {k} is required')

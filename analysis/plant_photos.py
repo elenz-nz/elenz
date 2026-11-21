@@ -41,7 +41,7 @@ UA = 'ElenzBot/1.0 (https://elenz.co.nz; hello@elenz.co.nz)'
 LICENCES = {
     'CC BY': 'by', 'CC BY-SA': 'by-sa',
 }
-FIELDS = ['slug', 'file', 'title', 'author', 'source_url', 'licence', 'licence_url', 'checked', 'crop']
+FIELDS = ['slug', 'file', 'title', 'author', 'source_url', 'licence', 'licence_url', 'checked', 'crop', 'focus']
 
 
 def fetch_url(url, tries=4):
@@ -116,7 +116,7 @@ def add(out):
                          licence=m['licence'],
                          licence_url=m['licence_url'] or ('https://creativecommons.org/publicdomain/mark/1.0/'
                                                           if m['licence'] == 'Public domain' else ''), checked=today,
-                         crop=f'none; resized to {im.width} px wide, WebP'))
+                         crop=f'none; resized to {im.width} px wide, WebP', focus=''))
         print('added', file, im.size)
     with open(CSV, 'w', newline='') as f:
         w = csv.DictWriter(f, FIELDS, lineterminator='\n')
@@ -150,7 +150,7 @@ def local(spec_path, srcdir):
             continue
         rows.append(dict(slug=m['slug'], file=m['file'], title=m['title'], author=m['author'],
                          source_url=m['source_url'], licence=m['licence'], licence_url=m['licence_url'],
-                         checked=today, crop=note))
+                         checked=today, crop=note, focus=''))
     with open(CSV, 'w', newline='', encoding='utf-8') as f:
         w = csv.DictWriter(f, FIELDS, lineterminator='\n')
         w.writeheader()
