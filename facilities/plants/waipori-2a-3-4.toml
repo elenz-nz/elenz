@@ -7,7 +7,9 @@ register = ["H038"]
 wikidata = "Q123943279"
 osm = ["relation/12550511", "relation/12550512", "relation/12550513", "relation/12550514"]
 reviewed = "2026-11-19"
-to_check = []
+to_check = [
+  "Boundary lead: Transpower's Assumptions Book v3.0 (30 Jun 2026; source transpower-assumptions-2026) puts one of Waipori 2A's three units at Halfway Bush (HWB220) with Waipori 1A, and the other two, with 3 and 4, at Berwick (BWK110) (para 113). If so, BWK1101's 74 MW is 2A less one unit, 3 and 4: check against the register's stations and Contact's ratings, together with Deep Stream (Waipori A)'s boundary question.",
+]
 notes = [
   "Elenz: Waipori (2A/3/4) 74 MW at BWK1101, plus Deep Stream (Waipori A) 26 MW at HWB0331; the rest is other embedded at HWB0331 (grade A). The register's 'Waipori A' probably means Waipori 1A, the scheme's first station, counted with Deep Stream.",
   "Hydro batch 5 (19 Nov 2026): facts checked against Contact's scheme page, a TrustPower release (2007), the EA register and network supply points table, Wikipedia and Stats NZ boundaries. The locations are left for the LINZ aerial check.",

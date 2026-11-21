@@ -7,7 +7,7 @@ register = ["T006"]
 reviewed = ""
 to_check = [
   "Location: only the grid connection; this meter is a whole site's connection to the grid (see /methods/generation#onepu), so there may be no single station point to add.",
-  "Owner: not published. The register's operator for KAW0112 ONU0 is Oji Fibre Solutions (Norske Skog Tasman before 6 May 2023), but no public document found says which plant is behind the meter.",
+  "Owner: not published as one owner. The register's operator for KAW0112 ONU0 is Oji Fibre Solutions (Norske Skog Tasman before 6 May 2023). Transpower's Assumptions Book v3.0 (30 Jun 2026; source transpower-assumptions-2026) puts four units behind the meter: TOPP1 and GDL (KA24), both Eastland Generation's, and TA2 and TA3, which it doesn't describe. Decide whether the page names owners per unit (a design decision for the Elenz team).",
   "Commissioned: the register's 1966 is not published, for the same reason.",
   "About: not written. If one is wanted, it should say no more than the Kawerau (Onepu) note on /methods/generation (a design decision for the Elenz team).",
   "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
@@ -17,6 +17,7 @@ notes = [
   "Geothermal batch 1 (19 Nov 2026): checked against the EA register and network supply points table and Stats NZ boundaries only. Public wording for this meter follows the generation method page's note.",
   "Region from the grid connection point in Stats NZ's 2025 region boundaries, 19 Nov 2026. No district published: the point is a substation, and Whakatāne District is 150–200 m from it.",
   "LINZ aerial check (18 Nov 2026): station point not set, grid connection point confirmed.",
+  "Transpower's Assumptions Book v3.0 (30 Jun 2026; source transpower-assumptions-2026), footnote 22: em6's 'KAW110 ONU' value covers Onepu_KA24, Onepu_TA2, Onepu_TA3 and Onepu_TOPP1; Transpower's security of supply assessment counts them as one 60 MW unit. Its embedded generation table (p. 21) lists the same four, plus Kawerau_TAM, at KAW110 (customers Horizon and Norske Skog). Added 21 Nov 2026; the generation method page's note names them.",
 ]
 
 [grid_connection]

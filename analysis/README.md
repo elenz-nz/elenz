@@ -182,7 +182,10 @@ burned for generation, and generation emissions. 25 quarters, FY21 Q1 (Jul–Sep
   ironmaking emissions sit in industrial processes). Both are 'gas' in the EA register.
 
 **Kawerau (Onepu), KAW0112 ONU0** (5 Nov 2026, `kawerau_onepu.py`). The EA's public meters, not the register's name,
-say what this is:
+say what this is. Confirmed 21 Nov 2026 by Transpower's Assumptions Book v3.0 (30 Jun 2026, footnote 22 and the
+embedded generation table, p. 21): em6's 'KAW110 ONU' value covers Onepu_KA24 (GDL), Onepu_TA2, Onepu_TA3 and
+Onepu_TOPP1, which the SOSA counts as one 60 MW unit. No public source gives TA2's and TA3's output or fuel, so the
+factor stays TOPP1 and GDL 24:9.
 
 - Generation_MD's `norskeskog` row equals Grid_import at KAW0112 in every half-hour of the months compared (5,808
   half-hours in Jan 2020, Jun 2021, Apr 2025 and Sep 2026). It's a connection meter's into-grid side, and
