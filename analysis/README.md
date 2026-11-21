@@ -367,7 +367,7 @@ network (grid stations: block dispatch and terminal-vs-connection differences) a
   dispatched); Teviot and other Pioneer hydro at `CYD0331` (8-21 GWh); flat output sold through Contact at Silverdale
   `SVL0331`, Takapu Road `TAK0331` and Bombay `BOB1101` (~20 MW together, landfill gas; the registry files Bombay as
   natural gas); Hokitika `HKK0661` hydro (6-8 GWh); ~60 small points, mostly hydro (West Coast, Otago, Southland).
-- **Wind is small** (~9 MW average). Hau Nui (`GYT0331`, 8.8 MW in the registry) injected only ~0.1 GWh in Sep 2026.
+- **Wind is small** (~9 MW average). Hau Nui (`GYT0331`, 8.8 MW in the registry) injected only ~0.1 GWh in Sep 2026. The farm is near the end of its life, with several turbines out of service (The Post, 2 Oct 2026; details in `facilities/station_leads.csv`, W013).
 - **Effect on shares:** a 24% solar share in the live week is ~23.3% of all generation; the renewable share reads
   slightly low, the fossil share slightly high.
 - **History vs live:** `Generation_MD` already carries all of Ngāwhā (29-40 GWh a month) and Teviot's own meter
