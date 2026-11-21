@@ -190,7 +190,7 @@
 			</div>
 			<figcaption>
 				{#if vk === 'map'}Map: Toitū Te Whenua LINZ, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.
-				{:else if av}Aerial view, about {size(av.across)} across{av.k !== 'site' ? '; the ring marks the station' : ''}. Imagery: {av.imagery ? `${av.imagery}, ` : ''}Toitū Te Whenua LINZ, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.
+				{:else if av}Aerial view, about {size(av.across)} across. Imagery: {av.imagery ? `${av.imagery}, ` : ''}Toitū Te Whenua LINZ, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.
 				{:else}Outline: Electricity Authority network zones, CC BY 4.0.{/if}
 				{#if note}<span class="note">{@render note()}</span>{/if}
 			</figcaption>
@@ -233,7 +233,7 @@
 	.lightbox .shut { position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; border-radius: 50%; border: 0; cursor: pointer; font-size: 1.6rem; line-height: 1;
 		background: rgb(255 255 255 / 0.88); color: #132020; }
 	.lightbox .shut:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-	@media (max-width: 600px) { .lightbox .stage { padding: 56px 0 0; } .lightbox .cap { padding: 0 12px; } .lightbox .step { top: auto; bottom: 70px; transform: none; } }
+	@media (max-width: 600px) { .lightbox .stage { padding: 56px 0 0; } .lightbox .cap { padding: 0 12px; } }
 	.views { position: absolute; top: 8px; right: 8px; background: var(--surface); box-shadow: 0 1px 3px rgb(0 0 0 / 0.3); }
 	.locator { position: absolute; left: 8px; bottom: 8px; width: auto; height: 34%; max-height: 120px; aspect-ratio: auto;
 		background: rgb(255 255 255 / 0.9); border-radius: 4px; padding: 4px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.3); pointer-events: none; }
