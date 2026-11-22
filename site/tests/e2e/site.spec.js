@@ -403,13 +403,13 @@ test.describe('plant pages', () => {
     await expect(page.locator('h1')).toHaveText('Plants');
   });
 
-  test('the plant index opens a plant that has several aerial views (Kawerau (Onepu) has no chosen view yet)', async ({ page }) => {
+  test('the plant index opens Kawerau (Onepu) with a click (a client-side navigation; its aerial views once shared a key and stopped the page)', async ({ page }) => {
     const errors = [];
     page.on('console', (m) => { if (m.type() === 'error' && /svelte\.dev\/e\//.test(m.text())) errors.push(m.text().slice(0, 200)); });
     await page.goto('/plants?q=onepu');
     await page.locator('.tbl tbody a', { hasText: 'Kawerau (Onepu)' }).click();   // a client-side navigation
     await expect(page.locator('h1')).toHaveText('Kawerau (Onepu)');
-    await expect(page.locator('.views').getByRole('button')).toHaveText(['Site', 'Close', 'Wide']);
+    await expect(page.locator('.photo .loc img')).toHaveAttribute('src', '/plants/aerial/kawerau-onepu-close.webp');   // its chosen view (the team, 23 Nov 2026)
     expect(errors).toEqual([]);
   });
 

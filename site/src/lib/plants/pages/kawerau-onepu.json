@@ -81,20 +81,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/kawerau-onepu-site.webp",
-   "across": 470,
-   "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2025)"
-  },
-  {
-   "k": "close",
    "file": "aerial/kawerau-onepu-close.webp",
    "across": 940,
-   "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/kawerau-onepu-wide.webp",
-   "across": 7520,
    "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2025)"
   }
  ],
