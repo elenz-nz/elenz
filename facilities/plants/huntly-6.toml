@@ -6,16 +6,15 @@ name = "Huntly 6"
 register = ["T024"]
 wikidata = "Q5945709"
 osm = ["way/167293886"]
-reviewed = ""
-to_check = [
-  "Other name P40: only Wikipedia's Genesis article calls Unit 6 \"Huntly P40\"; find a Genesis or official source before publishing it.",
-]
+reviewed = "2026-11-23"
+to_check = []
 notes = [
   "Elenz has four plants here: the Rankines (units 1–4 as one, Coal/gas, 1,000 MW → 750 MW from Jan 2014), Huntly 5 (403 MW), Huntly 6 (50 MW) and the battery (100 MW, Jul 2026). Split from T001.",
   "Thermal batch 1 (19 Nov 2026): facts checked against Genesis's Huntly page, the EA register and Stats NZ boundaries. Built by Genesis, so no previous owners. District and region as for the Rankines (same site).",
   "Capacity: Genesis gives 50.8 MW, the EA register 50 MW (Elenz uses 50); Wikipedia's list 48.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
   "Commissioned date rule (21 Nov 2026): first metered day 2004-05-20, from HLY2201 huntly_p40. The previous value moved to alt.",
+  "Team notes (23 Nov 2026): the Concept Consulting report for the EA (Appendix C, May 2023, concept-2023-thermal) calls Unit 6 \"formerly P40\", 51 MW (normal rating 48, maximum 50.8), natural gas or diesel, 2004: P40 is now an official-document name. The same report lists, for other thermal plant: Huntly Unit 5 403 MW (usually about 385) 2007; the Rankines as three 250 MW units from 1983 (the report says Unit 3 was decommissioned in 2012, the register 23 Jan 2014); Junction Road 100 MW (2 units) 2020; McKee 100 MW (2 units) 2013 (text says 2012); Stratford peakers 210 MW (2 x 105) 2010 (text says 2011); Whirinaki 155 MW (3 x 52) 2004; Taranaki Combined Cycle 377 MW, 1998. It doesn't cover Glenbrook, Whareroa, Kapuni or Edgecumbe.",
 ]
 
 [location]
@@ -35,8 +34,8 @@ checked = "2026-11-18"
 note = "code from the EA's network supply points table; the point is the substation, read from the LINZ aerial, 18 Nov 2026 (the table's point was [-37.541590, 175.151810])"
 
 [facts.other_names]
-value = ["Huntly Unit 6"]
-source = "genesis-huntly"
+value = ["Huntly Unit 6", "Huntly P40"]
+source = ["genesis-huntly", "concept-2023-thermal"]
 grade = "A"
 checked = "2026-11-19"
 

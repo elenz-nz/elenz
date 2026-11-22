@@ -21,8 +21,8 @@ test.describe('plant research page', () => {
     // a choice made before the page has hydrated is lost (the page then reads its settings from the address), and a
     // phone Safari on GitHub's runners can still be hydrating here (test report, 19 Nov 2026), so choose until it takes
     await expect(async () => {
-      await page.getByLabel('Needs').selectOption('grid');
-      await expect(page).toHaveURL(/\?key=k123&need=grid/, { timeout: 2_000 });
+      await page.getByLabel('Needs').selectOption('todo');
+      await expect(page).toHaveURL(/\?key=k123&need=todo/, { timeout: 2_000 });
     }).toPass({ timeout: 20_000 });
     const some = Number((await count.textContent()).match(/^(\d+)/)[1]);
     expect(some).toBeGreaterThan(0);

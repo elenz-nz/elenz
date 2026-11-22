@@ -5,10 +5,8 @@ plant = "Kaimai"
 name = "Kaimai"
 register = ["H010"]
 osm = ["way/616229609", "way/619975647", "way/987248229"]
-reviewed = "2026-11-19"
-to_check = [
-  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
-]
+reviewed = "2026-11-23"
+to_check = []
 notes = [
   "Station points (22 Nov 2026): read from the LINZ aerial by the Elenz team.",
   "One dispatched unit (Kaimai 5) carries the whole scheme: Lloyd Mandeno, Lower Mangapapa, Ruahihi and Kaimai 5. 42 MW.",
@@ -17,6 +15,7 @@ notes = [
   "Commissioning: Contact gives 1972–1994 for the scheme; the Manawa Energy article gives Lloyd Mandeno 1972, Lower Mangapapa April 1979 and Ruahihi 1981; Kaimai 5 (the register's dispatched unit) is left out until a source we can open dates it: 1994 is the end of Contact's range, and Wikipedia's list agrees. McLaren Falls, the scheme's 1925 station, closed in 1989.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
   "The [location] point is Ruahihi's, the largest station; each station's own point is in its entry.",
+  "Station MW (23 Nov 2026, team asked): Contact and Manawa Energy give only the scheme total (42 MW, 42.1 on Manawa's page). Per-station figures come from Wikipedia: its list of power stations has Lloyd Mandeno 15.6, Lower Mangapapa 6.0, Ruahihi 20 and Kaimai 5 0.35 MW (42 MW in all), its Kaimai article 16, 20, 5.6 and 0.3 (wp-kaimai-scheme). Grade B until an owner figure is found.",
 ]
 
 [location]
@@ -122,30 +121,37 @@ checked = ""
 
 [[stations]]
 value = "Lloyd Mandeno"
+mw = 15.6
 location = [-37.843995, 176.050816]
-source = ["contact-kaimai", "wp-manawa-energy"]
+source = ["contact-kaimai", "wp-manawa-energy", "wp-list", "wp-kaimai-scheme"]
 grade = "B"
-checked = "2026-11-19"
+checked = "2026-11-23"
 commissioned = "1972"
+note = "MW from Wikipedia's list of power stations; its Kaimai article gives 16 MW"
 
 [[stations]]
 value = "Lower Mangapapa"
+mw = 6.0
 location = [-37.820729, 176.041274]
 source = ["contact-kaimai", "wp-manawa-energy"]
 grade = "B"
-checked = "2026-11-19"
+checked = "2026-11-23"
 commissioned = "1979"
+note = "MW from Wikipedia's list of power stations; its Kaimai article gives 5.6 MW"
 
 [[stations]]
 value = "Ruahihi"
+mw = 20
 location = [-37.777318, 176.055234]
 source = ["contact-kaimai", "wp-manawa-energy"]
 grade = "B"
-checked = "2026-11-19"
+checked = "2026-11-23"
 commissioned = "1981"
+note = "MW from Wikipedia's list and its Kaimai article (both 20 MW)"
 
 [[stations]]
 value = "Kaimai 5"
+mw = 0.35
 location = [-37.872899, 176.037936]
 source = ["manawa-kaimai-scheme", "wp-list"]
 grade = "B"

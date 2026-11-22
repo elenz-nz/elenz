@@ -5,8 +5,8 @@ plant = "Junction Road"
 name = "Junction Road"
 register = ["T012"]
 osm = ["way/781973296"]
-reviewed = ""
-to_check = ["Capacity: Elenz uses 100 MW; the EA register says 130 MW. (Unchanged: plant_capacity.csv note.)"]
+reviewed = "2026-11-23"
+to_check = []
 notes = [
   "100 MW from Feb 2020.",
   "Thermal batch 1 (19 Nov 2026): facts checked against Todd Energy's power plants page, the Taranaki Regional Council's 2023/24 monitoring report and the EA register.",
@@ -15,6 +15,7 @@ notes = [
   "Previous operator: the council says the site was formerly operated by Todd Generation Ltd, whose consents moved to Nova Energy on 1 June 2022. Ownership before and after isn't stated, so no previous owners fact yet.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point added (the substation).",
   "Commissioned date rule (21 Nov 2026): first metered day 2020-02-05, from JRD1101 junctionroad; the code appears in January 2020. The previous value moved to alt.",
+  "Team notes (23 Nov 2026): 100 MW is fine. The Concept Consulting report for the EA (concept-2023-thermal) also gives Junction Road as 100 MW in two units, 2020; the register's 130 MW is kept as a rating.",
 ]
 
 [location]

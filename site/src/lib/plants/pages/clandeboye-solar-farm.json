@@ -23,13 +23,14 @@
  "scheme": null,
  "metered": null,
  "checking": false,
- "checked": "2026-11-21",
+ "checked": "2026-11-23",
  "about": {
-  "text": "Clandeboye is Lodestone Energy's fifth solar farm and its first in the South Island, on 42 hectares of former dairy land north of Temuka in South Canterbury. About 45,000 bifacial panels feed Alpine Energy's network, the first large solar farm on it, while the landowner runs sheep on the site. Construction began in 2025 and the farm first generated in 2026; it is expected to produce about 43 GWh a year.",
+  "text": "Clandeboye is Lodestone Energy's fifth solar farm and its first in the South Island, on 42 hectares of former dairy land north of Temuka in South Canterbury. About 45,000 bifacial panels on trackers feed Alpine Energy's network, the first large solar farm on it, while the landowner runs sheep on the site. Construction began in 2025 and the farm first generated in 2026; it is expected to produce about 43 GWh a year.",
   "refs": [
    1,
    2,
-   3
+   3,
+   4
   ]
  },
  "facts": [
@@ -38,7 +39,7 @@
    "label": "Commissioned",
    "value": "2026",
    "refs": [
-    4,
+    5,
     3
    ],
    "note": "first power reported in August 2026; first power reported in August 2026; the register's row starts 10 June 2026; the EA's metered data has no output for the farm yet"
@@ -48,7 +49,7 @@
    "label": "Region",
    "value": "Canterbury",
    "refs": [
-    5
+    6
    ],
    "note": "from the grid connection point (no station point yet); the sources place the farm near it, in the same region"
   },
@@ -57,7 +58,7 @@
    "label": "District",
    "value": "Timaru",
    "refs": [
-    6
+    7
    ],
    "note": "the grid connection point (Temuka) only"
   },
@@ -66,7 +67,7 @@
    "label": "Owner",
    "value": "Lodestone Energy",
    "refs": [
-    4,
+    5,
     1
    ],
    "note": "the register's operator: Lodestone Solar Limited"
@@ -84,7 +85,7 @@
    "label": "Connection point",
    "value": "Temuka (TMK0331)",
    "refs": [
-    7
+    8
    ]
   }
  ],
@@ -93,7 +94,7 @@
   "lon": 171.408782,
   "basis": "station",
   "refs": [
-   8
+   9
   ]
  },
  "images": [],
@@ -129,34 +130,41 @@
   },
   {
    "n": 4,
+   "title": "Clandeboye Solar Farm",
+   "publisher": "Ethical Power",
+   "url": "https://ethicalpower-eyg3duf8ejcph2dr.uksouth-01.azurewebsites.net/projects/clandeboye-solar-farm",
+   "opened": "2026-11-23"
+  },
+  {
+   "n": 5,
    "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
    "opened": "2026-11-19"
   },
   {
-   "n": 5,
+   "n": 6,
    "title": "Regional Council 2025 (boundaries)",
    "publisher": "Stats NZ",
    "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Regional_Council_2025/FeatureServer",
    "opened": "2026-11-19"
   },
   {
-   "n": 6,
+   "n": 7,
    "title": "Territorial Authority 2026 (boundaries)",
    "publisher": "Stats NZ",
    "url": "https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer",
    "opened": "2026-11-19"
   },
   {
-   "n": 7,
+   "n": 8,
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
   },
   {
-   "n": 8,
+   "n": 9,
    "title": "LINZ aerial imagery (LINZ Basemaps)",
    "publisher": "Toitū Te Whenua LINZ",
    "url": "https://basemaps.linz.govt.nz/",

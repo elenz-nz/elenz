@@ -15,6 +15,7 @@ notes = [
   "Commissioning: Genesis says June 2007; the EA register 2007 (a year); Elenz's history has its output from Feb 2007 (switched on early, in February, for commissioning).",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
   "Commissioned date rule (21 Nov 2026): first metered day 2007-02-02, from HLY2201 huntly_e3p: readings under 0.4 MW on 14 Sep 2006 (a test), then output from 2 Feb 2007. The previous value moved to alt.",
+  "Concept Consulting's thermal overview for the EA (concept-2023-thermal, 23 Nov 2026): Unit 5 is 403 MW (usually about 385), gas, 2007 (as e3p).",
 ]
 
 [location]

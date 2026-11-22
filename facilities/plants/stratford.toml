@@ -22,6 +22,7 @@ notes = [
   "Stations kept unpublished: the units fact carries the peakers and the closed units.",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
   "TCC closing date (design decision 21 Nov 2026): not pursued. Its last metered output is Dec 2025, Transpower's charging records disconnect it from 28 Jan 2026, and Elenz drops it from Stratford's capacity on 1 Apr 2026 (Contact's FY26 slides); the exact day doesn't change anything that matters between January and April, so the capacity row stays.",
+  "Concept Consulting's thermal overview for the EA (concept-2023-thermal, 23 Nov 2026): the peakers are 210 MW (2 x 105), 2010 in its table (2011 in the text); Taranaki Combined Cycle 377 MW, 1998. Elenz keeps the register's 212 MW for the peakers (team decision, 23 Nov).",
 ]
 
 [location]

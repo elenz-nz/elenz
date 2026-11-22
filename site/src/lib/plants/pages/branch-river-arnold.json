@@ -95,7 +95,8 @@
     2,
     3,
     7,
-    6
+    6,
+    8
    ],
    "note": "the board was corporatised as Marlborough Electric in the early 1990s (Wikipedia: 1992–93); TrustPower bought the scheme from Marlborough Electric in 1998 (Ministry for the Environment)"
   },
@@ -120,7 +121,7 @@
    "label": "Connection point",
    "value": "Argyle (ARG1101)",
    "refs": [
-    8
+    9
    ]
   }
  ],
@@ -129,7 +130,7 @@
   "lon": 173.203316,
   "basis": "Argyle station",
   "refs": [
-   9
+   10
   ]
  },
  "images": [],
@@ -205,13 +206,20 @@
   },
   {
    "n": 8,
+   "title": "Our Story (company history)",
+   "publisher": "Marlborough Lines",
+   "url": "https://www.marlboroughlines.co.nz/our-story",
+   "opened": "2026-11-23"
+  },
+  {
+   "n": 9,
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
   },
   {
-   "n": 9,
+   "n": 10,
    "title": "LINZ aerial imagery (LINZ Basemaps)",
    "publisher": "Toitū Te Whenua LINZ",
    "url": "https://basemaps.linz.govt.nz/",

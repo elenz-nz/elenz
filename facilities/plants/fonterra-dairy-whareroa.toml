@@ -2,13 +2,12 @@
 
 slug = "fonterra-dairy-whareroa"
 plant = "Fonterra Dairy - Whareroa"
-name = "Fonterra Dairy - Whareroa"
+name = "Whareroa Cogeneration Plant"
 register = ["T009"]
 reviewed = ""
 to_check = [
-  "Page name: the EA register's \"Fonterra Dairy - Whareroa\"; the owner calls it the Whareroa Cogeneration Plant. Rename the page? (Decision needed; the tracker's name stays.)",
+  "Metering: the team thinks the plant's market meter changed from net to gross about the end of Aug or start of Sep 2026 (and that the OHG substation supports the electric boilers). Find a public source or check Generation_MD against dispatch from Aug 2026 before changing the net-of-load note (overrides.toml) or the page.",
   "Capacity: Elenz uses 68 MW (the register's figure); the plant is four 10 MW gas turbines and a 28 MW steam turbine. Generation_MD is net of the site's load (see notes).",
-  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
   "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026) records a \"large plant connected\" adjustment event at HWA (Whareroa Cogen), with no effective date given (2 x 34 MW electric boilers; event processed 9 Oct 2026). Transpower's Appendix F models Hawera (65 MW gas cogeneration, averaging 32 MW a week) retiring in 2026. Watch whether the cogeneration plant stops, then set its status and end date.",
 ]
 notes = [
@@ -18,6 +17,7 @@ notes = [
   "Commissioned: Todd's Kapuni page (gas supply contracts, 1996) and Wikipedia's list give 1996; the EA register's 1966 looks like the dairy site's date or a typo (its effective dates start in 1996).",
   "The register's operator is still Nova Energy (Nov 2026).",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
+  "Page name (design decision, 23 Nov 2026): the page is named Whareroa Cogeneration Plant, the owner's name; the EA register's \"Fonterra Dairy - Whareroa\" is its other name, and the tracker's name stays. Team's understanding, not a source: the OHG substation was added to support the electric boilers, and the market meter changed from net to gross at about the end of Aug or start of Sep 2026. Not published; check it against the metered and dispatch data and an EA or owner document before the About or the load note says so. The EA approved Whareroa Cogeneration Limited as a Type B industrial co-generator from 13 Aug 2026 (ea-type-b-2026).",
 ]
 
 [location]
@@ -37,8 +37,8 @@ checked = "2026-11-19"
 note = "codes and point match the EA's network supply points table of 17 Nov 2026; the owner's notice names both"
 
 [facts.other_names]
-value = ["Whareroa Cogeneration Plant"]
-source = "ea-whareroa-2026"
+value = ["Fonterra Dairy - Whareroa"]
+source = ["ea-register", "ea-whareroa-2026"]
 grade = "A"
 checked = "2026-11-19"
 

@@ -18,6 +18,7 @@ notes = [
   "The 2 MW reciprocating units in Wikipedia's list are Todd's 2008 waste-gas cogeneration at the McKee plant (Scoop, 16 Jun 2008), not part of this 100 MW peaker or of Elenz's McKee. Stations kept unpublished.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
   "Commissioned date rule (21 Nov 2026): first metered day 2012-09-17, from MKE1101 McKee. The previous value moved to alt.",
+  "Concept Consulting's thermal overview for the EA (concept-2023-thermal, 23 Nov 2026): McKee is 100 MW in two units, gas from the Mangahewa and McKee fields, 2013 in its table (2012 in the text), Nova Energy.",
 ]
 
 [location]

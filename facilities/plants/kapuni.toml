@@ -7,7 +7,7 @@ register = ["T010"]
 reviewed = ""
 to_check = [
   "Owner: the joint venture's members today. The Commerce Commission (2003) has NGC and Todd Energy owning it 50:50; Vector (which had NGC's half) announced in December 2019 it would transfer its 50% to Todd Petroleum Mining. Todd Energy's Kapuni page now calls the gas treatment plant Todd's, so the sale went ahead; confirm the joint venture's share went with it before naming Todd as sole owner. The EA register's operator is Nova Energy.",
-  "Capacity: Elenz uses the register's 25 MW; check against an owner or council source.",
+  "Capacity: Elenz uses the register's 25 MW; Global Energy Monitor gives one 25.3 MW gas turbine (it cites government thermal-plant lists), but no owner or council source for the plant's size was found; the EA register lists four generation units.",
 ]
 notes = [
   "Still in the data as operating (25 MW, from Mar 1998).",
@@ -16,6 +16,7 @@ notes = [
   "Wikipedia's list gives the operator as Vector / Bay of Plenty Energy (out of date).",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
   "Commissioned date rule (21 Nov 2026): first metered day 1998-03-18, from KPA1101 kapuni; the code starts in March 1998. The previous value moved to alt.",
+  "Team notes (23 Nov 2026): looks good; find a source for 25 MW and anything else to add. Research: Global Energy Monitor (gem-kapuni) gives 25.3 MW for one gas turbine started in 1998, against the EA register's four generation units (ea-cogen-register); Todd Energy became 100% owner of the Kapuni field's mining licence in 2017–18 but its pages don't mention the cogeneration plant (todd-kapuni-business), and the EA's 2026 co-generator register still names the Kapuni Energy Joint Venture; the Concept Consulting thermal overview for the EA doesn't cover Kapuni (concept-2023-thermal). No owner or council figure found.",
 ]
 
 [location]
@@ -104,3 +105,10 @@ value = "Kapuni is a gas-fired cogeneration plant at the Kapuni gas treatment pl
 source = ["comcom-491", "trc-kgtp-2022", "vector-kapuni-2019", "ea-register"]
 grade = "A"
 checked = "2026-11-19"
+
+[[ratings]]
+value = 25.3
+basis = "Global Energy Monitor: one gas turbine unit (a secondary source)"
+source = "gem-kapuni"
+grade = "B"
+checked = "2026-11-23"

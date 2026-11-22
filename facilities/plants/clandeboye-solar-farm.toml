@@ -5,11 +5,8 @@ plant = "Clandeboye Solar Farm"
 name = "Clandeboye Solar Farm"
 register = ["S013"]
 osm = ["way/1442514369"]
-reviewed = "2026-11-19"
-to_check = [
-  "Mounting: add \"single-axis trackers\", sourced to Ethical Power's project page and Lodestone's (our dispatch check agrees, but isn't a source).",
-  "Metered zeros: the EA's metered data (Generation_MD) has Clandeboye at 0 every half hour in Sep and Oct 2026, though its dispatch shows output and so does our history. Trace where our figure comes from.",
-]
+reviewed = "2026-11-23"
+to_check = []
 notes = [
   "Solar batch (19 Nov 2026): facts checked against the EA register and network supply points table, Lodestone's farm page and groundbreaking news (through search results), EVs & Beyond's first-power report and Stats NZ boundaries.",
   "Region from the grid connection point (no station point yet); the sources place the farm near it, in the same region (Temuka; the farm is north of Temuka). District left unchecked until there is a station point: Temuka's point is in Timaru District.",
@@ -18,6 +15,7 @@ notes = [
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
   "Resolved: Appendix D commissioning lead. Commissioned date rule (21 Nov 2026): owner's date kept: TMK0331 clandeboye_solar_farm reads zero to Oct 2026 (the tracker uses dispatch), so the owner's date stays. Appendix D prints the connection as effective 24 Aug 2024 (the sheet was updated in Sep 2026, so 2026 may be meant); kept out of the page.",
   "Solar leads (21 Nov 2026): the developer's annual estimate added to the About text, worded as an estimate (lodestone-clandeboye).",
+  "Team notes (23 Nov 2026): Clandeboye first generated in early August. Generation_MD is probably lagging as new sites come online, so the page keeps using dispatch and the metered row is expected to appear later (design decision; recheck with November's metered data, with Kōwhai Park and Kaiwaikawe). Mounting: the EPC contractor's project page (ethicalpower-clandeboye) says the farm has around 45,000 tracking panels and Lodestone's says single-portrait bifacial panels; neither says single- or dual-axis, and the team found nothing written, so the page says \"on trackers\" only.",
 ]
 
 [location]
@@ -65,10 +63,10 @@ checked = "2026-11-19"
 note = "the register's operator: Lodestone Solar Limited"
 
 [facts.about]
-value = "Clandeboye is Lodestone Energy's fifth solar farm and its first in the South Island, on 42 hectares of former dairy land north of Temuka in South Canterbury. About 45,000 bifacial panels feed Alpine Energy's network, the first large solar farm on it, while the landowner runs sheep on the site. Construction began in 2025 and the farm first generated in 2026; it is expected to produce about 43 GWh a year."
-source = ["lodestone-clandeboye", "lodestone-clandeboye-groundbreaking", "evsandbeyond-clandeboye"]
+value = "Clandeboye is Lodestone Energy's fifth solar farm and its first in the South Island, on 42 hectares of former dairy land north of Temuka in South Canterbury. About 45,000 bifacial panels on trackers feed Alpine Energy's network, the first large solar farm on it, while the landowner runs sheep on the site. Construction began in 2025 and the farm first generated in 2026; it is expected to produce about 43 GWh a year."
+source = ["lodestone-clandeboye", "lodestone-clandeboye-groundbreaking", "evsandbeyond-clandeboye", "ethicalpower-clandeboye"]
 grade = "B"
-checked = "2026-11-21"
+checked = "2026-11-23"
 
 [[ratings]]
 value = 27.7

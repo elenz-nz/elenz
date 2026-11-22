@@ -27,7 +27,7 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": "2026-11-21",
+ "checked": "2026-11-23",
  "about": {
   "text": "Whirinaki, north of Napier, is a diesel-fired peaker plant. The government had it built after the power shortages of 2001 and 2003 as reserve generation of last resort, run by Contact Energy, and it opened in June 2004; Contact bought it in 2011. Its three fast-start units can reach full output from a cold start in 20 to 30 minutes, and about four million litres of diesel stored on site will run it at full output for 92 hours. An earlier gas turbine station on the same site ran from 1978 to 2001.",
   "refs": [
@@ -92,11 +92,14 @@
   {
    "k": "previous_owners",
    "label": "Previous owners",
-   "value": "New Zealand Government, 2004–11 (reserve generation, run by Contact Energy)",
+   "value": "New Zealand Government, 2004–11 (reserve generation, built and run by Contact Energy on its behalf)",
    "refs": [
+    7,
+    8,
+    9,
     2
    ],
-   "note": "Contact bought it from the Crown on 22 December 2011, after Meridian declined to take it in the 2010 market reforms (Wikipedia)"
+   "note": "Contact bought it from the Crown for $33 million, on 22 December 2011 (Wikipedia), after Meridian declined to take it in the 2010 market reforms; the Government's releases of 2004 and 2010 and RNZ cover the rest"
   },
   {
    "k": "ratings",
@@ -111,8 +114,8 @@
    "label": "Connection point",
    "value": "Whirinaki (WHI2201)",
    "refs": [
-    7,
-    8
+    10,
+    11
    ]
   }
  ],
@@ -121,7 +124,7 @@
   "lon": 176.887595,
   "basis": "station",
   "refs": [
-   8
+   11
   ]
  },
  "images": [],
@@ -178,13 +181,34 @@
   },
   {
    "n": 7,
+   "title": "Whirinaki power plant adds to electricity supply security (1 June 2004)",
+   "publisher": "New Zealand Government (via Scoop)",
+   "url": "https://m.scoop.co.nz/stories/PA0406/S00001/whirinaki-power-plant-adds-to-electricity-supply.htm",
+   "opened": "2026-11-23"
+  },
+  {
+   "n": 8,
+   "title": "Whirinaki plant to be sold (December 2010)",
+   "publisher": "New Zealand Government (via Scoop)",
+   "url": "https://www.scoop.co.nz/stories/PA1012/S00339/whirinaki-plant-to-be-sold.htm",
+   "opened": "2026-11-23"
+  },
+  {
+   "n": 9,
+   "title": "Whirinaki sold to Contact",
+   "publisher": "RNZ",
+   "url": "https://www.rnz.co.nz/news/business/93038/whirinaki-sold-to-contact",
+   "opened": "2026-11-23"
+  },
+  {
+   "n": 10,
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
   },
   {
-   "n": 8,
+   "n": 11,
    "title": "LINZ aerial imagery (LINZ Basemaps)",
    "publisher": "Toitū Te Whenua LINZ",
    "url": "https://basemaps.linz.govt.nz/",

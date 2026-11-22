@@ -6,7 +6,7 @@ name = "Kinleith"
 register = ["T005"]
 reviewed = ""
 to_check = [
-  "Owner: who owns the cogeneration plant now? ECNZ built it (Kinleith Cogeneration Limited) and it passed to Genesis Power in 1999; the EA register's operator was TrustPower to Oct 2021 and Manawa Energy since (Contact bought Manawa in 2025); the EA's co-generator register (2015) approves Carter Holt Harvey Pulp and Paper's Kinleith Mill turbine generator; Elenz's design decision (2 Nov 2026) groups it under Oji Fibre Solutions. Find a public source for the change from Genesis and today's owner.",
+  "Previous owners: ECNZ (Kinleith Cogeneration Limited) to 1999, then Genesis Power; Carter Holt Harvey owned it by 2007 (Gazette). Find the year Genesis sold it to Carter Holt Harvey, then publish previous owners and the About.",
   "Capacity: Indicative gross rating; net output reported around 38 MW.",
   "Since June 2025 the mill makes pulp only (Wikipedia): check whether the plant still runs as before.",
 ]
@@ -19,6 +19,7 @@ notes = [
   "Previous owners (not published until the owner is settled): ECNZ, through Kinleith Cogeneration Limited, to 1999; Genesis Power, from 1999 (Gazette 1999-37; Genesis still had it in 2003, Commerce Commission decision 490).",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
   "Transpower's BBI customer allocation workbook (Assumptions Book Appendix D, updated 19 Nov 2026; source transpower-appendix-d-2026): a changed point of connection for CHHE load, with CHHE added at KIN, effective 1 Jan 2026 (Oji Fibre and Powerco). About the mill's load, not the cogeneration.",
+  "Owner research (23 Nov 2026, team asked): Carter Holt Harvey Pulp and Paper Limited owned the turbine generator when the Electricity Commission approved it as an industrial co-generating station on 31 Jul 2007 (gazette-2007-au5491; the EA register's 2015 entry is the same company); the Bioenergy Association lists the plant under Oji Fibre Solutions (formerly CHH), 39 MWe (bioenergy-kinleith); Oji bought the CHH pulp and paper business, so Oji is the owner today. Genesis ran the plant in the early 2000s (NZ Herald; Commerce Commission 2003). The year Genesis stopped is not found. The register's operator (TrustPower, then Manawa) is the party that buys the output (the Gazette's 2004 and 2005 exemption notices name TrustPower as agent for CHH).",
 ]
 
 [location]
@@ -83,10 +84,10 @@ checked = ""
 
 [facts.owner]
 value = "Oji Fibre Solutions"
-source = "ea-register"
+source = ["bioenergy-kinleith", "gazette-2007-au5491", "ea-register"]
 grade = "B"
-checked = ""
-note = "Elenz's grouping (design decision, 2 Nov 2026); the register's operator is Manawa Energy. See to_check."
+checked = "2026-11-23"
+note = "Carter Holt Harvey Pulp and Paper owned the turbine generator in 2007; the Bioenergy Association lists Oji Fibre Solutions (formerly CHH). The register's operator is Manawa Energy, which buys the output."
 
 [facts.previous_owners]
 value = "Electricity Corporation of New Zealand (ECNZ), through Kinleith Cogeneration Limited, to 1999; Genesis Power (now Genesis Energy), from 1999"
