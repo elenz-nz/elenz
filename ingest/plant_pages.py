@@ -210,7 +210,9 @@ def aerial_views(s, p, loc, rows, chosen):
     if not main or not all(aerial_on(r, loc) for r in main):
         return None
     mine = [r for r in main if r['view'] == chosen.get(s, r['view'])]
-    out = [{'k': 'site', 'file': r['file'], 'across': int(r['across_m']), 'imagery': r['imagery']} for r in mine]
+    # one chosen view is the plant's "Site" whichever size it is; with no choice yet all three show, each under its own
+    # key (Site, Close, Wide: the page keys its view buttons by it, and a repeated key stops the page hydrating)
+    out = [{'k': 'site' if len(mine) == 1 else r['view'], 'file': r['file'], 'across': int(r['across_m']), 'imagery': r['imagery']} for r in mine]
     extra = station_views(rows)
     sts = [(i, st) for i, st in enumerate(p.get('stations', []), 1) if pf.published(st) and st.get('location')]
     if not sts or len(mine) != 1:

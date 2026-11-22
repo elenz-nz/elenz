@@ -167,3 +167,14 @@ test('every plant page\'s description fits search results (110 to 160 characters
     assert.ok(d.length >= 110 && d.length <= 160, `${p.slug}: ${d.length} characters`);
   }
 });
+
+test('each plant page\'s views and facts have their own keys (a repeated key stops the page hydrating)', async () => {
+  const { readdirSync, readFileSync } = await import('node:fs');
+  const dir = new URL('../src/lib/plants/pages/', import.meta.url);
+  for (const f of readdirSync(dir).filter((x) => x.endsWith('.json'))) {
+    const p = JSON.parse(readFileSync(new URL(f, dir), 'utf8'));
+    for (const [what, list] of [['aerial views', (p.aerial ?? []).map((v) => v.k)], ['facts', (p.facts ?? []).map((v) => v.k)], ['sources', (p.sources ?? []).map((v) => v.n)]]) {
+      assert.equal(new Set(list).size, list.length, `${p.slug}: ${what} repeat a key (${list.join(', ')})`);
+    }
+  }
+});
