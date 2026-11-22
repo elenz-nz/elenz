@@ -214,7 +214,7 @@
  "location": {
   "lat": -39.3322,
   "lon": 174.319,
-  "basis": "whole site",
+  "basis": "Stratford peakers station",
   "refs": [
    12
   ]
@@ -226,7 +226,7 @@
    "file": "aerial/stratford-site.webp",
    "across": 460,
    "imagery": "Taranaki 0.05m Urban Aerial Photos (2022-2023)",
-   "name": "Stratford",
+   "name": "Stratford peakers",
    "lat": -39.3322,
    "lon": 174.319
   },
