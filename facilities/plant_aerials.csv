@@ -119,6 +119,8 @@ kowhai-park-solar-farm,wide,aerial/kowhai-park-solar-farm-wide.webp,-43.495833,1
 kumara,site,aerial/kumara-site.webp,-42.635999,171.19527,18,440,West Coast 0.2m Rural Aerial Photos (2024-2026),2026-11-19
 kumara,close,aerial/kumara-close.webp,-42.635999,171.19527,17,880,West Coast 0.2m Rural Aerial Photos (2024-2026),2026-11-19
 kumara,wide,aerial/kumara-wide.webp,-42.635999,171.19527,14,7030,West Coast 0.2m Rural Aerial Photos (2024-2026),2026-11-19
+kumara,s2,aerial/kumara-s2.webp,-42.65562,171.194968,18,440,West Coast 0.2m Rural Aerial Photos (2024-2026),2026-11-22
+kumara,s3,aerial/kumara-s3.webp,-42.729878,171.20558,18,440,West Coast 0.2m Rural Aerial Photos (2024-2026),2026-11-22
 lauriston-solar-farm,site,aerial/lauriston-solar-farm-site.webp,-43.730393,171.786134,18,430,Ashburton 0.075m Urban Aerial Photos (2025),2026-11-19
 lauriston-solar-farm,close,aerial/lauriston-solar-farm-close.webp,-43.730393,171.786134,17,860,Ashburton 0.075m Urban Aerial Photos (2025),2026-11-19
 lauriston-solar-farm,wide,aerial/lauriston-solar-farm-wide.webp,-43.730393,171.786134,14,6900,Ashburton 0.075m Urban Aerial Photos (2025),2026-11-19
@@ -160,6 +162,8 @@ nga-tamariki,wide,aerial/nga-tamariki-wide.webp,-38.547222,176.195833,14,7470,Ba
 ngawha,site,aerial/ngawha-site.webp,-35.417424,173.852112,18,490,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
 ngawha,close,aerial/ngawha-close.webp,-35.417424,173.852112,17,970,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
 ngawha,wide,aerial/ngawha-wide.webp,-35.417424,173.852112,14,7790,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
+ngawha,s2,aerial/ngawha-s2.webp,-35.41752,173.867793,18,490,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-22
+ngawha,s3,aerial/ngawha-s3.webp,-35.403306,173.853463,18,490,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-22
 ohaaki,site,aerial/ohaaki-site.webp,-38.52796,176.29391,18,470,Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025),2026-11-19
 ohaaki,close,aerial/ohaaki-close.webp,-38.52796,176.29391,17,930,Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025),2026-11-19
 ohaaki,wide,aerial/ohaaki-wide.webp,-38.52796,176.29391,14,7470,Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025),2026-11-19
@@ -212,6 +216,7 @@ rangitaiki-solar-farm,wide,aerial/rangitaiki-solar-farm-wide.webp,-37.996342,176
 roaring-meg,site,aerial/roaring-meg-site.webp,-45.001541,169.069988,18,420,Otago 0.2m Rural Aerial Photos (2025),2026-11-19
 roaring-meg,close,aerial/roaring-meg-close.webp,-45.001541,169.069988,17,840,Otago 0.2m Rural Aerial Photos (2025),2026-11-19
 roaring-meg,wide,aerial/roaring-meg-wide.webp,-45.001541,169.069988,14,6760,Otago 0.2m Rural Aerial Photos (2025),2026-11-19
+roaring-meg,s2,aerial/roaring-meg-s2.webp,-44.9832,169.060502,18,420,Otago 0.2m Rural Aerial Photos (2025),2026-11-22
 rotohiko,site,aerial/rotohiko-site.webp,-37.576758,175.144881,18,470,Waikato 0.075m Urban Aerial Photos (2025-2026),2026-11-19
 rotohiko,close,aerial/rotohiko-close.webp,-37.576758,175.144881,17,950,Waikato 0.075m Urban Aerial Photos (2025-2026),2026-11-19
 rotohiko,wide,aerial/rotohiko-wide.webp,-37.576758,175.144881,14,7570,Waikato 0.075m Urban Aerial Photos (2025-2026),2026-11-19
@@ -296,12 +301,16 @@ tokaanu,wide,aerial/tokaanu-wide.webp,-38.981147,175.768366,14,7430,Taupō 0.1m 
 turitea-wind-farm,site,aerial/turitea-wind-farm-site.webp,-40.436369,175.700324,18,450,Palmerston North 0.1m Urban Aerial Photos (2024),2026-11-19
 turitea-wind-farm,close,aerial/turitea-wind-farm-close.webp,-40.436369,175.700324,17,910,Palmerston North 0.1m Urban Aerial Photos (2024),2026-11-19
 turitea-wind-farm,wide,aerial/turitea-wind-farm-wide.webp,-40.436369,175.700324,14,7270,Palmerston North 0.1m Urban Aerial Photos (2024),2026-11-19
+turitea-wind-farm,s1,aerial/turitea-wind-farm-s1.webp,-40.437447,175.699814,18,450,Palmerston North 0.1m Urban Aerial Photos (2024),2026-11-22
+turitea-wind-farm,s2,aerial/turitea-wind-farm-s2.webp,-40.472352,175.635858,18,450,Manawatū-Whanganui 0.3m Rural Aerial Photos (2021-2022),2026-11-22
 twin-rivers-solar-farm,site,aerial/twin-rivers-solar-farm-site.webp,-35.136452,173.350885,18,490,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
 twin-rivers-solar-farm,close,aerial/twin-rivers-solar-farm-close.webp,-35.136452,173.350885,17,980,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
 twin-rivers-solar-farm,wide,aerial/twin-rivers-solar-farm-wide.webp,-35.136452,173.350885,14,7810,Northland 0.3m Rural Aerial Photos (2023-2025),2026-11-19
 waikaremoana,site,aerial/waikaremoana-site.webp,-38.806639,177.150889,18,470,Hawke's Bay 0.2m Rural Aerial Photos (2025-2026),2026-11-19
 waikaremoana,close,aerial/waikaremoana-close.webp,-38.806639,177.150889,17,930,Hawke's Bay 0.2m Rural Aerial Photos (2025-2026),2026-11-19
 waikaremoana,wide,aerial/waikaremoana-wide.webp,-38.806639,177.150889,14,7450,Hawke's Bay 0.2m Rural Aerial Photos (2025-2026),2026-11-19
+waikaremoana,s1,aerial/waikaremoana-s1.webp,-38.803196,177.131046,18,470,Hawke's Bay 0.2m Rural Aerial Photos (2025-2026),2026-11-22
+waikaremoana,s3,aerial/waikaremoana-s3.webp,-38.838993,177.168133,18,470,Hawke's Bay 0.2m Rural Aerial Photos (2025-2026),2026-11-22
 waipapa,site,aerial/waipapa-site.webp,-38.291944,175.683611,18,470,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
 waipapa,close,aerial/waipapa-close.webp,-38.291944,175.683611,17,940,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19
 waipapa,wide,aerial/waipapa-wide.webp,-38.291944,175.683611,14,7500,Waikato 0.3m Rural Aerial Photos (2021-2024),2026-11-19

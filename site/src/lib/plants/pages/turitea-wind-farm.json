@@ -144,7 +144,28 @@
    "k": "site",
    "file": "aerial/turitea-wind-farm-wide.webp",
    "across": 7270,
-   "imagery": "Palmerston North 0.1m Urban Aerial Photos (2024)"
+   "imagery": "Palmerston North 0.1m Urban Aerial Photos (2024)",
+   "name": "Turitea Wind Farm",
+   "lat": -40.436369,
+   "lon": 175.700324
+  },
+  {
+   "k": "s1",
+   "file": "aerial/turitea-wind-farm-s1.webp",
+   "across": 450,
+   "imagery": "Palmerston North 0.1m Urban Aerial Photos (2024)",
+   "name": "Turitea North",
+   "lat": -40.437447,
+   "lon": 175.699814
+  },
+  {
+   "k": "s2",
+   "file": "aerial/turitea-wind-farm-s2.webp",
+   "across": 450,
+   "imagery": "Manawatū-Whanganui 0.3m Rural Aerial Photos (2021-2022)",
+   "name": "Turitea South",
+   "lat": -40.472352,
+   "lon": 175.635858
   }
  ],
  "sources": [

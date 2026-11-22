@@ -213,7 +213,7 @@ def aerial_views(s, p, loc, rows, chosen):
     sts = [(i, st) for i, st in enumerate(p.get('stations', []), 1) if pf.published(st) and st.get('location')]
     if not sts or len(mine) != 1:
         return out
-    here = [v for i, st in sts if list(st['location']) == list(loc['value']) for v in [st['value']]]
+    here = [st.get('view_label', st['value']) for i, st in sts if list(st['location']) == list(loc['value'])]
     out[0].update(name=here[0] if here else p['name'], lat=loc['value'][0], lon=loc['value'][1])
     for i, st in sts:
         r = extra.get(i)
@@ -221,7 +221,7 @@ def aerial_views(s, p, loc, rows, chosen):
             continue
         if not r or float(r['lat']) != st['location'][0] or float(r['lon']) != st['location'][1]:
             continue   # no image yet (or a stale one: --check says so)
-        out.append({'k': f's{i}', 'file': r['file'], 'across': int(r['across_m']), 'imagery': r['imagery'], 'name': st['value'],
+        out.append({'k': f's{i}', 'file': r['file'], 'across': int(r['across_m']), 'imagery': r['imagery'], 'name': st.get('view_label', st['value']),
                     'lat': st['location'][0], 'lon': st['location'][1]})
     if here:   # put the plant's own station where it stands in the list
         pos = [i for i, st in sts if list(st['location']) == list(loc['value'])][0]

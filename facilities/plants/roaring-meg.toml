@@ -8,6 +8,7 @@ osm = ["relation/12568869", "relation/12568870"]
 reviewed = ""
 to_check = []
 notes = [
+  "Station points (22 Nov 2026): read from the LINZ aerial by the Elenz team.",
   "Elenz plant (CML0331, 12 MW register) and grade A at CML0331 in other embedded generation.",
   "Hydro batch 5 (19 Nov 2026): facts checked against Pioneer Energy's history and scheme pages, the EA register and network supply points table and Wikipedia. The location and district are left for the LINZ aerial check.",
   "Region: Pioneer places the scheme in Central Otago - Queenstown Lakes; both districts are in Otago Region.",
@@ -116,6 +117,7 @@ checked = "2026-11-19"
 
 [[stations]]
 value = "Lower Roaring Meg"
+location = [-45.001541, 169.069988]
 mw = 3.0
 source = ["pioneer-roaring-meg", "wp-roaring-meg"]
 grade = "B"
@@ -124,6 +126,7 @@ commissioned = "1936"
 
 [[stations]]
 value = "Upper Roaring Meg"
+location = [-44.9832, 169.060502]
 mw = 1.26
 source = ["pioneer-roaring-meg", "wp-roaring-meg"]
 grade = "B"

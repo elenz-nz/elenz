@@ -10,6 +10,7 @@ reviewed = "2026-11-19"
 photo_leads = ["P032"]
 to_check = []
 notes = [
+  "Station points (22 Nov 2026): read from the LINZ aerial by the Elenz team.",
   "Added from Elenz's plant list (8 Nov 2026).",
   "Elenz shows the scheme's three stations (Tuai, Piripaua and Kaitawa) as one plant, 140 MW in the EA register.",
   "Hydro batch 2 (18 Nov 2026): facts checked against Genesis's Waikaremoana Power Scheme page, the EA register, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
@@ -136,6 +137,7 @@ checked = "2026-11-18"
 
 [[stations]]
 value = "Kaitawa"
+location = [-38.803196, 177.131046]
 mw = 36
 source = "genesis-waikaremoana"
 grade = "A"
@@ -143,6 +145,7 @@ checked = "2026-11-18"
 
 [[stations]]
 value = "Tuai"
+location = [-38.806639, 177.150889]
 mw = 60
 source = "genesis-waikaremoana"
 grade = "A"
@@ -150,6 +153,7 @@ checked = "2026-11-18"
 
 [[stations]]
 value = "Piripaua"
+location = [-38.838993, 177.168133]
 mw = 42
 source = "genesis-waikaremoana"
 grade = "A"
