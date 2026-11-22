@@ -7,7 +7,7 @@
 	// the corner. Switching only swaps what is shown, so a click answers at once. Without JavaScript the first tab
 	// shows (the photos when there are any), its first view, and the tabs and switches hide. docs/architecture.md,
 	// Plant pages.
-	import type { Snippet } from 'svelte';
+	import { untrack, type Snippet } from 'svelte';
 	import { LINZ_BASEMAPS_KEY } from '$app/env/public';
 	import { VIEW, NI as NI_PATH, SI as SI_PATH } from '#lib/home/nzmap.js';
 	import { toView, islandBox, aerialSource } from './map.js';
@@ -36,6 +36,12 @@
 	let i = $state(0);
 	const im = $derived(images[Math.min(i, images.length - 1)]);
 	function onScroll() { if (strip) i = Math.max(0, Math.min(images.length - 1, Math.round(strip.scrollLeft / strip.clientWidth))); }
+	// The strip is rebuilt when the visitor returns from Location, so put it back on the photo the counter shows
+	$effect(() => {
+		if (!strip) return;
+		const j = untrack(() => i);
+		if (j) strip.scrollTo({ left: j * strip.clientWidth, behavior: 'auto' });
+	});
 	function go(d: number) {
 		if (!strip) return;
 		const j = Math.max(0, Math.min(images.length - 1, i + d));
