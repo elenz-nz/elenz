@@ -10,7 +10,7 @@
 	import type { Snippet } from 'svelte';
 	import { LINZ_BASEMAPS_KEY } from '$app/env/public';
 	import { VIEW, NI as NI_PATH, SI as SI_PATH } from '#lib/home/nzmap.js';
-	import { toView, islandBox, aerialSource } from './map.js';
+	import { toView, islandBox, aerialSource, collapseCredit } from './map.js';
 
 	type Photo = { file: string; title: string; author: string; source_url: string; licence: string; licence_url: string; focus?: string };
 	type View = { k: string; file: string; across: number; imagery: string };
@@ -109,6 +109,7 @@
 				map.addLayer({ id: 'halo', type: 'circle', source: 'pt', paint: { 'circle-radius': 16, 'circle-color': colour, 'circle-opacity': 0.25 } });
 				map.addLayer({ id: 'pt', type: 'circle', source: 'pt', paint: { 'circle-radius': 7, 'circle-color': colour, 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2.5 } });
 				mapState = 'ready';
+				collapseCredit(el);
 			});
 		})().catch(fail);
 		function fail() { map?.remove(); map = null; mapState = 'failed'; }
@@ -259,5 +260,10 @@
 	.fail { position: absolute; inset: auto 8px 8px; margin: 0; background: var(--surface); color: var(--ink-2); font-size: 0.82rem; padding: 6px 10px; border-radius: 4px; }
 	figcaption { font-size: 0.78rem; color: var(--muted); line-height: 1.45; }
 	figcaption a { color: inherit; }
+	@media (max-width: 600px) {
+		figcaption { font-size: 0.68rem; line-height: 1.35; }
+		.ml :global(.maplibregl-ctrl-attrib.maplibregl-compact) { min-height: 18px; min-width: 18px; font-size: 10px; }
+		.ml :global(.maplibregl-ctrl-attrib-button) { width: 18px; height: 18px; background-size: 14px; }
+	}
 	.note { display: block; margin-top: 2px; }
 </style>
