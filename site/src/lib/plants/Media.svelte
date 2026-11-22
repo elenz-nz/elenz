@@ -170,8 +170,8 @@
 					<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
 				</button>
 				{#if images.length > 1}
-					<button type="button" class="step prev js-only" aria-label="Previous photo" disabled={i === 0} onclick={() => go(-1)}>‹</button>
-					<button type="button" class="step next js-only" aria-label="Next photo" disabled={i === images.length - 1} onclick={() => go(1)}>›</button>
+					<button type="button" class="nav prev js-only" aria-label="Previous photo" disabled={i === 0} onclick={() => go(-1)}><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
+					<button type="button" class="nav next js-only" aria-label="Next photo" disabled={i === images.length - 1} onclick={() => go(1)}><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 					<span class="count">{i + 1} of {images.length}</span>
 				{/if}
 			</div>
@@ -219,8 +219,8 @@
 						{/each}
 					</div>
 					<span class="sitename" aria-live="polite">{sites[sIdx].name}</span>
-					<button type="button" class="step prev js-only" aria-label="Previous station" disabled={sIdx === 0} onclick={() => sGo(-1)}>‹</button>
-					<button type="button" class="step next js-only" aria-label="Next station" disabled={sIdx === sites.length - 1} onclick={() => sGo(1)}>›</button>
+					<button type="button" class="nav prev js-only" aria-label="Previous station" disabled={sIdx === 0} onclick={() => sGo(-1)}><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
+					<button type="button" class="nav next js-only" aria-label="Next station" disabled={sIdx === sites.length - 1} onclick={() => sGo(1)}><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 					<span class="count">{sIdx + 1} of {sites.length}</span>
 				{:else if av}
 					<img src="/plants/{av.file}" alt="Aerial view of {name}, about {size(av.across)} across" width="1000" height="640" loading={hasPhotos ? 'lazy' : 'eager'} decoding="async" />
@@ -269,6 +269,13 @@
 	.step:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 	.prev { left: 8px; }
 	.next { right: 8px; }
+	/* The arrows over the photos and station views look like the tracker's chart arrows (tracker.css .nav) */
+	.nav { position: absolute; top: calc(50% - 22px); width: 30px; height: 44px; display: grid; place-items: center; padding: 0; border-radius: 4px; border: 1px solid var(--line);
+		background: color-mix(in srgb, var(--surface) 88%, transparent); color: var(--ink-2); cursor: pointer; opacity: 0.7; z-index: 1; }
+	.nav:hover:not(:disabled), .nav:focus-visible { opacity: 1; color: var(--ink); background: var(--surface); }
+	.nav:disabled { opacity: 0.25; cursor: default; }
+	.nav:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+	@media (max-width: 600px) { .nav { width: 26px; height: 38px; top: calc(50% - 19px); } }
 	.sitename { position: absolute; top: 8px; left: 8px; max-width: calc(100% - 140px); font-size: 0.8rem; line-height: 1.3; background: rgb(0 0 0 / 0.6); color: #fff;
 		border-radius: 3px; padding: 2px 8px; pointer-events: none; }
 	.count { position: absolute; bottom: 8px; right: 8px; font-size: 0.74rem; background: rgb(0 0 0 / 0.55); color: #fff; border-radius: 3px; padding: 1px 6px; }
