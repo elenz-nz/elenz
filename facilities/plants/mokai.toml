@@ -7,9 +7,7 @@ register = ["G010", "G011", "G012"]
 wikidata = "Q15379053"
 osm = ["way/170176583"]
 reviewed = "2026-11-19"
-to_check = [
-  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
-]
+to_check = []
 notes = [
   "G010: Elenz shows Mōkai as one plant: 55 → 95 (May 2005) → 112 MW (Jun 2007).",
   "G011: See G010.",

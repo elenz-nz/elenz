@@ -14,7 +14,8 @@ theirs, with checked facts only).
                  {k, label, value, source, grade, checked, published, note?, alt: [{value, source, grade, note?}]})
   sources        {id: {title, publisher, url, kind, opened, note}}, from plant_sources.csv
   photo_leads    plant_photo_leads.csv's rows
-  station_leads  station_leads.csv's rows (empty cells left out)
+  station_leads  station_leads.csv's rows (empty cells left out), each with `group`, where it stands for the
+                 research round on stations without a page (design decision, 23 Nov 2026; lead_group below)
 
 Everything in it is already public in this repository; the page is private so draft facts aren't read as Elenz's.
 How it is served: docs/architecture.md, Plant pages (the research page). Run from the repo root after editing a plant
@@ -100,6 +101,42 @@ def loc_state(p):
     return 'grid' if p.get('grid_connection') else 'none'
 
 
+# The station leads' groups, in the order lead_group tests them. `on_page` names the plant page a lead is already a
+# station on (or the units behind it, as Kawerau (Onepu)'s); retired and historic leads wait for the history round.
+LEAD_GROUPS = ('page', 'historic', 'new', 'small', 'osm', 'todo')
+
+
+def lead_group(r):
+    """Where a station lead stands: page (already on a plant page), historic (retired or historic: the history
+    round), new (not generating yet), small (under 1 MW or below the threshold), osm (an unverified OpenStreetMap
+    lead) or todo (to research now: a station without a page)."""
+    status = r.get('status', '').lower()
+    if r.get('on_page'):
+        return 'page'
+    if status.startswith('retired') or 'historic' in status:
+        return 'historic'
+    if status == 'commissioning' or r.get('shown_in_elenz') == 'Not yet':
+        return 'new'
+    try:
+        small = float(r.get('mw') or 'nan') < 1
+    except ValueError:
+        small = False
+    if small or 'below threshold' in status:
+        return 'small'
+    if status.startswith('lead (osm'):
+        return 'osm'
+    return 'todo'
+
+
+def station_leads(plants):
+    rows = [{k: v for k, v in r.items() if v} for r in pf.read_csv(STATION_LEADS)]
+    for r in rows:
+        if r.get('on_page') and r['on_page'] not in plants:
+            raise SystemExit(f"station_leads.csv {r['id']}: on_page {r['on_page']!r} is not a plant file")
+        r['group'] = lead_group(r)
+    return rows
+
+
 def same(a, b):
     return ' '.join(str(a).lower().split()) == ' '.join(str(b).lower().split())
 
@@ -138,7 +175,7 @@ def build():
         'sources': {r['id']: {k: r[k] for k in ('title', 'publisher', 'url', 'kind', 'opened', 'note')}
                     for r in pf.read_csv(pf.SOURCES)},
         'photo_leads': pf.read_csv(PHOTO_LEADS),
-        'station_leads': [{k: v for k, v in r.items() if v} for r in pf.read_csv(STATION_LEADS)],
+        'station_leads': station_leads(plants),
     }
 
 
@@ -162,7 +199,8 @@ def main(check=False):
     d = json.loads(text_)
     print(f"wrote site/src/lib/plants/research.json: {len(d['plants'])} plants, "
           f"{sum(p['checked'] for p in d['plants'])} of {sum(p['facts'] for p in d['plants'])} facts checked, "
-          f"{len(d['photo_leads'])} photo leads, {len(d['station_leads'])} station leads ({len(text_) // 1024} KB)")
+          f"{len(d['photo_leads'])} photo leads, {len(d['station_leads'])} station leads "
+          f"({sum(r['group'] == 'todo' for r in d['station_leads'])} to research) ({len(text_) // 1024} KB)")
     return True
 
 

@@ -178,8 +178,14 @@ check, not reviewed, facts not all checked, sources that disagree, no photo, loc
 grid connection), kept in the address with its key; a sortable table, each plant opening to its links (page, plant file,
 Wikidata, OpenStreetMap, tracker), to-check list, notes, every fact with its source, grade and date checked (a green edge
 once published) and each other source's value beneath it (amber where it differs), and its photos and photo leads; the
-two leads files folded below. "Download workbook" builds an .xlsx in the browser (`xlsx.js`, no library: sheets Plants,
-Facts, Sources, Photo leads, Station leads; the first row bold, frozen and filtered). The Worker guards it (`research` in
+station and photo leads below. Above the cards, the research rounds (`ROUNDS` in `research.js`: done, now, next; move
+`now` along when a round finishes). The station leads (design decision, 23 Nov 2026: the round after the first pass)
+have their own section: groups from `lead_group` in `ingest/plant_research.py` (To research first; OpenStreetMap leads,
+under 1 MW, not generating yet, historic, on a page already, all), a technology filter and a search, kept on the page
+only; each lead opens to its links, fields, to-check, notes, sources and its own Team notes box (notes key
+`lead-<id>`, beside the plants'); a card counts the leads to research. The photo leads stay folded below. "Download
+workbook" builds an .xlsx in the browser (`xlsx.js`, no library: sheets Plants, Facts, Sources, Photo leads, Station
+leads (with its group and team notes); the first row bold, frozen and filtered). The Worker guards it (`research` in
 `worker/index.js`, routed through it by `run_worker_first`): on elenz.co.nz it opens only with `?key=` set to the Worker
 secret `SCREENS_KEY` (the screens page's key), else the not-found page, `__data.json` included; on a branch preview it opens
 without one, so a research batch is reviewed on its pull request's preview (previews may not carry the Worker's secrets,

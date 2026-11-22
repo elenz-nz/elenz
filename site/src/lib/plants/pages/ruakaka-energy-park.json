@@ -22,7 +22,7 @@
  "owner": "Meridian",
  "scheme": null,
  "metered": null,
- "checking": true,
+ "checking": false,
  "checked": "2026-11-21",
  "about": {
   "text": "The Ruakākā battery is a grid-scale battery built by Meridian Energy at Marsden Point, south of Whangārei. Its 80 containers from Saft can deliver 100 MW for two hours, storing 200 MWh. Construction began in 2023 and it was officially opened in May 2025. It is the first stage of Meridian's Ruakākā Energy Park, with a 130 MW solar farm being built beside it.",

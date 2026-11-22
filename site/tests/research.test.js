@@ -3,7 +3,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { inflateRawSync } from 'node:zlib';
-import { readSettings, writeSettings, pick, filtered, needCounts, progress, workbook, DEFAULTS } from '#lib/plants/research.js';
+import { readSettings, writeSettings, pick, filtered, needCounts, progress, workbook, DEFAULTS, LEAD_GROUPS, ROUNDS, leadKey, leadCounts, leadTechs, pickLeads } from '#lib/plants/research.js';
 import { keyOf, loadNotes, saveNote, dateStamp, savedAt } from '#lib/plants/notes.js';
 import { xlsx, zip, crc32, col } from '#lib/plants/xlsx.js';
 import RESEARCH from '#lib/plants/research.json' with { type: 'json' };
@@ -145,4 +145,36 @@ test('the team notes: reading and saving through the Worker, with the key in a h
   assert.equal(dateStamp(new Date('2026-11-19T03:30:00Z')), '19 Nov 2026: ');
   assert.match(savedAt(Date.parse('2026-11-19T03:40:00Z')), /^saved 19 Nov 2026, 4:40\s?pm$/);
   assert.equal(savedAt(null), '');
+});
+
+test('station leads: groups, filters, note keys and the download', () => {
+  const leads = RESEARCH.station_leads;
+  const keys = new Set(LEAD_GROUPS.map(([k]) => k));
+  for (const r of leads) assert.ok(keys.has(r.group), `${r.id} has a known group`);
+  const n = leadCounts(leads);
+  assert.equal(n[''], leads.length);
+  assert.equal(LEAD_GROUPS.filter(([k]) => k).reduce((a, [k]) => a + n[k], 0), leads.length, 'every lead is in one group');
+  assert.ok(n.todo > 0);
+  for (const r of leads.filter((x) => x.on_page)) {
+    assert.equal(r.group, 'page');
+    assert.ok(RESEARCH.plants.some((p) => p.slug === r.on_page), `${r.id}: ${r.on_page} is a plant`);
+  }
+  assert.equal(ROUNDS.filter(([, , s]) => s === 'now').length, 1, 'one round under way');
+  const L = (o) => ({ id: 'X1', name: 'X', group: 'todo', ...o });
+  const few = [L({ id: 'H2', name: 'Ōkere Falls', technology: 'Hydro', region: 'Bay of Plenty' }), L({ id: 'W1', name: 'Brooklyn', technology: 'Wind' }),
+    L({ id: 'H1', name: 'Bullendale', technology: 'Hydro', group: 'historic' })];
+  assert.deepEqual(pickLeads(few, { group: 'todo', tech: '', text: '' }).map((r) => r.id), ['W1', 'H2']);
+  assert.deepEqual(pickLeads(few, { group: '', tech: 'Hydro', text: '' }).map((r) => r.id), ['H1', 'H2']);
+  assert.deepEqual(pickLeads(few, { group: '', tech: '', text: 'okere' }).map((r) => r.id), ['H2'], 'macrons ignored');
+  assert.deepEqual(pickLeads(few, { group: '', tech: '', text: 'plenty' }).map((r) => r.id), ['H2'], 'region matches');
+  assert.deepEqual(leadTechs(few), ['Hydro', 'Wind']);
+  assert.equal(leadKey('E025'), 'lead-e025');
+  assert.match(leadKey('E025'), /^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'a key the notes store takes (worker/notes.js, SLUG)');
+  assert.ok(!RESEARCH.plants.some((p) => p.slug.startsWith('lead-')), 'no plant slug clashes with a lead note key');
+  const id = leads[0].id;
+  const sheet = workbook(RESEARCH, { [leadKey(id)]: { text: 'Ask the network' } })[4];
+  assert.equal(sheet.header[0], 'Group');
+  assert.ok(!sheet.header.includes('group'));
+  assert.equal(sheet.rows[0][sheet.header.indexOf('Team notes')], 'Ask the network');
+  assert.equal(sheet.rows[0][sheet.header.indexOf('id')], id);
 });

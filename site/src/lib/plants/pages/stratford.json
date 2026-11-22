@@ -104,7 +104,7 @@
  "owner": "Contact",
  "scheme": null,
  "metered": "The metered history has one meter (SFD2201) for Taranaki Combined Cycle (1998–2025) and the two peakers (from 2011), and until 2001 the old Stratford gas turbines too, so it shows the station whole. The dispatch data (the live week and the weeks since the newest metered month) shows each unit.",
- "checking": true,
+ "checking": false,
  "checked": "2026-11-22",
  "about": {
   "text": "The Stratford site east of Stratford has held three gas-fired stations. Four gas turbines ran here from 1976 until 2001; the Taranaki Combined Cycle unit, cooled with water from the Pātea River, ran from 1998 until it reached the end of its life in 2026; and two fast-start peakers, opened in 2011, remain. The peakers can go from a cold start to full output in about ten minutes, to cover peaks in demand and complement hydro and wind generation.",

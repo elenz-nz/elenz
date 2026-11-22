@@ -11,7 +11,7 @@ like the rest of the repository, so they hold only what public sources say.
 | `plant_images.csv` | One row per image we may use (a plant can have several: the first leads its page, readers step through the rest): `slug`, `file`, `title`, `author`, `source_url`, `licence`, `licence_url`, `checked`, `crop`, `focus` (optional, "50% 12%": where a tall photo is anchored in the cropped frame, across then down; blank centres it). The file is `site/static/plants/<slug>.webp` (a second photo `<slug>-2.webp`, and so on), at most 1,600 px wide (WebP, quality 70 to 80), made from the source's own copy; `source_url` is the file's page, where the licence was read |
 | `plant_aerials.csv` | The LINZ aerial views each page shows (`analysis/plant_aerials.py`): `slug`, `view` (site, close, wide, and s1, s2 … for a station of a several-station plant), `file`, the point it is centred on, `zoom`, `across_m`, the `imagery` collection, `fetched` |
 | `plant_photo_leads.csv` | Photos worth checking; a lead stays listed after its photo is cleared and added to `plant_images.csv` |
-| `station_leads.csv` | Stations without a page yet: embedded stations, stations not in Elenz's data, new-station leads |
+| `station_leads.csv` | Stations without a page yet: embedded stations, stations not in Elenz's data, new-station leads; `on_page` names the plant page a lead is already on (see Stations without a page) |
 
 The first drafts came from the research register workbook of 8 Nov 2026 (`analysis/plants_import.py`, run once on
 18 Nov 2026). The workbook is retired: these files are now the record, edited directly.
@@ -151,6 +151,34 @@ Worker, never in these files); read them there before a batch, and put anything 
    preview, and the research page its progress. Their `--check` (in checks.yml) fails while one is out of date.
 
 Research goes in batches by fuel, one pull request per batch, for the Elenz team to review on the preview.
+
+## Stations without a page (station leads)
+
+The research round after the first pass (design decision, 23 Nov 2026): the stations in `station_leads.csv`, then the
+history round (previous owners, upgrades and closures for every page, then retired stations). The research page lists
+the leads in groups, worked out by `lead_group` in `ingest/plant_research.py`, in this order:
+
+| Group | A lead is in it when |
+| --- | --- |
+| On a page already | `on_page` names the plant page it is a station or unit on (the Teviot, Kaimai, Branch River and Roaring Meg stations; TOPP1 and GDL behind Kawerau (Onepu)). Set it when a lead turns out to be on a page; `plant_research.py` fails if the slug isn't a plant file |
+| Historic | its status starts "Retired" or mentions "historic": left for the history round |
+| Not generating yet | status "Commissioning" or `shown_in_elenz` "Not yet": a plant file when it first dispatches (Puna Komaru) |
+| Under 1 MW | `mw` under 1, or a status saying it is below the threshold: only as an exception |
+| OpenStreetMap leads | status "Lead (OSM, unverified)": confirm it exists, and its rating from a source we may use, first |
+| To research | everything else: the work list for this round |
+
+Each lead opens to its fields, sources and its own team notes (kept with the plants' notes under `lead-<id>`, never in
+the repository); the workbook's Station leads sheet has the group and the notes. For a lead that passes:
+
+1. Search the register and `metered_plants.csv` by grid exit point and unit code first: it may already be in Elenz's
+   data under another name, or be a station of a plant that has a page (then set `on_page` and add it to that plant's
+   `[[stations]]`).
+2. Otherwise give it a plant file without `plant` (its slug from its name; `plant_files.py --check` says so). It then
+   shows on the research page with the status "No Elenz data", and its facts are checked as for any plant.
+3. `plant_pages.py` builds public pages only for plant files with `plant` set, so these stations get no page yet: how
+   a page without Elenz's charts looks, and whether embedded meter data can stand in, is a design decision to make in a
+   code chat before the first one is published.
+4. Drop the lead's row once its plant file exists (the file's `register` keeps the lead's ID).
 
 ## Rules
 

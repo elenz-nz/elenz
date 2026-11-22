@@ -6,10 +6,8 @@ name = "Ruakākā Battery"
 register = ["B004"]
 wikidata = "Q133860797"
 osm = ["way/1395935526"]
-reviewed = ""
-to_check = [
-  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
-]
+reviewed = "2026-11-23"
+to_check = []
 notes = [
   "Added from Elenz's plant list (8 Nov 2026).",
   "Battery batch (19 Nov 2026): facts checked against Meridian's completion release (NZX, May 2025) and solar farm release (March 2025), RNZ's report of the opening, the EA register and network supply points table, and Stats NZ boundaries. Built by Meridian, so no previous owners.",

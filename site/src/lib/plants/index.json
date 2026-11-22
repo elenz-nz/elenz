@@ -761,7 +761,7 @@
    "owner": "Other generators",
    "commissioned": null,
    "closed": null,
-   "reviewed": false,
+   "reviewed": true,
    "pt": {
     "lat": -38.07571,
     "lon": 176.72056,
@@ -1261,7 +1261,7 @@
    "owner": "Other generators",
    "commissioned": "1998",
    "closed": null,
-   "reviewed": false,
+   "reviewed": true,
    "pt": {
     "lat": -35.417424,
     "lon": 173.852112,
@@ -1786,7 +1786,7 @@
    "owner": "Meridian",
    "commissioned": "2025",
    "closed": null,
-   "reviewed": false,
+   "reviewed": true,
    "pt": {
     "lat": -35.84867,
     "lon": 174.47729,
@@ -1861,7 +1861,7 @@
    "owner": "Mercury",
    "commissioned": "2018",
    "closed": "2022",
-   "reviewed": false,
+   "reviewed": true,
    "pt": {
     "lat": -36.92756,
     "lon": 174.82733,
@@ -1886,7 +1886,7 @@
    "owner": "Contact",
    "commissioned": "1976",
    "closed": null,
-   "reviewed": false,
+   "reviewed": true,
    "pt": {
     "lat": -39.3322,
     "lon": 174.319,
@@ -2361,7 +2361,7 @@
    "owner": "Other generators",
    "commissioned": "1924",
    "closed": null,
-   "reviewed": false,
+   "reviewed": true,
    "pt": {
     "lat": -45.538073,
     "lon": 169.322635,
@@ -2711,7 +2711,7 @@
    "owner": "Contact",
    "commissioned": "2004",
    "closed": null,
-   "reviewed": false,
+   "reviewed": true,
    "pt": {
     "lat": -39.382873,
     "lon": 176.887595,

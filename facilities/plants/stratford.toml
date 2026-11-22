@@ -6,10 +6,9 @@ name = "Stratford"
 register = ["T002", "T013"]
 wikidata = "Q7621980"
 osm = ["relation/17609409"]
-reviewed = ""
+reviewed = "2026-11-23"
 to_check = [
   "Previous owners of the combined cycle unit between 1998 and 2002: the Commerce Commission (2003) has it owned by NGC's Stratford Power Ltd; NGC entered generation by buying TransAlta NZ in 2000. Who built and owned it before that?",
-  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
   "Station points (22 Nov 2026): read from the LINZ aerial by the Elenz team; the plant point (-39.3322, 174.319) is on the peakers, so it is theirs.",

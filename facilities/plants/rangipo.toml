@@ -7,15 +7,13 @@ register = ["H057"]
 wikidata = "Q61448285"
 osm = ["way/989021414"]
 reviewed = "2026-11-19"
-to_check = [
-  "Optional: rename the tracker's \"Rangipo\" to \"Rangipō\" ([plant_names] in overrides.toml is fingerprinted, so on next-rebuild).",
-]
+to_check = []
 notes = [
   "Added from Elenz's plant list (8 Nov 2026).",
   "Hydro batch 2 (18 Nov 2026): facts checked against Genesis's Tongariro Power Scheme page, the EA register, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "Location from Wikidata (Q61448285), not yet checked against the aerial; it is about 90 m west of the grid connection point.",
   "District and region from the station's point (the [location] value) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district, and no other district or region is within 5 km.",
-  "Genesis spells the station Rangipō; the EA register and Elenz's data use Rangipo.",
+  "Genesis spells the station Rangipō; the EA register uses Rangipo; Elenz has used Rangipō since BUILD 13 (#181).",
   "Scheme order: Rangipō's tailrace returns water to the Tongariro River above the Poutū intake, which feeds Lake Rotoaira and Tokaanu, so Rangipō is the upstream station (overrides.toml [hydro_schemes] corrected 18 Nov 2026).",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
 ]

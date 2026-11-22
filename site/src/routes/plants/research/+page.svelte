@@ -16,7 +16,7 @@
 	import { islandName, fuelOf } from '#lib/plants/registry.js';
 	import { fmtMw } from '#lib/plants/history.js';
 	import { slug } from '#lib/site/viewurl.js';
-	import { DEFAULTS, NEEDS, LOC, STATUS, fuelsOf, fuelName, ownersOf, readSettings, writeSettings, filtered, needCounts, pick, progress, workbook, type Settings } from '#lib/plants/research.js';
+	import { DEFAULTS, NEEDS, LOC, STATUS, ROUNDS, LEAD_GROUPS, fuelsOf, fuelName, ownersOf, readSettings, writeSettings, filtered, needCounts, pick, progress, workbook, leadKey, leadCounts, leadTechs, pickLeads, type Settings } from '#lib/plants/research.js';
 	import { xlsx, XLSX_TYPE } from '#lib/plants/xlsx.js';
 	import { keyOf, loadNotes, saveNote, dateStamp, savedAt, PROBLEMS, MAX_NOTE, type Note, type NotesProblem } from '#lib/plants/notes.js';
 	import { newTabs } from '#lib/site/newtabs.js';
@@ -45,6 +45,22 @@
 	const pct = (a: number, b: number) => (b ? (100 * a) / b : 0);
 	const mw = (v: number | null) => (v == null ? '–' : fmtMw(v));
 	const osmUrl = (x: string) => `https://www.openstreetmap.org/${x}`;
+
+	// ---------- station leads: the stations without a page (the research round after the first pass) ----------
+	// Filters live on the page only (not in the address); each lead opens to every field and its own team notes,
+	// kept with the plants' under lead-<id> (design decision, 23 Nov 2026).
+	const leads = $derived(d.station_leads as any[]);
+	let lf = $state({ group: 'todo', tech: '', text: '' });
+	let leadOpen = $state('');
+	const leadNums = $derived(leadCounts(leads));
+	const leadRows = $derived(pickLeads(leads, lf));
+	const techs = $derived(leadTechs(leads));
+	const groupOf: Record<string, { name: string, what: string }> = Object.fromEntries(LEAD_GROUPS.map(([k, name, what]) => [k, { name, what }]));
+	const plantName = $derived(Object.fromEntries(plants.map((p) => [p.slug, p.name])));
+	const urls = (x: string) => (x.match(/https?:\/\/\S+/g) ?? []);
+	const host = (u: string) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return u; } };
+	const toggleLead = (id: string) => { leadOpen = leadOpen === id ? '' : id; };
+	const leadNoted = (id: string) => !!notes[leadKey(id)]?.text || dirty(leadKey(id));
 
 	// ---------- the team's notes ----------
 	// notesState: loading, ready, or why they can't be read. drafts: what's typed and not yet saved, by plant.
@@ -153,7 +169,7 @@
 		<h3><label for="note-{slug}">Team notes</label> <span class="quiet">private: kept by the Worker, not in the repository; Ctrl+Enter or leaving the box saves</span></h3>
 		{#if notesState === 'ready'}
 			<textarea id="note-{slug}" bind:this={areas[slug]} rows="4" maxlength={MAX_NOTE} spellcheck="true"
-				placeholder="Anything to remember about this plant: questions, leads, research updates…"
+				placeholder="Anything to remember: questions, leads, research updates…"
 				value={textOf(slug)} oninput={(e) => (drafts[slug] = e.currentTarget.value)}
 				onblur={() => saveFor(slug)} onkeydown={(e) => keys(e, slug)}></textarea>
 			<div class="note-bar">
@@ -185,6 +201,12 @@
 			<p class="sub">Private, for the Elenz team. Built from the plant files in the repository, so it shows exactly what the plant pages will publish: a fact appears on its page once it has a date checked, a grade A or B and public sources. <a href="{REPO}/PLANTS.md">How to check a plant</a></p>
 		</div>
 
+		<ol class="panel rounds" aria-label="Research rounds">
+			{#each ROUNDS as [name, what, state] (name)}
+				<li class={state}><span class="r-state">{state === 'done' ? 'Done' : state === 'now' ? 'Now' : 'Next'}</span> <strong>{name}</strong> <span class="quiet">{what}</span></li>
+			{/each}
+		</ol>
+
 		<div class="cards">
 			{#each [['Pages reviewed', prog.reviewed, prog.plants], ['Facts checked', prog.checked, prog.facts], ['Locations checked', prog.located, prog.plants], ['With a photo', prog.photos, prog.plants]] as [k, a, b] (k)}
 				<div class="panel card">
@@ -193,6 +215,11 @@
 					<span class="bar"><span style="width:{pct(+a, +b)}%"></span></span>
 				</div>
 			{/each}
+			<div class="panel card">
+				<span class="k">Stations to research</span>
+				<span class="v num">{leadNums.todo} <small>of {leads.length} leads</small></span>
+				<span class="v small"><a href="#leads-h">Station leads</a></span>
+			</div>
 			<div class="panel card">
 				<span class="k">Still to do</span>
 				<span class="v small">{prog.todo} with something to check</span>
@@ -326,6 +353,64 @@
 			</div>
 		</section>
 
+		<section class="panel leads-now" aria-labelledby="leads-h">
+			<div class="p-head flush">
+				<h2 id="leads-h">Station leads: stations without a page</h2>
+				<span class="quiet">From <a href="{REPO}/station_leads.csv">station_leads.csv</a>. Tap a station for its details and team notes. A station that passes gets a plant file (<a href="{REPO}/PLANTS.md">PLANTS.md</a>, Stations without a page); one already on a page is marked there with <code>on_page</code>.</span>
+			</div>
+			<div class="row">
+				<div class="seg wrapseg" role="group" aria-label="Lead group">
+					{#each LEAD_GROUPS as [k, name] (k)}
+						<button type="button" aria-pressed={lf.group === k} onclick={() => (lf.group = k)}>{name} <span class="num">{leadNums[k]}</span></button>
+					{/each}
+				</div>
+			</div>
+			<div class="row">
+				<label class="lab">Technology
+					<select bind:value={lf.tech}><option value="">All</option>{#each techs as x (x)}<option value={x}>{x}</option>{/each}</select>
+				</label>
+				<label class="lab find">Search leads
+					<input type="search" placeholder="Name, ID, owner, region" bind:value={lf.text} maxlength="40" autocomplete="off" />
+				</label>
+				{#if groupOf[lf.group]?.what}<span class="quiet">{groupOf[lf.group].what}.</span>{/if}
+			</div>
+			<div class="scroll">
+				<table>
+					<thead><tr><th>ID</th><th>Station</th><th class="w">Technology</th><th class="w">Region</th><th class="w">Status</th><th class="n">MW</th><th class="w">Owner</th><th class="w">In Elenz</th><th class="w">Group</th></tr></thead>
+					<tbody>
+						{#each leadRows as r (r.id)}
+							<tr class:on={r.id === leadOpen}>
+								<td class="num">{r.id}</td>
+								<td class="c-name"><button type="button" class="open" aria-expanded={r.id === leadOpen} onclick={() => toggleLead(r.id)}>{r.name}</button>{#if leadNoted(r.id)}<span class="has-note" title={dirty(leadKey(r.id)) ? 'Team notes not saved yet' : 'Has team notes'} class:unsaved={dirty(leadKey(r.id))}>✎</span>{/if}</td>
+								<td class="w">{r.technology ?? ''}</td><td class="w">{r.region ?? ''}</td><td class="w">{r.status ?? ''}</td>
+								<td class="n">{r.mw ?? ''}</td><td class="w">{r.owner ?? ''}</td><td class="w">{r.shown_in_elenz ?? ''}</td>
+								<td class="w">{groupOf[r.group]?.name ?? r.group}</td>
+							</tr>
+							{#if r.id === leadOpen}
+								<tr class="more"><td colspan="9">
+									<div class="detail">
+										<p class="links">
+											{#if r.on_page}<a href="/plants/{r.on_page}">On the {plantName[r.on_page] ?? r.on_page} page</a>{/if}
+											{#if r.wikidata}<a href="https://www.wikidata.org/wiki/{r.wikidata}">Wikidata {r.wikidata}</a>{/if}
+											{#if r.osm}{#each r.osm.split(/\s+/) as x (x)}<a href={osmUrl(x)}>OpenStreetMap {x}</a>{/each}{/if}
+											{#if r.lat && r.lon}<a href="https://www.openstreetmap.org/?mlat={r.lat}&mlon={r.lon}#map=15/{r.lat}/{r.lon}">Map ({r.lat}, {r.lon})</a>{/if}
+										</p>
+										<p class="quiet">{groupOf[r.group]?.name ?? r.group}{r.scheme ? ` · ${r.scheme} scheme` : ''}{r.mw ? ` · ${r.mw} MW` : ''}{r.mw_basis ? ` (${r.mw_basis})` : ''}{r.grid_exit_point ? ` · grid exit point ${r.grid_exit_point}` : ''}{r.location_source ? ` · location from ${r.location_source}` : ''}</p>
+										{#if r.to_check}<div><h3>To check</h3><p class="lead-text">{r.to_check}</p></div>{/if}
+										{@render teamNotes(leadKey(r.id))}
+										{#if r.notes}<div><h3>Notes <span class="quiet">(from the leads file)</span></h3><p class="lead-text">{r.notes}</p></div>{/if}
+										{#if r.sources && urls(r.sources).length}<div><h3>Sources</h3><ul>{#each urls(r.sources) as u (u)}<li><a href={u}>{host(u)}</a></li>{/each}</ul></div>{/if}
+									</div>
+								</td></tr>
+							{/if}
+						{:else}
+							<tr><td colspan="9" class="none">No station lead matches.</td></tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+		</section>
+
 		<details class="panel leads">
 			<summary><h2>Photo leads ({d.photo_leads.length})</h2></summary>
 			<p class="quiet">Photos worth checking, not yet cleared for use (<code>facilities/plant_photo_leads.csv</code>). Read the licence on the file’s own page before adding a row to <code>plant_images.csv</code>.</p>
@@ -335,25 +420,6 @@
 					<tbody>
 						{#each d.photo_leads as r (r.id)}
 							<tr><td class="num">{r.id}</td><td>{r.slugs}</td><td><a href={r.url}>{r.subject}</a></td><td>{r.collection}</td><td>{r.rights_lead}</td><td>{r.description}</td></tr>
-						{/each}
-					</tbody>
-				</table>
-			</div>
-		</details>
-
-		<details class="panel leads">
-			<summary><h2>Station leads ({d.station_leads.length})</h2></summary>
-			<p class="quiet">Stations without a page yet: embedded stations, stations not in Elenz’s data, and new-station leads (<code>facilities/station_leads.csv</code>).</p>
-			<div class="scroll">
-				<table>
-					<thead><tr><th>ID</th><th>Station</th><th>Technology</th><th>Region</th><th>Status</th><th class="n">MW</th><th>Owner</th><th>In Elenz</th><th>Grid exit point</th><th>Notes</th></tr></thead>
-					<tbody>
-						{#each d.station_leads as r (r.id)}
-							<tr>
-								<td class="num">{r.id}</td><td>{r.name}</td><td>{r.technology ?? ''}</td><td>{r.region ?? ''}</td><td>{r.status ?? ''}</td>
-								<td class="n">{r.mw ?? ''}</td><td>{r.owner ?? ''}</td><td>{r.shown_in_elenz ?? ''}</td><td>{r.grid_exit_point ?? ''}</td>
-								<td class="notes">{r.notes ?? ''}{#if r.to_check}<span class="note">To check: {r.to_check}</span>{/if}</td>
-							</tr>
 						{/each}
 					</tbody>
 				</table>
@@ -453,9 +519,19 @@
 	.clash { background: var(--warn-bg); color: var(--warn-ink); border-radius: 4px; padding: 8px 10px; font-size: 0.84rem; display: grid; gap: 6px; }
 	.clash p { margin: 0; }
 	.clash blockquote { margin: 0; padding: 6px 8px; background: var(--surface); color: var(--ink); border-radius: 3px; white-space: pre-wrap; max-height: 12em; overflow: auto; }
+	.rounds { list-style: none; margin: 0; padding: 10px 16px; gap: 6px; }
+	.rounds li { font-size: 0.9rem; line-height: 1.45; display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: baseline; }
+	.r-state { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 3px; padding: 1px 6px; background: var(--grid); color: var(--ink-2); }
+	.rounds .now .r-state { background: var(--accent); color: var(--surface); }
+	.rounds .done { color: var(--muted); }
+	.leads-now { padding: 14px 0 6px; }
+	.leads-now > .row { padding: 0 16px; }
+	.p-head.flush { display: grid; gap: 4px; }
+	.wrapseg { flex-wrap: wrap; }
+	.wrapseg .num { color: var(--muted); font-weight: 400; margin-left: 2px; }
+	.lead-text { margin: 0; font-size: 0.86rem; line-height: 1.5; white-space: pre-line; }
 	.leads summary { cursor: pointer; list-style-position: inside; }
 	.leads table { min-width: 760px; }
-	.leads .notes { min-width: 280px; font-size: 0.8rem; color: var(--ink-2); line-height: 1.45; }
 
 	/* phones: plant, MW, checked and to check; tap a plant for the rest */
 	@media (max-width: 700px) {
