@@ -262,8 +262,6 @@
 	figcaption a { color: inherit; }
 	@media (max-width: 600px) {
 		figcaption { font-size: 0.68rem; line-height: 1.35; }
-		.ml :global(.maplibregl-ctrl-attrib.maplibregl-compact) { min-height: 18px; min-width: 18px; font-size: 10px; }
-		.ml :global(.maplibregl-ctrl-attrib-button) { width: 18px; height: 18px; background-size: 14px; }
 	}
 	.note { display: block; margin-top: 2px; }
 </style>
