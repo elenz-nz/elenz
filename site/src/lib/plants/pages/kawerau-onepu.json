@@ -23,8 +23,15 @@
  "scheme": null,
  "metered": "This meter is a whole site's grid connection, not one generator's. Transpower's Assumptions Book (June 2026) puts four geothermal units behind it: Eastland's TOPP1 and GDL, and two it calls TA2 and TA3. It counts power going into the grid there, so it leaves out what the site uses itself and the power it takes from the grid at the same time. Generation_MD has no row for it before 2020, so 2013–2019 use the same figure from the grid meter (Grid_import). The dispatch data (the live week and the weeks since the newest metered month) reads higher.",
  "checking": true,
- "checked": "2026-11-21",
- "about": null,
+ "checked": "2026-11-23",
+ "about": {
+  "text": "This is the grid connection of an industrial site at Kawerau, which the Electricity Authority's register lists as one 53 MW geothermal unit under the mill's name. Power flows both ways through it, and we count only what goes into the grid. Transpower's Assumptions Book names four geothermal units behind it, which its security of supply assessment counts as one 60 MW unit: Eastland Generation's TOPP1 and GDL plants, and two it calls TA2 and TA3. No public figure shows how the meter's output splits among them.",
+  "refs": [
+   1,
+   2,
+   3
+  ]
+ },
  "facts": [
   {
    "k": "other_names",

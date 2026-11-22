@@ -22,7 +22,7 @@
  "owner": "Genesis",
  "scheme": null,
  "metered": null,
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "Huntly Battery is Genesis Energy's first grid-scale battery, built on the Huntly Power Station site in Waikato. It can deliver 100 MW for two hours, storing 200 MWh in 70 battery containers supplied by Saft, and connects to the grid through the Transpower substation on the site. It began operating in 2026 and was officially opened in October that year. A second stage of the same size has been approved, which would bring the site to 200 MW and 400 MWh.",

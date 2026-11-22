@@ -6,10 +6,9 @@ name = "Huntly Battery"
 register = ["B001"]
 wikidata = "Q5945709"
 osm = ["way/167293886"]
-reviewed = ""
+reviewed = "2026-11-23"
 to_check = [
   "Stage 2 (another 100 MW / 200 MWh, FID April 2026, commercial operation expected Q3 FY28): add a capacity row and update the About text when it dispatches.",
-  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
   "Elenz has four plants here: the Rankines (units 1–4 as one, Coal/gas, 1,000 MW → 750 MW from Jan 2014), Huntly 5 (403 MW), Huntly 6 (50 MW) and the battery (100 MW, Jul 2026). Split from T001.",
@@ -18,6 +17,7 @@ notes = [
   "District and region from Wikidata's site point (Waikato District; no other district within 3 km). The grid connection point (HLY2201) gives the same.",
   "Dropped the Wikipedia-list rating lead: battery ratings are MW / MWh, and the page shows ratings as MW. Storage (200 MWh) is in units and About. Genesis gives the cost as about NZ$130 million (not published).",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
+  "Team notes (23 Nov 2026): looks good for now; page signed off.",
 ]
 
 [location]

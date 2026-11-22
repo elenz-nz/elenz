@@ -6,11 +6,9 @@ name = "Benmore"
 register = ["H003"]
 wikidata = "Q4889583"
 osm = ["relation/12455469"]
-reviewed = "2026-11-19"
+reviewed = "2026-11-23"
 photo_leads = ["P004", "P005"]
-to_check = [
-  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
-]
+to_check = []
 notes = [
   "Elenz has 570 MW from 30 Jul 2026 (540 → 552 → 570 after upgrades).",
   "Hydro batch 3 (18 Nov 2026): facts checked against Meridian's station pages, the EA register and network supply points table, the Gazette and Stats NZ boundaries. The location is left for the LINZ aerial check.",
@@ -18,6 +16,7 @@ notes = [
   "Resolved: Capacity: Meridian's station page still gives six 93 MW units and up to 552 MW; Meridian's 30 July 2026 announcement raised the station to 570 MW, the figure Elenz uses. The Wikipedia rating of 540 MW (the consent-limited output before 2024) is dropped.",
   "Wikidata: Q4889583 (Benmore Dam) is also typed as a hydroelectric power station, so it stands for the station. The [location] point is still Wikipedia's.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
+  "Team notes (23 Nov 2026): checked; page signed off.",
 ]
 
 [location]

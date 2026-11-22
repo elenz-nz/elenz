@@ -23,7 +23,7 @@
  "scheme": null,
  "metered": "The register lists it as gas. We show it as bioenergy: Oji Fibre Solutions' cogeneration runs on wood waste and black liquor, with natural gas as a secondary fuel.",
  "checking": true,
- "checked": "2026-11-19",
+ "checked": "2026-11-23",
  "about": null,
  "facts": [
   {
@@ -53,10 +53,21 @@
    ]
   },
   {
+   "k": "owner",
+   "label": "Owner",
+   "value": "Oji Fibre Solutions",
+   "refs": [
+    5,
+    6,
+    7
+   ],
+   "note": "Carter Holt Harvey Pulp and Paper owned the turbine generator in 2007; the Bioenergy Association lists Oji Fibre Solutions (formerly CHH). The register's operator is Manawa Energy, which buys the output."
+  },
+  {
    "k": "ratings",
    "label": "Other ratings",
    "refs": [
-    5
+    8
    ],
    "value": "40 MW (Genesis's portfolio as the Commerce Commission listed it in 2003)"
   },
@@ -65,7 +76,7 @@
    "label": "Connection point",
    "value": "Kinleith (KIN0112)",
    "refs": [
-    6
+    9
    ]
   }
  ],
@@ -74,7 +85,7 @@
   "lon": 175.880681282426,
   "basis": "station",
   "refs": [
-   7
+   10
   ]
  },
  "images": [],
@@ -117,20 +128,41 @@
   },
   {
    "n": 5,
+   "title": "CHH Kinleith Cogeneration Plant",
+   "publisher": "Bioenergy Association of New Zealand",
+   "url": "https://www.bioenergy.org.nz/facility/chh-kinleith-cogeneration-plant",
+   "opened": "2026-11-23"
+  },
+  {
+   "n": 6,
+   "title": "Electricity Governance Rules (Approval as Industrial Co-generating Station (No. 1) (Carter Holt Harvey Pulp and Paper Limited)) Notice 2007",
+   "publisher": "Electricity Commission (New Zealand Gazette)",
+   "url": "https://gazette.govt.nz/notice/id/2007-au5491",
+   "opened": "2026-11-23"
+  },
+  {
+   "n": 7,
+   "title": "Dispatched generation plant (DispatchedGenerationPlant.csv)",
+   "publisher": "Electricity Authority",
+   "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/Generation/GenerationFleet/Existing",
+   "opened": "2026-11-19"
+  },
+  {
+   "n": 8,
    "title": "Decision 490: Genesis Power Limited and Natural Gas Corporation Holdings Limited (4 February 2003)",
    "publisher": "Commerce Commission",
    "url": "https://www.comcom.govt.nz/__data/assets/pdf_file/0025/73456/Public-Decision-490-Genesis-Power-Natural-Gas-4-Feb-2003.pdf",
    "opened": "2026-11-19"
   },
   {
-   "n": 6,
+   "n": 9,
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
   },
   {
-   "n": 7,
+   "n": 10,
    "title": "LINZ aerial imagery (LINZ Basemaps)",
    "publisher": "Toitū Te Whenua LINZ",
    "url": "https://basemaps.linz.govt.nz/",

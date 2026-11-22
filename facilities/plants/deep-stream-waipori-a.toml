@@ -15,6 +15,7 @@ notes = [
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
   "Points read from the LINZ aerial (18 Nov 2026), for station entries once the register row's boundary is settled: the [location] point is Deep Stream 2's powerhouse; Deep Stream 1 [-45.773435, 169.893654]; Waipori 1A [-45.881606, 169.977428]; the scheme's inlet [-45.738313, 169.842368] and a small lake on the race [-45.748501, 169.862881].",
   "Boundary (design decision 21 Nov 2026): the register's Deep Stream (Waipori A) at HWB0331 is taken to cover Deep Stream 1 and 2 and Waipori 1A (Transpower puts 1A at Halfway Bush; the other Waipori stations are at Berwick). Stations added with the points read from the aerial on 18 Nov; [location] stays on Deep Stream 2 (its aerial views). Capacity stays the register's 26 MW. Previous owners can now go ahead (to_check).",
+  "Team notes (23 Nov 2026): all settled, looks good. Previous owners (to_check) can now be researched.",
 ]
 
 [location]

@@ -8,7 +8,7 @@ wikidata = "Q21037318"
 osm = ["way/270012792"]
 reviewed = "2026-11-19"
 to_check = [
-  "Units: the unit count rests on Wikipedia, since Genesis's Tekapo page couldn't be opened. Check it on Genesis's page.",
+  "Units: ANDRITZ (the turbine upgrade) now agrees with Wikipedia on two 80 MW units; Genesis's Tekapo page and its map PDF (the team's links, 23 Nov 2026) still can't be opened from our research tools. A person can check them and raise the grade.",
 ]
 notes = [
   "Added from Elenz's plant list (8 Nov 2026).",
@@ -16,6 +16,7 @@ notes = [
   "District and region from the station's point (the [location] value, from Wikidata, not yet checked against the aerial) in Stats NZ's 2026 district and 2025 region boundaries, 18 Nov 2026; the grid connection point gives the same district. No other district or region is within 5 km.",
   "The EA register spells the station Takapō B; the site keeps Tekapo B (design decision, 30 Oct 2026).",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
+  "Team notes (23 Nov 2026): Genesis's Tekapo page and map/cross-section PDF given as sources; they can't be fetched here. Instead: ANDRITZ's turbine upgrade news (andritz-tekapo-b) gives two vertical Francis units of 80 MW each (about 160 MW), the upgrade awarded at the end of 2016 with the last turbine commissioned in February 2022; Genesis's 2024 consent application gives Tekapo B at 160 MW and Tekapo A at 30 MW (genesis-tekapo-aee-2024).",
 ]
 
 [location]
@@ -63,7 +64,7 @@ note = "the register's start date, 1977-01-01: often a year, not the day"
 
 [facts.units]
 value = "2 Francis turbines, 80 MW each"
-source = "wp-tekapo-b"
+source = ["andritz-tekapo-b", "wp-tekapo-b"]
 grade = "B"
 checked = "2026-11-18"
 

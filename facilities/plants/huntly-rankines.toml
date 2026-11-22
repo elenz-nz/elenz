@@ -6,10 +6,8 @@ name = "Huntly Rankines"
 register = ["T001"]
 wikidata = "Q5945709"
 osm = ["way/167293886"]
-reviewed = ""
-to_check = [
-  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
-]
+reviewed = "2026-11-23"
+to_check = []
 notes = [
   "Elenz has four plants here: the Rankines (units 1–4 as one, Coal/gas, 1,000 MW → 750 MW from Jan 2014), Huntly 5 (403 MW), Huntly 6 (50 MW) and the battery (100 MW, Jul 2026).",
   "Thermal batch 1 (19 Nov 2026): facts checked against Genesis's Huntly page and its August 2025 market release, the EA register, the Gazette (ECNZ notices) and Stats NZ boundaries. The location is left for the LINZ aerial check.",
@@ -19,6 +17,7 @@ notes = [
   "The closed fact (2012, Wikipedia's list) was unit 3's, not the plant's: removed, as the plant is operating.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
   "Rankine units (21 Nov 2026): the Commerce Commission's final determination ([2025] NZCC 22, 5 Nov 2025) authorises the Huntly Strategic Energy Reserve Huntly Firming Option to 31 Dec 2035, keeping Unit 2, which Genesis had intended to retire in January 2026. Three units stay (750 MW in plant_capacity.csv, Genesis's 3 × 240 MW as a rating), matching Transpower's Appendix F. The units share one meter code (HLY2201 huntly_1_4), which peaked at about 480 MW both before and after Feb 2026, so the metering can't count units.",
+  "Team notes (23 Nov 2026): looks good; page signed off.",
 ]
 
 [location]

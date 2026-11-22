@@ -8,9 +8,9 @@ wikidata = "Q5568199"
 osm = ["way/1196861316"]
 reviewed = ""
 to_check = [
-  "Capacity: Elenz uses 112 MW (Wikipedia: two plants, 1987 and 1997); the EA register says 68 MW. Find an owner or NZ Steel figure for each plant.",
-  "Previous owners: the NZ Herald reports Alinta bought the station from Duke Energy; find the year and who built each plant (NZ Steel?) from a public source.",
-  "Page name: the owner and the EA's co-generator register call it Glenbrook Power Station. Rename the page? (Decision needed; the tracker's name stays.)",
+  "Capacity: Elenz uses 112 MW (Wikipedia, and the NZ Herald for the 2004 sale); the EA register says 68 MW. Only a 34 MW figure for the original plant was found (Engineering NZ heritage record); ask NZ Steel or find a figure for each plant.",
+  "Owner: NZ Steel takes over operation of the Kilns Cogeneration Plant from 6 Sep 2026 (EA). Confirm whether it also owns it now before the owner changes from Alinta; then previous owners are Duke Energy (to 2004), Alinta from 2004 (publish once the owner is settled), and who built each plant.",
+  "Page name: the owner and the EA's co-generator register call it Glenbrook Power Station (the EA's 2026 approval names the Kilns Cogeneration Plant there); the team asked for research and hasn't decided. Rename the page? (Decision needed; the tracker's name stays.)",
 ]
 notes = [
   "Shown as waste heat, 112 MW. The meter runs ~1.47× dispatch.",
@@ -18,6 +18,7 @@ notes = [
   "District and region from the Wikidata point and the grid connection point in Stats NZ's boundaries, 19 Nov 2026: Auckland for both.",
   "Fuel: Elenz shows waste heat; the EA register says cogeneration on gas. Wikipedia: surplus gas from the iron-making kilns.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
+  "Research (23 Nov 2026, team asked for more): Ownership/operation: the EA approved New Zealand Steel Limited to operate the Kilns Cogeneration Plant at Glenbrook Power Station as a Type B station from 6 Sep 2026; the EA's consultation says NZ Steel intends to take over operation from another party (ea-type-b-2026, ea-nzsteel-consult-2026). Neither says whether the Alinta ownership changed. History: Duke Energy agreed in March 2004 to sell its Australian and New Zealand assets, including the 112 MW Glenbrook plant, to Alinta, closing in the second quarter (nbc-duke-alinta-2004; nzherald-alinta-glenbrook); LINZ's overseas-investment decisions (not opened) show Babcock & Brown Power buying Alinta's New Zealand company later. Plants: NZ Steel says it has used the iron-making waste gas for cogeneration since the late 1970s and commissioned a second plant on the rotary kilns' waste gas in 1997 (nzsteel-energy); Engineering NZ's heritage record puts a 34 MW co-generation plant in the original plant's design (engnz-glenbrook-heritage); Wikipedia gives 1987 and 1997 for the two plants and 112 MW in all. No public per-plant figure beyond the 34 MW was found; the EA register's 68 MW is twice that, which may or may not be a coincidence. Who built them: the sources say NZ Steel's mill, not who built the cogeneration plants. Other: the new electric arc furnace replaced two of the four coal kilns in 2026, which may change the kilns' waste gas and so this plant's output (NZ Steel, Aug 2026).",
 ]
 
 [location]

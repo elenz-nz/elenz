@@ -17,6 +17,7 @@ notes = [
   "Capacity: TG1 2.4 MW, TG2 3.5 MW (NZGA), 5.9 MW in all; Elenz uses 6 MW.",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
   "Stats NZ (19 Nov 2026): TG1's checked point is in Kawerau District and TG2's in Whakatāne District, so no district is published. The [location] point is TG2's (the larger).",
+  "Team notes (23 Nov 2026): looks good.",
 ]
 
 [location]

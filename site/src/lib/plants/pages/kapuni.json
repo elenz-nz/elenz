@@ -23,7 +23,7 @@
  "scheme": null,
  "metered": null,
  "checking": true,
- "checked": "2026-11-21",
+ "checked": "2026-11-23",
  "about": {
   "text": "Kapuni is a gas-fired cogeneration plant at the Kapuni gas treatment plant in South Taranaki, which processes the gas from the Kapuni field. Run by the Kapuni Energy Joint Venture, it makes both electricity and steam for the site. It has generated since 1998.",
   "refs": [
@@ -82,12 +82,20 @@
    "note": "a joint venture: in 2003 Todd Energy and NGC each held half; in December 2019 Vector announced the sale of its half to Todd"
   },
   {
+   "k": "ratings",
+   "label": "Other ratings",
+   "refs": [
+    8
+   ],
+   "value": "25.3 MW (Global Energy Monitor: one gas turbine unit (a secondary source))"
+  },
+  {
    "k": "grid_connection",
    "label": "Connection point",
    "value": "Kaponga (KPA1101)",
    "refs": [
-    8,
-    9
+    9,
+    10
    ]
   }
  ],
@@ -96,7 +104,7 @@
   "lon": 174.172625,
   "basis": "station",
   "refs": [
-   9
+   10
   ]
  },
  "images": [],
@@ -160,13 +168,20 @@
   },
   {
    "n": 8,
+   "title": "Kapuni power station",
+   "publisher": "Global Energy Monitor",
+   "url": "https://gem.wiki/Kapuni_power_station",
+   "opened": "2026-11-23"
+  },
+  {
+   "n": 9,
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
   },
   {
-   "n": 9,
+   "n": 10,
    "title": "LINZ aerial imagery (LINZ Basemaps)",
    "publisher": "Toitū Te Whenua LINZ",
    "url": "https://basemaps.linz.govt.nz/",
@@ -177,7 +192,7 @@
   "owner": [
    {
     "slug": "fonterra-dairy-whareroa",
-    "name": "Fonterra Dairy - Whareroa"
+    "name": "Whareroa Cogeneration Plant"
    },
    {
     "slug": "junction-road",
@@ -209,7 +224,7 @@
    },
    {
     "slug": "fonterra-dairy-whareroa",
-    "name": "Fonterra Dairy - Whareroa"
+    "name": "Whareroa Cogeneration Plant"
    },
    {
     "slug": "huntly-6",

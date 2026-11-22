@@ -41,7 +41,7 @@
  "owner": "Genesis",
  "scheme": null,
  "metered": "Shown as Coal/gas: units 1, 2 and 4 can burn coal or gas, and the market data doesn't say which.\nThe metered history has one meter for units 1–4 together, so it shows them as one. The dispatch data (the live week and the weeks since the newest metered month) shows each unit.\nSeptember 2020: Generation_MD has no Huntly that month, so the history uses the grid meter for the whole station, split between units by their offers.",
- "checking": true,
+ "checking": false,
  "checked": "2026-11-21",
  "about": {
   "text": "Huntly, on the Waikato River, is New Zealand's largest power station by capacity, and its Rankine units are its original part. Built as four 250 MW steam units able to burn either gas or coal, they were commissioned between 1982 and 1985. One unit was decommissioned in 2014 and three remain, run for baseload, to back up the hydro lakes in dry years, and for peaks. Genesis had planned to retire one of them in early 2026; in November 2025 the Commerce Commission authorised an arrangement under which Mercury, Meridian and Contact share its costs, keeping it available to the end of 2035.",

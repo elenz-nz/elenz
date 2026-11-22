@@ -8,7 +8,6 @@ wikidata = "Q288300"
 osm = ["way/95512220"]
 reviewed = ""
 to_check = [
-  "Previous owners: Wikipedia's dates (Crown-owned 2004–11, bought by Contact on 22 Dec 2011) rest on government and Contact releases it cites; find one of them to raise the grade.",
   "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
@@ -20,6 +19,8 @@ notes = [
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point moved to the substation.",
   "Commissioned date rule (21 Nov 2026): first metered day 2004-04-05, from WHI2201 whirinaki: the station first ran on 5 Apr 2004 (52 MW). The same code shows small amounts between Aug 1997 and May 2000 (see to_check). The previous value moved to alt.",
   "Early readings (design decision 21 Nov 2026): the Generation_MD code WHI2201 whirinaki shows small amounts between Aug 1997 and May 2000 (up to 323 MWh in a month), before this station was built. Probably the earlier Whirinaki station ECNZ sold to Contact in 1996 (gazette-1996-174), or testing. Ignored for now: the commissioned date stays at the station's first metered day (5 Apr 2004) and the history months are left as they are.",
+  "Concept Consulting's thermal overview for the EA (concept-2023-thermal, 23 Nov 2026): Whirinaki 155 MW (3 x 52), diesel, 2004, government-built and sold to Contact in 2011.",
+  "Team notes (23 Nov 2026): the team's Beehive release (the opening, 1 June 2004) and a NZ Herald list of sites can't be fetched here; the same release is on Scoop (scoop-whirinaki-2004), and the Government's December 2010 sale release and RNZ's report on the $33 million sale back the Crown ownership (scoop-whirinaki-2010, rnz-whirinaki-sold).",
 ]
 
 [location]
@@ -97,11 +98,11 @@ checked = "2026-11-19"
 note = "Contact Energy Limited"
 
 [facts.previous_owners]
-value = "New Zealand Government, 2004–11 (reserve generation, run by Contact Energy)"
-source = "wp-whirinaki"
-grade = "B"
-checked = "2026-11-19"
-note = "Contact bought it from the Crown on 22 December 2011, after Meridian declined to take it in the 2010 market reforms (Wikipedia)"
+value = "New Zealand Government, 2004–11 (reserve generation, built and run by Contact Energy on its behalf)"
+source = ["scoop-whirinaki-2004", "scoop-whirinaki-2010", "rnz-whirinaki-sold", "wp-whirinaki"]
+grade = "A"
+checked = "2026-11-23"
+note = "Contact bought it from the Crown for $33 million, on 22 December 2011 (Wikipedia), after Meridian declined to take it in the 2010 market reforms; the Government's releases of 2004 and 2010 and RNZ cover the rest"
 
 [facts.about]
 value = "Whirinaki, north of Napier, is a diesel-fired peaker plant. The government had it built after the power shortages of 2001 and 2003 as reserve generation of last resort, run by Contact Energy, and it opened in June 2004; Contact bought it in 2011. Its three fast-start units can reach full output from a cold start in 20 to 30 minutes, and about four million litres of diesel stored on site will run it at full output for 92 hours. An earlier gas turbine station on the same site ran from 1978 to 2001."

@@ -351,31 +351,6 @@
    "overview": "A 10 MW gas-fired station in the Bay of Plenty, closed in 2008."
   },
   {
-   "slug": "fonterra-dairy-whareroa",
-   "name": "Fonterra Dairy - Whareroa",
-   "plant": "Fonterra Dairy - Whareroa",
-   "fuel": "gas",
-   "island": "NI",
-   "status": "operating",
-   "mw": 68.0,
-   "owner": "Nova",
-   "commissioned": "1996",
-   "closed": null,
-   "reviewed": false,
-   "pt": {
-    "lat": -39.60956,
-    "lon": 174.298311,
-    "basis": "station",
-    "checked": true
-   },
-   "thumb": {
-    "kind": "aerial",
-    "file": "aerial/fonterra-dairy-whareroa-close.webp",
-    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
-   },
-   "overview": "A 68 MW gas-fired station in Taranaki, generating since 1996."
-  },
-  {
    "slug": "glenbrook-ohurua-battery",
    "name": "Glenbrook-Ohurua Battery",
    "plant": "Glenbrook-Ohurua Battery",
@@ -386,7 +361,7 @@
    "owner": "Contact",
    "commissioned": "2026",
    "closed": null,
-   "reviewed": false,
+   "reviewed": true,
    "pt": {
     "lat": -37.200769,
     "lon": 174.735005,
@@ -511,7 +486,7 @@
    "owner": "Genesis",
    "commissioned": "2004",
    "closed": null,
-   "reviewed": false,
+   "reviewed": true,
    "pt": {
     "lat": -37.544493,
     "lon": 175.149956,
@@ -536,7 +511,7 @@
    "owner": "Genesis",
    "commissioned": "2026",
    "closed": null,
-   "reviewed": false,
+   "reviewed": true,
    "pt": {
     "lat": -37.543134,
     "lon": 175.146859,
@@ -561,7 +536,7 @@
    "owner": "Genesis",
    "commissioned": "1982",
    "closed": null,
-   "reviewed": false,
+   "reviewed": true,
    "pt": {
     "lat": -37.544493,
     "lon": 175.149956,
@@ -586,7 +561,7 @@
    "owner": "Nova",
    "commissioned": "2020",
    "closed": null,
-   "reviewed": false,
+   "reviewed": true,
    "pt": {
     "lat": -39.116698,
     "lon": 174.103689,
@@ -2670,6 +2645,31 @@
     "credit": "Photo: Paradoxsm, Public domain"
    },
    "overview": "A 124 MW hydro station on the Waikato River in Waikato, generating since 1956."
+  },
+  {
+   "slug": "fonterra-dairy-whareroa",
+   "name": "Whareroa Cogeneration Plant",
+   "plant": "Fonterra Dairy - Whareroa",
+   "fuel": "gas",
+   "island": "NI",
+   "status": "operating",
+   "mw": 68.0,
+   "owner": "Nova",
+   "commissioned": "1996",
+   "closed": null,
+   "reviewed": false,
+   "pt": {
+    "lat": -39.60956,
+    "lon": 174.298311,
+    "basis": "station",
+    "checked": true
+   },
+   "thumb": {
+    "kind": "aerial",
+    "file": "aerial/fonterra-dairy-whareroa-close.webp",
+    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+   },
+   "overview": "A 68 MW gas-fired station in Taranaki, generating since 1996."
   },
   {
    "slug": "wheao-and-flaxy",
