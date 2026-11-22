@@ -81,7 +81,7 @@
 			<dt>Why is the price high?</dt>
 			<dd>The button in the wholesale price tile opens the price explainer: whether the price is usual for the time of week, and what is different when it isn’t. The button lights up when there’s something to see.</dd>
 			<dt>Every generator right now</dt>
-			<dd>Select a column heading to sort by it, and again to reverse it. On a computer, Shift-click another heading to sort within it, such as island then MW. On a phone, use the Sort and Then menus. Filter by fuel, island or owner, or type a plant’s name; each plant links to its history on the tracker, and its Plant page link opens the plant’s own page. The address keeps these settings, so a view can be linked.</dd>
+			<dd>Select a column heading to sort by it, and again to reverse it. On a computer, Shift-click another heading to sort within it, such as island then MW. On a phone, use the Sort and Then menus. Filter by fuel, island or owner, or type a plant’s name; each plant links to its history on the tracker, and the Plant pages link above the list opens the list of plants, each with its own page. The address keeps these settings, so a view can be linked.</dd>
 			<dt>Keep screen on</dt>
 			<dd>Stops your screen going to sleep while the page is open, for leaving it up on a spare display.</dd>
 		</dl>

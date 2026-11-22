@@ -391,16 +391,26 @@ test.describe('plant pages', () => {
     await page.route('**/data/history/plants.json', (r) => r.fulfill({ contentType: 'application/json', body: JSON.stringify(PLANT_HISTORY) }));
   });
 
-  test('Plants is in the menu, and Now links each plant to its page', async ({ page }, testInfo) => {
+  test('Plants is in the menu, and Now\'s generator list links to the plant index', async ({ page }) => {
     await page.goto('/now');
     const nav = page.getByRole('navigation', { name: 'Pages' });
     await expect(nav.getByRole('link', { name: 'Plants' })).toHaveAttribute('href', '/plants');
-    const link = page.locator('.gtab a.g-page').first();
-    await expect(link).toHaveAttribute('href', /^\/plants\/[a-z0-9-]+$/);
-    const href = await link.getAttribute('href');
+    const link = page.locator('.gens a.g-plants');
+    await expect(link).toHaveAttribute('href', '/plants');
+    await expect(page.locator('.gtab a.g-page')).toHaveCount(0);   // no link beside each plant (test report, 23 Nov 2026: too busy)
     await link.click();
-    await expect(page).toHaveURL(new RegExp(`${href}$`));
-    await expect(page.locator('h1')).toBeVisible();
+    await expect(page).toHaveURL(/\/plants$/);
+    await expect(page.locator('h1')).toHaveText('Plants');
+  });
+
+  test('a plant page\'s breadcrumb links back to the index, filtered to its fuel, and its sources open in new tabs', async ({ page }) => {
+    await page.goto('/plants/manapouri');
+    const crumb = page.locator('.crumb');
+    await expect(crumb.getByRole('link', { name: 'Plants' })).toHaveAttribute('href', '/plants');
+    await expect(crumb.getByRole('link', { name: 'Hydro' })).toHaveAttribute('href', '/plants?fuel=hydro');
+    const ext = page.locator('#sources a[href^="http"]');
+    expect(await ext.count()).toBeGreaterThan(0);
+    for (const a of await ext.all()) { await expect(a).toHaveAttribute('target', '_blank'); await expect(a).toHaveAttribute('rel', /noopener/); }
   });
 
   test('a plant page shows its live output, history and capacity, and is open to search', async ({ page }) => {

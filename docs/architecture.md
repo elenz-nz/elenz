@@ -143,11 +143,13 @@ A provisional record leads (design decision, 12 Nov 2026; `headline(rec, prov)` 
 `/plants/<slug>`, one page per plant file (wave 1: the 110 tracker plants), built from the design mock-up of 17 Nov 2026
 (`src/routes/plants/[slug]/`, `src/lib/plants/`). Public since 23 Nov 2026 (design decision, the Elenz team having looked
 over the pages): `PLANTS_PUBLIC` in `registry.js` is true. While it was false the pages were noindex, out of the sitemap,
-with no menu item and no links in; the prerender finds them through `entries` in `+page.server.ts`. Switching on was one
+with no menu item and no links in; the prerender finds them through `entries` in `+page.server.ts`. The index's "Pages checked so far" bar shows only while the flag is false. A page's breadcrumb links to the index and to
+the index filtered to its fuel (`/plants?fuel=geo`), and a source's link opens in a new tab. Switching on was one
 pull request: the flag; the sitemap (the index, `/plants/share` and every page, from `slugs.json`); Plants in the menu
 between Records and Articles (six links and the theme button now share a phone's width, so `tracker.css` shrinks the
-links at 420, 400, 380 and 340 px, and at 340 px and under the theme button drops under them); a "Plant page" link
-beside each plant on Now's generator list and a link in the Tracker's plant view (`plantHref` in `registry.js`); and LINZ
+links at 420, 400, 380 and 340 px, and at 340 px and under the theme button drops under them); a "Plant pages" link
+in the header of Now's generator card (to the index; a link beside every plant looked too busy, test report, 23 Nov 2026)
+and a link in the Tracker's plant view (`plantHref` in `registry.js`); and LINZ
 Basemaps on the privacy page (the index map and a page's Map view load its tiles from LINZ) and in the methods' source
 register (`linz-basemaps`). `slugs.json` (every page's slug, written with the pages by `ingest/plant_pages.py`, checked by
 its `--check`) is what lets Now and the Tracker link only plants that have a page without loading `index.json`. Setting

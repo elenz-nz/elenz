@@ -7,7 +7,6 @@ import { FUELS } from '#lib/tracker/fuels.js';
 import CAPACITY from '#lib/tracker/capacity.json';
 import PLANT_META from '#lib/tracker/plants.json';
 import { slug } from '#lib/site/viewurl.js';
-import { plantHref } from '#lib/plants/registry.js';
 import { withOemb } from '#lib/tracker/oemb.js';
 
 const FUEL = Object.fromEntries(FUELS.map((f) => [f.k, f]));
@@ -24,7 +23,7 @@ function capacityNow(name, fallback, today) {
 
 /** @typedef {{ name: string, mw: number, cap: number | null }} Unit */
 /** @typedef {{ name: string, key: string, fuel: string, fuelName: string, tok: string, isl: string, owner: string, scheme: string | null,
- *   mw: number, cap: number | null, pct: number | null, charging: boolean, href: string, page: string | null, units: Unit[], part: string,
+ *   mw: number, cap: number | null, pct: number | null, charging: boolean, href: string, units: Unit[], part: string,
  *   aka: string[], est?: boolean }} Row */
 /** @typedef {{ by: string, asc: boolean }} SortKey */
 /** @typedef {{ fuel: string, island: string, owner: string, by: string, asc: boolean, then?: SortKey[], text: string, on: boolean }} Settings */
@@ -58,7 +57,6 @@ export function generatorRows(D) {
       charging: p.fuel === 'batt' && mw < -0.05,
       href: p.est ? `/tracker?fuel=oemb&region=${p.isl}` : `/tracker?fuel=${p.fuel}&plant=${slug(p.group || p.name)}`,
       est: !!p.est,
-      page: p.est ? null : plantHref(p.group || p.name),   // the plant's own page, once the plant pages are public
       units: (p.units || []).map((u) => ({ name: u.label || u.name, mw: u.s?.[j] ?? 0, cap: u.cap || null })),
       // a station shown whole lists its register plants (they carry a label); a plant on two buses, its connections
       part: (p.units || []).some((u) => u.label) ? 'units' : 'connections',

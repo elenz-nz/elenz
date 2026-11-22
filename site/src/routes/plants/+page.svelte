@@ -105,10 +105,12 @@
 				<h1>Plants</h1>
 				<p class="sub">Every generating station Elenz tracks: {operating} operating and {closedN} closed. Each has a page with its output now, its history back to 1997 where the data has it, and facts with their sources.</p>
 			</div>
-			<div class="progress">
-				<span class="quiet">Pages checked so far</span>
-				<div class="bar-row"><span class="bar"><span style="width:{(100 * reviewed) / plants.length}%"></span></span><span class="num">{reviewed} of {plants.length}</span></div>
-			</div>
+			{#if !PLANTS_PUBLIC}
+				<div class="progress">
+					<span class="quiet">Pages checked so far</span>
+					<div class="bar-row"><span class="bar"><span style="width:{(100 * reviewed) / plants.length}%"></span></span><span class="num">{reviewed} of {plants.length}</span></div>
+				</div>
+			{/if}
 		</div>
 
 		{#if !PLANTS_PUBLIC}

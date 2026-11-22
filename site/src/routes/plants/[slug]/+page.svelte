@@ -113,7 +113,7 @@
 
 	<main class="plant" style="--c: var({tok})">
 		<div class="head">
-			<p class="crumb">Plants › {fuel.name}</p>
+			<p class="crumb"><a href="/plants">Plants</a> › <a href="/plants?fuel={p.fuel}{p.status === 'closed' ? '&closed=1' : ''}">{fuel.name}</a></p>
 			<h1>{p.name}</h1>
 			<p class="sub">{subtitle(p)}</p>
 			<ul class="tags" aria-label="About this plant">
@@ -161,7 +161,7 @@
 							{#if p.fuel === 'diesel'}
 								<p class="quiet">{p.name} is a standby plant and hasn’t run in the last 7 days. It shows here when it next generates. Its past output is in the history, which the Electricity Authority updates each month, about 6 weeks after the month.</p>
 							{:else}
-								<p class="quiet">{p.name} isn’t in the live dispatch data. Its output appears in the history once the Electricity Authority publishes each month’s metered data, about 6 weeks after the month.</p>
+								<p class="quiet">{p.name} hasn’t generated in the last 7 days, so it isn’t in the live dispatch data. It may be out of service or just not running. It shows here when it next generates. Its past output is in the history, which the Electricity Authority updates each month, about 6 weeks after the month.</p>
 							{/if}
 						{:else}
 							<div class="now-body">
@@ -273,7 +273,7 @@
 								<p>This shows the installed capacity Elenz counts for {p.name}, and when it changed.</p>
 								<ul>
 									{#each p.steps as s}
-										<li>{fmtMw(s.mw)} MW{s.from ? ` from ${longDate(s.from)}` : ''}{s.to ? ` to ${longDate(s.to)}` : ''}: {#each s.sources as src, i}{i ? '; ' : ''}{#if src.url}<a href={src.url}>{src.label}</a>{:else}{src.label}{/if}{/each}.</li>
+										<li>{fmtMw(s.mw)} MW{s.from ? ` from ${longDate(s.from)}` : ''}{s.to ? ` to ${longDate(s.to)}` : ''}: {#each s.sources as src, i}{i ? '; ' : ''}{#if src.url}<a href={src.url} target="_blank" rel="noopener">{src.label}</a>{:else}{src.label}{/if}{/each}.</li>
 									{/each}
 								</ul>
 								<p><a href="/methods/capacity#table">How installed capacity is counted</a></p>
@@ -328,7 +328,7 @@
 			<h2 id="src-h">Sources</h2>
 			<ol class="sources">
 				{#each p.sources as s}
-					<li id="src-{s.n}">{s.publisher ? `${s.publisher}, ` : ''}{#if s.url}<a href={s.url}>{s.title}</a>{:else}{s.title}{/if}.{#if s.opened} Checked {longDate(s.opened)}.{/if}</li>
+					<li id="src-{s.n}">{s.publisher ? `${s.publisher}, ` : ''}{#if s.url}<a href={s.url} target="_blank" rel="noopener">{s.title}</a>{:else}{s.title}{/if}.{#if s.opened} Checked {longDate(s.opened)}.{/if}</li>
 				{/each}
 				<li value={nSources + 1}>Live and history figures, installed capacity and owner: Elenz, from Electricity Authority data (CC BY 4.0). How they’re made: <a href="/methods">Data and methods</a>.</li>
 			</ol>
@@ -343,6 +343,8 @@
 	.plant { display: grid; gap: 16px; }
 	.head { display: grid; gap: 8px; padding-top: 6px; }
 	.crumb { margin: 0; color: var(--muted); font-size: 0.82rem; }
+	.crumb a { color: inherit; text-decoration: none; }
+	.crumb a:hover { color: var(--accent); text-decoration: underline; }
 	h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); letter-spacing: -0.01em; line-height: 1.1; }
 	h2 { font-size: 1.02rem; }
 	.sub { margin: 0; color: var(--ink-2); font-size: 1rem; max-width: 62ch; }

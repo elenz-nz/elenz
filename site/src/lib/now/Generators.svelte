@@ -8,6 +8,7 @@
 	import { retitle } from '#lib/site/view.js';
 	import { generatorRows, readSettings, writeSettings, pick, SORTS } from './generators.js';
 	import { slug } from '#lib/site/viewurl.js';
+	import { PLANTS_PUBLIC } from '#lib/plants/registry.js';
 
 	let { D, when }: { D: any; when: string } = $props();
 
@@ -79,11 +80,12 @@
 				<li>% of capacity: current MW against the plant's installed capacity.</li>
 				<li>Batteries show negative MW while charging.</li>
 				<li>Click a column heading to sort by it; Shift-click another to sort within it (island, then MW).</li>
-				<li>Tap a plant to see its history in the Tracker. “Plant page” opens its own page, with facts, photos and location.</li>
+				<li>Tap a plant to see its history in the Tracker. “Plant pages” opens the list of plants, each with its own page of facts, photos and location.</li>
 			</ul>
 			<p><a href="/methods/capacity">How capacity is counted</a></p>
 		</InfoTip></span>
 		<span class="unit">{when} · {running} of {rows.length} generating</span>
+		{#if PLANTS_PUBLIC}<a class="g-plants" href="/plants">Plant pages ›</a>{/if}
 	</div>
 
 	<div class="g-ctl">
@@ -133,7 +135,7 @@
 					<tr class:off={Math.abs(r.mw) < 0.05}>
 						<td class="c-name">
 							<span class="dot" style="--c:var({r.tok})" title={r.fuelName}></span>
-							<a href={r.href} title="{r.name} in the tracker">{r.name}</a>{#if r.est}<small class="est"> est.</small>{/if}{#if r.page}<a class="g-page" href={r.page} title="About {r.name}: its plant page" aria-label="{r.name} plant page">Plant page</a>{/if}
+							<a href={r.href} title="{r.name} in the tracker">{r.name}</a>{#if r.est}<small class="est"> est.</small>{/if}
 							{#if r.units.length > 1}
 								<button type="button" class="g-units" aria-expanded={open.has(r.key)} onclick={() => toggle(r.key)}
 									aria-label="{open.has(r.key) ? 'Hide' : 'Show'} {r.name}'s {r.part}">{r.units.length} {r.part}</button>
@@ -180,6 +182,8 @@
 	.p-head h2 { margin: 0; font-size: 1rem; }
 	.p-info { margin-left: -6px; align-self: center; }
 	.unit { color: var(--muted); font-size: 0.8rem; font-family: var(--font-data); }
+	.g-plants { margin-left: auto; font-size: 0.8rem; color: var(--accent); text-decoration: none; }
+	.g-plants:hover { text-decoration: underline; }
 	.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 	.g-ctl { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 	.g-ctl select, .g-ctl input[type='search'] { font: inherit; font-size: 0.86rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 5px 8px; min-height: 32px; }
@@ -229,6 +233,4 @@
 		tfoot th { text-align: left; }
 	}
 	.est { color: var(--muted); font-size: 0.85em; }
-	.c-name a.g-page { margin-left: 6px; font-size: 0.7rem; font-weight: 400; color: var(--muted); vertical-align: 1px; }
-	.c-name a.g-page:hover { color: var(--accent); }
 </style>
