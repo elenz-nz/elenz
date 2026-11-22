@@ -154,11 +154,12 @@ checked = ""
 [[stations]]
 value = "Stratford peakers"
 id = "T002"
-source = "elenz-register"
-grade = "C"
-checked = ""
-mw = 150
-commissioned = "Stratford CC 1998; Stratford peaker 2010"
+source = ["contact-stratford-peakers", "wp-stratford"]
+grade = "A"
+checked = "2026-11-22"
+mw = 200
+commissioned = "2011"
+note = "two fast-start gas turbines; Contact gives up to 200 MW and 2011, Wikipedia two LMS100 units of 200 MW opened 31 May 2011; the register has 2 × 106 MW (212), which the plant's capacity keeps"
 
 [[stations]]
 value = "Taranaki Combined Cycle"
