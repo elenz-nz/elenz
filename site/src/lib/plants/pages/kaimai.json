@@ -128,10 +128,31 @@
  "images": [],
  "aerial": [
   {
+   "k": "s1",
+   "file": "aerial/kaimai-s1.webp",
+   "across": 470,
+   "imagery": "Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025)",
+   "name": "Lloyd Mandeno",
+   "lat": -37.843995,
+   "lon": 176.050816
+  },
+  {
+   "k": "s2",
+   "file": "aerial/kaimai-s2.webp",
+   "across": 470,
+   "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2025)",
+   "name": "Lower Mangapapa",
+   "lat": -37.820729,
+   "lon": 176.041274
+  },
+  {
    "k": "site",
    "file": "aerial/kaimai-site.webp",
    "across": 470,
-   "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2025)"
+   "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2025)",
+   "name": "Ruahihi",
+   "lat": -37.777318,
+   "lon": 176.055234
   }
  ],
  "sources": [

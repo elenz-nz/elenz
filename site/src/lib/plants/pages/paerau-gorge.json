@@ -113,7 +113,19 @@
    "k": "site",
    "file": "aerial/paerau-gorge-site.webp",
    "across": 420,
-   "imagery": "Otago 0.2m Rural Aerial Photos (2025)"
+   "imagery": "Otago 0.2m Rural Aerial Photos (2025)",
+   "name": "Paerau",
+   "lat": -45.348745,
+   "lon": 169.94459
+  },
+  {
+   "k": "s2",
+   "file": "aerial/paerau-gorge-s2.webp",
+   "across": 420,
+   "imagery": "Otago 0.2m Rural Aerial Photos (2025)",
+   "name": "Patearoa",
+   "lat": -45.32642,
+   "lon": 169.956577
   }
  ],
  "sources": [

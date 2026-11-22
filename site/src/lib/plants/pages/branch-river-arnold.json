@@ -138,7 +138,19 @@
    "k": "site",
    "file": "aerial/branch-river-arnold-site.webp",
    "across": 450,
-   "imagery": "Marlborough 0.25m Rural Aerial Photos (2023-2024)"
+   "imagery": "Marlborough 0.25m Rural Aerial Photos (2023-2024)",
+   "name": "Argyle",
+   "lat": -41.67076,
+   "lon": 173.203316
+  },
+  {
+   "k": "s2",
+   "file": "aerial/branch-river-arnold-s2.webp",
+   "across": 450,
+   "imagery": "Marlborough 0.25m Rural Aerial Photos (2023-2024)",
+   "name": "Wairau",
+   "lat": -41.64828,
+   "lon": 173.22418
   }
  ],
  "sources": [
