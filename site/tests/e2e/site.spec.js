@@ -438,6 +438,19 @@ test.describe('plant pages', () => {
     await expect(page.locator('.loc figcaption')).toContainText('° S');   // the coordinates moved here from the side
   });
 
+  test('coming back from Location keeps the strip on the photo the counter shows', async ({ page }) => {
+    await page.goto('/plants/manapouri');
+    const strip = page.locator('.photo .strip');
+    await strip.focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(page.locator('.photo .photos')).toContainText('2 of 2');
+    await expect.poll(() => strip.evaluate((el) => Math.round(el.scrollLeft / el.clientWidth))).toBe(1);
+    await page.getByRole('button', { name: 'Location' }).click();
+    await page.getByRole('button', { name: 'Photo' }).click();
+    await expect(page.locator('.photo .photos')).toContainText('2 of 2');
+    await expect.poll(() => page.locator('.photo .strip').evaluate((el) => Math.round(el.scrollLeft / el.clientWidth))).toBe(1);
+  });
+
   test('a photo opens full size and the gallery steps through, and a photo can anchor its crop', async ({ page }) => {
     await page.goto('/plants/manapouri');
     await page.locator('.photo .photos img').first().click();
