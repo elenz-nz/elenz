@@ -19,7 +19,7 @@
 		<p class="mt-kicker">Elenz</p>
 		<h1 id="mt-h">Privacy</h1>
 		<p class="mt-lede">We don’t ask who you are. Elenz uses no cookies, shows no ads and has no trackers. We count visits, and we have your email address only if you write to us.</p>
-		<p class="mt-meta">Updated 16 November 2026</p>
+		<p class="mt-meta">Updated 23 November 2026</p>
 	</header>
 
 	<div class="mt-body">
@@ -32,7 +32,8 @@
 		<p>So the site opens the way you left it, your browser remembers your light or dark choice, your last region, range, interval and chart settings on the tracker, whether you asked a page to keep the screen on, the layout you chose for the dashboard, the view you chose for the power landscape, and whether you asked not to be counted. These are kept in your browser’s own storage, never sent anywhere, and you can remove them by clearing this site’s data in your browser.</p>
 
 		<h2 id="hosting">Hosting</h2>
-		<p>The site runs on Cloudflare. Like any web host, Cloudflare handles your IP address to deliver pages and protect the site from attacks. We don’t store visitors’ IP addresses. Everything the pages need, including their fonts, comes from elenz.co.nz itself; the only other requests are the two visit counters, Cloudflare’s and Umami’s.</p>
+		<p>The site runs on Cloudflare. Like any web host, Cloudflare handles your IP address to deliver pages and protect the site from attacks. We don’t store visitors’ IP addresses. Everything the pages need, including their fonts, comes from elenz.co.nz itself; the only other requests are the two visit counters, Cloudflare’s and Umami’s, and the maps below.</p>
+		<p id="maps">The map on the Plants page, and the Map view on a plant’s page (opened from its Location tab), draw their map tiles, style and satellite imagery from LINZ Basemaps, run by Toitū Te Whenua Land Information New Zealand (LINZ). Your browser asks LINZ’s servers for them when the map opens, so LINZ sees your IP address and the part of the country you are looking at, as any web server would. LINZ has its own privacy policy. The aerial pictures on a plant’s page are our own copies and make no request to LINZ.</p>
 
 		<h2 id="email">If you email us</h2>
 		<p>Messages to hello@elenz.co.nz are kept in our email account so we can answer them. Your address isn’t shared with anyone or added to any mailing list. Replies are sent through Brevo, an email service, which records whether a reply was opened. Ask, and we’ll delete your messages.</p>

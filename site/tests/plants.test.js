@@ -7,6 +7,7 @@ import { toView, islandBox } from '#lib/plants/map.js';
 import { readSettings, writeSettings, pick, filtered, fuelsOf, ownersOf, dotSize, statusText, toggleFuel, onlyFuel, DEFAULTS } from '#lib/plants/list.js';
 import INDEX from '#lib/plants/index.json' with { type: 'json' };
 import { PTS, NI, SI, VIEW } from '#lib/home/nzmap.js';
+import { plantHref, PLANTS_PUBLIC } from '#lib/plants/registry.js';
 import MANAPOURI from '#lib/plants/pages/manapouri.json' with { type: 'json' };
 
 const STEPS = [{ from: null, to: '2002-04-30', mw: 585 }, { from: '2002-05-01', to: '2007-12-31', mw: 700 }, { from: '2008-01-01', to: null, mw: 800 }];
@@ -147,4 +148,22 @@ test('the locator frames one island', () => {
   assert.ok(pt[0] > x && pt[0] < x + w && pt[1] > y && pt[1] < y + h);
   const s = islandBox(SI);
   assert.ok(s[1] > y + h * 0.5, 'the South Island sits below the North Island');
+});
+
+test('plant names link to their pages by slug, and only where a page exists', () => {
+  assert.equal(PLANTS_PUBLIC, true);
+  assert.equal(plantHref('Manapōuri'), '/plants/manapouri');
+  assert.equal(plantHref('Branch River (Arnold)'), '/plants/branch-river-arnold');
+  assert.equal(plantHref('Other embedded generation · North Island'), null);
+  assert.equal(plantHref('Not a plant'), null);
+  // every plant the index lists has a page link, and every page is in the sitemap's list (slugs.json: plant_pages.py)
+  for (const p of INDEX.plants) assert.equal(plantHref(p.plant), `/plants/${p.slug}`, p.plant);
+});
+
+test('every plant page\'s description fits search results (110 to 160 characters)', async () => {
+  const { description } = await import('#lib/plants/registry.js');
+  for (const p of INDEX.plants) {
+    const d = description({ name: p.name, status: p.status, fuel: p.fuel, island: p.island });
+    assert.ok(d.length >= 110 && d.length <= 160, `${p.slug}: ${d.length} characters`);
+  }
 });

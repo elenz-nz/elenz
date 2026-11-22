@@ -79,7 +79,7 @@
 				<li>% of capacity: current MW against the plant's installed capacity.</li>
 				<li>Batteries show negative MW while charging.</li>
 				<li>Click a column heading to sort by it; Shift-click another to sort within it (island, then MW).</li>
-				<li>Tap a plant to see its history in the Tracker.</li>
+				<li>Tap a plant to see its history in the Tracker. “Plant page” opens its own page, with facts, photos and location.</li>
 			</ul>
 			<p><a href="/methods/capacity">How capacity is counted</a></p>
 		</InfoTip></span>
@@ -133,7 +133,7 @@
 					<tr class:off={Math.abs(r.mw) < 0.05}>
 						<td class="c-name">
 							<span class="dot" style="--c:var({r.tok})" title={r.fuelName}></span>
-							<a href={r.href} title="{r.name} in the tracker">{r.name}</a>{#if r.est}<small class="est"> est.</small>{/if}
+							<a href={r.href} title="{r.name} in the tracker">{r.name}</a>{#if r.est}<small class="est"> est.</small>{/if}{#if r.page}<a class="g-page" href={r.page} title="About {r.name}: its plant page" aria-label="{r.name} plant page">Plant page</a>{/if}
 							{#if r.units.length > 1}
 								<button type="button" class="g-units" aria-expanded={open.has(r.key)} onclick={() => toggle(r.key)}
 									aria-label="{open.has(r.key) ? 'Hide' : 'Show'} {r.name}'s {r.part}">{r.units.length} {r.part}</button>
@@ -229,4 +229,6 @@
 		tfoot th { text-align: left; }
 	}
 	.est { color: var(--muted); font-size: 0.85em; }
+	.c-name a.g-page { margin-left: 6px; font-size: 0.7rem; font-weight: 400; color: var(--muted); vertical-align: 1px; }
+	.c-name a.g-page:hover { color: var(--accent); }
 </style>

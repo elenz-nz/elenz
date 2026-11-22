@@ -80,7 +80,7 @@ docs, not here: keep this file short.
 - `site/`: the SvelteKit site. Routes in `src/routes/`; shared pieces in `src/lib/site/`; the Generation tab's charts in
   `src/lib/tracker/` (`tracker.js`, `fuels.js`, `emissions.js`, `series.js`, `oemb.js`, `tracker.css`) and its lower
   cards in `src/lib/generation/`; the Prices tab in `src/lib/prices/`; Now in `src/lib/now/` and `src/lib/home/`;
-  Records in `src/lib/records/`; plant pages in `src/lib/plants/` (hidden until `PLANTS_PUBLIC`; the private research page at `/plants/research`); Articles in `src/lib/articles/`; Data and methods in `src/lib/methods/`
+  Records in `src/lib/records/`; plant pages in `src/lib/plants/` (public since 23 Nov 2026, `PLANTS_PUBLIC` in `registry.js`; the private research page at `/plants/research`); Articles in `src/lib/articles/`; Data and methods in `src/lib/methods/`
   (`registry.ts`, `roles.ts`, `pages/`); the landing page's previews in `src/lib/landing/`. Tests in `site/tests/`
   (`npm test`) and `site/tests/e2e/` (browsers).
 - `worker/index.js`: serves the site and `/data/*` from Workers KV, and its crons start the GitHub jobs. Tests in
@@ -133,7 +133,7 @@ Each is explained in `docs/architecture.md`.
 
 Live at https://elenz.co.nz: live data every 5 minutes, history since Aug 1997 (BUILD 13, 21 Nov 2026). The tag
 `v0.9.0` (9 Nov 2026) marks the version that passed user acceptance testing.
-Next: plant pages (`/plants/<slug>`), the map, a hydro panel, offer stacks and downloads.
+Plant pages (`/plants/<slug>`, 110) went public on 23 Nov 2026. Next: the fuller map, a hydro panel, offer stacks and downloads.
 
 Recurring upkeep: add Genesis's Rankine coal share to `emissions.js` each quarter (performance report ~3 weeks
 after quarter end; FY27 Q1 (23%) added 24 Oct 2026, FY27 Q2 due late Jan 2027); add each year's NZGA geothermal figures (NZ Geothermal Workshop,

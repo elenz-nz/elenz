@@ -503,20 +503,30 @@ a { color: var(--accent); }
 @media (max-width: 440px) {
   .pill .ptime { display: none; }
 }
-/* phones: the five page links no longer fit beside the brand, so they take a row of their own under it */
+/* phones: the page links no longer fit beside the brand, so they take a row of their own under it */
 @media (max-width: 620px) {
   .masthead { flex-wrap: wrap; row-gap: 6px; }
   .mast-r { width: 100%; margin-left: 0; justify-content: space-between; }
   .pages a:first-child { padding-left: 0; }
 }
-@media (max-width: 400px) {
+@media (max-width: 420px) {
   .pages a { padding-inline: 5px; }
+}
+/* six page links (Plants joined the menu on 23 Nov 2026) and the theme button in the window's width */
+@media (max-width: 400px) {
+  .pages a { padding-inline: 4px; font-size: 0.83rem; }
+}
+@media (max-width: 380px) {
+  .pages a { padding-inline: 3px; font-size: 0.8rem; }
+}
+@media (max-width: 400px) {
   .status .pill { letter-spacing: 0.01em; padding-inline: 6px; font-size: 0.7rem; }
   .toolbar .seg button { padding: 2px 5px; }
 }
-/* the smallest phones: the five page links and the theme button, in the window's width */
+/* the smallest phones (320 px): six links and the theme button don't fit one line, so the button drops under them */
 @media (max-width: 340px) {
-  .pages a { padding-inline: 3px; font-size: 0.8rem; }
+  .pages a { padding-inline: 3px; font-size: 0.78rem; }
+  .mast-r { flex-wrap: wrap; row-gap: 4px; }
 }
 .pill.live { background: var(--live-bg); color: var(--live-ink); }
 .pill.live::before { background: currentColor; }

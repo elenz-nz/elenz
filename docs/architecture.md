@@ -141,11 +141,17 @@ A provisional record leads (design decision, 12 Nov 2026; `headline(rec, prov)` 
 ## Plant pages
 
 `/plants/<slug>`, one page per plant file (wave 1: the 110 tracker plants), built from the design mock-up of 17 Nov 2026
-(`src/routes/plants/[slug]/`, `src/lib/plants/`). Hidden while `PLANTS_PUBLIC` is false (`registry.js`; design decision,
-17 Nov 2026): noindex, out of the sitemap, no menu item and no links in, so the prerender finds them through `entries`
-in `+page.server.ts`. Switching them on is one pull request: the flag, the sitemap (the index and every page), Plants in the menu
-between Records and Articles, links from Now and the tracker drill-in, and LINZ Basemaps on the privacy page (the map
-loads its tiles from LINZ) and in the methods' source register.
+(`src/routes/plants/[slug]/`, `src/lib/plants/`). Public since 23 Nov 2026 (design decision, the Elenz team having looked
+over the pages): `PLANTS_PUBLIC` in `registry.js` is true. While it was false the pages were noindex, out of the sitemap,
+with no menu item and no links in; the prerender finds them through `entries` in `+page.server.ts`. Switching on was one
+pull request: the flag; the sitemap (the index, `/plants/share` and every page, from `slugs.json`); Plants in the menu
+between Records and Articles (six links and the theme button now share a phone's width, so `tracker.css` shrinks the
+links at 420, 400, 380 and 340 px, and at 340 px and under the theme button drops under them); a "Plant page" link
+beside each plant on Now's generator list and a link in the Tracker's plant view (`plantHref` in `registry.js`); and LINZ
+Basemaps on the privacy page (the index map and a page's Map view load its tiles from LINZ) and in the methods' source
+register (`linz-basemaps`). `slugs.json` (every page's slug, written with the pages by `ingest/plant_pages.py`, checked by
+its `--check`) is what lets Now and the Tracker link only plants that have a page without loading `index.json`. Setting
+the flag false hides everything again: noindex, no menu item, no links, and the index's draft map points return.
 
 Three sources, so nothing waits on a site build. The static part is `src/lib/plants/pages/<slug>.json`, written by
 `ingest/plant_pages.py` from the plant files, `plant_capacity.csv` and `plants.json` and committed (`--check` in

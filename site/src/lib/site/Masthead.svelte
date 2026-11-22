@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import Mark from './Mark.svelte';
 	import { ARTICLES_PUBLIC } from '#lib/articles/registry.js';
+	import { PLANTS_PUBLIC } from '#lib/plants/registry.js';
 
 	// the tracker's masthead carries the page's h1; other pages use their own heading
 	// the landing page shows the mark large in its own hero, so its masthead is just the navigation
@@ -43,6 +44,7 @@
 			<a href="/now" aria-current={page.url.pathname.startsWith('/now') ? 'page' : undefined}>Now</a>
 			<a href="/tracker" aria-current={page.url.pathname.startsWith('/tracker') ? 'page' : undefined}>Tracker</a>
 			<a href="/records" aria-current={page.url.pathname.startsWith('/records') ? 'page' : undefined}>Records</a>
+			{#if PLANTS_PUBLIC}<a href="/plants" aria-current={page.url.pathname.startsWith('/plants') ? 'page' : undefined}>Plants</a>{/if}
 			{#if ARTICLES_PUBLIC}<a href="/articles" aria-current={page.url.pathname.startsWith('/articles') ? 'page' : undefined}>Articles</a>{/if}
 			<a href="/about" aria-current={page.url.pathname.startsWith('/about') || page.url.pathname.startsWith('/methods') ? 'page' : undefined}>About</a>
 		</nav>

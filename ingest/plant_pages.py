@@ -26,7 +26,7 @@ Each plant page (/plants/<slug>) is prerendered from its file here; its live pan
   sources                [{n, title, publisher, url, opened}]: the sources the published facts cite, numbered
   related                {owner: [...], scheme: [...], fuel: [...]}: other plant pages, each {slug, name}
 
-and the index page (/plants) is built from site/src/lib/plants/index.json, one row per plant: slug, name, plant (its
+and the index page (/plants) is built from site/src/lib/plants/index.json (with slugs.json, every page's slug, for Now and the Tracker's links), one row per plant: slug, name, plant (its
 name in Elenz's data), fuel, island, status, mw, owner (plants.json's, "Other generators" included), commissioned (its checked year, or null),
 closed (the year its last capacity row ended), reviewed, pt, its point on the map: {lat, lon, basis, checked}, thumb,
 the picture the index's side panel shows (its first photo, else its aerial site view, else null: {kind, file, credit}),
@@ -57,6 +57,7 @@ from common import ROOT
 
 OUT = os.path.join(ROOT, 'site', 'src', 'lib', 'plants', 'pages')
 INDEX = os.path.join(ROOT, 'site', 'src', 'lib', 'plants', 'index.json')
+SLUGS = os.path.join(ROOT, 'site', 'src', 'lib', 'plants', 'slugs.json')   # every page's slug, small enough for Now and the Tracker to link plant names
 META = os.path.join(ROOT, 'site', 'src', 'lib', 'tracker', 'plants.json')
 IMAGES_DIR = os.path.join(ROOT, 'site', 'static', 'plants')
 AERIALS = os.path.join(ROOT, 'facilities', 'plant_aerials.csv')
@@ -421,9 +422,17 @@ def main(check=False):
                     problems.append('site/src/lib/plants/index.json is out of date')
         except FileNotFoundError:
             problems.append('site/src/lib/plants/index.json is missing')
+        try:
+            with open(SLUGS, encoding='utf-8') as f:
+                if f.read() != dump(sorted(pages)):
+                    problems.append('site/src/lib/plants/slugs.json is out of date')
+        except FileNotFoundError:
+            problems.append('site/src/lib/plants/slugs.json is missing')
     else:
         with open(INDEX, 'w', encoding='utf-8') as f:
             f.write(dump(idx))
+        with open(SLUGS, 'w', encoding='utf-8') as f:
+            f.write(dump(sorted(pages)))
     for s in sorted(have - set(pages)):
         if check:
             problems.append(f'site/src/lib/plants/pages/{s}.json has no plant file')

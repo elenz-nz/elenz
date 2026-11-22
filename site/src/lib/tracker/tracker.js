@@ -6,6 +6,7 @@ import { efAt, plantEf, BY_PLANT } from './emissions.js';
 import { onDateSettled } from '../site/datefield.js';
 import '../site/datepick.js';   // <date-pick>: the date box's calendar (TRK-07)
 import { nzOffset, tzName, KEY, fromLayout, firstAtOrAfter, historyStore, genTotal } from './series.js';
+import { plantHref } from '#lib/plants/registry.js';
 import PLANT_META from './plants.json';  // owner, hydro scheme, other names and metering note per plant (ingest/plant_meta.py)
 import CAPACITY from './capacity.json';   // installed MW per plant (ingest/capacity.py)
 import { readView, writeView, slug, describe, shareLinks, setTitle, addYears } from '#lib/site/view.js';
@@ -1166,9 +1167,11 @@ export function mountTracker(D, hooks = {}) {
     // layer, what it is and a link to its method page (test report TRK-01, 6 Nov 2026)
     const aka = lv === 'unit' ? akaOf(d.plant) : [], metered = lv === 'unit' ? meteredOf(d.plant) : '';
     const est = lv !== 'top' && lv !== 'fuel' && ESTIMATED.includes(d.fuel) ? EST_NOTE[d.fuel] : null;
+    const page = lv === 'unit' ? plantHref(d.plant) : null;   // the plant's own page (once the plant pages are public)
     const pn = $('plant-note');
-    pn.hidden = !aka.length && !metered && !est;
-    pn.innerHTML = (est ? `<p><b>Calculated estimate</b></p><p>${esc(est.text)}</p><p><a href="${est.href}">How it’s estimated</a></p>` : '')
+    pn.hidden = !aka.length && !metered && !est && !page;
+    pn.innerHTML = (page ? `<p><a href="${page}">${esc(d.plant)}’s plant page</a>: photos, facts, location and history</p>` : '')
+      + (est ? `<p><b>Calculated estimate</b></p><p>${esc(est.text)}</p><p><a href="${est.href}">How it’s estimated</a></p>` : '')
       + (aka.length ? `<p><b>Also known as</b> ${aka.map(esc).join(', ')}</p>` : '')
       + (metered ? `<p><b>Plant notes</b></p><ul>${metered.split('\n').map(x => `<li>${esc(x)}</li>`).join('')}</ul><p><a href="/methods/generation#whole">More</a></p>` : '');
   }

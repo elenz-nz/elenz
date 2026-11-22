@@ -380,7 +380,7 @@ test('a site picked from far down the list goes back up to the chart (GRP-03)', 
   await expect.poll(() => page.evaluate(() => document.getElementById('charts').getBoundingClientRect().top)).toBeGreaterThan(-5);
 });
 
-// plant pages (hidden until PLANTS_PUBLIC): the history file comes from the history job, so the tests hand them a small
+// plant pages (public since 23 Nov 2026, PLANTS_PUBLIC): the history file comes from the history job, so the tests hand them a small
 // one (two years of Manapōuri, the newest month running)
 const PLANT_MONTHS = Array.from({ length: 34 }, (_, k) => `${2024 + Math.floor(k / 12)}-${String((k % 12) + 1).padStart(2, '0')}`);
 const PLANT_HISTORY = { v: 1, months: PLANT_MONTHS, src: 'm'.repeat(33) + 'd', end: Date.UTC(2026, 9, 15, 11), left: 0,
@@ -391,10 +391,22 @@ test.describe('plant pages', () => {
     await page.route('**/data/history/plants.json', (r) => r.fulfill({ contentType: 'application/json', body: JSON.stringify(PLANT_HISTORY) }));
   });
 
-  test('a plant page shows its live output, history and capacity, and stays out of search', async ({ page }) => {
+  test('Plants is in the menu, and Now links each plant to its page', async ({ page }, testInfo) => {
+    await page.goto('/now');
+    const nav = page.getByRole('navigation', { name: 'Pages' });
+    await expect(nav.getByRole('link', { name: 'Plants' })).toHaveAttribute('href', '/plants');
+    const link = page.locator('.gtab a.g-page').first();
+    await expect(link).toHaveAttribute('href', /^\/plants\/[a-z0-9-]+$/);
+    const href = await link.getAttribute('href');
+    await link.click();
+    await expect(page).toHaveURL(new RegExp(`${href}$`));
+    await expect(page.locator('h1')).toBeVisible();
+  });
+
+  test('a plant page shows its live output, history and capacity, and is open to search', async ({ page }) => {
     await page.goto('/plants/manapouri');
     await expect(page.locator('h1')).toHaveText('Manapōuri');
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+    await expect(page.locator('meta[name="robots"]')).toHaveCount(0);   // no noindex once PLANTS_PUBLIC is true
     await expect(page.locator('.now .big .num')).toHaveText(/^\d/);
     await expect(page.locator('section[aria-labelledby="hist-h"] svg > rect')).toHaveCount(3);   // 2024, 2025, 2026
     await expect(page.locator('section[aria-labelledby="mon-h"] svg > rect')).toHaveCount(24);
@@ -522,7 +534,7 @@ test.describe('plant pages', () => {
 test.describe('plant index', () => {
   test('filters keep to the address, and a dot opens its plant in the panel', async ({ page }) => {
     await page.goto('/plants');
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+    await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
     await expect(page.locator('.tbl tbody tr')).toHaveCount(20);
     await page.getByRole('button', { name: /^Show all \d+$/ }).click();
     await expect(page.locator('.tbl tbody tr')).toHaveCount(101);   // closed plants wait for "Show closed"
