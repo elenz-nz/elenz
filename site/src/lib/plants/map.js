@@ -57,10 +57,15 @@ export const aerialSource = (key) => ({
   attribution: '© Toitū Te Whenua LINZ, CC BY 4.0'
 });
 
-// MapLibre's compact credit opens by itself on first load; start it as the small (i) button instead
+// MapLibre opens its compact credit by itself on first load and again whenever the map resizes or its sources load;
+// keep it as the small (i) button until the visitor opens it.
 export function collapseCredit(el) {
   const a = el?.querySelector('.maplibregl-ctrl-attrib');
   if (!a) return;
-  a.classList.remove('maplibregl-compact-show');
-  a.removeAttribute('open');
+  const shut = () => { a.classList.remove('maplibregl-compact-show'); a.removeAttribute('open'); };
+  shut();
+  const watch = new MutationObserver(shut);
+  watch.observe(a, { attributes: true, attributeFilter: ['class', 'open'] });
+  a.addEventListener('pointerdown', () => watch.disconnect(), { once: true });
+  setTimeout(shut, 0);
 }
