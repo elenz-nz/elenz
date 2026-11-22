@@ -12,7 +12,7 @@ to_check = [
   "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
-  "Station points (22 Nov 2026): read from the LINZ aerial by the Elenz team; Kaimai 5 and the Taranaki Combined Cycle show once the station's own entry is checked.",
+  "Station points (22 Nov 2026): read from the LINZ aerial by the Elenz team.",
   "T002: Elenz shows Stratford as one plant (one meter, SFD2201): TCC and the two peakers. 212 MW from Apr 2026 (peakers).",
   "T013: Ran until March 2026 (Elenz: Stratford drops 542 → 212 MW on 1 Apr 2026).",
   "Thermal batch 1 (19 Nov 2026): facts checked against Contact's Stratford Peakers page and its August 2026 market release, the EA register, the Commerce Commission's 2003 decision on TCC, the Gazette (ECNZ's sale to Contact) and Stats NZ boundaries. The location is left for the LINZ aerial check.",
@@ -164,8 +164,9 @@ commissioned = "Stratford CC 1998; Stratford peaker 2010"
 value = "Taranaki Combined Cycle"
 location = [-39.329889, 174.318904]
 id = "T013"
-source = "elenz-register"
-grade = "C"
-checked = ""
+source = ["wp-stratford", "contact-tcc-2022"]
+grade = "B"
+checked = "2026-11-22"
 mw = 377
-commissioned = "Stratford CC 1998; Stratford peaker 2010"
+commissioned = "1998"
+note = "Wikipedia gives 377 MW and 1998 (built 1996–98); Contact's 2022 news calls it its gas-fired baseload plant near Stratford, able to generate 360 MW, and dates it to 1996"
