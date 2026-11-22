@@ -22,7 +22,7 @@
  "owner": "Mercury",
  "scheme": null,
  "metered": "Generation_MD keeps the old station's code (SWN2201, \"southdown\", gas) for the battery after the station closed, so the metered history counts it as the battery from 2016. Its output there starts in September 2018. Before the dispatch data starts (10 Sep 2020) the history has its discharge only, not its charging.",
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "Southdown Battery was a 1 MW Tesla Powerpack, storing 2 MWh, that Mercury installed at its research and development centre in South Auckland, connected to the grid at Southdown. Launched in August 2018, it was, in Mercury's words, the first large-scale battery in New Zealand connected directly to the national grid. Mercury ran it as a trial of how a battery could trade in the electricity market and work alongside its hydro and geothermal stations. The EA's register lists it until May 2022.",

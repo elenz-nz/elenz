@@ -22,7 +22,7 @@
  "owner": null,
  "scheme": null,
  "metered": "The metered history has Teviot's own meter. It is never dispatched, so in the live week and the weeks since the newest metered month, its output is a calculated estimate from its typical day.",
- "checking": true,
+ "checking": false,
  "checked": "2026-11-22",
  "about": {
   "text": "The Teviot scheme in Central Otago carries water from Lake Onslow, high in the Lammerlaw Range, down the Teviot River through a chain of small dams and six power stations to the Clutha near Roxburgh. The first, George, opened in 1924; Bridge followed in 1972, then Ellis and Michelle in the early 1980s, when a new arch dam raised Lake Onslow, Horseshoe Bend in 1999 and Kowhai in 2010. Irrigation shares the water, and in summer it takes priority at some stations. Ellis runs on refurbished 1940s machinery bought from Dunedin's Waipori Falls station.",

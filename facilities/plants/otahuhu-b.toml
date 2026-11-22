@@ -7,9 +7,7 @@ register = ["T015"]
 wikidata = "Q7108372"
 reviewed = "2026-11-19"
 photo_leads = ["P030"]
-to_check = [
-  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
-]
+to_check = []
 notes = [
   "385 → 404 MW, to Sep 2015.",
   "Thermal batch 1 (19 Nov 2026): facts checked against the EA register, Wikipedia's Ōtāhuhu Power Station article, the Commerce Commission's 2003 decision and Stats NZ boundaries. No previous owners: Contact bought the Ōtāhuhu site from ECNZ in 1996, before Ōtāhuhu B was commissioned (Gazette 1996-174); whether Contact or ECNZ started building it is not checked.",

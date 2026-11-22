@@ -93,6 +93,47 @@ test.describe('plant research page', () => {
     expect(errors).toEqual([]);
   });
 
+  test('station leads: the rounds, groups, a lead\'s details and its own team notes', async ({ page, browserName }) => {
+    const errors = [];
+    const ignore = browserName === 'webkit' ? WEBKIT_CANCELLED : OK_ERRORS;
+    page.on('pageerror', (e) => { if (!ignore.test(e.message)) errors.push(e.message); });
+    await page.route(/cloudflareinsights\.com|umami\.is/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
+    const saved = [];
+    await page.route('**/data/plant-notes**', async (route) => {
+      const req = route.request();
+      if (req.method() === 'GET') return route.fulfill({ json: { notes: { 'lead-h046': { text: 'Phoenix mine, 1886.', at: 1795000000000 } } } });
+      const slug = new URL(req.url()).pathname.split('/').pop(), body = req.postDataJSON();
+      saved.push({ slug, ...body });
+      return route.fulfill({ json: { text: body.text.trim(), at: 1795000100000 } });
+    });
+    await page.goto('/plants/research?key=k123');
+    await expect(page.getByRole('list', { name: 'Research rounds' })).toContainText('Stations without a page');
+    const leads = page.locator('section.leads-now');
+    // "To research" is chosen first; a choice made while the page hydrates can be lost, so choose until it takes
+    await expect(leads.getByRole('button', { name: /^To research/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(async () => {
+      await leads.getByRole('button', { name: /^Historic/ }).click();
+      await expect(leads.getByRole('button', { name: /^Historic/ })).toHaveAttribute('aria-pressed', 'true', { timeout: 2_000 });
+    }).toPass({ timeout: 20_000 });
+    await leads.getByLabel('Search leads').fill('bullen');
+    await expect(leads.locator('tbody > tr')).toHaveCount(1);
+    await expect(leads.locator('tr .has-note')).toBeVisible();
+    await leads.getByRole('button', { name: 'Bullendale' }).click();
+    const box = leads.locator('.detail').getByLabel('Team notes');
+    await expect(box).toHaveValue('Phoenix mine, 1886.');
+    await box.fill('Phoenix mine, 1886. Look in Papers Past.');
+    await leads.locator('.detail > p.quiet').click();   // leaving the box saves it
+    await expect.poll(() => saved.length).toBe(1);
+    expect(saved[0]).toEqual({ slug: 'lead-h046', text: 'Phoenix mine, 1886. Look in Papers Past.', base: 1795000000000 });
+
+    // a lead already on a page links to it
+    await leads.getByRole('button', { name: /^On a page already/ }).click();
+    await leads.getByLabel('Search leads').fill('Argyle');
+    await leads.getByRole('button', { name: 'Argyle' }).click();
+    await expect(leads.locator('.detail').getByRole('link', { name: 'On the Branch River page' })).toHaveAttribute('href', '/plants/branch-river-arnold');
+    expect(errors).toEqual([]);
+  });
+
   test('team notes say why they can\'t be read without the key', async ({ page }) => {
     await page.goto('/plants/research?plant=benmore');
     await expect(page.locator('.detail')).toContainText('Notes need the page’s key');

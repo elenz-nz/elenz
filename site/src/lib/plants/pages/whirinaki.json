@@ -26,7 +26,7 @@
  "owner": "Contact",
  "scheme": null,
  "metered": null,
- "checking": true,
+ "checking": false,
  "checked": "2026-11-23",
  "about": {
   "text": "Whirinaki, north of Napier, is a diesel-fired peaker plant. The government had it built after the power shortages of 2001 and 2003 as reserve generation of last resort, run by Contact Energy, and it opened in June 2004; Contact bought it in 2011. Its three fast-start units can reach full output from a cold start in 20 to 30 minutes, and about four million litres of diesel stored on site will run it at full output for 92 hours. An earlier gas turbine station on the same site ran from 1978 to 2001.",

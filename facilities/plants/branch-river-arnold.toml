@@ -7,9 +7,7 @@ register = ["H024"]
 wikidata = "Q140959164"
 osm = ["relation/12568807"]
 reviewed = "2026-11-19"
-to_check = [
-  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
-]
+to_check = []
 notes = [
   "The EA register names it \"Branch River (Arnold)\" at ARG1101 (12 MW); the metered code is argyle_wairau, so the scheme is Argyle plus Wairau. Arnold is a separate West Coast station (E020; Contact: Arnold River, 3 MW). The page's name drops \"(Arnold)\" (19 Nov 2026); the tracker's plant name is unchanged.",
   "Hydro batch 5 (19 Nov 2026): facts checked against Contact's scheme page, the Gazette (the 1983 consent to generate), the Ministry for the Environment's 2009 review, the EA register and network supply points table, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",

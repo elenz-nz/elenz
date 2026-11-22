@@ -10,7 +10,6 @@ reviewed = "2026-11-19"
 photo_leads = ["P018", "P019", "P032"]
 to_check = [
   "When it happens: most units retire mid-2027 and the rest by June 2031. Add a closed date and update its stations then.",
-  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
   "G001: 167 → 181 (Jun 2005) → 136 MW (May 2014).",

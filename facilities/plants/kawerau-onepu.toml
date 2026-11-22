@@ -4,10 +4,9 @@ slug = "kawerau-onepu"
 plant = "Kawerau (Onepu)"
 name = "Kawerau (Onepu)"
 register = ["T006"]
-reviewed = ""
+reviewed = "2026-11-23"
 to_check = [
   "Owner: not published as one owner. The register's operator for KAW0112 ONU0 is Oji Fibre Solutions (Norske Skog Tasman before 6 May 2023). Transpower's Assumptions Book v3.0 (30 Jun 2026; source transpower-assumptions-2026) puts four units behind the meter: TOPP1 and GDL (KA24), both Eastland Generation's, and TA2 and TA3, which it doesn't describe. Decide whether the page names owners per unit (a design decision for the Elenz team).",
-  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
   "Location (23 Nov 2026): the point is the middle of the Kawerau mill and plant complex read from the LINZ aerial, as a whole-site point; the connection point is the substation at its south-east corner. No unit points are published.",

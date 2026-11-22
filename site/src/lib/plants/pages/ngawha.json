@@ -56,7 +56,7 @@
  "owner": null,
  "scheme": null,
  "metered": "The metered history counts the whole station (Ngāwhā A and B). The dispatch data has only Ngāwhā B (OEC4), so in the live week and the weeks since the newest metered month, the rest of the station is filled in as a calculated estimate.",
- "checking": true,
+ "checking": false,
  "checked": "2026-11-19",
  "about": {
   "text": "Ngāwhā, near Kaikohe, is owned by Top Energy, the Far North's lines company. Its first binary units ran from 1998 and a second station followed in 2008, about 25 MW together. A third, OEC4, built with the Parahirahi Ngāwhā Waiariki Trust and Ngāti Rangi, exported its first power on New Year's Eve 2020 and more than doubled the capacity to 57 MW. The Far North can now meet its own electricity needs for most of the year, sending the surplus to the rest of Northland.",

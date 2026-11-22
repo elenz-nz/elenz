@@ -12,11 +12,8 @@ osm = [
   "relation/12568704",
   "relation/12568705",
 ]
-reviewed = ""
-to_check = [
-  "Location: no station point yet (OpenStreetMap is research only); find one on the LINZ aerial or in Wikidata (separate task). Six stations along the Teviot River east of Roxburgh.",
-  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
-]
+reviewed = "2026-11-23"
+to_check = []
 notes = [
   "Station points (22 Nov 2026): read from the LINZ aerial by the Elenz team; the plant point is Bridge and Ellis (about 20 m apart), so one view is named for both (Ellis's own read: -45.538022, 169.322882).",
   "Capacity: Elenz keeps the register's 22 MW (design decision 19 Nov 2026); Wikipedia's list totals 17.7 MW for the six stations (Ellis 7.8, Horseshoe Bend 4.3, Kowhai 1.9, Michelle 1.6, Teviot Bridge 1.1, George 1). Pioneer gives only Horseshoe Bend (4.3), Michelle (1.6) and George (1.0).",

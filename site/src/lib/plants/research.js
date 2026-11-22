@@ -137,11 +137,51 @@ export function progress(/** @type {any[]} */ plants) {
   };
 }
 
+/** The research rounds, shown at the top of the page; move `now` along when a round finishes (design decision,
+ * 23 Nov 2026: the stations without a page next, then history). [label, what it covers, 'done' | 'now' | 'next']. */
+export const ROUNDS = /** @type {[string, string, string][]} */ ([
+  ['First pass', 'The 110 tracker plants: facts, locations, aerial views, capacity and dates, then the pages went public (23 Nov 2026).', 'done'],
+  ['Stations without a page', 'The station leads below, starting with "To research": embedded and other stations Elenz has no page for yet.', 'now'],
+  ['History', 'Previous owners, upgrades and closures for every page, then retired stations (the leads marked "Historic").', 'next'],
+]);
+
+/** The station leads' groups (ingest/plant_research.py, lead_group): [key, label, what it means]. */
+export const LEAD_GROUPS = /** @type {[string, string, string][]} */ ([
+  ['todo', 'To research', 'Stations without a page: check each, then give it a plant file or set it aside'],
+  ['osm', 'OpenStreetMap leads', 'Unverified: confirm the station exists and its rating before researching it'],
+  ['small', 'Under 1 MW', 'Below the pages’ threshold: only as an exception'],
+  ['new', 'Not generating yet', 'Gets a plant file when it first dispatches'],
+  ['historic', 'Historic', 'Retired or historic: for the history round'],
+  ['page', 'On a page already', 'A station or unit on an existing plant page (on_page)'],
+  ['', 'All leads', ''],
+]);
+
+/** The note key for a station lead: its notes sit beside the plants' (notes.js), keyed lead-<id>. */
+export const leadKey = (/** @type {string} */ id) => `lead-${id.toLowerCase()}`;
+
+/** How many leads each group holds: {key: n}, '' for all. */
+export function leadCounts(/** @type {any[]} */ leads) {
+  return Object.fromEntries(LEAD_GROUPS.map(([k]) => [k, leads.filter((r) => !k || r.group === k).length]));
+}
+
+/** The technologies the leads have, A to Z. */
+export const leadTechs = (/** @type {any[]} */ leads) => [...new Set(leads.map((r) => r.technology ?? '').filter(Boolean))].sort();
+
+/** The leads to list: by group, technology and a name, ID, owner or region match; ordered by name. */
+export function pickLeads(/** @type {any[]} */ leads, /** @type {{ group: string, tech: string, text: string }} */ f) {
+  const text = norm(f.text.trim());
+  return leads
+    .filter((r) => (!f.group || r.group === f.group) && (!f.tech || r.technology === f.tech)
+      && (!text || [r.name, r.id, r.owner, r.region].some((x) => x && norm(x).includes(text))))
+    .sort((a, b) => norm(a.name).localeCompare(norm(b.name)) || a.id.localeCompare(b.id));
+}
+
 /** A source's name for a table: its title, or its ID if it has none. */
 export const sourceName = (/** @type {Record<string, any>} */ sources, /** @type {string} */ id) => sources[id]?.title || id;
 
 /** The download: one sheet each for the plants, every fact (other sources' values as their own rows), the sources and
- * the two leads files; the team's notes (notes.js, by slug) in the Plants sheet. [{name, header, rows}], for xlsx.js. */
+ * the two leads files; the team's notes (notes.js, by slug) in the Plants sheet, and the leads' (lead-<id>) with their
+ * group in the Station leads sheet. [{name, header, rows}], for xlsx.js. */
 export function workbook(/** @type {any} */ d, /** @type {Record<string, { text: string }>} */ notes = {}) {
   const srcs = d.sources, names = (/** @type {string[]} */ ids) => ids.map((x) => sourceName(srcs, x)).join('; ');
   const plants = [...d.plants].sort((a, b) => norm(a.name).localeCompare(norm(b.name)));
@@ -156,13 +196,15 @@ export function workbook(/** @type {any} */ d, /** @type {Record<string, { text:
   ]));
   const sourceRows = Object.entries(srcs).map(([id, s]) => [id, s.title, s.publisher, s.url, s.kind, s.opened, s.note]);
   const keys = (/** @type {any[]} */ rows) => [...new Set(rows.flatMap((r) => Object.keys(r)))];
-  const leadKeys = keys(d.photo_leads), stationKeys = keys(d.station_leads);
+  const leadKeys = keys(d.photo_leads), stationKeys = keys(d.station_leads).filter((k) => k !== 'group');
+  const groupName = Object.fromEntries(LEAD_GROUPS.map(([k, name]) => [k, name]));
   return [
     { name: 'Plants', header: ['Plant', 'Slug', 'Fuel', 'Island', 'Status', 'Installed MW', 'Owner', 'Scheme', 'Reviewed', 'Facts', 'Facts checked',
       'Location', 'Sources disagree on', 'Photos', 'Photo leads', 'To check', 'Notes', 'Team notes', 'Wikidata', 'OpenStreetMap', 'Register IDs', 'Page'], rows: plantRows },
     { name: 'Facts', header: ['Plant', 'Slug', 'Fact', 'Main or other source', 'Value', 'Source IDs', 'Sources', 'Grade', 'Checked', 'Published', 'Note'], rows: factRows },
     { name: 'Sources', header: ['ID', 'Title', 'Publisher', 'Address', 'Kind', 'Opened', 'Note'], rows: sourceRows },
     { name: 'Photo leads', header: leadKeys, rows: d.photo_leads.map((/** @type {any} */ r) => leadKeys.map((k) => r[k] ?? '')) },
-    { name: 'Station leads', header: stationKeys, rows: d.station_leads.map((/** @type {any} */ r) => stationKeys.map((k) => r[k] ?? '')) },
+    { name: 'Station leads', header: ['Group', ...stationKeys, 'Team notes'],
+      rows: d.station_leads.map((/** @type {any} */ r) => [groupName[r.group] ?? r.group, ...stationKeys.map((k) => r[k] ?? ''), notes[leadKey(r.id)]?.text ?? '']) },
   ];
 }

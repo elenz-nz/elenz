@@ -5,10 +5,9 @@ plant = "Ngāwhā"
 name = "Ngāwhā"
 register = ["G015"]
 osm = ["relation/11871344"]
-reviewed = ""
+reviewed = "2026-11-23"
 to_check = [
   "Stations: match the other sites on the aerial (notes) to OEC1 and OEC2, OEC3 and OEC4, then give each station its point.",
-  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
   "Station points (22 Nov 2026): read from the LINZ aerial by the Elenz team; the three are not matched to units, so each view is named Ngāwhā.",

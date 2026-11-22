@@ -8,9 +8,7 @@ wikidata = "Q7080591"
 osm = ["way/143397051"]
 reviewed = "2026-11-19"
 photo_leads = ["P021", "P022", "P032"]
-to_check = [
-  "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
-]
+to_check = []
 notes = [
   "65 MW to Dec 2012, 43.7 MW from Jan 2013.",
   "Geothermal batch 1 (19 Nov 2026): facts checked against Contact's station page, the EA register and network supply points table, the NZ Geothermal Association's Ōhaaki page, Engineering New Zealand's heritage record, Te Ara, Tu Tangata (April 1986), the Gazette (ECNZ's 1996 financial statements), Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
