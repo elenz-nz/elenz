@@ -245,7 +245,7 @@ the LINZ Basemaps `topolite-v2` style (Toitū Te Whenua LINZ, CC BY 4.0, credite
 build variable `LINZ_BASEMAPS_KEY` (declared in `src/env.ts`, set in Cloudflare's build settings, never committed;
 LINZ restricts a developer key to our sites, so it isn't a secret). Without the key, without WebGL 2, or if the style
 fails to load, the page keeps the outline map it is prerendered with (the Now map's outlines with `map.js` placing the
-dots), which is also what the browser tests see. Once the map is up, a Map / Satellite switch in its top left shows LINZ's aerial tiles (the same raster layer as the plant pages' Map view, under the dots) and the caption says which is shown. An island filter frames that island; the corner button the whole
+dots), which is also what the browser tests see. MapLibre's own credit button is off (design decision, 22 Nov 2026: it opened by itself and was fiddly on a phone); the caption under the map carries the LINZ credit. Once the map is up, a Map / Satellite switch in its top left shows LINZ's aerial tiles (the same raster layer as the plant pages' Map view, under the dots) and the caption says which is shown. An island filter frames that island; the corner button the whole
 country. Tests: the index tests in `tests/plants.test.js` and the plant index block in `tests/e2e/site.spec.js`.
 
 ## Tracker

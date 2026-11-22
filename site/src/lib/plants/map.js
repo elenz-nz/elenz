@@ -56,16 +56,3 @@ export const aerialSource = (key) => ({
   tiles: [`https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=${key}`],
   attribution: '© Toitū Te Whenua LINZ, CC BY 4.0'
 });
-
-// MapLibre opens its compact credit by itself on first load and again whenever the map resizes or its sources load;
-// keep it as the small (i) button until the visitor opens it.
-export function collapseCredit(el) {
-  const a = el?.querySelector('.maplibregl-ctrl-attrib');
-  if (!a) return;
-  const shut = () => { a.classList.remove('maplibregl-compact-show'); a.removeAttribute('open'); };
-  shut();
-  const watch = new MutationObserver(shut);
-  watch.observe(a, { attributes: true, attributeFilter: ['class', 'open'] });
-  a.addEventListener('pointerdown', () => watch.disconnect(), { once: true });
-  setTimeout(shut, 0);
-}
