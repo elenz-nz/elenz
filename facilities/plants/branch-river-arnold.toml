@@ -19,6 +19,7 @@ notes = [
   "Wikipedia's river article says commissioned in 1983 and completed in 1984. The Ministry for the Environment's review says a scheme has existed in the valley since about 1973; not used.",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
   "Team's source links (22 Nov 2026), not yet read (the first two can't be fetched from our research tools): the Ministry for the Environment's scheme proposal (environment.govt.nz/assets/Publications/Files/proposal.pdf); the Envirolink report on the scheme's effect on low flows in the Wairau River (envirolink.govt.nz/assets/Envirolink/2232-MLDC164-...pdf); Infratil's 2023 investor day Manawa update (the intake upgrade); Marlborough Lines' history page (marlboroughlines.co.nz/our-story), which has the 1983 flood that took out temporary installations.",
+  "Marlborough Lines' history page, read in Chrome (23 Nov 2026): Wairau powerhouse generating from 22 Jun 1983 and Argyle from 16 Aug 1983; the power board was corporatised as Marlborough Electric; its generation was sold under the Bradford reforms. Agrees with the previous-owners fact. The Ministry and Envirolink PDFs were not opened.",
 ]
 
 [location]
@@ -106,6 +107,7 @@ source = [
   "mfe-wairau-2009",
   "nzx-announcements-391276",
   "contact-manawa-2025",
+  "marlborough-lines-our-story",
 ]
 grade = "A"
 checked = "2026-11-19"

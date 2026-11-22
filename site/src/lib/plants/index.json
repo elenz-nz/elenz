@@ -763,12 +763,16 @@
    "closed": null,
    "reviewed": false,
    "pt": {
-    "lat": -38.07673,
-    "lon": 176.72238,
-    "basis": "grid connection",
-    "checked": false
+    "lat": -38.07571,
+    "lon": 176.72056,
+    "basis": "whole site (the mill and plant complex)",
+    "checked": true
    },
-   "thumb": null,
+   "thumb": {
+    "kind": "aerial",
+    "file": "aerial/kawerau-onepu-site.webp",
+    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+   },
    "overview": "A 53 MW geothermal station in the Bay of Plenty."
   },
   {
