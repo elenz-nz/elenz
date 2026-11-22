@@ -5,6 +5,8 @@ import { SITE_URL } from '#lib/site/viewurl.js';
 import { DEFS } from '#lib/records/records.js';
 import { TOPICS } from '#lib/methods/registry.js';
 import { articles, hidden, ARTICLES_PUBLIC } from '#lib/articles/registry.js';
+import { PLANTS_PUBLIC } from '#lib/plants/registry.js';
+import PLANT_SLUGS from '#lib/plants/slugs.json';
 import type { RequestHandler } from './$types';
 
 export const prerender = true;
@@ -20,6 +22,7 @@ const urls = (): Url[] => [
 	{ path: '/landscape' },
 	{ path: '/records' },
 	...DEFS.filter((d) => !d.old).map((d) => ({ path: `/records/${d.id}` })),
+	...(PLANTS_PUBLIC ? [{ path: '/plants' }, { path: '/plants/share' }, ...PLANT_SLUGS.map((s: string) => ({ path: `/plants/${s}` }))] : []),
 	...(ARTICLES_PUBLIC
 		? [{ path: '/articles' }, ...articles.filter((a) => !hidden(a)).map((a) => ({ path: `/articles/${a.slug}`, lastmod: a.date }))]
 		: []),

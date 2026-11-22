@@ -1,15 +1,22 @@
 // The plant pages (/plants/<slug>): whether they are public yet, and the words the pages build from Elenz's own data.
 //
-// PLANTS_PUBLIC (design decision, 17 Nov 2026): the pages are built on main but hidden while their facts and photos
-// are checked batch by batch: noindex, out of the sitemap, no menu item and no links in. Switching them on is one
-// small pull request once wave 1's facts are checked: set this true, add /plants and the pages to the sitemap
-// (src/routes/sitemap.xml) and Plants to the menu (Masthead.svelte, between Records and Articles), link plant names
-// from Now and the tracker, and name LINZ Basemaps on the privacy page (the index map loads its tiles) and in the
-// methods' source register. The index (/plants) then drops its draft map points (its +page.server.ts). /plants/share
-// (the call for first-hand knowledge) goes in the sitemap too.
+// PLANTS_PUBLIC (design decision, 17 Nov 2026): the pages were built on main but hidden while their facts and photos
+// were checked batch by batch: noindex, out of the sitemap, no menu item and no links in. Switched on 23 Nov 2026 (the
+// Elenz team looked over the pages): the flag is true, /plants, /plants/share and every page are in the sitemap
+// (src/routes/sitemap.xml), Plants is in the menu (Masthead.svelte, between Records and Articles), plant names on Now
+// and in the Tracker's plant view link to their pages (`plantHref` below), and LINZ Basemaps is named on the privacy
+// page (the index map and a page's Map view load its tiles) and in the methods' source register. The index (/plants)
+// drops its draft map points (its +page.server.ts). Setting this false hides everything again.
 import { FUELS } from '#lib/tracker/fuels.js';
+import { slug } from '#lib/site/viewurl.js';
+import SLUGS from './slugs.json' with { type: 'json' };
 
-export const PLANTS_PUBLIC = false;
+export const PLANTS_PUBLIC = true;
+
+const HAVE = new Set(SLUGS);
+/** A plant's page address, from the tracker's plant name (its slug), or null while the pages are hidden or it has none.
+ *  slugs.json is every page's slug, written with the pages by ingest/plant_pages.py (small, unlike index.json). */
+export const plantHref = (/** @type {string} */ name) => (PLANTS_PUBLIC && HAVE.has(slug(name)) ? `/plants/${slug(name)}` : null);
 
 // how the pages name a plant of each fuel: one, and several
 const KIND = {
@@ -35,5 +42,7 @@ export function subtitle(p) {
 export function description(p) {
   const what = p.status === 'closed' ? `a closed ${kind(p.fuel).toLowerCase()}` : `a ${kind(p.fuel).toLowerCase()}`;
   const now = p.status === 'operating' ? 'its output now and in every year in our records' : 'its output in every year in our records';
-  return `${p.name}, ${what} in the ${islandName(p.island)}: ${now}, its capacity factor and installed capacity.`;
+  const full = `${p.name}, ${what} in the ${islandName(p.island)}: ${now}, its capacity factor and installed capacity.`;
+  // a long name ("Fonterra Dairy – Whareroa") would pass 160 characters: drop the second "its"
+  return full.length <= 160 ? full : full.replace(', its capacity factor', ', capacity factor');
 }

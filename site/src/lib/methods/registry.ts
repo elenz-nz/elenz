@@ -268,6 +268,13 @@ export const SOURCES: Source[] = [
 		period: 'A single national dataset.', fresh: 'Static dataset, not updated.', licence: CCBY,
 	},
 	{
+		id: 'linz-basemaps', name: 'Basemaps and aerial imagery', publisher: 'Toitū Te Whenua Land Information New Zealand (LINZ)', dataset: 'LINZ Basemaps: Topolite basemap and aerial imagery', role: 'Mapping',
+		url: 'https://basemaps.linz.govt.nz/',
+		what: 'A New Zealand topographic basemap and aerial photographs, served as map tiles.',
+		use: 'Draws the map on the Plants page and each plant page’s Map view, and supplies the aerial pictures on the plant pages.',
+		period: 'Current imagery; each aerial view names its imagery collection.', fresh: 'As LINZ publishes new imagery.', licence: CCBY,
+	},
+	{
 		id: 'guehmt', name: 'Installed distributed generation', publisher: EA, dataset: 'Report GUEHMT', role: 'Main data',
 		url: 'https://www.emi.ea.govt.nz/Retail/Reports/GUEHMT',
 		what: 'Installed distributed generation each month, from the registry, by grid exit point and fuel. Solar is also split into systems up to 10 kW and over 10 kW.',
