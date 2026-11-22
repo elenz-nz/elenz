@@ -423,6 +423,27 @@ test.describe('plant pages', () => {
     await expect(page.getByRole('button', { name: 'Photo' })).toHaveCount(0);   // no photo, so no tabs
   });
 
+  test('a plant of several stations steps through its stations\' aerial views with arrows, named', async ({ page }) => {
+    await page.goto('/plants/branch-river-arnold');
+    if (await page.getByRole('button', { name: 'Location' }).count()) await page.getByRole('button', { name: 'Location' }).click();
+    const loc = page.locator('.photo .loc');
+    await expect(loc.locator('.sitename')).toHaveText('Argyle');
+    await expect(loc.locator('.count')).toHaveText('1 of 2');
+    await expect(loc.getByRole('button', { name: 'Previous station' })).toBeDisabled();
+    await loc.getByRole('button', { name: 'Next station' }).click();
+    await expect(loc.locator('.sitename')).toHaveText('Wairau');
+    await expect(loc.locator('.count')).toHaveText('2 of 2');
+    await expect(loc.getByRole('button', { name: 'Next station' })).toBeDisabled();
+    await expect(loc.locator('figcaption')).toContainText('Aerial view of Wairau');
+    const img = loc.locator('.strip img').nth(1);
+    await expect(img).toHaveAttribute('src', '/plants/aerial/branch-river-arnold-s2.webp');
+    await expect(img).toHaveJSProperty('complete', true);
+    expect(await img.evaluate((el) => el.naturalWidth)).toBe(1000);   // the file is there
+    await loc.locator('.strip').focus();
+    await page.keyboard.press('ArrowLeft');
+    await expect(loc.locator('.sitename')).toHaveText('Argyle');
+  });
+
   test('a licensed photo leads, credited, and the Location tab has the aerial views', async ({ page }) => {
     await page.goto('/plants/manapouri');
     const photo = page.locator('.photo .photos img').first();   // a strip: one image per photo

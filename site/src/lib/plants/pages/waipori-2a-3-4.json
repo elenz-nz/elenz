@@ -136,7 +136,28 @@
    "k": "site",
    "file": "aerial/waipori-2a-3-4-site.webp",
    "across": 420,
-   "imagery": "Otago 0.2m Rural Aerial Photos (2025)"
+   "imagery": "Otago 0.2m Rural Aerial Photos (2025)",
+   "name": "Waipori 2A",
+   "lat": -45.905521,
+   "lon": 169.985545
+  },
+  {
+   "k": "s2",
+   "file": "aerial/waipori-2a-3-4-s2.webp",
+   "across": 420,
+   "imagery": "Otago 0.2m Rural Aerial Photos (2025)",
+   "name": "Waipori 3",
+   "lat": -45.916803,
+   "lon": 169.992205
+  },
+  {
+   "k": "s3",
+   "file": "aerial/waipori-2a-3-4-s3.webp",
+   "across": 420,
+   "imagery": "Otago 0.2m Rural Aerial Photos (2025)",
+   "name": "Waipori 4",
+   "lat": -45.925228,
+   "lon": 170.021095
   }
  ],
  "sources": [

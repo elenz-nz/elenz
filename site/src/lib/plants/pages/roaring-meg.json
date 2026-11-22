@@ -133,7 +133,19 @@
    "k": "site",
    "file": "aerial/roaring-meg-site.webp",
    "across": 420,
-   "imagery": "Otago 0.2m Rural Aerial Photos (2025)"
+   "imagery": "Otago 0.2m Rural Aerial Photos (2025)",
+   "name": "Lower Roaring Meg",
+   "lat": -45.001541,
+   "lon": 169.069988
+  },
+  {
+   "k": "s2",
+   "file": "aerial/roaring-meg-s2.webp",
+   "across": 420,
+   "imagery": "Otago 0.2m Rural Aerial Photos (2025)",
+   "name": "Upper Roaring Meg",
+   "lat": -44.9832,
+   "lon": 169.060502
   }
  ],
  "sources": [

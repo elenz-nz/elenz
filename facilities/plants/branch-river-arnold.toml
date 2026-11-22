@@ -14,6 +14,7 @@ notes = [
   "The EA register names it \"Branch River (Arnold)\" at ARG1101 (12 MW); the metered code is argyle_wairau, so the scheme is Argyle plus Wairau. Arnold is a separate West Coast station (E020; Contact: Arnold River, 3 MW). The page's name drops \"(Arnold)\" (19 Nov 2026); the tracker's plant name is unchanged.",
   "Hydro batch 5 (19 Nov 2026): facts checked against Contact's scheme page, the Gazette (the 1983 consent to generate), the Ministry for the Environment's 2009 review, the EA register and network supply points table, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "District and region from Argyle station's Wikidata point in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. The grid connection point gives the same. No other district within 5 km.",
+  "Station points (22 Nov 2026): Argyle is the plant point; the Wairau powerhouse [-41.64828, 173.22418] was read from the LINZ aerial (penstock from its headpond, the building, and the tailrace to the Wairau River, about 3.9 km down the race from Argyle, as the 1983 consent says: a 3,885 m race and a 950 m tailrace).",
   "Resolved: Capacity: the 1983 consent gives Argyle 3.8 MW and Wairau 7.2 MW (11 MW, as Contact says); the register has 12 MW (Elenz); Wikipedia's list's 3.8 is Argyle alone. Contact's 11 is a rating.",
   "Wikipedia's river article says commissioned in 1983 and completed in 1984. The Ministry for the Environment's review says a scheme has existed in the valley since about 1973; not used.",
   "LINZ aerial check (18 Nov 2026): station point confirmed, grid connection point confirmed.",
@@ -132,6 +133,7 @@ checked = ""
 [[stations]]
 value = "Argyle"
 mw = 3.8
+location = [-41.67076, 173.203316]
 source = "library-1983-1983-20issue-20071"
 grade = "A"
 checked = "2026-11-19"
@@ -140,6 +142,7 @@ note = "a vertical Kaplan turbine (1983 consent)"
 [[stations]]
 value = "Wairau"
 mw = 7.2
+location = [-41.64828, 173.22418]
 source = "library-1983-1983-20issue-20071"
 grade = "A"
 checked = "2026-11-19"

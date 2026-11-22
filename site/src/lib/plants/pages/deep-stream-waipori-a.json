@@ -129,7 +129,28 @@
    "k": "site",
    "file": "aerial/deep-stream-waipori-a-site.webp",
    "across": 420,
-   "imagery": "Otago 0.2m Rural Aerial Photos (2025)"
+   "imagery": "Otago 0.2m Rural Aerial Photos (2025)",
+   "name": "Deep Stream 2",
+   "lat": -45.809597,
+   "lon": 169.905336
+  },
+  {
+   "k": "s1",
+   "file": "aerial/deep-stream-waipori-a-s1.webp",
+   "across": 420,
+   "imagery": "Otago 0.2m Rural Aerial Photos (2025)",
+   "name": "Deep Stream 1",
+   "lat": -45.773435,
+   "lon": 169.893654
+  },
+  {
+   "k": "s3",
+   "file": "aerial/deep-stream-waipori-a-s3.webp",
+   "across": 420,
+   "imagery": "Otago 0.2m Rural Aerial Photos (2025)",
+   "name": "Waipori 1A",
+   "lat": -45.881606,
+   "lon": 169.977428
   }
  ],
  "sources": [

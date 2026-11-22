@@ -17,9 +17,12 @@ Each plant page (/plants/<slug>) is prerendered from its file here; its live pan
   location               {lat, lon, basis, refs} once the station's point is checked
   images                 [{file, title, author, source_url, licence, licence_url, focus?}]: the plant's rows of
                          plant_images.csv, in file order (the first leads; the page lets readers step through the rest)
-  aerial                 [{k, file, across, imagery}]: the plant's one LINZ aerial view, shown as "Site" (k is always site;
-                         the view is the one in facilities/plant_aerial_choice.csv, else all three: site, close, wide;
-                         analysis/plant_aerials.py), once its location is checked and while the views are centred on it
+  aerial                 [{k, file, across, imagery, name?, lat?, lon?}]: the plant's LINZ aerial view, shown as "Site" (k is
+                         site; the view is the one in facilities/plant_aerial_choice.csv, else all three: site, close,
+                         wide; analysis/plant_aerials.py), once its location is checked and while the views are centred on
+                         it. A plant of several stations with their own checked points also lists a site view of each (k
+                         s1, s2, the station's place in [[stations]]), and then every entry has the station's `name` and
+                         point (`lat`, `lon`), in [[stations]] order, for the page's arrows and name label
   sources                [{n, title, publisher, url, opened}]: the sources the published facts cite, numbered
   related                {owner: [...], scheme: [...], fuel: [...]}: other plant pages, each {slug, name}
 
@@ -164,9 +167,7 @@ def page(s, p, cap, meta, srcs, images, aerials, chosen):
     dates = [e.get('checked') for _, e, alt in pf.entries(p) if not alt and pf.published(e)]
     imgs = [r for r in images if r['slug'] == s]
     views = [r for r in aerials if r['slug'] == s]
-    aerial = ([{'k': 'site', 'file': r['file'], 'across': int(r['across_m']), 'imagery': r['imagery']}
-               for r in views if r['view'] == chosen.get(s, r['view'])]
-              if location and views and all(aerial_on(r, loc) for r in views) else None)
+    aerial = aerial_views(s, p, loc, views, chosen) if location and views else None
     return {
         'slug': s, 'name': p['name'], 'plant': p.get('plant', ''),
         'fuel': last.get('fuel', ''), 'island': last.get('island', ''), 'status': status_of(rs),
@@ -189,8 +190,60 @@ def page(s, p, cap, meta, srcs, images, aerials, chosen):
 
 
 def aerial_on(row, loc):
-    """True while an aerial view is centred on the plant file's location."""
+    """True while an aerial view is centred on the given [lat, lon] entry's point."""
     return float(row['lat']) == loc['value'][0] and float(row['lon']) == loc['value'][1]
+
+
+def station_views(rows):
+    """The per-station rows (view s1, s2: the station's place in the plant file's [[stations]] list)."""
+    return {int(r['view'][1:]): r for r in rows if re.fullmatch(r's\d+', r['view'])}
+
+
+def aerial_views(s, p, loc, rows, chosen):
+    """The plant's aerial views for its Location tab, in order: the plant's own view (the one chosen in
+    plant_aerial_choice.csv, else all three) and, for a plant of several stations, one site view of each station with its
+    own checked point (a station on the plant's point is the plant's view, named for it). Each carries `name` when there
+    is more than one picture, so the page can say which site it shows; None when a view is out of date. The main site
+    (the plant's point, or the station its file's main_station names) comes first."""
+    main = [r for r in rows if r['view'] in ('site', 'close', 'wide')]
+    if not main or not all(aerial_on(r, loc) for r in main):
+        return None
+    mine = [r for r in main if r['view'] == chosen.get(s, r['view'])]
+    out = [{'k': 'site', 'file': r['file'], 'across': int(r['across_m']), 'imagery': r['imagery']} for r in mine]
+    extra = station_views(rows)
+    sts = [(i, st) for i, st in enumerate(p.get('stations', []), 1) if pf.published(st) and st.get('location')]
+    if not sts or len(mine) != 1:
+        return out
+    here = [st.get('view_label', st['value']) for i, st in sts if list(st['location']) == list(loc['value'])]
+    out[0].update(name=here[0] if here else p['name'], lat=loc['value'][0], lon=loc['value'][1])
+    for i, st in sts:
+        r = extra.get(i)
+        if list(st['location']) == list(loc['value']):
+            continue
+        if not r or float(r['lat']) != st['location'][0] or float(r['lon']) != st['location'][1]:
+            continue   # no image yet (or a stale one: --check says so)
+        out.append({'k': f's{i}', 'file': r['file'], 'across': int(r['across_m']), 'imagery': r['imagery'], 'name': st.get('view_label', st['value']),
+                    'lat': st['location'][0], 'lon': st['location'][1]})
+    # The main site comes first, so it is the picture a visitor sees on opening: the plant's own point (its station, or
+    # the whole site) unless the plant file's main_station names another station (design decision, 22 Nov 2026). The
+    # rest follow in station order, the plant's own picture standing at its station's place.
+    pos = {i: n for n, (i, st) in enumerate(sts)}
+    at = [i for i, st in sts if list(st['location']) == list(loc['value'])]
+    out[0]['order'] = pos[at[0]] if at else -1
+    for v in out[1:]:
+        v['order'] = pos[int(v['k'][1:])]
+    want = p.get('main_station')
+    if want:
+        hit = [i for i, st in sts if st['value'] == want]
+        if not hit:
+            raise SystemExit(f"{s}: main_station {want!r} is not a station with a checked point")
+        first = 'site' if hit[0] in at else f's{hit[0]}'
+    else:
+        first = 'site'
+    out.sort(key=lambda v: (v['k'] != first, v['order']))
+    for v in out:
+        del v['order']
+    return out if len(out) > 1 else [{k: v for k, v in out[0].items() if k not in ('name', 'lat', 'lon')}]
 
 
 def related(pages, meta):
@@ -325,6 +378,12 @@ def aerial_problems(plants, aerials):
         loc = p.get('location')
         if not (loc and pf.published(loc)):
             out.append(f"{r['slug']}: aerial view {r['view']} but no checked location (run analysis/plant_aerials.py)")
+        elif re.fullmatch(r's\d+', r['view']):
+            sts = p.get('stations', [])
+            i = int(r['view'][1:])
+            st = sts[i - 1] if i <= len(sts) else None
+            if not (st and pf.published(st) and st.get('location') and aerial_on(r, {'value': st['location']})):
+                out.append(f"{r['slug']}: aerial view {r['view']} is centred on an old station point (run analysis/plant_aerials.py)")
         elif not aerial_on(r, loc):
             out.append(f"{r['slug']}: aerial view {r['view']} is centred on an old point (run analysis/plant_aerials.py)")
         if not os.path.exists(os.path.join(IMAGES_DIR, r['file'])):

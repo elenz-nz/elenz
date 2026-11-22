@@ -10,6 +10,7 @@ to_check = [
   "Previous owners: not yet found in a source we could open (the Westland Electric Power Board and Westland Power Ltd appear in 1920s reports; Trustpower by 1999). Papers Past and NZLII refuse automated reads, so this may need a look by hand.",
 ]
 notes = [
+  "Station points (22 Nov 2026): read from the LINZ aerial by the Elenz team.",
   "H028: 10 MW at KUM0661; the scheme beyond its dispatched unit is also in other embedded generation.",
   "H029: In the Kūmara scheme (metered code kumara_dillmans).",
   "H030: In the Kūmara scheme.",
@@ -115,6 +116,7 @@ checked = ""
 
 [[stations]]
 value = "Kūmara"
+location = [-42.635999, 171.19527]
 id = "H028"
 source = "contact-dillmans"
 grade = "A"
@@ -122,6 +124,7 @@ checked = "2026-11-19"
 
 [[stations]]
 value = "Dillmans"
+location = [-42.65562, 171.194968]
 id = "H029"
 source = "contact-dillmans"
 grade = "A"
@@ -129,6 +132,7 @@ checked = "2026-11-19"
 
 [[stations]]
 value = "Duffers"
+location = [-42.729878, 171.20558]
 id = "H030"
 source = "contact-dillmans"
 grade = "A"

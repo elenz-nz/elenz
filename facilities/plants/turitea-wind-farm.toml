@@ -9,6 +9,7 @@ osm = ["relation/13560722"]
 reviewed = "2026-11-19"
 to_check = []
 notes = [
+  "Station points (22 Nov 2026): read from the LINZ aerial by the Elenz team.",
   "W009: Elenz shows Turitea as one plant: 118.8 MW from Aug 2021, 221.4 MW from Apr 2023.",
   "W010: See W009.",
   "Wind batch 1 (19 Nov 2026): facts checked against the owners' wind farm pages and releases, the EA register and network supply points table, NZX announcements, Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
@@ -117,6 +118,7 @@ checked = "2026-11-19"
 
 [[stations]]
 value = "Turitea North"
+location = [-40.437447, 175.699814]
 id = "W009"
 mw = 118.8
 commissioned = "2021"
@@ -127,6 +129,7 @@ note = "33 Vestas V112 turbines of 3.6 MW"
 
 [[stations]]
 value = "Turitea South"
+location = [-40.472352, 175.635858]
 id = "W010"
 mw = 102.6
 commissioned = "2023"

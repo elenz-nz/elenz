@@ -114,7 +114,28 @@
    "k": "site",
    "file": "aerial/kumara-site.webp",
    "across": 440,
-   "imagery": "West Coast 0.2m Rural Aerial Photos (2024-2026)"
+   "imagery": "West Coast 0.2m Rural Aerial Photos (2024-2026)",
+   "name": "Kūmara",
+   "lat": -42.635999,
+   "lon": 171.19527
+  },
+  {
+   "k": "s2",
+   "file": "aerial/kumara-s2.webp",
+   "across": 440,
+   "imagery": "West Coast 0.2m Rural Aerial Photos (2024-2026)",
+   "name": "Dillmans",
+   "lat": -42.65562,
+   "lon": 171.194968
+  },
+  {
+   "k": "s3",
+   "file": "aerial/kumara-s3.webp",
+   "across": 440,
+   "imagery": "West Coast 0.2m Rural Aerial Photos (2024-2026)",
+   "name": "Duffers",
+   "lat": -42.729878,
+   "lon": 171.20558
   }
  ],
  "sources": [

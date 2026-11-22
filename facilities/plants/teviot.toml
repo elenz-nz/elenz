@@ -18,6 +18,7 @@ to_check = [
   "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
+  "Station points (22 Nov 2026): read from the LINZ aerial by the Elenz team; the plant point is Bridge and Ellis (about 20 m apart), so one view is named for both (Ellis's own read: -45.538022, 169.322882).",
   "Capacity: Elenz keeps the register's 22 MW (design decision 19 Nov 2026); Wikipedia's list totals 17.7 MW for the six stations (Ellis 7.8, Horseshoe Bend 4.3, Kowhai 1.9, Michelle 1.6, Teviot Bridge 1.1, George 1). Pioneer gives only Horseshoe Bend (4.3), Michelle (1.6) and George (1.0).",
   "Elenz plant Teviot (22 MW register, CYD0331, never dispatched). Wikipedia lists Ellis, George, Horseshoe Bend, Kowhai, Michelle and Teviot Bridge in the scheme, 17.7 MW together.",
   "Hydro batch 5 (19 Nov 2026): facts checked against Pioneer Energy's history and scheme pages, the EA register and network supply points table and Wikipedia's list. The locations are left for the LINZ aerial check.",
@@ -26,6 +27,14 @@ notes = [
   "Pioneer's page also describes a 1.6 MW Marslin power station at the Marslin Dam (1981), in nearly the same words as Michelle (1.6 MW, 1982, fed from the Marslin Dam). Taken as the same station; not listed separately.",
   "The grid connection point is Clyde's (CYD0331), the same as Clyde station's; the register's unit code TVT0 is also Roaring Meg's.",
 ]
+
+[location]
+value = [-45.538073, 169.322635]
+basis = "Bridge and Ellis stations"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-22"
+note = "read from the LINZ aerial by the Elenz team, 22 Nov 2026; Bridge and Ellis stand about 20 m apart"
 
 [grid_connection]
 value = [-45.18039, 169.30622]
@@ -123,6 +132,7 @@ checked = ""
 
 [[stations]]
 value = "George"
+location = [-45.538461, 169.327783]
 mw = 1.0
 source = "pioneer-teviot"
 grade = "A"
@@ -132,6 +142,8 @@ note = "one 1,000 kW machine since 2002"
 
 [[stations]]
 value = "Bridge"
+location = [-45.538073, 169.322635]
+view_label = "Bridge and Ellis"
 source = "pioneer-teviot"
 grade = "A"
 checked = "2026-11-19"
@@ -147,6 +159,7 @@ commissioned = "1981"
 
 [[stations]]
 value = "Michelle"
+location = [-45.539734, 169.346132]
 mw = 1.6
 source = "pioneer-teviot"
 grade = "A"
@@ -155,6 +168,7 @@ commissioned = "1982"
 
 [[stations]]
 value = "Horseshoe Bend"
+location = [-45.540826, 169.493345]
 mw = 4.3
 source = "pioneer-teviot"
 grade = "A"
@@ -163,6 +177,7 @@ commissioned = "1999"
 
 [[stations]]
 value = "Kowhai"
+location = [-45.532032, 169.360257]
 source = "pioneer-teviot"
 grade = "A"
 checked = "2026-11-19"

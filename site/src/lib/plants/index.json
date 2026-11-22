@@ -1911,7 +1911,7 @@
    "pt": {
     "lat": -39.3322,
     "lon": 174.319,
-    "basis": "whole site",
+    "basis": "Stratford peakers station",
     "checked": true
    },
    "thumb": {
@@ -2384,12 +2384,16 @@
    "closed": null,
    "reviewed": false,
    "pt": {
-    "lat": -45.18039,
-    "lon": 169.30622,
-    "basis": "grid connection",
-    "checked": false
+    "lat": -45.538073,
+    "lon": 169.322635,
+    "basis": "Bridge and Ellis stations",
+    "checked": true
    },
-   "thumb": null,
+   "thumb": {
+    "kind": "aerial",
+    "file": "aerial/teviot-site.webp",
+    "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
+   },
    "overview": "A 22 MW hydro station on the Teviot River in Otago, generating since 1924."
   },
   {

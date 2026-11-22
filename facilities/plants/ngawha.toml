@@ -11,6 +11,7 @@ to_check = [
   "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
+  "Station points (22 Nov 2026): read from the LINZ aerial by the Elenz team; the three are not matched to units, so each view is named Ngāwhā.",
   "10 → 25 (Aug 2008) → 57 MW (Dec 2020). Only Ngāwhā B is dispatched.",
   "Geothermal batch 1 (19 Nov 2026): facts checked against Ngāwhā Generation's (Top Energy's) pages, the EA register and network supply points table, the NZ Geothermal Association's 2023 generation report, Wikipedia and Stats NZ boundaries. NZGA's Ngāwhā field page wasn't reachable (the address returned its home page).",
   "District and region from the draft point and from the grid connection point in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026: both Far North. No other district within 5 km.",
@@ -121,6 +122,8 @@ checked = "2026-11-19"
 
 [[stations]]
 value = "OEC1 and OEC2"
+location = [-35.417424, 173.852112]
+view_label = "Ngāwhā"
 mw = 10
 source = "nzga-generation-2023"
 grade = "B"
@@ -129,6 +132,8 @@ commissioned = "1998"
 
 [[stations]]
 value = "OEC3"
+location = [-35.41752, 173.867793]
+view_label = "Ngāwhā"
 mw = 15
 source = "nzga-generation-2023"
 grade = "B"
@@ -137,6 +142,8 @@ commissioned = "2008"
 
 [[stations]]
 value = "OEC4"
+location = [-35.403306, 173.853463]
+view_label = "Ngāwhā"
 id = "G015"
 mw = 31.5
 source = ["ea-register", "ngawhagen-opening-2021"]

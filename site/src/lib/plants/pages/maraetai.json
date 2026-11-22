@@ -141,7 +141,28 @@
    "k": "site",
    "file": "aerial/maraetai-close.webp",
    "across": 940,
-   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
+   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)",
+   "name": "Maraetai",
+   "lat": -38.351965,
+   "lon": 175.743502
+  },
+  {
+   "k": "s1",
+   "file": "aerial/maraetai-s1.webp",
+   "across": 470,
+   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)",
+   "name": "Maraetai I",
+   "lat": -38.352043,
+   "lon": 175.746163
+  },
+  {
+   "k": "s2",
+   "file": "aerial/maraetai-s2.webp",
+   "across": 470,
+   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)",
+   "name": "Maraetai II",
+   "lat": -38.351886,
+   "lon": 175.740842
   }
  ],
  "sources": [

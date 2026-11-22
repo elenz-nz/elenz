@@ -10,6 +10,7 @@ to_check = [
   "Look over the page on elenz.co.nz and say what to change (for the Elenz team).",
 ]
 notes = [
+  "Station points (22 Nov 2026): read from the LINZ aerial by the Elenz team.",
   "One dispatched unit (Kaimai 5) carries the whole scheme: Lloyd Mandeno, Lower Mangapapa, Ruahihi and Kaimai 5. 42 MW.",
   "Hydro batch 5 (19 Nov 2026): facts checked against Contact's scheme page, the EA register and network supply points table and Wikipedia (the Manawa Energy article's history of the Tauranga electricity undertakings). The locations and district are left for the LINZ aerial check.",
   "Resolved: Capacity: Contact gives 42 MW, the same as the register and Elenz.",
@@ -145,9 +146,9 @@ commissioned = "1981"
 
 [[stations]]
 value = "Kaimai 5"
-location = [-37.872893, 176.037991]
-source = ["contact-kaimai", "wp-list"]
+location = [-37.872899, 176.037936]
+source = ["manawa-kaimai-scheme", "wp-list"]
 grade = "B"
-checked = ""
+checked = "2026-11-22"
 commissioned = "1994"
-note = "not named in Contact's or the Manawa Energy article; the register's dispatched unit"
+note = "named as one of the scheme's four stations on Manawa Energy's Kaimai page and in Wikipedia's list (0.35 MW, 1994); neither the page nor Contact's gives it a date or size of its own; it is also the register's dispatched unit"

@@ -154,7 +154,28 @@
    "k": "site",
    "file": "aerial/ngawha-site.webp",
    "across": 490,
-   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
+   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)",
+   "name": "Ngāwhā",
+   "lat": -35.417424,
+   "lon": 173.852112
+  },
+  {
+   "k": "s2",
+   "file": "aerial/ngawha-s2.webp",
+   "across": 490,
+   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)",
+   "name": "Ngāwhā",
+   "lat": -35.41752,
+   "lon": 173.867793
+  },
+  {
+   "k": "s3",
+   "file": "aerial/ngawha-s3.webp",
+   "across": 490,
+   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)",
+   "name": "Ngāwhā",
+   "lat": -35.403306,
+   "lon": 173.853463
   }
  ],
  "sources": [

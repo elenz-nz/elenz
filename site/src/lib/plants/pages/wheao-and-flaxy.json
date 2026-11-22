@@ -114,7 +114,19 @@
    "k": "site",
    "file": "aerial/wheao-and-flaxy-site.webp",
    "across": 470,
-   "imagery": "Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025)"
+   "imagery": "Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025)",
+   "name": "Wheao",
+   "lat": -38.633149,
+   "lon": 176.578097
+  },
+  {
+   "k": "s2",
+   "file": "aerial/wheao-and-flaxy-s2.webp",
+   "across": 470,
+   "imagery": "Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025)",
+   "name": "Flaxy",
+   "lat": -38.634231,
+   "lon": 176.557952
   }
  ],
  "sources": [

@@ -13,22 +13,44 @@
 	import { toView, islandBox, aerialSource } from './map.js';
 
 	type Photo = { file: string; title: string; author: string; source_url: string; licence: string; licence_url: string; focus?: string };
-	type View = { k: string; file: string; across: number; imagery: string };
+	type View = { k: string; file: string; across: number; imagery: string; name?: string; lat?: number; lon?: number };
 	type Loc = { lat: number; lon: number; basis: string };
 	let { images = [], aerial = null, location = null, island, name, tok, note }: {
-		images?: Photo[]; aerial?: View[] | null; location?: Loc | null; island: string; name: string; tok: string; note?: Snippet;
+		images?: Photo[]; aerial?: View[] | null; location?: Loc | null; island: string; name: string; tok: string; note?: Snippet<[{ lat: number; lon: number; name?: string } | undefined]>;
 	} = $props();
 
 	const KEY = LINZ_BASEMAPS_KEY;
 	const LABEL: Record<string, string> = { site: 'Site', close: 'Close', wide: 'Wide', map: 'Map' };
 	const hasPhotos = $derived(images.length > 0);
 	const hasLoc = $derived(!!location);
-	const views = $derived([...(aerial ?? []).map((v) => v.k), ...(location && KEY ? ['map'] : [])]);
+	// A plant of several stations lists one site view of each (each with its name): they are stepped through with arrows, like
+	// the photos, under one Site view, and the switch is Site and Map.
+	const sites = $derived((aerial ?? []).length > 1 && (aerial ?? []).every((v) => v.name) ? (aerial as View[]) : []);
+	const views = $derived([...(sites.length ? ['site'] : (aerial ?? []).map((v) => v.k)), ...(location && KEY ? ['map'] : [])]);
 	let tab = $state<'photos' | 'location' | ''>('');
 	const shown = $derived(tab || (hasPhotos ? 'photos' : 'location'));
 	let k = $state('');
 	const vk = $derived(views.includes(k) ? k : views[0] ?? '');
-	const av = $derived((aerial ?? []).find((v) => v.k === vk) ?? null);
+	let si = $state(0);
+	const sIdx = $derived(Math.min(si, Math.max(sites.length - 1, 0)));
+	const av = $derived(sites.length ? (vk === 'site' ? sites[sIdx] : null) : (aerial ?? []).find((v) => v.k === vk) ?? null);
+	let sStrip = $state<HTMLDivElement>();
+	function sScroll() { if (sStrip) si = Math.max(0, Math.min(sites.length - 1, Math.round(sStrip.scrollLeft / sStrip.clientWidth))); }
+	// The strip is rebuilt when the visitor returns from Map or Photos, so put it back on the station the label shows
+	$effect(() => {
+		if (!sStrip) return;
+		const j = untrack(() => si);
+		if (j) sStrip.scrollTo({ left: j * sStrip.clientWidth, behavior: 'auto' });
+	});
+	function sGo(d: number) {
+		if (!sStrip) return;
+		const j = Math.max(0, Math.min(sites.length - 1, sIdx + d));
+		sStrip.scrollTo({ left: j * sStrip.clientWidth, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+		si = j;
+	}
+	function sKeys(e: KeyboardEvent) {
+		if (e.key === 'ArrowRight') { sGo(1); e.preventDefault(); } else if (e.key === 'ArrowLeft') { sGo(-1); e.preventDefault(); }
+	}
 	const size = (m: number) => (m >= 1000 ? `${(m / 1000).toFixed(m >= 5000 ? 0 : 1)} km` : `${Math.round(m / 50) * 50} m`);
 
 	// ---------- photos ----------
@@ -71,7 +93,7 @@
 	// ---------- the island locator ----------
 	const BOX = { NI: islandBox(NI_PATH), SI: islandBox(SI_PATH) };
 	const box = $derived(BOX[island === 'SI' ? 'SI' : 'NI']);
-	const pin = $derived(location ? toView(location.lat, location.lon) : null);
+	const pin = $derived(location ? toView(av?.lat ?? location.lat, av?.lon ?? location.lon) : null);
 
 	// ---------- the map view ----------
 	let mapEl = $state<HTMLDivElement>();
@@ -148,8 +170,8 @@
 					<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
 				</button>
 				{#if images.length > 1}
-					<button type="button" class="step prev js-only" aria-label="Previous photo" disabled={i === 0} onclick={() => go(-1)}>‹</button>
-					<button type="button" class="step next js-only" aria-label="Next photo" disabled={i === images.length - 1} onclick={() => go(1)}>›</button>
+					<button type="button" class="nav prev js-only" aria-label="Previous photo" disabled={i === 0} onclick={() => go(-1)}><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
+					<button type="button" class="nav next js-only" aria-label="Next photo" disabled={i === images.length - 1} onclick={() => go(1)}><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 					<span class="count">{i + 1} of {images.length}</span>
 				{/if}
 			</div>
@@ -187,6 +209,19 @@
 						</div>
 					{/if}
 					{#if mapState === 'failed'}<p class="fail">The map can’t load right now. The aerial views still work.</p>{/if}
+				{:else if sites.length}
+					<!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -->
+					<div class="strip" bind:this={sStrip} onscroll={sScroll} onkeydown={sKeys} tabindex="0" role="region"
+						aria-label="Aerial views of the stations of {name}, {sites.length}; use the arrow keys to move between them">
+						{#each sites as x, j (x.k)}
+							<img src="/plants/{x.file}" alt="Aerial view of {x.name}, about {size(x.across)} across" width="1000" height="640"
+								loading={j || hasPhotos ? 'lazy' : 'eager'} decoding="async" style="cursor: auto" />
+						{/each}
+					</div>
+					<span class="sitename" aria-live="polite">{sites[sIdx].name}</span>
+					<button type="button" class="nav prev js-only" aria-label="Previous station" disabled={sIdx === 0} onclick={() => sGo(-1)}><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
+					<button type="button" class="nav next js-only" aria-label="Next station" disabled={sIdx === sites.length - 1} onclick={() => sGo(1)}><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
+					<span class="count">{sIdx + 1} of {sites.length}</span>
 				{:else if av}
 					<img src="/plants/{av.file}" alt="Aerial view of {name}, about {size(av.across)} across" width="1000" height="640" loading={hasPhotos ? 'lazy' : 'eager'} decoding="async" />
 				{:else}
@@ -209,9 +244,9 @@
 			</div>
 			<figcaption>
 				{#if vk === 'map'}{base === 'sat' ? 'Satellite imagery' : 'Map'}: Toitū Te Whenua LINZ, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.
-				{:else if av}Aerial view, about {size(av.across)} across. Imagery: {av.imagery ? `${av.imagery}, ` : ''}Toitū Te Whenua LINZ, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.
+				{:else if av}Aerial view{sites.length ? ` of ${av.name}` : ''}, about {size(av.across)} across. Imagery: {av.imagery ? `${av.imagery}, ` : ''}Toitū Te Whenua LINZ, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.
 				{:else}Outline: Electricity Authority network zones, CC BY 4.0.{/if}
-				{#if note}<span class="note">{@render note()}</span>{/if}
+				{#if note}<span class="note">{@render note(sites.length && vk === 'site' ? (sites[sIdx] as any) : undefined)}</span>{/if}
 			</figcaption>
 		</figure>
 	{/if}
@@ -234,6 +269,15 @@
 	.step:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 	.prev { left: 8px; }
 	.next { right: 8px; }
+	/* The arrows over the photos and station views look like the tracker's chart arrows (tracker.css .nav) */
+	.nav { position: absolute; top: calc(50% - 22px); width: 30px; height: 44px; display: grid; place-items: center; padding: 0; border-radius: 4px; border: 1px solid var(--line);
+		background: color-mix(in srgb, var(--surface) 88%, transparent); color: var(--ink-2); cursor: pointer; opacity: 0.7; z-index: 1; }
+	.nav:hover:not(:disabled), .nav:focus-visible { opacity: 1; color: var(--ink); background: var(--surface); }
+	.nav:disabled { opacity: 0.25; cursor: default; }
+	.nav:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+	@media (max-width: 600px) { .nav { width: 26px; height: 38px; top: calc(50% - 19px); } }
+	.sitename { position: absolute; top: 8px; left: 8px; max-width: calc(100% - 140px); font-size: 0.8rem; line-height: 1.3; background: rgb(0 0 0 / 0.6); color: #fff;
+		border-radius: 3px; padding: 2px 8px; pointer-events: none; }
 	.count { position: absolute; bottom: 8px; right: 8px; font-size: 0.74rem; background: rgb(0 0 0 / 0.55); color: #fff; border-radius: 3px; padding: 1px 6px; }
 	.zoom { position: absolute; top: 8px; left: 8px; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 4px; border: 0; cursor: pointer;
 		background: rgb(0 0 0 / 0.55); color: #fff; }
