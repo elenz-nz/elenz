@@ -8,7 +8,7 @@
 	import { onMount } from 'svelte';
 	import { LINZ_BASEMAPS_KEY } from '$app/env/public';
 	import { VIEW, NI as NI_PATH, SI as SI_PATH } from '#lib/home/nzmap.js';
-	import { toView, aerialSource, collapseCredit } from './map.js';
+	import { toView, aerialSource } from './map.js';
 	import { dotSize, fuelName, type Plant } from './list.js';
 	import { fuelOf } from './registry.js';
 	import { fmtMw } from './history.js';
@@ -98,7 +98,7 @@
 			ml.setWorkerUrl(worker.default);
 			map = new ml.Map({
 				container: box, style: STYLE, bounds: view(), fitBoundsOptions: { padding: 12 }, maxBounds: [[160, -50], [185, -31]],
-				minZoom: 3.5, maxZoom: 15, dragRotate: false, pitchWithRotate: false, attributionControl: { compact: true },
+				minZoom: 3.5, maxZoom: 15, dragRotate: false, pitchWithRotate: false, attributionControl: false,
 				cooperativeGestures: false
 			});
 			map.touchZoomRotate.disableRotation();
@@ -141,7 +141,6 @@
 				map.on('click', 'plants', (e: any) => onpick(e.features[0].properties.slug));
 				framed = island;
 				mode = 'map';
-				collapseCredit(box);
 			});
 		})().catch(fail);
 		function fail() {
@@ -198,8 +197,6 @@
 	.cap { margin: 6px 4px 0; color: var(--muted); font-size: 0.76rem; line-height: 1.45; }
 	@media (max-width: 600px) {
 		.cap { font-size: 0.66rem; line-height: 1.35; }
-		.pmap :global(.maplibregl-ctrl-attrib.maplibregl-compact) { min-height: 18px; min-width: 18px; font-size: 10px; }
-		.pmap :global(.maplibregl-ctrl-attrib-button) { width: 18px; height: 18px; background-size: 14px; }
 	}
 	.pmap :global(.nz-all) { display: grid; place-items: center; color: #333; }
 	.pmap :global(.plant-tip .maplibregl-popup-content) { font: 0.82rem/1.35 var(--font-ui); padding: 5px 9px; color: #132020; }

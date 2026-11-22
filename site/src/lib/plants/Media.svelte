@@ -10,7 +10,7 @@
 	import type { Snippet } from 'svelte';
 	import { LINZ_BASEMAPS_KEY } from '$app/env/public';
 	import { VIEW, NI as NI_PATH, SI as SI_PATH } from '#lib/home/nzmap.js';
-	import { toView, islandBox, aerialSource, collapseCredit } from './map.js';
+	import { toView, islandBox, aerialSource } from './map.js';
 
 	type Photo = { file: string; title: string; author: string; source_url: string; licence: string; licence_url: string; focus?: string };
 	type View = { k: string; file: string; across: number; imagery: string };
@@ -97,7 +97,7 @@
 			ml.setWorkerUrl(worker.default);
 			map = new ml.Map({
 				container: el, style: `https://basemaps.linz.govt.nz/v1/styles/topolite-v2.json?api=${KEY}`, center: at, zoom: 11,
-				minZoom: 5, maxZoom: 16, dragRotate: false, pitchWithRotate: false, cooperativeGestures: true, attributionControl: { compact: true }
+				minZoom: 5, maxZoom: 16, dragRotate: false, pitchWithRotate: false, cooperativeGestures: true, attributionControl: false
 			});
 			map.touchZoomRotate.disableRotation();
 			map.addControl(new ml.NavigationControl({ showCompass: false }), 'top-left');
@@ -109,7 +109,6 @@
 				map.addLayer({ id: 'halo', type: 'circle', source: 'pt', paint: { 'circle-radius': 16, 'circle-color': colour, 'circle-opacity': 0.25 } });
 				map.addLayer({ id: 'pt', type: 'circle', source: 'pt', paint: { 'circle-radius': 7, 'circle-color': colour, 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2.5 } });
 				mapState = 'ready';
-				collapseCredit(el);
 			});
 		})().catch(fail);
 		function fail() { map?.remove(); map = null; mapState = 'failed'; }
@@ -262,8 +261,6 @@
 	figcaption a { color: inherit; }
 	@media (max-width: 600px) {
 		figcaption { font-size: 0.68rem; line-height: 1.35; }
-		.ml :global(.maplibregl-ctrl-attrib.maplibregl-compact) { min-height: 18px; min-width: 18px; font-size: 10px; }
-		.ml :global(.maplibregl-ctrl-attrib-button) { width: 18px; height: 18px; background-size: 14px; }
 	}
 	.note { display: block; margin-top: 2px; }
 </style>
