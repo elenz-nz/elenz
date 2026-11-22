@@ -119,6 +119,22 @@ check(plant_pages.point({'location': loc('osm')}, srcs) is None, 'plant index: n
 # aerial views (plant_pages.aerial_on): only while centred on the plant file's location
 check(plant_pages.aerial_on({'lat': '-45.5', 'lon': '167.3'}, loc('wd', '2026-11-18')), 'plant aerials: centred on the location')
 check(not plant_pages.aerial_on({'lat': '-45.5', 'lon': '167.31'}, loc('wd', '2026-11-18')), 'plant aerials: an old point is stale')
+# per-station aerial views (plant_pages.aerial_views): each station with its own checked point, in file order, named
+row = lambda v, lat, lon: {'slug': 'x', 'view': v, 'file': f'aerial/x-{v}.webp', 'lat': str(lat), 'lon': str(lon), 'across_m': '420', 'imagery': 'I'}  # noqa: E731
+stn = lambda n, lat, ch='2026-11-18': {'value': n, 'location': [lat, 167.3], 'checked': ch, 'source': 'wd'}  # noqa: E731
+mk = {'location': loc('wd', '2026-11-18'), 'name': 'Two', 'stations': [stn('A', -45.5), stn('B', -45.4), stn('C', -45.3), stn('D', -45.2, '')]}
+rows = [row('site', -45.5, 167.3), row('s2', -45.4, 167.3), row('s3', -45.3, 167.3), row('s4', -45.2, 167.3)]
+av = plant_pages.aerial_views('x', mk, mk['location'], rows, {'x': 'site'})
+check([v['name'] for v in av] == ['A', 'B', 'C'] and [v['k'] for v in av] == ['site', 's2', 's3'],
+      'plant aerials: a view of each station with a checked point, the plant\'s own point named for its station')
+check(av[1]['lat'] == -45.4, 'plant aerials: a station view carries its own point')
+check(plant_pages.aerial_views('x', mk, mk['location'], rows[:2], {'x': 'site'})[1]['name'] == 'B'
+      and len(plant_pages.aerial_views('x', mk, mk['location'], rows[:2], {'x': 'site'})) == 2,
+      'plant aerials: a station without its image yet is left out')
+one = plant_pages.aerial_views('x', {'location': loc('wd', '2026-11-18'), 'name': 'One', 'stations': [stn('A', -45.5)]}, mk['location'], rows[:1], {})
+check(len(one) == 1 and 'name' not in one[0], 'plant aerials: one picture carries no name')
+check(plant_pages.aerial_views('x', mk, loc('wd', '2026-11-18') | {'value': [-45.55, 167.3]}, rows, {}) is None,
+      'plant aerials: a moved plant point leaves no views')
 json.dumps(pf, allow_nan=False)
 for k in ('p10', 'p90', 'pmin', 'pmax', 'n500', 'n1000', 'rv_hydro', 'rv_geo', 'batt_d', 'batt_c', 'rv_battc'):
     check(k in dd['NI'] and len(dd['NI'][k]) == len(dd['t']), f'daily: {k}')

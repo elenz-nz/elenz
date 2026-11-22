@@ -129,7 +129,7 @@
 			<p class="checking" role="note">We’re still checking this page’s facts against their sources. The live and history figures are Elenz’s own. <a href={PLANTS_MD}>How we check plants</a></p>
 		{/if}
 
-		{#snippet coords()}<span class="num">{Math.abs(p.location.lat).toFixed(3)}° S, {p.location.lon.toFixed(3)}° E</span>{p.location.basis !== 'station' ? ` · ${p.location.basis}` : ''}{@render refs(p.location.refs)}{/snippet}
+		{#snippet coords(at?: { lat: number; lon: number; name?: string })}{@const pt = at?.name ? at : p.location}<span class="num">{Math.abs(pt.lat).toFixed(3)}° S, {pt.lon.toFixed(3)}° E</span>{#if at?.name}{:else}{p.location.basis !== 'station' ? ` · ${p.location.basis}` : ''}{@render refs(p.location.refs)}{/if}{/snippet}
 
 		{#if p.images.length || p.location || operating}
 			<div class="top">

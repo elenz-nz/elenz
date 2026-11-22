@@ -12,6 +12,11 @@ shows (from Basemaps' attribution file: the highest-priority aerial collection c
 the page credits. ingest/plant_pages.py gives a plant page its views only while the CSV's point matches the plant
 file's checked location, and its --check fails when they differ.
 
+A plant made of several stations also gets one site view (zoom 18, about 450 m, no marks) centred on each station that has
+its own checked point apart from the plant's own (a station on the plant's point is that view), saved as <slug>-s1.webp, <slug>-s2.webp and so on (the station's place in the plant file's
+[[stations]] list) and listed in the CSV as view s1, s2. The plant page shows them after the plant's own view, with arrows
+and the station's name (design decision, 22 Nov 2026).
+
 Plants without a checked location get no views. Run it after a plant's location changes (only the plants whose point
 moved, or that have no views yet, are fetched; --all refetches every plant), then run ingest/plant_pages.py:
 
@@ -166,7 +171,11 @@ def main(args):
             continue
         lat, lon = loc['value']
         marks = [loc['value']] + [st['location'] for st in p.get('stations', []) if st.get('location')]
-        for view, z in VIEWS.items():
+        jobs = [(view, z, (lat, lon), [] if view == 'site' else marks) for view, z in VIEWS.items()]
+        # a station standing on the plant's own point is that view already; only the others need an image
+        jobs += [(f's{i}', VIEWS['site'], tuple(st['location']), []) for i, st in enumerate(p.get('stations', []), 1)
+                 if published(st) and st.get('location') and list(st['location']) != list(loc['value'])]
+        for view, z, (lat, lon), mk in jobs:
             keep.add((s, view))
             file = f'aerial/{s}-{view}.webp'
             old = rows.get((s, view))
@@ -174,7 +183,7 @@ def main(args):
                      and os.path.exists(os.path.join(OUT, f'{s}-{view}.webp')))
             if (only and s not in only) or (fresh and not everything and s not in only):
                 continue
-            data = render(tiles, (lat, lon), z, [] if view == 'site' else marks)
+            data = render(tiles, (lat, lon), z, mk)
             with open(os.path.join(OUT, f'{s}-{view}.webp'), 'wb') as f:
                 f.write(data)
             rows[(s, view)] = {'slug': s, 'view': view, 'file': file, 'lat': lat, 'lon': lon, 'zoom': z,
@@ -187,10 +196,11 @@ def main(args):
         del rows[k]
         print(f'{k[0]} {k[1]}: removed (no checked location)')
     order = list(VIEWS)
+    rank = lambda v: order.index(v) if v in order else len(order) + int(v[1:])
     with open(CSV, 'w', newline='', encoding='utf-8') as f:
         w = csv.DictWriter(f, fieldnames=FIELDS, lineterminator='\n')
         w.writeheader()
-        for k in sorted(rows, key=lambda k: (k[0], order.index(k[1]))):
+        for k in sorted(rows, key=lambda k: (k[0], rank(k[1]))):
             w.writerow(rows[k])
 
 
