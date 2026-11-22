@@ -101,20 +101,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/dannevirke-solar-farm-site.webp",
-   "across": 460,
-   "imagery": "Manawatū-Whanganui 0.2m Rural Aerial Photos (2023-2024)"
-  },
-  {
-   "k": "close",
    "file": "aerial/dannevirke-solar-farm-close.webp",
    "across": 910,
-   "imagery": "Manawatū-Whanganui 0.2m Rural Aerial Photos (2023-2024)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/dannevirke-solar-farm-wide.webp",
-   "across": 7300,
    "imagery": "Manawatū-Whanganui 0.2m Rural Aerial Photos (2023-2024)"
   }
  ],

@@ -118,20 +118,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/kaiwaikawe-wind-farm-site.webp",
-   "across": 480,
-   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
-  },
-  {
-   "k": "close",
    "file": "aerial/kaiwaikawe-wind-farm-close.webp",
    "across": 970,
-   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/kaiwaikawe-wind-farm-wide.webp",
-   "across": 7740,
    "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
   }
  ],

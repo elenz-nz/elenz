@@ -141,20 +141,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/new-plymouth-site.webp",
-   "across": 460,
-   "imagery": "Taranaki 0.1m Urban Aerial Photos (2022)"
-  },
-  {
-   "k": "close",
    "file": "aerial/new-plymouth-close.webp",
    "across": 930,
-   "imagery": "Taranaki 0.1m Urban Aerial Photos (2022)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/new-plymouth-wide.webp",
-   "across": 7420,
    "imagery": "Taranaki 0.1m Urban Aerial Photos (2022)"
   }
  ],

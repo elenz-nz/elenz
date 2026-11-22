@@ -114,18 +114,6 @@
    "file": "aerial/paerau-gorge-site.webp",
    "across": 420,
    "imagery": "Otago 0.2m Rural Aerial Photos (2025)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/paerau-gorge-close.webp",
-   "across": 840,
-   "imagery": "Otago 0.2m Rural Aerial Photos (2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/paerau-gorge-wide.webp",
-   "across": 6710,
-   "imagery": "Otago 0.2m Rural Aerial Photos (2025)"
   }
  ],
  "sources": [

@@ -110,20 +110,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/glenbrook-ohurua-battery-site.webp",
-   "across": 480,
-   "imagery": "Auckland 0.075m Urban Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "close",
    "file": "aerial/glenbrook-ohurua-battery-close.webp",
    "across": 950,
-   "imagery": "Auckland 0.075m Urban Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/glenbrook-ohurua-battery-wide.webp",
-   "across": 7610,
    "imagery": "Auckland 0.075m Urban Aerial Photos (2024-2025)"
   }
  ],

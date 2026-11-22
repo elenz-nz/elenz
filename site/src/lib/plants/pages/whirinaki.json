@@ -131,18 +131,6 @@
    "file": "aerial/whirinaki-site.webp",
    "across": 460,
    "imagery": "Hawke's Bay 0.1m Urban Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/whirinaki-close.webp",
-   "across": 920,
-   "imagery": "Hawke's Bay 0.1m Urban Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/whirinaki-wide.webp",
-   "across": 7380,
-   "imagery": "Hawke's Bay 0.1m Urban Aerial Photos (2024-2025)"
   }
  ],
  "sources": [

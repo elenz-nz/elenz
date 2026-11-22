@@ -411,14 +411,13 @@ test.describe('plant pages', () => {
     await expect(page.locator('.now')).toHaveCount(0);
   });
 
-  test('the aerial views switch scale and credit their imagery', async ({ page }) => {
+  test('the plant page shows its one chosen aerial view and credits its imagery', async ({ page }) => {
     await page.goto('/plants/aniwhenua');   // no photo, so the views lead the page
     const img = page.locator('.photo .loc img');
     await expect(img).toHaveAttribute('src', '/plants/aerial/aniwhenua-site.webp');
     await expect(img).toHaveJSProperty('complete', true);
     expect(await img.evaluate((el) => el.naturalWidth)).toBe(1000);   // the file is there
-    await page.getByRole('button', { name: 'Wide' }).click();
-    await expect(img).toHaveAttribute('src', '/plants/aerial/aniwhenua-wide.webp');
+    await expect(page.getByRole('button', { name: 'Wide' })).toHaveCount(0);   // one image, no scale switch
     await expect(page.locator('.loc figcaption')).toContainText('Toitū Te Whenua LINZ');
     await expect(page.locator('.loc .locator')).toBeVisible();   // the island locator in the corner
     await expect(page.getByRole('button', { name: 'Photo' })).toHaveCount(0);   // no photo, so no tabs
@@ -434,7 +433,7 @@ test.describe('plant pages', () => {
     await expect(credit).toContainText('CC BY-SA 3.0');
     for (const a of await credit.locator('a').all()) await expect(a).toHaveAttribute('target', '_blank');
     await page.getByRole('button', { name: 'Location' }).click();
-    await expect(page.locator('.photo .loc img')).toHaveAttribute('src', '/plants/aerial/manapouri-site.webp');
+    await expect(page.locator('.photo .loc img')).toHaveAttribute('src', '/plants/aerial/manapouri-close.webp');
     await expect(page.locator('.photo .photos')).toHaveCount(0);
     await expect(page.locator('.loc figcaption')).toContainText('° S');   // the coordinates moved here from the side
   });

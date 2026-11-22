@@ -162,18 +162,6 @@
    "file": "aerial/southdown-site.webp",
    "across": 480,
    "imagery": "Auckland 0.075m Urban Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/southdown-close.webp",
-   "across": 950,
-   "imagery": "Auckland 0.075m Urban Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/southdown-wide.webp",
-   "across": 7640,
-   "imagery": "Auckland 0.075m Urban Aerial Photos (2024-2025)"
   }
  ],
  "sources": [

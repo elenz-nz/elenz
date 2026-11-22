@@ -109,20 +109,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/papareireia-site.webp",
-   "across": 480,
-   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
-  },
-  {
-   "k": "close",
    "file": "aerial/papareireia-close.webp",
    "across": 970,
-   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/papareireia-wide.webp",
-   "across": 7720,
    "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
   }
  ],

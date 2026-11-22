@@ -195,7 +195,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/clandeboye-solar-farm-site.webp",
+    "file": "aerial/clandeboye-solar-farm-wide.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 24 MW solar farm in Canterbury, generating since 2026."
@@ -295,7 +295,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/dannevirke-solar-farm-site.webp",
+    "file": "aerial/dannevirke-solar-farm-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 19 MW solar farm in Manawatū-Whanganui, generating since 2026."
@@ -345,7 +345,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/edgecumbe-site.webp",
+    "file": "aerial/edgecumbe-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 10 MW gas-fired station in the Bay of Plenty, closed in 2008."
@@ -370,7 +370,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/fonterra-dairy-whareroa-site.webp",
+    "file": "aerial/fonterra-dairy-whareroa-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 68 MW gas-fired station in Taranaki, generating since 1996."
@@ -395,7 +395,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/glenbrook-ohurua-battery-site.webp",
+    "file": "aerial/glenbrook-ohurua-battery-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 100 MW battery in Auckland, in service since 2026."
@@ -420,7 +420,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/glenbrook-steel-site.webp",
+    "file": "aerial/glenbrook-steel-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 112 MW waste heat plant in Auckland, generating since 1987."
@@ -445,7 +445,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/harapaki-site.webp",
+    "file": "aerial/harapaki-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 176 MW wind farm in Hawke's Bay, generating since 2023."
@@ -645,7 +645,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/kaiwaikawe-wind-farm-site.webp",
+    "file": "aerial/kaiwaikawe-wind-farm-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 77 MW wind farm in Northland, generating since 2026."
@@ -670,7 +670,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/kaiwera-downs-stage-2-site.webp",
+    "file": "aerial/kaiwera-downs-stage-2-wide.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 155 MW wind farm in Southland, generating since 2026."
@@ -695,7 +695,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/kaiwera-downs-wind-farm-site.webp",
+    "file": "aerial/kaiwera-downs-wind-farm-wide.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 43 MW wind farm in Southland, generating since 2023."
@@ -841,7 +841,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/kawerau-tg1-tg2-site.webp",
+    "file": "aerial/kawerau-tg1-tg2-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 6 MW geothermal station on the Kawerau geothermal field in the Bay of Plenty, generating from 1989 to 2017; now closed."
@@ -891,7 +891,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/kinleith-site.webp",
+    "file": "aerial/kinleith-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 40 MW bioenergy plant in Waikato, generating since 1997."
@@ -916,7 +916,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/kohira-solar-farm-site.webp",
+    "file": "aerial/kohira-solar-farm-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 24 MW solar farm in Northland, generating since 2023."
@@ -991,7 +991,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/lauriston-solar-farm-site.webp",
+    "file": "aerial/lauriston-solar-farm-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 47 MW solar farm in Canterbury, generating since 2025."
@@ -1191,7 +1191,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/mokai-site.webp",
+    "file": "aerial/mokai-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 112 MW geothermal station on the Mōkai geothermal field in Waikato, generating since 1999."
@@ -1216,7 +1216,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/new-plymouth-site.webp",
+    "file": "aerial/new-plymouth-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 100 MW gas-fired station in Taranaki, generating from 1974 to 2008; now closed."
@@ -1241,7 +1241,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/nga-awa-purua-site.webp",
+    "file": "aerial/nga-awa-purua-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 148 MW geothermal station on the Rotokawa geothermal field in Waikato, generating since 2010."
@@ -1266,7 +1266,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/nga-tamariki-site.webp",
+    "file": "aerial/nga-tamariki-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 132 MW geothermal station on the Ngā Tamariki geothermal field in Waikato, generating since 2013."
@@ -1441,7 +1441,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/omeheu-solar-farm-site.webp",
+    "file": "aerial/omeheu-solar-farm-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 28.7 MW solar farm in the Bay of Plenty, generating since 2026."
@@ -1541,7 +1541,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/pamu-ra-ki-whitianga-solar-farm-site.webp",
+    "file": "aerial/pamu-ra-ki-whitianga-solar-farm-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 23.8 MW solar farm in Waikato, generating since 2025."
@@ -1566,7 +1566,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/papareireia-site.webp",
+    "file": "aerial/papareireia-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 17.6 MW solar farm in Northland, generating since 2025."
@@ -1591,7 +1591,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/patea-site.webp",
+    "file": "aerial/patea-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 34.5 MW hydro station on the Pātea River in Taranaki, generating since 1984."
@@ -1641,7 +1641,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/pukenui-solar-farm-site.webp",
+    "file": "aerial/pukenui-solar-farm-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 17.2 MW solar farm in Northland, generating since 2025."
@@ -1691,7 +1691,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/rangitaiki-solar-farm-site.webp",
+    "file": "aerial/rangitaiki-solar-farm-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 24 MW solar farm in the Bay of Plenty, generating since 2024."
@@ -1841,7 +1841,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/ruakaka-solar-farm-site.webp",
+    "file": "aerial/ruakaka-solar-farm-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 120 MW solar farm in Northland, not generating yet."
@@ -1941,7 +1941,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/taiohi-solar-farm-site.webp",
+    "file": "aerial/taiohi-solar-farm-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 22.4 MW solar farm in Waikato, generating since 2025."
@@ -2041,7 +2041,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/tauhara-site.webp",
+    "file": "aerial/tauhara-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 174 MW geothermal station on the Tauhara geothermal field in Waikato, generating since 2024."
@@ -2066,7 +2066,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/tauhei-solar-farm-site.webp",
+    "file": "aerial/tauhei-solar-farm-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 147 MW solar farm in Waikato, generating since 2026."
@@ -2116,7 +2116,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/te-awamutu-site.webp",
+    "file": "aerial/te-awamutu-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 54 MW gas-fired station in Waikato, closed in 2007."
@@ -2141,7 +2141,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/te-herenga-o-te-ra-solar-farm-site.webp",
+    "file": "aerial/te-herenga-o-te-ra-solar-farm-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 33 MW solar farm in the Bay of Plenty, generating since 2024."
@@ -2216,7 +2216,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/te-mihi-site.webp",
+    "file": "aerial/te-mihi-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 166 MW geothermal station on the Wairākei geothermal field in Waikato, generating since 2013."
@@ -2241,7 +2241,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/te-puna-mauri-o-omaru-at-ruawai-site.webp",
+    "file": "aerial/te-puna-mauri-o-omaru-at-ruawai-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 20 MW solar farm in Northland, generating since 2024."
@@ -2266,7 +2266,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/te-rapa-site.webp",
+    "file": "aerial/te-rapa-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 48 MW gas-fired station in Waikato, generating from 1999 to 2023; now closed."
@@ -2462,7 +2462,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/twin-rivers-solar-farm-site.webp",
+    "file": "aerial/twin-rivers-solar-farm-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 24 MW solar farm in Northland, generating since 2025."
@@ -2612,7 +2612,7 @@
    },
    "thumb": {
     "kind": "aerial",
-    "file": "aerial/waitaki-site.webp",
+    "file": "aerial/waitaki-close.webp",
     "credit": "Aerial: Toitū Te Whenua LINZ, CC BY 4.0"
    },
    "overview": "A 105 MW hydro station on the Waitaki River in Canterbury, generating since 1935."

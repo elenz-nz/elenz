@@ -155,18 +155,6 @@
    "file": "aerial/ngawha-site.webp",
    "across": 490,
    "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/ngawha-close.webp",
-   "across": 970,
-   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/ngawha-wide.webp",
-   "across": 7790,
-   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
   }
  ],
  "sources": [

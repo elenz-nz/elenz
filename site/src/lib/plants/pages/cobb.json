@@ -141,18 +141,6 @@
    "file": "aerial/cobb-site.webp",
    "across": 450,
    "imagery": "Tasman 0.25m Rural Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/cobb-close.webp",
-   "across": 900,
-   "imagery": "Tasman 0.25m Rural Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/cobb-wide.webp",
-   "across": 7200,
-   "imagery": "Tasman 0.25m Rural Aerial Photos (2024-2025)"
   }
  ],
  "sources": [

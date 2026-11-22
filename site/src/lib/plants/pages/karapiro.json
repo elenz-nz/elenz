@@ -141,18 +141,6 @@
    "file": "aerial/karapiro-site.webp",
    "across": 470,
    "imagery": "Waipa 0.1m Urban Aerial Photos (2026)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/karapiro-close.webp",
-   "across": 940,
-   "imagery": "Waipa 0.1m Urban Aerial Photos (2026)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/karapiro-wide.webp",
-   "across": 7540,
-   "imagery": "Waipa 0.1m Urban Aerial Photos (2026)"
   }
  ],
  "sources": [

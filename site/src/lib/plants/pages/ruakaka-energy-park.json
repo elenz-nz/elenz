@@ -124,18 +124,6 @@
    "file": "aerial/ruakaka-energy-park-site.webp",
    "across": 480,
    "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/ruakaka-energy-park-close.webp",
-   "across": 970,
-   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/ruakaka-energy-park-wide.webp",
-   "across": 7740,
-   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
   }
  ],
  "sources": [

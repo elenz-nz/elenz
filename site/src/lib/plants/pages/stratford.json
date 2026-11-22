@@ -216,18 +216,6 @@
    "file": "aerial/stratford-site.webp",
    "across": 460,
    "imagery": "Taranaki 0.05m Urban Aerial Photos (2022-2023)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/stratford-close.webp",
-   "across": 920,
-   "imagery": "Taranaki 0.05m Urban Aerial Photos (2022-2023)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/stratford-wide.webp",
-   "across": 7390,
-   "imagery": "Taranaki 0.05m Urban Aerial Photos (2022-2023)"
   }
  ],
  "sources": [

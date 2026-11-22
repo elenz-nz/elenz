@@ -147,20 +147,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/roxburgh-site.webp",
-   "across": 420,
-   "imagery": "Otago 0.1m Urban Aerial Photos (2023-2024)"
-  },
-  {
-   "k": "close",
    "file": "aerial/roxburgh-close.webp",
    "across": 840,
-   "imagery": "Otago 0.1m Urban Aerial Photos (2023-2024)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/roxburgh-wide.webp",
-   "across": 6700,
    "imagery": "Otago 0.1m Urban Aerial Photos (2023-2024)"
   }
  ],

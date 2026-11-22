@@ -100,20 +100,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/twin-rivers-solar-farm-site.webp",
-   "across": 490,
-   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
-  },
-  {
-   "k": "close",
    "file": "aerial/twin-rivers-solar-farm-close.webp",
    "across": 980,
-   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/twin-rivers-solar-farm-wide.webp",
-   "across": 7810,
    "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
   }
  ],

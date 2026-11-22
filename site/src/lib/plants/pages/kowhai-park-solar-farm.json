@@ -111,20 +111,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/kowhai-park-solar-farm-site.webp",
-   "across": 430,
-   "imagery": "Christchurch 0.075m Urban Aerial Photos (2025)"
-  },
-  {
-   "k": "close",
    "file": "aerial/kowhai-park-solar-farm-close.webp",
    "across": 870,
-   "imagery": "Christchurch 0.075m Urban Aerial Photos (2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/kowhai-park-solar-farm-wide.webp",
-   "across": 6930,
    "imagery": "Christchurch 0.075m Urban Aerial Photos (2025)"
   }
  ],

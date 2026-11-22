@@ -128,20 +128,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/waipipi-site.webp",
-   "across": 460,
-   "imagery": "Taranaki 0.25m Rural Aerial Photos (2021-2022)"
-  },
-  {
-   "k": "close",
    "file": "aerial/waipipi-close.webp",
    "across": 920,
-   "imagery": "Taranaki 0.25m Rural Aerial Photos (2021-2022)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/waipipi-wide.webp",
-   "across": 7340,
    "imagery": "Taranaki 0.25m Rural Aerial Photos (2021-2022)"
   }
  ],

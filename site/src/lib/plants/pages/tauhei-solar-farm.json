@@ -99,20 +99,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/tauhei-solar-farm-site.webp",
-   "across": 470,
-   "imagery": "Waikato 0.3m Rural Aerial Photos (2023-2024)"
-  },
-  {
-   "k": "close",
    "file": "aerial/tauhei-solar-farm-close.webp",
    "across": 950,
-   "imagery": "Waikato 0.3m Rural Aerial Photos (2023-2024)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/tauhei-solar-farm-wide.webp",
-   "across": 7570,
    "imagery": "Waikato 0.3m Rural Aerial Photos (2023-2024)"
   }
  ],

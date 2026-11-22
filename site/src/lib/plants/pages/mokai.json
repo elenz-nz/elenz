@@ -159,20 +159,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/mokai-site.webp",
-   "across": 470,
-   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
-  },
-  {
-   "k": "close",
    "file": "aerial/mokai-close.webp",
    "across": 930,
-   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/mokai-wide.webp",
-   "across": 7470,
    "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
   }
  ],

@@ -126,20 +126,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/te-rapa-site.webp",
-   "across": 470,
-   "imagery": "Hamilton 0.05m Urban Aerial Photos (2025)"
-  },
-  {
-   "k": "close",
    "file": "aerial/te-rapa-close.webp",
    "across": 940,
-   "imagery": "Hamilton 0.05m Urban Aerial Photos (2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/te-rapa-wide.webp",
-   "across": 7560,
    "imagery": "Hamilton 0.05m Urban Aerial Photos (2025)"
   }
  ],

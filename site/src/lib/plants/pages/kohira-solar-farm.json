@@ -106,20 +106,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/kohira-solar-farm-site.webp",
-   "across": 490,
-   "imagery": "Northland 0.1m Urban Aerial Photos (2016)"
-  },
-  {
-   "k": "close",
    "file": "aerial/kohira-solar-farm-close.webp",
    "across": 980,
-   "imagery": "Northland 0.1m Urban Aerial Photos (2016)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/kohira-solar-farm-wide.webp",
-   "across": 7820,
    "imagery": "Northland 0.1m Urban Aerial Photos (2016)"
   }
  ],

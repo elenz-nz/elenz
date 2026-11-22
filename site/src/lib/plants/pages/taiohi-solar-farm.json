@@ -101,20 +101,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/taiohi-solar-farm-site.webp",
-   "across": 470,
-   "imagery": "Waikato District 0.1m Urban Aerial Photos (2021)"
-  },
-  {
-   "k": "close",
    "file": "aerial/taiohi-solar-farm-close.webp",
    "across": 950,
-   "imagery": "Waikato District 0.1m Urban Aerial Photos (2021)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/taiohi-solar-farm-wide.webp",
-   "across": 7590,
    "imagery": "Waikato District 0.1m Urban Aerial Photos (2021)"
   }
  ],

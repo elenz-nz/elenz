@@ -89,20 +89,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/edgecumbe-site.webp",
-   "across": 470,
-   "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2025)"
-  },
-  {
-   "k": "close",
    "file": "aerial/edgecumbe-close.webp",
    "across": 940,
-   "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/edgecumbe-wide.webp",
-   "across": 7530,
    "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2025)"
   }
  ],

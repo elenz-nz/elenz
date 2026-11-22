@@ -118,20 +118,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/fonterra-dairy-whareroa-site.webp",
-   "across": 460,
-   "imagery": "Taranaki 0.1m Urban Aerial Photos (2022-2023)"
-  },
-  {
-   "k": "close",
    "file": "aerial/fonterra-dairy-whareroa-close.webp",
    "across": 920,
-   "imagery": "Taranaki 0.1m Urban Aerial Photos (2022-2023)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/fonterra-dairy-whareroa-wide.webp",
-   "across": 7360,
    "imagery": "Taranaki 0.1m Urban Aerial Photos (2022-2023)"
   }
  ],

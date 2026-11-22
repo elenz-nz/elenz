@@ -138,20 +138,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/tararua-wind-farm-3-site.webp",
-   "across": 460,
-   "imagery": "Palmerston North 0.1m Urban Aerial Photos (2024)"
-  },
-  {
-   "k": "close",
    "file": "aerial/tararua-wind-farm-3-close.webp",
    "across": 910,
-   "imagery": "Palmerston North 0.1m Urban Aerial Photos (2024)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/tararua-wind-farm-3-wide.webp",
-   "across": 7280,
    "imagery": "Palmerston North 0.1m Urban Aerial Photos (2024)"
   }
  ],

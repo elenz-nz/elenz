@@ -105,20 +105,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/white-hill-site.webp",
-   "across": 420,
-   "imagery": "Southland 0.25m Rural Aerial Photos (2023-2024)"
-  },
-  {
-   "k": "close",
    "file": "aerial/white-hill-close.webp",
    "across": 830,
-   "imagery": "Southland 0.25m Rural Aerial Photos (2023-2024)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/white-hill-wide.webp",
-   "across": 6670,
    "imagery": "Southland 0.25m Rural Aerial Photos (2023-2024)"
   }
  ],

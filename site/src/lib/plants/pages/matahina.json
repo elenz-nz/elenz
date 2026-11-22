@@ -143,20 +143,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/matahina-site.webp",
-   "across": 470,
-   "imagery": "Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "close",
    "file": "aerial/matahina-close.webp",
    "across": 940,
-   "imagery": "Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/matahina-wide.webp",
-   "across": 7520,
    "imagery": "Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025)"
   }
  ],

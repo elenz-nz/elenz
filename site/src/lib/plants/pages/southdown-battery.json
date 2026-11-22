@@ -113,18 +113,6 @@
    "file": "aerial/southdown-battery-site.webp",
    "across": 480,
    "imagery": "Auckland 0.075m Urban Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/southdown-battery-close.webp",
-   "across": 950,
-   "imagery": "Auckland 0.075m Urban Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/southdown-battery-wide.webp",
-   "across": 7640,
-   "imagery": "Auckland 0.075m Urban Aerial Photos (2024-2025)"
   }
  ],
  "sources": [

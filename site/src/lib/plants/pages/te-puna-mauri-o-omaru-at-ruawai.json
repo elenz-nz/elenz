@@ -117,20 +117,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/te-puna-mauri-o-omaru-at-ruawai-site.webp",
-   "across": 480,
-   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
-  },
-  {
-   "k": "close",
    "file": "aerial/te-puna-mauri-o-omaru-at-ruawai-close.webp",
    "across": 960,
-   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/te-puna-mauri-o-omaru-at-ruawai-wide.webp",
-   "across": 7720,
    "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
   }
  ],

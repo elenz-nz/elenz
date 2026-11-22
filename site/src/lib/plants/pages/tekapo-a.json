@@ -172,20 +172,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/tekapo-a-site.webp",
-   "across": 430,
-   "imagery": "Mackenzie 0.075m Urban Aerial Photos (2025-2026)"
-  },
-  {
-   "k": "close",
    "file": "aerial/tekapo-a-close.webp",
    "across": 860,
-   "imagery": "Mackenzie 0.075m Urban Aerial Photos (2025-2026)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/tekapo-a-wide.webp",
-   "across": 6870,
    "imagery": "Mackenzie 0.075m Urban Aerial Photos (2025-2026)"
   }
  ],

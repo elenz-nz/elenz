@@ -126,18 +126,6 @@
    "file": "aerial/rangipo-site.webp",
    "across": 460,
    "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/rangipo-close.webp",
-   "across": 930,
-   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/rangipo-wide.webp",
-   "across": 7410,
-   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
   }
  ],
  "sources": [

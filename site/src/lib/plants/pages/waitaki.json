@@ -138,20 +138,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/waitaki-site.webp",
-   "across": 420,
-   "imagery": "Canterbury - Waitaki 0.3m Rural Aerial Photos (2021)"
-  },
-  {
-   "k": "close",
    "file": "aerial/waitaki-close.webp",
    "across": 850,
-   "imagery": "Canterbury - Waitaki 0.3m Rural Aerial Photos (2021)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/waitaki-wide.webp",
-   "across": 6790,
    "imagery": "Canterbury - Waitaki 0.3m Rural Aerial Photos (2021)"
   }
  ],

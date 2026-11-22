@@ -161,20 +161,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/ohaaki-site.webp",
-   "across": 470,
-   "imagery": "Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "close",
    "file": "aerial/ohaaki-close.webp",
    "across": 930,
-   "imagery": "Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/ohaaki-wide.webp",
-   "across": 7470,
    "imagery": "Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025)"
   }
  ],

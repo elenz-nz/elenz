@@ -147,20 +147,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/tekapo-b-site.webp",
-   "across": 430,
-   "imagery": "Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021)"
-  },
-  {
-   "k": "close",
    "file": "aerial/tekapo-b-close.webp",
    "across": 860,
-   "imagery": "Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/tekapo-b-wide.webp",
-   "across": 6860,
    "imagery": "Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021)"
   }
  ],

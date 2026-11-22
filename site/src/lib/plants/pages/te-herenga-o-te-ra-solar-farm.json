@@ -96,20 +96,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/te-herenga-o-te-ra-solar-farm-site.webp",
-   "across": 470,
-   "imagery": "Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "close",
    "file": "aerial/te-herenga-o-te-ra-solar-farm-close.webp",
    "across": 940,
-   "imagery": "Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/te-herenga-o-te-ra-solar-farm-wide.webp",
-   "across": 7530,
    "imagery": "Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025)"
   }
  ],

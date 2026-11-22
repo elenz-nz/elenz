@@ -134,18 +134,6 @@
    "file": "aerial/roaring-meg-site.webp",
    "across": 420,
    "imagery": "Otago 0.2m Rural Aerial Photos (2025)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/roaring-meg-close.webp",
-   "across": 840,
-   "imagery": "Otago 0.2m Rural Aerial Photos (2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/roaring-meg-wide.webp",
-   "across": 6760,
-   "imagery": "Otago 0.2m Rural Aerial Photos (2025)"
   }
  ],
  "sources": [

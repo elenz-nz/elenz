@@ -113,18 +113,6 @@
    "file": "aerial/aniwhenua-site.webp",
    "across": 470,
    "imagery": "Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/aniwhenua-close.webp",
-   "across": 940,
-   "imagery": "Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/aniwhenua-wide.webp",
-   "across": 7500,
-   "imagery": "Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025)"
   }
  ],
  "sources": [

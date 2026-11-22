@@ -153,20 +153,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/tararua-stage-ii-site.webp",
-   "across": 460,
-   "imagery": "Manawatū-Whanganui 0.3m Rural Aerial Photos (2021-2022)"
-  },
-  {
-   "k": "close",
    "file": "aerial/tararua-stage-ii-close.webp",
    "across": 910,
-   "imagery": "Manawatū-Whanganui 0.3m Rural Aerial Photos (2021-2022)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/tararua-stage-ii-wide.webp",
-   "across": 7280,
    "imagery": "Manawatū-Whanganui 0.3m Rural Aerial Photos (2021-2022)"
   }
  ],

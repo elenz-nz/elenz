@@ -131,20 +131,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/te-apiti-site.webp",
-   "across": 460,
-   "imagery": "Manawatū-Whanganui 0.2m Rural Aerial Photos (2023-2024)"
-  },
-  {
-   "k": "close",
    "file": "aerial/te-apiti-close.webp",
    "across": 910,
-   "imagery": "Manawatū-Whanganui 0.2m Rural Aerial Photos (2023-2024)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/te-apiti-wide.webp",
-   "across": 7290,
    "imagery": "Manawatū-Whanganui 0.2m Rural Aerial Photos (2023-2024)"
   }
  ],

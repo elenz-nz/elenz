@@ -111,18 +111,6 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/kaiwera-downs-wind-farm-site.webp",
-   "across": 410,
-   "imagery": "Southland 0.25m Rural Aerial Photos (2023-2024)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/kaiwera-downs-wind-farm-close.webp",
-   "across": 830,
-   "imagery": "Southland 0.25m Rural Aerial Photos (2023-2024)"
-  },
-  {
-   "k": "wide",
    "file": "aerial/kaiwera-downs-wind-farm-wide.webp",
    "across": 6610,
    "imagery": "Southland 0.25m Rural Aerial Photos (2023-2024)"
