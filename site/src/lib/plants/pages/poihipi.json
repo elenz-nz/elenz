@@ -139,18 +139,6 @@
    "file": "aerial/poihipi-site.webp",
    "across": 470,
    "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/poihipi-close.webp",
-   "across": 930,
-   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/poihipi-wide.webp",
-   "across": 7460,
-   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
   }
  ],
  "sources": [

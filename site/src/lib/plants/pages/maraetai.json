@@ -139,20 +139,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/maraetai-site.webp",
-   "across": 470,
-   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
-  },
-  {
-   "k": "close",
    "file": "aerial/maraetai-close.webp",
    "across": 940,
-   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/maraetai-wide.webp",
-   "across": 7490,
    "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
   }
  ],

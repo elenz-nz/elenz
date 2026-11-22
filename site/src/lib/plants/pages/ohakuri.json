@@ -148,20 +148,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/ohakuri-site.webp",
-   "across": 470,
-   "imagery": "Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "close",
    "file": "aerial/ohakuri-close.webp",
    "across": 940,
-   "imagery": "Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/ohakuri-wide.webp",
-   "across": 7490,
    "imagery": "Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025)"
   }
  ],

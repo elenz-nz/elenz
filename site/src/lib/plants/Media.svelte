@@ -10,7 +10,7 @@
 	import type { Snippet } from 'svelte';
 	import { LINZ_BASEMAPS_KEY } from '$app/env/public';
 	import { VIEW, NI as NI_PATH, SI as SI_PATH } from '#lib/home/nzmap.js';
-	import { toView, islandBox } from './map.js';
+	import { toView, islandBox, aerialSource, collapseCredit } from './map.js';
 
 	type Photo = { file: string; title: string; author: string; source_url: string; licence: string; licence_url: string; focus?: string };
 	type View = { k: string; file: string; across: number; imagery: string };
@@ -71,6 +71,11 @@
 	let mapEl = $state<HTMLDivElement>();
 	let map: any = null;
 	let mapState = $state<'idle' | 'loading' | 'ready' | 'failed'>('idle');
+	let base = $state<'map' | 'sat'>('map');
+	$effect(() => {
+		const b = base;
+		if (mapState === 'ready' && map?.getLayer('aerial')) map.setLayoutProperty('aerial', 'visibility', b === 'sat' ? 'visible' : 'none');
+	});
 	$effect(() => {
 		// Leaving the Map view removes its container, so drop the map with it; the next visit builds a new one in the new
 		// container (a kept map would still point at the removed one and the view would stay blank).
@@ -98,10 +103,13 @@
 			map.addControl(new ml.NavigationControl({ showCompass: false }), 'top-left');
 			map.on('error', (e: any) => { if (mapState !== 'ready' && /style|Failed to fetch|40[13]/i.test(String(e?.error?.message ?? ''))) fail(); });
 			map.on('load', () => {
+				map.addSource('aerial', aerialSource(KEY));
+				map.addLayer({ id: 'aerial', type: 'raster', source: 'aerial', layout: { visibility: base === 'sat' ? 'visible' : 'none' } });
 				map.addSource('pt', { type: 'geojson', data: { type: 'Feature', geometry: { type: 'Point', coordinates: at }, properties: {} } });
 				map.addLayer({ id: 'halo', type: 'circle', source: 'pt', paint: { 'circle-radius': 16, 'circle-color': colour, 'circle-opacity': 0.25 } });
 				map.addLayer({ id: 'pt', type: 'circle', source: 'pt', paint: { 'circle-radius': 7, 'circle-color': colour, 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2.5 } });
 				mapState = 'ready';
+				collapseCredit(el);
 			});
 		})().catch(fail);
 		function fail() { map?.remove(); map = null; mapState = 'failed'; }
@@ -167,6 +175,12 @@
 			<div class="frame">
 				{#if vk === 'map'}
 					<div class="ml" bind:this={mapEl} role="region" aria-label="Map around {name}"></div>
+					{#if mapState === 'ready'}
+						<div class="basemap seg js-only" role="group" aria-label="Map style">
+							<button type="button" aria-pressed={base === 'map'} onclick={() => (base = 'map')}>Map</button>
+							<button type="button" aria-pressed={base === 'sat'} onclick={() => (base = 'sat')}>Satellite</button>
+						</div>
+					{/if}
 					{#if mapState === 'failed'}<p class="fail">The map can’t load right now. The aerial views still work.</p>{/if}
 				{:else if av}
 					<img src="/plants/{av.file}" alt="Aerial view of {name}, about {size(av.across)} across" width="1000" height="640" loading={hasPhotos ? 'lazy' : 'eager'} decoding="async" />
@@ -189,7 +203,7 @@
 				{/if}
 			</div>
 			<figcaption>
-				{#if vk === 'map'}Map: Toitū Te Whenua LINZ, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.
+				{#if vk === 'map'}{base === 'sat' ? 'Satellite imagery' : 'Map'}: Toitū Te Whenua LINZ, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.
 				{:else if av}Aerial view, about {size(av.across)} across. Imagery: {av.imagery ? `${av.imagery}, ` : ''}Toitū Te Whenua LINZ, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.
 				{:else}Outline: Electricity Authority network zones, CC BY 4.0.{/if}
 				{#if note}<span class="note">{@render note()}</span>{/if}
@@ -234,6 +248,7 @@
 		background: rgb(255 255 255 / 0.88); color: #132020; }
 	.lightbox .shut:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 	@media (max-width: 600px) { .lightbox .stage { padding: 56px 0 0; } .lightbox .cap { padding: 0 12px; } }
+	.basemap { position: absolute; top: 46px; right: 8px; left: auto; bottom: auto; z-index: 2; background: var(--surface); box-shadow: 0 1px 3px rgb(0 0 0 / 0.3); }
 	.views { position: absolute; top: 8px; right: 8px; background: var(--surface); box-shadow: 0 1px 3px rgb(0 0 0 / 0.3); }
 	.locator { position: absolute; left: 8px; bottom: 8px; width: auto; height: 34%; max-height: 120px; aspect-ratio: auto;
 		background: rgb(255 255 255 / 0.9); border-radius: 4px; padding: 4px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.3); pointer-events: none; }
@@ -245,5 +260,10 @@
 	.fail { position: absolute; inset: auto 8px 8px; margin: 0; background: var(--surface); color: var(--ink-2); font-size: 0.82rem; padding: 6px 10px; border-radius: 4px; }
 	figcaption { font-size: 0.78rem; color: var(--muted); line-height: 1.45; }
 	figcaption a { color: inherit; }
+	@media (max-width: 600px) {
+		figcaption { font-size: 0.68rem; line-height: 1.35; }
+		.ml :global(.maplibregl-ctrl-attrib.maplibregl-compact) { min-height: 18px; min-width: 18px; font-size: 10px; }
+		.ml :global(.maplibregl-ctrl-attrib-button) { width: 18px; height: 18px; background-size: 14px; }
+	}
 	.note { display: block; margin-top: 2px; }
 </style>

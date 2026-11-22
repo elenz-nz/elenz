@@ -108,20 +108,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/te-uku-site.webp",
-   "across": 470,
-   "imagery": "Waikato 0.3m Rural Aerial Photos (2023-2024)"
-  },
-  {
-   "k": "close",
    "file": "aerial/te-uku-close.webp",
    "across": 940,
-   "imagery": "Waikato 0.3m Rural Aerial Photos (2023-2024)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/te-uku-wide.webp",
-   "across": 7540,
    "imagery": "Waikato 0.3m Rural Aerial Photos (2023-2024)"
   }
  ],

@@ -81,20 +81,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/kinleith-site.webp",
-   "across": 470,
-   "imagery": "South Waikato 0.1m Urban Aerial Photos (2025)"
-  },
-  {
-   "k": "close",
    "file": "aerial/kinleith-close.webp",
    "across": 940,
-   "imagery": "South Waikato 0.1m Urban Aerial Photos (2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/kinleith-wide.webp",
-   "across": 7500,
    "imagery": "South Waikato 0.1m Urban Aerial Photos (2025)"
   }
  ],

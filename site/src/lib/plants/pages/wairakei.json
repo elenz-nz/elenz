@@ -178,20 +178,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/wairakei-site.webp",
-   "across": 470,
-   "imagery": "Taupō 0.1m Urban Aerial Photos (2025)"
-  },
-  {
-   "k": "close",
    "file": "aerial/wairakei-close.webp",
    "across": 930,
-   "imagery": "Taupō 0.1m Urban Aerial Photos (2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/wairakei-wide.webp",
-   "across": 7460,
    "imagery": "Taupō 0.1m Urban Aerial Photos (2025)"
   }
  ],

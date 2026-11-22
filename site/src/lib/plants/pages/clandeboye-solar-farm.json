@@ -100,18 +100,6 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/clandeboye-solar-farm-site.webp",
-   "across": 430,
-   "imagery": "Canterbury 0.2m Rural Aerial Photos (2024)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/clandeboye-solar-farm-close.webp",
-   "across": 860,
-   "imagery": "Canterbury 0.2m Rural Aerial Photos (2024)"
-  },
-  {
-   "k": "wide",
    "file": "aerial/clandeboye-solar-farm-wide.webp",
    "across": 6850,
    "imagery": "Canterbury 0.2m Rural Aerial Photos (2024)"

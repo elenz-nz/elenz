@@ -135,20 +135,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/ohau-a-site.webp",
-   "across": 430,
-   "imagery": "Mackenzie 0.075m Urban Aerial Photos (2025-2026)"
-  },
-  {
-   "k": "close",
    "file": "aerial/ohau-a-close.webp",
    "across": 860,
-   "imagery": "Mackenzie 0.075m Urban Aerial Photos (2025-2026)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/ohau-a-wide.webp",
-   "across": 6840,
    "imagery": "Mackenzie 0.075m Urban Aerial Photos (2025-2026)"
   }
  ],

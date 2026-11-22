@@ -100,18 +100,6 @@
    "file": "aerial/mckee-site.webp",
    "across": 460,
    "imagery": "Taranaki 0.25m Rural Aerial Photos (2021-2022)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/mckee-close.webp",
-   "across": 930,
-   "imagery": "Taranaki 0.25m Rural Aerial Photos (2021-2022)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/mckee-wide.webp",
-   "across": 7420,
-   "imagery": "Taranaki 0.25m Rural Aerial Photos (2021-2022)"
   }
  ],
  "sources": [

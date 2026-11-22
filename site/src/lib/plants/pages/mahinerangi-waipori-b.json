@@ -121,20 +121,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/mahinerangi-waipori-b-site.webp",
-   "across": 420,
-   "imagery": "Otago 0.2m Rural Aerial Photos (2025)"
-  },
-  {
-   "k": "close",
    "file": "aerial/mahinerangi-waipori-b-close.webp",
    "across": 830,
-   "imagery": "Otago 0.2m Rural Aerial Photos (2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/mahinerangi-waipori-b-wide.webp",
-   "across": 6660,
    "imagery": "Otago 0.2m Rural Aerial Photos (2025)"
   }
  ],

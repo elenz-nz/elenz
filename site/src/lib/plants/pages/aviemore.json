@@ -134,20 +134,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/aviemore-site.webp",
-   "across": 420,
-   "imagery": "Canterbury - Waitaki 0.3m Rural Aerial Photos (2021)"
-  },
-  {
-   "k": "close",
    "file": "aerial/aviemore-close.webp",
    "across": 850,
-   "imagery": "Canterbury - Waitaki 0.3m Rural Aerial Photos (2021)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/aviemore-wide.webp",
-   "across": 6800,
    "imagery": "Canterbury - Waitaki 0.3m Rural Aerial Photos (2021)"
   }
  ],

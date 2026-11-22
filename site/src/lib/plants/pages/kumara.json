@@ -115,18 +115,6 @@
    "file": "aerial/kumara-site.webp",
    "across": 440,
    "imagery": "West Coast 0.2m Rural Aerial Photos (2024-2026)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/kumara-close.webp",
-   "across": 880,
-   "imagery": "West Coast 0.2m Rural Aerial Photos (2024-2026)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/kumara-wide.webp",
-   "across": 7030,
-   "imagery": "West Coast 0.2m Rural Aerial Photos (2024-2026)"
   }
  ],
  "sources": [

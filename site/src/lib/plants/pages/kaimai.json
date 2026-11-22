@@ -132,18 +132,6 @@
    "file": "aerial/kaimai-site.webp",
    "across": 470,
    "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2025)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/kaimai-close.webp",
-   "across": 940,
-   "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/kaimai-wide.webp",
-   "across": 7550,
-   "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2025)"
   }
  ],
  "sources": [

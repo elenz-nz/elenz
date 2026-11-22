@@ -196,10 +196,9 @@ snap), with arrows and "1 of 3" when there is more than one; each credited under
 tab. A click or tap on a photo (or the corner button) opens all the plant's photos uncropped in a native `<dialog>` (design
 decision, 22 Nov 2026: the frame crops to 1000:640, which cuts tall photos hard): arrows, the arrow keys, a swipe, Esc, each photo
 credited; closing leaves the strip on the photo last viewed. `plant_images.csv`'s optional `focus` ("50% 12%", across then down)
-sets `object-position` for the cropped frame, so a tall photo's subject stays in view; blank centres it. Location: the plant's LINZ aerial views (Site, Close and Wide, about 450 m, 1 km and 7.5 km across; a switch that
-only swaps the image's address; credited with the imagery collection, Toitū Te Whenua LINZ, CC BY 4.0) and, with the
+sets `object-position` for the cropped frame, so a tall photo's subject stays in view; blank centres it. Location: one LINZ aerial view, labelled Site (design decision, 22 Nov 2026: three views were too much on a page; the Elenz team chose the best of Site, Close and Wide, about 450 m, 1 km and 7.5 km across, for each plant, listed in `facilities/plant_aerial_choice.csv`, which `plant_pages.py` reads; a plant without a row shows all three; all three images are still made and kept by `analysis/plant_aerials.py`; credited with the imagery collection, Toitū Te Whenua LINZ, CC BY 4.0) and, with the
 LINZ key, a Map view (the index's MapLibre and `topolite-v2` style, loaded only when Map is chosen, centred on the point,
-with cooperative gestures so it doesn't catch the page's scrolling), a small locator of the plant's island in the corner
+with cooperative gestures so it doesn't catch the page's scrolling), a Map / Satellite switch just under the Site / Map switch, only while Map is chosen (design decision, 22 Nov 2026: LINZ's aerial tiles as a raster layer over the basemap, `aerialSource()` in `map.js`, shown or hidden without reloading the map), a small locator of the plant's island in the corner
 (`islandBox()` in `map.js` frames the one island's outline: the whole-country map was hard to read in light mode), and
 the coordinates with their source under it. With no photo, the Location tab leads alone; every plant with a checked
 point has aerial views (design decision, 19 Nov 2026). Without JavaScript the first tab's first view shows. The views are WebP files in `static/plants/aerial/`, made by
@@ -246,7 +245,7 @@ the LINZ Basemaps `topolite-v2` style (Toitū Te Whenua LINZ, CC BY 4.0, credite
 build variable `LINZ_BASEMAPS_KEY` (declared in `src/env.ts`, set in Cloudflare's build settings, never committed;
 LINZ restricts a developer key to our sites, so it isn't a secret). Without the key, without WebGL 2, or if the style
 fails to load, the page keeps the outline map it is prerendered with (the Now map's outlines with `map.js` placing the
-dots), which is also what the browser tests see. An island filter frames that island; the corner button the whole
+dots), which is also what the browser tests see. Once the map is up, a Map / Satellite switch in its top left shows LINZ's aerial tiles (the same raster layer as the plant pages' Map view, under the dots) and the caption says which is shown. An island filter frames that island; the corner button the whole
 country. Tests: the index tests in `tests/plants.test.js` and the plant index block in `tests/e2e/site.spec.js`.
 
 ## Tracker

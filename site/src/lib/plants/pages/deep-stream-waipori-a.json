@@ -130,18 +130,6 @@
    "file": "aerial/deep-stream-waipori-a-site.webp",
    "across": 420,
    "imagery": "Otago 0.2m Rural Aerial Photos (2025)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/deep-stream-waipori-a-close.webp",
-   "across": 830,
-   "imagery": "Otago 0.2m Rural Aerial Photos (2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/deep-stream-waipori-a-wide.webp",
-   "across": 6660,
-   "imagery": "Otago 0.2m Rural Aerial Photos (2025)"
   }
  ],
  "sources": [

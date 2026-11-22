@@ -49,3 +49,18 @@ export function islandBox(path, pad = 8) {
   const x0 = Math.min(...xs) - pad, y0 = Math.min(...ys) - pad;
   return [x0, y0, Math.max(...xs) + pad - x0, Math.max(...ys) + pad - y0];
 }
+
+/** LINZ Basemaps' aerial tiles as a MapLibre raster source (Toitū Te Whenua LINZ, CC BY 4.0), for the Satellite view. */
+export const aerialSource = (key) => ({
+  type: 'raster', tileSize: 256, maxzoom: 19,
+  tiles: [`https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=${key}`],
+  attribution: '© Toitū Te Whenua LINZ, CC BY 4.0'
+});
+
+// MapLibre's compact credit opens by itself on first load; start it as the small (i) button instead
+export function collapseCredit(el) {
+  const a = el?.querySelector('.maplibregl-ctrl-attrib');
+  if (!a) return;
+  a.classList.remove('maplibregl-compact-show');
+  a.removeAttribute('open');
+}

@@ -142,18 +142,6 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/turitea-wind-farm-site.webp",
-   "across": 450,
-   "imagery": "Palmerston North 0.1m Urban Aerial Photos (2024)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/turitea-wind-farm-close.webp",
-   "across": 910,
-   "imagery": "Palmerston North 0.1m Urban Aerial Photos (2024)"
-  },
-  {
-   "k": "wide",
    "file": "aerial/turitea-wind-farm-wide.webp",
    "across": 7270,
    "imagery": "Palmerston North 0.1m Urban Aerial Photos (2024)"

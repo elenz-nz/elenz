@@ -157,18 +157,6 @@
    "file": "aerial/ohau-c-site.webp",
    "across": 430,
    "imagery": "Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/ohau-c-close.webp",
-   "across": 850,
-   "imagery": "Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/ohau-c-wide.webp",
-   "across": 6830,
-   "imagery": "Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021)"
   }
  ],
  "sources": [

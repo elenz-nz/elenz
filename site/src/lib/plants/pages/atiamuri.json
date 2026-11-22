@@ -144,20 +144,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/atiamuri-site.webp",
-   "across": 470,
-   "imagery": "Taupō 0.1m Urban Aerial Photos (2025)"
-  },
-  {
-   "k": "close",
    "file": "aerial/atiamuri-close.webp",
    "across": 940,
-   "imagery": "Taupō 0.1m Urban Aerial Photos (2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/atiamuri-wide.webp",
-   "across": 7490,
    "imagery": "Taupō 0.1m Urban Aerial Photos (2025)"
   }
  ],

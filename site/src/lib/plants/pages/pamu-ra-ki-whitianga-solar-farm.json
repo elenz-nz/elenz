@@ -98,20 +98,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/pamu-ra-ki-whitianga-solar-farm-site.webp",
-   "across": 480,
-   "imagery": "Waikato 0.3m Rural Aerial Photos (2023-2024)"
-  },
-  {
-   "k": "close",
    "file": "aerial/pamu-ra-ki-whitianga-solar-farm-close.webp",
    "across": 960,
-   "imagery": "Waikato 0.3m Rural Aerial Photos (2023-2024)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/pamu-ra-ki-whitianga-solar-farm-wide.webp",
-   "across": 7650,
    "imagery": "Waikato 0.3m Rural Aerial Photos (2023-2024)"
   }
  ],

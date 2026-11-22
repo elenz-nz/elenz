@@ -141,18 +141,6 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/mill-creek-site.webp",
-   "across": 450,
-   "imagery": "Wellington 0.2m Rural Aerial Photos (2025-2026)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/mill-creek-close.webp",
-   "across": 900,
-   "imagery": "Wellington 0.2m Rural Aerial Photos (2025-2026)"
-  },
-  {
-   "k": "wide",
    "file": "aerial/mill-creek-wide.webp",
    "across": 7190,
    "imagery": "Wellington 0.2m Rural Aerial Photos (2025-2026)"

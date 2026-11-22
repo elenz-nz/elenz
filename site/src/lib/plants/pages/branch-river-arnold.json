@@ -139,18 +139,6 @@
    "file": "aerial/branch-river-arnold-site.webp",
    "across": 450,
    "imagery": "Marlborough 0.25m Rural Aerial Photos (2023-2024)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/branch-river-arnold-close.webp",
-   "across": 890,
-   "imagery": "Marlborough 0.25m Rural Aerial Photos (2023-2024)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/branch-river-arnold-wide.webp",
-   "across": 7140,
-   "imagery": "Marlborough 0.25m Rural Aerial Photos (2023-2024)"
   }
  ],
  "sources": [

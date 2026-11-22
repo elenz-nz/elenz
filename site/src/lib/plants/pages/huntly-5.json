@@ -115,20 +115,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/huntly-5-site.webp",
-   "across": 470,
-   "imagery": "Waikato 0.075m Urban Aerial Photos (2025-2026)"
-  },
-  {
-   "k": "close",
    "file": "aerial/huntly-5-close.webp",
    "across": 950,
-   "imagery": "Waikato 0.075m Urban Aerial Photos (2025-2026)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/huntly-5-wide.webp",
-   "across": 7580,
    "imagery": "Waikato 0.075m Urban Aerial Photos (2025-2026)"
   }
  ],

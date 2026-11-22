@@ -133,18 +133,6 @@
    "file": "aerial/highbank-site.webp",
    "across": 430,
    "imagery": "Selwyn 0.2m Rural Aerial Photos (2025)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/highbank-close.webp",
-   "across": 870,
-   "imagery": "Selwyn 0.2m Rural Aerial Photos (2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/highbank-wide.webp",
-   "across": 6920,
-   "imagery": "Selwyn 0.2m Rural Aerial Photos (2025)"
   }
  ],
  "sources": [

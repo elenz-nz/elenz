@@ -139,18 +139,6 @@
    "file": "aerial/mangahao-site.webp",
    "across": 450,
    "imagery": "Manawatū-Whanganui 0.3m Rural Aerial Photos (2021-2022)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/mangahao-close.webp",
-   "across": 910,
-   "imagery": "Manawatū-Whanganui 0.3m Rural Aerial Photos (2021-2022)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/mangahao-wide.webp",
-   "across": 7260,
-   "imagery": "Manawatū-Whanganui 0.3m Rural Aerial Photos (2021-2022)"
   }
  ],
  "sources": [

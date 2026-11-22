@@ -162,20 +162,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/benmore-site.webp",
-   "across": 430,
-   "imagery": "Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021)"
-  },
-  {
-   "k": "close",
    "file": "aerial/benmore-close.webp",
    "across": 850,
-   "imagery": "Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/benmore-wide.webp",
-   "across": 6810,
    "imagery": "Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021)"
   }
  ],

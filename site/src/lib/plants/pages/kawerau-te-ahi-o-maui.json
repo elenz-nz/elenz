@@ -125,18 +125,6 @@
    "file": "aerial/kawerau-te-ahi-o-maui-site.webp",
    "across": 470,
    "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2023)"
-  },
-  {
-   "k": "close",
-   "file": "aerial/kawerau-te-ahi-o-maui-close.webp",
-   "across": 940,
-   "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2023)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/kawerau-te-ahi-o-maui-wide.webp",
-   "across": 7520,
-   "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2023)"
   }
  ],
  "sources": [

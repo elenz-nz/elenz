@@ -128,20 +128,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/patea-site.webp",
-   "across": 460,
-   "imagery": "Taranaki 0.25m Rural Aerial Photos (2021-2022)"
-  },
-  {
-   "k": "close",
    "file": "aerial/patea-close.webp",
    "across": 920,
-   "imagery": "Taranaki 0.25m Rural Aerial Photos (2021-2022)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/patea-wide.webp",
-   "across": 7370,
    "imagery": "Taranaki 0.25m Rural Aerial Photos (2021-2022)"
   }
  ],

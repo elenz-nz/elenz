@@ -173,20 +173,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/manapouri-site.webp",
-   "across": 420,
-   "imagery": "Southland 0.75m Rural Aerial Photos (2005-2011)"
-  },
-  {
-   "k": "close",
    "file": "aerial/manapouri-close.webp",
    "across": 840,
-   "imagery": "Southland 0.75m Rural Aerial Photos (2005-2011)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/manapouri-wide.webp",
-   "across": 6690,
    "imagery": "Southland 0.75m Rural Aerial Photos (2005-2011)"
   }
  ],

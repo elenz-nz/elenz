@@ -108,20 +108,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/pukenui-solar-farm-site.webp",
-   "across": 490,
-   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
-  },
-  {
-   "k": "close",
    "file": "aerial/pukenui-solar-farm-close.webp",
    "across": 980,
-   "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/pukenui-solar-farm-wide.webp",
-   "across": 7840,
    "imagery": "Northland 0.3m Rural Aerial Photos (2023-2025)"
   }
  ],

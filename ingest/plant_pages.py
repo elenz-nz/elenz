@@ -17,7 +17,8 @@ Each plant page (/plants/<slug>) is prerendered from its file here; its live pan
   location               {lat, lon, basis, refs} once the station's point is checked
   images                 [{file, title, author, source_url, licence, licence_url, focus?}]: the plant's rows of
                          plant_images.csv, in file order (the first leads; the page lets readers step through the rest)
-  aerial                 [{k, file, across, imagery}]: the plant's LINZ aerial views (site, close, wide;
+  aerial                 [{k, file, across, imagery}]: the plant's one LINZ aerial view, shown as "Site" (k is always site;
+                         the view is the one in facilities/plant_aerial_choice.csv, else all three: site, close, wide;
                          analysis/plant_aerials.py), once its location is checked and while the views are centred on it
   sources                [{n, title, publisher, url, opened}]: the sources the published facts cite, numbered
   related                {owner: [...], scheme: [...], fuel: [...]}: other plant pages, each {slug, name}
@@ -56,6 +57,7 @@ INDEX = os.path.join(ROOT, 'site', 'src', 'lib', 'plants', 'index.json')
 META = os.path.join(ROOT, 'site', 'src', 'lib', 'tracker', 'plants.json')
 IMAGES_DIR = os.path.join(ROOT, 'site', 'static', 'plants')
 AERIALS = os.path.join(ROOT, 'facilities', 'plant_aerials.csv')
+AERIAL_CHOICE = os.path.join(ROOT, 'facilities', 'plant_aerial_choice.csv')   # slug,view: the one view each page shows
 
 # the facts a page shows, in its order, with their labels (FACT_KEYS in plant_files.py; `about` has its own block)
 LABELS = [('other_names', 'Other names'), ('commissioned', 'Commissioned'), ('closed', 'Closed'), ('units', 'Units'),
@@ -120,7 +122,7 @@ def status_of(rs):
     return 'closed' if rs and all(r['end'] for r in rs) else 'operating'
 
 
-def page(s, p, cap, meta, srcs, images, aerials):
+def page(s, p, cap, meta, srcs, images, aerials, chosen):
     rs = cap.get(p.get('plant'), [])
     m = meta.get(p.get('plant'), {})
     last = rs[-1] if rs else {}
@@ -162,7 +164,8 @@ def page(s, p, cap, meta, srcs, images, aerials):
     dates = [e.get('checked') for _, e, alt in pf.entries(p) if not alt and pf.published(e)]
     imgs = [r for r in images if r['slug'] == s]
     views = [r for r in aerials if r['slug'] == s]
-    aerial = ([{'k': r['view'], 'file': r['file'], 'across': int(r['across_m']), 'imagery': r['imagery']} for r in views]
+    aerial = ([{'k': 'site', 'file': r['file'], 'across': int(r['across_m']), 'imagery': r['imagery']}
+               for r in views if r['view'] == chosen.get(s, r['view'])]
               if location and views and all(aerial_on(r, loc) for r in views) else None)
     return {
         'slug': s, 'name': p['name'], 'plant': p.get('plant', ''),
@@ -305,10 +308,11 @@ def build():
     srcs = pf.sources()
     images = pf.read_csv(pf.IMAGES)
     aerials = pf.read_csv(AERIALS) if os.path.exists(AERIALS) else []
+    chosen = {r['slug']: r['view'] for r in pf.read_csv(AERIAL_CHOICE)} if os.path.exists(AERIAL_CHOICE) else {}
     cap = capacity_rows()
     with open(META, encoding='utf-8') as f:
         meta = json.load(f)
-    pages = {s: page(s, p, cap, meta, srcs, images, aerials) for s, p in plants.items() if p.get('plant')}
+    pages = {s: page(s, p, cap, meta, srcs, images, aerials, chosen) for s, p in plants.items() if p.get('plant')}
     related(pages, meta)
     return pages, index(plants, pages, meta, srcs), aerial_problems(plants, aerials)
 

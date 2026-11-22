@@ -123,20 +123,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/west-wind-site.webp",
-   "across": 450,
-   "imagery": "Wellington 0.2m Rural Aerial Photos (2025-2026)"
-  },
-  {
-   "k": "close",
    "file": "aerial/west-wind-close.webp",
    "across": 900,
-   "imagery": "Wellington 0.2m Rural Aerial Photos (2025-2026)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/west-wind-wide.webp",
-   "across": 7180,
    "imagery": "Wellington 0.2m Rural Aerial Photos (2025-2026)"
   }
  ],

@@ -138,20 +138,8 @@
  "aerial": [
   {
    "k": "site",
-   "file": "aerial/nga-awa-purua-site.webp",
-   "across": 470,
-   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
-  },
-  {
-   "k": "close",
    "file": "aerial/nga-awa-purua-close.webp",
    "across": 930,
-   "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
-  },
-  {
-   "k": "wide",
-   "file": "aerial/nga-awa-purua-wide.webp",
-   "across": 7470,
    "imagery": "Waikato 0.3m Rural Aerial Photos (2021-2024)"
   }
  ],
