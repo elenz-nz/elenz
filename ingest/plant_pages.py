@@ -203,7 +203,8 @@ def aerial_views(s, p, loc, rows, chosen):
     """The plant's aerial views for its Location tab, in order: the plant's own view (the one chosen in
     plant_aerial_choice.csv, else all three) and, for a plant of several stations, one site view of each station with its
     own checked point (a station on the plant's point is the plant's view, named for it). Each carries `name` when there
-    is more than one picture, so the page can say which site it shows; None when a view is out of date."""
+    is more than one picture, so the page can say which site it shows; None when a view is out of date. The main site
+    (the plant's point, or the station its file's main_station names) comes first."""
     main = [r for r in rows if r['view'] in ('site', 'close', 'wide')]
     if not main or not all(aerial_on(r, loc) for r in main):
         return None
@@ -223,9 +224,25 @@ def aerial_views(s, p, loc, rows, chosen):
             continue   # no image yet (or a stale one: --check says so)
         out.append({'k': f's{i}', 'file': r['file'], 'across': int(r['across_m']), 'imagery': r['imagery'], 'name': st.get('view_label', st['value']),
                     'lat': st['location'][0], 'lon': st['location'][1]})
-    if here:   # put the plant's own station where it stands in the list
-        pos = [i for i, st in sts if list(st['location']) == list(loc['value'])][0]
-        out.sort(key=lambda v: pos if v['k'] == 'site' else int(v['k'][1:]))
+    # The main site comes first, so it is the picture a visitor sees on opening: the plant's own point (its station, or
+    # the whole site) unless the plant file's main_station names another station (design decision, 22 Nov 2026). The
+    # rest follow in station order, the plant's own picture standing at its station's place.
+    pos = {i: n for n, (i, st) in enumerate(sts)}
+    at = [i for i, st in sts if list(st['location']) == list(loc['value'])]
+    out[0]['order'] = pos[at[0]] if at else -1
+    for v in out[1:]:
+        v['order'] = pos[int(v['k'][1:])]
+    want = p.get('main_station')
+    if want:
+        hit = [i for i, st in sts if st['value'] == want]
+        if not hit:
+            raise SystemExit(f"{s}: main_station {want!r} is not a station with a checked point")
+        first = 'site' if hit[0] in at else f's{hit[0]}'
+    else:
+        first = 'site'
+    out.sort(key=lambda v: (v['k'] != first, v['order']))
+    for v in out:
+        del v['order']
     return out if len(out) > 1 else [{k: v for k, v in out[0].items() if k not in ('name', 'lat', 'lon')}]
 
 

@@ -146,15 +146,6 @@
  ],
  "aerial": [
   {
-   "k": "s1",
-   "file": "aerial/waikaremoana-s1.webp",
-   "across": 470,
-   "imagery": "Hawke's Bay 0.2m Rural Aerial Photos (2025-2026)",
-   "name": "Kaitawa",
-   "lat": -38.803196,
-   "lon": 177.131046
-  },
-  {
    "k": "site",
    "file": "aerial/waikaremoana-close.webp",
    "across": 930,
@@ -162,6 +153,15 @@
    "name": "Tuai",
    "lat": -38.806639,
    "lon": 177.150889
+  },
+  {
+   "k": "s1",
+   "file": "aerial/waikaremoana-s1.webp",
+   "across": 470,
+   "imagery": "Hawke's Bay 0.2m Rural Aerial Photos (2025-2026)",
+   "name": "Kaitawa",
+   "lat": -38.803196,
+   "lon": 177.131046
   },
   {
    "k": "s3",

@@ -131,6 +131,11 @@ check(av[1]['lat'] == -45.4, 'plant aerials: a station view carries its own poin
 check(plant_pages.aerial_views('x', mk, mk['location'], rows[:2], {'x': 'site'})[1]['name'] == 'B'
       and len(plant_pages.aerial_views('x', mk, mk['location'], rows[:2], {'x': 'site'})) == 2,
       'plant aerials: a station without its image yet is left out')
+mk2 = dict(mk, main_station='C')
+check([v['name'] for v in plant_pages.aerial_views('x', mk, mk['location'], rows, {'x': 'site'})] == ['A', 'B', 'C'],
+      'plant aerials: the plant\'s own point is the main site, first')
+check([v['name'] for v in plant_pages.aerial_views('x', mk2, mk2['location'], rows, {'x': 'site'})] == ['C', 'A', 'B'],
+      'plant aerials: main_station puts another station first, the rest in order')
 one = plant_pages.aerial_views('x', {'location': loc('wd', '2026-11-18'), 'name': 'One', 'stations': [stn('A', -45.5)]}, mk['location'], rows[:1], {})
 check(len(one) == 1 and 'name' not in one[0], 'plant aerials: one picture carries no name')
 check(plant_pages.aerial_views('x', mk, loc('wd', '2026-11-18') | {'value': [-45.55, 167.3]}, rows, {}) is None,

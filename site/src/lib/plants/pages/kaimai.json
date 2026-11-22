@@ -130,6 +130,15 @@
  "images": [],
  "aerial": [
   {
+   "k": "site",
+   "file": "aerial/kaimai-site.webp",
+   "across": 470,
+   "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2025)",
+   "name": "Ruahihi",
+   "lat": -37.777318,
+   "lon": 176.055234
+  },
+  {
    "k": "s1",
    "file": "aerial/kaimai-s1.webp",
    "across": 470,
@@ -146,15 +155,6 @@
    "name": "Lower Mangapapa",
    "lat": -37.820729,
    "lon": 176.041274
-  },
-  {
-   "k": "site",
-   "file": "aerial/kaimai-site.webp",
-   "across": 470,
-   "imagery": "Bay of Plenty 0.1m Urban Aerial Photos (2025)",
-   "name": "Ruahihi",
-   "lat": -37.777318,
-   "lon": 176.055234
   },
   {
    "k": "s4",

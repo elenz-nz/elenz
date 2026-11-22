@@ -36,7 +36,7 @@ FACT_KEYS = {'other_names', 'commissioned', 'closed', 'units', 'scheme', 'field'
 # The other fact-shaped entries: [location] and [grid_connection] (value = [lat, lon]), [[ratings]] (value = MW),
 # [[stations]] (value = the station's name; location = [lat, lon], the station's own point read from the LINZ aerial).
 TOP_KEYS = {'slug', 'plant', 'name', 'register', 'reviewed', 'to_check', 'notes', 'osm', 'wikidata', 'photo_leads',
-            'facts', 'location', 'grid_connection', 'ratings', 'stations'}
+            'facts', 'location', 'grid_connection', 'ratings', 'stations', 'main_station'}
 GRADES = {'A', 'B', 'C'}
 SOURCE_KINDS = {'public', 'research'}   # research: never cited by a published fact (our own register, OpenStreetMap)
 # Licences an image may carry (plan: CC BY, BY-SA, CC0, public domain, or an owner's written permission).
