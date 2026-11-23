@@ -90,14 +90,12 @@
 
 <h3 id="headroom">Spare dispatchable capacity</h3>
 <p>This chart covers hydro, gas, coal/gas, diesel and batteries. For each island and fuel, it takes capacity less output, never below zero, then adds the results up. It leaves out geothermal, bioenergy and waste heat, because they run close to flat out as a rule. It leaves out wind and solar because they follow the weather. An island on its own counts only its own plant, not what the HVDC link could bring.</p>
-<p>The chart gives three levels, which differ only in what counts as capacity:</p>
+<p>The chart gives two levels, which differ only in what counts as capacity:</p>
 <dl>
 	<dt>Installed</dt>
-	<dd>Every unit’s installed MW from the capacity table. Every unit counts as available, so this is the most there could have been.</dd>
+	<dd>Every unit’s installed MW from the capacity table. Every unit counts, including units that were broken, under maintenance, switched off or short of water or fuel. It is the most there could have been, not what was available.</dd>
 	<dt>Offered</dt>
-	<dd>What generators offered for each half-hour in their final energy offers, from January 2013. Plant that is off and slow to start isn’t offered, so Huntly’s Rankine units drop out on most days. So do units out for maintenance or faults, and plant short of fuel.</dd>
-	<dt>Under $1,000</dt>
-	<dd>Only the part offered under $1,000/MWh. Generators offer water they want to keep, and peaking plant, at high prices. This level is what was there at a price the market usually pays. Whirinaki’s diesel units are usually offered above it.</dd>
+	<dd>What generators offered for each half-hour in their final energy offers, from January 2013, at any price. Capacity that wasn’t offered wasn’t available. Plant that is off and slow to start isn’t offered, so Huntly’s Rankine units drop out on most days. So do units out for maintenance or faults, and plant short of fuel.</dd>
 </dl>
 <p>On 16 October 2026 the lowest headroom was about 3,500 MW installed but 1,150 MW offered. Huntly 1, 2, 4 and 5 offered nothing, and Manapōuri offered 620 MW of its 800 MW.</p>
 <p>Where an interval covers more data than it shows, each level is its lowest within that interval. The offers job keeps each day’s lowest offered headroom. Daily history keeps each day’s highest half-hour of dispatchable output, so the installed level’s lowest figure reaches back to 1997.</p>
@@ -107,7 +105,7 @@
 		<table>
 			<thead><tr><th>Term</th><th>Meaning</th><th>Unit</th></tr></thead>
 			<tbody>
-				<tr><td>Capacity</td><td>Installed, offered or offered under $1,000/MWh, depending on the level</td><td>MW</td></tr>
+				<tr><td>Capacity</td><td>Installed or offered, depending on the level</td><td>MW</td></tr>
 				<tr><td>Output</td><td>That fuel’s generation in that island. For batteries, discharge only.</td><td>MW</td></tr>
 			</tbody>
 		</table>
@@ -132,7 +130,7 @@
 
 <h2 id="interpretation">How to interpret it</h2>
 <p>A high capacity factor means a fuel ran close to flat out. A low one can mean a peaking plant doing its job, not a problem. Wind and solar capacity factors depend mainly on the weather.</p>
-<p>Spare dispatchable capacity shows how much room the system had, not how secure it was. The offered level is the better guide, and the under $1,000 level the most cautious. Offers don’t say why MW wasn’t offered. An outage, maintenance, a unit not committed, or fuel or water kept back all look the same.</p>
+<p>Spare dispatchable capacity shows how much room the system had, not how secure it was. The offered level is the better guide, because it counts only what could have run. Offers don’t say why MW wasn’t offered. An outage, maintenance, a unit not committed, or fuel or water kept back all look the same.</p>
 <GoodFor rows={[
 	{ use: 'Capacity factor by fuel over a year', level: 'good', verdict: 'Uses metered or dispatch output against capacity day by day.' },
 	{ use: 'Capacity factor for one plant in recent weeks', level: 'care', verdict: 'Dispatch output is used, which can differ for Glenbrook, Kawerau (Onepu) and stations on block-dispatched chains.' },

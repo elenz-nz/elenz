@@ -43,7 +43,7 @@
 			if (s && s.compare === false) compare = false;
 			if (s && s.hydro === false) withHydro = false;
 			if (s && (s.room === 'levels' || s.room === 'fuel')) roomView = s.room;
-			if (s && ['I', 'O', 'C'].includes(s.basis)) roomBasis = s.basis;
+			if (s && ['I', 'O'].includes(s.basis)) roomBasis = s.basis;
 		} catch { /* storage blocked: defaults */ }
 		const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { near = true; io.disconnect(); } }, { rootMargin: '600px 0px' });
 		if (box) io.observe(box);
@@ -128,17 +128,17 @@
 	const pc = (x: number) => (x === x ? `${x.toFixed(1)}%` : '–');
 
 	// ---------- dispatchable headroom ----------
-	// hydro, thermal and battery capacity not generating, at three levels: installed, offered, and offered under
-	// $1,000/MWh (ingest/offered.py). Levels: the three totals as nested areas; By fuel: one level stacked by fuel.
+	// hydro, thermal and battery capacity not generating, at two levels: installed and offered (ingest/offered.py).
+	// Levels: both totals as nested areas; By fuel: one level stacked by fuel.
 	// Where a chart point spans more data than it shows, the levels are the lowest within each point.
 	const FUEL: Record<string, any> = Object.fromEntries(FUELS.map((f) => [f.k, f]));
 	const ROOM_NAME: Record<string, string> = { hydro: 'Hydro', gas: 'Gas', coal: 'Coal/gas', diesel: 'Diesel', batt: 'Battery' };
-	const LEVEL_NAME: Record<string, string> = { I: 'Installed', O: 'Offered', C: 'Offered under $1,000' };
-	const LEVEL_SHORT: Record<string, string> = { I: 'installed', O: 'offered', C: 'under $1,000' };
-	const LEVEL_TOK: Record<string, string> = { I: '--muted', O: '--accent', C: '--accent' };
+	const LEVEL_NAME: Record<string, string> = { I: 'Installed', O: 'Offered' };
+	const LEVEL_SHORT: Record<string, string> = { I: 'installed', O: 'offered' };
+	const LEVEL_TOK: Record<string, string> = { I: '--muted', O: '--accent' };
 	let withHydro = $state(true);
 	let roomView = $state<'levels' | 'fuel'>('levels');
-	let roomBasis = $state<'I' | 'O' | 'C'>('O');
+	let roomBasis = $state<'I' | 'O'>('O');
 	// thermal and batteries at the bottom of the fuel stack, read from zero; hydro on top
 	const ROOM_ORDER = ['gas', 'coal', 'diesel', 'batt', 'hydro'];
 	const roomFuels = $derived(ROOM_ORDER.filter((k) => withHydro || k !== 'hydro'));
@@ -191,8 +191,8 @@
 		const out: any[] = [];
 		if (roomView === 'levels') {
 			for (const L of levelsShown) {
-				out.push({ kind: 'area', values: levelVals[L], tok: LEVEL_TOK[L], opacity: L === 'I' ? 0.16 : L === 'O' ? 0.2 : 0.42 });
-				out.push({ kind: 'line', values: levelVals[L], tok: LEVEL_TOK[L], width: L === 'C' ? 1.7 : 1.2, dash: L === 'O' ? '5 3' : '' });
+				out.push({ kind: 'area', values: levelVals[L], tok: LEVEL_TOK[L], opacity: L === 'I' ? 0.16 : 0.36 });
+				out.push({ kind: 'line', values: levelVals[L], tok: LEVEL_TOK[L], width: L === 'O' ? 1.7 : 1.2, dash: '' });
 			}
 			return out;
 		}
@@ -228,7 +228,7 @@
 		return { v: a[j], t, ci, avgDay: !useLow };
 	};
 	const tight = $derived<Record<string, any>>(roomRaw ? Object.fromEntries(LEVELS.map((L: string) => [L, tightOf(L)])) : {});
-	const markL = $derived(roomView === 'levels' ? (tight.C ? 'C' : 'I') : roomBasis);
+	const markL = $derived(roomView === 'levels' ? (tight.O ? 'O' : 'I') : roomBasis);
 	const mw = (x: number) => (x === x ? `${Math.round(x).toLocaleString('en-NZ')} MW` : '–');
 	const dayName = (t: number) => { const d = new Date(t + nzOffset(t)); return `${WD[d.getUTCDay()]} ${d.getUTCDate()} ${MON[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
 	const whenOf = (x: any) => (!x ? '' : v?.kind === 'day' ? dayName(x.t) : (() => { const d = new Date(x.t + nzOffset(x.t)), h = d.getUTCHours(); return `${h % 12 || 12}:${String(d.getUTCMinutes()).padStart(2, '0')} ${h < 12 ? 'am' : 'pm'} ${WD[d.getUTCDay()]} ${d.getUTCDate()} ${MON[d.getUTCMonth()]}`; })());
@@ -317,13 +317,12 @@
 		<div class="card-head">
 			<div>
 				<div class="ttl-row"><h2>Spare dispatchable capacity</h2><InfoTip>
-				<p>This shows how much more generation {regionIn} could have called on beyond what was running at the time.</p>
+				<p>This shows how much more {regionIn} could have generated from plant that can be turned up when needed: hydro, gas, coal/gas, diesel and batteries.</p>
 				<ul>
-					<li>Dispatchable plants’ output can be increased if required: hydro, gas, coal/gas, diesel and batteries, unlike wind and solar.</li>
-					<li>“Levels”: three lines showing spare installed capacity, spare capacity offered into the market, and spare capacity offered under $1,000/MWh.</li>
-					<li>“By fuel”: one of those levels split by fuel. “Include hydro” takes hydro in or out.</li>
+					<li>“Installed”: every plant at full size, whether it could run or not. It counts plant that was broken, under maintenance, switched off or short of water, so it is not what was available.</li>
+					<li>“Offered”: only what generators offered to run at that time. Capacity that wasn’t offered wasn’t available.</li>
+					<li>“By fuel” splits one level by fuel. “Include hydro” takes hydro in or out.</li>
 					{#if coarse && !avgOnly}<li>Each point is the lowest spare capacity in that {lowWord}: the tightest moment, not the average.</li>{/if}
-					<li>The figure above the chart is the tightest moment in the whole range, marked on the chart.</li>
 					{#if v && v.region !== 'NZ'}<li>Only {regionIn}'s plant is counted, not the HVDC link.</li>{/if}
 					{#if avgOnly}<li>Some of these dates show daily averages rather than each day's lowest.</li>{/if}
 				</ul>
@@ -337,14 +336,14 @@
 				</div>
 				<!-- always in the layout (hidden in the Levels view), so switching views doesn't move the other controls -->
 				<div class="seg" class:held={roomView !== 'fuel'} role="group" aria-label="Level to show by fuel" aria-hidden={roomView !== 'fuel'} inert={roomView !== 'fuel'}>
-					{#each levelsShown as L}<button type="button" aria-pressed={roomBasis === L} onclick={() => { roomBasis = L as any; save(); }}>{L === 'C' ? 'Under $1,000' : LEVEL_NAME[L]}</button>{/each}
+					{#each levelsShown as L}<button type="button" aria-pressed={roomBasis === L} onclick={() => { roomBasis = L as any; save(); }}>{LEVEL_NAME[L]}</button>{/each}
 				</div>
 				<button type="button" class="tog box" aria-pressed={withHydro} onclick={() => { withHydro = !withHydro; save(); }}><i aria-hidden="true"></i>Include hydro</button>
 				<PopButton open={popped === 'room'} name="headroom chart" onclick={() => pop('room')} />
 			</div>
 		</div>
 		{#if offLate}
-			<p class="off-note" role="note"><b>Offers start in January 2013.</b> The EA’s records of what generators offered begin on 1 January 2013, so {roomView === 'levels' ? 'the Offered and Under $1,000 lines cover' : 'this level covers'} only dates from then on. Installed capacity is tracked back to August 1997.</p>
+			<p class="off-note" role="note"><b>Offers start in January 2013.</b> The EA’s records of what generators offered begin on 1 January 2013, so {roomView === 'levels' ? 'the Offered line covers' : 'this level covers'} only dates from then on. Installed capacity is tracked back to August 1997.</p>
 		{/if}
 		<p class="readout" aria-live="polite">
 			{#if roomHover >= 0 && roomAt && curI && roomHover < curI.n}
@@ -467,8 +466,7 @@
 	.legend i.ln { height: 0; border-top: 1.5px solid var(--ink); border-radius: 0; width: 16px; }
 	.legend i.lv { width: 16px; border-radius: 1px; opacity: 1; }
 	.legend i.lv-I { background: color-mix(in srgb, var(--muted) 16%, transparent); border-top: 1.5px solid var(--muted); }
-	.legend i.lv-O { background: color-mix(in srgb, var(--accent) 20%, transparent); border-top: 1.5px dashed var(--accent); }
-	.legend i.lv-C { background: color-mix(in srgb, var(--accent) 42%, transparent); border-top: 2px solid var(--accent); }
+	.legend i.lv-O { background: color-mix(in srgb, var(--accent) 36%, transparent); border-top: 2px solid var(--accent); }
 	.legend i.gap { background: var(--warn-bg); }
 	.off-note { margin: 0; padding: 7px 10px; border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 4px 4px 0; font-size: 0.8rem; color: var(--ink-2); }
 	.off-note b { color: var(--ink); }
