@@ -117,7 +117,7 @@ export const TOPICS: Topic[] = [
 		title: 'Installed capacity',
 		summary: 'How much each plant can generate at full output, and how that has changed since 1997.',
 		shownOn: [['Tracker', '/tracker']],
-		reviewed: '2026-11-06',
+		reviewed: '2026-11-23',
 		code: ['facilities/plant_capacity.csv', 'ingest/capacity.py', 'ingest/offered.py', 'analysis/capacity_check.py', 'analysis/README.md'],
 	},
 	{

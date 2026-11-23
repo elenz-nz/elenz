@@ -211,11 +211,12 @@ export function mixRows(S, region, from, to, prev, fine) {
 // ---------- dispatchable headroom ----------
 // Plant that can be called on at short notice: hydro, thermal (gas, the Rankines, diesel) and batteries. Geothermal,
 // bioenergy and waste heat run flat out as a rule, and wind and solar follow the weather, so they're left out.
-// Three levels, each less output: installed capacity (capacity.json), what was offered (the final energy offers),
-// and what was offered under $1,000/MWh (ingest/offered.py: hist/off/YYYY-MM.json by half-hour, hist/off/days.json
-// by day). For each island and fuel the level less output, never below zero, then added up.
+// Two levels, each less output: installed capacity (capacity.json) and what was offered (the final energy offers,
+// ingest/offered.py: hist/off/YYYY-MM.json by half-hour, hist/off/days.json by day). For each island and fuel the
+// level less output, never below zero, then added up. The offers files also hold the MW offered under $1,000/MWh
+// ('c', lowC); the chart stopped showing it on 23 Nov 2026 (design decision: installed and offered only).
 export const DISPATCH = DISPATCHABLE;
-export const LEVELS = ['I', 'O', 'C'];
+export const LEVELS = ['I', 'O'];
 const HH = 18e5;
 
 /** Installed MW of a fuel in one island at each time in t (sorted), from the capacity steps. */
