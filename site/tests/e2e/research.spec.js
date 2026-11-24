@@ -108,7 +108,7 @@ test.describe('plant research page', () => {
     });
     await page.goto('/plants/research?key=k123');
     await expect(page.getByRole('list', { name: 'Research rounds' })).toContainText('Stations without a page');
-    const leads = page.locator('section.leads-now');
+    const leads = page.locator('details.leads-now');
     // "To research" is chosen first; a choice made while the page hydrates can be lost, so choose until it takes
     await expect(leads.getByRole('button', { name: /^To research/ })).toHaveAttribute('aria-pressed', 'true');
     await expect(async () => {
@@ -132,6 +132,28 @@ test.describe('plant research page', () => {
     await leads.getByRole('button', { name: 'Argyle' }).click();
     await expect(leads.locator('.detail').getByRole('link', { name: 'On the Branch River page' })).toHaveAttribute('href', '/plants/branch-river-arnold');
     expect(errors).toEqual([]);
+  });
+
+  test('the three lists fold, and the photo leads filter by status', async ({ page }) => {
+    await page.route(/cloudflareinsights\.com|umami\.is/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
+    await page.goto('/plants/research?key=k123');
+    const plants = page.locator('details.tbl'), stations = page.locator('details.leads-now'), photos = page.locator('details.leads');
+    await expect(plants).toHaveAttribute('open', '');
+    await expect(stations).toHaveAttribute('open', '');
+    await expect(photos).not.toHaveAttribute('open', '');
+    // a fold answers once the page has hydrated; a click before it still toggles the native details
+    await plants.locator('summary').click();
+    await expect(plants.locator('table')).toBeHidden();
+    await plants.locator('summary').click();
+    await expect(plants.locator('table')).toBeVisible();
+    await photos.locator('summary').click();
+    const rows = photos.locator('tbody tr');
+    await expect(async () => {
+      await photos.getByRole('button', { name: /^Needs a photo/ }).click();
+      await expect(photos.getByRole('button', { name: /^Needs a photo/ })).toHaveAttribute('aria-pressed', 'true', { timeout: 2_000 });
+    }).toPass({ timeout: 20_000 });
+    await expect(rows.first()).toContainText('Needs a photo');
+    for (const r of await rows.all()) await expect(r).toContainText('Needs a photo');
   });
 
   test('team notes say why they can\'t be read without the key', async ({ page }) => {

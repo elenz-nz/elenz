@@ -268,9 +268,9 @@
 			</div>
 		</div>
 
-		<section class="panel tbl" aria-labelledby="tbl-h">
+		<details class="panel tbl" open>
+			<summary><h2 id="tbl-h">{rows.length} of {plants.length} plants</h2></summary>
 			<div class="p-head">
-				<h2 id="tbl-h">{rows.length} of {plants.length} plants</h2>
 				<span class="quiet">Tap a plant for its facts and sources.</span>
 			</div>
 			<div class="scroll">
@@ -363,11 +363,11 @@
 					</tbody>
 				</table>
 			</div>
-		</section>
+		</details>
 
-		<section class="panel leads-now" aria-labelledby="leads-h">
+		<details class="panel leads-now" open>
+			<summary><h2 id="leads-h">Station leads: stations without a page</h2></summary>
 			<div class="p-head flush">
-				<h2 id="leads-h">Station leads: stations without a page</h2>
 				<span class="quiet">From <a href="{REPO}/station_leads.csv">station_leads.csv</a>. Tap a station for its details and team notes. A station that passes gets a plant file (<a href="{REPO}/PLANTS.md">PLANTS.md</a>, Stations without a page); one already on a page is marked there with <code>on_page</code>.</span>
 			</div>
 			<div class="row">
@@ -421,7 +421,7 @@
 					</tbody>
 				</table>
 			</div>
-		</section>
+		</details>
 
 		<details class="panel leads">
 			<summary><h2>Photo leads ({photoRows.length === photoLeads.length ? photoLeads.length : `${photoRows.length} of ${photoLeads.length}`})</h2></summary>
@@ -560,7 +560,8 @@
 	.wrapseg { flex-wrap: wrap; }
 	.wrapseg .num { color: var(--muted); font-weight: 400; margin-left: 2px; }
 	.lead-text { margin: 0; font-size: 0.86rem; line-height: 1.5; white-space: pre-line; }
-	.leads summary { cursor: pointer; list-style-position: inside; }
+	.leads summary, .tbl > summary, .leads-now > summary { cursor: pointer; list-style-position: inside; }
+	.tbl > summary, .leads-now > summary { padding: 0 16px; margin-bottom: 10px; }
 	.leads table { min-width: 760px; }
 	.leads > .row { padding: 0; }
 
