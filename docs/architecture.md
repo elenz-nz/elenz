@@ -392,6 +392,15 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   section). A few Umami events count how the dashboards are used (`#lib/site/track.js`, which lists them; keep them few,
   since each counts against the plan; Support Elenz and Report a problem clicks are two of them). The browser tests block
   both scripts.
+  One view per page (design decision, 24 Nov 2026): Umami's script counts a page view whenever the address changes
+  (it wraps `history.pushState` and `replaceState`), and Tracker, Now, the dashboards, Records and Plants keep the
+  reader's view in the address, so every click counted as a view (test report, 24 Nov: one visitor's 7 minutes on
+  Tracker made 128 views of `/tracker`). `data-before-send="elenzBeforeSend"` hands each view to an inline script in
+  `src/app.html` (`#umami-views`), which drops a view whose path matches the last one sent. A new path, or coming back
+  to one, still counts, and the first view keeps its full address, so UTM tags still reach Umami's UTM report.
+  `data-exclude-search` was not used: it would strip the tags too. Events pass untouched. `tests/umami-views.test.js`.
+  The dashboard's `layout-change` is throttled to one a minute (`throttled()` in `track.js`), so a run of changes shows
+  in Umami as events exactly 60 seconds apart; that is the throttle, not a timer.
   Opting out (design decision, 16 Nov 2026): an inline script at the top of `src/app.html` turns any address with
   `?exclude-me` into `umami.disabled` in the browser's storage, before Umami's script loads; `?include-me` removes it.
   It takes the word out of the address and shows a short note (`#optout-note`). Umami's script and the heartbeat
