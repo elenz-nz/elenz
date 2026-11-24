@@ -176,6 +176,46 @@ export function pickLeads(/** @type {any[]} */ leads, /** @type {{ group: string
     .sort((a, b) => norm(a.name).localeCompare(norm(b.name)) || a.id.localeCompare(b.id));
 }
 
+/** The photo leads' statuses: [key, label, what it means]. Worked out from plant_images.csv, never kept by hand. */
+export const PHOTO_STATUS = /** @type {[string, string, string][]} */ ([
+  ['needs', 'Needs a photo', 'A plant this lead covers has no photo yet: the ones to check first'],
+  ['used', 'In use', 'This lead’s file is already one of the plant’s photos'],
+  ['has', 'Plant has a photo', 'Every plant it covers already has a photo: a spare or an alternative view'],
+  ['none', 'No plant named', 'Names no plant (a whole collection, or the plants cell is empty): a place to search, not one photo'],
+  ['', 'All leads', ''],
+]);
+
+/** The plant slugs a photo lead names (its slugs field is separated by spaces, commas or semicolons). */
+export const leadSlugs = (/** @type {any} */ r) => String(r.slugs ?? '').split(/[\s,;|]+/).filter(Boolean);
+
+/** Each photo lead's status: 'used' when its address is the source of a photo on a plant page, 'has' when every plant
+ * it names already has a photo, 'none' when it names no plant on a page, otherwise 'needs'. {id: key}. */
+export function photoStatuses(/** @type {any[]} */ leads, /** @type {any[]} */ plants) {
+  const bare = (/** @type {string} */ u) => String(u ?? '').trim().split('#')[0];
+  const used = new Set(plants.flatMap((p) => (p.images ?? []).map((/** @type {any} */ i) => bare(i.source_url))));
+  const photo = new Map(plants.map((p) => [p.slug, (p.images ?? []).length > 0]));
+  return Object.fromEntries(leads.map((r) => {
+    const known = leadSlugs(r).filter((x) => photo.has(x));
+    const key = used.has(bare(r.url)) ? 'used' : !known.length ? 'none' : known.every((x) => photo.get(x)) ? 'has' : 'needs';
+    return [r.id, key];
+  }));
+}
+
+/** How many photo leads each status holds: {key: n}, '' for all. */
+export function photoCounts(/** @type {any[]} */ leads, /** @type {Record<string, string>} */ status) {
+  return Object.fromEntries(PHOTO_STATUS.map(([k]) => [k, leads.filter((r) => !k || status[r.id] === k).length]));
+}
+
+/** The collections the photo leads come from, A to Z. */
+export const photoCollections = (/** @type {any[]} */ leads) => [...new Set(leads.map((r) => r.collection ?? '').filter(Boolean))].sort();
+
+/** The photo leads to list: by status, collection and a plant, subject or ID match; in file order. */
+export function pickPhotoLeads(/** @type {any[]} */ leads, /** @type {Record<string, string>} */ status, /** @type {{ status: string, collection: string, text: string }} */ f) {
+  const text = norm(f.text.trim());
+  return leads.filter((r) => (!f.status || status[r.id] === f.status) && (!f.collection || r.collection === f.collection)
+    && (!text || [r.id, r.slugs, r.subject, r.description].some((x) => x && norm(x).includes(text))));
+}
+
 /** A source's name for a table: its title, or its ID if it has none. */
 export const sourceName = (/** @type {Record<string, any>} */ sources, /** @type {string} */ id) => sources[id]?.title || id;
 

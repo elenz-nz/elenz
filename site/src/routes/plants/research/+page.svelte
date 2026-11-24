@@ -16,7 +16,7 @@
 	import { islandName, fuelOf } from '#lib/plants/registry.js';
 	import { fmtMw } from '#lib/plants/history.js';
 	import { slug } from '#lib/site/viewurl.js';
-	import { DEFAULTS, NEEDS, LOC, STATUS, ROUNDS, LEAD_GROUPS, fuelsOf, fuelName, ownersOf, readSettings, writeSettings, filtered, needCounts, pick, progress, workbook, leadKey, leadCounts, leadTechs, pickLeads, type Settings } from '#lib/plants/research.js';
+	import { DEFAULTS, NEEDS, LOC, STATUS, ROUNDS, LEAD_GROUPS, fuelsOf, fuelName, ownersOf, readSettings, writeSettings, filtered, needCounts, pick, progress, workbook, leadKey, leadCounts, leadTechs, pickLeads, PHOTO_STATUS, photoStatuses, photoCounts, photoCollections, pickPhotoLeads, leadSlugs, type Settings } from '#lib/plants/research.js';
 	import { xlsx, XLSX_TYPE } from '#lib/plants/xlsx.js';
 	import { keyOf, loadNotes, saveNote, dateStamp, savedAt, PROBLEMS, MAX_NOTE, type Note, type NotesProblem } from '#lib/plants/notes.js';
 	import { newTabs } from '#lib/site/newtabs.js';
@@ -42,6 +42,18 @@
 	const owners = $derived(ownersOf(plants));
 	const narrowed = $derived(!!(s.fuel || s.island || s.owner || s.status || s.need || s.text.trim()));
 	const leadsOf = $derived(Object.fromEntries((d.photo_leads as any[]).map((r) => [r.id, r])));
+
+	// ---------- photo leads: what each one is for ----------
+	// The status is worked out from the plants' photos (plant_images.csv), so it follows as photos are added; filters
+	// live on the page only.
+	const photoLeads = $derived(d.photo_leads as any[]);
+	let pf = $state({ status: '', collection: '', text: '' });
+	const photoStatus = $derived(photoStatuses(photoLeads, plants));
+	const photoNums = $derived(photoCounts(photoLeads, photoStatus));
+	const photoRows = $derived(pickPhotoLeads(photoLeads, photoStatus, pf));
+	const photoColls = $derived(photoCollections(photoLeads));
+	const statusName: Record<string, string> = Object.fromEntries(PHOTO_STATUS.map(([k, name]) => [k, name]));
+	const statusWhat = $derived(PHOTO_STATUS.find(([k]) => k === pf.status)?.[2] ?? '');
 	const pct = (a: number, b: number) => (b ? (100 * a) / b : 0);
 	const mw = (v: number | null) => (v == null ? '–' : fmtMw(v));
 	const osmUrl = (x: string) => `https://www.openstreetmap.org/${x}`;
@@ -256,9 +268,9 @@
 			</div>
 		</div>
 
-		<section class="panel tbl" aria-labelledby="tbl-h">
+		<details class="panel tbl" open>
+			<summary><h2 id="tbl-h">{rows.length} of {plants.length} plants</h2></summary>
 			<div class="p-head">
-				<h2 id="tbl-h">{rows.length} of {plants.length} plants</h2>
 				<span class="quiet">Tap a plant for its facts and sources.</span>
 			</div>
 			<div class="scroll">
@@ -351,11 +363,11 @@
 					</tbody>
 				</table>
 			</div>
-		</section>
+		</details>
 
-		<section class="panel leads-now" aria-labelledby="leads-h">
+		<details class="panel leads-now" open>
+			<summary><h2 id="leads-h">Station leads: stations without a page</h2></summary>
 			<div class="p-head flush">
-				<h2 id="leads-h">Station leads: stations without a page</h2>
 				<span class="quiet">From <a href="{REPO}/station_leads.csv">station_leads.csv</a>. Tap a station for its details and team notes. A station that passes gets a plant file (<a href="{REPO}/PLANTS.md">PLANTS.md</a>, Stations without a page); one already on a page is marked there with <code>on_page</code>.</span>
 			</div>
 			<div class="row">
@@ -409,17 +421,35 @@
 					</tbody>
 				</table>
 			</div>
-		</section>
+		</details>
 
 		<details class="panel leads">
-			<summary><h2>Photo leads ({d.photo_leads.length})</h2></summary>
-			<p class="quiet">Photos worth checking, not yet cleared for use (<code>facilities/plant_photo_leads.csv</code>). Read the licence on the file’s own page before adding a row to <code>plant_images.csv</code>.</p>
+			<summary><h2>Photo leads ({photoRows.length === photoLeads.length ? photoLeads.length : `${photoRows.length} of ${photoLeads.length}`})</h2></summary>
+			<p class="quiet">Photos worth checking, not yet cleared for use (<code>facilities/plant_photo_leads.csv</code>). Read the licence on the file’s own page before adding a row to <code>plant_images.csv</code>. The status is worked out from the photos the plants already have.</p>
+			<div class="row">
+				<div class="seg wrapseg" role="group" aria-label="Photo lead status">
+					{#each PHOTO_STATUS as [k, name] (k)}
+						<button type="button" aria-pressed={pf.status === k} onclick={() => (pf.status = k)}>{name} <span class="num">{photoNums[k]}</span></button>
+					{/each}
+				</div>
+			</div>
+			<div class="row">
+				<label class="lab">Collection
+					<select bind:value={pf.collection}><option value="">All</option>{#each photoColls as x (x)}<option value={x}>{x}</option>{/each}</select>
+				</label>
+				<label class="lab find">Search photo leads
+					<input type="search" placeholder="Plant, subject, ID" bind:value={pf.text} maxlength="40" autocomplete="off" />
+				</label>
+				{#if statusWhat}<span class="quiet">{statusWhat}.</span>{/if}
+			</div>
 			<div class="scroll">
 				<table>
-					<thead><tr><th>ID</th><th>Plants</th><th>Subject</th><th>Collection</th><th>Rights</th><th>What it shows</th></tr></thead>
+					<thead><tr><th>ID</th><th>Plants</th><th>Subject</th><th>Collection</th><th>Rights</th><th>What it shows</th><th>Status</th></tr></thead>
 					<tbody>
-						{#each d.photo_leads as r (r.id)}
-							<tr><td class="num">{r.id}</td><td>{r.slugs}</td><td><a href={r.url}>{r.subject}</a></td><td>{r.collection}</td><td>{r.rights_lead}</td><td>{r.description}</td></tr>
+						{#each photoRows as r (r.id)}
+							<tr><td class="num">{r.id}</td><td>{#each leadSlugs(r) as x, i (x)}{#if i}, {/if}{plantName[x] ?? x}{/each}</td><td><a href={r.url}>{r.subject}</a></td><td>{r.collection}</td><td>{r.rights_lead}</td><td>{r.description}</td><td>{statusName[photoStatus[r.id]]}</td></tr>
+						{:else}
+							<tr><td colspan="7" class="none">No photo lead matches.</td></tr>
 						{/each}
 					</tbody>
 				</table>
@@ -530,8 +560,10 @@
 	.wrapseg { flex-wrap: wrap; }
 	.wrapseg .num { color: var(--muted); font-weight: 400; margin-left: 2px; }
 	.lead-text { margin: 0; font-size: 0.86rem; line-height: 1.5; white-space: pre-line; }
-	.leads summary { cursor: pointer; list-style-position: inside; }
+	.leads summary, .tbl > summary, .leads-now > summary { cursor: pointer; list-style-position: inside; }
+	.tbl > summary, .leads-now > summary { padding: 0 16px; margin-bottom: 10px; }
 	.leads table { min-width: 760px; }
+	.leads > .row { padding: 0; }
 
 	/* phones: plant, MW, checked and to check; tap a plant for the rest */
 	@media (max-width: 700px) {
