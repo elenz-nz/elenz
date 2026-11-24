@@ -11,7 +11,8 @@
 		['Live and recent market data', 'live-recent', ['rtd', 'dispatch']],
 		['Prices and offers', 'prices-offers', ['final', 'offers']],
 		['Metered data', 'metered-data', ['genmd', 'embedded', 'gridexport', 'gridimport', 'tiwai', 'hvdcflows', 'reconciliation']],
-		['Plants and network', 'plants-network', ['register', 'nsp', 'shapes', 'guehmt', 'capacity']],
+		['Plants and network', 'plants-network', ['register', 'nsp', 'shapes', 'linz-dem', 'linz-basemaps', 'guehmt', 'capacity']],
+		['Plant pages', 'plant-pages', ['plant-files', 'commons', 'statsnz-boundaries']],
 		['Weather', 'weather', ['satellite', 'era5', 'forecast']],
 		['Emissions and national statistics', 'emissions-statistics', ['genesis', 'mbie', 'mfe', 'nzga', 'inventory']],
 	];

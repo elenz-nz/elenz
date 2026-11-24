@@ -31,6 +31,11 @@ name in Elenz's data), fuel, island, status, mw, owner (plants.json's, "Other ge
 closed (the year its last capacity row ended), reviewed, pt, its point on the map: {lat, lon, basis, checked}, thumb,
 the picture the index's side panel shows (its first photo, else its aerial site view, else null: {kind, file, credit}),
 and overview, one sentence built from its checked facts (overview() below).
+
+The Plant pages method page (/methods/plants) lists every image credit from site/src/lib/plants/credits.json (credits()
+below): summary {pages, reviewed, with_photo, photos}, photos [{slug, name, title, author, source_url, licence,
+licence_url}] (every row of plant_images.csv whose plant has a page, by plant name then file order) and imagery
+[{collection, pages}] (each LINZ aerial imagery collection the pages' aerial views come from, with how many pages use it).
 `checked` is true for the station's checked location; otherwise pt is a draft, the plant file's unchecked location
 or, without one, its grid connection (the EA's network supply point), for the map while the pages are hidden (design
 decision, 18 Nov 2026). The index page drops every draft point once PLANTS_PUBLIC is true, and a draft never cites a
@@ -58,6 +63,7 @@ from common import ROOT
 OUT = os.path.join(ROOT, 'site', 'src', 'lib', 'plants', 'pages')
 INDEX = os.path.join(ROOT, 'site', 'src', 'lib', 'plants', 'index.json')
 SLUGS = os.path.join(ROOT, 'site', 'src', 'lib', 'plants', 'slugs.json')   # every page's slug, small enough for Now and the Tracker to link plant names
+CREDITS = os.path.join(ROOT, 'site', 'src', 'lib', 'plants', 'credits.json')   # every image credit, for /methods/plants
 META = os.path.join(ROOT, 'site', 'src', 'lib', 'tracker', 'plants.json')
 IMAGES_DIR = os.path.join(ROOT, 'site', 'static', 'plants')
 AERIALS = os.path.join(ROOT, 'facilities', 'plant_aerials.csv')
@@ -359,6 +365,21 @@ def index(plants, pages, meta, srcs):
     return {'plants': rows}
 
 
+def credits(plants, pages):
+    """Every image the plant pages show, for the image credits on /methods/plants (site/src/lib/plants/credits.json)."""
+    order = sorted(pages, key=lambda s: pf.slug(pages[s]['name']))
+    photos = [{'slug': s, 'name': pages[s]['name'], **{k: im[k] for k in ('title', 'author', 'source_url', 'licence', 'licence_url')}}
+              for s in order for im in pages[s]['images']]
+    uses = {}
+    for s in order:
+        for c in {v['imagery'] for v in pages[s]['aerial'] or []}:
+            uses[c] = uses.get(c, 0) + 1
+    return {'summary': {'pages': len(pages), 'reviewed': sum(1 for s in pages if plants[s].get('reviewed')),
+                        'with_photo': sum(1 for p in pages.values() if p['images']), 'photos': len(photos)},
+            'photos': photos,
+            'imagery': [{'collection': c, 'pages': n} for c, n in sorted(uses.items(), key=lambda x: pf.slug(x[0]))]}
+
+
 def build():
     plants = pf.load()
     srcs = pf.sources()
@@ -370,7 +391,7 @@ def build():
         meta = json.load(f)
     pages = {s: page(s, p, cap, meta, srcs, images, aerials, chosen) for s, p in plants.items() if p.get('plant')}
     related(pages, meta)
-    return pages, index(plants, pages, meta, srcs), aerial_problems(plants, aerials)
+    return pages, index(plants, pages, meta, srcs), credits(plants, pages), aerial_problems(plants, aerials)
 
 
 def aerial_problems(plants, aerials):
@@ -399,7 +420,7 @@ def dump(p):
 
 
 def main(check=False):
-    pages, idx, problems = build()
+    pages, idx, cred, problems = build()
     have = {f[:-5] for f in os.listdir(OUT) if f.endswith('.json')} if os.path.isdir(OUT) else set()
     for s, p in pages.items():
         for im in p['images']:
@@ -417,24 +438,18 @@ def main(check=False):
             os.makedirs(OUT, exist_ok=True)
             with open(path, 'w', encoding='utf-8') as f:
                 f.write(dump(p))
-    if check:
-        try:
-            with open(INDEX, encoding='utf-8') as f:
-                if f.read() != dump(idx):
-                    problems.append('site/src/lib/plants/index.json is out of date')
-        except FileNotFoundError:
-            problems.append('site/src/lib/plants/index.json is missing')
-        try:
-            with open(SLUGS, encoding='utf-8') as f:
-                if f.read() != dump(sorted(pages)):
-                    problems.append('site/src/lib/plants/slugs.json is out of date')
-        except FileNotFoundError:
-            problems.append('site/src/lib/plants/slugs.json is missing')
-    else:
-        with open(INDEX, 'w', encoding='utf-8') as f:
-            f.write(dump(idx))
-        with open(SLUGS, 'w', encoding='utf-8') as f:
-            f.write(dump(sorted(pages)))
+    for path, data in ((INDEX, idx), (SLUGS, sorted(pages)), (CREDITS, cred)):
+        name = os.path.relpath(path, ROOT)
+        if check:
+            try:
+                with open(path, encoding='utf-8') as f:
+                    if f.read() != dump(data):
+                        problems.append(f'{name} is out of date')
+            except FileNotFoundError:
+                problems.append(f'{name} is missing')
+        else:
+            with open(path, 'w', encoding='utf-8') as f:
+                f.write(dump(data))
     for s in sorted(have - set(pages)):
         if check:
             problems.append(f'site/src/lib/plants/pages/{s}.json has no plant file')

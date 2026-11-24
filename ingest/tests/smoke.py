@@ -140,6 +140,14 @@ one = plant_pages.aerial_views('x', {'location': loc('wd', '2026-11-18'), 'name'
 check(len(one) == 1 and 'name' not in one[0], 'plant aerials: one picture carries no name')
 check(plant_pages.aerial_views('x', mk, loc('wd', '2026-11-18') | {'value': [-45.55, 167.3]}, rows, {}) is None,
       'plant aerials: a moved plant point leaves no views')
+# image credits for /methods/plants (plant_pages.credits): photos by plant name, each imagery collection counted once a page
+im = lambda t: {'title': t, 'author': 'A', 'source_url': 'u', 'licence': 'CC0 1.0', 'licence_url': ''}  # noqa: E731
+cr = plant_pages.credits({'b': {'reviewed': '2026-11-24'}, 'a': {}},
+                         {'b': {'name': 'Beta', 'images': [], 'aerial': [{'imagery': 'I'}, {'imagery': 'I'}]},
+                          'a': {'name': 'Ōtāhuhu', 'images': [im('one'), im('two')], 'aerial': [{'imagery': 'J'}]}})
+check([p['title'] for p in cr['photos']] == ['one', 'two'] and cr['photos'][0]['name'] == 'Ōtāhuhu', 'plant credits: photos by plant name, in file order')
+check(cr['imagery'] == [{'collection': 'I', 'pages': 1}, {'collection': 'J', 'pages': 1}], 'plant credits: a collection counts once a page')
+check(cr['summary'] == {'pages': 2, 'reviewed': 1, 'with_photo': 1, 'photos': 2}, 'plant credits: the summary counts')
 json.dumps(pf, allow_nan=False)
 for k in ('p10', 'p90', 'pmin', 'pmax', 'n500', 'n1000', 'rv_hydro', 'rv_geo', 'batt_d', 'batt_c', 'rv_battc'):
     check(k in dd['NI'] and len(dd['NI'][k]) == len(dd['t']), f'daily: {k}')

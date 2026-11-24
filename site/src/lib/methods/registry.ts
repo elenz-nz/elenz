@@ -129,6 +129,14 @@ export const TOPICS: Topic[] = [
 		code: ['ingest/history.py', 'ingest/metered.py', 'facilities/metered_plants.csv', 'site/src/lib/tracker/series.js', 'analysis/metered_check.py', 'analysis/README.md'],
 	},
 	{
+		slug: 'plants',
+		title: 'Plant pages',
+		summary: 'What each plant’s page shows: its facts and where each comes from, its photos and aerial views, and Elenz’s own figures for the plant.',
+		shownOn: [['Plants', '/plants']],
+		reviewed: '2026-11-24',
+		code: ['facilities/PLANTS.md', 'ingest/plant_files.py', 'ingest/plant_pages.py', 'ingest/plant_history.py', 'site/src/lib/plants/history.js', 'facilities/plant_sources.csv', 'facilities/plant_images.csv', 'facilities/plant_aerials.csv'],
+	},
+	{
 		slug: 'records',
 		title: 'Records',
 		summary: 'The highest and lowest half-hours, days, weeks, months, years and runs since August 1997.',
@@ -287,6 +295,27 @@ export const SOURCES: Source[] = [
 		what: 'Every plant the tracker shows, with its installed MW and the dates each figure applies. It starts from the EA’s plant register and corrects missed upgrades, closures and staged commissioning. Each row names its source.',
 		use: 'Supplies the capacity factors in the Generation tab’s mix table, and its spare dispatchable capacity chart.',
 		period: 'August 1997 onward.', fresh: 'Updated by hand as plants change.', licence: 'Compiled by Elenz from the sources each row names.',
+	},
+	{
+		id: 'plant-files', name: 'Plant files', publisher: 'Elenz', dataset: 'facilities/plants/', role: 'Main data',
+		url: 'https://github.com/elenz-nz/elenz/tree/main/facilities/plants',
+		what: 'One file for each plant page, holding the plant’s facts. Each fact names its source, its grade and the date we checked it, with what other sources say beside it.',
+		use: 'Supplies the Facts list, the About text, the location and the numbered sources on each plant page.',
+		period: 'Every plant the tracker shows.', fresh: 'Updated by hand as facts are checked.', licence: 'Compiled by Elenz from the sources each fact names.',
+	},
+	{
+		id: 'statsnz-boundaries', name: 'Region and district boundaries', publisher: 'Stats NZ', dataset: 'Regional Council 2025; Territorial Authority 2026', role: 'Mapping',
+		url: 'https://services2.arcgis.com/vKb0s8tBIA3bdocZ/ArcGIS/rest/services/Territorial_Authority_2026/FeatureServer',
+		what: 'The boundaries of New Zealand’s regions and of its territorial authorities, the districts and cities.',
+		use: 'Gives each plant page’s region and district, by testing the station’s checked point against the boundaries.',
+		period: 'Regions as at 2025, districts as at 2026.', fresh: 'Stats NZ publishes new boundaries each year.', licence: CCBY,
+	},
+	{
+		id: 'commons', name: 'Wikimedia Commons', publisher: 'Wikimedia Foundation', role: 'Reference',
+		url: 'https://commons.wikimedia.org/',
+		what: 'Freely licensed photos and other media. Each file has its own licence, set by its author.',
+		use: 'Supplies most of the photos on the plant pages, each used under the licence on the file’s own page.',
+		period: 'Current.', fresh: 'Files are added continuously.', licence: 'Each file’s own. Elenz uses only files under CC BY, CC BY-SA or CC0, or in the public domain.',
 	},
 	// ---------- weather ----------
 	{

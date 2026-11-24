@@ -27,7 +27,6 @@
 	const tok = $derived(fuel.tok);
 	const operating = $derived(p.status === 'operating');
 	const isBatt = $derived(p.fuel === 'batt');
-	const PLANTS_MD = 'https://github.com/elenz-nz/elenz/blob/main/facilities/PLANTS.md';
 	const LIVE_MINUTES = 15;
 
 	// ---------- live panel ----------
@@ -126,7 +125,7 @@
 		</div>
 
 		{#if p.checking}
-			<p class="checking" role="note">We’re still checking this page’s facts against their sources. The live and history figures are Elenz’s own. <a href={PLANTS_MD}>How we check plants</a></p>
+			<p class="checking" role="note">We’re still checking this page’s facts against their sources. The live and history figures are Elenz’s own. <a href="/methods/plants#checking">How we check plant pages</a></p>
 		{/if}
 
 		{#snippet coords(at?: { lat: number; lon: number; name?: string })}{@const pt = at?.name ? at : p.location}<span class="num">{Math.abs(pt.lat).toFixed(3)}° S, {pt.lon.toFixed(3)}° E</span>{#if at?.name}{:else}{p.location.basis !== 'station' ? ` · ${p.location.basis}` : ''}{@render refs(p.location.refs)}{/if}{/snippet}
@@ -330,7 +329,7 @@
 				{#each p.sources as s}
 					<li id="src-{s.n}">{s.publisher ? `${s.publisher}, ` : ''}{#if s.url}<a href={s.url} target="_blank" rel="noopener">{s.title}</a>{:else}{s.title}{/if}.{#if s.opened} Checked {longDate(s.opened)}.{/if}</li>
 				{/each}
-				<li value={nSources + 1}>Live and history figures, installed capacity and owner: Elenz, from Electricity Authority data (CC BY 4.0). How they’re made: <a href="/methods">Data and methods</a>.</li>
+				<li value={nSources + 1}>Live and history figures, installed capacity and owner: Elenz, from Electricity Authority data (CC BY 4.0). How this page is put together: <a href="/methods/plants">Plant pages</a>, in <a href="/methods">Data and methods</a>.</li>
 			</ol>
 			<p class="report">Spotted something wrong on this page? <ReportLink label="Report it" /></p>
 		</section>

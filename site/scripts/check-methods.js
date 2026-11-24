@@ -23,8 +23,16 @@ for (const [path, html] of pages) {
 	}
 }
 
+// the source register lists every dataset: one entry for each in its groups, as many as its lede counts
+const register = pages.get('/methods/sources');
+if (register) {
+	const said = +(register.match(/lists the (\d+) datasets/)?.[1] ?? NaN);
+	const listed = [...register.matchAll(/<article class="src[ "]/g)].length;
+	if (said !== listed) bad.push(`/methods/sources: says ${said} datasets but lists ${listed} (add each new dataset to a group)`);
+}
+
 if (bad.length) {
 	console.error(bad.join('\n'));
 	process.exit(1);
 }
-console.log('method pages: sections in order, every section link leads somewhere');
+console.log('method pages: sections in order, every section link leads somewhere, every dataset in the register');
