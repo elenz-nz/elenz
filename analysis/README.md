@@ -85,9 +85,21 @@ capacity, ~1,264 kWh per kW of panels, before calibration.
   day to day, midday exports = 0.55 × model − 32 MW (NI 0.46, SI 0.68; r 0.95); through the six clearest days each
   extra modelled MW gives 0.57-0.63 MW of exports. Consistent with ~40% of extra output used on site; can't rule out
   the model being somewhat high on clear days. Timing matches (best lag 0; exports' centre ~20 minutes after the
-  model's, as morning use on site absorbs early output). Recheck with October 2026's exports (18-19 Oct).
+  model's, as morning use on site absorbs early output).
+  October 2026 recheck (24 Nov 2026, BUILD 13 history, October's reconciliation file of 7 Nov): the clear days still
+  hold up. In BUILD 13, 18 Oct peaks at 752 MW (1 pm) and the month's highest is 769 MW (1 pm, 23 Oct, ~89%);
+  exports peaked at 444 MW (1:30 pm, 23 Oct), 434 MW on 18 Oct and 427 MW on 19 Oct. October alone: midday share
+  p10-p90 0.49-0.55, 0.53 on the clearest quarter of days and 0.51 on the rest; midday exports = 0.58 × model − 31 MW
+  (NI 0.54, SI 0.64; r 0.99). Aug-Oct together: 0.59 × model − 46 MW (r 0.97). Through the six clearest days (all in
+  October) each extra modelled MW gives 0.58-0.63 MW of exports, as in Aug-Sep. No flattening at the top: on
+  18-19 Oct and 23 Oct exports keep rising with the model to the peak, and the share is higher near the peak (0.55-0.56
+  above 85% of the day's peak) than at 40-85% (0.48-0.50); across October the median share rises from 0.50 at
+  300-400 MW modelled to 0.55-0.56 above 600 MW. That is what fixed household use on site gives, and the opposite of
+  a model running high on clear days. Timing: lag 0 and +1 half-hour tie (r 0.987); exports peak 30-60 minutes after
+  the model. Conclusion: no change to `CAL` or the model.
 - Metered rooftop exports (EMI `Volumes/Reconciliation`, injection on distribution networks, solar-shaped
-  series, dispatched farms removed): Sep 2026 46.6 GWh, peak 363 MW. Modelled generation 95 GWh after calibration.
+  series, dispatched farms removed): Sep 2026 46.6 GWh, peak 363 MW (48.5 GWh, 364 MW in the revised file of
+  24 Oct); Aug 2026 34.0 GWh, 265 MW; Oct 2026 71.9 GWh, 444 MW. Modelled generation 95 GWh after calibration.
   Daily totals correlate at 0.985 (Sep 2026) and 0.991 (Sep 2025); the midday export share is steady (p10–p90
   0.45–0.54 of modelled generation); exports never exceed modelled generation nationally. The South Island
   exports a larger share (0.6) because of new 4–12 MW ground-mounted systems at Blenheim and Southbrook, which
