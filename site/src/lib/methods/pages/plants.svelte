@@ -74,25 +74,31 @@
 <h3 id="images">Photos and aerial views</h3>
 <p>Every page has a LINZ aerial view of its site, centred on its checked point and credited with the imagery collection it comes from. A plant made of several stations has a view of each station with its own point. The Map view shows the same point on LINZ’s topographic basemap.</p>
 <p>A photo appears only once we have read its licence on the file’s own page. We use photos under CC BY, CC BY-SA or CC0, or in the public domain. We don’t use NonCommercial or NoDerivatives licences, because we resize and crop every photo. An owner’s photos appear only with the owner’s written permission. Photos taken by the Elenz team are credited “Elenz team” and published under CC BY 4.0, like the rest of Elenz. Photos people send through <a href="/plants/share">Share what you know</a> need the sender’s copyright and their agreement to publish under CC BY 4.0. We never present an AI-made picture as a photo.</p>
-<p>Each photo is credited under it with its author, a link to its source and its licence. Photos under CC BY-SA keep that licence when we resize them, and the credit says so. Every credit is also listed below.</p>
+<p>Each photo is credited under it with its author, a link to its source and its licence. Photos under CC BY-SA keep that licence when we resize them, and the credit says so. Every credit is also listed under Image credits.</p>
 
 <h3 id="credits">Image credits</h3>
-<p>{summary.with_photo} of the {summary.pages} plant pages have a photo. These are all {summary.photos} photos, by plant.</p>
-<div class="tbl credits">
-	<table>
-		<thead><tr><th>Plant</th><th>Photo</th><th>Author</th><th>Licence</th></tr></thead>
-		<tbody>
-			{#each photos as p, i (i)}
-				<tr>
-					<td><a href="/plants/{p.slug}">{p.name}</a></td>
-					<td><a href={p.source_url} target="_blank" rel="noopener">{p.title}</a></td>
-					<td>{p.author}</td>
-					<td>{#if p.licence_url}<a href={p.licence_url} target="_blank" rel="noopener">{p.licence}</a>{:else}{p.licence}{/if}</td>
-				</tr>
-			{/each}
-		</tbody>
-	</table>
-</div>
+<p>{summary.with_photo} of the {summary.pages} plant pages have a photo. The list gives all {summary.photos} photos, by plant.</p>
+<details class="calc">
+	<summary>
+		<svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><path d="m3 6 5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+		<span class="to-show">Show the photo credits</span><span class="to-hide">Hide the photo credits</span>
+	</summary>
+	<div class="calc-body tbl credits">
+		<table>
+			<thead><tr><th>Plant</th><th>Photo</th><th>Author</th><th>Licence</th></tr></thead>
+			<tbody>
+				{#each photos as p, i (i)}
+					<tr>
+						<td><a href="/plants/{p.slug}">{p.name}</a></td>
+						<td><a href={p.source_url} target="_blank" rel="noopener">{p.title}</a></td>
+						<td>{p.author}</td>
+						<td>{#if p.licence_url}<a href={p.licence_url} target="_blank" rel="noopener">{p.licence}</a>{:else}{p.licence}{/if}</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	</div>
+</details>
 <p>The aerial views come from these {imagery.length} LINZ imagery collections, each credited Toitū Te Whenua LINZ, CC BY 4.0.</p>
 <details class="calc">
 	<summary>
