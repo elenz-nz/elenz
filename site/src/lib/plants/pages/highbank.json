@@ -23,7 +23,7 @@
  "scheme": null,
  "metered": "It has no metered rows before October 2001, and its rows read next to nothing until April 2002.",
  "checking": true,
- "checked": "2026-11-19",
+ "checked": "2026-11-25",
  "about": {
   "text": "Highbank, on the south bank of the Rakaia River in mid Canterbury, runs on water from the Rangitata Diversion Race, a canal built for irrigation: in summer farms have first call on the water, so the station generates mostly in winter. The Public Works Department built it alongside the race, and it opened in June 1945 with a single generator, then the largest in New Zealand. Since 2010 pumps at the site can lift water from the Rakaia back up the penstock into the race for irrigators. The 1945 unit is now being replaced, and the pumps have been run as small turbines in the meantime.",
   "refs": [
@@ -35,12 +35,12 @@
   {
    "k": "commissioned",
    "label": "Commissioned",
-   "value": "1945",
+   "value": "Highbank 1945; Montalto 1982",
    "refs": [
     1,
     2
    ],
-   "note": "opened 16 June 1945; Contact gives 1939–1945 for the build"
+   "note": "Highbank opened 16 June 1945 (Contact gives 1939–1945 for the build); Montalto first generated in June 1982 (RDRML)"
   },
   {
    "k": "river",
@@ -93,28 +93,38 @@
    "note": "built by the Public Works Department; ECNZ's accounts record the sale in the year to 31 March 1999, and Wikipedia gives 1998 ($37 million, with Montalto)"
   },
   {
+   "k": "stations",
+   "label": "Stations",
+   "refs": [
+    1,
+    2,
+    10
+   ],
+   "value": "Highbank, Montalto (1.6 MW)"
+  },
+  {
    "k": "ratings",
    "label": "Other ratings",
    "refs": [
     1
    ],
-   "value": "27 MW (Contact's maximum capacity, the 1945 unit now being replaced (Elenz uses the EA register's 28 MW))"
+   "value": "27 MW (Contact's maximum capacity for Highbank and Montalto together (Elenz uses the EA register's 28 MW for Highbank))"
   },
   {
    "k": "grid_connection",
    "label": "Connection point",
    "value": "Ashburton (ASB0661)",
    "refs": [
-    10
+    11
    ]
   }
  ],
  "location": {
   "lat": -43.573176,
   "lon": 171.735537,
-  "basis": "station",
+  "basis": "Highbank station",
   "refs": [
-   11
+   12
   ]
  },
  "images": [
@@ -132,7 +142,19 @@
    "k": "site",
    "file": "aerial/highbank-site.webp",
    "across": 430,
-   "imagery": "Selwyn 0.2m Rural Aerial Photos (2025)"
+   "imagery": "Selwyn 0.2m Rural Aerial Photos (2025)",
+   "name": "Highbank",
+   "lat": -43.573176,
+   "lon": 171.735537
+  },
+  {
+   "k": "s2",
+   "file": "aerial/highbank-s2.webp",
+   "across": 430,
+   "imagery": "Canterbury 0.2m Rural Aerial Photos (2024)",
+   "name": "Montalto",
+   "lat": -43.80031443859625,
+   "lon": 171.33908601802898
   }
  ],
  "sources": [
@@ -201,13 +223,20 @@
   },
   {
    "n": 10,
+   "title": "Asset Management Plan 2025–35",
+   "publisher": "EA Networks",
+   "url": "https://www.eanetworks.co.nz/assets/PDFs/Disclosures/2025/AMP2025-35_Final_inc_Schedules.pdf",
+   "opened": "2026-11-25"
+  },
+  {
+   "n": 11,
    "title": "Network supply points table",
    "publisher": "Electricity Authority",
    "url": "https://www.emi.ea.govt.nz/Wholesale/Datasets/MappingsAndGeospatial/NetworkSupplyPointsTable",
    "opened": "2026-11-19"
   },
   {
-   "n": 11,
+   "n": 12,
    "title": "LINZ aerial imagery (LINZ Basemaps)",
    "publisher": "Toitū Te Whenua LINZ",
    "url": "https://basemaps.linz.govt.nz/",

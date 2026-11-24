@@ -1,0 +1,87 @@
+# Plant page facts for Talla Burn. How to check a plant: facilities/PLANTS.md.
+
+slug = "talla-burn"
+name = "Talla Burn"
+register = ["L021", "H063"]
+reviewed = ""
+to_check = [
+  "Owner today: Talla Burn Generation Limited (the Hore and Wilson families) in 2011; check it hasn't changed (Companies Office or a recent public document).",
+  "Capacity: the owner's 2011 release gives 2.4 MW; others differ (see notes). An owner or network figure with its basis would settle it.",
+  "Wikidata item, if any.",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch C (25 Nov 2026): leads L021 (Talla Burn, 2.15 MW) and H063 (OpenStreetMap lead, 2.6 MW), one station; both rows dropped. Not in the EA register or metered_plants.csv under any code (other embedded at CYD0331).",
+  "Capacity: 2.4 MW (owner's release, 29 Jul 2011); 2.3 MW (Renewable Energy World / Hydro Review); 2 MW (Aurora's AMP, rounded); 2.15 MW (MBIE's list, via the lead); 2.6 MW (the 2009 plans, via OpenStreetMap).",
+  "Commissioned 2010: generating since November 2010 (ODT) or September 2010 (Hydro Review); officially opened 29 July 2011.",
+  "Point given by the Elenz team and confirmed on the LINZ aerial, 25 Nov 2026 (Otago 0.2m Rural Aerial Photos (2025)).",
+  "District and region from the point in Stats NZ's boundaries, 25 Nov 2026: Central Otago District, Otago Region; no other district within 1 km (Beaumont itself is in Clutha District).",
+]
+
+[location]
+value = [-45.75608765374752, 169.5135246377726]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-25"
+note = "given by the Elenz team, confirmed on the LINZ aerial 25 Nov 2026"
+
+[grid_connection]
+value = [-45.18039, 169.30622]
+code = "CYD0331 CLYDE"
+source = ["ea-nsp", "aurora-amp-2025"]
+grade = "A"
+checked = "2026-11-25"
+note = "embedded in Aurora Energy's network: its AMP (Table 3-6) places Talla Burn (2 MW) at Clyde; point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.other_names]
+value = "Paul Wilson Station (the powerhouse)"
+source = ["scoop-talla-burn-2011", "odt-talla-burn-2011"]
+grade = "A"
+checked = "2026-11-25"
+
+[facts.commissioned]
+value = "2010"
+source = ["odt-talla-burn-2011", "rew-paul-wilson"]
+grade = "B"
+checked = "2026-11-25"
+note = "generating from late 2010 (ODT: November; Hydro Review: September); officially opened 29 July 2011"
+
+[facts.river]
+value = "Talla Burn (Beaumont Station)"
+source = "scoop-talla-burn-2011"
+grade = "A"
+checked = "2026-11-25"
+
+[facts.region]
+value = "Otago"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-25"
+
+[facts.territorial_authority]
+value = "Central Otago"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-25"
+
+[facts.owner]
+value = "Talla Burn Generation Limited"
+source = ["scoop-talla-burn-2011", "odt-talla-burn-2011"]
+grade = "A"
+checked = ""
+note = "as at its opening in 2011, owned by the Hore and Wilson families; today's owner not yet confirmed"
+
+[[ratings]]
+value = 2.4
+basis = "the owner's opening release (basis not stated)"
+source = "scoop-talla-burn-2011"
+grade = "A"
+checked = "2026-11-25"
+
+[[ratings]]
+value = 2.3
+basis = "Hydro Review (basis not stated)"
+source = "rew-paul-wilson"
+grade = "B"
+checked = ""

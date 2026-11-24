@@ -164,7 +164,7 @@ the leads in groups, worked out by `lead_group` in `ingest/plant_research.py`, i
 
 | Group | A lead is in it when |
 | --- | --- |
-| On a page already | `on_page` names the plant page it is a station or unit on (the Teviot, Kaimai, Branch River and Roaring Meg stations; TOPP1 and GDL behind Kawerau (Onepu)). Set it when a lead turns out to be on a page; `plant_research.py` fails if the slug isn't a plant file |
+| On a page already | `on_page` names the plant page it is a station or unit on (the Teviot, Kaimai, Branch River and Roaring Meg stations; Montalto on Highbank; TOPP1 and GDL behind Kawerau (Onepu)). Set it when a lead turns out to be on a page; `plant_research.py` fails if the slug isn't a plant file |
 | Historic | its status starts "Retired" or mentions "historic": left for the history round |
 | Not generating yet | status "Commissioning" or `shown_in_elenz` "Not yet": a plant file when it first dispatches (Puna Komaru) |
 | Under 1 MW | `mw` under 1, or a status saying it is below the threshold: only as an exception |
