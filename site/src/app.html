@@ -34,6 +34,24 @@
 				} catch (e) {}
 			})();
 		</script>
+		<script id="umami-views">
+			// One Umami page view per page (design decision, 24 Nov 2026): Umami counts a view whenever the address changes,
+			// and Tracker, Now, the dashboards, Records and Plants keep the reader's view in the address (?…), so each click
+			// counted as a view (test report, 24 Nov: one visitor's 7 minutes on Tracker made 128 views). Umami's script hands
+			// each view and event to this first (data-before-send below); a view of the same path as the last one sent is
+			// dropped. The first view of a page keeps its full address, ?utm_ tags included; events pass untouched.
+			window.elenzBeforeSend = (function () {
+				var last = null;
+				return function (type, p) {
+					if (type !== 'event' || !p || p.name) return p;
+					var path;
+					try { path = new URL(p.url, location.href).pathname; } catch (e) { return p; }
+					if (path === last) return null;
+					last = path;
+					return p;
+				};
+			})();
+		</script>
 		<!-- with JavaScript off, anything marked js-only (empty charts, "Loading") goes, leaving each page's plain line
 		     (RES-04). It lives here, not in a page: Svelte builds a page's markup itself on a click between pages, and Chrome
 		     then treats a <style> inside <noscript> as a real style, hiding the charts for everyone. -->
@@ -46,7 +64,7 @@
 		<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "052b4d2063e946d8ba41bb6f5f953c10"}'></script>
 		<!-- Umami (cloud.umami.is, free Hobby plan): page views, time on page, referrers; no cookies. data-domains keeps
 		     previews and local builds out of the counts; data-do-not-track honours the browser's Do Not Track setting.
-		     The website ID is public by design. -->
-		<script defer src="https://cloud.umami.is/script.js" data-website-id="3c608b8c-c219-4908-a32d-4db391b24025" data-domains="elenz.co.nz" data-do-not-track="true"></script>
+		     data-before-send drops repeat views of the same page (#umami-views above). The website ID is public by design. -->
+		<script defer src="https://cloud.umami.is/script.js" data-website-id="3c608b8c-c219-4908-a32d-4db391b24025" data-domains="elenz.co.nz" data-do-not-track="true" data-before-send="elenzBeforeSend"></script>
 	</body>
 </html>
