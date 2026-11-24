@@ -3,7 +3,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { inflateRawSync } from 'node:zlib';
-import { readSettings, writeSettings, pick, filtered, needCounts, progress, workbook, DEFAULTS, LEAD_GROUPS, ROUNDS, leadKey, leadCounts, leadTechs, pickLeads } from '#lib/plants/research.js';
+import { readSettings, writeSettings, pick, filtered, needCounts, progress, workbook, DEFAULTS, LEAD_GROUPS, ROUNDS, leadKey, leadCounts, leadTechs, pickLeads, photoStatuses, photoCounts, photoCollections, pickPhotoLeads, leadSlugs } from '#lib/plants/research.js';
 import { keyOf, loadNotes, saveNote, dateStamp, savedAt } from '#lib/plants/notes.js';
 import { xlsx, zip, crc32, col } from '#lib/plants/xlsx.js';
 import RESEARCH from '#lib/plants/research.json' with { type: 'json' };
@@ -177,4 +177,39 @@ test('station leads: groups, filters, note keys and the download', () => {
   assert.ok(!sheet.header.includes('group'));
   assert.equal(sheet.rows[0][sheet.header.indexOf('Team notes')], 'Ask the network');
   assert.equal(sheet.rows[0][sheet.header.indexOf('id')], id);
+});
+
+test('photo leads: status from the plants’ photos, and their filters', () => {
+  const plants = [
+    P({ slug: 'arapuni', images: [{ source_url: 'https://c/a.jpg' }] }),
+    P({ slug: 'karapiro' }),
+    P({ slug: 'benmore', images: [{ source_url: 'https://c/b.jpg#x' }] }),
+  ];
+  const L = (id, slugs, url, collection = 'Wikimedia Commons', subject = id) => ({ id, slugs, subject, url, collection, rights_lead: '', description: '' });
+  const leads = [
+    L('P1', 'arapuni', 'https://c/a.jpg'),
+    L('P2', 'arapuni', 'https://c/other.jpg', 'Wikimedia Commons category'),
+    L('P3', 'karapiro', 'https://c/k.jpg'),
+    L('P4', 'arapuni karapiro', 'https://c/m.jpg', 'Te Ara'),
+    L('P5', 'benmore', 'https://c/b.jpg'),
+    L('P6', 'nowhere', 'https://c/n.jpg'),
+  ];
+  assert.deepEqual(leadSlugs({ slugs: 'a b,c; d' }), ['a', 'b', 'c', 'd']);
+  const st = photoStatuses(leads, plants);
+  assert.deepEqual(st, { P1: 'used', P2: 'has', P3: 'needs', P4: 'needs', P5: 'used', P6: 'none' });
+  assert.deepEqual(photoCounts(leads, st), { needs: 2, used: 2, has: 1, none: 1, '': 6 });
+  assert.deepEqual(photoCollections(leads), ['Te Ara', 'Wikimedia Commons', 'Wikimedia Commons category']);
+  const ids = (f) => pickPhotoLeads(leads, st, { status: '', collection: '', text: '', ...f }).map((r) => r.id);
+  assert.deepEqual(ids({ status: 'needs' }), ['P3', 'P4']);
+  assert.deepEqual(ids({ status: 'none' }), ['P6']);
+  assert.deepEqual(ids({ collection: 'Te Ara' }), ['P4']);
+  assert.deepEqual(ids({ status: 'needs', text: 'karap' }), ['P3', 'P4']);
+  assert.equal(ids({}).length, 6);
+});
+
+test('photo leads: every real lead gets exactly one status', () => {
+  const st = photoStatuses(RESEARCH.photo_leads, RESEARCH.plants);
+  const n = photoCounts(RESEARCH.photo_leads, st);
+  assert.equal(n[''], RESEARCH.photo_leads.length);
+  assert.equal(n.needs + n.used + n.has + n.none, n['']);
 });

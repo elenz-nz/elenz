@@ -183,7 +183,7 @@ station and photo leads below. Above the cards, the research rounds (`ROUNDS` in
 have their own section: groups from `lead_group` in `ingest/plant_research.py` (To research first; OpenStreetMap leads,
 under 1 MW, not generating yet, historic, on a page already, all), a technology filter and a search, kept on the page
 only; each lead opens to its links, fields, to-check, notes, sources and its own Team notes box (notes key
-`lead-<id>`, beside the plants'); a card counts the leads to research. The photo leads stay folded below. "Download
+`lead-<id>`, beside the plants'); a card counts the leads to research. The photo leads stay folded below, with their own filters (design decision, 24 Nov 2026): a status worked out in `research.js` (`photoStatuses`) from the plants' photos, never kept by hand (needs a photo; in use, when the lead's address is a photo's `source_url`; plant has a photo; no plant named), a collection filter and a search, kept on the page only. "Download
 workbook" builds an .xlsx in the browser (`xlsx.js`, no library: sheets Plants, Facts, Sources, Photo leads, Station
 leads (with its group and team notes); the first row bold, frozen and filtered). The Worker guards it (`research` in
 `worker/index.js`, routed through it by `run_worker_first`): on elenz.co.nz it opens only with `?key=` set to the Worker
