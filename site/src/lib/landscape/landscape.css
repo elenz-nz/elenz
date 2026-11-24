@@ -56,6 +56,11 @@
 .ls .labels span i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
 .ls .labels span.under { transform: translate(-50%, 0); }
 .ls .scene { position: relative; display: grid; gap: 10px; }
+/* screen-burn drift (#lib/site/drift.js): what stays still on the picture (place names, the numbers, the wall-screen
+   credit) moves a few pixels in a slow loop; the drawing itself changes with the light through the day. A moved box
+   holds its absolutely placed children, so the labels' box covers the picture, as the picture held them before. */
+.ls .labels { position: absolute; inset: 0; pointer-events: none; }
+.ls .labels, .ls .hud, .ls .kcredit { translate: var(--dx, 0) var(--dy, 0); }
 .ls .hud { position: absolute; left: 1.4%; top: 2.6%; height: 47%; display: flex; flex-direction: column; align-items: flex-start; gap: calc(.7 * var(--u)); pointer-events: none; font-family: var(--font-kid); color: #13202a; }
 .ls .hud-card { background: rgba(255, 255, 255, .88); border-radius: max(3px, calc(.4 * var(--u))); padding: calc(.35 * var(--u)) var(--u) calc(.45 * var(--u)); display: flex; align-items: baseline; gap: calc(.6 * var(--u)); white-space: nowrap; }
 .ls .hud-card b { font-weight: 600; font-size: clamp(13px, calc(2.5 * var(--u)), 27px); font-variant-numeric: tabular-nums; line-height: 1.1; }

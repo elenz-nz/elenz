@@ -4,7 +4,10 @@
 	// wall screen. Cards keep their size when fewer are chosen (two large columns, four small), and a value too long
 	// for its card shrinks until it fits (fit, below). Horizon draws the last 24 hours of New Zealand's generation,
 	// Live mix the mix right now, Plain colour a flat colour; the other backgrounds are drawn scenes (backgrounds.js,
-	// loaded only when picked). Simple hides the line under each value.
+	// loaded only when picked). Simple hides the line under each value. The cards and the background drift a few pixels
+	// in a slow loop against screen burn (#lib/site/drift.js); the background is drawn that much larger than the screen,
+	// so no edge shows.
+	import { driftAt, STEP_MS } from '#lib/site/drift.js';
 	import { BACKGROUNDS, plainPalette } from './layout.js';
 	import { FUEL_COLOUR } from './values.js';
 
@@ -21,6 +24,9 @@
 	const pal = $derived(bg === 'plain' ? plainPalette(col) : info);
 	// sizes are in hundredths of the screen's width (--u), measured here: container query units need Safari 16
 	let w = $state(0);
+	// the drift's offset goes in the stage's style string, which Svelte writes whole (so not use:drift)
+	let dxy = $state(driftAt(Date.now()));
+	$effect(() => { const id = setInterval(() => (dxy = driftAt(Date.now())), STEP_MS); return () => clearInterval(id); });
 	const RN: Record<string, string> = { NZ: 'New Zealand', NI: 'North Island', SI: 'South Island' };
 
 	// drawn scenes: loaded on first use
@@ -70,7 +76,7 @@
 </script>
 
 <div class="stage" bind:clientWidth={w} class:narrow={w > 0 && w <= 640}
-	style="--u:{(w || 1280) / 100}px;--ink:{pal.ink};--sub:{pal.sub};--tile:{pal.tile};--edge:{pal.edge};--spin:{spin || 1}s"
+	style="--u:{(w || 1280) / 100}px;--ink:{pal.ink};--sub:{pal.sub};--tile:{pal.tile};--edge:{pal.edge};--spin:{spin || 1}s;--dx:{dxy[0]}px;--dy:{dxy[1]}px"
 	data-hvdc={flow} class:still={!spin} class:simple>
 	<div class="bg" aria-hidden="true">
 		{#if bg === 'horizon' || bg === 'light'}
@@ -138,6 +144,9 @@
 	.stage { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 4px; background: #131c1c; color: var(--ink);
 		font-family: var(--font-ui); }
 	.bg, .bg :global(svg), .plain { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+	/* screen-burn drift (#lib/site/drift.js): the background is 6 px larger on every side than the 5 px it moves */
+	.bg { inset: -6px; width: auto; height: auto; }
+	.bg, .fg { translate: var(--dx, 0) var(--dy, 0); }
 
 	/* wide screens: the cards sit in the middle of the screen, with room around them; two large columns and four small
 	   ones whether or not each is filled, so fewer cards stay the same size */
