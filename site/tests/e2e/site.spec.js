@@ -552,6 +552,46 @@ test.describe('plant pages', () => {
 
 // the plant index (/plants): without a LINZ key (as in checks.yml) the map is the drawn outline
 test.describe('plant index', () => {
+  // Test report, 24 Nov 2026 (a real phone at 320 px): the island tabs were wider than the card, which stretched the
+  // card, the Find box and the page sideways. Firefox and WebKit run this too, since they lay out grid items differently.
+  for (const width of [320, 360, 390]) {
+    test(`at ${width} px the page doesn't scroll sideways and the filters stay in their card`, async ({ page }, info) => {
+      test.skip(isPhone(info), 'set by width, with a mouse here');
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto('/plants');
+      await expect(page.locator('.tbl tbody tr').first()).toBeVisible();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth), 'document scrollWidth').toBeLessThanOrEqual(width);
+      expect(await page.evaluate(sticksOut), 'what sticks out').toBe('');
+      // the island tabs and the Find box lie inside the filter card (its padding included)
+      const card = await page.locator('.panel.ctl').boundingBox();
+      for (const sel of ['.seg.isl', '.find input']) {
+        const b = await page.locator(sel).boundingBox();
+        expect(b.x, `${sel} left`).toBeGreaterThanOrEqual(card.x);
+        expect(b.x + b.width, `${sel} right`).toBeLessThanOrEqual(card.x + card.width);
+      }
+      // each tab name is whole: the names wrap rather than being cut off
+      for (const tab of await page.locator('.seg.isl button').all()) {
+        expect(await tab.evaluate((e) => e.scrollWidth <= e.clientWidth + 1), await tab.textContent()).toBe(true);
+      }
+    });
+  }
+
+  test('the fuel chips scroll in their own row, with a fade while more lie to the right (320 px)', async ({ page }, info) => {
+    test.skip(isPhone(info), 'set by width, with a mouse here');
+    await page.setViewportSize({ width: 320, height: 800 });
+    await page.goto('/plants');
+    const wrap = page.locator('.fuelwrap'), row = page.locator('.fuels');
+    await expect(wrap).toHaveClass(/fade/);
+    expect(await row.evaluate((e) => e.scrollWidth > e.clientWidth), 'the chips overflow their row').toBe(true);
+    await row.evaluate((e) => { e.scrollLeft = e.scrollWidth; });
+    await expect(wrap).not.toHaveClass(/fade/);
+    await row.evaluate((e) => { e.scrollLeft = 0; });
+    await expect(wrap).toHaveClass(/fade/);
+    // on a wide screen the chips wrap, so there is nothing to hint at
+    await page.setViewportSize({ width: 1024, height: 800 });
+    await expect(wrap).not.toHaveClass(/fade/);
+  });
+
   test('filters keep to the address, and a dot opens its plant in the panel', async ({ page }) => {
     await page.goto('/plants');
     await expect(page.locator('meta[name="robots"]')).toHaveCount(0);

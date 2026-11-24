@@ -25,6 +25,20 @@
 	const SHOW = 20;   // rows before "Show all", while no filter is set
 	const DESC = 'Every power plant Elenz tracks in New Zealand, on a map and in a table: fuel, island, owner, installed capacity and output now, with a page for each.';
 
+	// Fuel chips scroll sideways on a phone: mark the row `fade` while chips lie past its right edge, so a fade shows there
+	// and goes at the end (test report, 24 Nov 2026).
+	function edge(node: HTMLElement) {
+		const wrap = node.parentElement as HTMLElement;
+		const look = () => wrap.classList.toggle('fade', node.scrollLeft + node.clientWidth < node.scrollWidth - 2);
+		node.addEventListener('scroll', look, { passive: true });
+		const ro = new ResizeObserver(look);
+		ro.observe(node);
+		const mo = new MutationObserver(look);
+		mo.observe(node, { childList: true, subtree: true });
+		look();
+		return { destroy() { node.removeEventListener('scroll', look); ro.disconnect(); mo.disconnect(); } };
+	}
+
 	let s = $state<Settings>({ ...DEFAULTS });
 	let ready = false;
 	let all = $state(false);
@@ -118,7 +132,8 @@
 		{/if}
 
 		<div class="panel ctl">
-			<div class="fuels" role="group" aria-label="Fuel">
+			<div class="fuelwrap">
+			<div class="fuels" role="group" aria-label="Fuel" use:edge>
 				<button type="button" class="all" aria-pressed={!s.fuels} onclick={() => { s.fuels = null; all = false; }}>All fuels<span class="n">{base.length}</span></button>
 				{#each fuels as f (f.k)}
 					{#if f.count || !s.fuels || s.fuels.includes(f.k)}
@@ -130,8 +145,9 @@
 					{/if}
 				{/each}
 			</div>
+			</div>
 			<div class="row">
-				<div class="seg" role="group" aria-label="Island">
+				<div class="seg isl" role="group" aria-label="Island">
 					{#each [['', 'New Zealand'], ['NI', 'North Island'], ['SI', 'South Island']] as [k, name] (k)}
 						<button type="button" aria-pressed={s.island === k} onclick={() => { s.island = k; all = false; }}>{name}</button>
 					{/each}
@@ -260,7 +276,10 @@
 	.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px 16px; min-width: 0; display: grid; gap: 10px; align-content: start; }
 	.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--c); flex: none; }
 
-	.ctl { padding: 12px 14px; }
+	/* one shrinkable column: a grid item's min-width is auto, so a wide row inside (the island tabs) stretched the whole
+	   card past a 320 px screen, and the Find box with it */
+	.ctl { padding: 12px 14px; grid-template-columns: minmax(0, 1fr); }
+	.fuelwrap { position: relative; min-width: 0 }
 	.fuels { display: flex; flex-wrap: wrap; gap: 6px; }
 	.fuels .all, .fb { font-size: 0.8rem; font-weight: 500; display: inline-flex; align-items: center; min-height: 32px; border-radius: 4px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
 	.fuels button { font: inherit; font-size: inherit; font-weight: inherit; color: inherit; background: none; border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; min-height: 30px; }
@@ -276,8 +295,8 @@
 	.seg { display: inline-flex; gap: 2px; border-radius: 4px; padding: 2px; background: var(--grid); }
 	.seg button { font: inherit; font-size: 0.8rem; font-weight: 500; border: 1px solid transparent; background: transparent; color: var(--ink); padding: 2px 10px; min-height: 30px; border-radius: 3px; cursor: pointer; }
 	.seg button[aria-pressed='true'] { background: var(--surface); border-color: var(--line); }
-	.lab { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--ink-2); }
-	.lab select, .lab input[type='search'] { font: inherit; font-size: 0.86rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; min-height: 32px; }
+	.lab { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--ink-2); min-width: 0; max-width: 100%; }
+	.lab select, .lab input[type='search'] { min-width: 0; max-width: 100%; font: inherit; font-size: 0.86rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; min-height: 32px; }
 	.find { margin-left: auto; }
 	.find input { width: 180px; }
 	.clear, .more { font: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--accent); border-radius: 4px; font-size: 0.8rem; font-weight: 600; padding: 3px 10px; min-height: 30px; }
@@ -331,8 +350,15 @@
 	@media (max-width: 640px) {
 		table { min-width: 0; }
 		.c-fuel, .c-isl, .c-own, .c-com, .c-st { display: none; }
-		.fuels { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -14px; padding: 0 14px; }
+		.fuelwrap { margin: 0 -14px; }
+		.fuels { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 0 14px; }
 		.fuels > * { flex: none; }
+		/* the hint that more chips lie to the right: a fade over the card's edge, gone once the last chip shows */
+		.fuelwrap::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 36px; pointer-events: none; opacity: 0; transition: opacity 0.15s; background: linear-gradient(to right, transparent, var(--surface)); }
+		.fuelwrap:global(.fade)::after { opacity: 1; }
+		/* the island tabs share the card's width, a name wrapping to a second line if it must, so they never overflow */
+		.seg.isl { display: flex; flex: 1 1 100%; min-width: 0; }
+		.seg.isl button { flex: 1 1 0; min-width: 0; padding: 2px 4px; line-height: 1.2; white-space: normal; text-wrap: balance; overflow-wrap: anywhere; }
 		.find { margin-left: 0; flex: 1 1 100%; }
 		.find input { flex: 1; width: auto; min-width: 0; }
 	}
