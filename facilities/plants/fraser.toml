@@ -1,0 +1,122 @@
+# Plant page facts for Fraser. How to check a plant: facilities/PLANTS.md.
+
+slug = "fraser"
+name = "Fraser"
+register = ["E015", "E016"]
+reviewed = ""
+to_check = [
+  "Upper Fraser's grid exit point: Aurora's AMP lists \"Earnscleugh Stations\" (8 MW) at Clyde; taken as Upper Fraser (on Earnscleugh Station, 8 MW), an inference to confirm.",
+  "Lower Fraser's capacity: Aurora's AMP gives 3 MW (rounded), Wikipedia's list 2.8; Pioneer gives none. Look for an owner or Engineering New Zealand figure.",
+  "Wikidata items for the scheme and its stations (Wikidata didn't answer from the workspace, 25 Nov 2026).",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch C (25 Nov 2026): leads E015 (Fraser, 3.2 MW) and E016 (Upper Fraser, 8 MW), both other embedded at CYD0331. Not in the EA register or metered_plants.csv under any code. One file for the scheme, two stations, as Teviot (design decision, 25 Nov 2026).",
+  "Station points given by the Elenz team and confirmed on the LINZ aerial, 25 Nov 2026 (Lower Fraser: Otago 0.1m Urban Aerial Photos (2018); Upper Fraser: Otago 0.2m Rural Aerial Photos (2025)).",
+  "District and region from both stations' points in Stats NZ's 2026 district and 2025 region boundaries, 25 Nov 2026: Central Otago District, Otago Region; no other district within 1 km.",
+  "Capacity: Upper Fraser 8 MW (Pioneer); Lower Fraser 3 MW (Aurora's AMP, rounded); Wikipedia's list 2.8 for Lower Fraser; the lead's 3.2 for Fraser came from our old register.",
+  "Commissioned: Pioneer gives Lower Fraser 1954 (work began 1951; turbine and generator replaced 2015); Wikipedia's list was read earlier as 1956 (not rechecked). Upper Fraser commissioned July 2019, officially opened 17 Sep 2019.",
+]
+
+[location]
+value = [-45.24110215860614, 169.20075778894693]
+basis = "Upper Fraser station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-25"
+note = "given by the Elenz team, confirmed on the LINZ aerial 25 Nov 2026"
+
+[grid_connection]
+value = [-45.18039, 169.30622]
+code = "CYD0331 CLYDE"
+source = ["ea-nsp", "aurora-amp-2025"]
+grade = "A"
+checked = "2026-11-25"
+note = "embedded in Aurora Energy's network: its AMP (Table 3-6) places Fraser Generation (3 MW) and the Earnscleugh stations (8 MW) at Clyde; point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.commissioned]
+value = "Lower Fraser 1954; Upper Fraser 2019"
+source = "pioneer-fraser"
+grade = "A"
+checked = "2026-11-25"
+note = "Upper Fraser commissioned July 2019 and officially opened 17 September 2019"
+
+[facts.units]
+value = "Upper Fraser: one 8 MW five-jet Pelton turbine (Andritz Hydro)"
+source = "pioneer-fraser"
+grade = "A"
+checked = "2026-11-25"
+note = "Pioneer gives no unit count for Lower Fraser; its turbine and generator were replaced in 2015"
+
+[facts.scheme]
+value = "Fraser Scheme"
+source = "pioneer-fraser"
+grade = "A"
+checked = "2026-11-25"
+
+[facts.river]
+value = "Fraser River"
+source = "pioneer-fraser"
+grade = "A"
+checked = ""
+
+[facts.region]
+value = "Otago"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-25"
+
+[facts.territorial_authority]
+value = "Central Otago"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-25"
+
+[[facts.territorial_authority.alt]]
+value = "near Alexandra (Central Otago)"
+source = "pioneer-fraser"
+grade = "A"
+checked = ""
+
+[facts.owner]
+value = "Pioneer Energy"
+source = "pioneer-fraser"
+grade = "A"
+checked = "2026-11-25"
+note = "through Pioneer Energy Renewables, whose locations pages list the scheme"
+
+[[ratings]]
+value = "Upper Fraser 8; Lower Fraser 3"
+basis = "Pioneer (Upper Fraser); Aurora's AMP, rounded to the MW (Lower Fraser)"
+source = ["pioneer-fraser", "aurora-amp-2025"]
+grade = "A"
+checked = "2026-11-25"
+
+[[ratings]]
+value = "Lower Fraser 2.8"
+basis = "Wikipedia (basis not stated)"
+source = "wp-list"
+grade = "B"
+checked = ""
+
+[[stations]]
+value = "Upper Fraser"
+id = "E016"
+location = [-45.24110215860614, 169.20075778894693]
+mw = 8
+source = "pioneer-fraser"
+grade = "A"
+checked = "2026-11-25"
+commissioned = "2019"
+note = "13 km west of Alexandra; one 8 MW Pelton turbine"
+
+[[stations]]
+value = "Lower Fraser"
+id = "E015"
+location = [-45.20594460257506, 169.30213339790956]
+mw = 3
+source = ["pioneer-fraser", "aurora-amp-2025"]
+grade = "A"
+checked = "2026-11-25"
+commissioned = "1954"
+note = "3 MW is Aurora's rounded figure for Fraser Generation; Wikipedia's list 2.8"

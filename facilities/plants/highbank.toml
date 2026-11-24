@@ -3,27 +3,30 @@
 slug = "highbank"
 plant = "Highbank"
 name = "Highbank"
-register = ["H033"]
+register = ["H033", "H034"]
 wikidata = "Q131745148"
 osm = ["relation/12618188"]
 reviewed = ""
 to_check = [
   "Capacity lead: Transpower's Assumptions Book v3.0, Appendix F (model inputs of 4 Jun 2026; source transpower-assumptions-2026) models Highbank at 27 MW, the old unit's rating, which suggests the new unit wasn't in service when the inputs were set (4 Jun 2026).",
+  "For the history round: the Rangitata Diversion Race's history (rdrml-history: Highbank approved 1937, generating 8 June 1945; Montalto decided 1978, built from 1981, generating June 1982), the 2015 ECan review group submissions (https://environment.govt.nz/assets/uploads/ecan-review-2015-group-submissions-3.pdf, not readable from the workspace or in Chrome's PDF viewer: save a copy to a connected folder), and Montalto's builder, the Ashburton Electric-Power Board (its project sign, aepb-montalto-sign, a research lead until the Facebook post's address or another public copy is found).",
+  "Montalto's capacity: EA Networks gives 1.6 MW; the AEPB's project sign gives the generator's rated output as 1,900 kW; Wikipedia's list 1.8. Cite the sign once a public copy is found.",
   "Capacity: recheck in May 2027 whether the new unit is running, and whether it is 19 MW (Contact) or 29 MW (Wikipedia); keep 28 MW until then (design decision 21 Nov 2026: the new unit isn't expected in service before then).",
 ]
 notes = [
-  "28 MW (register). Separate from Montalto (H034), which is other embedded at ASB0661.",
+  "28 MW (register). Montalto (H034, other embedded at ASB0661) is a station on this page since 25 Nov 2026 (station leads round, batch C): Contact's page says Highbank consists of the Highbank and Montalto power stations. Montalto isn't in Elenz's Highbank figures: its output is in ASB0661's embedded generation.",
+  "Montalto (25 Nov 2026): point given by the Elenz team and confirmed on the LINZ aerial (Canterbury 0.2m Rural Aerial Photos (2024)), in Ashburton District (Stats NZ, nothing else within 1 km); 1.6 MW, an induction generator built by the Ashburton Electric Power Board, 1982 (EA Networks' AMP 2025, Contact, RDRML). The AEPB's project sign: 7.3 m head, 31 m3/s, Tampella horizontal tube turbine, Strömberg induction generator rated 1,900 kW at 3,300 V.",
   "Hydro batch 5 (19 Nov 2026): facts checked against Contact's station page, the EA register and network supply points table, the Gazette (ECNZ's 1995 disclosure and its accounts for the year to 31 March 1999), Wikipedia and Stats NZ boundaries. The location is left for the LINZ aerial check.",
   "Location: Wikidata's point (Q131745148), not yet checked against the aerial.",
   "District and region from the station's Wikidata point in Stats NZ's 2026 district and 2025 region boundaries, 19 Nov 2026. The grid connection point (Ashburton) also gives Ashburton District. Selwyn District is within 1 km, across the Rakaia River.",
-  "Capacity: Contact gives a maximum of 27 MW, the 1945 unit; the register 28 MW (Elenz); Wikipedia's list 25.2. While the unit is replaced, the site's six irrigation pumps run as turbines (Contact: 1 MW each; Wikipedia: 5.8 MW in all).",
+  "Capacity: Contact gives a maximum of 27 MW for Highbank and Montalto together (read until 25 Nov 2026 as the 1945 unit alone); EA Networks' AMP 2025 gives Highbank 26 MW and Montalto 1.6; the register 28 MW (Elenz); Wikipedia's list 25.2. While the unit is replaced, the site's six irrigation pumps run as turbines (Contact: 1 MW each; Wikipedia: 5.8 MW in all).",
   "LINZ aerial check (18 Nov 2026): station point read from the aerial, grid connection point confirmed.",
   "Team notes (23 Nov 2026): looks good.",
 ]
 
 [location]
 value = [-43.573176, 171.735537]
-basis = "station"
+basis = "Highbank station"
 source = "linz-aerial"
 grade = "B"
 checked = "2026-11-18"
@@ -38,11 +41,11 @@ checked = "2026-11-19"
 note = "code and point match the EA's network supply points table of 18 Nov 2026"
 
 [facts.commissioned]
-value = "1945"
+value = "Highbank 1945; Montalto 1982"
 source = ["contact-highbank", "wp-highbank"]
 grade = "A"
-checked = "2026-11-19"
-note = "opened 16 June 1945; Contact gives 1939–1945 for the build"
+checked = "2026-11-25"
+note = "Highbank opened 16 June 1945 (Contact gives 1939–1945 for the build); Montalto first generated in June 1982 (RDRML)"
 
 [[facts.commissioned.alt]]
 value = "1945"
@@ -123,7 +126,27 @@ checked = ""
 
 [[ratings]]
 value = 27
-basis = "Contact's maximum capacity, the 1945 unit now being replaced (Elenz uses the EA register's 28 MW)"
+basis = "Contact's maximum capacity for Highbank and Montalto together (Elenz uses the EA register's 28 MW for Highbank)"
 source = "contact-highbank"
 grade = "A"
 checked = "2026-11-19"
+
+[[stations]]
+value = "Highbank"
+id = "H033"
+location = [-43.573176, 171.735537]
+source = ["contact-highbank", "wp-highbank"]
+grade = "A"
+checked = "2026-11-25"
+commissioned = "1945"
+
+[[stations]]
+value = "Montalto"
+id = "H034"
+location = [-43.80031443859625, 171.33908601802898]
+mw = 1.6
+source = ["eanetworks-amp-2025", "contact-highbank"]
+grade = "A"
+checked = "2026-11-25"
+commissioned = "1982"
+note = "on the Rangitata Diversion Race, about 40 km south-west of Highbank; an induction generator built by the Ashburton Electric Power Board"
