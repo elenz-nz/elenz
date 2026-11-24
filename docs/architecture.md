@@ -417,6 +417,12 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   `src/app.html` (`#umami-views`), which drops a view whose path matches the last one sent. A new path, or coming back
   to one, still counts, and the first view keeps its full address, so UTM tags still reach Umami's UTM report.
   `data-exclude-search` was not used: it would strip the tags too. Events pass untouched. `tests/umami-views.test.js`.
+  What was dropped becomes a `view-change` event (design decision, 25 Nov 2026), so time spent working a page still
+  shows in a visitor's timeline: `{ page, changes, keys }`, the number of address changes and the names (never the
+  values) of the settings that changed (`#` for the hash). The first change of a run goes at once, then at most one a
+  minute per page with the changes since, as `throttled()` does; a new page or `pagehide` sends what's waiting. So a
+  page's `view-change` count is roughly its minutes of active use. `/dashboard` sends none: `layout-change` covers it.
+  It is on `/privacy`.
   The dashboard's `layout-change` is throttled to one a minute (`throttled()` in `track.js`), so a run of changes shows
   in Umami as events exactly 60 seconds apart; that is the throttle, not a timer.
   Opting out (design decision, 16 Nov 2026): an inline script at the top of `src/app.html` turns any address with

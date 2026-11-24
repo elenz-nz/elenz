@@ -40,14 +40,52 @@
 			// counted as a view (test report, 24 Nov: one visitor's 7 minutes on Tracker made 128 views). Umami's script hands
 			// each view and event to this first (data-before-send below); a view of the same path as the last one sent is
 			// dropped. The first view of a page keeps its full address, ?utm_ tags included; events pass untouched.
+			// What was dropped becomes a view-change event instead (design decision, 25 Nov 2026), so time spent working a page
+			// still shows: { page, changes, keys }, the number of address changes and the names (never the values) of the
+			// settings that changed, '#' for the part after #. The first change of a run goes at once, then at most one a minute
+			// for each page with the changes since (as track.js's throttled()); leaving the page or closing the tab sends what's
+			// waiting. /dashboard has its own layout-change event (#lib/site/track.js), so it sends none.
 			window.elenzBeforeSend = (function () {
-				var last = null;
+				var EVERY = 60e3, OWN_EVENT = { '/dashboard': 1 };
+				var lastPath = null, lastUrl = null, run = null;
+				function send(page, changes, keys) {
+					try { window.umami.track('view-change', { page: page, changes: changes, keys: Object.keys(keys).sort().join(',') }); } catch (e) {}
+				}
+				function tick() {
+					if (!run.changes) { run = null; return; }
+					send(run.page, run.changes, run.keys);
+					run.changes = 0; run.keys = {};
+					run.timer = setTimeout(tick, EVERY);
+				}
+				function flush() {
+					if (!run) return;
+					clearTimeout(run.timer);
+					if (run.changes) send(run.page, run.changes, run.keys);
+					run = null;
+				}
+				function changed(a, b) {
+					var keys = {};
+					a.searchParams.forEach(function (v, k) { if (b.searchParams.get(k) !== v) keys[k] = 1; });
+					b.searchParams.forEach(function (v, k) { if (a.searchParams.get(k) !== v) keys[k] = 1; });
+					if (a.hash !== b.hash) keys['#'] = 1;
+					return keys;
+				}
+				function change(path, keys) {
+					if (OWN_EVENT[path]) return;
+					if (!run) { send(path, 1, keys); run = { page: path, changes: 0, keys: {}, timer: setTimeout(tick, EVERY) }; return; }
+					run.changes += 1;
+					for (var k in keys) run.keys[k] = 1;
+				}
+				try { window.addEventListener('pagehide', flush); } catch (e) {}
 				return function (type, p) {
 					if (type !== 'event' || !p || p.name) return p;
-					var path;
-					try { path = new URL(p.url, location.href).pathname; } catch (e) { return p; }
-					if (path === last) return null;
-					last = path;
+					var url;
+					try { url = new URL(p.url, location.href); } catch (e) { return p; }
+					var prev = lastUrl;
+					lastUrl = url;
+					if (url.pathname === lastPath) { change(url.pathname, changed(prev, url)); return null; }
+					flush();
+					lastPath = url.pathname;
 					return p;
 				};
 			})();
@@ -64,7 +102,7 @@
 		<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "052b4d2063e946d8ba41bb6f5f953c10"}'></script>
 		<!-- Umami (cloud.umami.is, free Hobby plan): page views, time on page, referrers; no cookies. data-domains keeps
 		     previews and local builds out of the counts; data-do-not-track honours the browser's Do Not Track setting.
-		     data-before-send drops repeat views of the same page (#umami-views above). The website ID is public by design. -->
+		     data-before-send turns repeat views of the same page into view-change events (#umami-views above). The website ID is public by design. -->
 		<script defer src="https://cloud.umami.is/script.js" data-website-id="3c608b8c-c219-4908-a32d-4db391b24025" data-domains="elenz.co.nz" data-do-not-track="true" data-before-send="elenzBeforeSend"></script>
 	</body>
 </html>

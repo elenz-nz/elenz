@@ -6,6 +6,8 @@
 //   wall-screen-copy    Copy wall-screen link             { page }
 //   layout-change       the dashboard's layout changed    { bg, view, big, small } (bg and view, then how many of each), at most one a minute (throttled)
 //   landscape-mode      the landscape's mode chosen       { mode }
+//   view-change         a page's view changed in the address { page, changes, keys }: sent from app.html (#umami-views)
+//                       instead of a page view, at most one a minute per page; keys are setting names, never values
 //   support-click       Support Elenz clicked             (data-umami-event in Coffee.svelte; Umami adds the page)
 //   report-click        Report a problem clicked          (ReportLink.svelte)
 // A browser that has opted out (?exclude-me, src/app.html) sends none of them: Umami's script checks umami.disabled.
