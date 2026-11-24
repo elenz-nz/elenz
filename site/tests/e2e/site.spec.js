@@ -619,6 +619,10 @@ test.describe('plant index', () => {
 
   test('the fuel squares mix fuels, and the dots can show output now', async ({ page }) => {
     await page.goto('/plants');
+    // the Installed / Output now switch is as wide as its two buttons, not the whole key card
+    const track = await page.locator('.key .seg').boundingBox();
+    const btns = await page.locator('.key .seg button').evaluateAll((bs) => bs.reduce((n, b) => n + b.getBoundingClientRect().width, 0));
+    expect(track.width, 'size switch track').toBeLessThan(btns + 12);
     await page.getByRole('button', { name: 'Show Wind' }).click();
     await page.getByRole('button', { name: 'Show Hydro' }).click();
     await expect(page).toHaveURL(/fuel=(?!.*hydro)(?!.*wind)[a-z,]+/);

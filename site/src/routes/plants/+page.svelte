@@ -317,6 +317,7 @@
 	dt { color: var(--muted); }
 	dd { margin: 0; }
 	.link { color: var(--accent); font-size: 0.9rem; }
+	.key .seg { justify-self: start; }   /* the key card is a grid: left to itself the track ran the card's whole width */
 	.key .sizes { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 12px 16px; }
 	.key .sizes > span { display: grid; justify-items: center; gap: 4px; font-size: 0.74rem; color: var(--muted); }
 	.key i { display: block; border-radius: 50%; background: var(--muted); }
