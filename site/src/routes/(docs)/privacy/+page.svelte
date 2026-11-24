@@ -19,12 +19,12 @@
 		<p class="mt-kicker">Elenz</p>
 		<h1 id="mt-h">Privacy</h1>
 		<p class="mt-lede">We don’t ask who you are. Elenz uses no cookies, shows no ads and has no trackers. We count visits, and we have your email address only if you write to us.</p>
-		<p class="mt-meta">Updated 23 November 2026</p>
+		<p class="mt-meta">Updated 25 November 2026</p>
 	</header>
 
 	<div class="mt-body">
 		<h2 id="visits">Counting visits</h2>
-		<p>Elenz counts visits with two services, Cloudflare Web Analytics and Umami. They record which pages are viewed, the site a visitor came from, their country, and the kind of browser and device; Umami also records how long a page stays open. Neither uses cookies or follows anyone from site to site. Umami uses your IP address only to work out your country, and doesn’t store it. We see only totals, never individual visitors. Umami also counts a few clicks, such as opening a wall-screen link, changing a dashboard’s layout, or the Support Elenz and Report a problem links. If your browser is set to send Do Not Track, Umami doesn’t count your visit.</p>
+		<p>Elenz counts visits with two services, Cloudflare Web Analytics and Umami. They record which pages are viewed, the site a visitor came from, their country, and the kind of browser and device; Umami also records how long a page stays open. Neither uses cookies or follows anyone from site to site. Umami uses your IP address only to work out your country, and doesn’t store it. We see only totals, never individual visitors. Umami also counts a few clicks, such as opening a wall-screen link, changing a dashboard’s layout, or the Support Elenz and Report a problem links, and how often a page’s view is changed, such as a chart’s range or region on Tracker: which setting changed, not what it was set to. If your browser is set to send Do Not Track, Umami doesn’t count your visit.</p>
 		<p id="screens">The Now page, the dashboard and the power landscape are often left open on a screen, which visit counters can’t see. While one is open, it tells our host, Cloudflare, every 5 minutes that it is still open: which of the three pages it is, whether it’s on screen or hidden, whether it came from a wall-screen link, and how many minutes it has been open. Each opened page gets a random number, forgotten when it closes, so we can tell how long a screen stays open but not whose it is; Cloudflare adds your country. Nothing is kept in your browser, and nothing is sent if your browser sends Do Not Track or you’ve opted out (below).</p>
 		<p id="opt-out">To leave your browser out of Umami’s counts and the screen count, open <a href="/?exclude-me" data-sveltekit-reload>elenz.co.nz/?exclude-me</a>. Your browser then keeps a note, <code>umami.disabled</code>, that both of them check; to be counted again, open <a href="/?include-me" data-sveltekit-reload>elenz.co.nz/?include-me</a>. Cloudflare Web Analytics still counts the visit, as part of its totals.</p>
 
