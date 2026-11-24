@@ -117,7 +117,7 @@
 		<div class="head">
 			<div class="intro">
 				<h1>Plants</h1>
-				<p class="sub">Every generating station Elenz tracks: {operating} operating and {closedN} closed. Each has a page with its output now, its history back to 1997 where the data has it, and facts with their sources.</p>
+				<p class="sub">Every generating station Elenz tracks: {operating} operating and {closedN} closed. Each has a page with its output now, its history back to 1997 where the data has it, and facts with their sources. <a href="/methods/plants">How the pages are put together</a></p>
 			</div>
 			{#if !PLANTS_PUBLIC}
 				<div class="progress">
@@ -219,6 +219,7 @@
 				<span class="p-tip"><InfoTip label="About this table">
 					<p>Every plant Elenz tracks. Installed is its capacity today (or when it closed); Now is its dispatch in the newest 5-minute interval, the same figure as Now’s “Every generator right now”.</p>
 					<p>Commissioned shows once we’ve checked it against a source. Click a column heading to sort by it.</p>
+					<p><a href="/methods/plants#dates">How commissioned dates are chosen</a></p>
 				</InfoTip></span>
 			</div>
 			<div class="scroll">

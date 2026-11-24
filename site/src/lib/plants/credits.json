@@ -1,0 +1,703 @@
+{
+ "summary": {
+  "pages": 110,
+  "reviewed": 88,
+  "with_photo": 43,
+  "photos": 59
+ },
+ "photos": [
+  {
+   "slug": "arapuni",
+   "name": "Arapuni",
+   "title": "Arapuni Power Station",
+   "author": "Schwede66",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Arapuni_power_station.JPG",
+   "licence": "CC BY-SA 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  },
+  {
+   "slug": "arapuni",
+   "name": "Arapuni",
+   "title": "Arapuni Dam and power station, 1929 (Alexander Turnbull Library)",
+   "author": "Albert Percy Godber",
+   "source_url": "https://commons.wikimedia.org/wiki/File:View_of_the_Arapuni_Dam_and_power_station,_1929._ATLIB_294933.png",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  {
+   "slug": "arapuni",
+   "name": "Arapuni",
+   "title": "Arapuni Power Station from the lookout",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "slug": "atiamuri",
+   "name": "Ātiamuri",
+   "title": "Atiamuri Power Station",
+   "author": "Ulrich Lange",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Lake_Atiamuri_Power_Station.jpg",
+   "licence": "CC BY-SA 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  },
+  {
+   "slug": "aviemore",
+   "name": "Aviemore",
+   "title": "Aviemore Dam",
+   "author": "Ingolfson",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Aviemore_Dam_From_Canterbury.jpg",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  {
+   "slug": "benmore",
+   "name": "Benmore",
+   "title": "Benmore Power Station",
+   "author": "Andrew Cooper",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Benmore_Power_Stn_NZ.jpg",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  {
+   "slug": "clyde",
+   "name": "Clyde",
+   "title": "Clyde Dam with its power station",
+   "author": "Ulrich Lange",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Clyde_Dam_with_Power_Station_(frontview).jpg",
+   "licence": "CC BY 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by/3.0/"
+  },
+  {
+   "slug": "cobb",
+   "name": "Cobb",
+   "title": "Cobb Power Station",
+   "author": "Pseudopanax at English Wikipedia",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Cobb_Power_Station.jpg",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  {
+   "slug": "highbank",
+   "name": "Highbank",
+   "title": "Highbank Power Station",
+   "author": "Bevanw58",
+   "source_url": "https://commons.wikimedia.org/wiki/File:RDR_Highbank_Power_station_1.jpg",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  {
+   "slug": "huntly-5",
+   "name": "Huntly 5",
+   "title": "Huntly Power Station",
+   "author": "Follash",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Huntly_Power_Station.JPG",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  {
+   "slug": "huntly-6",
+   "name": "Huntly 6",
+   "title": "Huntly Power Station",
+   "author": "Follash",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Huntly_Power_Station.JPG",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  {
+   "slug": "huntly-rankines",
+   "name": "Huntly Rankines",
+   "title": "Huntly Power Station",
+   "author": "Follash",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Huntly_Power_Station.JPG",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  {
+   "slug": "kawerau",
+   "name": "Kawerau",
+   "title": "Geothermal power plant at Kawerau",
+   "author": "Rjglewis",
+   "source_url": "https://commons.wikimedia.org/wiki/File:100_MW_Geothermal_Power_Plant_at_Kawerau_NZ.jpg",
+   "licence": "CC BY-SA 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  },
+  {
+   "slug": "kowhai-park-solar-farm",
+   "name": "Kōwhai Park Solar Farm",
+   "title": "Kōwhai Park Solar Farm",
+   "author": "Paora",
+   "source_url": "https://commons.wikimedia.org/wiki/File:K%C5%8Dwhai_Park_Solar_Farm_PA01.jpg",
+   "licence": "CC0 1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  {
+   "slug": "mahinerangi-waipori-b",
+   "name": "Mahinerangi",
+   "title": "Mahinerangi Wind Farm",
+   "author": "Samuel Mann",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Mahinerangi_Wind_Farm.jpg",
+   "licence": "CC BY 2.0",
+   "licence_url": "https://creativecommons.org/licenses/by/2.0/"
+  },
+  {
+   "slug": "manapouri",
+   "name": "Manapōuri",
+   "title": "Manapōuri Power Station machine hall",
+   "author": "Jens Bludau",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Manapouri_Power_Station.jpg",
+   "licence": "CC BY-SA 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  },
+  {
+   "slug": "manapouri",
+   "name": "Manapōuri",
+   "title": "Manapōuri Power Station at Lake Manapōuri",
+   "author": "Pseudopanax at English Wikipedia",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Manapouri_power_station_at_Lake_Manapouri_in_the_afternoon.jpg",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  {
+   "slug": "mangahao",
+   "name": "Mangahao",
+   "title": "Mangahao Power Station turbine room, 1924 (Alexander Turnbull Library)",
+   "author": "Albert Percy Godber",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Mangahao_Power_Station,_1924_ATLIB_301155.png",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  {
+   "slug": "mangahao",
+   "name": "Mangahao",
+   "title": "Mangahao Power Station interior, 1924 (Alexander Turnbull Library)",
+   "author": "Albert Percy Godber",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Mangahao_Power_Station,_1924_ATLIB_301146.png",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  {
+   "slug": "maraetai",
+   "name": "Maraetai",
+   "title": "Maraetai Power Station",
+   "author": "Majorconvenience",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Maraetai_Power_Station.jpg",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  {
+   "slug": "matahina",
+   "name": "Matahina",
+   "title": "Matahina Dam",
+   "author": "Ulrich Lange",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Lake_Matahina_-_Dam.jpg",
+   "licence": "CC BY-SA 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  },
+  {
+   "slug": "mill-creek",
+   "name": "Mill Creek",
+   "title": "Mill Creek Wind Farm from Ohariu Bay",
+   "author": "Wainuiomartian",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Mill_Creek_wind_farm_from_Ohariu_Bay.jpg",
+   "licence": "CC0 1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  {
+   "slug": "ohaaki",
+   "name": "Ōhaaki",
+   "title": "Ōhaaki geothermal power station",
+   "author": "SmokeySteve",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Ohaaki_geothermal_power_station.jpg",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  {
+   "slug": "ohakuri",
+   "name": "Ōhakuri",
+   "title": "Ōhākuri Power Station",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "slug": "ohakuri",
+   "name": "Ōhakuri",
+   "title": "Ōhākuri Power Station and the Waikato River",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "slug": "ohau-a",
+   "name": "Ōhau A",
+   "title": "Ōhau A Power Station",
+   "author": "Ulrich Lange",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Hydroelectric_Power_Station_Ohau_A.jpg",
+   "licence": "CC BY 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by/3.0/"
+  },
+  {
+   "slug": "ohau-b",
+   "name": "Ōhau B",
+   "title": "Ōhau B Power Station",
+   "author": "Ulrich Lange",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Hydroelectric_Power_Station_Ohau_B.jpg",
+   "licence": "CC BY 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by/3.0/"
+  },
+  {
+   "slug": "ohau-c",
+   "name": "Ōhau C",
+   "title": "Ōhau C hydroelectric power station",
+   "author": "Dirk Pons",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Ohau_C_hydroelectric_Power_station_New_Zealand.jpg",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "slug": "otahuhu-b",
+   "name": "Ōtāhuhu B",
+   "title": "Ōtāhuhu B combined cycle turbine",
+   "author": "Stug.stug",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Otahuhu_B_combined_cycle_turbine.jpg",
+   "licence": "CC BY-SA 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  },
+  {
+   "slug": "roxburgh",
+   "name": "Roxburgh",
+   "title": "Roxburgh Power Station",
+   "author": "Kelisi (CJMoss)",
+   "source_url": "https://commons.wikimedia.org/wiki/File:RoxburghHydroStnNZ.JPG",
+   "licence": "CC BY-SA 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  },
+  {
+   "slug": "southdown",
+   "name": "Southdown",
+   "title": "Southdown Power Station",
+   "author": "russellstreet (Flickr)",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Southdown_Power_Station.jpg",
+   "licence": "CC BY-SA 2.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+  },
+  {
+   "slug": "tararua-stage-i",
+   "name": "Tararua stage I",
+   "title": "Tararua Wind Farm",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "slug": "tararua-stage-i",
+   "name": "Tararua stage I",
+   "title": "Tararua Wind Farm",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "slug": "tararua-stage-i",
+   "name": "Tararua stage I",
+   "title": "Tararua Wind Farm",
+   "author": "SmokeySteve",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Tararua_wind_farm.jpg",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  {
+   "slug": "tararua-stage-ii",
+   "name": "Tararua stage II",
+   "title": "Tararua Wind Farm",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "slug": "tararua-stage-ii",
+   "name": "Tararua stage II",
+   "title": "Tararua Wind Farm",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "slug": "tararua-stage-ii",
+   "name": "Tararua stage II",
+   "title": "Tararua Wind Farm",
+   "author": "SmokeySteve",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Tararua_wind_farm.jpg",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  {
+   "slug": "tararua-wind-farm-3",
+   "name": "Tararua Wind Farm 3",
+   "title": "Tararua Wind Farm",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "slug": "tararua-wind-farm-3",
+   "name": "Tararua Wind Farm 3",
+   "title": "Tararua Wind Farm",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "slug": "te-apiti",
+   "name": "Te Āpiti",
+   "title": "Te Apiti Wind Farm in early evening sunlight",
+   "author": "Pseudopanax at English Wikipedia",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Te_Apiti_wind_farm_in_early_evening_sunlight.jpg",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  {
+   "slug": "te-apiti",
+   "name": "Te Āpiti",
+   "title": "Te Apiti Wind Farm",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "slug": "te-apiti",
+   "name": "Te Āpiti",
+   "title": "Te Apiti Wind Farm",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "slug": "te-rere-hau",
+   "name": "Te Rere Hau",
+   "title": "Te Rere Hau Wind Farm",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "slug": "te-rere-hau",
+   "name": "Te Rere Hau",
+   "title": "Te Rere Hau Wind Farm",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "slug": "te-uku",
+   "name": "Te Uku",
+   "title": "Te Uku Wind Farm",
+   "author": "Symac",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Te_Uku_Wind_Farm_(2).jpg",
+   "licence": "CC BY-SA 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  },
+  {
+   "slug": "tekapo-a",
+   "name": "Tekapo A",
+   "title": "Tekapo A Power Station",
+   "author": "Philipp Weigell",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Power_plant_Tekapo_A.jpg",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  {
+   "slug": "tekapo-b",
+   "name": "Tekapo B",
+   "title": "Tekapo B Power Station on Lake Pukaki",
+   "author": "Pseudopanax at English Wikipedia",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Pukaki_Power_Station_(Tekapo_B).jpg",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  {
+   "slug": "tokaanu",
+   "name": "Tokaanu",
+   "title": "Tokaanu Power Station",
+   "author": "Ulrich Lange",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Tokaanu_Power_Station.jpg",
+   "licence": "CC BY-SA 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  },
+  {
+   "slug": "turitea-wind-farm",
+   "name": "Turitea Wind Farm",
+   "title": "Turitea Wind Farm",
+   "author": "Elenz team",
+   "source_url": "https://elenz.co.nz",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "slug": "waikaremoana",
+   "name": "Waikaremoana",
+   "title": "Art Deco power house at Tuai",
+   "author": "Searlenz",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Art_Deco_power_house_in_Tuai.jpg",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  {
+   "slug": "waipapa",
+   "name": "Waipāpa",
+   "title": "Waipapa Power Station",
+   "author": "russellstreet",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Waipapa_Power_Station_-_4590618767.jpg",
+   "licence": "CC BY-SA 2.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+  },
+  {
+   "slug": "waipapa",
+   "name": "Waipāpa",
+   "title": "Waipapa Hydro Power Station from the air, 14 Oct 1966 (Alexander Turnbull Library)",
+   "author": "Whites Aviation",
+   "source_url": "https://digitalnz.org/records/23135737",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "slug": "waipapa",
+   "name": "Waipāpa",
+   "title": "Waipapa Hydro Power Station from the air, 6 Jan 1976 (Alexander Turnbull Library)",
+   "author": "Whites Aviation",
+   "source_url": "https://digitalnz.org/records/23206198",
+   "licence": "CC BY 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+   "slug": "waipipi",
+   "name": "Waipipi",
+   "title": "Four turbines of the Waipipi Wind Farm",
+   "author": "Majorconvenience",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Four_turbines_of_the_Waipipi_Wind_Farm.jpg",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  {
+   "slug": "wairakei",
+   "name": "Wairākei",
+   "title": "Wairākei geothermal power plant",
+   "author": "Ingolfson",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Wairakei_Geothermal_Power_Plant.jpg",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  {
+   "slug": "west-wind",
+   "name": "West Wind",
+   "title": "West Wind Farm, Mākara",
+   "author": "Krzysztof Golik",
+   "source_url": "https://commons.wikimedia.org/wiki/File:West_Wind_Farm_Makara_01.jpg",
+   "licence": "CC BY-SA 4.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  {
+   "slug": "west-wind",
+   "name": "West Wind",
+   "title": "West Wind Farm from the West Wind Recreation Area lookout",
+   "author": "Pseudopanax at English Wikipedia",
+   "source_url": "https://commons.wikimedia.org/wiki/File:West_Wind_Farm_from_West_Wind_Recreation_Area_lookout.jpg",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  {
+   "slug": "whakamaru",
+   "name": "Whakamaru",
+   "title": "Whakamaru Power Station",
+   "author": "Paradoxsm",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Whakamaru_Power_Station.jpg",
+   "licence": "Public domain",
+   "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  {
+   "slug": "white-hill",
+   "name": "White Hill",
+   "title": "White Hill Wind Farm",
+   "author": "Daveosaurus",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Whitehill.JPG",
+   "licence": "CC BY-SA 3.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  }
+ ],
+ "imagery": [
+  {
+   "collection": "Ashburton 0.075m Urban Aerial Photos (2025)",
+   "pages": 1
+  },
+  {
+   "collection": "Auckland 0.075m Urban Aerial Photos (2024-2025)",
+   "pages": 6
+  },
+  {
+   "collection": "Bay of Plenty 0.1m Urban Aerial Photos (2023)",
+   "pages": 1
+  },
+  {
+   "collection": "Bay of Plenty 0.1m Urban Aerial Photos (2025)",
+   "pages": 7
+  },
+  {
+   "collection": "Bay of Plenty East 0.2m Rural Aerial Photos (2024-2025)",
+   "pages": 4
+  },
+  {
+   "collection": "Bay of Plenty West 0.2m Rural Aerial Photos (2024-2025)",
+   "pages": 5
+  },
+  {
+   "collection": "Canterbury 0.2m Rural Aerial Photos (2024)",
+   "pages": 1
+  },
+  {
+   "collection": "Canterbury - Mackenzie 0.3m Rural Aerial Photos (2021)",
+   "pages": 4
+  },
+  {
+   "collection": "Canterbury - Waitaki 0.3m Rural Aerial Photos (2021)",
+   "pages": 2
+  },
+  {
+   "collection": "Christchurch 0.075m Urban Aerial Photos (2025)",
+   "pages": 1
+  },
+  {
+   "collection": "Hamilton 0.05m Urban Aerial Photos (2025)",
+   "pages": 1
+  },
+  {
+   "collection": "Hawke's Bay 0.1m Urban Aerial Photos (2024-2025)",
+   "pages": 1
+  },
+  {
+   "collection": "Hawke's Bay 0.2m Rural Aerial Photos (2025-2026)",
+   "pages": 2
+  },
+  {
+   "collection": "Mackenzie 0.075m Urban Aerial Photos (2025-2026)",
+   "pages": 2
+  },
+  {
+   "collection": "Manawatū-Whanganui 0.2m Rural Aerial Photos (2023-2024)",
+   "pages": 3
+  },
+  {
+   "collection": "Manawatū-Whanganui 0.3m Rural Aerial Photos (2021-2022)",
+   "pages": 3
+  },
+  {
+   "collection": "Marlborough 0.25m Rural Aerial Photos (2023-2024)",
+   "pages": 1
+  },
+  {
+   "collection": "Northland 0.1m Urban Aerial Photos (2016)",
+   "pages": 1
+  },
+  {
+   "collection": "Northland 0.3m Rural Aerial Photos (2023-2025)",
+   "pages": 8
+  },
+  {
+   "collection": "Otago 0.1m Urban Aerial Photos (2018)",
+   "pages": 1
+  },
+  {
+   "collection": "Otago 0.1m Urban Aerial Photos (2023-2024)",
+   "pages": 3
+  },
+  {
+   "collection": "Otago 0.2m Rural Aerial Photos (2025)",
+   "pages": 6
+  },
+  {
+   "collection": "Palmerston North 0.1m Urban Aerial Photos (2024)",
+   "pages": 3
+  },
+  {
+   "collection": "Selwyn 0.2m Rural Aerial Photos (2025)",
+   "pages": 2
+  },
+  {
+   "collection": "South Waikato 0.1m Urban Aerial Photos (2025)",
+   "pages": 1
+  },
+  {
+   "collection": "Southland 0.25m Rural Aerial Photos (2023-2024)",
+   "pages": 3
+  },
+  {
+   "collection": "Southland 0.75m Rural Aerial Photos (2005-2011)",
+   "pages": 1
+  },
+  {
+   "collection": "Taranaki 0.05m Urban Aerial Photos (2022-2023)",
+   "pages": 1
+  },
+  {
+   "collection": "Taranaki 0.1m Urban Aerial Photos (2022)",
+   "pages": 2
+  },
+  {
+   "collection": "Taranaki 0.1m Urban Aerial Photos (2022-2023)",
+   "pages": 2
+  },
+  {
+   "collection": "Taranaki 0.25m Rural Aerial Photos (2021-2022)",
+   "pages": 3
+  },
+  {
+   "collection": "Tasman 0.25m Rural Aerial Photos (2024-2025)",
+   "pages": 1
+  },
+  {
+   "collection": "Taupō 0.1m Urban Aerial Photos (2025)",
+   "pages": 7
+  },
+  {
+   "collection": "Waikato 0.075m Urban Aerial Photos (2025-2026)",
+   "pages": 5
+  },
+  {
+   "collection": "Waikato 0.3m Rural Aerial Photos (2021-2024)",
+   "pages": 9
+  },
+  {
+   "collection": "Waikato 0.3m Rural Aerial Photos (2023-2024)",
+   "pages": 3
+  },
+  {
+   "collection": "Waikato District 0.1m Urban Aerial Photos (2021)",
+   "pages": 1
+  },
+  {
+   "collection": "Waipa 0.1m Urban Aerial Photos (2026)",
+   "pages": 3
+  },
+  {
+   "collection": "Wellington 0.2m Rural Aerial Photos (2025-2026)",
+   "pages": 2
+  },
+  {
+   "collection": "West Coast 0.2m Rural Aerial Photos (2024-2026)",
+   "pages": 1
+  }
+ ]
+}

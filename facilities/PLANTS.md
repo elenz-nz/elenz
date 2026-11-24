@@ -13,6 +13,10 @@ like the rest of the repository, so they hold only what public sources say.
 | `plant_photo_leads.csv` | Photos worth checking; a lead stays listed after its photo is cleared and added to `plant_images.csv` |
 | `station_leads.csv` | Stations without a page yet: embedded stations, stations not in Elenz's data, new-station leads; `on_page` names the plant page a lead is already on (see Stations without a page) |
 
+The public account of these rules is the method page `/methods/plants` (`site/src/lib/methods/pages/plants.svelte`):
+when a rule here changes, change it in the same pull request. Its image credits come from `plant_images.csv` and the
+aerial views, through `site/src/lib/plants/credits.json` (`ingest/plant_pages.py`).
+
 The first drafts came from the research register workbook of 8 Nov 2026 (`analysis/plants_import.py`, run once on
 18 Nov 2026). The workbook is retired: these files are now the record, edited directly.
 
