@@ -5,7 +5,8 @@
 	// fetches tracker.json as /now does and hands each new interval over. Linked from /now and /guide since 16 Nov 2026,
 	// with its own link-preview image (static/og/landscape.png, analysis/dashboard_og_png.py); sends a heartbeat while
 	// open (#lib/site/heartbeat.js). The view (mode, what shows, replay speed) is in the address and kept in this browser
-	// (prefs.js); `kiosk=1` shows the picture alone for a wall screen, replaying again if it's a replay.
+	// (prefs.js); `kiosk=1` shows the picture alone for a wall screen, replaying again if it's a replay. The words and
+	// numbers on the picture drift a few pixels in a slow loop against screen burn (#lib/site/drift.js, landscape.css).
 	import { onMount, tick } from 'svelte';
 	import '@fontsource/fredoka/500.css';
 	import '@fontsource/fredoka/600.css';
@@ -14,6 +15,7 @@
 	import Preview from '#lib/site/Preview.svelte';
 	import KeepAwake from '#lib/now/KeepAwake.svelte';
 	import { startHeartbeat } from '#lib/site/heartbeat.js';
+	import { drift } from '#lib/site/drift.js';
 	import { track, trackOnLoad } from '#lib/site/track.js';
 	import { nextDue, CHECK_EVERY } from '#lib/site/poll.js';
 	import { generatorRows } from '#lib/now/generators.js';
@@ -175,7 +177,7 @@
 			</div>
 		{/if}
 
-		<div class="scene js-only">
+		<div class="scene js-only" use:drift>
 			<div class="stage" id="stage">
 				<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
 				<canvas id="cv" role="img" aria-label="A storybook New Zealand landscape showing how electricity is being made: wind turbines on a ridge, a hydro dam with its lake and river, a steaming geothermal station, a solar farm, solar panels on houses, a gas power station and batteries, all joined to the town by power lines."></canvas>

@@ -45,6 +45,15 @@ as `/now` does (`#lib/site/poll.js`), and both, like `/now`, send the heartbeat 
 (`#lib/site/track.js`): `wall-screen-open` and `wall-screen-copy` on both, `layout-change` on the dashboard (at most one
 a minute), `landscape-mode` on the landscape.
 
+Screen-burn drift (`#lib/site/drift.js`, design decision, 25 Nov 2026): either page may stay open on a screen for days,
+and an OLED or plasma screen can keep a faint copy of what never changes. So what stays still drifts up to 5 px each way
+along a slow Lissajous path (periods of 17 and 23 minutes), in whole pixels, at most one pixel every 20 seconds, which
+nobody sees move. It is always on, on the page itself and in full screen and the wall-screen view, with no setting: the
+screens that need it are the ones nobody would think to set. The action sets `--dx` and `--dy`; on the dashboard the
+cards and the background move (the background drawn 6 px larger on every side, so no edge shows), on the landscape the
+place names, the numbers and the wall-screen credit (the painted scene changes with the light through the day). A
+moved box holds its absolutely placed children, so the landscape's `.labels` covers the picture. Tests: `tests/drift.test.js`.
+
 `/dashboard`, the big-number dashboard (`src/routes/dashboard/+page.svelte`, `src/lib/dashboard/`): one or two large live
 values and up to four small ones over a background, for a wall screen, a spare tablet or a phone. Every value is in
 `values.js` (keys, groups for the picker's tabs, the regions and measures each can show, and how it is worked out, from
