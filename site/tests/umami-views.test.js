@@ -52,6 +52,15 @@ test('a change of view on the same page is no view, but a view-change event', ()
   assert.deepEqual(sent, [{ name: 'view-change', page: '/tracker', changes: 1, keys: 'range' }]);
 });
 
+test('the same settings in a new order are no change', () => {
+  const { view, sent } = setup();
+  assert.ok(view(T + '?fuel=oemb&region=NI'));
+  assert.equal(view(T + '?region=NI&fuel=oemb'), null, 'still no view');
+  assert.deepEqual(sent, [], 'and no event');
+  view(T + '?region=SI&fuel=oemb');
+  assert.deepEqual(sent, [{ name: 'view-change', page: '/tracker', changes: 1, keys: 'region' }]);
+});
+
 test('a run of changes sends at most one event a minute, counting what came between', () => {
   const { view, sent, advance } = setup();
   view(T);

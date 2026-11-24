@@ -83,7 +83,13 @@
 					try { url = new URL(p.url, location.href); } catch (e) { return p; }
 					var prev = lastUrl;
 					lastUrl = url;
-					if (url.pathname === lastPath) { change(url.pathname, changed(prev, url)); return null; }
+					if (url.pathname === lastPath) {
+						// the same settings rewritten (Tracker puts them in a fixed order, so a link's own order changes on load): no change
+						var keys = changed(prev, url), any = false;
+						for (var k in keys) any = true;
+						if (any) change(url.pathname, keys);
+						return null;
+					}
 					flush();
 					lastPath = url.pathname;
 					return p;
