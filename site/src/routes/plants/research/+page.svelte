@@ -244,7 +244,7 @@
 				<label class="lab">Fuel
 					<select bind:value={s.fuel}><option value="">All fuels</option>{#each fuels as f (f.k)}<option value={f.k}>{f.name}</option>{/each}</select>
 				</label>
-				<div class="seg" role="group" aria-label="Island">
+				<div class="seg isl" role="group" aria-label="Island">
 					{#each [['', 'Both islands'], ['NI', 'North'], ['SI', 'South']] as [k, name] (k)}
 						<button type="button" aria-pressed={s.island === k} onclick={() => (s.island = k)}>{name}</button>
 					{/each}
@@ -485,13 +485,13 @@
 	.bar { height: 6px; border-radius: 3px; background: var(--grid); overflow: hidden; margin-top: 4px; }
 	.bar span { display: block; height: 100%; background: var(--accent); }
 
-	.ctl { padding: 12px 14px; }
+	.ctl { padding: 12px 14px; grid-template-columns: minmax(0, 1fr); }
 	.row { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
 	.seg { display: inline-flex; gap: 2px; border-radius: 4px; padding: 2px; background: var(--grid); }
 	.seg button { font: inherit; font-size: 0.8rem; font-weight: 500; border: 1px solid transparent; background: transparent; color: var(--ink); padding: 2px 10px; min-height: 30px; border-radius: 3px; cursor: pointer; }
 	.seg button[aria-pressed='true'] { background: var(--surface); border-color: var(--line); }
-	.lab { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--ink-2); }
-	.lab select, .lab input[type='search'] { font: inherit; font-size: 0.86rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; min-height: 32px; max-width: 100%; }
+	.lab { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--ink-2); min-width: 0; max-width: 100%; }
+	.lab select, .lab input[type='search'] { font: inherit; font-size: 0.86rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; min-height: 32px; min-width: 0; max-width: 100%; }
 	.find input { width: 180px; }
 	.btn { font: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--accent); border-radius: 4px; font-size: 0.8rem; font-weight: 600; padding: 3px 10px; min-height: 32px; }
 	.btn:disabled { color: var(--muted); cursor: progress; }
@@ -571,6 +571,8 @@
 		.dl { margin-left: 0; }
 		.find { flex: 1 1 100%; }
 		.find input { flex: 1; width: auto; min-width: 0; }
+		.seg.isl { display: flex; flex: 1 1 100%; min-width: 0; }
+		.seg.isl button { flex: 1 1 0; min-width: 0; padding: 2px 4px; line-height: 1.2; white-space: normal; text-wrap: balance; overflow-wrap: anywhere; }
 		/* the opened plant fits the screen: each fact a small card, grade and date checked on its first line */
 		.detail { max-width: calc(100vw - 40px); overflow-wrap: anywhere; }
 		.facts thead { display: none; }
