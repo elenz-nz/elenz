@@ -594,7 +594,11 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
 - `.github/workflows/watchdog.yml`: checks the live site every 15 minutes; opens an issue labelled `stale-data`
   (GitHub emails it to the Elenz team) when live data is over 60 minutes old, history over 5 days behind, the Worker
   can't start a job, or embedded solar's irradiance is failing (the reserve forecast not refreshed for 6 hours, the
-  satellite 6 hours behind, or daylight with no irradiance at all: `docs/data-notes.md`), and closes it when the data recovers.
+  satellite 6 hours behind, or daylight with no irradiance at all: `docs/data-notes.md`), or the history has no
+  metered data for the month 90 days ago (`metered_to` in `hist/index.json`, kept by `history.metered_months`; the EA
+  publishes a month's metered files ~5-6 weeks after it ends, and the history closes a month without them after
+  `METERED_WAIT`, 100 days, so this comes first: design decision, 26 Nov 2026, after the register file was renamed),
+  and closes it when the data recovers.
   Its `records` job is the record alert (design decision, 17 Nov 2026, for the public push: the team hears of a record
   first). It reads records.json and tracker.json from the live site and lists every provisional record the site shows
   (`provisionalNow` in `site/src/lib/records/alert.js`: the live week through `liveBeats`, as /now and the record pages

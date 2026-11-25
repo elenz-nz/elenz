@@ -29,7 +29,8 @@ Stored (Cloudflare KV in GitHub Actions, data/store locally), one set per NZ cal
   site shows the layer)
 and across all months:
   hist/day.json              every day since 2020 (the 1-year and all-time views)
-  hist/index.json            months stored, first and last time (published once the backfill has caught up)
+  hist/index.json            months stored, first and last time, the newest month built from metered data
+                             (`metered_to`; published once the backfill has caught up)
   hist/progress.json         the job's own record: months stored and finished, and the plant mapping used
   hist/roof_cap.json         rooftop solar capacity by point and month (EA report GUEHMT by Root NSP, less the
                              dispatched farms it also counts); the live job reads it too
@@ -648,6 +649,21 @@ class Counted:
         return self.used + n <= WRITE_BUDGET
 
 
+def metered_months(store, index, stored, seed=6):
+    """Months whose published hh file is built from metered data: the job's own record, or (before it kept one) read
+    from the newest `seed` stored months' hh meta."""
+    if 'metered' in index:
+        return set(index['metered'])
+    out = set()
+    for mo in sorted(stored)[-seed:]:
+        try:
+            if json.loads(store.get(f'hist/hh/{mo}.json') or b'{}').get('meta', {}).get('source') == 'metered':
+                out.add(mo)
+        except ValueError:
+            pass
+    return out
+
+
 def main(budget_min=300, rebuild=False, start=None, log=print):
     t_start = time.time()
     if os.environ.get('GITHUB_ACTIONS') and not all(os.environ.get(k) for k in ('CF_ACCOUNT_ID', 'CF_API_TOKEN')):
@@ -675,6 +691,10 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
     cap = solar_capacity(store)
     yesterday = datetime.now(NZ).date() - timedelta(days=1)
     caps_before = index.get('roof_mw', {})
+    # months published from metered data (hh meta 'source'), so the watchdog can tell when the EA's metered files stop
+    # arriving: a month is closed without them METERED_WAIT days after it ends, and nothing else would say so.
+    # Seeded once from the newest stored months' hh files (a few KV reads), then kept up as months are rebuilt.
+    metered = metered_months(store, index, stored)
     done = set(index.get('done', [])) - left   # complete months: nothing left to fetch or rebuild
     done_before = set(done)
     changed_dd = {}
@@ -818,6 +838,7 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
             stored.add(month)
             left.discard(month)
             caps_before[month] = hh['meta']['roof_mw']
+            (metered.add if hh['meta']['source'] == 'metered' else metered.discard)(month)
 
     # other embedded generation's average days by month (for estimates here and in the live job), when they changed
     if json.dumps(prof, sort_keys=True) != prof_before and store.room(1 + 3):
@@ -854,7 +875,8 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
     # 'at': when this run saved it; the Worker's health check and the watchdog treat a stale index as expected while a
     # rebuild is under way (rebuild_left not empty, progress saved within two days)
     progress = {'months': months, 'done': sorted(done), 'rebuild_left': sorted(left), 'hash': mhash, 'roof_mw': caps_before,
-                'writes': {today: store.used + 1}, 'at': int(time.time() * 1000), 'hv': hvdc.VERSION, 'oemb_files': ofiles}
+                'writes': {today: store.used + 1}, 'at': int(time.time() * 1000), 'hv': hvdc.VERSION, 'oemb_files': ofiles,
+                'metered': sorted(metered), 'metered_to': max(metered) if metered else None}
     if not changed_dd:
         # no month rebuilt, but a run can still have saved files (a month's state, the solar capacity table) or
         # finished months: record them, so the day's KV write count stays right and finished months aren't revisited
@@ -874,7 +896,7 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
     put_json(store, 'hist/day.json', day)
     index = {**progress, 'first': day['t'][0], 'end': end, 'built': int(time.time() * 1000)}
     index['writes'] = {today: store.used + 2}
-    put_json(store, 'hist/index.json', {k: v for k, v in index.items() if k != 'oemb_files'})   # the public copy
+    put_json(store, 'hist/index.json', {k: v for k, v in index.items() if k not in ('oemb_files', 'metered')})   # the public copy
     put_json(store, 'hist/progress.json', index)
     log(f'history: {len(months)} months, {day["N"]} days to {pd.Timestamp(index["end"], unit="ms", tz="UTC").tz_convert(NZ)}, '
         f'{len(changed_dd)} months rebuilt in {time.time() - t_start:.0f} s, {store.used} KV writes today')

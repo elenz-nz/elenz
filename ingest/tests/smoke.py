@@ -602,5 +602,19 @@ _d = ea_dates(['2014-05-02', '2/05/2014', 'null', '', None, '30/09/2015'])
 check([None if pd.isna(x) else f'{x:%Y-%m-%d}' for x in _d] == ['2014-05-02', '2014-05-02', None, None, None, '2015-09-30'],
       'dates: ISO and day-first EA dates both read the right way round')
 
+# ---------- months built from metered data (history.metered_months, for the watchdog's metered check) ----------
+class _Store(dict):
+    def get(self, k):
+        return dict.get(self, k)
+
+
+_st = _Store({f'hist/hh/2026-{m:02d}.json': json.dumps({'meta': {'source': 'metered' if m <= 9 else 'dispatch'}}).encode()
+              for m in range(1, 12)})
+_mons = {f'2026-{m:02d}' for m in range(1, 12)}
+check(history.metered_months(_st, {}, _mons) == {f'2026-{m:02d}' for m in range(6, 10)},
+      'history: metered months seeded from the newest hh files')
+check(history.metered_months(_st, {'metered': ['2026-10']}, _mons) == {'2026-10'},
+      "history: metered months kept from the job's own record once it has one")
+
 print(f'\n{len(failures)} failed' if failures else '\nall passed')
 sys.exit(1 if failures else 0)
