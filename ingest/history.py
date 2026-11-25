@@ -111,6 +111,8 @@ FIRST_MONTH = mt.FIRST_MONTH   # first month of metered history (Generation_MD):
 ROOF_FROM = pd.Timestamp('2013-08-01', tz=NZ).tz_convert('UTC')   # embedded solar: the registry's first month
 METERED_WAIT = 100           # days after a month ends before its metered data must be there for the month to be done
 IRR_MONTHS_PER_RUN = 20      # months of missing satellite irradiance fetched per run (~100 Open-Meteo calls each)
+IRR_FC_DAYS = 90             # satellite gaps this recent are filled from the forecast service's past (it keeps 92 days)
+IRR_FC_AFTER = pd.Timedelta(hours=3)   # ...once they are this old (the satellite normally lags ~45 minutes)
 STEP = pd.Timedelta(minutes=30)
 WORKERS = 6
 
@@ -185,12 +187,70 @@ def irradiance(start, end):
     return out
 
 
-def irr_missing(s, icols, before=None):
-    """Trading periods (from ROOF_FROM on, and before `before` if given) missing irradiance at any point."""
+def irr_missing(s, icols, before=None, satellite=False):
+    """Trading periods (from ROOF_FROM on, and before `before` if given) missing irradiance at any point. With
+    satellite=True, periods filled from the forecast service (state column `irf` = 1) count as missing too: they are
+    still asked of the satellite on later runs."""
     keep = s.index >= ROOF_FROM
     if before is not None:
         keep &= s.index < before
-    return s.index[keep & s[icols].isna().any(axis=1).values]
+    miss = s[icols].isna().any(axis=1).values
+    if satellite and 'irf' in s:
+        miss = miss | (s['irf'] == 1).values
+    return s.index[keep & miss]
+
+
+def irr_satellite_fill(s, icols, gaps, r):
+    """Write satellite irradiance r (indexed like gaps) into state s: into blank cells, and over whole periods that
+    came from the forecast where the satellite now covers every point (their `irf` goes back to 0)."""
+    r = r.reindex(gaps)[icols].to_numpy(dtype=float)
+    cur = s.loc[gaps, icols].to_numpy(dtype=float)
+    fc = ((s.loc[gaps, 'irf'] == 1).to_numpy() if 'irf' in s else np.zeros(len(gaps), bool))[:, None]
+    full = ~np.isnan(r).any(axis=1)[:, None]
+    s.loc[gaps, icols] = np.where(fc & full, r, np.where(np.isnan(cur), r, cur))
+    if 'irf' in s:
+        s.loc[gaps[(fc & full)[:, 0]], 'irf'] = 0
+
+
+class ForecastIrradiance:
+    """The forecast service's model irradiance for the last IRR_FC_DAYS, by trading period, fetched at most once a
+    run and only when a month needs it: the history's stand-in while the satellite feed is down (test report, 25 Nov
+    2026: Open-Meteo's Himawari data blank from 19 Nov 23:00 UTC, and the history had zero embedded solar there)."""
+
+    def __init__(self, icols):
+        self.icols, self.tab, self.tried = icols, None, False
+
+    def fill(self, s):
+        """Fill blank irradiance older than IRR_FC_AFTER and within IRR_FC_DAYS from the forecast, marking those
+        periods `irf` = 1. Returns the number of trading periods filled."""
+        now = pd.Timestamp.now(tz='UTC')
+        gaps = irr_missing(s, self.icols, now - IRR_FC_AFTER)
+        gaps = gaps[gaps >= now - pd.Timedelta(days=IRR_FC_DAYS)]
+        if not len(gaps):
+            return 0
+        if not self.tried:
+            self.tried = True
+            try:
+                tps = pd.date_range((now - pd.Timedelta(days=IRR_FC_DAYS + 1)).floor('30min'), now.floor('30min'),
+                                    freq='30min')
+                fc = rooftop.forecast(get, past_days=min(92, IRR_FC_DAYS + 2))
+                self.tab = rooftop.half_hourly(fc, tps).reindex(columns=self.icols)
+            except Exception as e:
+                print(f'  irradiance: forecast service unavailable ({e})')
+        if self.tab is None:
+            return 0
+        f = self.tab.reindex(gaps)
+        ok = f.notna().all(axis=1).to_numpy()
+        if not ok.any():
+            return 0
+        rows = gaps[ok]
+        cur = s.loc[rows, self.icols]
+        s.loc[rows, self.icols] = cur.where(cur.notna(), f.loc[rows]).to_numpy(dtype=float)
+        if 'irf' not in s:
+            s['irf'] = 0
+        s['irf'] = s['irf'].fillna(0)
+        s.loc[rows, 'irf'] = 1
+        return int(ok.sum())
 
 
 def solar_capacity(store):
@@ -354,6 +414,7 @@ def build_month(s, month, cap, log, prof=None, recon_file=None):
                   'hvdc_metered': round(float(hv_ok.mean()), 4),
                   'final_prices': round(float(final.mean()), 4),
                   'source': 'metered' if met else 'dispatch',
+                  'irr_forecast': int((g['irf'] == 1).sum()) if 'irf' in g else 0,
                   'end': js['t0'] + (len(full) - 1) * js['step']}
     if prof is not None:
         isl_tab = mt.islands()
@@ -622,6 +683,7 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
     stopped = ''
     repairs = 0
     icols = irr_cols()
+    fc_irr = ForecastIrradiance(icols)
     # other embedded generation (embedded.py): each month's reconciliation file name (a revision has a new one), and
     # the average days its estimates and the live job's come from
     ofiles = dict(index.get('oemb_files', {}))
@@ -691,17 +753,22 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
                 s[c] = np.nan
         # irradiance is only meaningful by day; a trading period counts as missing if any point lacks it (and only
         # from Aug 2013, when the embedded solar registry starts)
-        gaps = irr_missing(s, icols)
+        gaps = irr_missing(s, icols, satellite=True)
         recent = month_last >= yesterday - timedelta(days=30)
         fixed = False
         # retry missing irradiance for recent months (the service can lag), or anywhere days of it are missing (a new
-        # point, a backfill); a few hours missing long ago are outages and stay interpolated
+        # point, a backfill); a few hours missing long ago are outages and stay interpolated. Periods that came from
+        # the forecast are asked of the satellite again, and replaced once it has them.
         if len(gaps) and repairs < IRR_MONTHS_PER_RUN and ((recent and not new) or len(gaps) > 3 * 48):
             repairs += 1
             r = irradiance(gaps.min(), gaps.max())
-            before = int(s[icols].isna().sum().sum())
-            s.loc[gaps, icols] = r.reindex(gaps)[icols].values
-            fixed = int(s[icols].isna().sum().sum()) < before
+            before = len(irr_missing(s, icols, satellite=True)), int(s[icols].isna().sum().sum())
+            irr_satellite_fill(s, icols, gaps, r)
+            after = len(irr_missing(s, icols, satellite=True)), int(s[icols].isna().sum().sum())
+            fixed = after[0] < before[0] or after[1] < before[1]
+        # what the satellite still lacks in the last IRR_FC_DAYS: the forecast service's irradiance stands in
+        if fc_irr.fill(s):
+            fixed = True
         # days of irradiance still missing (beyond this run's share): leave the month for a later run rather than
         # spend KV writes saving and rebuilding it twice
         two_days_ago = pd.Timestamp.now(tz='UTC') - pd.Timedelta(days=2)
@@ -717,14 +784,17 @@ def main(budget_min=300, rebuild=False, start=None, log=print):
             log(f'{month}: +{len(new)} days ({len(todo) - len(new)} not published yet), {len(dispatch_days(s))} days of dispatch data'
                 + ('; metered data' + (' (complete)' if mt.complete(s, m) else ' (part published)') if 'mg' in s else '')
                 + (f'; irradiance missing for {missing_r} trading periods' if missing_r else '')
+                + (f'; forecast irradiance for {int((s["irf"] == 1).sum())} trading periods'
+                   if 'irf' in s and (s['irf'] == 1).any() else '')
                 + (f'; {unpriced} trading periods without final prices yet' if unpriced else '')
                 + ('; metered HVDC added' if hv_metered else '')
                 + (f'; reconciliation data ({ofiles[month].rsplit("/", 1)[-1]})' if got_o else ''))
         hv_missing = s[['H|BEN', 'H|HAY']].isna().any().any()
         irr_n = len(irr_missing(s, icols))
+        irr_fc = len(irr_missing(s, icols, satellite=True)) - irr_n   # periods still on the forecast
         met_ok = mt.complete(s, m) or month_last < yesterday - timedelta(days=METERED_WAIT)
         if (month_last < yesterday - timedelta(days=14)
-                and (irr_n == 0 or (not recent and irr_n <= 3 * 48))
+                and (irr_n == 0 or (not recent and irr_n <= 3 * 48)) and (irr_fc == 0 or not recent)
                 and not s[['F|NI', 'F|SI']].isna().any().any() and not (s['fi'] == 1).any()
                 and (not hv_missing or month_last < yesterday - timedelta(days=90))
                 and met_ok

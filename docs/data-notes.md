@@ -100,6 +100,14 @@ What we've learned about the EA's data and the services the site uses: feed timi
   fetched), `fc_end` (how far it reaches) and `roof_gap` (daylight with no irradiance at all), and the watchdog
   raises its `stale-data` issue when the forecast hasn't refreshed for 6 hours, the satellite is 6 hours behind, or
   `roof_gap` is set. `/data/health` doesn't count these: the site is up and only one estimate is affected.
+- Satellite feed down for days (test report, 25 Nov 2026): Open-Meteo's Himawari data (`jma_jaxa_himawari`, so also
+  `satellite_radiation_seamless`) came back blank from 19 Nov 23:00 UTC; the live job ran on the forecast as designed,
+  but the history had no fallback, stored 21-24 Nov with zero embedded solar, and would have stopped rebuilding
+  November once more than three days were missing. Since then the history fills satellite gaps older than 3 hours
+  (`IRR_FC_AFTER`) and within 90 days (`IRR_FC_DAYS`; the forecast service keeps 92 past days) from the forecast
+  service, one fetch a run (`ForecastIrradiance`), marking those periods `irf` = 1 in the state. They are still asked
+  of the satellite on later runs and replaced where it covers every point; a month isn't `done` while it has forecast
+  periods and is within 30 days. hh meta `irr_forecast` counts a month's forecast periods.
 - Final prices (`FinalEnergyPrices`): `ByMonth/YYYYMM_FinalEnergyPrices.csv` for past months (~10 MB, every node),
   `YYYYMMDD_FinalEnergyPrices.csv` daily for the last year, `_I` suffix while interim (the last day or two, and
   occasionally days under review, e.g. 31 Aug and 1 Sep 2026). Trading period k starts (k−1) half-hours after local
