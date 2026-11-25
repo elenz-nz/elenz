@@ -1,6 +1,7 @@
 import adapter from '@sveltejs/adapter-static';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
+import { SCRIPT_SRC } from './scripts/csp.js';
 
 export default defineConfig({
 	// Vite 8 otherwise rewrites `max-width` rules as `width<=`, which Safari only reads from 16.4: older iPhones then skip
@@ -16,7 +17,9 @@ export default defineConfig({
 			adapter: adapter(),
 			// asset addresses from the site root (/_app/...), not relative to the page: the not-found page (404.html) is
 			// served at any address, e.g. /records/not-a-record, where relative ones would point to /records/_app/...
-			paths: { relative: false }
+			paths: { relative: false },
+			// each page's inline scripts allowed by hash only (scripts/csp.js)
+			csp: { mode: 'hash', directives: { 'script-src': SCRIPT_SRC } }
 		})
 	]
 });

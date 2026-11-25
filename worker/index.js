@@ -91,10 +91,11 @@ async function beat(request, env, url) {
 // other sites framing Elenz and restricts no scripts or styles. Screen wake lock and sharing stay allowed (/now's Keep
 // screen on, the Share buttons).
 export const SECURITY_HEADERS = {
-  'Content-Security-Policy': "frame-ancestors 'self'",
+  // the same policy as site/static/_headers (see the note there)
+  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://cloud.umami.is; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://basemaps.linz.govt.nz; font-src 'self' data:; connect-src 'self' https://basemaps.linz.govt.nz https://cloudflareinsights.com https://cloud.umami.is https://gateway.umami.is https://api-gateway.umami.dev; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'",
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
-  'Strict-Transport-Security': 'max-age=2592000',
+  'Strict-Transport-Security': 'max-age=31536000',
   'X-Content-Type-Options': 'nosniff',
 };
 

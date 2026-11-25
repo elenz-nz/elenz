@@ -5,17 +5,21 @@
 // (Chrome), then the desktop layout on phones. A refresh hid the first, so these go through the site's own links.
 import { test as base, expect } from '@playwright/test';
 import { OK_ERRORS, WEBKIT_CANCELLED } from './errors.js';
+import { watchCsp } from './csp.js';
 
 // any uncaught error in the page fails the test, but for the cancelled loads in ./errors.js, which aren't faults. The
-// analytics scripts are blocked so the tests reach nothing outside the build.
+// analytics scripts are blocked so the tests reach nothing outside the build. Each page gets the Content-Security-Policy
+// _headers gives it, and anything that policy blocks fails the test too (./csp.js).
 const test = base.extend({
   page: async ({ page, browserName }, use) => {
     const errors = [];
     const ignore = browserName === 'webkit' ? WEBKIT_CANCELLED : OK_ERRORS;
     await page.route(/cloudflareinsights\.com|umami\.is/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
     page.on('pageerror', (e) => { if (!ignore.test(e.message)) errors.push(e.message); });
+    const blocked = await watchCsp(page);
     await use(page);
     expect(errors, 'uncaught errors in the page').toEqual([]);
+    expect(blocked, 'loads the Content-Security-Policy blocked').toEqual([]);
   },
 });
 
@@ -873,4 +877,24 @@ test.describe('dashboards', () => {
       await expect.poll(() => page.evaluate(sticksOut), { message: 'what sticks out past the side of the screen' }).toBe('');
     });
   }
+});
+
+// The Content-Security-Policy (design decision, 26 Nov 2026; ./csp.js): every test fails on anything it blocks, and this
+// one walks the pages that load the most kinds of thing (charts, a chart drawn into a PNG, the map, both dashboards,
+// the landscape's fonts) on a direct visit, so their own start-up scripts run under it.
+test.describe('Content-Security-Policy', () => {
+  test('the pages and a chart download run under it, and the dashboards alone may be framed', async ({ page }) => {
+    for (const path of ['/', '/now', '/tracker', '/tracker/prices', '/records', '/plants', '/plants/benmore', '/plants/share', '/methods/sources', '/guide', '/dashboard', '/landscape']) {
+      const res = await page.goto(path);
+      await page.waitForLoadState('networkidle');
+      const policy = res.headers()['content-security-policy'];
+      expect(policy, path).toMatch(/default-src 'self'/);
+      expect(policy, path).toContain(['/dashboard', '/landscape'].includes(path) ? "frame-ancestors *" : "frame-ancestors 'self'");
+      expect(await page.locator('meta[http-equiv="content-security-policy"]').getAttribute('content'), path).toMatch(/^script-src 'self' 'sha256-/);
+    }
+    await page.goto('/tracker');
+    await page.getByRole('button', { name: 'Download the chart or data' }).click();
+    const [dl] = await Promise.all([page.waitForEvent('download'), page.locator('#dl-pop .dl-go', { hasText: 'PNG' }).first().click()]);
+    expect(dl.suggestedFilename()).toMatch(/\.png$/);
+  });
 });

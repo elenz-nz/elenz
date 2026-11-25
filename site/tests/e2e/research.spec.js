@@ -3,6 +3,7 @@
 // without the Worker).
 import { test, expect } from '@playwright/test';
 import { OK_ERRORS, WEBKIT_CANCELLED } from './errors.js';
+import { watchCsp } from './csp.js';
 
 test.describe('plant research page', () => {
   test('filters, a plant\'s facts and the download', async ({ page, browserName }) => {
@@ -11,6 +12,7 @@ test.describe('plant research page', () => {
     // the visit counters: on elenz.co.nz the Worker takes them out of this page; here they're stubbed, as in site.spec.js
     await page.route(/cloudflareinsights\.com|umami\.is/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
     page.on('pageerror', (e) => { if (!ignore.test(e.message)) errors.push(e.message); });
+    const blocked = await watchCsp(page);   // the page's Content-Security-Policy (./csp.js)
     await page.goto('/plants/research?key=k123');
     await expect(page.getByRole('heading', { name: 'Plant research' })).toBeVisible();
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
@@ -40,12 +42,14 @@ test.describe('plant research page', () => {
     const [dl] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: /Download workbook/ }).click()]);
     expect(dl.suggestedFilename()).toMatch(/^elenz-plant-research-\d{4}-\d{2}-\d{2}\.xlsx$/);
     expect(errors).toEqual([]);
+    expect(blocked, 'loads the Content-Security-Policy blocked').toEqual([]);
   });
 
   test('team notes: read with the key, saved on leaving the box, and every link opens in a new tab', async ({ page, browserName }) => {
     const errors = [];
     const ignore = browserName === 'webkit' ? WEBKIT_CANCELLED : OK_ERRORS;
     page.on('pageerror', (e) => { if (!ignore.test(e.message)) errors.push(e.message); });
+    const blocked = await watchCsp(page);   // the page's Content-Security-Policy (./csp.js)
     await page.route(/cloudflareinsights\.com|umami\.is/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
     // the Worker's notes store (worker/notes.js), stood in for: the static build here has no Worker
     const saved = [];
@@ -91,12 +95,14 @@ test.describe('plant research page', () => {
     await tab.close();
     await expect(page).toHaveURL(/\/plants\/research\?key=k123&need=mine&plant=benmore/);   // this tab stays put
     expect(errors).toEqual([]);
+    expect(blocked, 'loads the Content-Security-Policy blocked').toEqual([]);
   });
 
   test('station leads: the rounds, groups, a lead\'s details and its own team notes', async ({ page, browserName }) => {
     const errors = [];
     const ignore = browserName === 'webkit' ? WEBKIT_CANCELLED : OK_ERRORS;
     page.on('pageerror', (e) => { if (!ignore.test(e.message)) errors.push(e.message); });
+    const blocked = await watchCsp(page);   // the page's Content-Security-Policy (./csp.js)
     await page.route(/cloudflareinsights\.com|umami\.is/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
     const saved = [];
     await page.route('**/data/plant-notes**', async (route) => {
@@ -132,6 +138,7 @@ test.describe('plant research page', () => {
     await leads.getByRole('button', { name: 'Argyle' }).click();
     await expect(leads.locator('.detail').getByRole('link', { name: 'On the Branch River page' })).toHaveAttribute('href', '/plants/branch-river-arnold');
     expect(errors).toEqual([]);
+    expect(blocked, 'loads the Content-Security-Policy blocked').toEqual([]);
   });
 
   test('the three lists fold, and the photo leads filter by status', async ({ page }) => {

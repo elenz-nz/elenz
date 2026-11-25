@@ -5,24 +5,31 @@ https://:preview.elenz.workers.dev/*
   X-Robots-Tag: noindex
 
 # Security headers for every static file. The Worker sends the same list on its own responses (SECURITY_HEADERS in
-# worker/index.js); worker/tests/worker.test.js checks the two agree.
+# worker/index.js); worker/tests/worker.test.js checks the two agree. The Content-Security-Policy (design decision,
+# 26 Nov 2026) names every origin a page may load from: our own files, the two counters (Cloudflare Web Analytics and
+# Umami, scripts and their reports) and LINZ's aerial tiles on the plant maps; data: fonts are the landscape's, blob:
+# images the chart download. Inline scripts are allowed here because each page's start-up script differs; the <meta>
+# policy SvelteKit writes into every page narrows them to that page's own by hash (vite.config.ts). A new outside
+# origin goes in here, in SECURITY_HEADERS and in the two dashboard rules below; the browser tests (tests/e2e/csp.js)
+# fail on anything the policy blocks. Strict-Transport-Security is one year, without includeSubDomains: mail. is the
+# email service's link domain, which isn't ours to keep on HTTPS (no preload either, as that needs includeSubDomains).
 /*
-  Content-Security-Policy: frame-ancestors 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://cloud.umami.is; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://basemaps.linz.govt.nz; font-src 'self' data:; connect-src 'self' https://basemaps.linz.govt.nz https://cloudflareinsights.com https://cloud.umami.is https://gateway.umami.is https://api-gateway.umami.dev; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
   Referrer-Policy: strict-origin-when-cross-origin
-  Strict-Transport-Security: max-age=2592000
+  Strict-Transport-Security: max-age=31536000
   X-Content-Type-Options: nosniff
 
 # The two dashboards may be shown inside other pages, such as a Home Assistant Webpage card or a wall-screen app
 # (design decision, 17 Nov 2026): they hold no account or form, so framing them risks nothing. The /* rule above still
-# applies here, so its frame-ancestors is taken off and a looser one put on. Every other page keeps frame-ancestors
+# applies here, so its policy is taken off and the same one put on with frame-ancestors *. Every other page keeps frame-ancestors
 # 'self'. Both pages are static files, so the Worker's own list (SECURITY_HEADERS) doesn't need the exception.
 /dashboard
   ! Content-Security-Policy
-  Content-Security-Policy: frame-ancestors *
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://cloud.umami.is; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://basemaps.linz.govt.nz; font-src 'self' data:; connect-src 'self' https://basemaps.linz.govt.nz https://cloudflareinsights.com https://cloud.umami.is https://gateway.umami.is https://api-gateway.umami.dev; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors *
 /landscape
   ! Content-Security-Policy
-  Content-Security-Policy: frame-ancestors *
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://cloud.umami.is; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://basemaps.linz.govt.nz; font-src 'self' data:; connect-src 'self' https://basemaps.linz.govt.nz https://cloudflareinsights.com https://cloud.umami.is https://gateway.umami.is https://api-gateway.umami.dev; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors *
 
 # SvelteKit's built scripts and styles carry a hash of their contents in their names, so a file at one address never
 # changes: browsers may keep them for a year without asking again. Everything else keeps Cloudflare's default (check
