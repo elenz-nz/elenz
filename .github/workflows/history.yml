@@ -5,7 +5,7 @@
 # runs carry on, and the site keeps the previous history until it is complete. Run it by hand from the Actions tab ("History" → "Run workflow"), ticking "rebuild" to rebuild every
 # month's JSON from the stored data.
 #
-# Secrets: CF_ACCOUNT_ID, CF_API_TOKEN (the same ones as the live job). No EMI key needed: the files are public.
+# Secrets: CF_ACCOUNT_ID, CF_API_TOKEN (the same ones as the live job, in the production environment). No EMI key needed: the files are public.
 name: History
 
 on:
@@ -28,11 +28,15 @@ concurrency:
 jobs:
   history:
     if: github.repository == 'elenz-nz/elenz'
+    environment:   # its secrets are open only to runs from main (design decision, 25 Nov 2026; docs/architecture.md)
+      name: production
+      deployment: false
     runs-on: ubuntu-latest
     timeout-minutes: 330
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           sparse-checkout: |
             ingest
             facilities

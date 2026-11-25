@@ -119,7 +119,8 @@ site-only tables), `facilities/metered_plants.csv`, `facilities/embedded_points.
 `facilities/embedded_registry_split.csv` trigger a rebuild automatically, so they are collected and merged together
 (`facilities/NEXT_REBUILD.md`).
 
-**Secrets:** repository secrets `EMI_KEY`, `CF_ACCOUNT_ID` and `CF_API_TOKEN` (Workers KV: Edit); Worker secret
+**Secrets:** `EMI_KEY`, `CF_ACCOUNT_ID` and `CF_API_TOKEN` (Workers KV: Edit), in the GitHub environment `production`,
+which only `main` may use; Worker secret
 `GITHUB_TOKEN` (fine-grained, this repository only, Actions read/write). The token expires, so renew it yearly or the
 updates stop.
 

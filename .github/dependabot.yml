@@ -2,12 +2,16 @@
 # separately whenever an alert appears (turned on in the repository's settings).
 # Python is left out: ingest/requirements.txt is locked to hashes and refreshed by hand
 # from ingest/requirements.in (see CLAUDE.md).
+# A new release waits 7 days before a version update offers it (cooldown), so a hijacked release is usually caught
+# and pulled before it reaches a pull request, its preview build or the site. Security updates don't wait.
 version: 2
 updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
+    cooldown:
+      default-days: 7
     groups:
       actions:
         patterns: ["*"]
@@ -16,6 +20,8 @@ updates:
     directory: /site
     schedule:
       interval: monthly
+    cooldown:
+      default-days: 7
     groups:
       site:
         patterns: ["*"]
@@ -31,6 +37,8 @@ updates:
     directory: /worker
     schedule:
       interval: monthly
+    cooldown:
+      default-days: 7
     groups:
       worker:
         patterns: ["*"]

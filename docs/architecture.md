@@ -553,7 +553,7 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
 
 - `.github/workflows/update-data.yml`: runs `update.py` on GitHub (free because the repo is public). Triggered every
   5 minutes by the Worker's Cloudflare cron through the workflow_dispatch API, because GitHub's own schedule never
-  fired for this new repo (it stays as a 30-minute backup). Secrets: `EMI_KEY`, `CF_ACCOUNT_ID`, `CF_API_TOKEN`
+  fired for this new repo (it stays as a 30-minute backup). Secrets (environment `production`): `EMI_KEY`, `CF_ACCOUNT_ID`, `CF_API_TOKEN`
   (Workers KV Storage: Edit). KV namespace id lives in `wrangler.jsonc`. A run with no new data saves nothing.
 - `.github/workflows/history.yml`: runs `history.py`, triggered every 6 hours by the Worker's second cron. The first
   run backfills ~2,200 daily files (resumes next run if it hits its time budget). KV writes: ~3 per changed month,
@@ -570,6 +570,27 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   grouped pull request each (minor and patch only; `@playwright/test` left out, as it is pinned to the browser a Claude
   session has). Python isn't included: `ingest/requirements.txt` is refreshed by hand. Security updates arrive
   separately whenever an alert appears; like any pull request they merge only once the checks pass.
+  Each version update waits 7 days after a release (`cooldown`), so a hijacked release is usually pulled before it
+  reaches a pull request; security updates don't wait. The `ignore` rules apply to security updates too, so an alert
+  whose fix is only in a new major version (or in `@playwright/test`) gets no pull request: do those by hand.
+- CI and outside code (design decisions, 25 Nov 2026):
+  - The secrets `EMI_KEY`, `CF_ACCOUNT_ID` and `CF_API_TOKEN` live in the GitHub environment `production`, whose
+    deployment branches are limited to `main`. Only the three data jobs (update-data, history, offers) name it, with
+    `deployment: false` so no deployment record is made each run. A workflow on any other branch can't read them, so a
+    change has to pass the checks and merge before it can use them. A new job that needs them names the environment.
+  - Every checkout sets `persist-credentials: false`: no job pushes, so none keeps the workflow token on disk where the
+    code it runs could read it.
+  - The checks install only pinned versions (ruff too); `ingest/requirements.txt` is locked to hashes, so the shared
+    pip cache can't hand the data jobs anything else.
+  - `site/.npmrc` sets `ignore-scripts=true`: packages' install scripts don't run in CI or in Cloudflare's build (where
+    the deploy credentials are). None of the site's packages needs one. The Worker's test tools (esbuild, workerd)
+    do, and they run only in the checks, which hold no secrets.
+  - Actions are pinned by major tag, not commit SHA: every action used is GitHub's own (`actions/*`), and Dependabot
+    keeps them current. An action from anyone else would be pinned by SHA.
+  - Pull requests from forks run the checks with no secrets and a read-only token (`pull_request`, never
+    `pull_request_target`), and Cloudflare doesn't build forks, so they get no preview.
+  - `worker/vendor/resvg` is outside every audit tool's view (no `package.json`): it was checked byte for byte against
+    the npm package's 2.6.2 on 25 Nov 2026; check a newer version the same way before copying it in.
 - `.github/workflows/watchdog.yml`: checks the live site every 15 minutes; opens an issue labelled `stale-data`
   (GitHub emails it to the Elenz team) when live data is over 60 minutes old, history over 5 days behind, the Worker
   can't start a job, or embedded solar's irradiance is failing (the reserve forecast not refreshed for 6 hours, the

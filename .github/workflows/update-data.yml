@@ -4,7 +4,7 @@
 # backup every 30 minutes. Each run fills any intervals a late or skipped run missed, and saves nothing if no new
 # data has arrived.
 #
-# Secrets (repo Settings → Secrets and variables → Actions): EMI_KEY, CF_ACCOUNT_ID, CF_API_TOKEN.
+# Secrets (repo Settings → Environments → production, which only main may use): EMI_KEY, CF_ACCOUNT_ID, CF_API_TOKEN.
 # The KV namespace id is read from wrangler.jsonc.
 name: Update data
 
@@ -23,11 +23,15 @@ concurrency:
 jobs:
   update:
     if: github.repository == 'elenz-nz/elenz'   # copies of the repo don't run it
+    environment:   # its secrets are open only to runs from main (design decision, 25 Nov 2026; docs/architecture.md)
+      name: production
+      deployment: false
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           sparse-checkout: |
             ingest
             facilities
