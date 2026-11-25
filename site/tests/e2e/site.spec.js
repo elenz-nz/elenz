@@ -884,8 +884,6 @@ test.describe('dashboards', () => {
 // the landscape's fonts) on a direct visit, so their own start-up scripts run under it.
 test.describe('Content-Security-Policy', () => {
   test('the pages and a chart download run under it, and the dashboards alone may be framed', async ({ page }) => {
-    // twelve pages to network idle, then a download: past the 45 s default on WebKit in CI (test report, 26 Nov 2026)
-    test.slow();
     for (const path of ['/', '/now', '/tracker', '/tracker/prices', '/records', '/plants', '/plants/benmore', '/plants/share', '/methods/sources', '/guide', '/dashboard', '/landscape']) {
       const res = await page.goto(path);
       await page.waitForLoadState('networkidle');
@@ -895,7 +893,11 @@ test.describe('Content-Security-Policy', () => {
       expect(await page.locator('meta[http-equiv="content-security-policy"]').getAttribute('content'), path).toMatch(/^script-src 'self' 'sha256-/);
     }
     await page.goto('/tracker');
+    // the charts must be drawn first: the menu reads them when it opens (test report, 26 Nov 2026: opened too early
+    // under CI load, the download never came)
+    await expect(page.locator('#sys')).toContainText('Renewable share');
     await page.getByRole('button', { name: 'Download the chart or data' }).click();
+    await expect(page.locator('#dl-pop .dl-go', { hasText: 'PNG' }).first()).toBeEnabled();
     const [dl] = await Promise.all([page.waitForEvent('download'), page.locator('#dl-pop .dl-go', { hasText: 'PNG' }).first().click()]);
     expect(dl.suggestedFilename()).toMatch(/\.png$/);
   });
