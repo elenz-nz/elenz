@@ -2,6 +2,9 @@
 .emi_key
 .env
 .env.*
+# Wrangler's local secrets for `wrangler dev` (SCREENS_KEY and the like)
+.dev.vars
+.dev.vars.*
 
 # raw and reference data (downloaded by ingest/sync.py and ingest/emi_live.py)
 /data/
