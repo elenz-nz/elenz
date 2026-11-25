@@ -108,13 +108,21 @@ export async function recordImage(request, env, url, ctx) {
   const d = id ? def(id) : null;
   const fallback = () => env.ASSETS.fetch(new Request(new URL('/og/elenz.png', url), request));
   if (!d || !env.DATA) return fallback();
-  const cache = typeof caches !== 'undefined' ? caches.default : null;
-  const hit = cache ? await cache.match(request).catch(() => null) : null;
-  if (hit) return hit;
   const { region, period } = view(d, url);
   const L = await lead(env, d, region, period);
   if (!L) return fallback();
   const v = imageVersion({ rec: L.top, isNew: L.isNew, period });
+  const control = url.searchParams.get('v') === v ? 'public, max-age=31536000, immutable' : 'public, max-age=600';
+  // kept under the image's tidy address (record, region, period and the current v), whatever else the address
+  // carries, so each image is drawn once however the address is written
+  const cache = typeof caches !== 'undefined' ? caches.default : null;
+  const key = new Request(new URL(imagePath(d, region, period, v), url));
+  const hit = cache ? await cache.match(key).catch(() => null) : null;
+  if (hit) {
+    const r = new Response(hit.body, hit);
+    r.headers.set('cache-control', control);
+    return r;
+  }
   let png;
   try {
     png = await render(sceneToSvg(recordScene({ d, region, rec: L.top, end: L.R.end, isNew: L.isNew, period, dark: true })));
@@ -122,12 +130,9 @@ export async function recordImage(request, env, url, ctx) {
     console.log(`record image failed: ${e && e.message}`);
     return fallback();
   }
-  const res = new Response(png, {
-    headers: {
-      'content-type': 'image/png',
-      'cache-control': url.searchParams.get('v') === v ? 'public, max-age=31536000, immutable' : 'public, max-age=600',
-    },
-  });
-  if (cache && ctx?.waitUntil) ctx.waitUntil(cache.put(request, res.clone()).catch(() => {}));
-  return res;
+  if (cache && ctx?.waitUntil) {
+    const kept = new Response(png, { headers: { 'content-type': 'image/png', 'cache-control': 'public, max-age=31536000, immutable' } });
+    ctx.waitUntil(cache.put(key, kept).catch(() => {}));
+  }
+  return new Response(png, { headers: { 'content-type': 'image/png', 'cache-control': control } });
 }

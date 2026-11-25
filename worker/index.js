@@ -30,6 +30,7 @@ import { RECORD_PAGE, RECORD_IMAGE, recordPage, recordImage } from './og.js';
 import { BEAT_URL, readBeat } from '../site/src/lib/site/beat.js';
 import { SCREENS_URL, screens, keyMatches } from './screens.js';
 import { NOTES_URL, plantNotes } from './notes.js';
+import { readUpTo } from './body.js';
 
 const WORKFLOWS = 'https://api.github.com/repos/elenz-nz/elenz/actions/workflows';
 const HISTORY_CRON = '40 */6 * * *'; // must match wrangler.jsonc
@@ -69,7 +70,7 @@ const noContent = () => new Response(null, { status: 204, headers: { 'cache-cont
 async function beat(request, env, url) {
   if (request.method !== 'POST') return new Response(null, { status: 405, headers: { allow: 'POST' } });
   if (url.hostname !== SITE_HOST || !env.BEATS || Number(request.headers.get('content-length') || 0) > 200) return noContent();
-  const b = readBeat(await request.text());
+  const b = readBeat(await readUpTo(request, 200));
   if (b) {
     try {
       env.BEATS.writeDataPoint({
@@ -105,10 +106,14 @@ export const SECURITY_HEADERS = {
 // reviewed there, previews may not carry the Worker's secrets, and they are noindex anyway. The page is never cached
 // or indexed, sends no referrer, and loses its two visit counters (Cloudflare Web Analytics and Umami), so the team's
 // visits aren't counted and the key never reaches them. Its __data.json is behind the same check.
+// Only a branch preview's own address opens it without the key: any other host the Worker is reached by (elenz.co.nz,
+// or the same name written another way) needs the key.
 export const RESEARCH = /^\/plants\/research(?:\.html|\/.*)?$/;
 const COUNTERS = ['script[src*="cloudflareinsights.com"]', 'script[src*="umami.is"]'];
+// a branch preview's address: https://<branch>-elenz.elenz.workers.dev (wrangler.jsonc, preview_urls)
+export const isPreview = (host) => /^[a-z0-9-]+-elenz\.elenz\.workers\.dev$/.test(host);
 async function research(request, env, url) {
-  const open = url.hostname !== SITE_HOST || (await keyMatches(url.searchParams.get('key'), env.SCREENS_KEY));
+  const open = isPreview(url.hostname) || (await keyMatches(url.searchParams.get('key'), env.SCREENS_KEY));
   if (!open || !['GET', 'HEAD'].includes(request.method)) {
     const nf = await env.ASSETS.fetch(new Request(new URL('/404-not-a-page', url)));
     return new Response(nf.body, { status: 404, headers: { 'content-type': nf.headers.get('content-type') || 'text/html; charset=utf-8', 'cache-control': 'no-store' } });

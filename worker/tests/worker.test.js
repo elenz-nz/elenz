@@ -338,6 +338,13 @@ test('the record image is a 1200 x 630 PNG, kept long only at its current addres
   const stale = await get('/og/records/demand_max.png?v=old');
   assert.equal(stale.headers.get('cache-control'), 'public, max-age=600');
   await stale.arrayBuffer();
+  // anything else in the address changes nothing: the same image, kept under its tidy address
+  const extra = await get(img.pathname + img.search + '&x=1&region=nowhere');
+  assert.equal(extra.headers.get('cache-control'), 'public, max-age=31536000, immutable');
+  assert.deepEqual(new Uint8Array(await extra.arrayBuffer()), png);
+  const junk = await get('/og/records/demand_max.png?v=old&x=2');
+  assert.equal(junk.headers.get('cache-control'), 'public, max-age=600');
+  assert.deepEqual(new Uint8Array(await junk.arrayBuffer()), png);
 });
 
 test('an unknown record or no records gives the site card', async () => {
@@ -484,6 +491,13 @@ test('/plants/research on elenz.co.nz needs the key; without it, the not-found p
     assert.ok(!/cloudflareinsights|umami/.test(page), 'the visit counters are taken out, so the key never reaches them');
     assert.match(page, /\/_app\/app\.js/, 'the page keeps its own script');
     assert.equal((await get(`/plants/research/__data.json?key=${KEY}`)).status, 200);
+    // only a branch preview's own address opens it without the key: not the site's name written another way, nor any
+    // other workers.dev address
+    for (const host of ['https://elenz.co.nz.', 'https://elenz.elenz.workers.dev', 'https://elenz-elenz.workers.dev', 'https://x-elenz.elenz.workers.dev.evil']) {
+      const r = await keyed.dispatchFetch(host + '/plants/research');
+      assert.equal(r.status, 404, host);
+      assert.ok(!(await r.text()).includes('facts'), host);
+    }
   } finally { await keyed.dispose(); }
 });
 
