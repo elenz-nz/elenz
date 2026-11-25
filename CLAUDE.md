@@ -87,7 +87,9 @@ docs, not here: keep this file short.
   `worker/tests/`.
 - `ingest/`: the Python data jobs. `update.py` (live, every 5 minutes), `history.py` (history since 1997, `BUILD`),
   `records.py`, `offered.py`, `embedded.py`, `rooftop.py`, `hvdc.py`, `explain.py`, `tod.py`, `capacity.py`,
-  `plant_meta.py`, `plant_history.py`, `plant_pages.py`, `plant_research.py`. Tests in `ingest/tests/`.
+  `plant_meta.py`, `plant_history.py`, `plant_files.py`, `plant_pages.py`, `plant_research.py`; shared by them:
+  `build_tracker.py`, `state.py`, `metered.py`, `pv.py`, `store.py` (KV), `emi_live.py` (API), `sync.py` (EMI files),
+  `common.py`. Tests in `ingest/tests/` (`smoke.py` needs the locked `ingest/requirements.txt` installed).
 - `facilities/`: curated tables (`overrides.toml`, `metered_plants.csv`, `embedded_points.csv`, `plant_capacity.csv`,
   `dispatch_adjust.json`, the plant register) and the plant pages' facts (`plants/<slug>.toml`; `PLANTS.md` says how to
   check a plant).
