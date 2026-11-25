@@ -884,6 +884,8 @@ test.describe('dashboards', () => {
 // the landscape's fonts) on a direct visit, so their own start-up scripts run under it.
 test.describe('Content-Security-Policy', () => {
   test('the pages and a chart download run under it, and the dashboards alone may be framed', async ({ page }) => {
+    // twelve pages to network idle, then a download: past the 45 s default on WebKit in CI (test report, 26 Nov 2026)
+    test.slow();
     for (const path of ['/', '/now', '/tracker', '/tracker/prices', '/records', '/plants', '/plants/benmore', '/plants/share', '/methods/sources', '/guide', '/dashboard', '/landscape']) {
       const res = await page.goto(path);
       await page.waitForLoadState('networkidle');
