@@ -59,6 +59,15 @@ What we've learned about the EA's data and the services the site uses: feed timi
   11 MB a day. Earlier history comes from `Generation_MD` (metered, from 1997) and final prices.
 - The register's dated rows matter for history: `register()` keeps retired units (Taranaki Combined Cycle) and
   old connections (Pātea on HWA1101), latest row winning. A unit idle all window is left out of its plant.
+- The register file changed shape in Nov 2026 (seen 19 Nov): EMI now publishes one undated
+  `GenerationFleet/Existing/DispatchedGenerationPlant.csv` in place of the dated `YYYYMMDD_…` files, with ISO dates
+  (`2014-05-02`, open rows ending `2099-12-31` rather than `9999-12-31T…Z`), `78.0` rather than `78`, blank rather than
+  `null`, and a new `ReconciliationTypeCode` column. `sync.py plants` takes either; `common.ea_dates` reads either date
+  form (a plain `dayfirst=True` swaps day and month in an ISO date). Checked on the new file (26 Nov 2026):
+  `register()`, `plant_capacity()`, `capacity.py`, `plant_meta.py` and the smoke test run unchanged; its new names
+  need `[plant_names]` entries or capacity rows before it's committed (`capacity.py --check` lists them: Ruakākā Energy
+  Park BESS, Te Puna Mauri ō Omaru, Puna Komaru solar farm). The register is fingerprinted: the refresh goes on
+  `next-rebuild`.
 - Installed distributed solar (EMI report GUEHMT) was 1,270 MW in Sep 2026, but ~410 MW of it is dispatched solar
   farms on local networks (Kōwhai Park is the Jul 2026 jump), so rooftop solar is ~860 MW. See analysis/README.md.
 - Renewable dispatch MW reflect actual output unless constrained (matches metered injection within ~1–2%).

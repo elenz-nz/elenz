@@ -41,7 +41,8 @@ def main():
         caps.append(c.groupby(c['Region ID'].str[:7])['Total capacity installed (MW)'].sum().rename(name))
     cap = pd.concat(caps, axis=1).fillna(0)
     reg = pd.read_csv(os.path.join(FACILITIES, 'plant_register.csv'), dtype=str)
-    now = reg[reg.EffectiveEndDate.str.startswith('9999')].copy()
+    # open-ended rows: 9999-12-31 in the older register, 2099-12-31 since Nov 2026
+    now = reg[reg.EffectiveEndDate.str[:4] >= '2099'].copy()
     now['k'] = now.Fuel.map(REGISTER_FUEL)
     now['mw'] = pd.to_numeric(now.NameplateMegawatts, errors='coerce')
     disp = now.dropna(subset=['k']).groupby(['PointOfConnectionCode', 'k']).mw.sum().unstack(fill_value=0)

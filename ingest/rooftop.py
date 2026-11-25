@@ -21,7 +21,7 @@ import numpy as np
 import pandas as pd
 
 import pv
-from common import FACILITIES, overrides
+from common import FACILITIES, ea_dates, overrides
 
 GUEHMT_NSP = ('https://www.emi.ea.govt.nz/Retail/Download/DataReport/CSV/GUEHMT?DateFrom=20130901&DateTo={to}'
               '&RegionType=NSP_ROOT&FuelType=solar_all&MarketSegment=All&Capacity={band}&seriesFilter=ALL')
@@ -92,7 +92,7 @@ def parse_guehmt(raw, value='Total capacity installed'):
     head = next(i for i, l in enumerate(lines) if l.startswith('Month end,'))
     d = pd.read_csv(io.StringIO('\n'.join(lines[head:])))
     col = next(c for c in d.columns if c.startswith(value))
-    d['month'] = pd.to_datetime(d['Month end'], dayfirst=True).dt.strftime('%Y-%m')
+    d['month'] = ea_dates(d['Month end'].values).dt.strftime('%Y-%m').values
     return d.pivot_table(index='month', columns='Region ID', values=col, aggfunc='sum').fillna(0.0)
 
 

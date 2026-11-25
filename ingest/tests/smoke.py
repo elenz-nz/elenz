@@ -564,5 +564,43 @@ except Exception:
 check(_urls and 'forecast_days=2' in _urls[0], 'irradiance: the forecast fallback runs past midnight UTC')
 _rt.satellite = _sat0
 
+# ---------- the API's rows with fields missing (emi_live.to_frame) ----------
+# seen live: RunDateTime null (~3 times a day; every row of the newest interval on 15 Oct 2026) and rows without a
+# connection point; a bad row must not fail the update
+from datetime import datetime as _dt  # noqa: E402
+
+import emi_live  # noqa: E402
+
+_ok = {'PointOfConnectionCode': 'BEN2202 BEN0', 'FiveMinuteIntervalDatetime': '2026-10-15T18:15:00',
+       'RunDateTime': '2026-10-15T05:14:01', 'SPDLoadMegawatt': 0, 'SPDGenerationMegawatt': 300.5, 'DollarsPerMegawattHour': 150.2}
+_rows = [_ok, {**_ok, 'PointOfConnectionCode': 'MAN2201 MAN0', 'RunDateTime': None},
+         {**_ok, 'PointOfConnectionCode': None}, {**_ok, 'PointOfConnectionCode': 'OHA2201 OHA0', 'FiveMinuteIntervalDatetime': None}]
+_tf = emi_live.to_frame(_rows, _dt(2026, 10, 15, 18, 15))
+check(list(_tf.columns) == emi_live.COLS and len(_tf) == 3 and set(_tf.UnitCode) == {'BEN0', 'MAN0', 'OHA0'}
+      and _tf.RunDateTime.nunique() == 1 and (_tf.IntervalDateTime.str[:16] == '2026-10-15T18:15').all(),
+      'live: API rows without a run time or interval borrow them; rows without a connection point are skipped')
+_tf = emi_live.to_frame([{**_ok, 'RunDateTime': None}])
+check(len(_tf) == 1 and _tf.RunDateTime.iloc[0].startswith('2026-10-15T18:14'),
+      'live: with no run time in the whole reply, a row takes a minute before its interval')
+
+# ---------- EA files that change shape: the register (sync.py) and dates (common.ea_dates) ----------
+import sync  # noqa: E402
+from common import ea_dates  # noqa: E402
+
+_fleet = 'Datasets/Wholesale/Generation/GenerationFleet/Existing/'
+check(sync.register_blob([_fleet + '20260301_DispatchedGenerationPlant.csv', _fleet + '20260901_DispatchedGenerationPlant.csv'])
+      .endswith('20260901_DispatchedGenerationPlant.csv')
+      and sync.register_blob([_fleet + '20260901_DispatchedGenerationPlant.csv', _fleet + 'DispatchedGenerationPlant.csv'])
+      == _fleet + 'DispatchedGenerationPlant.csv',
+      'register: the undated file (Nov 2026 on) is chosen, else the newest dated one')
+try:
+    sync.register_blob([_fleet + 'Readme.txt'])
+    check(False, 'register: a missing register file stops with a message')
+except SystemExit as e:
+    check('moved or renamed' in str(e), 'register: a missing register file stops with a message')
+_d = ea_dates(['2014-05-02', '2/05/2014', 'null', '', None, '30/09/2015'])
+check([None if pd.isna(x) else f'{x:%Y-%m-%d}' for x in _d] == ['2014-05-02', '2014-05-02', None, None, None, '2015-09-30'],
+      'dates: ISO and day-first EA dates both read the right way round')
+
 print(f'\n{len(failures)} failed' if failures else '\nall passed')
 sys.exit(1 if failures else 0)

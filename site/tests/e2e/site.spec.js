@@ -893,7 +893,11 @@ test.describe('Content-Security-Policy', () => {
       expect(await page.locator('meta[http-equiv="content-security-policy"]').getAttribute('content'), path).toMatch(/^script-src 'self' 'sha256-/);
     }
     await page.goto('/tracker');
+    // the charts must be drawn first: the menu reads them when it opens (test report, 26 Nov 2026: opened too early
+    // under CI load, the download never came)
+    await expect(page.locator('#sys')).toContainText('Renewable share');
     await page.getByRole('button', { name: 'Download the chart or data' }).click();
+    await expect(page.locator('#dl-pop .dl-go', { hasText: 'PNG' }).first()).toBeEnabled();
     const [dl] = await Promise.all([page.waitForEvent('download'), page.locator('#dl-pop .dl-go', { hasText: 'PNG' }).first().click()]);
     expect(dl.suggestedFilename()).toMatch(/\.png$/);
   });

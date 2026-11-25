@@ -106,13 +106,6 @@ export const RANGES = {
 export const INT_LABEL = { '5m': '5m', '30m': '30m', '1d': 'Day', '1w': 'Week', '1mo': 'Month' };
 const INT_KEY = { '30m': KEY.hh, '1d': KEY.day, '1w': KEY.week, '1mo': KEY.month };
 
-/** The last `days` days of a segment (all of it when days is null). */
-export function lastDays(S, days) {
-  if (!days) return S;
-  const a = firstAtOrAfter(S.t, S.t[S.n - 1] - days * 864e5 + 1);
-  return slice(S, a, S.n);
-}
-
 /** A time-mode segment at the chosen interval. */
 export const atInterval = (S, int) => (int === '5m' ? S : aggregate(S, INT_KEY[int]));
 

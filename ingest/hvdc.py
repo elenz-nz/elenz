@@ -9,12 +9,9 @@ transfer comes from the island balances (generation − load in each island), fi
 average of the two balances, checked on months left out of the fit). Link losses between the two ends are about
 59 MW × (flow / 1000 MW)².
 """
-import io
 
-import numpy as np
 import pandas as pd
 
-from common import NZ
 
 # transfer at mid-link ≈ a·(SI gen − SI load) + b·(NI load − NI gen) + c·SI load + d·NI load + e
 FIT = (0.6533, 0.3386, -0.0639, 0.0231, 41.29)

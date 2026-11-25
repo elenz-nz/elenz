@@ -1,6 +1,7 @@
 """Shared paths and curated reference data for the Elenz ingest jobs."""
 import csv
 import os
+import re
 import tomllib
 from zoneinfo import ZoneInfo
 
@@ -52,3 +53,22 @@ def key():
         with open(path) as f:
             k = f.read().strip()
     return k
+
+
+ISO_DATE = re.compile(r'^\d{4}-\d{2}-\d{2}')
+
+
+def ea_dates(values):
+    """EA dates as pandas timestamps (NaT where blank or 'null'), whichever way the file writes them: ISO
+    (2014-05-02, the register since Nov 2026) or day first (2/05/2014, the older register and the EMI reports).
+    pd.to_datetime(..., dayfirst=True) alone swaps day and month in an ISO date (2014-05-02 -> 5 Feb), so each
+    value is read by its own shape."""
+    import pandas as pd
+    s = pd.Series(values, dtype=object)
+    iso = s.astype(str).str.match(ISO_DATE)
+    out = pd.Series(pd.NaT, index=s.index, dtype='datetime64[ns]')
+    if iso.any():
+        out[iso] = pd.to_datetime(s[iso].astype(str).str[:10], format='%Y-%m-%d', errors='coerce')
+    if (~iso).any():
+        out[~iso] = pd.to_datetime(s[~iso], dayfirst=True, errors='coerce', format='mixed')
+    return out

@@ -28,7 +28,7 @@ import os
 import sys
 from datetime import date, datetime, timedelta
 
-from common import FACILITIES, NZ, overrides
+from common import FACILITIES, NZ, ea_dates, overrides
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 CSV = os.path.join(FACILITIES, 'plant_capacity.csv')
@@ -114,8 +114,7 @@ def shown_plants():
     reg = pd.read_csv(os.path.join(FACILITIES, 'plant_register.csv'))
     reg = reg.sort_values('EffectiveEndDate').drop_duplicates(['PointOfConnectionCode', 'UnitCode'], keep='last')
     retired = {}
-    for r in reg.itertuples():
-        d = pd.to_datetime(r.DateDecommissioned, dayfirst=True, errors='coerce')
+    for r, d in zip(reg.itertuples(), ea_dates(reg.DateDecommissioned.values)):
         retired[(r.PointOfConnectionCode, r.UnitCode)] = None if pd.isna(d) else d.date()
     for k, n in unit_names.items():
         if k not in fuel:
