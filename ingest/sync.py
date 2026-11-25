@@ -25,10 +25,24 @@ def list_blobs(prefix):
     return re.findall(r'<Name>([^<]+)</Name>', xml)
 
 
+def register_blob(names):
+    """The register file to download from a listing of the fleet folder. Since Nov 2026 the EA publishes one file
+    without a date prefix (DispatchedGenerationPlant.csv, ISO dates, a ReconciliationTypeCode column); before that,
+    a dated file per release (YYYYMMDD_DispatchedGenerationPlant.csv, d/mm/yyyy dates). The undated file wins;
+    otherwise the newest dated one. Fails with a clear message if neither is there (the file has moved again)."""
+    undated = [n for n in names if n.rsplit('/', 1)[-1] == 'DispatchedGenerationPlant.csv']
+    dated = sorted(n for n in names if n.endswith('_DispatchedGenerationPlant.csv'))
+    if undated or dated:
+        return (undated or dated)[-1]
+    raise SystemExit(f'No DispatchedGenerationPlant.csv in {FLEET}/: the EA has moved or renamed the register. '
+                     f'Files there: {", ".join(n.rsplit("/", 1)[-1] for n in names) or "none"}')
+
+
 def plants():
-    name = sorted(n for n in list_blobs(FLEET + '/') if n.endswith('_DispatchedGenerationPlant.csv'))[-1]
+    name = register_blob(list_blobs(FLEET + '/'))
     urlretrieve(f'{BLOB}/{name}', os.path.join(FACILITIES, 'plant_register.csv'))
-    print('plant register:', os.path.basename(name), '-> facilities/plant_register.csv (review the diff, then commit)')
+    print('plant register:', os.path.basename(name), '-> facilities/plant_register.csv (review the diff, then commit;',
+          'the register is in the history fingerprint, so the refresh goes on next-rebuild: facilities/NEXT_REBUILD.md)')
 
 
 def daily(start, end):

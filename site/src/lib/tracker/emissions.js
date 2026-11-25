@@ -74,14 +74,6 @@ export function rankineAt(t) {
 /** Emission factor for a fuel (an entry of FUELS) at time t: time-varying for the Rankines, otherwise the fuel's own. */
 export const efAt = (f, t) => (f.k === 'coal' ? rankineAt(t) : f.ef || 0);
 
-/** The quarter whose coal share applies at time t, and whether it is carried forward from an earlier quarter. */
-export function rankineQuarter(t) {
-  let i = 0;
-  while (i + 1 < STEPS.length && t >= STEPS[i + 1][0]) i++;
-  const next = STEPS[i][0] + 92 * 86400e3;
-  return { quarter: RANKINE_COAL_SHARE[i][0], share: RANKINE_COAL_SHARE[i][1], carried: t >= next };
-}
-
 // ---------- geothermal ----------
 // Operational emissions (non-condensable gases released from the field) per station, g CO₂e/kWh (= kg/MWh), from the
 // NZ Geothermal Association's emissions working group (McLean et al.): CY2020 from NZGW 2021 (Table 3); CY2022 from

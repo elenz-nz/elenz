@@ -315,8 +315,6 @@ export function catalogue(x) {
   return [...BASE, ...plants];
 }
 
-export const DEFAULT_KEYS = BASE.map((v) => v.k);
-
 /** One value, ready for a tile: { key, label, region, measure, v, u, s, est, none, txt, c } (v '–' when unavailable). */
 export function resolve(spec, cat, x) {
   const [k0, r0, m0] = String(spec || '').split(':');

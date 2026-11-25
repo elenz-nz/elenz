@@ -479,7 +479,7 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   "interpolated"), `build_tracker.py`
   (state → tracker.json; `assemble()` is shared with history), `emi_live.py` (API client), `store.py` (Workers KV
   via the Cloudflare REST API, or `data/store` locally), `sync.py` (EMI blob container + Open-Meteo), `common.py`
-  (paths, overrides). `history.py`: history since 1 Aug 1997 (see its docstring for the KV keys `hist/*`): metered data
+  (paths, overrides, `ea_dates` for EA dates written either ISO or day first). `history.py`: history since 1 Aug 1997 (see its docstring for the KV keys `hist/*`): metered data
   (`metered.py`: Generation_MD, Embedded_generation, Grid_export/import, Tiwai) for every month the EA has published it
   (~5-6 weeks behind), the daily dispatch files (from 10 Sep 2020) for the weeks since and to fill what the metering
   lacks; bump its `BUILD` number to rebuild every month after changing how months are built.
@@ -680,7 +680,8 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   units), `[solar_farms_in_registry]` (dispatched farms the
   distributed-generation registry also counts), plus `[owners]`, `[plant_owners]` and `[hydro_schemes]` for the
   site's By owner / By hydro scheme views; `facilities/connection_points.csv`: POC → island;
-  `facilities/plant_register.csv`: the EA register (refresh with `sync.py plants`, review the diff).
+  `facilities/plant_register.csv`: the EA register (refresh with `sync.py plants`, review the diff; the file's Nov 2026 layout
+  is in `docs/data-notes.md`; a refresh rebuilds history, so it goes on `next-rebuild`).
 - `facilities/plant_capacity.csv`: installed MW of every plant the tracker shows, with the dates each figure applies
   (start/end inclusive, blank = open; `basis` register / override / pending; source and note per row; evidence in
   `analysis/capacity_check.py` and the "Installed capacity" section of `analysis/README.md`). Capacity counts from the
