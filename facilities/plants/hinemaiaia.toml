@@ -5,13 +5,13 @@ name = "Hinemaiaia"
 register = ["H016", "L008", "L009", "L010"]
 reviewed = ""
 to_check = [
-  "Grid exit point: embedded in Unison's Taupō network, most likely at Wairakei (WRK0331, Unison's Taupō GXP), but no document read yet says so. Unison's RAMP section 4 (network development plans) should; its PDFs sit behind a bot check, so it needs saving to a connected folder.",
   "Which station is which: the Elenz team's three points run down the river (upper, middle, lower); Wikipedia's list puts A at the upper one. Which of the middle and lower is B and which C? (Contact: the trout transfer is above the Hinemaiaia B dam.)",
   "Station sizes: Wikipedia's list gives A 2.0, B 1.3, C 2.8 MW (6.1); MBIE's list gives A 2.4 (6.5). Contact gives only the scheme's 7 MW. Look for an owner or network figure per station.",
   "Wikidata items for the scheme or its stations.",
   "For the Elenz team: how a page without Elenz data looks, before this station is published.",
 ]
 notes = [
+  "Grid exit point from Unison's 2026 plan (a copy the Elenz team saved, 26 Nov 2026): Taupō is supplied through Wairakei GXP, supplemented by Rotokawa, Te Huka and Hinemaiaia; the new Tauhara GXP (TAB0331) takes only Te Huka 3 and the future Taupō East zone substation, so Hinemaiaia is at Wairakei.",
   "Station leads round, batch A (26 Nov 2026): leads H016 (Hinemaiaia, 7 MW) and L008–L010 (Hinemaiaia A, B and C, from MBIE's 2020 list), one scheme; all four rows dropped. One file for the scheme, three stations, as Fraser and Teviot. Not in the EA register or metered_plants.csv under any code.",
   "Commissioned: Contact gives 1952–1982 for the scheme; MBIE and Wikipedia's list give A 1952, B 1966, C 1982.",
   "Owners: built to supply Taupō (Contact); Trustpower/Manawa (MBIE's 2020 list), Contact since it bought Manawa (11 July 2025). Earlier owners for the history round.",
@@ -26,6 +26,14 @@ source = ["linz-aerial", "wp-list"]
 grade = "B"
 checked = "2026-11-26"
 note = "given by the Elenz team as the upper station, confirmed on the LINZ aerial 26 Nov 2026; Wikipedia's list places A there"
+
+[grid_connection]
+value = [-38.62571, 176.10546]
+code = "WRK0331 WAIRAKEI"
+source = ["ea-nsp", "unison-ramp-2026"]
+grade = "A"
+checked = "2026-11-26"
+note = "embedded in Unison's Taupō network, which Wairakei GXP supplies with a smaller contribution from Hinemaiaia's hydro (Unison's 2026 plan, §6.1.1.1 and Table 6-5); point from the EA's network supply points table of 24 Nov 2026"
 
 [facts.commissioned]
 value = "1952 (A), 1966 (B), 1982 (C)"
@@ -69,6 +77,13 @@ note = "Manawa Energy (formerly Trustpower) until Contact bought it in July 2025
 value = 7
 basis = "Contact: the scheme's maximum capacity"
 source = "contact-hinemaiaia"
+grade = "A"
+checked = "2026-11-26"
+
+[[ratings]]
+value = 6.0
+basis = "Unison's 2026 plan: the scheme's 2025/26 peak output (firm capacity 9 MVA)"
+source = "unison-ramp-2026"
 grade = "A"
 checked = "2026-11-26"
 
