@@ -1,0 +1,67 @@
+# Plant page facts for Wahapo. How to check a plant: facilities/PLANTS.md.
+
+slug = "wahapo"
+name = "Wahapo"
+register = ["H031"]
+osm = ["relation/12589016"]
+reviewed = ""
+to_check = [
+  "Location: the station's own point (the Elenz team gives it; confirm it on the LINZ aerial), then district and region from Stats NZ's boundaries.",
+  "Commissioned: Contact and MBIE give 1960; Westpower's AMP gives 1991 (the 1990s redevelopment). Keep 1960 and say when it was redeveloped, once a year for the redevelopment is found.",
+  "Wikidata item.",
+  "For the history round: built as Okarito Forks; owners before Trustpower.",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch B (26 Nov 2026): lead H031 (Wahapo, 3 MW, Manawa Energy). Not in the EA register or metered_plants.csv under any code; other embedded at HKK0661 (embedded_points.csv).",
+  "Capacity: Contact 3 MW; Manawa's old page, MBIE's 2020 list, Wikipedia's list and Westpower's AMP 3.1 (3,100 kW).",
+  "Westpower: Wahapo, with Amethyst and Fox, can run apart from the grid during outages to supply South Westland.",
+]
+
+[grid_connection]
+value = [-42.72479, 170.98295]
+code = "HKK0661 HOKITIKA"
+source = ["ea-nsp", "westpower-amp-2026"]
+grade = "A"
+checked = "2026-11-26"
+note = "embedded in Westpower's network at Wahapo substation (11 kV), on the South Westland line from Hokitika GXP (Westpower's 2026 AMP, Table 4.7 and pp. 126, 132 and 163); point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.other_names]
+value = "Okarito Forks"
+source = "contact-wahapo"
+grade = "A"
+checked = "2026-11-26"
+
+[facts.commissioned]
+value = "1960"
+source = ["contact-wahapo", "mbie-opportunities-in-new-zealand"]
+grade = "A"
+checked = "2026-11-26"
+note = "redeveloped in the 1990s (Contact); Westpower's AMP gives 1991 as its year in service"
+
+[facts.river]
+value = "Lake Wahapo"
+source = "contact-wahapo"
+grade = "A"
+checked = "2026-11-26"
+
+[facts.owner]
+value = "Contact Energy"
+source = ["contact-wahapo", "contact-manawa-2025", "westpower-amp-2026"]
+grade = "A"
+checked = "2026-11-26"
+note = "Manawa Energy (formerly Trustpower) until Contact bought it in July 2025"
+
+[[ratings]]
+value = 3
+basis = "Contact: maximum capacity"
+source = "contact-wahapo"
+grade = "A"
+checked = "2026-11-26"
+
+[[ratings]]
+value = 3.1
+basis = "MBIE's 2020 list; Westpower's AMP (kW generated)"
+source = ["mbie-opportunities-in-new-zealand", "westpower-amp-2026"]
+grade = "A"
+checked = "2026-11-26"

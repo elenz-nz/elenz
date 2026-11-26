@@ -1,0 +1,66 @@
+# Plant page facts for Rochfort. How to check a plant: facilities/PLANTS.md.
+
+slug = "rochfort"
+name = "Rochfort"
+register = ["L005"]
+reviewed = ""
+to_check = [
+  "Location: the station's own point (the Elenz team gives it; confirm it on the LINZ aerial), then district and region from Stats NZ's boundaries.",
+  "Grid exit point code: Buller Electricity's GXP is its own Robertson Street substation; the EA's table has two Orowaiti points at the same place (ORO1101, ORO1102). ORO1102 is taken because the EA's registry puts Buller's embedded hydro there and ORO1101's embedded generation is diesel (embedded_registry_split.csv); confirm.",
+  "Capacity: Buller Electricity's AMP gives 5 MW; Profile Group, MBIE's 2020 list and Wikipedia's list 4.2. Did the 2017 second stage add capacity? Kawatiri Energy's own figure, if published.",
+  "Commissioned: switched on June 2013 (Profile Group's article, an earlier copy read in a search result); a second stage came online in 2017. BraveTrace gives 1 January 2013, a register-style date.",
+  "Owner: Kawatiri Energy (Profile Group holds shares). A Kawatiri Energy source?",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch B (26 Nov 2026): lead L005 (Lake Rochfort, 4.2 MW, from MBIE's 2020 list). Not in the EA register or metered_plants.csv under any code, nor under the name Rochfort or Kawatiri.",
+  "Named \"Rochfort\" as BraveTrace and Buller Electricity do; Profile Group and MBIE say Lake Rochfort Scheme. Near Westport; Lake Rochfort fed by Christmas Creek and the Whareatea River; a 4.2 km pipeline and a 400 m head (BraveTrace, Profile Group). About 19 GWh a year.",
+  "Kawatiri Energy investigated it from 2002, had consents by 2008 and built from 2009 (Profile Group).",
+]
+
+[grid_connection]
+value = [-41.76371, 171.6336]
+code = "ORO1102 OROWAITI"
+source = ["ea-nsp", "buller-amp-2026"]
+grade = "A"
+checked = "2026-11-26"
+note = "embedded in Buller Electricity's network, 6 km out on the Robertson Street–Ngakawau 33 kV circuit 1 from its Robertson Street GXP (Buller Electricity's 2026 AMP, pp. 58–59); point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.other_names]
+value = "Lake Rochfort Scheme"
+source = ["profile-rochfort", "mbie-opportunities-in-new-zealand"]
+grade = "A"
+checked = "2026-11-26"
+
+[facts.commissioned]
+value = "2013"
+source = ["mbie-opportunities-in-new-zealand", "profile-rochfort"]
+grade = "A"
+checked = "2026-11-26"
+note = "switched on June 2013; a second stage online in 2017 (Profile Group)"
+
+[facts.river]
+value = "Lake Rochfort (Whareatea River)"
+source = "bravetrace-rochfort"
+grade = "B"
+checked = "2026-11-26"
+
+[facts.owner]
+value = "Kawatiri Energy"
+source = ["buller-amp-2026", "profile-rochfort", "mbie-opportunities-in-new-zealand"]
+grade = "A"
+checked = "2026-11-26"
+
+[[ratings]]
+value = 4.2
+basis = "Profile Group; MBIE's 2020 list"
+source = ["profile-rochfort", "mbie-opportunities-in-new-zealand"]
+grade = "A"
+checked = "2026-11-26"
+
+[[ratings]]
+value = 5
+basis = "Buller Electricity's AMP"
+source = "buller-amp-2026"
+grade = "A"
+checked = "2026-11-26"

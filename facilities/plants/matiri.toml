@@ -1,0 +1,61 @@
+# Plant page facts for Matiri. How to check a plant: facilities/PLANTS.md.
+
+slug = "matiri"
+name = "Matiri"
+register = ["E019"]
+reviewed = ""
+to_check = [
+  "Location: the powerhouse (the Elenz team gives it; confirm it on the LINZ aerial). Wikipedia's point is the intake weir at Lake Matiri, not the station, 2.4 km of pipeline away. Then district and region from Stats NZ's boundaries (Wikipedia's list: Buller; its article: Tasman District).",
+  "First output: the commissioning day (Wikipedia gives 11 December 2020, the opening). An embedded meter's first output, if one is metered.",
+  "Wikidata item.",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch B (26 Nov 2026): lead E019 (Matiri Power Scheme, 4.9 MW, Pioneer). Not in the EA register or metered_plants.csv under any code; other embedded at MCH0111 (embedded_points.csv).",
+  "Capacity: Pioneer 5.0 MW; Network Tasman's AMP 5 MW; MBIE's 2020 list 4.8 (before it was finished); NZ Energy's 2008 consent 4.6; the lead's 4.9 came from our old register.",
+  "Owners: Southern Generation partnership from commissioning (Wikipedia; Network Tasman's AMP); Pioneer took the whole partnership in May 2024 (see Mangapēhi's notes). Development: Tasman Energy, then NZ Energy (consent 2009, DOC concession 2011), Pioneer from October 2014.",
+  "Stage 2 and an East Branch scheme were put forward under the Fast-track Approvals Act (the Lower Matiri Renewable Energy Project, environment.govt.nz); for a later look.",
+]
+
+[grid_connection]
+value = [-41.78881, 172.33692]
+code = "MCH0111 MURCHISON"
+source = ["ea-nsp", "ntl-amp-2024"]
+grade = "A"
+checked = "2026-11-26"
+note = "embedded in Network Tasman's network, connected at Transpower's Murchison GXP (Network Tasman's 2024 AMP, p. 36); point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.commissioned]
+value = "December 2020"
+source = ["pioneer-matiri", "wp-matiri"]
+grade = "A"
+checked = "2026-11-26"
+note = "Pioneer gives 2020; Wikipedia 11 December 2020, the official opening"
+
+[facts.river]
+value = "Matiri River (Lake Matiri)"
+source = ["pioneer-matiri", "wp-matiri"]
+grade = "A"
+checked = "2026-11-26"
+note = "run of river: weirs at the lake's outlet, 2.4 km pipeline to the powerhouse"
+
+[facts.owner]
+value = "Pioneer Energy"
+source = ["pioneer-matiri", "tlc-hydro-sale-2021"]
+grade = "A"
+checked = "2026-11-26"
+note = "through the Southern Generation partnership, wholly Pioneer's since May 2024"
+
+[[ratings]]
+value = 5
+basis = "Pioneer: power station"
+source = ["pioneer-matiri", "ntl-amp-2024"]
+grade = "A"
+checked = "2026-11-26"
+
+[[ratings]]
+value = 4.8
+basis = "MBIE's 2020 list (before commissioning)"
+source = "mbie-opportunities-in-new-zealand"
+grade = "A"
+checked = ""
