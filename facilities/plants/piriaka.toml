@@ -7,7 +7,7 @@ wikidata = "Q62415231"
 osm = ["way/986089016"]
 reviewed = ""
 to_check = [
-  "Location: Wikipedia's point sits on an island in the Whanganui River on the LINZ aerial, not plainly on a powerhouse; there are two powerhouses (1924 and 1971). Needs the Elenz team's point.",
+  "Two powerhouses (1924 and 1971): the point marks the station buildings beside State Highway 4; is the 1971 powerhouse at the same spot?",
   "Capacity: Contact gives 1 MW, King Country Energy's 2022 submission 1.3, The Lines Company's machines 1.6 (1.0, 0.3 and 0.3). Which is the station's rating?",
   "Read Wikipedia's Piriaka Power Station article in full (the API refused it on 26 Nov 2026).",
   "For the Elenz team: how a page without Elenz data looks, before this station is published.",
@@ -15,16 +15,17 @@ to_check = [
 notes = [
   "Station leads round, batch A (26 Nov 2026): lead H018 (Piriaka, 1 MW, King Country Energy). Not in the EA register or metered_plants.csv under any code; other embedded at ONG0331 (embedded_points.csv).",
   "Contact: built to supply Taumarunui borough; a second powerhouse with a horizontal Kaplan turbine, built in 1971, doubled its output.",
-  "District and region from Wikipedia's point in Stats NZ's boundaries, 26 Nov 2026: Ruapehu District, Manawatū-Whanganui Region; no other district within 2 km. Recheck once the point is settled.",
+  "Point given by the Elenz team and confirmed on the station buildings on the LINZ aerial, 26 Nov 2026 (Manawatū-Whanganui 0.3m Rural Aerial Photos (2021-2022)); Wikipedia's point is 1.5 km away, on an island in the river.",
+  "District and region from the point in Stats NZ's boundaries, 26 Nov 2026: Ruapehu District, Manawatū-Whanganui Region; no other district within 2 km.",
 ]
 
 [location]
-value = [-38.9175, 175.34080556]
+value = [-38.91180301114503, 175.34284104763495]
 basis = "station"
-source = "wp-piriaka"
+source = "linz-aerial"
 grade = "B"
-checked = ""
-note = "Wikipedia's point, not yet confirmed on the LINZ aerial"
+checked = "2026-11-26"
+note = "given by the Elenz team, confirmed on the LINZ aerial 26 Nov 2026"
 
 [grid_connection]
 value = [-38.74573, 175.18165]
@@ -57,13 +58,13 @@ checked = "2026-11-26"
 value = "Manawatū-Whanganui"
 source = "statsnz-regc-2025"
 grade = "A"
-checked = ""
+checked = "2026-11-26"
 
 [facts.territorial_authority]
 value = "Ruapehu"
 source = "statsnz-ta-2026"
 grade = "A"
-checked = ""
+checked = "2026-11-26"
 
 [facts.owner]
 value = "King Country Energy"
