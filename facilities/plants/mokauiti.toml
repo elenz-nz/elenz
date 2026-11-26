@@ -1,0 +1,86 @@
+# Plant page facts for Mōkauiti. How to check a plant: facilities/PLANTS.md.
+
+slug = "mokauiti"
+name = "Mōkauiti"
+register = ["H015"]
+reviewed = ""
+to_check = [
+  "Capacity: Contact and King Country Energy's 2022 submission (body) give 1.9 MW; the same submission's summary 1.7, MBIE's list and The Lines Company's machines 1.6 (1.0 and 0.6). Kept 1.9.",
+  "Wikidata item, if any.",
+  "For the history round: MBIE's list gives 1925, 1938 and 1963 (earlier stations on the site?); the Wairere Electric Power Board's 1958 decision.",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Point given by the Elenz team and confirmed on the LINZ aerial, 26 Nov 2026 (Waikato 0.3m Rural Aerial Photos (2023-2024)): the powerhouse on the Mokauiti Stream west of Wairere; the lead's point was Hangatiki GXP's.",
+  "District and region from the point in Stats NZ's boundaries, 26 Nov 2026: Waitomo District, Waikato Region; no other district within 2 km.",
+  "Station leads round, batch A (26 Nov 2026): lead H015 (Mōkauiti, 2 MW, King Country Energy). Not in the EA register or metered_plants.csv under any code; other embedded at HTI0331 (embedded_points.csv).",
+  "Spelling: Contact and King Country Energy write Mokauiti; the lead and the page use the macron, as for the Mōkau River. Check the gazetted name before publishing.",
+  "King Country Energy's submission: proposed by the Wairere Electric Power Board in 1958, generating from 1963; earth dam about 10 m high and 147 m long, 520 m penstock to the station, two turbines; dewatered reach about 800 m. Contact: head 42.7 m.",
+]
+
+[location]
+value = [-38.55271875629292, 174.96208222706667]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-26"
+note = "given by the Elenz team, confirmed on the LINZ aerial 26 Nov 2026"
+
+[grid_connection]
+value = [-38.25136, 175.17796]
+code = "HTI0331 HANGATIKI"
+source = ["ea-nsp", "tlc-amp-2026"]
+grade = "A"
+checked = "2026-11-26"
+note = "embedded in The Lines Company's network: its 2026 AMP (Table 5, p. 45) places Mokauiti 1 and 2 at Hangatiki GXP; point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.commissioned]
+value = "1963"
+source = ["contact-mokauiti", "kce-waitomo-2022"]
+grade = "A"
+checked = "2026-11-26"
+
+[facts.units]
+value = "2 (1.0 and 0.6 MW)"
+source = ["tlc-amp-2026", "kce-waitomo-2022"]
+grade = "A"
+checked = "2026-11-26"
+
+[facts.river]
+value = "Mokauiti Stream"
+source = ["contact-mokauiti", "kce-waitomo-2022"]
+grade = "A"
+checked = "2026-11-26"
+
+[facts.region]
+value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-26"
+
+[facts.territorial_authority]
+value = "Waitomo"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-26"
+
+[facts.owner]
+value = "King Country Energy"
+source = ["kce-waitomo-2022", "kce-our-story"]
+grade = "A"
+checked = "2026-11-26"
+note = "Contact Energy holds 75% of King Country Energy (since 2025) and runs the station"
+
+[[ratings]]
+value = 1.9
+basis = "Contact: maximum capacity"
+source = ["contact-mokauiti", "kce-waitomo-2022"]
+grade = "A"
+checked = "2026-11-26"
+
+[[ratings]]
+value = 1.6
+basis = "The Lines Company's AMP: its two machines (1.0 and 0.6 MW)"
+source = "tlc-amp-2026"
+grade = "A"
+checked = "2026-11-26"

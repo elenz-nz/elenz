@@ -1,0 +1,71 @@
+# Plant page facts for Mangaio. How to check a plant: facilities/PLANTS.md.
+
+slug = "mangaio"
+name = "Mangaio"
+register = ["L004"]
+reviewed = ""
+to_check = [
+  "Grid connection: not found. The EA's network supply points table has a Genesis embedded-generation point at Tokaanu 33 kV (TKU0331, from July 2008), which could be Mangaio; no document read yet says so. Genesis's annual reports or a network AMP may.",
+  "Is Mangaio metered with Rangipō (both feed water to Rangipō)? It is not in the EA register under its own name.",
+  "A Genesis source for its capacity and commissioning (annual report 2009, or a Genesis station page).",
+  "Wikidata item, if any.",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Point given by the Elenz team and confirmed on the LINZ aerial, 26 Nov 2026 (Manawatū-Whanganui 0.3m Rural Aerial Photos (2021-2022)): the building at the Mangaio Tunnel's outlet above the Mangaio Stream gorge; Wikipedia's Genesis table says Waikato region, the point says Manawatū-Whanganui.",
+  "District and region from the point in Stats NZ's boundaries, 26 Nov 2026: Ruapehu District, Manawatū-Whanganui Region; no other district within 2 km.",
+  "Station leads round, batch A (26 Nov 2026): lead L004 (Mangaio, 1.8 MW, Genesis Energy, 2008, from MBIE's 2020 list). A station of Genesis's Tongariro Power Scheme, alongside Tokaanu and Rangipō (both have pages); its own station with its own point, so its own file, not a station of Rangipō's page. Not in the EA register or metered_plants.csv under any code.",
+  "Capacity: 1.8 MW (MBIE; Wikipedia's Genesis table, 5.8 GWh a year); Wikipedia's Tongariro article says about 2 MW.",
+  "Construction began January 2007, commissioning from the end of 2008 (a secondary page quoting Genesis; not citable).",
+]
+
+[location]
+value = [-39.3824891715569, 175.72231740096024]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-26"
+note = "given by the Elenz team, confirmed on the LINZ aerial 26 Nov 2026"
+
+[facts.commissioned]
+value = "2008"
+source = ["wp-tongariro", "mbie-opportunities-in-new-zealand"]
+grade = "A"
+checked = "2026-11-26"
+
+[facts.scheme]
+value = "Tongariro Power Scheme"
+source = ["genesis-rivers-lakes", "wp-tongariro"]
+grade = "A"
+checked = "2026-11-26"
+
+[facts.river]
+value = "Wahianoa Aqueduct to Lake Moawhango (Mangaio Stream)"
+source = "wp-tongariro"
+grade = "B"
+checked = "2026-11-26"
+
+[facts.region]
+value = "Manawatū-Whanganui"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-26"
+
+[facts.territorial_authority]
+value = "Ruapehu"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-26"
+
+[facts.owner]
+value = "Genesis Energy"
+source = ["genesis-rivers-lakes", "mbie-opportunities-in-new-zealand"]
+grade = "A"
+checked = "2026-11-26"
+
+[[ratings]]
+value = 1.8
+basis = "MBIE's 2020 list of existing small hydro"
+source = "mbie-opportunities-in-new-zealand"
+grade = "A"
+checked = "2026-11-26"

@@ -1,0 +1,86 @@
+# Plant page facts for Wairere. How to check a plant: facilities/PLANTS.md.
+
+slug = "wairere"
+name = "Wairere"
+register = ["H014"]
+wikidata = "Q85814149"
+reviewed = ""
+to_check = [
+  "Capacity: Contact and King Country Energy's 2022 submission give 4.3 MW, the same submission's summary and MBIE's list 4.6, The Lines Company's machines add to 4.2 (3.0 and 1.2). Kept 4.3.",
+  "For the history round: owners over time (the Wairere Electric Power Board from 1923; King Country Energy since the 1998–99 reforms) and the 2013–14 refurbishment (Wikipedia: three units replaced by one).",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch A (26 Nov 2026): lead H014 (Wairere, 5 MW, King Country Energy). Not in the EA register or metered_plants.csv under any code; other embedded at HTI0331 (embedded_points.csv).",
+  "Point given by the Elenz team and confirmed on the powerhouse on the LINZ aerial, 26 Nov 2026 (Waikato 0.3m Rural Aerial Photos (2023-2024)); Wikipedia's point is within a few metres.",
+  "District and region from the point in Stats NZ's boundaries, 26 Nov 2026: Waitomo District, Waikato Region; no other district within 2 km.",
+  "Downstream of Mōkauiti on the Mokau River (Contact); head 19.6 m; weir 2.5 m high above the 19 m Wairere Falls, powerhouse about 50 m below them (King Country Energy's submission).",
+]
+
+[location]
+value = [-38.53161644367144, 175.0083683111974]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-26"
+note = "given by the Elenz team, confirmed on the LINZ aerial 26 Nov 2026"
+
+[grid_connection]
+value = [-38.25136, 175.17796]
+code = "HTI0331 HANGATIKI"
+source = ["ea-nsp", "tlc-amp-2026"]
+grade = "A"
+checked = "2026-11-26"
+note = "embedded in The Lines Company's network: its 2026 AMP (Table 5, p. 45) places Wairere 4 and 5 at Hangatiki GXP; point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.commissioned]
+value = "1925"
+source = ["contact-wairere", "kce-waitomo-2022"]
+grade = "A"
+checked = "2026-11-26"
+note = "generating since 1925; the present dam dates from the 1950s"
+
+[facts.units]
+value = "2 (3.0 and 1.2 MW)"
+source = "tlc-amp-2026"
+grade = "A"
+checked = "2026-11-26"
+
+[facts.river]
+value = "Mokau River (Wairere Falls)"
+source = ["contact-wairere", "kce-waitomo-2022"]
+grade = "A"
+checked = "2026-11-26"
+
+[facts.region]
+value = "Waikato"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-26"
+
+[facts.territorial_authority]
+value = "Waitomo"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-26"
+
+[facts.owner]
+value = "King Country Energy"
+source = ["kce-waitomo-2022", "kce-our-story"]
+grade = "A"
+checked = "2026-11-26"
+note = "Contact Energy holds 75% of King Country Energy (since 2025) and runs the station"
+
+[[ratings]]
+value = 4.3
+basis = "Contact: maximum capacity"
+source = ["contact-wairere", "kce-waitomo-2022"]
+grade = "A"
+checked = "2026-11-26"
+
+[[ratings]]
+value = 4.2
+basis = "The Lines Company's AMP: its two machines (3.0 and 1.2 MW)"
+source = "tlc-amp-2026"
+grade = "A"
+checked = "2026-11-26"
