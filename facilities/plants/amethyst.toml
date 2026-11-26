@@ -1,0 +1,61 @@
+# Plant page facts for Amethyst. How to check a plant: facilities/PLANTS.md.
+
+slug = "amethyst"
+name = "Amethyst"
+register = ["E025"]
+osm = ["node/10571698079"]
+reviewed = ""
+to_check = [
+  "Location: the station's own point (the Elenz team gives it; confirm it on the LINZ aerial), then district and region from Stats NZ's boundaries.",
+  "Capacity basis: Westpower's 7.6 MW against its AMP's 7,400 kW generated (Table 4.7); which is the machine rating?",
+  "Wikidata item, if any.",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch B (26 Nov 2026): lead E025 (Amethyst, 7.6 MW, Westpower). Not in the EA register or metered_plants.csv under any code; other embedded at HKK0661 (embedded_points.csv).",
+  "Westpower's page: 5 km east of Hari Hari beside State Highway 6 near the Wanganui River bridge; the powerhouse is within 500 m of the Alpine Fault. A DOC concession report says the scheme is on the Amethyst River north of Hari Hari.",
+  "Owned by Amethyst Hydro Ltd: Westpower 88%, Harihari Hydro Ltd 12% (Westpower). Westpower is the lines company too, so this is the network owner's own station.",
+  "MBIE's 2020 list: Westpower, 7.6 MW, 2013. Wikipedia's list: 7.6 MW, 2013, Westland.",
+  "From the lead (Westpower's page, to recheck for the history round): a six-jet vertical Pelton turbine designed in New Zealand; an earlier 250 kW Amethyst station supplied the Harihari area from 1954 to 1991, on the same river about 1 km upstream. Geotechnical paper on the tunnel: geotech.net.nz/pdfs/amethyst-hydro-tunnel.pdf.",
+]
+
+[grid_connection]
+value = [-42.72479, 170.98295]
+code = "HKK0661 HOKITIKA"
+source = ["ea-nsp", "westpower-amp-2026"]
+grade = "A"
+checked = "2026-11-26"
+note = "embedded in Westpower's network at Hari Hari substation (11 kV), on the Hokitika–Hari Hari line from Hokitika GXP (Westpower's 2026 AMP, Table 4.7 and pp. 126 and 132); point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.commissioned]
+value = "June 2013"
+source = ["westpower-amethyst", "westpower-amp-2026"]
+grade = "A"
+checked = "2026-11-26"
+
+[facts.river]
+value = "Amethyst River"
+source = "westpower-amethyst"
+grade = "A"
+checked = "2026-11-26"
+note = "a low weir on the Amethyst River; tunnel and penstock 2.5 km long; run of river, no dam"
+
+[facts.owner]
+value = "Amethyst Hydro Ltd (Westpower 88%, Harihari Hydro 12%)"
+source = "westpower-amethyst"
+grade = "A"
+checked = "2026-11-26"
+
+[[ratings]]
+value = 7.6
+basis = "Westpower"
+source = ["westpower-amethyst", "mbie-opportunities-in-new-zealand"]
+grade = "A"
+checked = "2026-11-26"
+
+[[ratings]]
+value = 7.4
+basis = "Westpower's AMP: kW generated (Table 4.7)"
+source = "westpower-amp-2026"
+grade = "A"
+checked = ""

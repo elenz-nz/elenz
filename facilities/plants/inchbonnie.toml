@@ -1,0 +1,45 @@
+# Plant page facts for Inchbonnie. How to check a plant: facilities/PLANTS.md.
+
+slug = "inchbonnie"
+name = "Inchbonnie"
+register = ["E022"]
+reviewed = ""
+to_check = [
+  "Location: the station's own point (the Elenz team gives it; confirm it on the LINZ aerial), then district and region from Stats NZ's boundaries.",
+  "Grid exit point: Westpower's AMP connects it at Inchbonnie (11 kV) and says Arnold substation's feeders reach Inchbonnie, so Dobson; an inference to confirm (the lead had Greymouth or Dobson).",
+  "Commissioned: Westpower's AMP gives 2015 (year in service); MBIE's 2020 list gives no year. An owner date?",
+  "Which two streams feed it (the owner's page says two streams in the Hohonu Range).",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch B (26 Nov 2026): lead E022 (Inchbonnie, 2 MW, Inchbonnie Hydro). Not in the EA register or metered_plants.csv under any code.",
+  "Capacity 1.7 MW: the owner's site, Westpower's AMP (1,700 kW) and MBIE's 2020 list agree; the lead's 2 MW was rounded.",
+]
+
+[grid_connection]
+value = [-42.45321, 171.30094]
+code = "DOB0331 DOBSON"
+source = ["ea-nsp", "westpower-amp-2026"]
+grade = "A"
+checked = "2026-11-26"
+note = "embedded in Westpower's network at Inchbonnie (11 kV, Table 4.7); Arnold substation's feeders reach Inchbonnie and Arnold is fed from Dobson GXP (pp. 125 and 162), an inference; point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.commissioned]
+value = "2015"
+source = "westpower-amp-2026"
+grade = "A"
+checked = "2026-11-26"
+note = "Westpower's AMP: year in service"
+
+[facts.owner]
+value = "Inchbonnie Hydro"
+source = ["westpower-amp-2026", "inchbonnie-hydro"]
+grade = "A"
+checked = "2026-11-26"
+
+[[ratings]]
+value = 1.7
+basis = "Inchbonnie Hydro"
+source = ["inchbonnie-hydro", "westpower-amp-2026", "mbie-opportunities-in-new-zealand"]
+grade = "A"
+checked = "2026-11-26"

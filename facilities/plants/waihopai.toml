@@ -1,0 +1,62 @@
+# Plant page facts for Waihopai. How to check a plant: facilities/PLANTS.md.
+
+slug = "waihopai"
+name = "Waihopai"
+register = ["H025"]
+osm = ["relation/12607855"]
+reviewed = ""
+to_check = [
+  "Location: the station's own point (the Elenz team gives it; confirm it on the LINZ aerial), then district and region from Stats NZ's boundaries.",
+  "Wikipedia's list gives Waihopai a point near Rangipō (-39.153316, 175.836802), plainly a copy error: don't use it.",
+  "Capacity: Contact 2.4 MW (and MBIE); Manawa's old page and Marlborough Lines' AMP 2.5. Keep Contact's.",
+  "Commissioned: the Marlborough Electric Power Trust gives 6 April 1927; Wikipedia's Marlborough Lines article says first electricity in August 1927 (official switch-on 6 August 1927). Which day?",
+  "Wikidata item.",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch B (26 Nov 2026): lead H025 (Waihopai, 3 MW, Manawa Energy, grade C). Not in the EA register or metered_plants.csv under any code.",
+  "Owners: the Marlborough Electric Power Board built it (1925–1927); Marlborough Electric (1993); sold to TrustPower in 1999 with the Branch scheme (MEPT); Manawa from 2022; Contact since July 2025.",
+  "Upgrades in the 1930s and 1960s more than doubled its output (Contact). Engineering New Zealand: 25 km south of Renwick; the lake silted up, so it runs as run of river.",
+]
+
+[grid_connection]
+value = [-41.49842, 173.93253]
+code = "BLN0331 BLENHEIM"
+source = ["ea-nsp", "mll-amp-2023"]
+grade = "A"
+checked = "2026-11-26"
+note = "embedded in Marlborough Lines' 33 kV network, whose only GXP is Blenheim (Marlborough Lines' 2023 AMP, pp. 37 and 129); point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.commissioned]
+value = "1927"
+source = ["contact-waihopai", "mept-history"]
+grade = "A"
+checked = "2026-11-26"
+
+[facts.river]
+value = "Waihopai River"
+source = ["contact-waihopai", "engnz-waihopai"]
+grade = "A"
+checked = "2026-11-26"
+note = "a 33 m concrete arch dam"
+
+[facts.owner]
+value = "Contact Energy"
+source = ["contact-waihopai", "contact-manawa-2025"]
+grade = "A"
+checked = "2026-11-26"
+note = "Manawa Energy (formerly Trustpower) until Contact bought it in July 2025"
+
+[[ratings]]
+value = 2.4
+basis = "Contact: maximum capacity"
+source = ["contact-waihopai", "mbie-opportunities-in-new-zealand"]
+grade = "A"
+checked = "2026-11-26"
+
+[[ratings]]
+value = 2.5
+basis = "Marlborough Lines' AMP"
+source = "mll-amp-2023"
+grade = "A"
+checked = "2026-11-26"

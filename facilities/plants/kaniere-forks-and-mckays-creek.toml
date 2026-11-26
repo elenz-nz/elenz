@@ -1,0 +1,79 @@
+# Plant page facts for Kaniere Forks and McKays Creek. How to check a plant: facilities/PLANTS.md.
+
+slug = "kaniere-forks-and-mckays-creek"
+name = "Kaniere Forks and McKays Creek"
+register = ["H026", "H027", "E021"]
+reviewed = ""
+to_check = [
+  "Location: each station's own point (the Elenz team gives them; confirm on the LINZ aerial), then district and region from Stats NZ's boundaries.",
+  "Kaniere Forks commissioned: Contact gives 1911 (MBIE and Wikipedia's list agree); one copy of Contact's page read 1909 in a search result; Westpower's AMP gives 1931 (probably McKays Creek's year repeated). Keep 1911 unless a better source turns up.",
+  "Capacities: Contact gives 1 MW for the two together; Westpower's AMP 0.5 (Kaniere Forks) and 1.1 (McKays Creek); MBIE and Wikipedia's list 0.43 and 1.1. Which is the scheme's rating?",
+  "Grid exit point: Westpower's AMP puts the Kokatahi-Kowhitirangi area on Hokitika GXP (p. 126); both stations connect at their own 11 kV points. Hokitika is an inference to confirm.",
+  "Wikidata items.",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch B (26 Nov 2026): leads H026 (Kaniere Forks) and H027 (McKays Creek, merged with E021 Mackays Creek, 1 MW), both other embedded at HKK0661. Contact and Manawa have one page for the two (\"Kaniere Forks/McKays Creek\"), so one file with two stations, as Fraser and Hinemaiaia. Not in the EA register or metered_plants.csv under any code.",
+  "Both draw on the 1874 Kaniere Water Race (Contact); built for early gold mining.",
+  "Owners: Trustpower/Manawa (MBIE's 2020 list), Contact since it bought Manawa (11 July 2025). Earlier owners for the history round.",
+]
+
+[grid_connection]
+value = [-42.72479, 170.98295]
+code = "HKK0661 HOKITIKA"
+source = ["ea-nsp", "westpower-amp-2026"]
+grade = "A"
+checked = "2026-11-26"
+note = "embedded in Westpower's network at the Kaniere Forks and McKays Creek 11 kV points (Table 4.7); Hokitika GXP supplies the Kokatahi-Kowhitirangi area (p. 126); point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.commissioned]
+value = "1911 (Kaniere Forks), 1931 (McKays Creek)"
+source = ["contact-kaniere-mckays", "mbie-opportunities-in-new-zealand"]
+grade = "A"
+checked = "2026-11-26"
+
+[facts.river]
+value = "Kaniere River (Kaniere Water Race)"
+source = "contact-kaniere-mckays"
+grade = "A"
+checked = "2026-11-26"
+
+[facts.owner]
+value = "Contact Energy"
+source = ["contact-kaniere-mckays", "contact-manawa-2025", "westpower-amp-2026"]
+grade = "A"
+checked = "2026-11-26"
+note = "Manawa Energy (formerly Trustpower) until Contact bought it in July 2025"
+
+[[ratings]]
+value = 1
+basis = "Contact: maximum capacity of the two stations together"
+source = "contact-kaniere-mckays"
+grade = "A"
+checked = "2026-11-26"
+
+[[ratings]]
+value = "McKays Creek 1.1; Kaniere Forks 0.5"
+basis = "Westpower's AMP: kW generated (Table 4.7)"
+source = "westpower-amp-2026"
+grade = "A"
+checked = ""
+
+[[stations]]
+value = "Kaniere Forks"
+id = "H026"
+mw = 0.43
+source = "mbie-opportunities-in-new-zealand"
+grade = "A"
+checked = ""
+commissioned = "1911"
+note = "0.43 MW in MBIE's 2020 list and Wikipedia's; 0.5 in Westpower's AMP"
+
+[[stations]]
+value = "McKays Creek"
+id = "H027"
+mw = 1.1
+source = ["mbie-opportunities-in-new-zealand", "westpower-amp-2026"]
+grade = "A"
+checked = "2026-11-26"
+commissioned = "1931"
