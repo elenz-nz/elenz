@@ -7,6 +7,10 @@
 #             files 1-4 days late, so a few days' lag is normal)
 #   trigger:  the Worker's calls to GitHub (/data/status.json) have failed for TRIGGER_MINUTES (it retries once;
 #             GitHub drops a single call now and then, and the next one 5 minutes later works)
+#   metered:  the newest month the history built from metered data (index.json `metered_to`) is older than the month
+#             METERED_DAYS ago. The EA publishes a month's metered files ~5-6 weeks after it ends; history closes a
+#             month without them METERED_WAIT (100) days after it ends, silently, so this says so first (a metered
+#             file moved or renamed, as the register file was in Nov 2026). Skipped while a rebuild is under way.
 #   solar:    embedded solar's irradiance (the live file's meta): daylight with none at all (roof_gap), the reserve
 #             forecast not refreshed for FORECAST_HOURS (the live job fetches it every 3 hours and it reaches at
 #             least a day ahead, so this comes well before the estimate runs out of data), or the satellite more
@@ -39,6 +43,7 @@ env:
   SITE: https://elenz.co.nz
   LIVE_MINUTES: '60'   # 45 until 7 Nov 2026: the EMI feed's ~50-minute stalls set it off (docs/data-notes.md)
   HISTORY_DAYS: '5'
+  METERED_DAYS: '90'   # a month is due from about 60 days after it ends with this; METERED_WAIT in ingest/history.py is 100
   REBUILD_DAYS: '12'   # allowed while a full history rebuild is under way (see the history check below)
   FORECAST_HOURS: '6'    # the reserve irradiance forecast is fetched every 3 hours (FORECAST_MAX_AGE in ingest/update.py)
   SATELLITE_HOURS: '6'   # the satellite normally runs about 45 minutes behind; the forecast stands in after 2 hours
@@ -94,6 +99,12 @@ jobs:
             if (hist.error) problems.push(`The history index can't be read (${hist.error}).`);
             else if (now - hist.end > histDays * 86400e3)
               problems.push(`History is ${ago(now - hist.end)} behind (newest half-hour ${nz(hist.end)})${rebuilding ? `, with ${prog.rebuild_left.length} months still to rebuild` : ''}.`);
+            // metered data: keys the history job writes since Nov 2026 (skipped on an older index, and during a rebuild)
+            if (!hist.error && !rebuilding && 'metered_to' in hist) {
+              const due = new Date(now - process.env.METERED_DAYS * 86400e3).toISOString().slice(0, 7);
+              if (!hist.metered_to || hist.metered_to < due)
+                problems.push(`History has no metered data for ${due} (newest metered month ${hist.metered_to || 'none'}): the EA's metered files (Generation_MD and friends) may have moved or changed. History closes a month without them 100 days after it ends.`);
+            }
             const status = await get('/data/status.json');
             if (!status.error) {
               const lasting = (st) => now - Date.parse(st.since || st.at) >= process.env.TRIGGER_MINUTES * 60e3;
