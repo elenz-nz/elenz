@@ -1,0 +1,78 @@
+# Plant page facts for Mangapēhi. How to check a plant: facilities/PLANTS.md.
+
+slug = "mangapehi"
+name = "Mangapēhi"
+register = ["L001"]
+reviewed = ""
+to_check = [
+  "Location: the station's point (Pioneer: in a gorge on the Mangapehi River about 30 km south of Te Kuiti); then district and region from Stats NZ.",
+  "Commissioned: Pioneer gives 1996; MBIE's 2020 list (and Wikipedia's lists) 2008. Which is the station's first output, and was it rebuilt?",
+  "Capacity: The Lines Company's machines add to 3.0 MW (two of 1.5); MBIE's list and Wikipedia 1.6. Pioneer gives none.",
+  "Wikidata item, if any.",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch A (26 Nov 2026): lead L001 (Mangapehi, 1.6 MW, Clearwater Hydro / The Lines Company in MBIE's 2020 list). Not in the EA register or metered_plants.csv under any code; other embedded at HTI0331 (embedded_points.csv).",
+  "Owners: The Lines Company (its Clearwater Hydro schemes) until 19 July 2021, then Southern Generation Limited Partnership (half Pioneer's), wholly Pioneer's from May 2024, now Pioneer Energy Renewables.",
+  "Pioneer: head 105 m, 2,000 l/s, 5.1 GWh a year, 2.46 km of mainly above-ground steel pipe, two generators, connected to The Lines Company's network. TLC (2018): low weir, no dam or storage lake, fish pass.",
+]
+
+[grid_connection]
+value = [-38.25136, 175.17796]
+code = "HTI0331 HANGATIKI"
+source = ["ea-nsp", "tlc-amp-2026"]
+grade = "A"
+checked = "2026-11-26"
+note = "embedded in The Lines Company's network: its 2026 AMP (Table 5, p. 45) places Mangapēhi 1 and 2 at Hangatiki GXP; point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.commissioned]
+value = "1996"
+source = "pioneer-mangapehi"
+grade = "A"
+checked = ""
+note = "MBIE's 2020 list gives 2008"
+
+[[facts.commissioned.alt]]
+value = "2008"
+source = "mbie-opportunities-in-new-zealand"
+grade = "A"
+
+[facts.units]
+value = "2 (1.5 MW each)"
+source = ["tlc-amp-2026", "pioneer-mangapehi"]
+grade = "A"
+checked = "2026-11-26"
+
+[facts.river]
+value = "Mangapēhi River"
+source = "pioneer-mangapehi"
+grade = "A"
+checked = "2026-11-26"
+
+[facts.owner]
+value = "Pioneer Energy Renewables"
+source = ["pioneer-mangapehi", "tlc-amp-2026"]
+grade = "A"
+checked = "2026-11-26"
+note = "Pioneer Energy's renewables company (formerly Southern Generation)"
+
+[facts.previous_owners]
+value = "The Lines Company (until 2021); Southern Generation Limited Partnership (2021–2024)"
+source = ["tlc-hydro-sale-2021", "scoop-pioneer-sglp-2024"]
+grade = "A"
+checked = "2026-11-26"
+note = "sold by The Lines Company on 19 July 2021; Pioneer took full ownership of the partnership in May 2024"
+
+[[ratings]]
+value = 3.0
+basis = "The Lines Company's AMP: its two machines (1.5 MW each)"
+source = "tlc-amp-2026"
+grade = "A"
+checked = "2026-11-26"
+
+[[ratings]]
+value = 1.6
+basis = "MBIE's 2020 list of existing small hydro"
+source = "mbie-opportunities-in-new-zealand"
+grade = "A"
+checked = ""

@@ -1,0 +1,87 @@
+# Plant page facts for Piriaka. How to check a plant: facilities/PLANTS.md.
+
+slug = "piriaka"
+name = "Piriaka"
+register = ["H018"]
+wikidata = "Q62415231"
+osm = ["way/986089016"]
+reviewed = ""
+to_check = [
+  "Location: Wikipedia's point sits on an island in the Whanganui River on the LINZ aerial, not plainly on a powerhouse; there are two powerhouses (1924 and 1971). Needs the Elenz team's point.",
+  "Capacity: Contact gives 1 MW, King Country Energy's 2022 submission 1.3, The Lines Company's machines 1.6 (1.0, 0.3 and 0.3). Which is the station's rating?",
+  "Read Wikipedia's Piriaka Power Station article in full (the API refused it on 26 Nov 2026).",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch A (26 Nov 2026): lead H018 (Piriaka, 1 MW, King Country Energy). Not in the EA register or metered_plants.csv under any code; other embedded at ONG0331 (embedded_points.csv).",
+  "Contact: built to supply Taumarunui borough; a second powerhouse with a horizontal Kaplan turbine, built in 1971, doubled its output.",
+  "District and region from Wikipedia's point in Stats NZ's boundaries, 26 Nov 2026: Ruapehu District, Manawatū-Whanganui Region; no other district within 2 km. Recheck once the point is settled.",
+]
+
+[location]
+value = [-38.9175, 175.34080556]
+basis = "station"
+source = "wp-piriaka"
+grade = "B"
+checked = ""
+note = "Wikipedia's point, not yet confirmed on the LINZ aerial"
+
+[grid_connection]
+value = [-38.74573, 175.18165]
+code = "ONG0331 ONGARUE"
+source = ["ea-nsp", "tlc-amp-2026"]
+grade = "A"
+checked = "2026-11-26"
+note = "embedded in The Lines Company's network: its 2026 AMP (Table 5, p. 45) places Piriaka 1 to 3 at Ōngarue GXP, whose generation can be switched to National Park or Tokaanu; point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.commissioned]
+value = "1924"
+source = ["contact-piriaka", "mbie-opportunities-in-new-zealand"]
+grade = "A"
+checked = "2026-11-26"
+note = "a second powerhouse was added in 1971"
+
+[facts.units]
+value = "3 (1.0, 0.3 and 0.3 MW)"
+source = "tlc-amp-2026"
+grade = "A"
+checked = "2026-11-26"
+
+[facts.river]
+value = "Whanganui River"
+source = "contact-piriaka"
+grade = "A"
+checked = "2026-11-26"
+
+[facts.region]
+value = "Manawatū-Whanganui"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = ""
+
+[facts.territorial_authority]
+value = "Ruapehu"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = ""
+
+[facts.owner]
+value = "King Country Energy"
+source = ["kce-waitomo-2022", "kce-our-story"]
+grade = "A"
+checked = "2026-11-26"
+note = "Contact Energy holds 75% of King Country Energy (since 2025) and runs the station"
+
+[[ratings]]
+value = 1
+basis = "Contact: maximum capacity"
+source = "contact-piriaka"
+grade = "A"
+checked = "2026-11-26"
+
+[[ratings]]
+value = 1.6
+basis = "The Lines Company's AMP: its three machines (1.0, 0.3 and 0.3 MW)"
+source = "tlc-amp-2026"
+grade = "A"
+checked = "2026-11-26"
