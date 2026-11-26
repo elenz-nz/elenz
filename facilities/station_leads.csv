@@ -1,8 +1,4 @@
 id,name,technology,scheme,region,status,mw,mw_basis,owner,shown_in_elenz,on_page,grid_exit_point,wikidata,lat,lon,location_source,osm,sources,notes,to_check
-
-New Zealand Designed Six-Jet Vertical Pelton Turbine
-
-The original 250 kW Amethyst Power Station, which was developed to supply the Harihari area, was commissioned in 1954 and decommissioned in 1991. It took water from the same river and was situated approximately 1 km upstream from the current site. Grade B (Westpower). Wikipedia 7.6 MW, 2013.",
 E007,Ardmore Solar,Solar,,Auckland,Operating,10,,Kenny Energy Limited,Embedded solar,,Takanini (area as entered),,,,,way/1346991619,,Not dispatched; in the embedded solar estimate.,
 T004,Bream Bay,Thermal/Diesel,Marsden/Bream Bay,Northland,Operating,8,"Verify name, rating and status.",Manawa Energy,Other embedded,,BRB0331 Bream Bay,,,,,way/1411690315,,"Wikipedia: 9 MW diesel reciprocating plant, 2011, Manawa. Not dispatched, so probably within other embedded generation at Bream Bay (an inference; no public source ties it yet). BRB0331 is also the grid exit point of Meridian's Ruakākā battery and solar farm.",
 W011,Brooklyn,Wind,Wellington,Wellington,Operating,1,Small installation; threshold decision.,,Not in Elenz data,,,,,,,,,About 0.2 MW; too small for the grid data. Heritage exception only.,
