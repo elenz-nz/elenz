@@ -63,10 +63,16 @@
 					if (run.changes) send(run.page, run.changes, run.keys);
 					run = null;
 				}
+				// not settings (test report, 27 Nov 2026): link tags a page drops when it rewrites its address (?fbclid=… from
+				// Facebook showed up as a changed setting; also utm_, gclid, msclkid and the like), our own ?exclude-me, and
+				// empty names
+				var NOT_SETTING = /^(utm_|mc_[ce]id$|_ga$|_gl$|igshid$|ref$|exclude-me$|$)|clk?id$/;
 				function changed(a, b) {
 					var keys = {};
-					a.searchParams.forEach(function (v, k) { if (b.searchParams.get(k) !== v) keys[k] = 1; });
-					b.searchParams.forEach(function (v, k) { if (a.searchParams.get(k) !== v) keys[k] = 1; });
+					function diff(x, y) {
+						x.searchParams.forEach(function (v, k) { if (!NOT_SETTING.test(k) && y.searchParams.get(k) !== v) keys[k] = 1; });
+					}
+					diff(a, b); diff(b, a);
 					if (a.hash !== b.hash) keys['#'] = 1;
 					return keys;
 				}

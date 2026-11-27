@@ -61,6 +61,23 @@ test('the same settings in a new order are no change', () => {
   assert.deepEqual(sent, [{ name: 'view-change', page: '/tracker', changes: 1, keys: 'region' }]);
 });
 
+test('link tags a page drops from its address are no change', () => {
+  const { view, sent } = setup();
+  assert.ok(view(T + '?fbclid=IwAR0abc&range=7d'));
+  assert.equal(view(T + '?range=7d'), null, 'still no view');
+  view(T + '?range=7d&gclid=x&msclkid=y&utm_source=z&ref=w&exclude-me&=1');
+  assert.deepEqual(sent, [], 'no event for tags, our opt-out or an empty name');
+  view(T + '?range=30d&fbclid=again');
+  assert.deepEqual(sent, [{ name: 'view-change', page: '/tracker', changes: 1, keys: 'range' }], 'only the real setting');
+});
+
+test('a setting whose name only looks like a tag still counts', () => {
+  const { view, sent } = setup();
+  view(T + '?prefer=1');
+  view(T + '?prefer=2&reference=1');
+  assert.deepEqual(sent, [{ name: 'view-change', page: '/tracker', changes: 1, keys: 'prefer,reference' }]);
+});
+
 test('a run of changes sends at most one event a minute, counting what came between', () => {
   const { view, sent, advance } = setup();
   view(T);
