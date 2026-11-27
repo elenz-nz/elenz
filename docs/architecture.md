@@ -420,7 +420,11 @@ Other embedded generation on the site (design decisions, 6 Nov 2026): `src/lib/t
   What was dropped becomes a `view-change` event (design decision, 25 Nov 2026), so time spent working a page still
   shows in a visitor's timeline: `{ page, changes, keys }`, the number of address changes and the names (never the
   values) of the settings that changed (`#` for the hash); the same settings rewritten in another order (Tracker's fixed
-  order, on arriving from a link) count as no change. The first change of a run goes at once, then at most one a
+  order, on arriving from a link) count as no change. Names that aren't settings are left out of the comparison (test
+  report, 27 Nov 2026: `fbclid` from a Facebook link showed up as a changed setting when the page rewrote its address
+  without it): link tags (`utm_*`, `*clid`/`*clkid` such as `gclid` and `msclkid`, `_ga`, `_gl`, `mc_cid`, `mc_eid`,
+  `igshid`, `ref`), our own `exclude-me` and empty names (`NOT_SETTING`); a change to only those sends nothing. It is
+  a list of what to ignore, not of the settings, so a new setting shows without a list to keep. The first change of a run goes at once, then at most one a
   minute per page with the changes since, as `throttled()` does; a new page or `pagehide` sends what's waiting. So a
   page's `view-change` count is roughly its minutes of active use. `/dashboard` sends none: `layout-change` covers it.
   It is on `/privacy`.
