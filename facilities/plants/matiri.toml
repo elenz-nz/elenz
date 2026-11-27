@@ -5,7 +5,6 @@ name = "Matiri"
 register = ["E019"]
 reviewed = ""
 to_check = [
-  "Location: the powerhouse (the Elenz team gives it; confirm it on the LINZ aerial). Wikipedia's point is the intake weir at Lake Matiri, not the station, 2.4 km of pipeline away. Then district and region from Stats NZ's boundaries (Wikipedia's list: Buller; its article: Tasman District).",
   "First output: the commissioning day (Wikipedia gives 11 December 2020, the opening). An embedded meter's first output, if one is metered.",
   "Wikidata item.",
   "For the Elenz team: how a page without Elenz data looks, before this station is published.",
@@ -15,7 +14,16 @@ notes = [
   "Capacity: Pioneer 5.0 MW; Network Tasman's AMP 5 MW; MBIE's 2020 list 4.8 (before it was finished); NZ Energy's 2008 consent 4.6; the lead's 4.9 came from our old register.",
   "Owners: Southern Generation partnership from commissioning (Wikipedia; Network Tasman's AMP); Pioneer took the whole partnership in May 2024 (see Mangapēhi's notes). Development: Tasman Energy, then NZ Energy (consent 2009, DOC concession 2011), Pioneer from October 2014.",
   "Stage 2 and an East Branch scheme were put forward under the Fast-track Approvals Act (the Lower Matiri Renewable Energy Project, environment.govt.nz); for a later look.",
+  "Location (27 Nov 2026): the Elenz team's point is on the powerhouse, 1.9 km from Wikipedia's point (the intake weir).",
 ]
+
+[location]
+value = [-41.67733373779023, 172.32507704590714]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-27"
+note = "given by the Elenz team, confirmed on the LINZ aerial 27 Nov 2026; the imagery (Tasman 0.3m Rural Aerial Photos (2020)) shows the powerhouse being finished"
 
 [grid_connection]
 value = [-41.78881, 172.33692]
@@ -38,6 +46,18 @@ source = ["pioneer-matiri", "wp-matiri"]
 grade = "A"
 checked = "2026-11-26"
 note = "run of river: weirs at the lake's outlet, 2.4 km pipeline to the powerhouse"
+
+[facts.region]
+value = "Tasman"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-27"
+
+[facts.territorial_authority]
+value = "Tasman"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-27"
 
 [facts.owner]
 value = "Pioneer Energy"

@@ -6,7 +6,6 @@ register = ["E025"]
 osm = ["node/10571698079"]
 reviewed = ""
 to_check = [
-  "Location: the station's own point (the Elenz team gives it; confirm it on the LINZ aerial), then district and region from Stats NZ's boundaries.",
   "Capacity basis: Westpower's 7.6 MW against its AMP's 7,400 kW generated (Table 4.7); which is the machine rating?",
   "Wikidata item, if any.",
   "For the Elenz team: how a page without Elenz data looks, before this station is published.",
@@ -18,6 +17,14 @@ notes = [
   "MBIE's 2020 list: Westpower, 7.6 MW, 2013. Wikipedia's list: 7.6 MW, 2013, Westland.",
   "From the lead (Westpower's page, to recheck for the history round): a six-jet vertical Pelton turbine designed in New Zealand; an earlier 250 kW Amethyst station supplied the Harihari area from 1954 to 1991, on the same river about 1 km upstream. Geotechnical paper on the tunnel: geotech.net.nz/pdfs/amethyst-hydro-tunnel.pdf.",
 ]
+
+[location]
+value = [-43.15897431735831, 170.6284940080633]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-27"
+note = "given by the Elenz team, confirmed on the LINZ aerial 27 Nov 2026"
 
 [grid_connection]
 value = [-42.72479, 170.98295]
@@ -39,6 +46,18 @@ source = "westpower-amethyst"
 grade = "A"
 checked = "2026-11-26"
 note = "a low weir on the Amethyst River; tunnel and penstock 2.5 km long; run of river, no dam"
+
+[facts.region]
+value = "West Coast"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-27"
+
+[facts.territorial_authority]
+value = "Westland"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-27"
 
 [facts.owner]
 value = "Amethyst Hydro Ltd (Westpower 88%, Harihari Hydro 12%)"
