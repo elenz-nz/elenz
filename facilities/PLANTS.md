@@ -171,6 +171,12 @@ the leads in groups, worked out by `lead_group` in `ingest/plant_research.py`, i
 | OpenStreetMap leads | status "Lead (OSM, unverified)": confirm it exists, and its rating from a source we may use, first |
 | To research | everything else: the work list for this round |
 
+A planned station becomes a lead once its construction has started: a groundbreaking or works under way reported in a
+public source, or a "committed" project in Transpower's Assumptions Book (design decision, 27 Nov 2026). A consent alone
+isn't enough, since many consented farms are never built; consented and proposed projects stay off the list until work
+begins. Such a lead has the status "Under construction" and `shown_in_elenz` "Not yet", and gets a page only once it
+shows in Elenz's data.
+
 Each lead opens to its fields, sources and its own team notes (kept with the plants' notes under `lead-<id>`, never in
 the repository); the workbook's Station leads sheet has the group and the notes. For a lead that passes:
 
