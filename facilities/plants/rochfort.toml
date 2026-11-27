@@ -5,7 +5,6 @@ name = "Rochfort"
 register = ["L005"]
 reviewed = ""
 to_check = [
-  "Location: the station's own point (the Elenz team gives it; confirm it on the LINZ aerial), then district and region from Stats NZ's boundaries.",
   "Grid exit point code: Buller Electricity's GXP is its own Robertson Street substation; the EA's table has two Orowaiti points at the same place (ORO1101, ORO1102). ORO1102 is taken because the EA's registry puts Buller's embedded hydro there and ORO1101's embedded generation is diesel (embedded_registry_split.csv); confirm.",
   "Capacity: Buller Electricity's AMP gives 5 MW; Profile Group, MBIE's 2020 list and Wikipedia's list 4.2. Did the 2017 second stage add capacity? Kawatiri Energy's own figure, if published.",
   "Commissioned: switched on June 2013 (Profile Group's article, an earlier copy read in a search result); a second stage came online in 2017. BraveTrace gives 1 January 2013, a register-style date.",
@@ -17,6 +16,14 @@ notes = [
   "Named \"Rochfort\" as BraveTrace and Buller Electricity do; Profile Group and MBIE say Lake Rochfort Scheme. Near Westport; Lake Rochfort fed by Christmas Creek and the Whareatea River; a 4.2 km pipeline and a 400 m head (BraveTrace, Profile Group). About 19 GWh a year.",
   "Kawatiri Energy investigated it from 2002, had consents by 2008 and built from 2009 (Profile Group).",
 ]
+
+[location]
+value = [-41.75439850921282, 171.70802083175644]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-27"
+note = "given by the Elenz team, confirmed on the LINZ aerial 27 Nov 2026"
 
 [grid_connection]
 value = [-41.76371, 171.6336]
@@ -44,6 +51,18 @@ value = "Lake Rochfort (Whareatea River)"
 source = "bravetrace-rochfort"
 grade = "B"
 checked = "2026-11-26"
+
+[facts.region]
+value = "West Coast"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-27"
+
+[facts.territorial_authority]
+value = "Buller"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-27"
 
 [facts.owner]
 value = "Kawatiri Energy"

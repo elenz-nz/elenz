@@ -6,8 +6,6 @@ register = ["H025"]
 osm = ["relation/12607855"]
 reviewed = ""
 to_check = [
-  "Location: the station's own point (the Elenz team gives it; confirm it on the LINZ aerial), then district and region from Stats NZ's boundaries.",
-  "Wikipedia's list gives Waihopai a point near Rangipō (-39.153316, 175.836802), plainly a copy error: don't use it.",
   "Capacity: Contact 2.4 MW (and MBIE); Manawa's old page and Marlborough Lines' AMP 2.5. Keep Contact's.",
   "Commissioned: the Marlborough Electric Power Trust gives 6 April 1927; Wikipedia's Marlborough Lines article says first electricity in August 1927 (official switch-on 6 August 1927). Which day?",
   "Wikidata item.",
@@ -17,7 +15,16 @@ notes = [
   "Station leads round, batch B (26 Nov 2026): lead H025 (Waihopai, 3 MW, Manawa Energy, grade C). Not in the EA register or metered_plants.csv under any code.",
   "Owners: the Marlborough Electric Power Board built it (1925–1927); Marlborough Electric (1993); sold to TrustPower in 1999 with the Branch scheme (MEPT); Manawa from 2022; Contact since July 2025.",
   "Upgrades in the 1930s and 1960s more than doubled its output (Contact). Engineering New Zealand: 25 km south of Renwick; the lake silted up, so it runs as run of river.",
+  "Location (27 Nov 2026): the Elenz team's point is on the powerhouse at the foot of the penstock below the dam; Wikipedia's list gives a point near Rangipō by mistake.",
 ]
+
+[location]
+value = [-41.664459394135896, 173.57462979430568]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-27"
+note = "given by the Elenz team, confirmed on the LINZ aerial 27 Nov 2026"
 
 [grid_connection]
 value = [-41.49842, 173.93253]
@@ -39,6 +46,18 @@ source = ["contact-waihopai", "engnz-waihopai"]
 grade = "A"
 checked = "2026-11-26"
 note = "a 33 m concrete arch dam"
+
+[facts.region]
+value = "Marlborough"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-27"
+
+[facts.territorial_authority]
+value = "Marlborough"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-27"
 
 [facts.owner]
 value = "Contact Energy"

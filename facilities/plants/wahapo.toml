@@ -6,7 +6,6 @@ register = ["H031"]
 osm = ["relation/12589016"]
 reviewed = ""
 to_check = [
-  "Location: the station's own point (the Elenz team gives it; confirm it on the LINZ aerial), then district and region from Stats NZ's boundaries.",
   "Commissioned: Contact and MBIE give 1960; Westpower's AMP gives 1991 (the 1990s redevelopment). Keep 1960 and say when it was redeveloped, once a year for the redevelopment is found.",
   "Wikidata item.",
   "For the history round: built as Okarito Forks; owners before Trustpower.",
@@ -17,6 +16,14 @@ notes = [
   "Capacity: Contact 3 MW; Manawa's old page, MBIE's 2020 list, Wikipedia's list and Westpower's AMP 3.1 (3,100 kW).",
   "Westpower: Wahapo, with Amethyst and Fox, can run apart from the grid during outages to supply South Westland.",
 ]
+
+[location]
+value = [-43.247666107269005, 170.23428420323168]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-27"
+note = "given by the Elenz team, confirmed on the LINZ aerial 27 Nov 2026"
 
 [grid_connection]
 value = [-42.72479, 170.98295]
@@ -44,6 +51,18 @@ value = "Lake Wahapo"
 source = "contact-wahapo"
 grade = "A"
 checked = "2026-11-26"
+
+[facts.region]
+value = "West Coast"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-27"
+
+[facts.territorial_authority]
+value = "Westland"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-27"
 
 [facts.owner]
 value = "Contact Energy"
