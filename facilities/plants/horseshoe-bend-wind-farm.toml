@@ -6,7 +6,6 @@ register = ["W018"]
 osm = ["relation/12568578"]
 reviewed = ""
 to_check = [
-  "Location: the whole-site point was read from the LINZ aerial among the three turbines; for the Elenz team to confirm.",
   "Elenz data: Aurora lists it at Clyde GXP beside the Teviot stations, whose Elenz plant (Teviot, CYD0331) never dispatched. Is its output in Elenz's other embedded generation at CYD0331?",
   "First output: an embedded meter's first output, if one is metered.",
   "Wikidata item, if any.",
@@ -26,7 +25,7 @@ basis = "whole site"
 source = "linz-aerial"
 grade = "B"
 checked = "2026-11-28"
-note = "read from the LINZ aerial, 28 Nov 2026: among the three turbines; for the Elenz team to confirm"
+note = "read from the LINZ aerial, 28 Nov 2026, and confirmed by the Elenz team: among the three turbines"
 
 [grid_connection]
 value = [-45.18039, 169.30622]
