@@ -1,0 +1,91 @@
+# Plant page facts for Flat Hill. How to check a plant: facilities/PLANTS.md.
+
+slug = "flat-hill"
+name = "Flat Hill"
+register = ["E012"]
+osm = ["relation/12556046"]
+reviewed = ""
+to_check = [
+  "Location: the whole-site point was read from the LINZ aerial among the eight turbines; for the Elenz team to confirm.",
+  "Units' size: Pioneer gives eight turbines and Wikipedia 6.8 MW, so 850 kW each; a source naming the turbine model and rating.",
+  "First output: an embedded meter's first output, if one is metered (opened 31 August 2015).",
+  "Wikidata item, if any.",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch E (28 Nov 2026): lead E012 (Flat Hill, 6 MW, Pioneer). Not in the EA register or metered_plants.csv under any code; other embedded at INV0331 (embedded_points.csv, which guessed it from an ODT article: EIL's AMP now confirms it).",
+  "Connection: Pioneer says it connects to The Power Company's Bluff substation by 1.5 km of 11 kV cable; EIL's AMP says the same and that Bluff substation is fed from Invercargill GXP through TPCL's Colyer Road substation. Bluff (BLF0111) is an embedded network supply point under INV0331 in the EA's table.",
+  "Owners: built by Pioneer for the Southern Generation partnership (EIL's AMP still says Southern Generation's); Pioneer took the whole partnership in May 2024 (scoop-pioneer-sglp-2024).",
+  "Capacity: EIL's AMP and Wikipedia 6.8 MW; NZWEA 7 (rounded); the lead's 6 came from our old register.",
+  "Point read from the LINZ aerial (Invercargill 0.1m Urban Aerial Photos (2022)), 28 Nov 2026: eight turbines on Flat Hill, about 3 km west of Bluff.",
+  "District and region from the point in Stats NZ's boundaries, 28 Nov 2026: Invercargill City, Southland Region; the sea (area outside territorial authority) is within 2 km.",
+]
+
+[location]
+value = [-46.5806, 168.2843]
+basis = "whole site"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-28"
+note = "read from the LINZ aerial, 28 Nov 2026: among the eight turbines; for the Elenz team to confirm"
+
+[grid_connection]
+value = [-46.39259, 168.39312]
+code = "INV0331 INVERCARGILL"
+source = ["ea-nsp", "eil-amp-2026", "pioneer-flat-hill"]
+grade = "A"
+checked = "2026-11-28"
+note = "embedded at The Power Company's Bluff substation, which EIL's 2026 AMP (section 3.1, p. 42; Bluff zone substation, p. 45) says is supplied from Invercargill GXP; code and point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.commissioned]
+value = "2015"
+source = ["pioneer-flat-hill", "wp-flat-hill"]
+grade = "A"
+checked = "2026-11-28"
+note = "officially opened 31 August 2015 (Pioneer); Wikipedia: commissioned August 2015"
+
+[facts.units]
+value = "Eight turbines"
+source = ["pioneer-flat-hill", "wp-flat-hill"]
+grade = "A"
+checked = "2026-11-28"
+note = "71 m high with 26 m blades (Pioneer)"
+
+[facts.region]
+value = "Southland"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-28"
+
+[facts.territorial_authority]
+value = "Invercargill"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-28"
+
+[facts.owner]
+value = "Pioneer Energy Renewables"
+source = ["pioneer-flat-hill", "scoop-pioneer-sglp-2024"]
+grade = "A"
+checked = "2026-11-28"
+note = "Pioneer Energy's renewables company (formerly Southern Generation)"
+
+[facts.previous_owners]
+value = "Southern Generation Limited Partnership (2015–2024)"
+source = ["eil-amp-2026", "scoop-pioneer-sglp-2024"]
+grade = "A"
+checked = "2026-11-28"
+note = "Pioneer took full ownership of the partnership in May 2024"
+
+[facts.about]
+value = "Flat Hill wind farm stands on a 460 ha farm site on the Bluff Peninsula, about 3 km from Bluff. Its eight turbines were shipped in through the Port of Bluff in 2015, and the farm was opened on 31 August that year. It feeds The Power Company's Bluff substation, so its output is used locally, and makes about 25 GWh a year."
+source = ["pioneer-flat-hill", "eil-amp-2026"]
+grade = "A"
+checked = "2026-11-28"
+
+[[ratings]]
+value = 6.8
+basis = "EIL's 2026 AMP: installed capacity"
+source = ["eil-amp-2026", "wp-flat-hill"]
+grade = "A"
+checked = "2026-11-28"
