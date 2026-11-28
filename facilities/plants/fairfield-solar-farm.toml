@@ -1,0 +1,37 @@
+# Plant page facts for Fairfield Solar Farm. How to check a plant: facilities/PLANTS.md.
+
+slug = "fairfield-solar-farm"
+name = "Fairfield Solar Farm"
+register = ["E018"]
+reviewed = ""
+to_check = [
+  "Location: the farm's point, for the Elenz team (not found in OpenStreetMap; near Fairton, on Fairfield Road?); then test district and region against Stats NZ.",
+  "Owner: EA Networks calls it \"Talleys Fairfield solar farm\" and Talley's sought consent for a 5 MW farm on two sites near Fairton (Boffa Miskell); the lead names Natures Flame Limited. Which, and an owner's source.",
+  "Commissioned date: an owner's date or first output.",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch F (28 Nov 2026): lead E018 (Natures Flame Fairfield, 4.2 MW, Natures Flame Limited). Not in the EA register or metered_plants.csv under any code; a solar farm on a local network, not dispatched, so in the embedded solar estimate.",
+  "EA Networks' 2026 AMP (pp. 17, 110): the 4.4 MW Talleys Fairfield solar farm (TFSF), about 7,000 MWh a year; connected since 2023. Talley's Fairfield site (the former Silver Fern Farms Fairton plant) is an EA Networks customer.",
+]
+
+[grid_connection]
+value = [-43.94164, 171.80215]
+code = "ASB0661 ASHBURTON"
+source = ["ea-nsp", "eanetworks-amp-2026"]
+grade = "A"
+checked = "2026-11-28"
+note = "embedded in EA Networks' network (2026 AMP, p. 110); EA Networks' 66 kV GXP supplies all its consumers; code and point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.other_names]
+value = "Talleys Fairfield solar farm"
+source = "eanetworks-amp-2026"
+grade = "A"
+checked = "2026-11-28"
+
+[[ratings]]
+value = 4.4
+basis = "EA Networks' 2026 AMP"
+source = "eanetworks-amp-2026"
+grade = "A"
+checked = "2026-11-28"

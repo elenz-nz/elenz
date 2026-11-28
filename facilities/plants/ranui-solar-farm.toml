@@ -1,0 +1,59 @@
+# Plant page facts for Rānui Solar Farm. How to check a plant: facilities/PLANTS.md.
+
+slug = "ranui-solar-farm"
+name = "Rānui Solar Farm"
+register = ["E024"]
+osm = ["way/1411690030"]
+reviewed = ""
+to_check = [
+  "Location: the farm's point, for the Elenz team (the LINZ aerial predates the farm here); then test district and region against Stats NZ and check them.",
+  "Owner: Ra Nui Solar Ltd (Flight Group; Marlborough Lines' AMP: \"Ranui Solar\"); an owner's source for the name and ownership.",
+  "Capacity basis: 9.9 MWac (Marlborough Lines) against 12.6 MW (news; the DC size?).",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch F (28 Nov 2026): lead E024 (Ranui Solar, 9.9 MW, owner given as Marlborough Lines, wrongly). Not in the EA register or metered_plants.csv under any code; a solar farm on a local network, not dispatched, so in the embedded solar estimate.",
+  "Marlborough Lines' 2026 AMP (p. 21): Ranui Solar owns a 9.9 MWac solar plant near Riverlands, Blenheim.",
+  "Marlborough App (April 2026): first power through Marlborough Lines' network on 9 March 2026, in final testing but fully operational; 10 ha of a 16 ha former vineyard in Riverlands beside SH1; owner Rick Osborne. Earlier reports gave 12.6 MW. Not the same as Rānui Generation (Twin Rivers, Northland).",
+]
+
+[grid_connection]
+value = [-41.49842, 173.93253]
+code = "BLN0331 BLENHEIM"
+source = ["ea-nsp", "mll-amp-2026", "mll-amp-2023"]
+grade = "A"
+checked = "2026-11-28"
+note = "embedded in Marlborough Lines' network (2026 AMP, p. 21); Blenheim is its only GXP (2023 AMP, p. 37); code and point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.commissioned]
+value = "2026"
+source = "marlboroughapp-ranui-2026"
+grade = "B"
+checked = "2026-11-28"
+note = "first power 9 March 2026"
+
+[facts.region]
+value = "Marlborough"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = ""
+
+[facts.territorial_authority]
+value = "Marlborough"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = ""
+
+[facts.owner]
+value = "Ranui Solar"
+source = "mll-amp-2026"
+grade = "A"
+checked = "2026-11-28"
+note = "Ra Nui Solar Ltd, part of the Flight Group (its website)"
+
+[[ratings]]
+value = 9.9
+basis = "Marlborough Lines' 2026 AMP: 9.9 MWac"
+source = "mll-amp-2026"
+grade = "A"
+checked = "2026-11-28"

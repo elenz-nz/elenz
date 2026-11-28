@@ -1,0 +1,79 @@
+# Plant page facts for Waingawa Solar Farm. How to check a plant: facilities/PLANTS.md.
+
+slug = "waingawa-solar-farm"
+name = "Waingawa Solar Farm"
+register = ["E002", "S031"]
+osm = ["way/1411690253"]
+reviewed = ""
+to_check = [
+  "Grid exit point: Masterton GXP is inferred (Powerco's AMP: Masterton supplies the Norfolk zone substation; the farm connects to a transformer on Norfolk Road and its output is used in the Masterton network). A document placing it.",
+  "Rating basis: 4.7 MWp (pv magazine); the lead's 4 MW and Lightyears' earlier 4.5 MW.",
+  "Elenz data: is it in the embedded solar estimate at MST0331?",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch F (28 Nov 2026): lead E002 (Norfolk Rd Solar Farm, 4 MW, Lightyears Solar Limited). Not in the EA register or metered_plants.csv under any code; a solar farm on a local network, not dispatched, so in the embedded solar estimate.",
+  "Lightyears' Waingawa Solar Farm at 331 Norfolk Road, Waingawa (Carterton District Council consent 230034); about 6 ha of a 12 ha lifestyle block, 7,700 panels; turned on in April 2025 (Scoop; pv magazine, 4.7 MWp). Not in Powerco's list of generators over 1 MW (Table 12.82).",
+  "Point read from the LINZ aerial (Wellington 0.2m Rural Aerial Photos (2025-2026)), 28 Nov 2026: the middle of the main array.",
+  "District and region from the point in Stats NZ's boundaries, 28 Nov 2026: Carterton District, Wellington Region; Masterton District lies within about 2 km (east of the Waingawa River).",
+]
+
+[location]
+value = [-40.9499, 175.5726]
+basis = "whole site"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-28"
+note = "read from the LINZ aerial, 28 Nov 2026: the middle of the main array; for the Elenz team to confirm"
+
+[grid_connection]
+value = [-40.97727, 175.6115]
+code = "MST0331 MASTERTON"
+source = ["ea-nsp", "powerco-amp-2026"]
+grade = "B"
+checked = "2026-11-28"
+note = "inferred: Powerco's 2026 AMP (§12.14, PDF p. 295) has Masterton GXP supplying the Norfolk zone substation beside the farm; code and point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.other_names]
+value = "Norfolk Road Solar Farm"
+source = "times-age-norfolk-solar"
+grade = "B"
+checked = "2026-11-28"
+
+[facts.commissioned]
+value = "2025"
+source = ["scoop-waingawa-2025", "pvmag-waingawa-2025"]
+grade = "B"
+checked = "2026-11-28"
+note = "turned on in April 2025"
+
+[facts.units]
+value = "7,700 panels"
+source = "pvmag-waingawa-2025"
+grade = "B"
+checked = "2026-11-28"
+
+[facts.region]
+value = "Wellington"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-28"
+
+[facts.territorial_authority]
+value = "Carterton"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-28"
+
+[facts.owner]
+value = "Lightyears Solar"
+source = ["scoop-waingawa-2025", "pvmag-waingawa-2025"]
+grade = "B"
+checked = "2026-11-28"
+
+[[ratings]]
+value = 4.7
+basis = "pv magazine: 4.7 MWp"
+source = "pvmag-waingawa-2025"
+grade = "B"
+checked = "2026-11-28"
