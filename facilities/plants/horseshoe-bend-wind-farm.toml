@@ -1,0 +1,95 @@
+# Plant page facts for Horseshoe Bend Wind Farm. How to check a plant: facilities/PLANTS.md.
+
+slug = "horseshoe-bend-wind-farm"
+name = "Horseshoe Bend Wind Farm"
+register = ["W018"]
+osm = ["relation/12568578"]
+reviewed = ""
+to_check = [
+  "Location: the whole-site point was read from the LINZ aerial among the three turbines; for the Elenz team to confirm.",
+  "Elenz data: Aurora lists it at Clyde GXP beside the Teviot stations, whose Elenz plant (Teviot, CYD0331) never dispatched. Is its output in Elenz's other embedded generation at CYD0331?",
+  "First output: an embedded meter's first output, if one is metered.",
+  "Wikidata item, if any.",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch E (28 Nov 2026): lead W018 (Horseshoe Bend, 2 MW, Pioneer Energy). Not in the EA register or metered_plants.csv under any code. Not a station of Teviot: Pioneer and Aurora list it separately from the Teviot hydro stations (Horseshoe Bend hydro, 4.3 MW, is one of those).",
+  "Capacity: Pioneer three turbines of 0.75 MW (2.25 MW); Aurora's AMP and NZWEA 2 (rounded).",
+  "Pioneer: Pioneer's first wind farm; about 15 km east of Roxburgh, between the Horseshoe Bend power station and dam, on a plateau south of the Teviot River at about 600 m, on Pioneer's own land.",
+  "Point read from the LINZ aerial (Otago 0.2m Rural Aerial Photos (2025)), 28 Nov 2026: three turbines on the plateau.",
+  "District and region from the point in Stats NZ's boundaries, 28 Nov 2026: Central Otago District, Otago Region; no other district within 2 km.",
+]
+
+[location]
+value = [-45.5437, 169.5050]
+basis = "whole site"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-28"
+note = "read from the LINZ aerial, 28 Nov 2026: among the three turbines; for the Elenz team to confirm"
+
+[grid_connection]
+value = [-45.18039, 169.30622]
+code = "CYD0331 CLYDE"
+source = ["ea-nsp", "aurora-amp-2025"]
+grade = "A"
+checked = "2026-11-28"
+note = "embedded in Aurora's network: Aurora's 2025 AMP, Table 3-6 (p. 31), lists Horseshoe Bend Wind, 2 MW, at Clyde; code and point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.commissioned]
+value = "2009"
+source = "pioneer-horseshoe-bend-wind"
+grade = "A"
+checked = "2026-11-28"
+
+[facts.units]
+value = "Three turbines of 0.75 MW"
+source = "pioneer-horseshoe-bend-wind"
+grade = "A"
+checked = "2026-11-28"
+note = "45 m hubs, 44 m rotors"
+
+[facts.scheme]
+value = "Teviot"
+source = "pioneer-horseshoe-bend-wind"
+grade = "A"
+checked = "2026-11-28"
+note = "Pioneer: embedded within the Teviot scheme, beside its Horseshoe Bend hydro station and dam"
+
+[facts.region]
+value = "Otago"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-28"
+
+[facts.territorial_authority]
+value = "Central Otago"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-28"
+
+[facts.owner]
+value = "Pioneer Energy Renewables"
+source = ["pioneer-horseshoe-bend-wind", "aurora-amp-2025"]
+grade = "A"
+checked = "2026-11-28"
+
+[facts.about]
+value = "Horseshoe Bend wind farm was Pioneer's first wind farm, built in 2009 within its Teviot hydro scheme, about 15 km east of Roxburgh. Its three 0.75 MW turbines stand on a plateau about 600 m up, south of the Teviot River between the Horseshoe Bend power station and dam, on Pioneer's own land. It feeds Aurora's network and makes about 1.9 GWh a year."
+source = ["pioneer-horseshoe-bend-wind", "aurora-amp-2025"]
+grade = "A"
+checked = "2026-11-28"
+
+[[ratings]]
+value = 2.25
+basis = "Pioneer: three turbines of 0.75 MW"
+source = "pioneer-horseshoe-bend-wind"
+grade = "A"
+checked = "2026-11-28"
+
+[[ratings]]
+value = 2
+basis = "Aurora's 2025 AMP (rounded to the MW)"
+source = "aurora-amp-2025"
+grade = "A"
+checked = "2026-11-28"

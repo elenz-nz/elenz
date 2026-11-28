@@ -1,0 +1,98 @@
+# Plant page facts for Hau Nui. How to check a plant: facilities/PLANTS.md.
+
+slug = "hau-nui"
+name = "Hau Nui"
+register = ["W013"]
+wikidata = "Q5682287"
+osm = ["relation/3666844"]
+reviewed = ""
+to_check = [
+  "Location: the whole-site point was read from the LINZ aerial between the two stages' turbine rows; for the Elenz team to confirm.",
+  "Owner before 1999: NZ History and the Sunday Star-Times say Genesis built it in 1996, before Genesis Energy existed (it was formed in the 1999 reforms). Who built and owned stage 1 (an ECNZ or Wairarapa power board project?) needs a source.",
+  "Any date Meridian sets to decommission or repower it (could ask with the photo permission emails).",
+  "Elenz data: Powerco puts both stages at Greytown GXP, where they are in Elenz's other embedded generation. Is there a distinct embedded meter or reconciliation series for them?",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch E (28 Nov 2026): lead W013 (Hau Nui, 9 MW, Meridian Energy). Not in the EA register or metered_plants.csv under any code; other embedded at GYT0331.",
+  "Owners: Genesis to 25 Oct 2024, when NZ Windfarms bought it (NZX); Meridian bought NZ Windfarms in July 2025 (meridian-nzwf-2025).",
+  "The Post (2 Oct 2026): nearing the end of its working life; NZ Windfarms' Oct 2024 documents said five turbines were not running and two ran at reduced capacity. That fits the low output (~0.1 GWh injected in Sep 2026). How many turbines still run is not pursued (design decision 21 Nov 2026).",
+  "Capacity: NZX and NZWEA 8.65 MW (stage 1 seven Enercon E-40 of 550 kW, 3.85 MW, 11 kV; stage 2 eight of 600 kW, 4.8 MW, 33 kV). Powerco's Table 12.82 lists 3.85 MW at 11 kV and 5 MW at 33 kV; the lead's 9 MW was rounded.",
+  "Point read from the LINZ aerial (Wellington 0.2m Rural Aerial Photos (2025-2026)), 28 Nov 2026: 15 turbines in two rows along Range Road, stage 1 north, stage 2 about 1 km south. Wikidata's point (-41.3617, 175.484) is at the stage 1 row's north end.",
+  "District and region from the point in Stats NZ's boundaries, 28 Nov 2026: South Wairarapa District, Wellington Region; no other district within 2 km.",
+]
+
+[location]
+value = [-41.3718, 175.4763]
+basis = "whole site"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-28"
+note = "read from the LINZ aerial, 28 Nov 2026: midway between the two stages' turbines; for the Elenz team to confirm"
+
+[grid_connection]
+value = [-41.11824, 175.43728]
+code = "GYT0331 GREYTOWN"
+source = ["ea-nsp", "powerco-amp-2026"]
+grade = "A"
+checked = "2026-11-28"
+note = "embedded in Powerco's network: Powerco's 2026 AMP, Table 12.82 (PDF pp. 308–309), lists Hau Nui Wind Farm at Greytown GXP, 3.85 MW at 11 kV and 5 MW at 33 kV; code and point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.commissioned]
+value = "1996"
+source = ["nzx-nwf-hau-nui-2024", "nzhistory-hau-nui"]
+grade = "A"
+checked = "2026-11-28"
+note = "stage 1 (seven turbines) began generating on 6 June 1996 (NZ History); stage 2 (eight turbines) added in 2004"
+
+[facts.units]
+value = "15 Enercon E-40 turbines: seven of 550 kW (stage 1, 1996) and eight of 600 kW (stage 2, 2004)"
+source = ["nzx-nwf-hau-nui-2024", "windenergy-hau-nui"]
+grade = "A"
+checked = "2026-11-28"
+
+[facts.region]
+value = "Wellington"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-28"
+
+[facts.territorial_authority]
+value = "South Wairarapa"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-28"
+
+[facts.owner]
+value = "Meridian Energy"
+source = ["meridian-nzwf-2025", "nzx-nwf-hau-nui-2024"]
+grade = "A"
+checked = "2026-11-28"
+note = "through NZ Windfarms, which bought Hau Nui in October 2024 and which Meridian bought in July 2025"
+
+[facts.previous_owners]
+value = "Genesis Energy (to 2024); NZ Windfarms (2024–2025)"
+source = ["nzx-nwf-hau-nui-2024", "meridian-nzwf-2025"]
+grade = "A"
+checked = "2026-11-28"
+note = "NZ Windfarms bought it from Genesis on 25 October 2024; Meridian completed its purchase of NZ Windfarms in July 2025"
+
+[facts.about]
+value = "Hau Nui, about 21 km south-east of Martinborough, was New Zealand's first wind farm: its first seven turbines began generating in June 1996, and eight more were added in 2004, for 15 in all and 8.65 MW. It feeds Powerco's local network rather than the national grid. Genesis sold it to NZ Windfarms in 2024, which Meridian bought in 2025."
+source = ["nzx-nwf-hau-nui-2024", "nzhistory-hau-nui", "powerco-amp-2026", "meridian-nzwf-2025"]
+grade = "A"
+checked = "2026-11-28"
+
+[[ratings]]
+value = 8.65
+basis = "NZ Windfarms (NZX, 25 October 2024): 15 turbines"
+source = ["nzx-nwf-hau-nui-2024", "windenergy-hau-nui"]
+grade = "A"
+checked = "2026-11-28"
+
+[[ratings]]
+value = 8.85
+basis = "Powerco's 2026 AMP: 3.85 MW at 11 kV and 5 MW at 33 kV, rounded"
+source = "powerco-amp-2026"
+grade = "A"
+checked = "2026-11-28"

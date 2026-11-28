@@ -1,0 +1,93 @@
+# Plant page facts for Mount Stuart. How to check a plant: facilities/PLANTS.md.
+
+slug = "mount-stuart"
+name = "Mount Stuart"
+register = ["W021"]
+osm = ["relation/12545873"]
+reviewed = ""
+to_check = [
+  "Location: the whole-site point was read from the LINZ aerial on the middle of the turbine row; for the Elenz team to confirm.",
+  "First output: Wikipedia gives December 2011; an embedded meter's first output, if one is metered.",
+  "Previous owners: built by Pioneer Generation (2011); check whether it ever sat in the Southern Generation partnership.",
+  "Wikidata item, if any.",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch E (28 Nov 2026): lead W021 (Mount Stuart, 8 MW, Pioneer Energy). Not in the EA register or metered_plants.csv under any code; other embedded at BAL0331 (embedded_points.csv, which guessed it from Wikipedia: OtagoNet's AMP now confirms it).",
+  "Capacity: Pioneer 7.65 MW (nine Gamesa 850 kW turbines); OtagoNet's AMP 8.0 MW and an 8 MVA connection (maximum demand 8.1 MW, Nov 2024); NZWEA 8 (rounded). NZWEA lists it under Southland, wrongly: it is in Otago.",
+  "OtagoNet: connected to its 33 kV Glenore–Lawrence line, on the Balclutha GXP's subtransmission; Pioneer owns the connection equipment. Pioneer: about 2 km of 33 kV cable to the lines network, transformers outside the towers, no substation.",
+  "Point read from the LINZ aerial (Otago 0.2m Rural Aerial Photos (2025)), 28 Nov 2026: nine turbines in a north–south row beside the Manuka Gorge highway.",
+  "District and region from the point in Stats NZ's boundaries, 28 Nov 2026: Clutha District, Otago Region; no other district within 2 km.",
+]
+
+[location]
+value = [-46.0535, 169.7757]
+basis = "whole site"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-28"
+note = "read from the LINZ aerial, 28 Nov 2026: the middle of the turbine row; for the Elenz team to confirm"
+
+[grid_connection]
+value = [-46.2277, 169.77088]
+code = "BAL0331 BALCLUTHA"
+source = ["ea-nsp", "otagonet-amp-2026"]
+grade = "A"
+checked = "2026-11-28"
+note = "embedded in OtagoNet's network on the 33 kV Glenore–Lawrence line, which the AMP's network diagram (section 3.1, p. 42–44) shows on the Balclutha GXP's subtransmission; code and point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.commissioned]
+value = "2011"
+source = "pioneer-mount-stuart"
+grade = "A"
+checked = "2026-11-28"
+
+[[facts.commissioned.alt]]
+value = "2011-12"
+source = "wp-wind-power-nz"
+grade = "B"
+
+[facts.units]
+value = "Nine Gamesa turbines of 850 kW"
+source = "pioneer-mount-stuart"
+grade = "A"
+checked = "2026-11-28"
+note = "45 m towers, 52 m rotors"
+
+[facts.region]
+value = "Otago"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-28"
+
+[facts.territorial_authority]
+value = "Clutha"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = "2026-11-28"
+
+[facts.owner]
+value = "Pioneer Energy Renewables"
+source = ["pioneer-mount-stuart", "otagonet-amp-2026"]
+grade = "A"
+checked = "2026-11-28"
+
+[facts.about]
+value = "Mount Stuart wind farm stands on private farmland midway through the Manuka Gorge, near Lawrence in South Otago. Its nine 850 kW turbines, 7.65 MW in all, began generating in 2011, the first Gamesa machines in New Zealand. It feeds OtagoNet's 33 kV network rather than the national grid, and makes about 21 GWh a year."
+source = ["pioneer-mount-stuart", "otagonet-amp-2026"]
+grade = "A"
+checked = "2026-11-28"
+
+[[ratings]]
+value = 7.65
+basis = "Pioneer: nine 850 kW turbines"
+source = "pioneer-mount-stuart"
+grade = "A"
+checked = "2026-11-28"
+
+[[ratings]]
+value = 8
+basis = "OtagoNet's 2026 AMP: 8.0 MW, connection rated 8 MVA"
+source = "otagonet-amp-2026"
+grade = "A"
+checked = "2026-11-28"
