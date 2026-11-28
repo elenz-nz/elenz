@@ -1,0 +1,72 @@
+# Plant page facts for Te Matakupenga Solar Farm. How to check a plant: facilities/PLANTS.md.
+
+slug = "te-matakupenga-solar-farm"
+name = "Te Matakupenga Solar Farm"
+register = ["E004"]
+osm = ["way/1456389389"]
+reviewed = ""
+to_check = [
+  "Location: the farm's point, for the Elenz team (the LINZ aerial predates the farm here); then test district and region against Stats NZ and check them.",
+  "First output and commissioning date (due November 2025; NPDC's supply started 1 November 2025).",
+  "Elenz data: half the output feeds the airport's private network; is the rest in the embedded solar estimate at HUI0331?",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch F (28 Nov 2026): lead E004 (New Plymouth Airport, 8 MW, New Energy Ltd). Not in the EA register or metered_plants.csv under any code; a solar farm on a local network, not dispatched, so in the embedded solar estimate.",
+  "Owner: Papa Rererangi i Puketapu Ltd (PRIP), the New Plymouth District Council company that runs the airport; New Energy and Infratec built it; NewPower Energy operates and maintains it. Name gifted by Puketapu hapū.",
+  "LGFA: 10.02 MW on Airport Drive; half sells into the airport's private network, half into the market (NPDC buys it for three years). 14,400 panels over 15 ha (NPDC). Powerco's Table 12.82: 8 MW at Huirangi, 11 kV.",
+]
+
+[grid_connection]
+value = [-39.04342, 174.23703]
+code = "HUI0331 HUIRANGI"
+source = ["ea-nsp", "powerco-amp-2026"]
+grade = "A"
+checked = "2026-11-28"
+note = "embedded in Powerco's network: its 2026 AMP, Table 12.82 (PDF p. 308), lists PRIP Te Matakupenga, 8 MW at 11 kV, at Huirangi GXP; code and point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.other_names]
+value = "New Plymouth Airport Solar Farm"
+source = "npdc-airport-solar-2025"
+grade = "A"
+checked = "2026-11-28"
+
+[facts.commissioned]
+value = "2025"
+source = "lgfa-prip-solar"
+grade = "A"
+checked = ""
+note = "completion due November 2025; to confirm"
+
+[facts.region]
+value = "Taranaki"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = ""
+
+[facts.territorial_authority]
+value = "New Plymouth"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = ""
+
+[facts.owner]
+value = "Papa Rererangi i Puketapu"
+source = "lgfa-prip-solar"
+grade = "A"
+checked = "2026-11-28"
+note = "the New Plymouth District Council company that runs New Plymouth Airport"
+
+[[ratings]]
+value = 10.02
+basis = "LGFA: 10.02 MW"
+source = "lgfa-prip-solar"
+grade = "A"
+checked = "2026-11-28"
+
+[[ratings]]
+value = 8
+basis = "Powerco's 2026 AMP, Table 12.82"
+source = "powerco-amp-2026"
+grade = "A"
+checked = "2026-11-28"

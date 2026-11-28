@@ -1,0 +1,70 @@
+# Plant page facts for Ward Solar Farm. How to check a plant: facilities/PLANTS.md.
+
+slug = "ward-solar-farm"
+name = "Ward Solar Farm"
+register = ["S012", "E023"]
+reviewed = ""
+to_check = [
+  "Location: the two sites' points, for the Elenz team (not found in OpenStreetMap); then test district and region against Stats NZ.",
+  "Elenz data: is it in the embedded solar estimate at BLN0331?",
+  "For the Elenz team: how a page without Elenz data looks, before this station is published.",
+]
+notes = [
+  "Station leads round, batch F (28 Nov 2026): lead S012 (Ward, 9 MW, Marlborough Lines; merged with E023, Ward Solar, 9.2 MW). Not in the EA register or metered_plants.csv under any code; a solar farm on a local network, not dispatched, so in the embedded solar estimate.",
+  "Energy Marlborough (a Marlborough Lines subsidiary): 9 MW on two sites beside Ward township; the first site generating from August 2025, the second from December 2025. Marlborough Lines' 2026 AMP (p. 21): an 8.91 MWac plant next to Ward substation.",
+  "Energy Marlborough's other solar farms: Taylor Pass (853 kW, MLL depot, April 2023), Seaview near Seddon (3.96 MWac, October 2024), Wairau (6 MW, east of Wairau Valley township, August 2026; not yet a lead). Seaview and Wairau could be leads for the sweep.",
+]
+
+[grid_connection]
+value = [-41.49842, 173.93253]
+code = "BLN0331 BLENHEIM"
+source = ["ea-nsp", "mll-amp-2026", "mll-amp-2023"]
+grade = "A"
+checked = "2026-11-28"
+note = "embedded at Marlborough Lines' Ward zone substation (2026 AMP, p. 21); Blenheim is its only GXP (2023 AMP, p. 37); code and point from the EA's network supply points table of 24 Nov 2026"
+
+[facts.commissioned]
+value = "2025"
+source = "mll-energy-marlborough"
+grade = "A"
+checked = "2026-11-28"
+note = "first site August 2025, second December 2025"
+
+[facts.units]
+value = "Two sites beside Ward"
+source = "mll-energy-marlborough"
+grade = "A"
+checked = "2026-11-28"
+
+[facts.region]
+value = "Marlborough"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = ""
+
+[facts.territorial_authority]
+value = "Marlborough"
+source = "statsnz-ta-2026"
+grade = "A"
+checked = ""
+
+[facts.owner]
+value = "Energy Marlborough"
+source = "mll-energy-marlborough"
+grade = "A"
+checked = "2026-11-28"
+note = "a subsidiary of Marlborough Lines"
+
+[[ratings]]
+value = 8.91
+basis = "Marlborough Lines' 2026 AMP: 8.91 MWac"
+source = "mll-amp-2026"
+grade = "A"
+checked = "2026-11-28"
+
+[[ratings]]
+value = 9
+basis = "Energy Marlborough: 9 MW"
+source = "mll-energy-marlborough"
+grade = "A"
+checked = "2026-11-28"
