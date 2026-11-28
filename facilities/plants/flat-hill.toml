@@ -6,7 +6,6 @@ register = ["E012"]
 osm = ["relation/12556046"]
 reviewed = ""
 to_check = [
-  "Location: the whole-site point was read from the LINZ aerial among the eight turbines; for the Elenz team to confirm.",
   "Units' size: Pioneer gives eight turbines and Wikipedia 6.8 MW, so 850 kW each; a source naming the turbine model and rating.",
   "First output: an embedded meter's first output, if one is metered (opened 31 August 2015).",
   "Wikidata item, if any.",
@@ -27,7 +26,7 @@ basis = "whole site"
 source = "linz-aerial"
 grade = "B"
 checked = "2026-11-28"
-note = "read from the LINZ aerial, 28 Nov 2026: among the eight turbines; for the Elenz team to confirm"
+note = "read from the LINZ aerial, 28 Nov 2026, and confirmed by the Elenz team: among the eight turbines"
 
 [grid_connection]
 value = [-46.39259, 168.39312]
