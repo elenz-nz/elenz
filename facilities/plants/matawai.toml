@@ -5,7 +5,6 @@ name = "Matawai"
 register = ["L003"]
 reviewed = ""
 to_check = [
-  "Point: the station is in a gorge on the Waikohu River, on private farmland about 12 km south-east of Mātāwai township (Pioneer; EECA's report); not found on the LINZ aerial yet. The Elenz team to give the powerhouse's point; then district and region from Stats NZ (Gisborne).",
   "Capacity: 2 MW in MBIE's 2020 list and EECA's report; Pioneer gives none. The two generators' sizes?",
   "Elenz data: Firstlight's network has one grid exit point, TUI1101, where Genesis's Waikaremoana stations are metered. Does Matawai's output show in the EA's embedded data there?",
   "Name: Pioneer and MBIE write Matawai, EECA Mātāwai (the township's name). Which for the page?",
@@ -15,8 +14,18 @@ to_check = [
 notes = [
   "Station leads round, batch D (28 Nov 2026): lead L003 (Matawai, 2 MW, Clearwater Hydro / The Lines Company in MBIE's 2020 list, commissioned 2009). Not in the EA register or metered_plants.csv under any code.",
   "Pioneer: 153 m head, 1,800 l/s, 5–5.7 GWh a year, two generators, run unattended; 70 km west of Gisborne; connected to Firstlight's network. EECA: teed into the 11 kV circuit at a pole about 12 km south-east of Mātāwai township (Puha zone substation).",
+  "Point given by the Elenz team and confirmed on the LINZ aerial, 28 Nov 2026 (Gisborne 0.1m Rural Aerial Photos (2024-2025)): a small building at the edge of the Waikohu River gorge.",
+  "District and region from the point in Stats NZ's boundaries, 28 Nov 2026: Gisborne District, Gisborne Region (a unitary authority); no other district within 2 km.",
   "Owners: The Lines Company (its Clearwater Hydro schemes) until 19 July 2021, then Southern Generation Limited Partnership (half Pioneer's), wholly Pioneer's from May 2024, now Pioneer Energy Renewables.",
 ]
+
+[location]
+value = [-38.402803962556455, 177.61043161861033]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-28"
+note = "given by the Elenz team, confirmed on the LINZ aerial 28 Nov 2026"
 
 [grid_connection]
 value = [-38.80535, 177.1514]
@@ -41,6 +50,18 @@ checked = "2026-11-28"
 [facts.river]
 value = "Waikohu River"
 source = "pioneer-matawai"
+grade = "A"
+checked = "2026-11-28"
+
+[facts.region]
+value = "Gisborne"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-28"
+
+[facts.territorial_authority]
+value = "Gisborne"
+source = "statsnz-ta-2026"
 grade = "A"
 checked = "2026-11-28"
 
