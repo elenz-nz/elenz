@@ -5,7 +5,6 @@ name = "Esk"
 register = ["H022", "L006", "L007"]
 reviewed = ""
 to_check = [
-  "Points: the two stations are on private land (Toronui Station) on the Rimu and Toronui tributaries of the Esk River, joined to Unison's Tutira substation by a 4 km 33 kV line; not found on the LINZ aerial yet. The Elenz team to give each powerhouse's point; then district and region from Stats NZ (Wikipedia's list: Hastings).",
   "Grid exit point: Unison's 2026 plan (the Elenz team's copy) lists Esk Hydro under Hawke's Bay with the Esk and Tutira zone substations (Table 6-7). Which GXP supplies Tutira? embedded_points.csv has RDF0331 Redclyffe as \"likely Rimu (Esk)\" (grade B); confirm it from the plan before setting [grid_connection].",
   "Capacity: Contact 4 MW; Rimu 2.4 + Toronui 1.4 = 3.8 (Manawa, 2023; Trustpower, 2012; Unison's plan 3.9 MW peak). Kept Contact's 4.",
   "Commissioned: Contact gives 2013 (construction began 2012). Each station's first output.",
@@ -14,10 +13,20 @@ to_check = [
 ]
 notes = [
   "Station leads round, batch D (28 Nov 2026): leads H022 (Esk, 4 MW, other embedded at RDF0331, grade B), L006 (Toronui, 1.4 MW) and L007 (Rimu, 2.4 MW), from MBIE's 2020 list; one scheme, all three rows dropped. One file with two stations, as Fraser and Hinemaiaia. Not in the EA register or metered_plants.csv under any code.",
+  "Station points given by the Elenz team and confirmed on the LINZ aerial, 28 Nov 2026 (Hawke's Bay 0.2m Rural Aerial Photos (2025-2026)): each a small powerhouse beside its stream, Rimu to the west and Toronui about 700 m east. The plant's point is Rimu's, the larger.",
+  "District and region from both points in Stats NZ's boundaries, 28 Nov 2026: Hastings District, Hawke's Bay Region; no other district within 2 km.",
   "Built by Trustpower ($13 million), run of river with Pelton turbines; output fed into Unison's network at Tutira by a 4 km 33 kV line (Hawke's Bay Today, 2012).",
   "Cyclone Gabrielle (February 2023) washed away Rimu's intake weir, access road and penstock; Toronui came back online in October 2023 and Rimu in June 2024 (Contact; Hawke's Bay Today, 2023).",
   "Owners: Trustpower, then Manawa Energy (renamed); Contact since it bought Manawa (11 July 2025).",
 ]
+
+[location]
+value = [-39.17586956461377, 176.76458128832226]
+basis = "station"
+source = "linz-aerial"
+grade = "B"
+checked = "2026-11-28"
+note = "given by the Elenz team, confirmed on the LINZ aerial 28 Nov 2026; Rimu, the larger station (Toronui has its own point under [[stations]])"
 
 [facts.commissioned]
 value = "2013"
@@ -34,6 +43,18 @@ checked = "2026-11-28"
 [facts.river]
 value = "Esk River (Rimu and Toronui tributaries)"
 source = ["contact-esk", "hbtoday-esk-2012"]
+grade = "A"
+checked = "2026-11-28"
+
+[facts.region]
+value = "Hawke's Bay"
+source = "statsnz-regc-2025"
+grade = "A"
+checked = "2026-11-28"
+
+[facts.territorial_authority]
+value = "Hastings"
+source = "statsnz-ta-2026"
 grade = "A"
 checked = "2026-11-28"
 
@@ -61,6 +82,7 @@ checked = "2026-11-28"
 [[stations]]
 value = "Rimu"
 id = "L007"
+location = [-39.17586956461377, 176.76458128832226]
 mw = 2.4
 source = ["nzherald-esk-2023", "mbie-opportunities-in-new-zealand"]
 grade = "A"
@@ -71,6 +93,7 @@ note = "back online June 2024 after Cyclone Gabrielle"
 [[stations]]
 value = "Toronui"
 id = "L006"
+location = [-39.17518781021375, 176.77270262030947]
 mw = 1.4
 source = ["nzherald-esk-2023", "mbie-opportunities-in-new-zealand"]
 grade = "A"
