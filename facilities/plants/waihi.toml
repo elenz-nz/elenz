@@ -30,10 +30,10 @@ note = "read from the LINZ aerial and confirmed by the Elenz team 28 Nov 2026: t
 [grid_connection]
 value = [-38.80535, 177.1514]
 code = "TUI1101 TUAI"
-source = ["ea-nsp", "eeca-reta-tairawhiti"]
+source = ["ea-nsp", "firstlight-amp-2023", "eeca-reta-tairawhiti"]
 grade = "A"
 checked = "2026-11-28"
-note = "embedded in Firstlight's network, reaching Kiwi zone substation by a 50 kV circuit (EECA's Tairāwhiti report, §4.2.2); TUI1101 is the network's only grid exit point in the EA's network supply points table of 24 Nov 2026, which gives the point"
+note = "embedded in Firstlight's network, reaching Kiwi zone substation by a 50 kV circuit (EECA's Tairāwhiti report, §4.2.2); Firstlight's 2023 AMP lists it (Table 5, p. 36) and says the network is supplied from Tuai GXP alone (p. 36); TUI1101 is the network's only supply point in the EA's network supply points table of 24 Nov 2026, which gives the point"
 
 [facts.commissioned]
 value = "1986"

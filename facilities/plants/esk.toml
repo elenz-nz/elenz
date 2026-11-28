@@ -5,7 +5,6 @@ name = "Esk"
 register = ["H022", "L006", "L007"]
 reviewed = ""
 to_check = [
-  "Grid exit point: Unison's 2026 plan (the Elenz team's copy) lists Esk Hydro under Hawke's Bay with the Esk and Tutira zone substations (Table 6-7). Which GXP supplies Tutira? embedded_points.csv has RDF0331 Redclyffe as \"likely Rimu (Esk)\" (grade B); confirm it from the plan before setting [grid_connection].",
   "Capacity: Contact 4 MW; Rimu 2.4 + Toronui 1.4 = 3.8 (Manawa, 2023; Trustpower, 2012; Unison's plan 3.9 MW peak). Kept Contact's 4.",
   "Commissioned: Contact gives 2013 (construction began 2012). Each station's first output.",
   "Wikidata items.",
@@ -27,6 +26,14 @@ source = "linz-aerial"
 grade = "B"
 checked = "2026-11-28"
 note = "given by the Elenz team, confirmed on the LINZ aerial 28 Nov 2026; Rimu, the larger station (Toronui has its own point under [[stations]])"
+
+[grid_connection]
+value = [-39.55156, 176.82184]
+code = "RDF0331 REDCLYFFE"
+source = ["ea-nsp", "unison-ramp-2026", "hbtoday-esk-2012"]
+grade = "A"
+checked = "2026-11-28"
+note = "embedded in Unison's network at Tutira (a 4 km 33 kV line); Unison's 2026 plan supplies the Esk and Tutira zone substations from Redclyffe GXP (Table 6-11) and says Esk hydro offsets Redclyffe's winter peaks (Table 6-1); point from the EA's network supply points table of 24 Nov 2026"
 
 [facts.commissioned]
 value = "2013"
